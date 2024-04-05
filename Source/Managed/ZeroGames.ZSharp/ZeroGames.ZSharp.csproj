@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="mkdir -p $(ProjectDir)\..\..\..\Binaries\Managed\" />
+        <Exec Command="copy $(TargetPath) $(ProjectDir)\..\..\..\Binaries\Managed\$(TargetFileName)" />
+    </Target>
+
+</Project>

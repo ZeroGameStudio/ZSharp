@@ -13,53 +13,53 @@ public class Dotnet : ModuleRules
 
 		PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "inc"));
 
-		string PlatformName = Target.Platform.ToString();
-		string DotnetVersion = "8.0.3";
+		string platformName = Target.Platform.ToString();
+		string dotnetVersion = "8.0.3";
 
-		string DotnetRoot = Path.Combine("$(BinaryOutputDir)", "dotnet");
-		string HostDir = Path.Combine(DotnetRoot, "host", "fxr", DotnetVersion);
-		string FrameworkDir = Path.Combine(DotnetRoot, "shared", "Microsoft.NETCore.App", DotnetVersion);
+		string dotnetRoot = Path.Combine("$(BinaryOutputDir)", "dotnet");
+		string hostDir = Path.Combine(dotnetRoot, "host", "fxr", dotnetVersion);
+		string frameworkDir = Path.Combine(dotnetRoot, "shared", "Microsoft.NETCore.App", dotnetVersion);
 
-		string HostfxrSrcPath = Path.Combine(ModuleDirectory, "lib", PlatformName, "host", "hostfxr.dll");
-		string HostfxrDstPath = Path.Combine(HostDir, "hostfxr.dll");
-		RuntimeDependencies.Add(HostfxrDstPath, HostfxrSrcPath);
+		string hostfxrSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "host", "hostfxr.dll");
+		string hostfxrDstPath = Path.Combine(hostDir, "hostfxr.dll");
+		RuntimeDependencies.Add(hostfxrDstPath, hostfxrSrcPath);
 		
-		string RuntimeName = "coreclr";
+		string runtimeName = "coreclr";
 		
-		string RuntimeSrcPath = Path.Combine(ModuleDirectory, "lib", PlatformName, "runtime", RuntimeName, "coreclr.dll");
-		string RuntimeDstPath = Path.Combine(FrameworkDir, "coreclr.dll");
-		RuntimeDependencies.Add(RuntimeDstPath, RuntimeSrcPath);
+		string runtimeSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "runtime", runtimeName, "coreclr.dll");
+		string runtimeDstPath = Path.Combine(frameworkDir, "coreclr.dll");
+		RuntimeDependencies.Add(runtimeDstPath, runtimeSrcPath);
 		
-		string CoreLibSrcPath = Path.Combine(ModuleDirectory, "lib", PlatformName, "runtime", RuntimeName, "System.Private.CoreLib.dll");
-		string CoreLibDstPath = Path.Combine(FrameworkDir, "System.Private.CoreLib.dll");
-		RuntimeDependencies.Add(CoreLibDstPath, CoreLibSrcPath);
+		string coreLibSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "runtime", runtimeName, "System.Private.CoreLib.dll");
+		string coreLibDstPath = Path.Combine(frameworkDir, "System.Private.CoreLib.dll");
+		RuntimeDependencies.Add(coreLibDstPath, coreLibSrcPath);
 
-		string FrameworkSrcDir = Path.Combine(ModuleDirectory, "framework");
-		IEnumerable<string> FrameworkFiles = GetFiles(FrameworkSrcDir);
-		foreach (var File in FrameworkFiles)
+		string frameworkSrcDir = Path.Combine(ModuleDirectory, "framework");
+		IEnumerable<string> frameworkFiles = GetFiles(frameworkSrcDir);
+		foreach (var file in frameworkFiles)
 		{
-			string RelativePath = File.Substring(FrameworkSrcDir.Length + 1, File.Length - FrameworkSrcDir.Length - 1);
+			string relativePath = file.Substring(frameworkSrcDir.Length + 1, file.Length - frameworkSrcDir.Length - 1);
 
-			RuntimeDependencies.Add(Path.Combine(FrameworkDir, RelativePath), File);
+			RuntimeDependencies.Add(Path.Combine(frameworkDir, relativePath), file);
 		}
 	}
 
-	private static IEnumerable<string> GetFiles(string InDirectory, string InPattern = "*.*")
+	private static IEnumerable<string> GetFiles(string directory, string pattern = "*.*")
 	{
-		var Files = new List<string>();
+		var files = new List<string>();
 
-		var Strings = Directory.GetFiles(InDirectory, InPattern);
+		var strings = Directory.GetFiles(directory, pattern);
 
-		foreach (var File in Strings)
+		foreach (var file in strings)
 		{
-			Files.Add(File);
+			files.Add(file);
 		}
 
-		foreach (var File in Directory.GetDirectories(InDirectory))
+		foreach (var file in Directory.GetDirectories(directory))
 		{
-			Files.AddRange(GetFiles(File, InPattern));
+			files.AddRange(GetFiles(file, pattern));
 		}
 
-		return Files;
+		return files;
 	}
 }

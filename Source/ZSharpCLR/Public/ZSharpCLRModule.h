@@ -11,8 +11,8 @@ class IZSharpCLRModule : public IModuleInterface
 public:
 	static FORCEINLINE IZSharpCLRModule& Get()
 	{
-		static IZSharpCLRModule& Singleton = FModuleManager::LoadModuleChecked<IZSharpCLRModule>("ZSharpCLR");
-		return Singleton;
+		static IZSharpCLRModule& GSingleton = FModuleManager::LoadModuleChecked<IZSharpCLRModule>("ZSharpCLR");
+		return GSingleton;
 	}
 
 	static FORCEINLINE bool IsAvailable()
@@ -20,3 +20,5 @@ public:
 		return FModuleManager::Get().IsModuleLoaded("ZSharpCLR");
 	}
 };
+
+

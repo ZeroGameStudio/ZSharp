@@ -2,8 +2,6 @@
 
 #include "ZSharpCLRModule.h"
 
-#include "CLR/CLR.h"
-
 class FZSharpCLRModule : public IZSharpCLRModule
 {
 	// Begin IModuleInterface
@@ -16,9 +14,10 @@ IMPLEMENT_MODULE(FZSharpCLRModule, ZSharpCLR)
 
 void FZSharpCLRModule::StartupModule()
 {
-	ZSharp::FCLR::Get().Startup();
 }
 
 void FZSharpCLRModule::ShutdownModule()
 {
 }
+
+

@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Exec Command="mkdir -p $(ProjectDir)\..\..\..\Binaries\Managed\" />
+        <Exec Command="if not exist $(ProjectDir)\..\..\..\Binaries\Managed\ mkdir $(ProjectDir)\..\..\..\Binaries\Managed\" />
         <Exec Command="copy $(TargetPath) $(ProjectDir)\..\..\..\Binaries\Managed\$(TargetFileName)" />
     </Target>
 

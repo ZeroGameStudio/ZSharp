@@ -2,15 +2,12 @@
 
 #pragma once
 
+#include "IZObject.h"
+
 namespace ZSharp
 {
-	class ZSHARPCLR_API FGenericCLR
+	class ZSHARPCLR_API IZAttribute : public IZObject
 	{
-
-	public:
-		void Startup();
 		
 	};
 }
-
-

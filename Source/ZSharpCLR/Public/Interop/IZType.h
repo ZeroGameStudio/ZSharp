@@ -1,0 +1,18 @@
+﻿// Copyright Zero Games. All Rights Reserved.
+
+#pragma once
+
+#include "IZMemberInfo.h"
+
+namespace ZSharp
+{
+	class IZMethodInfo;
+	class IZPropertyInfo;
+	
+	class ZSHARPCLR_API IZType : public IZMemberInfo
+	{
+	public:
+		virtual IZMethodInfo* GetMethod(const FString& name) const = 0;
+		virtual IZPropertyInfo* GetProperty(const FString& name) const = 0;
+	};
+}

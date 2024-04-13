@@ -113,14 +113,6 @@ void ZSharp::FZGenericCLR::Startup()
 
 			uint8(*Assembly_GetName)(FZGCHandle, FString&);
 		} ManagedFunctions;
-		struct
-		{
-			FZGCHandle TypeofAssemblyProxy;
-			FZGCHandle TypeofTypeProxy;
-			FZGCHandle TypeofMethodInfoProxy;
-			FZGCHandle TypeofPropertyInfoProxy;
-			FZGCHandle TypeofAttributeProxy;
-		} ManagedObjects;
 	} output{};
 	
 	int(*startUp)(const FStartupInput&, FStartupOutput&) = nullptr;

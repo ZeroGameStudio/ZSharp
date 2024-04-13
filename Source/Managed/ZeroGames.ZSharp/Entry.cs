@@ -34,20 +34,9 @@ internal unsafe struct ManagedFunctions
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct ManagedObjects
-{
-    public GCHandle TypeofAssemblyProxy;
-    public GCHandle TypeofTypeProxy;
-    public GCHandle TypeofMethodInfoProxy;
-    public GCHandle TypeofPropertyInfoProxy;
-    public GCHandle TypeofAttributeProxy;
-}
-
-[StructLayout(LayoutKind.Sequential)]
 internal struct StartupOutput
 {
     public ManagedFunctions ManagedFunctions;
-    public ManagedObjects ManagedObjects;
 }
 
 internal static class Entry
@@ -76,13 +65,6 @@ internal static class Entry
         
         // Assembly interop functions
         output->ManagedFunctions.Assembly_GetName = &Assembly_Interop.GetName;
-        
-        // Interop objects
-        output->ManagedObjects.TypeofAssemblyProxy = GCHandle.Alloc(typeof(InteropProxy<Assembly>), GCHandleType.Weak);
-        output->ManagedObjects.TypeofTypeProxy = GCHandle.Alloc(typeof(InteropProxy<Type>), GCHandleType.Weak);
-        output->ManagedObjects.TypeofMethodInfoProxy = GCHandle.Alloc(typeof(InteropProxy<MethodInfo>), GCHandleType.Weak);
-        output->ManagedObjects.TypeofPropertyInfoProxy = GCHandle.Alloc(typeof(InteropProxy<PropertyInfo>), GCHandleType.Weak);
-        output->ManagedObjects.TypeofAttributeProxy = GCHandle.Alloc(typeof(InteropProxy<Attribute>), GCHandleType.Weak);
         
         Logger.Log("====================== CoreCLR Startup ======================");
         

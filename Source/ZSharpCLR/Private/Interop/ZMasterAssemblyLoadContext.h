@@ -29,6 +29,11 @@ namespace ZSharp
 
 		virtual IZType* GetType(const FString& name) const override;
 
+		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) override;
+		virtual IZCallDispatcher* GetZCallDispatcher(FZCallHandle handle) const override;
+		virtual IZCallDispatcher* GetZCallDispatcher(const FString& name) const override;
+		virtual FZCallHandle GetZCallHandle(const IZCallDispatcher* dispatcher) const override;
+
 	private:
 		FZGCHandle Handle;
 		TFunction<void()> UnloadCallback;

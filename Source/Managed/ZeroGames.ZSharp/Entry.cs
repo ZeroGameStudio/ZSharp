@@ -12,6 +12,10 @@ internal unsafe struct UnmanagedFunctions
     public delegate* unmanaged<IntPtr, void> InteropString_Free;
     public delegate* unmanaged<IntPtr, char*> InteropString_GetData;
     public delegate* unmanaged<IntPtr, char*, void> InteropString_SetData;
+
+    public delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> MasterAssemblyLoadContext_ZCallByHandle;
+    public delegate* unmanaged<char*, ZCallBuffer*, ZCallHandle*, int32> MasterAssemblyLoadContext_ZCallByName;
+    public delegate* unmanaged<char*, ZCallHandle> MasterAssemblyLoadContext_GetZCallHandle;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -52,6 +56,11 @@ internal static class Entry
         InteropString_Interop.GFree = input->UnmanagedFunctions.InteropString_Free;
         InteropString_Interop.GGetData = input->UnmanagedFunctions.InteropString_GetData;
         InteropString_Interop.GSetData = input->UnmanagedFunctions.InteropString_SetData;
+        
+        // MasterAssemblyLoadContext
+        MasterAssemblyLoadContext_Interop.GZCallByHandle = input->UnmanagedFunctions.MasterAssemblyLoadContext_ZCallByHandle;
+        MasterAssemblyLoadContext_Interop.GZCallByName = input->UnmanagedFunctions.MasterAssemblyLoadContext_ZCallByName;
+        MasterAssemblyLoadContext_Interop.GGetZCallHandle = input->UnmanagedFunctions.MasterAssemblyLoadContext_GetZCallHandle;
         
         // CLR interop functions
         output->ManagedFunctions.CLR_CreateMasterALC = &CLR_Interop.CreateMasterALC;

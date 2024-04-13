@@ -3,6 +3,7 @@
 #pragma once
 
 #include "IZAssemblyLoadContext.h"
+#include "ZCallHandle.h"
 
 namespace ZSharp
 {
@@ -11,6 +12,7 @@ namespace ZSharp
 	class IZMethodInfo;
 	class IZPropertyInfo;
 	class IZConjugate;
+	class IZCallDispatcher;
 	
 	class ZSHARPCLR_API IZMasterAssemblyLoadContext : public IZAssemblyLoadContext
 	{
@@ -19,6 +21,11 @@ namespace ZSharp
 		virtual IZAssembly* GetAssembly(const FString& name) const = 0;
 	public:
 		virtual IZType* GetType(const FString& name) const = 0;
+	public:
+		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) = 0;
+		virtual IZCallDispatcher* GetZCallDispatcher(FZCallHandle handle) const = 0;
+		virtual IZCallDispatcher* GetZCallDispatcher(const FString& name) const = 0;
+		virtual FZCallHandle GetZCallHandle(const IZCallDispatcher* dispatcher) const = 0;
 	};
 }
 

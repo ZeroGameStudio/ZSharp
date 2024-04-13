@@ -42,6 +42,28 @@ public class MasterAssemblyLoadContext : AssemblyLoadContext, IGCHandle
         };
     }
 
+    public unsafe int32 ZCall(ZCallHandle handle, ZCallBuffer* buffer)
+    {
+        return MasterAssemblyLoadContext_Interop.GZCallByHandle(handle, buffer);
+    }
+
+    public unsafe int32 ZCall(string name, ZCallBuffer* buffer)
+    {
+        fixed (char* data = name.ToCharArray())
+        {
+            ZCallHandle handle;
+            return MasterAssemblyLoadContext_Interop.GZCallByName(data, buffer, &handle);
+        }
+    }
+
+    public unsafe ZCallHandle PrecacheZCall(string name)
+    {
+        fixed (char* data = name.ToCharArray())
+        {
+            return MasterAssemblyLoadContext_Interop.GGetZCallHandle(data);
+        }
+    }
+
     public GCHandle GCHandle { get; }
     
     private static MasterAssemblyLoadContext? _GSingleton;

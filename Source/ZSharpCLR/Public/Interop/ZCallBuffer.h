@@ -9,7 +9,7 @@ namespace ZSharp
 	class IZType;
 	class IZConjugate;
 
-	enum class EZInteropBufferSlotType : uint8
+	enum class EZCallBufferSlotType : uint8
 	{
 		UInt8,
 		UInt16,
@@ -22,21 +22,12 @@ namespace ZSharp
 		Float,
 		Double,
 		Bool,
-		String,
 		Conjugate,
 	};
 
-	struct ZSHARPCLR_API FZInteropConjugateBuffer
+	struct ZSHARPCLR_API FZCallBufferSlot
 	{
-		FZGCHandle ConjugateType;
-		FZGCHandle InnerType;
-		FZGCHandle OuterType;
-		FZGCHandle Conjugate;
-	};
-
-	struct ZSHARPCLR_API FZInteropBufferSlot
-	{
-		EZInteropBufferSlotType Type;
+		EZCallBufferSlotType Type;
 		union
 		{
 			uint8 UInt8;
@@ -49,15 +40,14 @@ namespace ZSharp
 			int64 Int64;
 			float Float;
 			double Double;
-			bool Bool;
-			FZGCHandle String;
-			FZInteropConjugateBuffer Conjugate;
-		};
+			uint8 Bool;
+			FZGCHandle Conjugate;
+		} Content;
 	};
 	
-	struct ZSHARPCLR_API FZInteropBuffer
+	struct ZSHARPCLR_API FZCallBuffer
 	{
-		FZInteropBufferSlot* Slots;
+		FZCallBufferSlot* Slots;
 		uint8 NumSlots;
 	};
 }

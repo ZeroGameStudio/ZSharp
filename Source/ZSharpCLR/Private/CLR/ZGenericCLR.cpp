@@ -6,6 +6,7 @@
 #include "hostfxr.h"
 #include "coreclr_delegates.h"
 #include "Interop/ZAssembly_Interop.h"
+#include "Interop/ZCallBuffer.h"
 #include "Interop/ZCLR_Interop.h"
 #include "Interop/ZGCHandle_Interop.h"
 #include "Interop/ZInteropString_Interop.h"
@@ -87,7 +88,7 @@ void ZSharp::FZGenericCLR::Startup()
 	const FString type = TEXT("ZeroGames.ZSharp.Entry, ZeroGames.ZSharp");
 	const FString method = TEXT("Startup");
 
-	struct FStartupInput
+	constexpr struct FStartupInput
 	{
 		struct
 		{
@@ -97,6 +98,10 @@ void ZSharp::FZGenericCLR::Startup()
 			void(*InteropString_Free)(FString&) = FZInteropString_Interop::Free;
 			const TCHAR*(*InteropString_GetData)(FString&) = FZInteropString_Interop::GetData;
 			void(*InteropString_SetData)(FString&, const TCHAR*) = FZInteropString_Interop::SetData;
+
+			int32(*MasterAssemblyLoadContext_ZCallByHandle)(FZCallHandle, FZCallBuffer*) = FZMasterAssemblyLoadContext_Interop::ZCallByHandle;
+			int32(*MasterAssemblyLoadContext_ZCallByName)(const TCHAR*, FZCallBuffer*, FZCallHandle*) = FZMasterAssemblyLoadContext_Interop::ZCallByName;
+			FZCallHandle(*MasterAssemblyLoadContext_GetZCallHandle)(const TCHAR*) = FZMasterAssemblyLoadContext_Interop::GetZCallHandle;
 		} UnmanagedFunctions;
 	} input;
 

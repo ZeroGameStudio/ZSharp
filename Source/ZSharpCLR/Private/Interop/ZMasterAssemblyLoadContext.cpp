@@ -5,6 +5,8 @@
 
 #include "ZAssembly.h"
 #include "ZMasterAssemblyLoadContext_Interop.h"
+#include "Interop/IZCallDispatcher.h"
+#include "Interop/ZCallBuffer.h"
 
 ZSharp::FZGCHandle ZSharp::FZMasterAssemblyLoadContext::GetGCHandle() const
 {
@@ -41,5 +43,36 @@ ZSharp::IZType* ZSharp::FZMasterAssemblyLoadContext::GetType(const FString& name
 {
 	checkNoEntry();
 	return nullptr;
+}
+
+class FZTestZCall : public ZSharp::IZCallDispatcher
+{
+	virtual const FString& GetName() const override { return Name; }
+	virtual int32 Dispatch(ZSharp::FZCallBuffer* buffer) const override
+	{
+		UE_LOG(LogTemp, Error, TEXT("===================== TestZCall: [%f] ====================="), buffer->Slots[0].Content.Float);
+		return 1;
+	}
+	FString Name = TEXT("TestZCall");
+};
+
+ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::RegisterZCall(IZCallDispatcher* dispatcher)
+{
+	return FZCallHandle();
+}
+
+ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetZCallDispatcher(FZCallHandle handle) const
+{
+	return new FZTestZCall;
+}
+
+ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetZCallDispatcher(const FString& name) const
+{
+	return new FZTestZCall;
+}
+
+ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const IZCallDispatcher* dispatcher) const
+{
+	return FZCallHandle();
 }
 

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp;
 
-internal static unsafe class MasterAssemblyLoadContext_Interop
+internal static class MasterAssemblyLoadContext_Interop
 {
     
     [UnmanagedCallersOnly]
@@ -13,10 +13,10 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     }
 
     [UnmanagedCallersOnly]
-    public static GCHandle LoadAssembly(uint8* buffer, int32 size)
+    public static unsafe GCHandle LoadAssembly(uint8* buffer, int32 size)
     {
         MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
-        
+
         uint8[] bufferArr = new uint8[size];
         for (int32 offset = 0; offset < size; ++offset)
         {

@@ -1,6 +1,6 @@
 ﻿namespace ZeroGames.ZSharp;
 
-public static unsafe class Logger
+public static class Logger
 {
 
     public static void Log(object message)
@@ -10,10 +10,13 @@ public static unsafe class Logger
         {
             return;
         }
-        
-        fixed (char* buffer = messageStr.ToCharArray())
+
+        unsafe
         {
-            UE_Interop.GUE_Log(1, buffer);
+            fixed (char* buffer = messageStr.ToCharArray())
+            {
+                UE_Interop.GUE_Log(1, buffer);
+            }
         }
     }
     
@@ -24,10 +27,13 @@ public static unsafe class Logger
         {
             return;
         }
-        
-        fixed (char* buffer = messageStr.ToCharArray())
+
+        unsafe
         {
-            UE_Interop.GUE_Log(2, buffer);
+            fixed (char* buffer = messageStr.ToCharArray())
+            {
+                UE_Interop.GUE_Log(2, buffer);
+            }
         }
     }
     
@@ -38,10 +44,13 @@ public static unsafe class Logger
         {
             return;
         }
-        
-        fixed (char* buffer = messageStr.ToCharArray())
+
+        unsafe
         {
-            UE_Interop.GUE_Log(3, buffer);
+            fixed (char* buffer = messageStr.ToCharArray())
+            {
+                UE_Interop.GUE_Log(3, buffer);
+            }
         }
     }
     

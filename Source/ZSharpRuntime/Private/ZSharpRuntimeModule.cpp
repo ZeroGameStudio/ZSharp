@@ -25,7 +25,6 @@ void FZSharpRuntimeModule::StartupModule()
 	TArray<uint8> content;
 	FFileHelper::LoadFileToArray(content, *path, FILEREAD_Silent);
 	ZSharp::IZAssembly* assembly = alc->LoadAssembly(content);
-	UE_LOG(LogTemp, Log, TEXT("===================== [%s] ====================="), *assembly->GetName());
 }
 
 void FZSharpRuntimeModule::ShutdownModule()

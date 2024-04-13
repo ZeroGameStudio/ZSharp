@@ -1,13 +1,16 @@
 ﻿namespace ZeroGames.ZSharp;
 
-public readonly unsafe struct InteropString : IDisposable
+public readonly struct InteropString : IDisposable
 {
     
     public InteropString(string str)
     {
-        fixed (char* data = str.ToCharArray())
+        unsafe
         {
-            _address = InteropString_Interop.GAlloc(data);
+            fixed (char* data = str.ToCharArray())
+            {
+                _address = InteropString_Interop.GAlloc(data);
+            }
         }
     }
 
@@ -21,11 +24,14 @@ public readonly unsafe struct InteropString : IDisposable
     {
         if (!_bNative)
         {
-            InteropString_Interop.GFree(_address);
+            unsafe
+            {
+                InteropString_Interop.GFree(_address);
+            }
         }
     }
 
-    public string Data
+    public unsafe string Data
     {
         get => new(InteropString_Interop.GGetData(_address));
         set

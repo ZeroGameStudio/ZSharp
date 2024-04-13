@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp;
 
-internal static unsafe class Assembly_Interop
+internal static class Assembly_Interop
 {
 
     [UnmanagedCallersOnly]

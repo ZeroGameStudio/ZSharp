@@ -1,6 +1,4 @@
-﻿using ZeroGames.ZSharp.Interop;
-
-namespace ZeroGames.ZSharp;
+﻿namespace ZeroGames.ZSharp;
 
 public static unsafe class Logger
 {

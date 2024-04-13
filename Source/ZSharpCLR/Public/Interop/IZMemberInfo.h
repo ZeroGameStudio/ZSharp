@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include "IZObject.h"
-#include "IZCustomAttributeProvider.h"
+#include "IZGCHandle.h"
 
 namespace ZSharp
 {
-	class ZSHARPCLR_API IZMemberInfo : public IZObject, public IZCustomAttributeProvider
+	class ZSHARPCLR_API IZMemberInfo : public IZGCHandle
 	{
 	public:
 		

@@ -3,10 +3,8 @@
 
 #include "ZMasterAssemblyLoadContext.h"
 
-void ZSharp::FZMasterAssemblyLoadContext::Release()
-{
-	Unload();
-}
+#include "ZAssembly.h"
+#include "ZMasterAssemblyLoadContext_Interop.h"
 
 ZSharp::FZGCHandle ZSharp::FZMasterAssemblyLoadContext::GetGCHandle() const
 {
@@ -15,17 +13,33 @@ ZSharp::FZGCHandle ZSharp::FZMasterAssemblyLoadContext::GetGCHandle() const
 
 void ZSharp::FZMasterAssemblyLoadContext::Unload()
 {
-	checkNoEntry();
+	FZMasterAssemblyLoadContext_Interop::GUnload();
+	UnloadCallback();
 }
 
-ZSharp::IZAssembly* ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const FString& name, TArray<uint8> buffer)
+ZSharp::IZAssembly* ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const TArray<uint8>& buffer)
 {
-	checkNoEntry();
-	return nullptr;
+	FZGCHandle handle = FZMasterAssemblyLoadContext_Interop::GLoadAssembly(buffer.GetData(), buffer.Num());
+	IZAssembly* assembly = new FZAssembly(handle);
+	AssemblyMap.Emplace(assembly->GetName(), assembly);
+
+	return assembly;
 }
 
 ZSharp::IZAssembly* ZSharp::FZMasterAssemblyLoadContext::GetAssembly(const FString& name) const
 {
+	const TUniquePtr<IZAssembly>* assembly = AssemblyMap.Find(name);
+	if (assembly)
+	{
+		return assembly->Get();
+	}
+	
+	return assembly ? assembly->Get() : nullptr;
+}
+
+ZSharp::IZType* ZSharp::FZMasterAssemblyLoadContext::GetType(const FString& name) const
+{
 	checkNoEntry();
 	return nullptr;
 }
+

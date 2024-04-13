@@ -13,6 +13,11 @@ namespace ZSharp
 		{
 			return !!Handle;
 		}
+
+		FString ToString() const
+		{
+			return FString::Printf(TEXT("GCHandle: [%llu]"), (uint64)Handle);
+		}
 		
 		void* Handle;
 		

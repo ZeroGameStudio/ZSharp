@@ -3,6 +3,8 @@
 #include "ZSharpRuntimeModule.h"
 
 #include "CLR/IZCLR.h"
+#include "Interop/IZAssembly.h"
+#include "Interop/IZMasterAssemblyLoadContext.h"
 
 class FZSharpRuntimeModule : public IZSharpRuntimeModule
 {
@@ -17,8 +19,16 @@ IMPLEMENT_MODULE(FZSharpRuntimeModule, ZSharpRuntime)
 void FZSharpRuntimeModule::StartupModule()
 {
 	ZSharp::IZCLR::Get().Startup();
+	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZCLR::Get().CreateMasterALC();
+
+	FString path = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Game.dll");
+	TArray<uint8> content;
+	FFileHelper::LoadFileToArray(content, *path, FILEREAD_Silent);
+	ZSharp::IZAssembly* assembly = alc->LoadAssembly(content);
+	UE_LOG(LogTemp, Log, TEXT("===================== [%s] ====================="), *assembly->GetName());
 }
 
 void FZSharpRuntimeModule::ShutdownModule()
 {
+
 }

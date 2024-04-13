@@ -3,12 +3,22 @@ using System.Runtime.Loader;
 
 namespace ZeroGames.ZSharp;
 
-public class MasterAssemblyLoadContext : AssemblyLoadContext, IConjugate
+public class MasterAssemblyLoadContext : AssemblyLoadContext, IGCHandle
 {
 
     public static MasterAssemblyLoadContext? Get()
     {
         return _GSingleton;
+    }
+
+    internal static void UnloadSingleton()
+    {
+        if (_GSingleton is null)
+        {
+            throw new Exception();
+        }
+        
+        _GSingleton.Unload();
     }
 
     public MasterAssemblyLoadContext() : base("Master", true)
@@ -18,19 +28,18 @@ public class MasterAssemblyLoadContext : AssemblyLoadContext, IConjugate
             throw new Exception();
         }
         
-        GCHandle = GCHandle.Alloc(this);
+        GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
         _GSingleton = this;
-    }
 
-    public void Release()
-    {
-        if (_GSingleton != this)
+        Unloading += context =>
         {
-            throw new Exception();
-        }
-        
-        GCHandle.Free();
-        _GSingleton = null;
+            if (_GSingleton != this)
+            {
+                throw new Exception();
+            }
+            
+            _GSingleton = null;
+        };
     }
 
     public GCHandle GCHandle { get; }

@@ -6,9 +6,12 @@
 
 namespace ZSharp
 {
+	struct FZInteropBuffer;
+	class IZConjugate;
+
 	class ZSHARPCLR_API IZMethodInfo : public IZMemberInfo
 	{
 	public:
-		virtual void Invoke(void* buffer) const = 0;
+		virtual int32 Invoke(const IZMethodInfo* method, IZConjugate* context, FZInteropBuffer* buffer) const = 0;
 	};
 }

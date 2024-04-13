@@ -2,6 +2,9 @@
 
 #include "ZSharpCLRModule.h"
 
+#include "CLR/IZCLR.h"
+#include "Interop/IZMasterAssemblyLoadContext.h"
+
 class FZSharpCLRModule : public IZSharpCLRModule
 {
 	// Begin IModuleInterface
@@ -18,6 +21,10 @@ void FZSharpCLRModule::StartupModule()
 
 void FZSharpCLRModule::ShutdownModule()
 {
+	if (ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZCLR::Get().GetMasterALC())
+	{
+		alc->Unload();
+	}
 }
 
 

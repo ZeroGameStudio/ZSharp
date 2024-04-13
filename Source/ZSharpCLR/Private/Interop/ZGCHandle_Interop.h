@@ -11,3 +11,5 @@ namespace ZSharp
 		inline static void(*GFree)(FZGCHandle) = nullptr;
 	};
 }
+
+

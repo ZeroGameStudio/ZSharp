@@ -5,8 +5,12 @@
 
 #include "hostfxr.h"
 #include "coreclr_delegates.h"
+#include "Interop/ZAssembly_Interop.h"
 #include "Interop/ZCLR_Interop.h"
 #include "Interop/ZGCHandle_Interop.h"
+#include "Interop/ZInteropString_Interop.h"
+#include "Interop/ZMasterAssemblyLoadContext.h"
+#include "Interop/ZMasterAssemblyLoadContext_Interop.h"
 
 namespace ZSharp::FZGenericCLR_Private
 {
@@ -17,14 +21,17 @@ namespace ZSharp::FZGenericCLR_Private
 		case 1:
 			{
 				UE_LOG(LogTemp, Log, TEXT("%s"), message);
+				break;
 			}
 		case 2:
 			{
 				UE_LOG(LogTemp, Warning, TEXT("%s"), message);
+				break;
 			}
 		case 3:
 			{
 				UE_LOG(LogTemp, Error, TEXT("%s"), message);
+				break;
 			}
 		default:
 			{
@@ -85,6 +92,11 @@ void ZSharp::FZGenericCLR::Startup()
 		struct
 		{
 			void(*UE_Log)(uint8, const TCHAR*) = FZGenericCLR_Private::UE_Log;
+			
+			FString&(*InteropString_Alloc)(const TCHAR*) = FZInteropString_Interop::Alloc;
+			void(*InteropString_Free)(FString&) = FZInteropString_Interop::Free;
+			const TCHAR*(*InteropString_GetData)(FString&) = FZInteropString_Interop::GetData;
+			void(*InteropString_SetData)(FString&, const TCHAR*) = FZInteropString_Interop::SetData;
 		} UnmanagedFunctions;
 	} input;
 
@@ -95,6 +107,11 @@ void ZSharp::FZGenericCLR::Startup()
 			FZGCHandle(*CLR_CreateMasterALC)();
 			
 			void(*GCHandle_Free)(FZGCHandle);
+
+			void(*MasterAssemblyLoadContext_Unload)();
+			FZGCHandle(*MasterAssemblyLoadContext_LoadAssembly)(const uint8*, int32);
+
+			uint8(*Assembly_GetName)(FZGCHandle, FString&);
 		} ManagedFunctions;
 		struct
 		{
@@ -104,7 +121,7 @@ void ZSharp::FZGenericCLR::Startup()
 			FZGCHandle TypeofPropertyInfoProxy;
 			FZGCHandle TypeofAttributeProxy;
 		} ManagedObjects;
-	} output;
+	} output{};
 	
 	int(*startUp)(const FStartupInput&, FStartupOutput&) = nullptr;
 
@@ -119,6 +136,11 @@ void ZSharp::FZGenericCLR::Startup()
 	ZCLR_Interop::GCreateMasterALC = output.ManagedFunctions.CLR_CreateMasterALC;
 
 	FZGCHandle_Interop::GFree = output.ManagedFunctions.GCHandle_Free;
+
+	FZMasterAssemblyLoadContext_Interop::GUnload = output.ManagedFunctions.MasterAssemblyLoadContext_Unload;
+	FZMasterAssemblyLoadContext_Interop::GLoadAssembly = output.ManagedFunctions.MasterAssemblyLoadContext_LoadAssembly;
+
+	FZAssembly_Interop::GGetName = output.ManagedFunctions.Assembly_GetName;
 }
 
 ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::CreateMasterALC()
@@ -128,7 +150,8 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::CreateMasterALC()
 		UE_LOG(LogTemp, Fatal, TEXT("Master ALC already exists!"));
 	}
 
-	FZGCHandle Handle = ZCLR_Interop::GCreateMasterALC();
+	FZGCHandle handle = ZCLR_Interop::GCreateMasterALC();
+	MasterALC = MakeUnique<FZMasterAssemblyLoadContext>(handle, [this]{ MasterALC = nullptr; });
 
 	return MasterALC.Get();
 }

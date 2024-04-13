@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace ZeroGames.ZSharp.Interop;
+namespace ZeroGames.ZSharp;
 
 internal static unsafe class UE_Interop
 {

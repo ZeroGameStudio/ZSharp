@@ -5,6 +5,7 @@
 #include "Interop/IZMasterAssemblyLoadContext.h"
 
 #include "Interop/IZAssembly.h"
+#include "Interop/IZCallDispatcher.h"
 
 namespace ZSharp
 {
@@ -34,11 +35,23 @@ namespace ZSharp
 		virtual IZCallDispatcher* GetZCallDispatcher(const FString& name) const override;
 		virtual FZCallHandle GetZCallHandle(const IZCallDispatcher* dispatcher) const override;
 
+		virtual FZGCHandle BuildConjugate(void* native, const IZType* type) override;
+		virtual void BuildConjugate(void* native, FZGCHandle handle) override;
+		virtual void ReleaseConjugate(void* native) override;
+		virtual void ReleaseConjugate(FZGCHandle handle) override;
+
 	private:
 		FZGCHandle Handle;
 		TFunction<void()> UnloadCallback;
 
 		TMap<FString, TUniquePtr<IZAssembly>> AssemblyMap;
+
+		TMap<FZCallHandle, TUniquePtr<IZCallDispatcher>> ZCallMap;
+		TMap<FString, IZCallDispatcher*> Name2ZCall;
+		TMap<IZCallDispatcher*, FZCallHandle> ZCall2Handle;
+
+		TMap<void*, FZGCHandle> Native2Conjugate;
+		TMap<FZGCHandle, void*> Conjugate2Native;
 		
 	};
 }

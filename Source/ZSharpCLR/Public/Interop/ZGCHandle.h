@@ -9,14 +9,24 @@ namespace ZSharp
 
 		void Free();
 
+		FString ToString() const
+		{
+			return FString::Printf(TEXT("GCHandle: [%llu]"), (uint64)Handle);
+		}
+
+		bool operator ==(const FZGCHandle other) const
+		{
+			return Handle == other.Handle;
+		}
+
 		operator bool() const
 		{
 			return !!Handle;
 		}
 
-		FString ToString() const
+		friend uint32 GetTypeHash(const FZGCHandle& handle)
 		{
-			return FString::Printf(TEXT("GCHandle: [%llu]"), (uint64)Handle);
+			return PointerHash(handle.Handle);
 		}
 		
 		void* Handle;

@@ -7,10 +7,11 @@
 namespace ZSharp
 {
 	struct FZCallBuffer;
-	class IZConjugate;
 
 	class ZSHARPCLR_API IZMethodInfo : public IZMemberInfo
 	{
+	public:
+		virtual bool IsZCallable() const = 0;
 	public:
 		virtual int32 Invoke(FZCallBuffer* buffer) const = 0;
 	};

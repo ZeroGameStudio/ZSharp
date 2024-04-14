@@ -12,6 +12,8 @@ namespace ZSharp
 	class ZSHARPCLR_API IZType : public IZMemberInfo
 	{
 	public:
+		virtual FZGCHandle New() const = 0;
+	public:
 		virtual IZMethodInfo* GetMethod(const FString& name) const = 0;
 		virtual IZPropertyInfo* GetProperty(const FString& name) const = 0;
 	};

@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace ZeroGames.ZSharp;
+﻿namespace ZeroGames.ZSharp;
 
 internal static class UE_Interop
 {

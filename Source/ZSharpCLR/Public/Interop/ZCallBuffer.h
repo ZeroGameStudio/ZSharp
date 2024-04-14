@@ -6,9 +6,6 @@
 
 namespace ZSharp
 {
-	class IZType;
-	class IZConjugate;
-
 	enum class EZCallBufferSlotType : uint8
 	{
 		UInt8,

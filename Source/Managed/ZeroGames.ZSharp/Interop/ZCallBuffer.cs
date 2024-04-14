@@ -18,7 +18,6 @@ public enum ZCallBufferSlotType : uint8
     Conjugate,
 }
 
-
 [StructLayout(LayoutKind.Sequential)]
 public struct ZCallBufferSlot
 {

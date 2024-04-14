@@ -6,7 +6,7 @@
 #include "ZAssembly.h"
 #include "ZMasterAssemblyLoadContext_Interop.h"
 #include "Interop/IZCallDispatcher.h"
-#include "Interop/ZCallBuffer.h"
+#include "Interop/IZType.h"
 
 ZSharp::FZGCHandle ZSharp::FZMasterAssemblyLoadContext::GetGCHandle() const
 {
@@ -45,34 +45,61 @@ ZSharp::IZType* ZSharp::FZMasterAssemblyLoadContext::GetType(const FString& name
 	return nullptr;
 }
 
-class FZTestZCall : public ZSharp::IZCallDispatcher
-{
-	virtual const FString& GetName() const override { return Name; }
-	virtual int32 Dispatch(ZSharp::FZCallBuffer* buffer) const override
-	{
-		UE_LOG(LogTemp, Error, TEXT("===================== TestZCall: [%f] ====================="), buffer->Slots[0].Content.Float);
-		return 1;
-	}
-	FString Name = TEXT("TestZCall");
-};
-
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::RegisterZCall(IZCallDispatcher* dispatcher)
 {
-	return FZCallHandle();
+	FZCallHandle handle = FAllocZCallHandle::Alloc();
+
+	ZCallMap.Emplace(handle, dispatcher);
+	Name2ZCall.Emplace(dispatcher->GetName(), dispatcher);
+	ZCall2Handle.Emplace(dispatcher, handle);
+
+	return handle;
 }
 
 ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetZCallDispatcher(FZCallHandle handle) const
 {
-	return new FZTestZCall;
+	const TUniquePtr<IZCallDispatcher>* pDispatcher = ZCallMap.Find(handle);
+	return pDispatcher ? pDispatcher->Get() : nullptr;
 }
 
 ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetZCallDispatcher(const FString& name) const
 {
-	return new FZTestZCall;
+	IZCallDispatcher* const* pDispatcher = Name2ZCall.Find(name);
+	return pDispatcher ? *pDispatcher : nullptr;
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const IZCallDispatcher* dispatcher) const
 {
-	return FZCallHandle();
+	const FZCallHandle* pHandle = ZCall2Handle.Find(dispatcher);
+	return pHandle ? *pHandle : FZCallHandle();
 }
+
+ZSharp::FZGCHandle ZSharp::FZMasterAssemblyLoadContext::BuildConjugate(void* native, const IZType* type)
+{
+	FZGCHandle handle = type->New();
+	BuildConjugate(native, handle);
+
+	return handle;
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::BuildConjugate(void* native, FZGCHandle handle)
+{
+	Native2Conjugate.Emplace(native, handle);
+	Conjugate2Native.Emplace(handle, native);
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(void* native)
+{
+	FZGCHandle handle;
+	Native2Conjugate.RemoveAndCopyValue(native, handle);
+	Conjugate2Native.Remove(handle);
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(FZGCHandle handle)
+{
+	void* native;
+	Conjugate2Native.RemoveAndCopyValue(handle, native);
+	Native2Conjugate.Remove(native);
+}
+
 

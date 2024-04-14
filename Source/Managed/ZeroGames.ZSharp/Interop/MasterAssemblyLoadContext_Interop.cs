@@ -16,14 +16,7 @@ internal static class MasterAssemblyLoadContext_Interop
     public static unsafe GCHandle LoadAssembly(uint8* buffer, int32 size)
     {
         MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
-
-        uint8[] bufferArr = new uint8[size];
-        for (int32 offset = 0; offset < size; ++offset)
-        {
-            bufferArr[offset] = *(buffer + offset);
-        }
-
-        Assembly asm = alc.LoadFromStream(new MemoryStream(bufferArr));
+        Assembly asm = alc.LoadFromStream(new UnmanagedMemoryStream(buffer, size));
         InteropProxy<Assembly> proxy = new(asm);
 
         string asmName = asm.FullName!.Split(',')[0];

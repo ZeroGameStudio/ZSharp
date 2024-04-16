@@ -1,4 +1,4 @@
-﻿namespace ZeroGames.ZSharp;
+﻿namespace ZeroGames.ZSharp.Core;
 
 internal static class UE_Interop
 {

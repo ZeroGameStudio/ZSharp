@@ -6,6 +6,7 @@
 
 #include "Interop/IZAssembly.h"
 #include "Interop/IZCallDispatcher.h"
+#include "Interop/IZCallResolver.h"
 
 namespace ZSharp
 {
@@ -33,12 +34,16 @@ namespace ZSharp
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) override;
 		virtual IZCallDispatcher* GetZCallDispatcher(FZCallHandle handle) const override;
 		virtual IZCallDispatcher* GetZCallDispatcher(const FString& name) const override;
+		virtual IZCallDispatcher* GetOrResolveZCallDispatcher(const FString& name) override;
 		virtual FZCallHandle GetZCallHandle(const IZCallDispatcher* dispatcher) const override;
+		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) override;
 
-		virtual FZGCHandle BuildConjugate(void* native, const IZType* type) override;
-		virtual void BuildConjugate(void* native, FZGCHandle handle) override;
-		virtual void ReleaseConjugate(void* native) override;
-		virtual void ReleaseConjugate(FZGCHandle handle) override;
+		virtual FZConjugateHandle BuildConjugate(void* unmanaged, const IZType* managedType) override;
+		virtual void BuildConjugate(void* unmanaged, FZConjugateHandle managed) override;
+		virtual void ReleaseConjugate(void* unmanaged) override;
+		virtual void ReleaseConjugate(FZConjugateHandle managed) override;
+		virtual FZConjugateHandle Conjugate(void* unmanaged) const override;
+		virtual void* Conjugate(FZConjugateHandle managed) const override;
 
 	private:
 		FZGCHandle Handle;
@@ -50,8 +55,10 @@ namespace ZSharp
 		TMap<FString, IZCallDispatcher*> Name2ZCall;
 		TMap<IZCallDispatcher*, FZCallHandle> ZCall2Handle;
 
-		TMap<void*, FZGCHandle> Native2Conjugate;
-		TMap<FZGCHandle, void*> Conjugate2Native;
+		TArray<TTuple<uint64, TUniquePtr<IZCallResolver>>> ZCallResolverLink;
+
+		TMap<void*, FZConjugateHandle> ConjugateUnmanaged2Managed;
+		TMap<FZConjugateHandle, void*> ConjugateManaged2Unmanaged;
 		
 	};
 }

@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 
-namespace ZeroGames.ZSharp;
+namespace ZeroGames.ZSharp.Core;
 
 public class MasterAssemblyLoadContext : AssemblyLoadContext, IGCHandle
 {
@@ -47,12 +47,12 @@ public class MasterAssemblyLoadContext : AssemblyLoadContext, IGCHandle
         return MasterAssemblyLoadContext_Interop.GZCallByHandle(handle, buffer);
     }
 
-    public unsafe int32 ZCall(string name, ZCallBuffer* buffer)
+    public unsafe int32 ZCall(string name, ZCallBuffer* buffer, bool bResolve = true)
     {
         fixed (char* data = name.ToCharArray())
         {
             ZCallHandle handle;
-            return MasterAssemblyLoadContext_Interop.GZCallByName(data, buffer, &handle);
+            return MasterAssemblyLoadContext_Interop.GZCallByName(data, buffer, &handle, (uint8)(bResolve ? 1 : 0));
         }
     }
 

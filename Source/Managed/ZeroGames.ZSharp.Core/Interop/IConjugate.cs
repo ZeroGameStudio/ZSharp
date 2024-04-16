@@ -1,4 +1,4 @@
-﻿namespace ZeroGames.ZSharp;
+﻿namespace ZeroGames.ZSharp.Core;
 
 /// <summary>
 /// A conjugate is object used by both managed and unmanaged side.

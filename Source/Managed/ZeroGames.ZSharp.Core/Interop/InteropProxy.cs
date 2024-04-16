@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace ZeroGames.ZSharp;
+namespace ZeroGames.ZSharp.Core;
 
 internal class InteropProxy<T> : IGCHandle where T : class
 {

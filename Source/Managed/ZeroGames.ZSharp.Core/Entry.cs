@@ -1,7 +1,8 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace ZeroGames.ZSharp;
+namespace ZeroGames.ZSharp.Core;
 
 [StructLayout(LayoutKind.Sequential)]
 internal unsafe struct UnmanagedFunctions
@@ -14,7 +15,7 @@ internal unsafe struct UnmanagedFunctions
     public delegate* unmanaged<IntPtr, char*, void> InteropString_SetData;
 
     public delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> MasterAssemblyLoadContext_ZCallByHandle;
-    public delegate* unmanaged<char*, ZCallBuffer*, ZCallHandle*, int32> MasterAssemblyLoadContext_ZCallByName;
+    public delegate* unmanaged<char*, ZCallBuffer*, ZCallHandle*, uint8, int32> MasterAssemblyLoadContext_ZCallByName;
     public delegate* unmanaged<char*, ZCallHandle> MasterAssemblyLoadContext_GetZCallHandle;
 }
 
@@ -33,7 +34,7 @@ internal unsafe struct ManagedFunctions
 
     public delegate* unmanaged<void> MasterAssemblyLoadContext_Unload;
     public delegate* unmanaged<uint8*, int32, GCHandle> MasterAssemblyLoadContext_LoadAssembly;
-
+    
     public delegate* unmanaged<GCHandle, IntPtr, uint8> Assembly_GetName;
 }
 
@@ -71,11 +72,16 @@ internal static class Entry
         // MasterAssemblyLoadContext interop functions
         output->ManagedFunctions.MasterAssemblyLoadContext_Unload = &MasterAssemblyLoadContext_Interop.Unload;
         output->ManagedFunctions.MasterAssemblyLoadContext_LoadAssembly = &MasterAssemblyLoadContext_Interop.LoadAssembly;
-        
+
         // Assembly interop functions
         output->ManagedFunctions.Assembly_GetName = &Assembly_Interop.GetName;
         
         Logger.Log("====================== CoreCLR Startup ======================");
+        
+        // while (!Debugger.IsAttached)
+        // {
+        //     Logger.Log("Waiting for debugger...");
+        // }
         
         return 1;
     }

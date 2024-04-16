@@ -17,6 +17,8 @@ IMPLEMENT_MODULE(FZSharpCLRModule, ZSharpCLR)
 
 void FZSharpCLRModule::StartupModule()
 {
+	// Startup the runtime as soon as the module startup.
+	(void)ZSharp::IZCLR::Get();
 }
 
 void FZSharpCLRModule::ShutdownModule()

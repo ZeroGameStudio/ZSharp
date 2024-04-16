@@ -4,42 +4,30 @@
 
 namespace ZSharp
 {
-	struct ZSHARPCLR_API FZCallHandle
+	struct FZCallHandle
 	{
-
-		friend struct FAllocZCallHandle;
-
-	private:
-		static FZCallHandle Alloc();
-
-	public:
-		FZCallHandle()
-			: Handle(0){}
-
-	public:
-		bool IsValid() const { return !!Handle; }
-
-		friend uint32 GetTypeHash(const FZCallHandle& handle)
-		{
-			return GetTypeHash(handle.Handle);
-		}
-
-		bool operator ==(const FZCallHandle other) const
-		{
-			return Handle == other.Handle;
-		}
-		
-	private:
 		uint64 Handle;
-		
 	};
+	
+	static_assert(TIsPODType<FZCallHandle>::Value, "ZCallHandle must be POD type!");
+	static_assert(sizeof(FZCallHandle) == sizeof(uint64), "ZCallHandle must only have a uint64 member!");
 
-	struct FAllocZCallHandle
+	FZCallHandle AllocateZCallHandle();
+
+	inline bool IsValid(const FZCallHandle& handle)
 	{
-		friend class FZMasterAssemblyLoadContext;
-	private:
-		static FZCallHandle Alloc() { return FZCallHandle::Alloc(); }
-	};
+		return !!handle.Handle;
+	}
+
+	inline bool operator ==(const FZCallHandle& lhs, const FZCallHandle& rhs)
+	{
+		return lhs.Handle == rhs.Handle;
+	}
+
+	inline uint32 GetTypeHash(const FZCallHandle& handle)
+	{
+		return ::GetTypeHash(handle.Handle);
+	}
 }
 
 

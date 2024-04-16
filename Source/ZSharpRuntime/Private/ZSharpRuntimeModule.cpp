@@ -19,7 +19,7 @@ IMPLEMENT_MODULE(FZSharpRuntimeModule, ZSharpRuntime)
 void FZSharpRuntimeModule::StartupModule()
 {
 	ZSharp::IZCLR::Get().Startup();
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZCLR::Get().CreateMasterALC();
+	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZCLR::Get().LoadMasterALC();
 
 	FString path = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Game.dll");
 	TArray<uint8> content;

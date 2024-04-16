@@ -5,6 +5,7 @@
 
 #include "hostfxr.h"
 #include "coreclr_delegates.h"
+#include "Interop/IZSlimAssemblyLoadContext.h"
 #include "Interop/ZAssembly_Interop.h"
 #include "Interop/ZCallBuffer.h"
 #include "Interop/ZCLR_Interop.h"
@@ -12,6 +13,7 @@
 #include "Interop/ZInteropString_Interop.h"
 #include "Interop/ZMasterAssemblyLoadContext.h"
 #include "Interop/ZMasterAssemblyLoadContext_Interop.h"
+#include "Interop/ZGCHandle.h"
 
 namespace ZSharp::FZGenericCLR_Private
 {
@@ -40,6 +42,42 @@ namespace ZSharp::FZGenericCLR_Private
 			}
 		}
 	}
+}
+
+FDelegateHandle ZSharp::FZGenericCLR::RegisterMasterALCLoaded(FZOnMasterALCLoaded::FDelegate delegate, bool bNotifyIfLoaded)
+{
+	FDelegateHandle handle = OnMasterALCLoaded.Add(delegate);
+	if (bNotifyIfLoaded && MasterALC.Get())
+	{
+		delegate.ExecuteIfBound(MasterALC.Get());
+	}
+
+	return handle;
+}
+
+void ZSharp::FZGenericCLR::UnregisterMasterALCLoaded(FDelegateHandle delegate)
+{
+	OnMasterALCLoaded.Remove(delegate);
+}
+
+void ZSharp::FZGenericCLR::UnregisterMasterALCLoaded(const void* userObject)
+{
+	OnMasterALCLoaded.RemoveAll(userObject);
+}
+
+FDelegateHandle ZSharp::FZGenericCLR::RegisterMasterALCUnloaded(FZOnMasterALCUnloaded::FDelegate delegate)
+{
+	return OnMasterALCUnloaded.Add(delegate);
+}
+
+void ZSharp::FZGenericCLR::UnregisterMasterALCUnloaded(FDelegateHandle delegate)
+{
+	OnMasterALCUnloaded.Remove(delegate);
+}
+
+void ZSharp::FZGenericCLR::UnregisterMasterALCUnloaded(const void* userObject)
+{
+	OnMasterALCUnloaded.RemoveAll(userObject);
 }
 
 void ZSharp::FZGenericCLR::Startup()
@@ -84,8 +122,8 @@ void ZSharp::FZGenericCLR::Startup()
 
 	closeHostFXR(handle);
 
-	const FString assembly = FPaths::Combine(pluginBinariesDir, "Managed", "ZeroGames.ZSharp.dll");
-	const FString type = TEXT("ZeroGames.ZSharp.Entry, ZeroGames.ZSharp");
+	const FString assembly = FPaths::Combine(pluginBinariesDir, "Managed", "ZeroGames.ZSharp.Core.dll");
+	const FString type = TEXT("ZeroGames.ZSharp.Core.Entry, ZeroGames.ZSharp.Core");
 	const FString method = TEXT("Startup");
 
 	constexpr struct FStartupInput
@@ -100,11 +138,11 @@ void ZSharp::FZGenericCLR::Startup()
 			void(*InteropString_SetData)(FString&, const TCHAR*) = FZInteropString_Interop::SetData;
 
 			int32(*MasterAssemblyLoadContext_ZCallByHandle)(FZCallHandle, FZCallBuffer*) = FZMasterAssemblyLoadContext_Interop::ZCallByHandle;
-			int32(*MasterAssemblyLoadContext_ZCallByName)(const TCHAR*, FZCallBuffer*, FZCallHandle*) = FZMasterAssemblyLoadContext_Interop::ZCallByName;
+			int32(*MasterAssemblyLoadContext_ZCallByName)(const TCHAR*, FZCallBuffer*, FZCallHandle*, uint8) = FZMasterAssemblyLoadContext_Interop::ZCallByName;
 			FZCallHandle(*MasterAssemblyLoadContext_GetZCallHandle)(const TCHAR*) = FZMasterAssemblyLoadContext_Interop::GetZCallHandle;
 		} UnmanagedFunctions;
 	} input;
-
+	
 	struct FStartupOutput
 	{
 		struct
@@ -140,7 +178,7 @@ void ZSharp::FZGenericCLR::Startup()
 	FZAssembly_Interop::GGetName = output.ManagedFunctions.Assembly_GetName;
 }
 
-ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::CreateMasterALC()
+ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::LoadMasterALC()
 {
 	if (MasterALC)
 	{
@@ -148,9 +186,19 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::CreateMasterALC()
 	}
 
 	FZGCHandle handle = ZCLR_Interop::GCreateMasterALC();
-	MasterALC = MakeUnique<FZMasterAssemblyLoadContext>(handle, [this]{ MasterALC = nullptr; });
+	MasterALC = MakeUnique<FZMasterAssemblyLoadContext>(handle, [this]{ HandleMasterALCUnloaded(); });
+
+	OnMasterALCLoaded.Broadcast(MasterALC.Get());
 
 	return MasterALC.Get();
+}
+
+void ZSharp::FZGenericCLR::UnloadMasterALC()
+{
+	if (MasterALC.Get())
+	{
+		MasterALC->Unload();
+	}
 }
 
 ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::GetMasterALC()
@@ -158,16 +206,36 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::GetMasterALC()
 	return MasterALC.Get();
 }
 
-ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::CreateSlimALC(const FString& name)
+ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::LoadSlimALC(const FString& name)
 {
 	checkNoEntry();
 	return nullptr;
+}
+
+void ZSharp::FZGenericCLR::UnloadSlimALC(const FString& name)
+{
+	if (IZSlimAssemblyLoadContext* alc = GetSlimALC(name))
+	{
+		alc->Unload();
+	}
+}
+
+void ZSharp::FZGenericCLR::UnloadSlimALC(IZSlimAssemblyLoadContext* alc)
+{
+	alc->Unload();
 }
 
 ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::GetSlimALC(const FString& name)
 {
 	checkNoEntry();
 	return nullptr;
+}
+
+void ZSharp::FZGenericCLR::HandleMasterALCUnloaded()
+{
+	MasterALC = nullptr;
+
+	OnMasterALCUnloaded.Broadcast();
 }
 
 

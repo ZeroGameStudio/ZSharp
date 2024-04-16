@@ -10,5 +10,7 @@ namespace ZSharp
 	{
 	public:
 		virtual const FString& GetName() const = 0;
+	public:
+		virtual bool IsZCallable() const = 0;
 	};
 }

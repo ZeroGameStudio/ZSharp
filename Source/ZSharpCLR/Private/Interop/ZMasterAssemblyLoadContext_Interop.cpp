@@ -27,7 +27,7 @@ int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByHandle(FZCallHandle ha
 	return 1;
 }
 
-int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByName(const TCHAR* name, FZCallBuffer* buffer, FZCallHandle* outHandle)
+int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByName(const TCHAR* name, FZCallBuffer* buffer, FZCallHandle* outHandle, uint8 bResolve)
 {
 	IZMasterAssemblyLoadContext* alc = IZCLR::Get().GetMasterALC();
 	if (!alc)
@@ -35,7 +35,7 @@ int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByName(const TCHAR* name
 		return 0;
 	}
 	
-	const IZCallDispatcher* dispatcher = alc->GetZCallDispatcher(name);
+	const IZCallDispatcher* dispatcher = bResolve ? alc->GetOrResolveZCallDispatcher(name) : alc->GetZCallDispatcher(name);
 	if (!dispatcher)
 	{
 		return 0;
@@ -55,13 +55,13 @@ ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext_Interop::GetZCallHandle
 	IZMasterAssemblyLoadContext* alc = IZCLR::Get().GetMasterALC();
 	if (!alc)
 	{
-		return FZCallHandle();
+		return FZCallHandle{};
 	}
 	
 	const IZCallDispatcher* dispatcher = alc->GetZCallDispatcher(name);
 	if (!dispatcher)
 	{
-		return FZCallHandle();
+		return FZCallHandle{};
 	}
 
 	return alc->GetZCallHandle(dispatcher);

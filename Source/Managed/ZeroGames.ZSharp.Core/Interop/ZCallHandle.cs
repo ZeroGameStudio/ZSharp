@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace ZeroGames.ZSharp;
+namespace ZeroGames.ZSharp.Core;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct ZCallHandle

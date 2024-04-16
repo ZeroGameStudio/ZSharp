@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroGames.ZSharp", "ZeroGames.ZSharp\ZeroGames.ZSharp.csproj", "{F64622CE-88DC-49FD-AABA-B3C719671BFD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroGames.ZSharp.Core", "ZeroGames.ZSharp.Core\ZeroGames.ZSharp.Core.csproj", "{F64622CE-88DC-49FD-AABA-B3C719671BFD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

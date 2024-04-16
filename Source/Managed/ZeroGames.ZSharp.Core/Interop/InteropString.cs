@@ -1,4 +1,4 @@
-﻿namespace ZeroGames.ZSharp;
+﻿namespace ZeroGames.ZSharp.Core;
 
 public readonly struct InteropString : IDisposable
 {

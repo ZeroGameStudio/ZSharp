@@ -47,7 +47,7 @@ ZSharp::IZType* ZSharp::FZMasterAssemblyLoadContext::GetType(const FString& name
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::RegisterZCall(IZCallDispatcher* dispatcher)
 {
-	FZCallHandle handle = FAllocZCallHandle::Alloc();
+	FZCallHandle handle = AllocateZCallHandle();
 
 	ZCallMap.Emplace(handle, dispatcher);
 	Name2ZCall.Emplace(dispatcher->GetName(), dispatcher);
@@ -68,38 +68,75 @@ ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetZCallDispatche
 	return pDispatcher ? *pDispatcher : nullptr;
 }
 
+ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetOrResolveZCallDispatcher(const FString& name)
+{
+	if (IZCallDispatcher* const* pDispatcher = Name2ZCall.Find(name))
+	{
+		return *pDispatcher;
+	}
+
+	for (const auto& resolver : ZCallResolverLink)
+	{
+		if (IZCallDispatcher* dispatcher = resolver.Get<1>()->Resolve(name))
+		{
+			(void)RegisterZCall(dispatcher);
+			return dispatcher;
+		}
+	}
+	
+	return nullptr;
+}
+
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const IZCallDispatcher* dispatcher) const
 {
 	const FZCallHandle* pHandle = ZCall2Handle.Find(dispatcher);
-	return pHandle ? *pHandle : FZCallHandle();
+	return pHandle ? *pHandle : FZCallHandle{};
 }
 
-ZSharp::FZGCHandle ZSharp::FZMasterAssemblyLoadContext::BuildConjugate(void* native, const IZType* type)
+void ZSharp::FZMasterAssemblyLoadContext::RegisterZCallResolver(IZCallResolver* resolver, uint64 priority)
 {
-	FZGCHandle handle = type->New();
-	BuildConjugate(native, handle);
-
-	return handle;
+	ZCallResolverLink.Emplace(TTuple<uint64, TUniquePtr<IZCallResolver>>(priority, resolver));
+	ZCallResolverLink.StableSort([](auto& lhs, auto& rhs){ return lhs.template Get<0>() < rhs.template Get<0>(); });
 }
 
-void ZSharp::FZMasterAssemblyLoadContext::BuildConjugate(void* native, FZGCHandle handle)
+ZSharp::FZConjugateHandle ZSharp::FZMasterAssemblyLoadContext::BuildConjugate(void* unmanaged, const IZType* managedType)
 {
-	Native2Conjugate.Emplace(native, handle);
-	Conjugate2Native.Emplace(handle, native);
+	FZConjugateHandle managed = managedType->BuildConjugate(unmanaged);
+	BuildConjugate(unmanaged, managed);
+
+	return managed;
 }
 
-void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(void* native)
+void ZSharp::FZMasterAssemblyLoadContext::BuildConjugate(void* unmanaged, FZConjugateHandle managed)
 {
-	FZGCHandle handle;
-	Native2Conjugate.RemoveAndCopyValue(native, handle);
-	Conjugate2Native.Remove(handle);
+	ConjugateUnmanaged2Managed.Emplace(unmanaged, managed);
+	ConjugateManaged2Unmanaged.Emplace(managed, unmanaged);
 }
 
-void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(FZGCHandle handle)
+void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(void* unmanaged)
 {
-	void* native;
-	Conjugate2Native.RemoveAndCopyValue(handle, native);
-	Native2Conjugate.Remove(native);
+	FZConjugateHandle managed;
+	ConjugateUnmanaged2Managed.RemoveAndCopyValue(unmanaged, managed);
+	ConjugateManaged2Unmanaged.Remove(managed);
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(FZConjugateHandle managed)
+{
+	void* unmanaged;
+	ConjugateManaged2Unmanaged.RemoveAndCopyValue(managed, unmanaged);
+	ConjugateUnmanaged2Managed.Remove(unmanaged);
+}
+
+ZSharp::FZConjugateHandle ZSharp::FZMasterAssemblyLoadContext::Conjugate(void* unmanaged) const
+{
+	const FZConjugateHandle* managed = ConjugateUnmanaged2Managed.Find(unmanaged);
+	return managed ? *managed : FZConjugateHandle{};
+}
+
+void* ZSharp::FZMasterAssemblyLoadContext::Conjugate(FZConjugateHandle managed) const
+{
+	void* const* unmanaged = ConjugateManaged2Unmanaged.Find(managed);
+	return unmanaged ? *unmanaged : nullptr;
 }
 
 

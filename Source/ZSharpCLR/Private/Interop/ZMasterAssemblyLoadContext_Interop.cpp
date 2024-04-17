@@ -3,14 +3,14 @@
 
 #include "ZMasterAssemblyLoadContext_Interop.h"
 
-#include "CLR/IZCLR.h"
+#include "CLR/IZSharpCLR.h"
 #include "Interop/IZCallDispatcher.h"
 #include "Interop/IZMasterAssemblyLoadContext.h"
 
 
 int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByHandle(FZCallHandle handle, FZCallBuffer* buffer)
 {
-	IZMasterAssemblyLoadContext* alc = IZCLR::Get().GetMasterALC();
+	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
 	if (!alc)
 	{
 		return 0;
@@ -29,7 +29,7 @@ int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByHandle(FZCallHandle ha
 
 int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByName(const TCHAR* name, FZCallBuffer* buffer, FZCallHandle* outHandle, uint8 bResolve)
 {
-	IZMasterAssemblyLoadContext* alc = IZCLR::Get().GetMasterALC();
+	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
 	if (!alc)
 	{
 		return 0;
@@ -52,7 +52,7 @@ int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByName(const TCHAR* name
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext_Interop::GetZCallHandle(const TCHAR* name)
 {
-	IZMasterAssemblyLoadContext* alc = IZCLR::Get().GetMasterALC();
+	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
 	if (!alc)
 	{
 		return FZCallHandle{};

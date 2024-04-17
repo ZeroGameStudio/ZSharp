@@ -11,12 +11,32 @@ public class String : IConjugate<String>
         return null;
     }
 
-    public String()
+    public String() : this(string.Empty)
+    {
+        
+    }
+
+    public String(string content)
     {
         GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
         _bNative = false;
     }
 
+    public override string ToString()
+    {
+        return "123";
+    }
+
+    public GCHandle GCHandle { get; }
+    public IntPtr Unmanaged { get; }
+    
+    private String(IntPtr unmanaged)
+    {
+        GCHandle = GCHandle.Alloc(this);
+        Unmanaged = unmanaged;
+        _bNative = true;
+    }
+    
     ~String()
     {
         if (!_bNative)
@@ -24,16 +44,6 @@ public class String : IConjugate<String>
             
         }
     }
-
-    private String(IntPtr unmanaged)
-    {
-        GCHandle = GCHandle.Alloc(this);
-        Unmanaged = unmanaged;
-        _bNative = true;
-    }
-
-    public GCHandle GCHandle { get; }
-    public IntPtr Unmanaged { get; }
 
     private bool _bNative;
 

@@ -10,12 +10,12 @@ namespace ZSharp
 	DECLARE_MULTICAST_DELEGATE_OneParam(FZOnMasterALCLoaded, IZMasterAssemblyLoadContext*)
 	DECLARE_MULTICAST_DELEGATE(FZOnMasterALCUnloaded)
 	
-	class ZSHARPCLR_API IZCLR
+	class ZSHARPCLR_API IZSharpCLR
 	{
 	public:
-		static IZCLR& Get();
+		static IZSharpCLR& Get();
 	public:
-		virtual ~IZCLR(){}
+		virtual ~IZSharpCLR(){}
 	public:
 		virtual IZMasterAssemblyLoadContext* LoadMasterALC() = 0;
 		virtual void UnloadMasterALC() = 0;

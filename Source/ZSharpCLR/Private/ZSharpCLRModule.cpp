@@ -2,8 +2,8 @@
 
 #include "ZSharpCLRModule.h"
 
-#include "CLR/CLRImplType.h"
-#include "CLR/IZCLR.h"
+#include "CLR\ZSharpCLR.h"
+#include "CLR/IZSharpCLR.h"
 #include "Interop/IZMasterAssemblyLoadContext.h"
 
 class FZSharpCLRModule : public IZSharpCLRModule
@@ -18,12 +18,12 @@ IMPLEMENT_MODULE(FZSharpCLRModule, ZSharpCLR)
 
 void FZSharpCLRModule::StartupModule()
 {
-	((FZCLRImplType&)ZSharp::IZCLR::Get()).Startup();
+	((FZSharpCLR&)ZSharp::IZSharpCLR::Get()).Startup();
 }
 
 void FZSharpCLRModule::ShutdownModule()
 {
-	if (ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZCLR::Get().GetMasterALC())
+	if (ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().GetMasterALC())
 	{
 		alc->Unload();
 	}

@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "CLR/IZCLR.h"
+#include "CLR/IZSharpCLR.h"
 #include "Interop/IZMasterAssemblyLoadContext.h"
 
 namespace ZSharp
 {
 	class IZAssemblyLoadContext;
 	
-	class FZGenericCLR : public IZCLR
+	class FZGenericCLR : public IZSharpCLR
 	{
 
 	public:

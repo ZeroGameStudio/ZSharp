@@ -2,7 +2,7 @@
 
 #include "ZSharpRuntimeModule.h"
 
-#include "CLR/IZCLR.h"
+#include "CLR/IZSharpCLR.h"
 #include "Interop/IZAssembly.h"
 #include "Interop/IZMasterAssemblyLoadContext.h"
 
@@ -18,7 +18,7 @@ IMPLEMENT_MODULE(FZSharpRuntimeModule, ZSharpRuntime)
 
 void FZSharpRuntimeModule::StartupModule()
 {
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZCLR::Get().LoadMasterALC();
+	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().LoadMasterALC();
 
 	{
 		FString path = FPaths::Combine(FPaths::ProjectPluginsDir(), "ZeroGames", "ZSharp", "Binaries", "Managed", "ZeroGames.ZSharp.UnrealEngine.dll");

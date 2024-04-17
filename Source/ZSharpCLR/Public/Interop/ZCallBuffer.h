@@ -19,6 +19,7 @@ namespace ZSharp
 		float Float;
 		double Double;
 		uint8 Bool;
+		void* Pointer;
 		FZConjugateHandle Conjugate;
 	};
 	

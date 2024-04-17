@@ -29,8 +29,6 @@ namespace ZSharp
 		virtual IZAssembly* LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) override;
 		virtual IZAssembly* GetAssembly(const FString& name) const override;
 
-		virtual IZType* GetType(const FString& name) const override;
-
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) override;
 		virtual IZCallDispatcher* GetZCallDispatcher(FZCallHandle handle) const override;
 		virtual IZCallDispatcher* GetZCallDispatcher(const FString& name) const override;

@@ -16,6 +16,7 @@ public struct ZCallBufferSlot
     [FieldOffset(0)] public float Float;
     [FieldOffset(0)] public double Double;
     [FieldOffset(0)] public uint8 Bool;
+    [FieldOffset(0)] public IntPtr Pointer;
     [FieldOffset(0)] public ConjugateHandle Conjugate;
 }
 

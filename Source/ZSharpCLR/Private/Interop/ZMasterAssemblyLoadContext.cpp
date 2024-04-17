@@ -39,12 +39,6 @@ ZSharp::IZAssembly* ZSharp::FZMasterAssemblyLoadContext::GetAssembly(const FStri
 	return assembly ? assembly->Get() : nullptr;
 }
 
-ZSharp::IZType* ZSharp::FZMasterAssemblyLoadContext::GetType(const FString& name) const
-{
-	checkNoEntry();
-	return nullptr;
-}
-
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::RegisterZCall(IZCallDispatcher* dispatcher)
 {
 	FZCallHandle handle = AllocateZCallHandle();

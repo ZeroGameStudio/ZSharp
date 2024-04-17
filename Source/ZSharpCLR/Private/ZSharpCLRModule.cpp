@@ -2,6 +2,7 @@
 
 #include "ZSharpCLRModule.h"
 
+#include "CLR/CLRImplType.h"
 #include "CLR/IZCLR.h"
 #include "Interop/IZMasterAssemblyLoadContext.h"
 
@@ -17,8 +18,7 @@ IMPLEMENT_MODULE(FZSharpCLRModule, ZSharpCLR)
 
 void FZSharpCLRModule::StartupModule()
 {
-	// Startup the runtime as soon as the module startup.
-	(void)ZSharp::IZCLR::Get();
+	((FZCLRImplType&)ZSharp::IZCLR::Get()).Startup();
 }
 
 void FZSharpCLRModule::ShutdownModule()

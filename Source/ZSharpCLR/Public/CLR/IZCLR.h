@@ -17,8 +17,6 @@ namespace ZSharp
 	public:
 		virtual ~IZCLR(){}
 	public:
-		virtual void Startup() = 0;
-	public:
 		virtual IZMasterAssemblyLoadContext* LoadMasterALC() = 0;
 		virtual void UnloadMasterALC() = 0;
 		virtual IZMasterAssemblyLoadContext* GetMasterALC() = 0;

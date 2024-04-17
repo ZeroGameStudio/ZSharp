@@ -21,7 +21,7 @@ namespace ZSharp
 		virtual void UnregisterMasterALCUnloaded(const void* userObject) override;
 		
 	public:
-		virtual void Startup() override;
+		void Startup();
 
 	public:
 		virtual IZMasterAssemblyLoadContext* LoadMasterALC() override;

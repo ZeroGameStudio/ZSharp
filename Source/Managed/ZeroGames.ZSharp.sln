@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroGames.ZSharp.Core", "ZeroGames.ZSharp.Core\ZeroGames.ZSharp.Core.csproj", "{F64622CE-88DC-49FD-AABA-B3C719671BFD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroGames.ZSharp.UnrealEngine", "ZeroGames.ZSharp.UnrealEngine\ZeroGames.ZSharp.UnrealEngine.csproj", "{745307CD-985C-4F98-AF7D-DF8D7A48AF38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{F64622CE-88DC-49FD-AABA-B3C719671BFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F64622CE-88DC-49FD-AABA-B3C719671BFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F64622CE-88DC-49FD-AABA-B3C719671BFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{745307CD-985C-4F98-AF7D-DF8D7A48AF38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{745307CD-985C-4F98-AF7D-DF8D7A48AF38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{745307CD-985C-4F98-AF7D-DF8D7A48AF38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{745307CD-985C-4F98-AF7D-DF8D7A48AF38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

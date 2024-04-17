@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ZeroGames.ZSharp.Core\ZeroGames.ZSharp.Core.csproj" />
+    </ItemGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="if not exist $(ProjectDir)\..\..\..\Binaries\Managed\ mkdir $(ProjectDir)\..\..\..\Binaries\Managed\" />
+        <Exec Command="copy $(TargetPath) $(ProjectDir)\..\..\..\Binaries\Managed\$(TargetFileName)" />
+    </Target>
+
+</Project>

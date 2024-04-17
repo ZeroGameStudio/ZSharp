@@ -2,13 +2,12 @@
 
 #include "CLR/IZCLR.h"
 
+#include "CLRImplType.h"
 #include "ZGenericCLR.h"
 
 ZSharp::IZCLR& ZSharp::IZCLR::Get()
 {
-	using ImplType = FZGenericCLR;
-
-	static ImplType GSingleton;
+	static FZCLRImplType GSingleton;
 
 	return GSingleton;
 }

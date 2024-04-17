@@ -8,37 +8,37 @@ public class MasterAssemblyLoadContext : AssemblyLoadContext, IGCHandle
 
     public static MasterAssemblyLoadContext? Get()
     {
-        return _GSingleton;
+        return _sSingleton;
     }
 
     internal static void UnloadSingleton()
     {
-        if (_GSingleton is null)
+        if (_sSingleton is null)
         {
             throw new Exception();
         }
         
-        _GSingleton.Unload();
+        _sSingleton.Unload();
     }
 
     public MasterAssemblyLoadContext() : base("Master", true)
     {
-        if (_GSingleton is not null)
+        if (_sSingleton is not null)
         {
             throw new Exception();
         }
         
         GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
-        _GSingleton = this;
+        _sSingleton = this;
 
         Unloading += context =>
         {
-            if (_GSingleton != this)
+            if (_sSingleton != this)
             {
                 throw new Exception();
             }
             
-            _GSingleton = null;
+            _sSingleton = null;
         };
     }
 
@@ -66,7 +66,7 @@ public class MasterAssemblyLoadContext : AssemblyLoadContext, IGCHandle
 
     public GCHandle GCHandle { get; }
     
-    private static MasterAssemblyLoadContext? _GSingleton;
+    private static MasterAssemblyLoadContext? _sSingleton;
     
 }
 

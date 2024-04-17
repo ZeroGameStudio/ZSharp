@@ -17,8 +17,7 @@ internal static class MasterAssemblyLoadContext_Interop
     {
         MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
         Assembly asm = alc.LoadFromStream(new UnmanagedMemoryStream(buffer, size));
-        InteropProxy<Assembly> proxy = new(asm);
-
+        
         string asmName = asm.FullName!.Split(',')[0];
         Type? entryType = asm.GetType($"{asmName}.Entry");
         if (entryType is not null)
@@ -30,7 +29,7 @@ internal static class MasterAssemblyLoadContext_Interop
             }
         }
 
-        return proxy.GCHandle;
+        return GCHandle.Alloc(asm, GCHandleType.Weak);
     }
     
     public static unsafe delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> GZCallByHandle;

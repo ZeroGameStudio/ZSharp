@@ -6,5 +6,3 @@ global using uint8 = byte;
 global using uint16 = ushort;
 global using uint32 = uint;
 global using uint64 = ulong;
-
-

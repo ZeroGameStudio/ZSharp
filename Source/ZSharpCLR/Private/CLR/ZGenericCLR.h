@@ -13,6 +13,9 @@ namespace ZSharp
 	{
 
 	public:
+		static FZGenericCLR& Get() { return (FZGenericCLR&)IZSharpCLR::Get(); }
+
+	public:
 		virtual FDelegateHandle RegisterMasterALCLoaded(FZOnMasterALCLoaded::FDelegate delegate, bool bNotifyIfLoaded = true) override;
 		virtual void UnregisterMasterALCLoaded(FDelegateHandle delegate) override;
 		virtual void UnregisterMasterALCLoaded(const void* userObject) override;

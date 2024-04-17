@@ -18,7 +18,7 @@ IMPLEMENT_MODULE(FZSharpCLRModule, ZSharpCLR)
 
 void FZSharpCLRModule::StartupModule()
 {
-	((FZSharpCLR&)ZSharp::IZSharpCLR::Get()).Startup();
+	FZSharpCLR::Get().Startup();
 }
 
 void FZSharpCLRModule::ShutdownModule()

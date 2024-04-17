@@ -19,9 +19,9 @@ void ZSharp::FZMasterAssemblyLoadContext::Unload()
 	UnloadCallback();
 }
 
-ZSharp::IZAssembly* ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const TArray<uint8>& buffer)
+ZSharp::IZAssembly* ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const TArray<uint8>& buffer, void* args)
 {
-	FZGCHandle handle = FZMasterAssemblyLoadContext_Interop::GLoadAssembly(buffer.GetData(), buffer.Num());
+	FZGCHandle handle = FZMasterAssemblyLoadContext_Interop::GLoadAssembly(buffer.GetData(), buffer.Num(), args);
 	IZAssembly* assembly = new FZAssembly(handle);
 	AssemblyMap.Emplace(assembly->GetName(), assembly);
 

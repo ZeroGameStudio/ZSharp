@@ -33,7 +33,7 @@ internal unsafe struct ManagedFunctions
     public delegate* unmanaged<GCHandle, void> GCHandle_Free;
 
     public delegate* unmanaged<void> MasterAssemblyLoadContext_Unload;
-    public delegate* unmanaged<uint8*, int32, GCHandle> MasterAssemblyLoadContext_LoadAssembly;
+    public delegate* unmanaged<uint8*, int32, void*, GCHandle> MasterAssemblyLoadContext_LoadAssembly;
     
     public delegate* unmanaged<GCHandle, IntPtr, uint8> Assembly_GetName;
 }

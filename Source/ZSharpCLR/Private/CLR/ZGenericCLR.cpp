@@ -152,7 +152,7 @@ void ZSharp::FZGenericCLR::Startup()
 			void(*GCHandle_Free)(FZGCHandle);
 
 			void(*MasterAssemblyLoadContext_Unload)();
-			FZGCHandle(*MasterAssemblyLoadContext_LoadAssembly)(const uint8*, int32);
+			FZGCHandle(*MasterAssemblyLoadContext_LoadAssembly)(const uint8*, int32, void*);
 
 			uint8(*Assembly_GetName)(FZGCHandle, FString&);
 		} ManagedFunctions;

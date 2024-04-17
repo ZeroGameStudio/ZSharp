@@ -16,7 +16,7 @@ namespace ZSharp
 		static FZCallHandle GetZCallHandle(const TCHAR* name);
 		
 		inline static void(*GUnload)() = nullptr;
-		inline static FZGCHandle(*GLoadAssembly)(const uint8*, int32) = nullptr;
+		inline static FZGCHandle(*GLoadAssembly)(const uint8*, int32, void*) = nullptr;
 	};
 }
 

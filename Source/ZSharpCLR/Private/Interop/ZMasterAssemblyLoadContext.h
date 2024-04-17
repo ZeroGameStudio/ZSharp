@@ -26,7 +26,7 @@ namespace ZSharp
 		virtual void Unload() override;
 
 		// IZMasterAssemblyLoadContext
-		virtual IZAssembly* LoadAssembly(const TArray<uint8>& buffer) override;
+		virtual IZAssembly* LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) override;
 		virtual IZAssembly* GetAssembly(const FString& name) const override;
 
 		virtual IZType* GetType(const FString& name) const override;

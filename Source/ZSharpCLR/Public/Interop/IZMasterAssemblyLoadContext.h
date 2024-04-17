@@ -18,7 +18,7 @@ namespace ZSharp
 	class ZSHARPCLR_API IZMasterAssemblyLoadContext : public IZAssemblyLoadContext
 	{
 	public:
-		virtual IZAssembly* LoadAssembly(const TArray<uint8>& buffer) = 0;
+		virtual IZAssembly* LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) = 0;
 		virtual IZAssembly* GetAssembly(const FString& name) const = 0;
 	public:
 		virtual IZType* GetType(const FString& name) const = 0;

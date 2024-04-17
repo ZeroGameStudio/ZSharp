@@ -13,7 +13,7 @@ internal static class MasterAssemblyLoadContext_Interop
     }
 
     [UnmanagedCallersOnly]
-    public static unsafe GCHandle LoadAssembly(uint8* buffer, int32 size)
+    public static unsafe GCHandle LoadAssembly(uint8* buffer, int32 size, void* args)
     {
         MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
         Assembly asm = alc.LoadFromStream(new UnmanagedMemoryStream(buffer, size));
@@ -25,7 +25,8 @@ internal static class MasterAssemblyLoadContext_Interop
             MethodInfo? startupMethod = entryType.GetMethod("Startup");
             if (startupMethod is not null)
             {
-                startupMethod.Invoke(null, null);
+                object?[]? parameters = args is not null ? new object?[] { new IntPtr(args) } : null;
+                startupMethod.Invoke(null, parameters);
             }
         }
 

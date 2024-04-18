@@ -2,32 +2,33 @@
 
 #pragma once
 
-#include "Interop/IZAssembly.h"
-#include "Interop/IZType.h"
+#include "Interop/IZMethodInfo.h"
 
 namespace ZSharp
 {
-	class FZAssembly : public IZAssembly
+	class FZMethodInfo : public IZMethodInfo
 	{
 
 	public:
-		FZAssembly(FZGCHandle handle)
-			: Handle(handle){}
+		FZMethodInfo(FZGCHandle handle)
+			:Handle(handle){}
 
 	public:
 		// IZGCHandle
 		virtual FZGCHandle GetGCHandle() const override { return Handle; }
 
-		// IZAssembly
+		// IZMemberInfo
 		virtual const FString& GetName() const override;
-		
-		virtual const IZType* GetType(const FString& name) const override;
+		virtual bool IsZCallable() const override;
+
+		// IZMethodInfo
+		virtual int32 Invoke(FZCallBuffer* buffer) const override;
 
 	private:
 		FZGCHandle Handle;
 		mutable TOptional<FString> CachedName;
 		
-		mutable TMap<FString, TUniquePtr<IZType>> TypeMap;
-		
 	};
 }
+
+

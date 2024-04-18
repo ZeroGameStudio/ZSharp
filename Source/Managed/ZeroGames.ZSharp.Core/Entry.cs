@@ -36,6 +36,15 @@ internal unsafe struct ManagedFunctions
     public delegate* unmanaged<uint8*, int32, void*, GCHandle> MasterAssemblyLoadContext_LoadAssembly;
     
     public delegate* unmanaged<GCHandle, IntPtr, uint8> Assembly_GetName;
+    public delegate* unmanaged<GCHandle, char*, GCHandle> Assembly_GetType;
+    
+    public delegate* unmanaged<GCHandle, IntPtr, uint8> Type_GetName;
+    public delegate* unmanaged<GCHandle, IntPtr, ConjugateHandle> Type_BuildConjugate;
+    public delegate* unmanaged<GCHandle, char*, GCHandle> Type_GetMethodInfo;
+    public delegate* unmanaged<GCHandle, char*, GCHandle> Type_GetPropertyInfo;
+    
+    public delegate* unmanaged<GCHandle, IntPtr, uint8> MethodInfo_GetName;
+    public delegate* unmanaged<GCHandle, ZCallBuffer*, int32> MethodInfo_Invoke;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -75,6 +84,17 @@ internal static class Entry
 
         // Assembly interop functions
         output->ManagedFunctions.Assembly_GetName = &Assembly_Interop.GetName;
+        output->ManagedFunctions.Assembly_GetType = &Assembly_Interop.GetType;
+        
+        // Type interop functions
+        output->ManagedFunctions.Type_GetName = &Type_Interop.GetName;
+        output->ManagedFunctions.Type_BuildConjugate = &Type_Interop.BuildConjugate;
+        output->ManagedFunctions.Type_GetMethodInfo = &Type_Interop.GetMethodInfo;
+        output->ManagedFunctions.Type_GetPropertyInfo = &Type_Interop.GetPropertyInfo;
+        
+        // MethodInfo interop functions
+        output->ManagedFunctions.MethodInfo_GetName = &MethodInfo_Interop.GetName;
+        output->ManagedFunctions.MethodInfo_Invoke = &MethodInfo_Interop.Invoke;
         
         Logger.Log("====================== CoreCLR Startup ======================");
         

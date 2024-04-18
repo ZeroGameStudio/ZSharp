@@ -5,15 +5,11 @@ namespace ZeroGames.ZSharp.Core;
 public readonly struct ConjugateHandle
 {
 
-    public static ref readonly ConjugateHandle Invalid => ref _sInvalid;
-
-    public static ConjugateHandle FromConjugate(IConjugate conjugate) => new(conjugate.GCHandle);
+    public static ConjugateHandle FromConjugate(IConjugate? conjugate) => conjugate is not null ? new(conjugate.GCHandle) : new();
     public static ConjugateHandle FromGCHandle(GCHandle handle) => new(handle);
     public GCHandle ToGCHandle() => GCHandle.FromIntPtr(_handle);
 
     public bool bValid => _handle != IntPtr.Zero;
-
-    private static ConjugateHandle _sInvalid = new(new());
 
     private ConjugateHandle(GCHandle handle)
     {

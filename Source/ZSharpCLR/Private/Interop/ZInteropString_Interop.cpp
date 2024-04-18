@@ -5,7 +5,7 @@
 
 FString& ZSharp::FZInteropString_Interop::Alloc(const TCHAR* data)
 {
-	return *new FString(data);
+	return *new FString { data };
 }
 
 void ZSharp::FZInteropString_Interop::Free(FString& address)

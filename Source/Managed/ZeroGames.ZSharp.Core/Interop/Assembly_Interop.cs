@@ -21,6 +21,21 @@ internal static class Assembly_Interop
 
         return 0;
     }
+
+    [UnmanagedCallersOnly]
+    public static unsafe GCHandle GetType(GCHandle handle, char* name)
+    {
+        if (handle.Target is Assembly asm)
+        {
+            Type? type = asm.GetType(new string(name));
+            if (type is not null)
+            {
+                return GCHandle.Alloc(type, GCHandleType.Weak);
+            }
+        }
+
+        return new();
+    }
     
 }
 

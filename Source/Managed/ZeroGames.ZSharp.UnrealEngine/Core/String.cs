@@ -3,10 +3,10 @@ using ZeroGames.ZSharp.Core;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class String : IConjugate<String>
+public class String : IConjugate
 {
 
-    public static String? BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+    public static IConjugate? BuildConjugate(IntPtr unmanaged) => new String(unmanaged);
 
     public String() : this(string.Empty){}
 

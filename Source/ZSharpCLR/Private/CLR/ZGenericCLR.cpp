@@ -14,6 +14,8 @@
 #include "Interop/ZMasterAssemblyLoadContext.h"
 #include "Interop/ZMasterAssemblyLoadContext_Interop.h"
 #include "Interop/ZGCHandle.h"
+#include "Interop/ZMethodInfo_Interop.h"
+#include "Interop/ZType_Interop.h"
 
 namespace ZSharp::FZGenericCLR_Private
 {
@@ -155,6 +157,15 @@ void ZSharp::FZGenericCLR::Startup()
 			FZGCHandle(*MasterAssemblyLoadContext_LoadAssembly)(const uint8*, int32, void*);
 
 			uint8(*Assembly_GetName)(FZGCHandle, FString&);
+			FZGCHandle(*Assembly_GetType)(FZGCHandle, const TCHAR*);
+
+			uint8(*Type_GetName)(FZGCHandle, FString&);
+			FZConjugateHandle(*Type_BuildConjugate)(FZGCHandle, void*);
+			FZGCHandle(*Type_GetMethodInfo)(FZGCHandle, const TCHAR*);
+			FZGCHandle(*Type_GetPropertyInfo)(FZGCHandle, const TCHAR*);
+
+			uint8(*MethodInfo_GetName)(FZGCHandle, FString&);
+			int32(*MethodInfo_Invoke)(FZGCHandle, FZCallBuffer*);
 		} ManagedFunctions;
 	} output{};
 	
@@ -176,6 +187,15 @@ void ZSharp::FZGenericCLR::Startup()
 	FZMasterAssemblyLoadContext_Interop::GLoadAssembly = output.ManagedFunctions.MasterAssemblyLoadContext_LoadAssembly;
 
 	FZAssembly_Interop::GGetName = output.ManagedFunctions.Assembly_GetName;
+	FZAssembly_Interop::GGetType = output.ManagedFunctions.Assembly_GetType;
+
+	FZType_Interop::GGetName = output.ManagedFunctions.Type_GetName;
+	FZType_Interop::GBuildConjugate = output.ManagedFunctions.Type_BuildConjugate;
+	FZType_Interop::GGetMethodInfo = output.ManagedFunctions.Type_GetMethodInfo;
+	FZType_Interop::GGetPropertyInfo = output.ManagedFunctions.Type_GetPropertyInfo;
+
+	FZMethodInfo_Interop::GGetName = output.ManagedFunctions.MethodInfo_GetName;
+	FZMethodInfo_Interop::GInvoke = output.ManagedFunctions.MethodInfo_Invoke;
 }
 
 ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::LoadMasterALC()

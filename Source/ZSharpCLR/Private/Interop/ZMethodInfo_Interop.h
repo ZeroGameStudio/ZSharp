@@ -6,10 +6,12 @@
 
 namespace ZSharp
 {
-	struct FZAssembly_Interop
+	struct FZCallBuffer;
+	
+	struct FZMethodInfo_Interop
 	{
 		inline static uint8(*GGetName)(FZGCHandle, FString&) = nullptr;
-		inline static FZGCHandle(*GGetType)(FZGCHandle, const TCHAR*) = nullptr;
+		inline static int32(*GInvoke)(FZGCHandle, FZCallBuffer*) = nullptr;
 	};
 }
 

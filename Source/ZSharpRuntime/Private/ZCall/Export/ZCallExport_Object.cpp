@@ -31,7 +31,7 @@ namespace ZSharp
 	{
 		UObject* obj = FZConjugateRegistry::Get().Conjugate<UObject>(buffer->Slots[0].Conjugate);
 		FZConjugateHandle* res = &buffer->Slots[1].Conjugate;
-		FString* name = new FString{ obj->GetName() };
+		FString* name = new FString { obj->GetName() };
 		*res = FZConjugateRegistry::Get().BuildConjugate(name);
 		
 		return 0;

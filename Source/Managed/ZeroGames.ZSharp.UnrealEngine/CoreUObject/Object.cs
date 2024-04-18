@@ -3,10 +3,10 @@ using ZeroGames.ZSharp.Core;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public class Object : IConjugate<Object>
+public class Object : IConjugate
 {
 
-    public static Object? BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+    public static IConjugate? BuildConjugate(IntPtr unmanaged) => new Object(unmanaged);
 
     public unsafe Object Class
     {
@@ -16,7 +16,7 @@ public class Object : IConjugate<Object>
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
             {
                 new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Conjugate = ConjugateHandle.Invalid },
+                new() { Conjugate = new() },
             };
             ZCallBuffer buffer = new() { Slots = slots };
             alc.ZCall("ex://Object.GetClass", &buffer);
@@ -32,7 +32,7 @@ public class Object : IConjugate<Object>
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
             {
                 new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Conjugate = ConjugateHandle.Invalid },
+                new() { Conjugate = new() },
             };
             ZCallBuffer buffer = new() { Slots = slots };
             alc.ZCall("ex://Object.GetOuter", &buffer);
@@ -48,7 +48,7 @@ public class Object : IConjugate<Object>
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
             {
                 new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Conjugate = ConjugateHandle.Invalid },
+                new() { Conjugate = new() },
             };
             ZCallBuffer buffer = new() { Slots = slots };
             alc.ZCall("ex://Object.GetName", &buffer);

@@ -4,6 +4,7 @@
 #include "ZAssembly.h"
 
 #include "ZAssembly_Interop.h"
+#include "ZType.h"
 
 const FString& ZSharp::FZAssembly::GetName() const
 {
@@ -17,8 +18,17 @@ const FString& ZSharp::FZAssembly::GetName() const
 	return *CachedName;
 }
 
-ZSharp::IZType* ZSharp::FZAssembly::GetType(const FString& name) const
+const ZSharp::IZType* ZSharp::FZAssembly::GetType(const FString& name) const
 {
-	checkNoEntry();
-	return nullptr;
+	const TUniquePtr<IZType>* pType = TypeMap.Find(name);
+	if (pType)
+	{
+		return pType->Get();
+	}
+	
+	FZGCHandle handle = FZAssembly_Interop::GGetType(Handle, *name);
+	IZType* type = new FZType { handle };
+	TypeMap.Emplace(name, type);
+
+	return type;
 }

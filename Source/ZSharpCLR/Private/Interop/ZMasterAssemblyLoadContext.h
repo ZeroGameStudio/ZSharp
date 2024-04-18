@@ -26,13 +26,13 @@ namespace ZSharp
 		virtual void Unload() override;
 
 		// IZMasterAssemblyLoadContext
-		virtual IZAssembly* LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) override;
-		virtual IZAssembly* GetAssembly(const FString& name) const override;
+		virtual const IZAssembly* LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) override;
+		virtual const IZAssembly* GetAssembly(const FString& name) const override;
 
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) override;
-		virtual IZCallDispatcher* GetZCallDispatcher(FZCallHandle handle) const override;
-		virtual IZCallDispatcher* GetZCallDispatcher(const FString& name) const override;
-		virtual IZCallDispatcher* GetOrResolveZCallDispatcher(const FString& name) override;
+		virtual const IZCallDispatcher* GetZCallDispatcher(FZCallHandle handle) const override;
+		virtual const IZCallDispatcher* GetZCallDispatcher(const FString& name) const override;
+		virtual const IZCallDispatcher* GetOrResolveZCallDispatcher(const FString& name) override;
 		virtual FZCallHandle GetZCallHandle(const IZCallDispatcher* dispatcher) const override;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) override;
 

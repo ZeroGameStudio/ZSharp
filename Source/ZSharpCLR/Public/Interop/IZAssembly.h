@@ -13,6 +13,6 @@ namespace ZSharp
 	public:
 		virtual const FString& GetName() const = 0;
 	public:
-		virtual IZType* GetType(const FString& name) const = 0;
+		virtual const IZType* GetType(const FString& name) const = 0;
 	};
 }

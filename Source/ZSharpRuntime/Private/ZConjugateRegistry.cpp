@@ -42,7 +42,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::BuildConjugate(UObject* u
 
 	FString asmName = "ZeroGames.ZSharp.UnrealEngine";
 	FString managedTypeName = "ZeroGames.ZSharp.UnrealEngine.CoreUObject.Object";
-	IZType* managedType = alc->GetAssembly(asmName)->GetType(managedTypeName);
+	const IZType* managedType = alc->GetAssembly(asmName)->GetType(managedTypeName);
 	
 	if (!managedType)
 	{
@@ -90,7 +90,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::BuildConjugate(FString* u
 
 	FString asmName = "ZeroGames.ZSharp.UnrealEngine";
 	FString managedTypeName = "ZeroGames.ZSharp.UnrealEngine.Core.String";
-	IZType* managedType = alc->GetAssembly(asmName)->GetType(managedTypeName);
+	const IZType* managedType = alc->GetAssembly(asmName)->GetType(managedTypeName);
 	
 	if (!managedType)
 	{

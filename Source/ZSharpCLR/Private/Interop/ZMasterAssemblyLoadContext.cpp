@@ -19,16 +19,16 @@ void ZSharp::FZMasterAssemblyLoadContext::Unload()
 	UnloadCallback();
 }
 
-ZSharp::IZAssembly* ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const TArray<uint8>& buffer, void* args)
+const ZSharp::IZAssembly* ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const TArray<uint8>& buffer, void* args)
 {
 	FZGCHandle handle = FZMasterAssemblyLoadContext_Interop::GLoadAssembly(buffer.GetData(), buffer.Num(), args);
-	IZAssembly* assembly = new FZAssembly(handle);
+	IZAssembly* assembly = new FZAssembly { handle };
 	AssemblyMap.Emplace(assembly->GetName(), assembly);
 
 	return assembly;
 }
 
-ZSharp::IZAssembly* ZSharp::FZMasterAssemblyLoadContext::GetAssembly(const FString& name) const
+const ZSharp::IZAssembly* ZSharp::FZMasterAssemblyLoadContext::GetAssembly(const FString& name) const
 {
 	const TUniquePtr<IZAssembly>* assembly = AssemblyMap.Find(name);
 	if (assembly)
@@ -50,19 +50,19 @@ ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::RegisterZCall(IZCallDi
 	return handle;
 }
 
-ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetZCallDispatcher(FZCallHandle handle) const
+const ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetZCallDispatcher(FZCallHandle handle) const
 {
 	const TUniquePtr<IZCallDispatcher>* pDispatcher = ZCallMap.Find(handle);
 	return pDispatcher ? pDispatcher->Get() : nullptr;
 }
 
-ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetZCallDispatcher(const FString& name) const
+const ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetZCallDispatcher(const FString& name) const
 {
 	IZCallDispatcher* const* pDispatcher = Name2ZCall.Find(name);
 	return pDispatcher ? *pDispatcher : nullptr;
 }
 
-ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetOrResolveZCallDispatcher(const FString& name)
+const ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetOrResolveZCallDispatcher(const FString& name)
 {
 	if (IZCallDispatcher* const* pDispatcher = Name2ZCall.Find(name))
 	{

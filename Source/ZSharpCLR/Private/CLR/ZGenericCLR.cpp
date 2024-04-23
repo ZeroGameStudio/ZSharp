@@ -126,7 +126,7 @@ void ZSharp::FZGenericCLR::Startup()
 
 	const FString assembly = FPaths::Combine(pluginBinariesDir, "Managed", "ZeroGames.ZSharp.Core.dll");
 	const FString type = TEXT("ZeroGames.ZSharp.Core.Entry, ZeroGames.ZSharp.Core");
-	const FString method = TEXT("Startup");
+	const FString method = TEXT("DllMain");
 
 	constexpr struct FStartupInput
 	{

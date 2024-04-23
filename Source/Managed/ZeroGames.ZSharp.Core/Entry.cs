@@ -56,7 +56,7 @@ internal struct StartupOutput
 internal static class Entry
 {
     [UnmanagedCallersOnly]
-    private static unsafe int Startup(StartupInput* input, StartupOutput* output)
+    private static unsafe int DllMain(StartupInput* input, StartupOutput* output)
     {
         // UE
         UE_Interop.GUE_Log = input->UnmanagedFunctions.UE_Log;

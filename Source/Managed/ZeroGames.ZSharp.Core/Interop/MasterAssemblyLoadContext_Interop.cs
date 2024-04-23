@@ -22,7 +22,7 @@ internal static class MasterAssemblyLoadContext_Interop
         Type? entryType = asm.GetType($"{asmName}.Entry");
         if (entryType is not null)
         {
-            MethodInfo? startupMethod = entryType.GetMethod("Startup");
+            MethodInfo? startupMethod = entryType.GetMethod("DllMain");
             if (startupMethod is not null)
             {
                 object?[]? parameters = args is not null ? new object?[] { new IntPtr(args) } : null;

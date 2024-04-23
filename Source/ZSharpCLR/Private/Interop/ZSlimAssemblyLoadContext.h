@@ -13,7 +13,9 @@ namespace ZSharp
 		FZSlimAssemblyLoadContext(FZGCHandle handle, const TFunction<void()>& unloadCallback, const FString& name)
 			: Handle(handle)
 			, UnloadCallback(unloadCallback)
-			, Name(name){}
+			, Name(name)
+			, RunningCount(0)
+			, bUnloading(false){}
 		
 	public:
 		// IZGCHandle
@@ -33,6 +35,9 @@ namespace ZSharp
 		FZGCHandle Handle;
 		TFunction<void()> UnloadCallback;
 		FString Name;
+
+		mutable TAtomic<uint64> RunningCount;
+		mutable TAtomic<bool> bUnloading;
 		
 	};
 }

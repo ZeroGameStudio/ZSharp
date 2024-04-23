@@ -25,7 +25,7 @@ int32 ZSharp::IZSharpCLR::Run(const FString& path, void* args)
 		return -1;
 	}
 
-	ON_SCOPE_EXIT{ UnloadSlimALC(alc); };
+	ON_SCOPE_EXIT{ alc->Unload(); };
 
 	return alc->LoadAssembly(path, args);
 }

@@ -4,7 +4,6 @@
 
 #include "CLR/ZSharpCLR.h"
 #include "CLR/IZSharpCLR.h"
-#include "Interop/IZMasterAssemblyLoadContext.h"
 #include "Interop/ZCommonDllMainArgs.h"
 
 namespace ZSharp::ZSharpCLRModule_Private

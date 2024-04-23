@@ -18,11 +18,8 @@ namespace ZSharp
 		virtual ~IZSharpCLR(){}
 	public:
 		virtual IZMasterAssemblyLoadContext* CreateMasterALC() = 0;
-		virtual void UnloadMasterALC() = 0;
 		virtual IZMasterAssemblyLoadContext* GetMasterALC() = 0;
 		virtual IZSlimAssemblyLoadContext* CreateSlimALC(const FString& name) = 0;
-		virtual void UnloadSlimALC(IZSlimAssemblyLoadContext* alc) = 0;
-		virtual void UnloadSlimALC(const FString& name) = 0;
 		virtual IZSlimAssemblyLoadContext* GetSlimALC(const FString& name) = 0;
 	public:
 		virtual FDelegateHandle RegisterMasterALCLoaded(FZOnMasterALCLoaded::FDelegate delegate, bool bNotifyIfLoaded = true) = 0;

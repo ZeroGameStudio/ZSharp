@@ -30,11 +30,8 @@ namespace ZSharp
 
 	public:
 		virtual IZMasterAssemblyLoadContext* CreateMasterALC() override;
-		virtual void UnloadMasterALC() override;
 		virtual IZMasterAssemblyLoadContext* GetMasterALC() override;
 		virtual IZSlimAssemblyLoadContext* CreateSlimALC(const FString& name) override;
-		virtual void UnloadSlimALC(const FString& name) override;
-		virtual void UnloadSlimALC(IZSlimAssemblyLoadContext* alc) override;
 		virtual IZSlimAssemblyLoadContext* GetSlimALC(const FString& name) override;
 
 	private:
@@ -48,6 +45,7 @@ namespace ZSharp
 	private:
 		bool bInitialized = false;
 		TUniquePtr<IZMasterAssemblyLoadContext> MasterALC;
+		FRWLock SlimALCMapLock;
 		TMap<FString, TUniquePtr<IZSlimAssemblyLoadContext>> SlimALCMap;
 		
 	};

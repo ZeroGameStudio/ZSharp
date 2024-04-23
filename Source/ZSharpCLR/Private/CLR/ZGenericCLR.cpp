@@ -23,6 +23,8 @@
 
 FDelegateHandle ZSharp::FZGenericCLR::RegisterMasterALCLoaded(FZOnMasterALCLoaded::FDelegate delegate, bool bNotifyIfLoaded)
 {
+	check(IsInGameThread());
+	
 	FDelegateHandle handle = OnMasterALCLoaded.Add(delegate);
 	if (bNotifyIfLoaded && MasterALC.Get())
 	{
@@ -34,31 +36,43 @@ FDelegateHandle ZSharp::FZGenericCLR::RegisterMasterALCLoaded(FZOnMasterALCLoade
 
 void ZSharp::FZGenericCLR::UnregisterMasterALCLoaded(FDelegateHandle delegate)
 {
+	check(IsInGameThread());
+	
 	OnMasterALCLoaded.Remove(delegate);
 }
 
 void ZSharp::FZGenericCLR::UnregisterMasterALCLoaded(const void* userObject)
 {
+	check(IsInGameThread());
+	
 	OnMasterALCLoaded.RemoveAll(userObject);
 }
 
 FDelegateHandle ZSharp::FZGenericCLR::RegisterMasterALCUnloaded(FZOnMasterALCUnloaded::FDelegate delegate)
 {
+	check(IsInGameThread());
+	
 	return OnMasterALCUnloaded.Add(delegate);
 }
 
 void ZSharp::FZGenericCLR::UnregisterMasterALCUnloaded(FDelegateHandle delegate)
 {
+	check(IsInGameThread());
+	
 	OnMasterALCUnloaded.Remove(delegate);
 }
 
 void ZSharp::FZGenericCLR::UnregisterMasterALCUnloaded(const void* userObject)
 {
+	check(IsInGameThread());
+	
 	OnMasterALCUnloaded.RemoveAll(userObject);
 }
 
 void ZSharp::FZGenericCLR::Startup()
 {
+	check(IsInGameThread());
+	
 	if (bInitialized)
 	{
 		return;
@@ -185,6 +199,8 @@ void ZSharp::FZGenericCLR::Startup()
 
 void ZSharp::FZGenericCLR::Shutdown()
 {
+	check(IsInGameThread());
+	
 	if (!bInitialized)
 	{
 		return;
@@ -205,6 +221,8 @@ void ZSharp::FZGenericCLR::Shutdown()
 
 ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::CreateMasterALC()
 {
+	check(IsInGameThread());
+	
 	if (MasterALC)
 	{
 		UE_LOG(LogZSharpCLR, Fatal, TEXT("Master ALC already exists!"));
@@ -223,21 +241,17 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::CreateMasterALC()
 	return MasterALC.Get();
 }
 
-void ZSharp::FZGenericCLR::UnloadMasterALC()
-{
-	if (MasterALC.Get())
-	{
-		MasterALC->Unload();
-	}
-}
-
 ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::GetMasterALC()
 {
+	check(IsInGameThread());
+	
 	return MasterALC.Get();
 }
 
 ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::CreateSlimALC(const FString& name)
 {
+	FWriteScopeLock _(SlimALCMapLock);
+	
 	if (SlimALCMap.Contains(name))
 	{
 		UE_LOG(LogZSharpCLR, Fatal, TEXT("Slim ALC [%s] already exists!"), *name);
@@ -255,21 +269,10 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::CreateSlimALC(const FSt
 	return alc;
 }
 
-void ZSharp::FZGenericCLR::UnloadSlimALC(const FString& name)
-{
-	if (IZSlimAssemblyLoadContext* alc = GetSlimALC(name))
-	{
-		alc->Unload();
-	}
-}
-
-void ZSharp::FZGenericCLR::UnloadSlimALC(IZSlimAssemblyLoadContext* alc)
-{
-	alc->Unload();
-}
-
 ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::GetSlimALC(const FString& name)
 {
+	FReadScopeLock _(SlimALCMapLock);
+	
 	const TUniquePtr<IZSlimAssemblyLoadContext>* pAlc = SlimALCMap.Find(name);
 	return pAlc ? pAlc->Get() : nullptr;
 }
@@ -283,6 +286,8 @@ void ZSharp::FZGenericCLR::HandleMasterALCUnloaded()
 
 void ZSharp::FZGenericCLR::HandleSlimALCUnloaded(const FString& name)
 {
+	FWriteScopeLock _(SlimALCMapLock);
+	
 	SlimALCMap.Remove(name);
 }
 

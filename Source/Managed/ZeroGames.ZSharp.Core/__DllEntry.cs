@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.Core;
 [StructLayout(LayoutKind.Sequential)]
 internal unsafe struct UnmanagedFunctions
 {
-    public delegate* unmanaged<uint8, char*, void> UE_Log;
+    public delegate* unmanaged<uint8, char*, void> UnrealEngine_Log;
     
     public delegate* unmanaged<char*, IntPtr> InteropString_Alloc;
     public delegate* unmanaged<IntPtr, void> InteropString_Free;
@@ -64,18 +64,18 @@ internal static class __DllEntry
     private static unsafe int32 DllMain(StartupInput* input, StartupOutput* output)
     {
         // UE
-        UE_Interop.GUE_Log = input->UnmanagedFunctions.UE_Log;
+        UnrealEngine_Interop.SLog = input->UnmanagedFunctions.UnrealEngine_Log;
         
         // InteropString
-        InteropString_Interop.GAlloc = input->UnmanagedFunctions.InteropString_Alloc;
-        InteropString_Interop.GFree = input->UnmanagedFunctions.InteropString_Free;
-        InteropString_Interop.GGetData = input->UnmanagedFunctions.InteropString_GetData;
-        InteropString_Interop.GSetData = input->UnmanagedFunctions.InteropString_SetData;
+        InteropString_Interop.SAlloc = input->UnmanagedFunctions.InteropString_Alloc;
+        InteropString_Interop.SFree = input->UnmanagedFunctions.InteropString_Free;
+        InteropString_Interop.SGetData = input->UnmanagedFunctions.InteropString_GetData;
+        InteropString_Interop.SSetData = input->UnmanagedFunctions.InteropString_SetData;
         
         // MasterAssemblyLoadContext
-        MasterAssemblyLoadContext_Interop.GZCallByHandle = input->UnmanagedFunctions.MasterAssemblyLoadContext_ZCallByHandle;
-        MasterAssemblyLoadContext_Interop.GZCallByName = input->UnmanagedFunctions.MasterAssemblyLoadContext_ZCallByName;
-        MasterAssemblyLoadContext_Interop.GGetZCallHandle = input->UnmanagedFunctions.MasterAssemblyLoadContext_GetZCallHandle;
+        MasterAssemblyLoadContext_Interop.SZCallByHandle = input->UnmanagedFunctions.MasterAssemblyLoadContext_ZCallByHandle;
+        MasterAssemblyLoadContext_Interop.SZCallByName = input->UnmanagedFunctions.MasterAssemblyLoadContext_ZCallByName;
+        MasterAssemblyLoadContext_Interop.SGetZCallHandle = input->UnmanagedFunctions.MasterAssemblyLoadContext_GetZCallHandle;
         
         // CLR interop functions
         output->ManagedFunctions.CLR_CreateMasterALC = &CLR_Interop.CreateMasterALC;

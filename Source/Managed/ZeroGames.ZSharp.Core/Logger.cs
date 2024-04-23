@@ -13,7 +13,7 @@ public static class Logger
         {
             fixed (char* buffer = messageStr.ToCharArray())
             {
-                UE_Interop.GUE_Log(1, buffer);
+                UnrealEngine_Interop.SLog(1, buffer);
             }
         }
     }
@@ -26,7 +26,7 @@ public static class Logger
         {
             fixed (char* buffer = messageStr.ToCharArray())
             {
-                UE_Interop.GUE_Log(2, buffer);
+                UnrealEngine_Interop.SLog(2, buffer);
             }
         }
     }
@@ -39,7 +39,7 @@ public static class Logger
         {
             fixed (char* buffer = messageStr.ToCharArray())
             {
-                UE_Interop.GUE_Log(3, buffer);
+                UnrealEngine_Interop.SLog(3, buffer);
             }
         }
     }

@@ -121,7 +121,7 @@ void ZSharp::FZGenericCLR::Startup()
 	{
 		struct
 		{
-			void(*UE_Log)(uint8, const TCHAR*) = FZUnrealEngine_Interop::Log;
+			void(*UnrealEngine_Log)(uint8, const TCHAR*) = FZUnrealEngine_Interop::Log;
 			
 			FString&(*InteropString_Alloc)(const TCHAR*) = FZInteropString_Interop::Alloc;
 			void(*InteropString_Free)(FString&) = FZInteropString_Interop::Free;

@@ -2,13 +2,13 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-public static class InteropString_Interop
+internal static class InteropString_Interop
 {
 
-    public static unsafe delegate* unmanaged<char*, IntPtr> GAlloc;
-    public static unsafe delegate* unmanaged<IntPtr, void> GFree;
-    public static unsafe delegate* unmanaged<IntPtr, char*> GGetData;
-    public static unsafe delegate* unmanaged<IntPtr, char*, void> GSetData;
+    public static unsafe delegate* unmanaged<char*, IntPtr> SAlloc;
+    public static unsafe delegate* unmanaged<IntPtr, void> SFree;
+    public static unsafe delegate* unmanaged<IntPtr, char*> SGetData;
+    public static unsafe delegate* unmanaged<IntPtr, char*, void> SSetData;
 
 }
 

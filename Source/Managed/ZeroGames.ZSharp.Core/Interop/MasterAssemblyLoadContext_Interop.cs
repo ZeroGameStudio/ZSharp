@@ -49,8 +49,8 @@ internal static class MasterAssemblyLoadContext_Interop
         return GCHandle.Alloc(asm, GCHandleType.Weak);
     }
     
-    public static unsafe delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> GZCallByHandle;
-    public static unsafe delegate* unmanaged<char*, ZCallBuffer*, ZCallHandle*, uint8, int32> GZCallByName;
-    public static unsafe delegate* unmanaged<char*, ZCallHandle> GGetZCallHandle;
+    public static unsafe delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> SZCallByHandle;
+    public static unsafe delegate* unmanaged<char*, ZCallBuffer*, ZCallHandle*, uint8, int32> SZCallByName;
+    public static unsafe delegate* unmanaged<char*, ZCallHandle> SGetZCallHandle;
     
 }

@@ -26,6 +26,7 @@ namespace ZSharp
 		
 	public:
 		void Startup();
+		void Shutdown();
 
 	public:
 		virtual IZMasterAssemblyLoadContext* CreateMasterALC() override;

@@ -183,6 +183,26 @@ void ZSharp::FZGenericCLR::Startup()
 	FZMethodInfo_Interop::GInvoke = output.ManagedFunctions.MethodInfo_Invoke;
 }
 
+void ZSharp::FZGenericCLR::Shutdown()
+{
+	if (!bInitialized)
+	{
+		return;
+	}
+
+	if (MasterALC.Get())
+	{
+		MasterALC->Unload();
+	}
+
+	for (const auto& Pair : SlimALCMap)
+	{
+		Pair.Value->Unload();
+	}
+
+	bInitialized = false;
+}
+
 ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::CreateMasterALC()
 {
 	if (MasterALC)

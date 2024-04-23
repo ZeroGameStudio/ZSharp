@@ -71,10 +71,7 @@ void FZSharpCLRModule::StartupModule()
 
 void FZSharpCLRModule::ShutdownModule()
 {
-	if (ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().GetMasterALC())
-	{
-		alc->Unload();
-	}
+	FZSharpCLR::Get().Shutdown();
 }
 
 

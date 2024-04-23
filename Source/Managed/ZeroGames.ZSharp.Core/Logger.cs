@@ -3,13 +3,9 @@
 public static class Logger
 {
 
-    public static void Log(object message)
+    public static void Log(object? message)
     {
-        string? messageStr = message.ToString();
-        if (messageStr is null)
-        {
-            return;
-        }
+        string messageStr = message?.ToString() ?? "";
 
         unsafe
         {
@@ -20,13 +16,9 @@ public static class Logger
         }
     }
     
-    public static void Warning(object message)
+    public static void Warning(object? message)
     {
-        string? messageStr = message.ToString();
-        if (messageStr is null)
-        {
-            return;
-        }
+        string messageStr = message?.ToString() ?? "";
 
         unsafe
         {
@@ -37,13 +29,9 @@ public static class Logger
         }
     }
     
-    public static void Error(object message)
+    public static void Error(object? message)
     {
-        string? messageStr = message.ToString();
-        if (messageStr is null)
-        {
-            return;
-        }
+        string messageStr = message?.ToString() ?? "";
 
         unsafe
         {

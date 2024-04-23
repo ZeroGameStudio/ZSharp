@@ -6,9 +6,10 @@ internal static class GCHandle_Interop
 {
     
     [UnmanagedCallersOnly]
-    public static void Free(GCHandle handle)
+    public static int32 Free(GCHandle handle)
     {
         handle.Free();
+        return 0;
     }
     
 }

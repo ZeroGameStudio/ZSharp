@@ -10,7 +10,7 @@ namespace ZSharp
 	
 	struct FZMethodInfo_Interop
 	{
-		inline static uint8(*GGetName)(FZGCHandle, FString&) = nullptr;
+		inline static int32(*GGetName)(FZGCHandle, FString&) = nullptr;
 		inline static int32(*GInvoke)(FZGCHandle, FZCallBuffer*) = nullptr;
 	};
 }

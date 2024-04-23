@@ -1,47 +1,17 @@
 ﻿using System.Runtime.InteropServices;
-using System.Runtime.Loader;
 
 namespace ZeroGames.ZSharp.Core;
 
-public class MasterAssemblyLoadContext : AssemblyLoadContext, IGCHandle
+public class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase
 {
 
+    public const string KName = "__Master";
+    
     public static MasterAssemblyLoadContext? Get()
     {
         return _sSingleton;
     }
-
-    internal static void UnloadSingleton()
-    {
-        if (_sSingleton is null)
-        {
-            throw new Exception();
-        }
-        
-        _sSingleton.Unload();
-    }
-
-    public MasterAssemblyLoadContext() : base("Master", true)
-    {
-        if (_sSingleton is not null)
-        {
-            throw new Exception();
-        }
-        
-        GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
-        _sSingleton = this;
-
-        Unloading += context =>
-        {
-            if (_sSingleton != this)
-            {
-                throw new Exception();
-            }
-            
-            _sSingleton = null;
-        };
-    }
-
+    
     public unsafe int32 ZCall(ZCallHandle handle, ZCallBuffer* buffer)
     {
         return MasterAssemblyLoadContext_Interop.GZCallByHandle(handle, buffer);
@@ -64,9 +34,34 @@ public class MasterAssemblyLoadContext : AssemblyLoadContext, IGCHandle
         }
     }
 
-    public GCHandle GCHandle { get; }
+    internal static MasterAssemblyLoadContext Create()
+    {
+        if (_sSingleton is not null)
+        {
+            throw new Exception();
+        }
+
+        return new();
+    }
     
     private static MasterAssemblyLoadContext? _sSingleton;
+    
+    private MasterAssemblyLoadContext() : base(KName)
+    {
+        _sSingleton = this;
+
+        Unloading += context =>
+        {
+            if (_sSingleton != context)
+            {
+                throw new Exception();
+            }
+
+            _sSingleton = null;
+            
+            Logger.Log($"Master ALC Unloaded, name: {Name}, handle: {GCHandle.ToIntPtr(GCHandle)}");
+        };
+    }
     
 }
 

@@ -4,6 +4,7 @@
 
 #include "CLR/IZSharpCLR.h"
 #include "Interop/IZMasterAssemblyLoadContext.h"
+#include "Interop/IZSlimAssemblyLoadContext.h"
 
 namespace ZSharp
 {
@@ -27,10 +28,10 @@ namespace ZSharp
 		void Startup();
 
 	public:
-		virtual IZMasterAssemblyLoadContext* LoadMasterALC() override;
+		virtual IZMasterAssemblyLoadContext* CreateMasterALC() override;
 		virtual void UnloadMasterALC() override;
 		virtual IZMasterAssemblyLoadContext* GetMasterALC() override;
-		virtual IZSlimAssemblyLoadContext* LoadSlimALC(const FString& name) override;
+		virtual IZSlimAssemblyLoadContext* CreateSlimALC(const FString& name) override;
 		virtual void UnloadSlimALC(const FString& name) override;
 		virtual void UnloadSlimALC(IZSlimAssemblyLoadContext* alc) override;
 		virtual IZSlimAssemblyLoadContext* GetSlimALC(const FString& name) override;
@@ -41,10 +42,12 @@ namespace ZSharp
 
 	private:
 		void HandleMasterALCUnloaded();
+		void HandleSlimALCUnloaded(const FString& name);
 
 	private:
 		bool bInitialized = false;
 		TUniquePtr<IZMasterAssemblyLoadContext> MasterALC;
+		TMap<FString, TUniquePtr<IZSlimAssemblyLoadContext>> SlimALCMap;
 		
 	};
 }

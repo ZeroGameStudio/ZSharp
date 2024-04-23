@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Using Include="System.Byte" Alias="uint8" />
+        <Using Include="System.UInt16" Alias="uint16" />
+        <Using Include="System.UInt32" Alias="uint32" />
+        <Using Include="System.UInt64" Alias="uint64" />
+        <Using Include="System.SByte" Alias="int8" />
+        <Using Include="System.Int16" Alias="int16" />
+        <Using Include="System.Int32" Alias="int32" />
+        <Using Include="System.Int64" Alias="int64" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ZeroGames.ZSharp.Core\ZeroGames.ZSharp.Core.csproj" />
+    </ItemGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="if not exist $(ProjectDir)\..\..\..\Binaries\Managed\ mkdir $(ProjectDir)\..\..\..\Binaries\Managed\" />
+        <Exec Command="copy $(TargetPath) $(ProjectDir)\..\..\..\Binaries\Managed\$(TargetFileName)" />
+    </Target>
+
+</Project>

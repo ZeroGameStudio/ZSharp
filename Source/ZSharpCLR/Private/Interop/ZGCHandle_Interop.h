@@ -8,7 +8,7 @@ namespace ZSharp
 {
 	struct FZGCHandle_Interop
 	{
-		inline static void(*GFree)(FZGCHandle) = nullptr;
+		inline static int32(*GFree)(FZGCHandle) = nullptr;
 	};
 }
 

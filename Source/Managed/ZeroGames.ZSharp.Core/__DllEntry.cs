@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.Core;
 
@@ -29,21 +27,26 @@ internal struct StartupInput
 internal unsafe struct ManagedFunctions
 {
     public delegate* unmanaged<GCHandle> CLR_CreateMasterALC;
+    public delegate* unmanaged<char*, GCHandle> CLR_CreateSlimALC;
     
-    public delegate* unmanaged<GCHandle, void> GCHandle_Free;
+    public delegate* unmanaged<GCHandle, int32> GCHandle_Free;
 
-    public delegate* unmanaged<void> MasterAssemblyLoadContext_Unload;
+    public delegate* unmanaged<int32> MasterAssemblyLoadContext_Unload;
     public delegate* unmanaged<uint8*, int32, void*, GCHandle> MasterAssemblyLoadContext_LoadAssembly;
+
+    public delegate* unmanaged<GCHandle, int32> SlimAssemblyLoadContext_Unload;
+    public delegate* unmanaged<GCHandle, uint8*, int32, void*, int32> SlimAssemblyLoadContext_LoadAssembly;
+    public delegate* unmanaged<GCHandle, char*, char*, char*, void*, int32> SlimAssemblyLoadContext_CallMethod;
     
-    public delegate* unmanaged<GCHandle, IntPtr, uint8> Assembly_GetName;
+    public delegate* unmanaged<GCHandle, IntPtr, int32> Assembly_GetName;
     public delegate* unmanaged<GCHandle, char*, GCHandle> Assembly_GetType;
     
-    public delegate* unmanaged<GCHandle, IntPtr, uint8> Type_GetName;
+    public delegate* unmanaged<GCHandle, IntPtr, int32> Type_GetName;
     public delegate* unmanaged<GCHandle, IntPtr, ConjugateHandle> Type_BuildConjugate;
     public delegate* unmanaged<GCHandle, char*, GCHandle> Type_GetMethodInfo;
     public delegate* unmanaged<GCHandle, char*, GCHandle> Type_GetPropertyInfo;
     
-    public delegate* unmanaged<GCHandle, IntPtr, uint8> MethodInfo_GetName;
+    public delegate* unmanaged<GCHandle, IntPtr, int32> MethodInfo_GetName;
     public delegate* unmanaged<GCHandle, ZCallBuffer*, int32> MethodInfo_Invoke;
 }
 
@@ -53,10 +56,10 @@ internal struct StartupOutput
     public ManagedFunctions ManagedFunctions;
 }
 
-internal static class Entry
+internal static class __DllEntry
 {
     [UnmanagedCallersOnly]
-    private static unsafe int DllMain(StartupInput* input, StartupOutput* output)
+    private static unsafe int32 DllMain(StartupInput* input, StartupOutput* output)
     {
         // UE
         UE_Interop.GUE_Log = input->UnmanagedFunctions.UE_Log;
@@ -74,6 +77,7 @@ internal static class Entry
         
         // CLR interop functions
         output->ManagedFunctions.CLR_CreateMasterALC = &CLR_Interop.CreateMasterALC;
+        output->ManagedFunctions.CLR_CreateSlimALC = &CLR_Interop.CreateSlimALC;
         
         // GCHandle interop functions
         output->ManagedFunctions.GCHandle_Free = &GCHandle_Interop.Free;
@@ -82,6 +86,11 @@ internal static class Entry
         output->ManagedFunctions.MasterAssemblyLoadContext_Unload = &MasterAssemblyLoadContext_Interop.Unload;
         output->ManagedFunctions.MasterAssemblyLoadContext_LoadAssembly = &MasterAssemblyLoadContext_Interop.LoadAssembly;
 
+        // SlimAssemblyLoadContext interop functions
+        output->ManagedFunctions.SlimAssemblyLoadContext_Unload = &SlimAssemblyLoadContext_Interop.Unload;
+        output->ManagedFunctions.SlimAssemblyLoadContext_LoadAssembly = &SlimAssemblyLoadContext_Interop.LoadAssembly;
+        output->ManagedFunctions.SlimAssemblyLoadContext_CallMethod = &SlimAssemblyLoadContext_Interop.CallMethod;
+        
         // Assembly interop functions
         output->ManagedFunctions.Assembly_GetName = &Assembly_Interop.GetName;
         output->ManagedFunctions.Assembly_GetType = &Assembly_Interop.GetType;
@@ -97,12 +106,7 @@ internal static class Entry
         output->ManagedFunctions.MethodInfo_Invoke = &MethodInfo_Interop.Invoke;
         
         Logger.Log("====================== CoreCLR Startup ======================");
-        
-        // while (!Debugger.IsAttached)
-        // {
-        //     Logger.Log("Waiting for debugger...");
-        // }
-        
+
         return 1;
     }
 }

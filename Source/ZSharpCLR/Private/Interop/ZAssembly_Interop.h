@@ -8,7 +8,7 @@ namespace ZSharp
 {
 	struct FZAssembly_Interop
 	{
-		inline static uint8(*GGetName)(FZGCHandle, FString&) = nullptr;
+		inline static int32(*GGetName)(FZGCHandle, FString&) = nullptr;
 		inline static FZGCHandle(*GGetType)(FZGCHandle, const TCHAR*) = nullptr;
 	};
 }

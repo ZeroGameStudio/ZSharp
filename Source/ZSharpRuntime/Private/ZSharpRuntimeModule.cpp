@@ -20,7 +20,7 @@ IMPLEMENT_MODULE(FZSharpRuntimeModule, ZSharpRuntime)
 
 void FZSharpRuntimeModule::StartupModule()
 {
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().LoadMasterALC();
+	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().CreateMasterALC();
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_Export{}, 0);
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UFunction{}, 1);
 

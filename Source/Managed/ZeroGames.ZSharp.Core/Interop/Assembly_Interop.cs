@@ -7,7 +7,7 @@ internal static class Assembly_Interop
 {
 
     [UnmanagedCallersOnly]
-    public static uint8 GetName(GCHandle handle, IntPtr outNameAddr)
+    public static int32 GetName(GCHandle handle, IntPtr outNameAddr)
     {
         if (handle.Target is Assembly asm)
         {
@@ -16,10 +16,10 @@ internal static class Assembly_Interop
             string name = fullName.Split(',')[0];
             interopStr.Data = name;
 
-            return 1;
+            return 0;
         }
 
-        return 0;
+        return 1;
     }
 
     [UnmanagedCallersOnly]

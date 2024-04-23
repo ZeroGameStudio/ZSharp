@@ -20,7 +20,7 @@ namespace ZSharp
 		
 	public:
 		// IZGCHandle
-		virtual FZGCHandle GetGCHandle() const override;
+		virtual FZGCHandle GetGCHandle() const override { return Handle; }
 
 		// IZAssemblyLoadContext
 		virtual void Unload() override;

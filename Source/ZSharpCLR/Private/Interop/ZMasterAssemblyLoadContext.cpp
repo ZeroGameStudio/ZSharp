@@ -8,11 +8,6 @@
 #include "Interop/IZCallDispatcher.h"
 #include "Interop/IZType.h"
 
-ZSharp::FZGCHandle ZSharp::FZMasterAssemblyLoadContext::GetGCHandle() const
-{
-	return Handle;
-}
-
 void ZSharp::FZMasterAssemblyLoadContext::Unload()
 {
 	FZMasterAssemblyLoadContext_Interop::GUnload();

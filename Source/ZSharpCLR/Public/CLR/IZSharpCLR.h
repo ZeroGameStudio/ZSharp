@@ -17,10 +17,10 @@ namespace ZSharp
 	public:
 		virtual ~IZSharpCLR(){}
 	public:
-		virtual IZMasterAssemblyLoadContext* LoadMasterALC() = 0;
+		virtual IZMasterAssemblyLoadContext* CreateMasterALC() = 0;
 		virtual void UnloadMasterALC() = 0;
 		virtual IZMasterAssemblyLoadContext* GetMasterALC() = 0;
-		virtual IZSlimAssemblyLoadContext* LoadSlimALC(const FString& name) = 0;
+		virtual IZSlimAssemblyLoadContext* CreateSlimALC(const FString& name) = 0;
 		virtual void UnloadSlimALC(IZSlimAssemblyLoadContext* alc) = 0;
 		virtual void UnloadSlimALC(const FString& name) = 0;
 		virtual IZSlimAssemblyLoadContext* GetSlimALC(const FString& name) = 0;

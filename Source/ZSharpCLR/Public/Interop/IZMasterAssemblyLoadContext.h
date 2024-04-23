@@ -34,6 +34,9 @@ namespace ZSharp
 		virtual void ReleaseConjugate(FZConjugateHandle managed) = 0;
 		virtual FZConjugateHandle Conjugate(void* unmanaged) const = 0;
 		virtual void* Conjugate(FZConjugateHandle managed) const = 0;
+		// Helpers
+	public:
+		const IZAssembly* LoadAssembly(const FString& path, void* args = nullptr);
 	};
 }
 

@@ -31,6 +31,10 @@ namespace ZSharp
 		virtual FDelegateHandle RegisterMasterALCUnloaded(FZOnMasterALCUnloaded::FDelegate delegate) = 0;
 		virtual void UnregisterMasterALCUnloaded(FDelegateHandle delegate) = 0;
 		virtual void UnregisterMasterALCUnloaded(const void* userObject) = 0;
+		// Helpers
+	public:
+		int32 Run(const FString& path, void* args);
+		int32 RunAsync(const FString& path, void* args);
 	};
 }
 

@@ -33,7 +33,11 @@ internal static class SlimAssemblyLoadContext_Interop
                 if (dllMain is not null)
                 {
                     object?[]? parameters = args is not null ? new object?[] { new IntPtr(args) } : null;
-                    dllMain.Invoke(null, parameters);
+                    object? res = dllMain.Invoke(null, parameters);
+                    if (res?.GetType() == typeof(int32))
+                    {
+                        return (int32)res;
+                    }
                 }
             }
             
@@ -68,9 +72,9 @@ internal static class SlimAssemblyLoadContext_Interop
             }
 
             object?[]? parameters = args is not null ? new object?[] { new IntPtr(args) } : null;
-            dllMain.Invoke(null, parameters);
+            object? res =dllMain.Invoke(null, parameters);
 
-            return 0;
+            return res?.GetType() == typeof(int32) ? (int32)res : 0;
         }
         
         return -1;

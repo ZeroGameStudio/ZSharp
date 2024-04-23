@@ -36,6 +36,9 @@ public class ZSharpEditor : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
+				
+				"ZSharpCLR",
+				"ZSharpRuntime",
 			}
 		);
 		

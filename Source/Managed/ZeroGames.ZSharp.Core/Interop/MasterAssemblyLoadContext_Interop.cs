@@ -25,7 +25,6 @@ internal static class MasterAssemblyLoadContext_Interop
     [UnmanagedCallersOnly]
     public static unsafe GCHandle LoadAssembly(uint8* buffer, int32 size, void* args)
     {
-        while(!Debugger.IsAttached){}
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
         {

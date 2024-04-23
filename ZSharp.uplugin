@@ -24,6 +24,11 @@
 			"Name": "ZSharpRuntime",
 			"Type": "Runtime",
 			"LoadingPhase": "EarliestPossible"
+		},
+		{
+			"Name": "ZSharpEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	]
 }

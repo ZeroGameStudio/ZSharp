@@ -1,4 +1,6 @@
-﻿using ZeroGames.ZSharp.Core;
+﻿// Copyright Zero Games. All Rights Reserved.
+
+using ZeroGames.ZSharp.Core;
 
 namespace ZeroGames.ZSharp.GlueGenerator;
 

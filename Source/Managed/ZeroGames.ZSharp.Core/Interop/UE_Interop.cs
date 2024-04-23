@@ -1,4 +1,6 @@
-﻿namespace ZeroGames.ZSharp.Core;
+﻿// Copyright Zero Games. All Rights Reserved.
+
+namespace ZeroGames.ZSharp.Core;
 
 internal static class UE_Interop
 {

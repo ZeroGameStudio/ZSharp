@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿// Copyright Zero Games. All Rights Reserved.
+
+using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.Core;
 

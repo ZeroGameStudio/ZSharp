@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿// Copyright Zero Games. All Rights Reserved.
+
+using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.Core;
@@ -22,6 +25,7 @@ internal static class MasterAssemblyLoadContext_Interop
     [UnmanagedCallersOnly]
     public static unsafe GCHandle LoadAssembly(uint8* buffer, int32 size, void* args)
     {
+        while(!Debugger.IsAttached){}
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
         {

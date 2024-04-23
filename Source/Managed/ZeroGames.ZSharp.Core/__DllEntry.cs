@@ -105,7 +105,7 @@ internal static class __DllEntry
         output->ManagedFunctions.MethodInfo_GetName = &MethodInfo_Interop.GetName;
         output->ManagedFunctions.MethodInfo_Invoke = &MethodInfo_Interop.Invoke;
         
-        Logger.Log("====================== CoreCLR Startup ======================");
+        Logger.Log("====================== ZSharp Startup ======================");
 
         return 1;
     }

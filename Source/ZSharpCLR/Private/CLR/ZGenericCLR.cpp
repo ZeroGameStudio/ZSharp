@@ -5,7 +5,9 @@
 
 #include "hostfxr.h"
 #include "coreclr_delegates.h"
+#include "ZSharpCLRLogChannels.h"
 #include "Interop/IZSlimAssemblyLoadContext.h"
+#include "Interop/UnrealEngine_Interop.h"
 #include "Interop/ZAssembly_Interop.h"
 #include "Interop/ZCallBuffer.h"
 #include "Interop/ZCLR_Interop.h"
@@ -18,35 +20,6 @@
 #include "Interop/ZSlimAssemblyLoadContext.h"
 #include "Interop/ZSlimAssemblyLoadContext_Interop.h"
 #include "Interop/ZType_Interop.h"
-
-namespace ZSharp::FZGenericCLR_Private
-{
-	static void UE_Log(uint8 level, const TCHAR* message)
-	{
-		switch (level)
-		{
-		case 1:
-			{
-				UE_LOG(LogTemp, Log, TEXT("%s"), message);
-				break;
-			}
-		case 2:
-			{
-				UE_LOG(LogTemp, Warning, TEXT("%s"), message);
-				break;
-			}
-		case 3:
-			{
-				UE_LOG(LogTemp, Error, TEXT("%s"), message);
-				break;
-			}
-		default:
-			{
-				break;
-			}
-		}
-	}
-}
 
 FDelegateHandle ZSharp::FZGenericCLR::RegisterMasterALCLoaded(FZOnMasterALCLoaded::FDelegate delegate, bool bNotifyIfLoaded)
 {
@@ -134,7 +107,7 @@ void ZSharp::FZGenericCLR::Startup()
 	{
 		struct
 		{
-			void(*UE_Log)(uint8, const TCHAR*) = FZGenericCLR_Private::UE_Log;
+			void(*UE_Log)(uint8, const TCHAR*) = FZUnrealEngine_Interop::Log;
 			
 			FString&(*InteropString_Alloc)(const TCHAR*) = FZInteropString_Interop::Alloc;
 			void(*InteropString_Free)(FString&) = FZInteropString_Interop::Free;
@@ -214,7 +187,7 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::CreateMasterALC()
 {
 	if (MasterALC)
 	{
-		UE_LOG(LogTemp, Fatal, TEXT("Master ALC already exists!"));
+		UE_LOG(LogZSharpCLR, Fatal, TEXT("Master ALC already exists!"));
 	}
 
 	FZGCHandle handle = ZCLR_Interop::GCreateMasterALC();
@@ -247,7 +220,7 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::CreateSlimALC(const FSt
 {
 	if (SlimALCMap.Contains(name))
 	{
-		UE_LOG(LogTemp, Fatal, TEXT("Slim ALC [%s] already exists!"), *name);
+		UE_LOG(LogZSharpCLR, Fatal, TEXT("Slim ALC [%s] already exists!"), *name);
 	}
 
 	FZGCHandle handle = ZCLR_Interop::GCreateSlimALC(*name);

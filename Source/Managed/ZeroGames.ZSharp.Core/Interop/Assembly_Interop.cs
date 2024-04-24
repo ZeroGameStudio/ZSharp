@@ -32,7 +32,7 @@ internal static class Assembly_Interop
             Type? type = asm.GetType(new string(name));
             if (type is not null)
             {
-                return GCHandle.Alloc(type, GCHandleType.Weak);
+                return GCHandle.Alloc(type);
             }
         }
 

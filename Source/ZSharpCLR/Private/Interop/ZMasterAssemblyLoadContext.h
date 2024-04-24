@@ -18,6 +18,8 @@ namespace ZSharp
 			: Handle(handle)
 			, UnloadCallback(unloadCallback){}
 		
+		virtual ~FZMasterAssemblyLoadContext() override { Free(Handle); }
+
 	public:
 		// IZGCHandle
 		virtual FZGCHandle GetGCHandle() const override { return Handle; }

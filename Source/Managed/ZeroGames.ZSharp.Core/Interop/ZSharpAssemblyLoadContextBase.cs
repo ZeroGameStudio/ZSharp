@@ -10,7 +10,14 @@ public abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IGCHa
     
     protected ZSharpAssemblyLoadContextBase(string name) : base(name, true)
     {
-        GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
+        GCHandle = GCHandle.Alloc(this);
+
+        Unloading += _ => HandleUnload();
+    }
+
+    protected virtual void HandleUnload()
+    {
+        WeakReferenceMonitor.Monit(new(this), GCHandle.ToIntPtr(GCHandle));
     }
     
     public GCHandle GCHandle { get; }

@@ -45,24 +45,26 @@ public class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase
 
         return new();
     }
-    
+
+    protected override void HandleUnload()
+    {
+        base.HandleUnload();
+        
+        if (_sSingleton != this)
+        {
+            throw new Exception();
+        }
+
+        _sSingleton = null;
+            
+        Logger.Log($"Master ALC Unloaded, name: {Name}, handle: {GCHandle.ToIntPtr(GCHandle)}");
+    }
+
     private static MasterAssemblyLoadContext? _sSingleton;
     
     private MasterAssemblyLoadContext() : base(KName)
     {
         _sSingleton = this;
-
-        Unloading += context =>
-        {
-            if (_sSingleton != context)
-            {
-                throw new Exception();
-            }
-
-            _sSingleton = null;
-            
-            Logger.Log($"Master ALC Unloaded, name: {Name}, handle: {GCHandle.ToIntPtr(GCHandle)}");
-        };
     }
     
 }

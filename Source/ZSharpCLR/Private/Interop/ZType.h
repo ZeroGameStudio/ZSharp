@@ -16,6 +16,8 @@ namespace ZSharp
 		FZType(FZGCHandle handle)
 			:Handle(handle){}
 
+		virtual ~FZType() override { Free(Handle); }
+
 	public:
 		// IZGCHandle
 		virtual FZGCHandle GetGCHandle() const override { return Handle; }

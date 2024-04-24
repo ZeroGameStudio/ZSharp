@@ -46,7 +46,7 @@ internal static class Type_Interop
             MethodInfo? method = type.GetMethod(new string(name));
             if (method is not null)
             {
-                return GCHandle.Alloc(method, GCHandleType.Weak);
+                return GCHandle.Alloc(method);
             }
         }
 
@@ -61,7 +61,7 @@ internal static class Type_Interop
             PropertyInfo? property = type.GetProperty(new string(name));
             if (property is not null)
             {
-                return GCHandle.Alloc(property, GCHandleType.Weak);
+                return GCHandle.Alloc(property);
             }
         }
 

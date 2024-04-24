@@ -15,6 +15,8 @@ namespace ZSharp
 		FZMethodInfo(FZGCHandle handle)
 			: Handle(handle){}
 
+		virtual ~FZMethodInfo() override { Free(Handle); }
+
 	public:
 		// IZGCHandle
 		virtual FZGCHandle GetGCHandle() const override { return Handle; }

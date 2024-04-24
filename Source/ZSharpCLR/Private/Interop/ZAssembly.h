@@ -13,6 +13,8 @@ namespace ZSharp
 	public:
 		FZAssembly(FZGCHandle handle)
 			: Handle(handle){}
+		
+		virtual ~FZAssembly() override { Free(Handle); }
 
 	public:
 		// IZGCHandle

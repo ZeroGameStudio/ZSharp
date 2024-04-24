@@ -13,6 +13,8 @@ namespace ZSharp
 		FZPropertyInfo(FZGCHandle handle)
 			:Handle(handle){}
 
+		virtual ~FZPropertyInfo() override { Free(Handle); }
+
 	public:
 		// IZGCHandle
 		virtual FZGCHandle GetGCHandle() const override { return Handle; }

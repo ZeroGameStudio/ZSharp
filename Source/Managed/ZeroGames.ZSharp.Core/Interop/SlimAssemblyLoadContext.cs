@@ -17,24 +17,26 @@ public class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase
 
         return new(name);
     }
-    
+
+    protected override void HandleUnload()
+    {
+        base.HandleUnload();
+        
+        if (!_sInstanceMap.TryGetValue(Name!, out var alc) || alc != this)
+        {
+            throw new Exception();
+        }
+
+        _sInstanceMap.Remove(Name!);
+            
+        Logger.Log($"Slim ALC Unloaded, name: {Name}, handle: {GCHandle.ToIntPtr(GCHandle)}");
+    }
+
     private static readonly Dictionary<string, SlimAssemblyLoadContext> _sInstanceMap = new();
 
     private SlimAssemblyLoadContext(string name) : base(name)
     {
         _sInstanceMap[name] = this;
-
-        Unloading += context =>
-        {
-            if (!_sInstanceMap.TryGetValue(context.Name!, out var alc) || alc != context)
-            {
-                throw new Exception();
-            }
-
-            _sInstanceMap.Remove(context.Name!);
-            
-            Logger.Log($"Slim ALC Unloaded, name: {Name}, handle: {GCHandle.ToIntPtr(GCHandle)}");
-        };
     }
     
 }

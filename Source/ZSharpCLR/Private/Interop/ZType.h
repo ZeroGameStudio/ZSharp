@@ -25,7 +25,6 @@ namespace ZSharp
 		virtual bool IsZCallable() const override;
 
 		// IZType
-		virtual int32 New(FZCallBuffer* buffer) const override;
 		virtual FZConjugateHandle BuildConjugate(void* unmanaged) const override;
 
 		virtual const IZMethodInfo* GetMethod(const FString& name) const override;

@@ -1,11 +1,20 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.Core;
 
 internal static class CLR_Interop
 {
+
+    [UnmanagedCallersOnly]
+    public static void CollectGarbage(int32 generation, uint8 bAggressive, uint8 bBlocking, uint8 bCompacting)
+    {
+        Logger.Log("Request GC by unmanaged code.");
+        //GC.Collect(generation, bAggressive > 0 ? GCCollectionMode.Aggressive : GCCollectionMode.Default, bBlocking > 0, bCompacting > 0);
+        GC.Collect();
+    }
     
     [UnmanagedCallersOnly]
     public static GCHandle CreateMasterALC()

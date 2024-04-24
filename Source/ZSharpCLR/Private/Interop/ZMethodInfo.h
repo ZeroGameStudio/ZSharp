@@ -9,9 +9,11 @@ namespace ZSharp
 	class FZMethodInfo : public IZMethodInfo
 	{
 
+		using ThisClass = FZMethodInfo;
+
 	public:
 		FZMethodInfo(FZGCHandle handle)
-			:Handle(handle){}
+			: Handle(handle){}
 
 	public:
 		// IZGCHandle
@@ -22,11 +24,17 @@ namespace ZSharp
 		virtual bool IsZCallable() const override;
 
 		// IZMethodInfo
-		virtual int32 Invoke(FZCallBuffer* buffer) const override;
+		virtual ZCALL_TO_MANAGED_AUTO_BUFFER(Invoke) override;
+		virtual ZCALL_TO_MANAGED_USER_BUFFER(Invoke) override;
+		virtual ZCALL_TO_MANAGED_USER_BUFFER_CHECKED(Invoke) override;
+
+	private:
+		int32 GetNumSlots() const;
 
 	private:
 		FZGCHandle Handle;
 		mutable TOptional<FString> CachedName;
+		mutable TOptional<int32> CachedNumSlots;
 		
 	};
 }

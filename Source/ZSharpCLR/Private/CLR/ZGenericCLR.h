@@ -13,8 +13,23 @@ namespace ZSharp
 	class FZGenericCLR : public IZSharpCLR
 	{
 
+		using ThisClass = FZGenericCLR;
+
 	public:
-		static FZGenericCLR& Get() { return (FZGenericCLR&)IZSharpCLR::Get(); }
+		static FZGenericCLR& Get() { return StaticCast<FZGenericCLR&>(IZSharpCLR::Get()); }
+
+	public:
+		void Startup();
+		void Shutdown();
+
+	public:
+		virtual void CollectGarbage(int32 generation = -1, bool bAggressive = true, bool bBlocking = false, bool bCompacting = true) override;
+		
+	public:
+		virtual IZMasterAssemblyLoadContext* CreateMasterALC() override;
+		virtual IZMasterAssemblyLoadContext* GetMasterALC() override;
+		virtual IZSlimAssemblyLoadContext* CreateSlimALC(const FString& name) override;
+		virtual IZSlimAssemblyLoadContext* GetSlimALC(const FString& name) override;
 
 	public:
 		virtual FDelegateHandle RegisterMasterALCLoaded(FZOnMasterALCLoaded::FDelegate delegate, bool bNotifyIfLoaded = true) override;
@@ -23,22 +38,9 @@ namespace ZSharp
 		virtual FDelegateHandle RegisterMasterALCUnloaded(FZOnMasterALCUnloaded::FDelegate delegate) override;
 		virtual void UnregisterMasterALCUnloaded(FDelegateHandle delegate) override;
 		virtual void UnregisterMasterALCUnloaded(const void* userObject) override;
-		
-	public:
-		void Startup();
-		void Shutdown();
-
-	public:
-		virtual IZMasterAssemblyLoadContext* CreateMasterALC() override;
-		virtual IZMasterAssemblyLoadContext* GetMasterALC() override;
-		virtual IZSlimAssemblyLoadContext* CreateSlimALC(const FString& name) override;
-		virtual IZSlimAssemblyLoadContext* GetSlimALC(const FString& name) override;
 
 	private:
-		FZOnMasterALCLoaded OnMasterALCLoaded;
-		FZOnMasterALCUnloaded OnMasterALCUnloaded;
-
-	private:
+		void HandleGarbageCollectComplete();
 		void HandleMasterALCUnloaded();
 		void HandleSlimALCUnloaded(const FString& name);
 
@@ -47,6 +49,10 @@ namespace ZSharp
 		TUniquePtr<IZMasterAssemblyLoadContext> MasterALC;
 		FRWLock SlimALCMapLock;
 		TMap<FString, TUniquePtr<IZSlimAssemblyLoadContext>> SlimALCMap;
+
+	private:
+		FZOnMasterALCLoaded OnMasterALCLoaded;
+		FZOnMasterALCUnloaded OnMasterALCUnloaded;
 		
 	};
 }

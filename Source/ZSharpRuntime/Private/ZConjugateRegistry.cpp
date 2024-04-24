@@ -3,32 +3,67 @@
 
 #include "ZConjugateRegistry.h"
 
+#include "ZSharpRuntimeLogChannels.h"
 #include "CLR/IZSharpCLR.h"
 #include "Interop/IZAssembly.h"
 #include "Interop/IZMasterAssemblyLoadContext.h"
 
-ZSharp::FZConjugateRegistry& ZSharp::FZConjugateRegistry::Get()
+namespace ZSharp::FZConjugateRegistry_Private
 {
-	static FZConjugateRegistry GSingleton;
-	
-	return GSingleton;
-}
-
-ZSharp::FZConjugateRegistry::FZConjugateRegistry()
-{
-	IZSharpCLR::Get().RegisterMasterALCLoaded(FZOnMasterALCLoaded::FDelegate::CreateRaw(this, &FZConjugateRegistry::HandleMasterALCLoaded));
-	IZSharpCLR::Get().RegisterMasterALCUnloaded(FZOnMasterALCUnloaded::FDelegate::CreateRaw(this, &FZConjugateRegistry::HandleMasterALCUnloaded));
-}
-
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::BuildConjugate(UObject* unmanaged)
-{
-	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
-	if (!alc)
+	template <typename T>
+	void ReleaseCapturedConjugates(FZConjugateRegistry& registry, FZConjugateRegistry::TZConjugateSubregistry<T>& subregistry)
 	{
-		return FZConjugateHandle{};
-	}
+		TArray<T*> pendings;
+		for (const auto& pair : subregistry)
+		{
+			if (pair.Value.bCaptured)
+			{
+				pendings.Emplace(pair.Key);
+			}
+		}
 
-	FZConjugateHandle handle = alc->Conjugate(unmanaged);
+		for (const auto& unmanaged : pendings)
+		{
+			registry.ReleaseConjugate(unmanaged);
+		}
+	}
+}
+
+TUniquePtr<ZSharp::FZConjugateRegistry> ZSharp::FZConjugateRegistry::GSingleton;
+
+void ZSharp::FZConjugateRegistry::Startup()
+{
+	UE_CLOG(!!IZSharpCLR::Get().GetMasterALC(), LogZSharpRuntime, Fatal, TEXT("Conjugate Registry must startup before any master ALC!!!"));
+	
+	IZSharpCLR::Get().RegisterMasterALCLoaded(FZOnMasterALCLoaded::FDelegate::CreateStatic(&ThisClass::HandleMasterALCLoaded));
+	IZSharpCLR::Get().RegisterMasterALCUnloaded(FZOnMasterALCUnloaded::FDelegate::CreateStatic(&ThisClass::HandleMasterALCUnloaded));
+}
+
+ZSharp::FZConjugateRegistry* ZSharp::FZConjugateRegistry::Get()
+{
+	return GSingleton.Get();
+}
+
+ZSharp::FZConjugateRegistry::FZConjugateRegistry(IZMasterAssemblyLoadContext* masterALC)
+	: MasterALC(masterALC)
+	, ZCallToManagedDepth(0)
+{
+	MasterALC->RegisterPreZCallToManaged(FZPreZCallToManaged::FDelegate::CreateRaw(this, &ThisClass::HandlePreZCallToManaged));
+	MasterALC->RegisterPostZCallToManaged(FZPostZCallToManaged::FDelegate::CreateRaw(this, &ThisClass::HandlePostZCallToManaged));
+	FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);
+}
+
+ZSharp::FZConjugateRegistry::~FZConjugateRegistry()
+{
+	FCoreUObjectDelegates::GarbageCollectComplete.RemoveAll(this);
+	// Note that at this point MasterALC has been released and we have no need to remove delegates anymore.
+}
+
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(UObject* unmanaged)
+{
+	CheckGuarded();
+	
+	FZConjugateHandle handle = MasterALC->Conjugate(unmanaged);
 	if (IsValid(handle))
 	{
 		return handle;
@@ -42,14 +77,14 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::BuildConjugate(UObject* u
 
 	FString asmName = "ZeroGames.ZSharp.UnrealEngine";
 	FString managedTypeName = "ZeroGames.ZSharp.UnrealEngine.CoreUObject.Object";
-	const IZType* managedType = alc->GetAssembly(asmName)->GetType(managedTypeName);
+	const IZType* managedType = MasterALC->GetAssembly(asmName)->GetType(managedTypeName);
 	
 	if (!managedType)
 	{
 		return FZConjugateHandle{};
 	}
 	
-	handle = alc->BuildConjugate(unmanaged, managedType);
+	handle = MasterALC->BuildConjugate(unmanaged, managedType);
 	if (IsValid(handle))
 	{
 		ObjectRegistry.Emplace(unmanaged, unmanaged);
@@ -60,29 +95,21 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::BuildConjugate(UObject* u
 
 void ZSharp::FZConjugateRegistry::ReleaseConjugate(UObject* unmanaged)
 {
+	CheckNoGuarded();
+	
 	if (!ObjectRegistry.Remove(unmanaged))
 	{
 		return;
 	}
-	
-	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
-	if (!alc)
-	{
-		return;
-	}
-	
-	alc->ReleaseConjugate(unmanaged);
+
+	MasterALC->ReleaseConjugate(unmanaged);
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::BuildConjugate(FString* unmanaged)
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(FString* unmanaged)
 {
-	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
-	if (!alc)
-	{
-		return FZConjugateHandle{};
-	}
-
-	FZConjugateHandle handle = alc->Conjugate(unmanaged);
+	CheckGuarded();
+	
+	FZConjugateHandle handle = MasterALC->Conjugate(unmanaged);
 	if (IsValid(handle))
 	{
 		return handle;
@@ -90,101 +117,101 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::BuildConjugate(FString* u
 
 	FString asmName = "ZeroGames.ZSharp.UnrealEngine";
 	FString managedTypeName = "ZeroGames.ZSharp.UnrealEngine.Core.String";
-	const IZType* managedType = alc->GetAssembly(asmName)->GetType(managedTypeName);
+	const IZType* managedType = MasterALC->GetAssembly(asmName)->GetType(managedTypeName);
 	
 	if (!managedType)
 	{
 		return FZConjugateHandle{};
 	}
 	
-	handle = alc->BuildConjugate(unmanaged, managedType);
+	handle = MasterALC->BuildConjugate(unmanaged, managedType);
 	if (IsValid(handle))
 	{
-		StringRegistry.Emplace(unmanaged);
+		StringRegistry.Emplace(unmanaged, { unmanaged, true });
 	}
 
 	return handle;
 }
 
-void ZSharp::FZConjugateRegistry::BuildConjugate(FString* unmanaged, FZConjugateHandle managed)
+void ZSharp::FZConjugateRegistry::Conjugate(FString* unmanaged, FZConjugateHandle managed)
 {
+	CheckGuarded();
+	
 	if (!IsValid(managed))
 	{
 		return;
 	}
-	
-	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
-	if (!alc)
-	{
-		return;
-	}
 
-	alc->BuildConjugate(unmanaged, managed);
-	StringRegistry.Emplace(unmanaged);
+	MasterALC->BuildConjugate(unmanaged, managed);
+	StringRegistry.Emplace(unmanaged, { unmanaged });
 }
 
 void ZSharp::FZConjugateRegistry::ReleaseConjugate(FString* unmanaged)
 {
+	CheckNoGuarded();
+	
 	if (!StringRegistry.Remove(unmanaged))
 	{
 		return;
 	}
-	
-	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
-	if (!alc)
-	{
-		return;
-	}
-	
-	alc->ReleaseConjugate(unmanaged);
+
+	MasterALC->ReleaseConjugate(unmanaged);
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::BuildConjugate(FZTypedScriptStruct* unmanaged)
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(FZTypedScriptStruct* unmanaged)
 {
+	CheckGuarded();
+	
 	checkNoEntry();
 	return FZConjugateHandle{};
 }
 
-void ZSharp::FZConjugateRegistry::BuildConjugate(FZTypedScriptStruct* unmanaged, FZConjugateHandle managed)
+void ZSharp::FZConjugateRegistry::Conjugate(FZTypedScriptStruct* unmanaged, FZConjugateHandle managed)
 {
+	CheckGuarded();
+	
 	checkNoEntry();
 }
 
 void ZSharp::FZConjugateRegistry::ReleaseConjugate(FZTypedScriptStruct* unmanaged)
 {
+	CheckNoGuarded();
+	
 	checkNoEntry();
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::InternalConjugate(void* unmanaged) const
+void* ZSharp::FZConjugateRegistry::Conjugate(FZConjugateHandle managed) const
 {
-	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
-	if (!alc)
-	{
-		return FZConjugateHandle{};
-	}
-
-	return alc->Conjugate(unmanaged);
+	return MasterALC->Conjugate(managed);
 }
 
-void* ZSharp::FZConjugateRegistry::InternalConjugate(FZConjugateHandle managed) const
+void ZSharp::FZConjugateRegistry::CheckGuarded() const
 {
-	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
-	if (!alc)
-	{
-		return nullptr;
-	}
+	UE_CLOG(!IsGuarded(), LogZSharpRuntime, Fatal, TEXT("Conjugate guard check failed!!!"));
+}
 
-	return alc->Conjugate(managed);
+void ZSharp::FZConjugateRegistry::CheckNoGuarded() const
+{
+	UE_CLOG(IsGuarded(), LogZSharpRuntime, Fatal, TEXT("Conjugate guard check failed!!!"));
+}
+
+void ZSharp::FZConjugateRegistry::HandlePreZCallToManaged()
+{
+	++ZCallToManagedDepth;
+}
+
+void ZSharp::FZConjugateRegistry::HandlePostZCallToManaged()
+{
+	CheckGuarded();
+	
+	if (!--ZCallToManagedDepth)
+	{
+		GuardRelease();
+	}
 }
 
 void ZSharp::FZConjugateRegistry::HandleGarbageCollectComplete()
 {
-	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
-    if (!alc)
-    {
-    	return;
-    }
-    	
 	TArray<FObjectKey> pendingRemoves;
 	for (const auto& pair : ObjectRegistry)
 	{
@@ -198,24 +225,27 @@ void ZSharp::FZConjugateRegistry::HandleGarbageCollectComplete()
 	{
 		UObject* unmanaged;
 		ObjectRegistry.RemoveAndCopyValue(key, unmanaged);
-		alc->ReleaseConjugate(unmanaged);
+		MasterALC->ReleaseConjugate(unmanaged);
 	}
 }
 
 void ZSharp::FZConjugateRegistry::HandleMasterALCLoaded(IZMasterAssemblyLoadContext* alc)
 {
-	check(ObjectRegistry.IsEmpty());
-	check(StringRegistry.IsEmpty());
+	check(!GSingleton);
 
-	FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &FZConjugateRegistry::HandleGarbageCollectComplete);
+	GSingleton = MakeUnique<FZConjugateRegistry>(alc);
 }
 
 void ZSharp::FZConjugateRegistry::HandleMasterALCUnloaded()
 {
-	ObjectRegistry.Reset();
-	StringRegistry.Reset();
+	check(GSingleton);
 
-	FCoreUObjectDelegates::GarbageCollectComplete.RemoveAll(this);
+	GSingleton = nullptr;
+}
+
+void ZSharp::FZConjugateRegistry::GuardRelease()
+{
+	FZConjugateRegistry_Private::ReleaseCapturedConjugates(*this, StringRegistry);
 }
 
 

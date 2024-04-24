@@ -8,6 +8,7 @@ namespace ZSharp
 {
 	struct ZCLR_Interop
 	{
+		inline static void(*GCollectGarbage)(int32, uint8, uint8, uint8) = nullptr;
 		inline static FZGCHandle(*GCreateMasterALC)() = nullptr;
 		inline static FZGCHandle(*GCreateSlimALC)(const TCHAR*) = nullptr;
 	};

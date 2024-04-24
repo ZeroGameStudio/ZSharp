@@ -3,14 +3,15 @@
 #pragma once
 
 #include "IZMemberInfo.h"
+#include "ZCallToManaged.h"
 
 namespace ZSharp
 {
-	struct FZCallBuffer;
-
 	class ZSHARPCLR_API IZMethodInfo : public IZMemberInfo
 	{
 	public:
-		virtual int32 Invoke(FZCallBuffer* buffer) const = 0;
+		virtual ZCALL_TO_MANAGED_AUTO_BUFFER(Invoke) = 0;
+		virtual ZCALL_TO_MANAGED_USER_BUFFER(Invoke) = 0;
+		virtual ZCALL_TO_MANAGED_USER_BUFFER_CHECKED(Invoke) = 0;
 	};
 }

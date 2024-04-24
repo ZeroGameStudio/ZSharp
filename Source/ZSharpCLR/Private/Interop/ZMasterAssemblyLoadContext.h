@@ -36,12 +36,23 @@ namespace ZSharp
 		virtual FZCallHandle GetZCallHandle(const IZCallDispatcher* dispatcher) const override;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) override;
 
+		virtual FDelegateHandle RegisterPreZCallToManaged(FZPreZCallToManaged::FDelegate delegate) override;
+		virtual void UnregisterPreZCallToManaged(FDelegateHandle delegate) override;
+		virtual void UnregisterPreZCallToManaged(const void* userObject) override;
+		virtual FDelegateHandle RegisterPostZCallToManaged(FZPostZCallToManaged::FDelegate delegate) override;
+		virtual void UnregisterPostZCallToManaged(FDelegateHandle delegate) override;
+		virtual void UnregisterPostZCallToManaged(const void* userObject) override;
+
 		virtual FZConjugateHandle BuildConjugate(void* unmanaged, const IZType* managedType) override;
 		virtual void BuildConjugate(void* unmanaged, FZConjugateHandle managed) override;
 		virtual void ReleaseConjugate(void* unmanaged) override;
 		virtual void ReleaseConjugate(FZConjugateHandle managed) override;
 		virtual FZConjugateHandle Conjugate(void* unmanaged) const override;
 		virtual void* Conjugate(FZConjugateHandle managed) const override;
+
+	public:
+		void NotifyPreZCallToManaged() const;
+		void NotifyPostZCallToManaged() const;
 
 	private:
 		FZGCHandle Handle;
@@ -57,6 +68,9 @@ namespace ZSharp
 
 		TMap<void*, FZConjugateHandle> ConjugateUnmanaged2Managed;
 		TMap<FZConjugateHandle, void*> ConjugateManaged2Unmanaged;
+
+		FZPreZCallToManaged PreZCallToManaged;
+		FZPostZCallToManaged PostZCallToManaged;
 		
 	};
 }

@@ -21,7 +21,32 @@ internal static class MethodInfo_Interop
             return 0;
         }
 
-        return 1;
+        return -1;
+    }
+
+    [UnmanagedCallersOnly]
+    public static int32 GetNumSlots(GCHandle handle)
+    {
+        if (handle.Target is MethodInfo method)
+        {
+            int32 res = 0;
+
+            if (!method.IsStatic)
+            {
+                ++res;
+            }
+
+            res += method.GetParameters().Length;
+
+            if (method.ReturnType != typeof(void))
+            {
+                ++res;
+            }
+            
+            return res;
+        }
+
+        return -1;
     }
 
     [UnmanagedCallersOnly]

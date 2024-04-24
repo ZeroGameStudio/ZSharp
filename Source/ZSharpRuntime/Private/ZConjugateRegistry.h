@@ -16,44 +16,78 @@ namespace ZSharp
 	
 	class FZConjugateRegistry
 	{
-		
-	public:
-		static FZConjugateRegistry& Get();
 
-	public:
-		FZConjugateRegistry();
-
-	public:
-		FZConjugateHandle BuildConjugate(UObject* unmanaged);
-		void ReleaseConjugate(UObject* unmanaged);
-		
-		FZConjugateHandle BuildConjugate(FString* unmanaged);
-		void BuildConjugate(FString* unmanaged, FZConjugateHandle managed);
-		void ReleaseConjugate(FString* unmanaged);
-
-		FZConjugateHandle BuildConjugate(FZTypedScriptStruct* unmanaged);
-        void BuildConjugate(FZTypedScriptStruct* unmanaged, FZConjugateHandle managed);
-        void ReleaseConjugate(FZTypedScriptStruct* unmanaged);
+		using ThisClass = FZConjugateRegistry;
 
 	public:
 		template <typename T>
-		T* Conjugate(FZConjugateHandle managed) const { return (T*)InternalConjugate(managed); }
+		struct TZConjugateRecord
+		{
+			T* Unmanaged;
+			bool bCaptured = false;
+		};
 
-		// template <typename T>
-		// FZConjugateHandle Conjugate(T* unmanaged) const { return InternalConjugate(unmanaged); }
+		template <typename T>
+		using TZConjugateSubregistry = TMap<T*, TZConjugateRecord<T>>;
+		
+	public:
+		static void Startup();
+		static FZConjugateRegistry* Get();
+
+	public:
+		explicit FZConjugateRegistry(IZMasterAssemblyLoadContext* masterALC);
+		~FZConjugateRegistry();
+
+	public:
+		FZConjugateHandle Conjugate(UObject* unmanaged);
+		void ReleaseConjugate(UObject* unmanaged);
+		
+		FZConjugateHandle Conjugate(FString* unmanaged);
+		void Conjugate(FString* unmanaged, FZConjugateHandle managed);
+		void ReleaseConjugate(FString* unmanaged);
+
+		FZConjugateHandle Conjugate(FZTypedScriptStruct* unmanaged);
+        void Conjugate(FZTypedScriptStruct* unmanaged, FZConjugateHandle managed);
+        void ReleaseConjugate(FZTypedScriptStruct* unmanaged);
+
+		void* Conjugate(FZConjugateHandle managed) const;
+
+	public:
+		template <typename T>
+		T* Conjugate(FZConjugateHandle managed) const { return StaticCast<T*>(Conjugate(managed)); }
 
 	private:
-		FZConjugateHandle InternalConjugate(void* unmanaged) const;
-		void* InternalConjugate(FZConjugateHandle managed) const;
-	
+		static void HandleMasterALCLoaded(IZMasterAssemblyLoadContext* alc);
+		static void HandleMasterALCUnloaded();
+
 	private:
+		void GuardRelease();
+		
+		bool IsGuarded() const { return !!ZCallToManagedDepth; }
+		void CheckGuarded() const;
+		void CheckNoGuarded() const;
+		
+	private:
+		void HandlePreZCallToManaged();
+		void HandlePostZCallToManaged();
 		void HandleGarbageCollectComplete();
-		void HandleMasterALCLoaded(IZMasterAssemblyLoadContext* alc);
-		void HandleMasterALCUnloaded();
 
 	private:
+		static TUniquePtr<FZConjugateRegistry> GSingleton;
+
+	private:
+		IZMasterAssemblyLoadContext* MasterALC;
+
+	private:
+		// Registries
+		//  - UObject
 		TMap<FObjectKey, UObject*> ObjectRegistry;
-		TSet<FString*> StringRegistry;
+
+		//  - Captureables
+		TZConjugateSubregistry<FString> StringRegistry;
+
+		// Guard
+		uint32 ZCallToManagedDepth;
 		
 	};
 }

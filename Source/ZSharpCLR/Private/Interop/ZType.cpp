@@ -24,12 +24,6 @@ bool ZSharp::FZType::IsZCallable() const
 	return true;
 }
 
-int32 ZSharp::FZType::New(FZCallBuffer* buffer) const
-{
-	checkNoEntry();
-	return -1;
-}
-
 ZSharp::FZConjugateHandle ZSharp::FZType::BuildConjugate(void* unmanaged) const
 {
 	if (!IsZCallable())

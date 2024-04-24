@@ -2,12 +2,6 @@
 
 #pragma once
 
-namespace ZSharp
-{
-	class FZConjugateGuard
-	{
-		
-	};
-}
+DECLARE_LOG_CATEGORY_EXTERN(LogZSharpRuntime, Log, All);
 
 

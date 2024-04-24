@@ -27,50 +27,47 @@ void AZSharpActor::BeginPlay()
 		const ZSharp::IZType* type = assembly->GetType("ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics");
 		const ZSharp::IZMethodInfo* beginplay = type->GetMethod("BeginPlay");
 		
-		ZSharp::FZCallBufferSlot slots[1];
-		slots[0].Conjugate = ZSharp::FZConjugateRegistry::Get().BuildConjugate(this);
-		ZSharp::FZCallBuffer buffer { slots };
-		
-		beginplay->Invoke(&buffer);
+		beginplay->Invoke([this](ZSharp::FZCallBuffer& buffer, int32 numSlots)
+		{
+			buffer.Slots[0].Conjugate = ZSharp::FZConjugateRegistry::Get()->Conjugate(this);
+		});
 	}
 }
 
-void AZSharpActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void AZSharpActor::EndPlay(const EEndPlayReason::Type endPlayReason)
 {
 	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().GetMasterALC();
 	if (alc)
 	{
 		const ZSharp::IZAssembly* assembly = alc->GetAssembly("ZeroGames.ZSharp.UnrealEngine");
 		const ZSharp::IZType* type = assembly->GetType("ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics");
-		const ZSharp::IZMethodInfo* beginplay = type->GetMethod("EndPlay");
-		
-		ZSharp::FZCallBufferSlot slots[1];
-		slots[0].Conjugate = ZSharp::FZConjugateRegistry::Get().BuildConjugate(this);
-		ZSharp::FZCallBuffer buffer { slots };
-		
-		beginplay->Invoke(&buffer);
+		const ZSharp::IZMethodInfo* endplay = type->GetMethod("EndPlay");
+
+		endplay->Invoke([this](ZSharp::FZCallBuffer& buffer, int32 numSlots)
+		{
+			buffer.Slots[0].Conjugate = ZSharp::FZConjugateRegistry::Get()->Conjugate(this);
+		});
 	}
 	
-	Super::EndPlay(EndPlayReason);
+	Super::EndPlay(endPlayReason);
 }
 
-void AZSharpActor::Tick(float DeltaTime)
+void AZSharpActor::Tick(float deltaTime)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(deltaTime);
 
 	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().GetMasterALC();
 	if (alc)
 	{
 		const ZSharp::IZAssembly* assembly = alc->GetAssembly("ZeroGames.ZSharp.UnrealEngine");
 		const ZSharp::IZType* type = assembly->GetType("ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics");
-		const ZSharp::IZMethodInfo* beginplay = type->GetMethod("Tick");
+		const ZSharp::IZMethodInfo* tick = type->GetMethod("Tick");
 		
-		ZSharp::FZCallBufferSlot slots[2];
-		slots[0].Conjugate = ZSharp::FZConjugateRegistry::Get().BuildConjugate(this);
-		slots[1].Float = DeltaTime;
-		ZSharp::FZCallBuffer buffer { slots };
-		
-		beginplay->Invoke(&buffer);
+		tick->Invoke([this, deltaTime](ZSharp::FZCallBuffer& buffer, int32 numSlots)
+		{
+			buffer.Slots[0].Conjugate = ZSharp::FZConjugateRegistry::Get()->Conjugate(this);
+			buffer.Slots[1].Float = deltaTime;
+		});
 	}
 }
 

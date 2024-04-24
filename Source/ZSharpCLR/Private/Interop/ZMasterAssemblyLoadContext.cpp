@@ -4,7 +4,9 @@
 #include "ZMasterAssemblyLoadContext.h"
 
 #include "ZAssembly.h"
+#include "ZGCHandle_Interop.h"
 #include "ZMasterAssemblyLoadContext_Interop.h"
+#include "ZSharpCLRLogChannels.h"
 #include "Interop/IZCallDispatcher.h"
 #include "Interop/IZType.h"
 
@@ -82,7 +84,7 @@ const ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetOrResolv
 	{
 		if (IZCallDispatcher* dispatcher = resolver.Get<1>()->Resolve(name))
 		{
-			(void)RegisterZCall(dispatcher);
+			RegisterZCall(dispatcher);
 			return dispatcher;
 		}
 	}
@@ -104,6 +106,36 @@ void ZSharp::FZMasterAssemblyLoadContext::RegisterZCallResolver(IZCallResolver* 
 	
 	ZCallResolverLink.Emplace(TTuple<uint64, TUniquePtr<IZCallResolver>>(priority, resolver));
 	ZCallResolverLink.StableSort([](auto& lhs, auto& rhs){ return lhs.template Get<0>() < rhs.template Get<0>(); });
+}
+
+FDelegateHandle ZSharp::FZMasterAssemblyLoadContext::RegisterPreZCallToManaged(FZPreZCallToManaged::FDelegate delegate)
+{
+	return PreZCallToManaged.Add(delegate);
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::UnregisterPreZCallToManaged(FDelegateHandle delegate)
+{
+	PreZCallToManaged.Remove(delegate);
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::UnregisterPreZCallToManaged(const void* userObject)
+{
+	PreZCallToManaged.RemoveAll(userObject);
+}
+
+FDelegateHandle ZSharp::FZMasterAssemblyLoadContext::RegisterPostZCallToManaged(FZPostZCallToManaged::FDelegate delegate)
+{
+	return PostZCallToManaged.Add(delegate);
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::UnregisterPostZCallToManaged(FDelegateHandle delegate)
+{
+	PostZCallToManaged.Remove(delegate);
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::UnregisterPostZCallToManaged(const void* userObject)
+{
+	PostZCallToManaged.RemoveAll(userObject);
 }
 
 ZSharp::FZConjugateHandle ZSharp::FZMasterAssemblyLoadContext::BuildConjugate(void* unmanaged, const IZType* managedType)
@@ -129,8 +161,11 @@ void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(void* unmanaged)
 	check(IsInGameThread());
 	
 	FZConjugateHandle managed;
-	ConjugateUnmanaged2Managed.RemoveAndCopyValue(unmanaged, managed);
-	ConjugateManaged2Unmanaged.Remove(managed);
+	if (ConjugateUnmanaged2Managed.RemoveAndCopyValue(unmanaged, managed))
+	{
+		ConjugateManaged2Unmanaged.Remove(managed);
+		FZGCHandle_Interop::GFree({ managed.Handle });
+	}
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(FZConjugateHandle managed)
@@ -138,8 +173,11 @@ void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(FZConjugateHandle man
 	check(IsInGameThread());
 	
 	void* unmanaged;
-	ConjugateManaged2Unmanaged.RemoveAndCopyValue(managed, unmanaged);
-	ConjugateUnmanaged2Managed.Remove(unmanaged);
+	if (ConjugateManaged2Unmanaged.RemoveAndCopyValue(managed, unmanaged))
+	{
+		ConjugateUnmanaged2Managed.Remove(unmanaged);
+		FZGCHandle_Interop::GFree({ managed.Handle });
+	}
 }
 
 ZSharp::FZConjugateHandle ZSharp::FZMasterAssemblyLoadContext::Conjugate(void* unmanaged) const
@@ -156,6 +194,20 @@ void* ZSharp::FZMasterAssemblyLoadContext::Conjugate(FZConjugateHandle managed) 
 	
 	void* const* unmanaged = ConjugateManaged2Unmanaged.Find(managed);
 	return unmanaged ? *unmanaged : nullptr;
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::NotifyPreZCallToManaged() const
+{
+	UE_LOG(LogZSharpCLR, Verbose, TEXT("===================== Pre ZCall To Managed ====================="));
+	
+	PreZCallToManaged.Broadcast();
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::NotifyPostZCallToManaged() const
+{
+	PostZCallToManaged.Broadcast();
+
+	UE_LOG(LogZSharpCLR, Verbose, TEXT("===================== Post ZCall To Managed ====================="));
 }
 
 

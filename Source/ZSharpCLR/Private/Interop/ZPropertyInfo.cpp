@@ -20,16 +20,4 @@ bool ZSharp::FZPropertyInfo::IsZCallable() const
 	return true;
 }
 
-int32 ZSharp::FZPropertyInfo::Get(FZCallBuffer* buffer) const
-{
-	checkNoEntry();
-	return -1;
-}
-
-int32 ZSharp::FZPropertyInfo::Set(FZCallBuffer* buffer) const
-{
-	checkNoEntry();
-	return -1;
-}
-
 

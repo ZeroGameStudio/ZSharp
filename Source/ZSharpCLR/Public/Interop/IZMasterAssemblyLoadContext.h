@@ -14,6 +14,9 @@ namespace ZSharp
 	class IZPropertyInfo;
 	class IZCallDispatcher;
 	class IZCallResolver;
+
+	DECLARE_MULTICAST_DELEGATE(FZPreZCallToManaged)
+	DECLARE_MULTICAST_DELEGATE(FZPostZCallToManaged)
 	
 	class ZSHARPCLR_API IZMasterAssemblyLoadContext : public IZAssemblyLoadContext
 	{
@@ -27,6 +30,13 @@ namespace ZSharp
 		virtual const IZCallDispatcher* GetOrResolveZCallDispatcher(const FString& name) = 0;
 		virtual FZCallHandle GetZCallHandle(const IZCallDispatcher* dispatcher) const = 0;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) = 0;
+
+		virtual FDelegateHandle RegisterPreZCallToManaged(FZPreZCallToManaged::FDelegate delegate) = 0;
+		virtual void UnregisterPreZCallToManaged(FDelegateHandle delegate) = 0;
+		virtual void UnregisterPreZCallToManaged(const void* userObject) = 0;
+		virtual FDelegateHandle RegisterPostZCallToManaged(FZPostZCallToManaged::FDelegate delegate) = 0;
+		virtual void UnregisterPostZCallToManaged(FDelegateHandle delegate) = 0;
+		virtual void UnregisterPostZCallToManaged(const void* userObject) = 0;
 	public:
 		virtual FZConjugateHandle BuildConjugate(void* unmanaged, const IZType* managedType) = 0;
 		virtual void BuildConjugate(void* unmanaged, FZConjugateHandle managed) = 0;

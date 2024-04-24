@@ -17,6 +17,8 @@ namespace ZSharp
 	public:
 		virtual ~IZSharpCLR(){}
 	public:
+		virtual void CollectGarbage(int32 generation = -1, bool bAggressive = true, bool bBlocking = false, bool bCompacting = true) = 0;
+	public:
 		virtual IZMasterAssemblyLoadContext* CreateMasterALC() = 0;
 		virtual IZMasterAssemblyLoadContext* GetMasterALC() = 0;
 		virtual IZSlimAssemblyLoadContext* CreateSlimALC(const FString& name) = 0;

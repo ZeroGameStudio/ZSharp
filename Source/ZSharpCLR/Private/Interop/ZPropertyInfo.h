@@ -21,10 +21,6 @@ namespace ZSharp
 		virtual const FString& GetName() const override;
 		virtual bool IsZCallable() const override;
 
-		// IZPropertyInfo
-		virtual int32 Get(FZCallBuffer* buffer) const override;
-		virtual int32 Set(FZCallBuffer* buffer) const override;
-
 	private:
 		FZGCHandle Handle;
 		mutable TOptional<FString> CachedName;

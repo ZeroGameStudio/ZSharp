@@ -28,6 +28,7 @@ internal struct StartupInput
 [StructLayout(LayoutKind.Sequential)]
 internal unsafe struct ManagedFunctions
 {
+    public delegate* unmanaged<int32, uint8, uint8, uint8, void> CLR_CollectGarbage;
     public delegate* unmanaged<GCHandle> CLR_CreateMasterALC;
     public delegate* unmanaged<char*, GCHandle> CLR_CreateSlimALC;
     
@@ -49,6 +50,7 @@ internal unsafe struct ManagedFunctions
     public delegate* unmanaged<GCHandle, char*, GCHandle> Type_GetPropertyInfo;
     
     public delegate* unmanaged<GCHandle, IntPtr, int32> MethodInfo_GetName;
+    public delegate* unmanaged<GCHandle, int32> MethodInfo_GetNumSlots;
     public delegate* unmanaged<GCHandle, ZCallBuffer*, int32> MethodInfo_Invoke;
 }
 
@@ -78,6 +80,7 @@ internal static class __DllEntry
         MasterAssemblyLoadContext_Interop.SGetZCallHandle = input->UnmanagedFunctions.MasterAssemblyLoadContext_GetZCallHandle;
         
         // CLR interop functions
+        output->ManagedFunctions.CLR_CollectGarbage = &CLR_Interop.CollectGarbage;
         output->ManagedFunctions.CLR_CreateMasterALC = &CLR_Interop.CreateMasterALC;
         output->ManagedFunctions.CLR_CreateSlimALC = &CLR_Interop.CreateSlimALC;
         
@@ -105,6 +108,7 @@ internal static class __DllEntry
         
         // MethodInfo interop functions
         output->ManagedFunctions.MethodInfo_GetName = &MethodInfo_Interop.GetName;
+        output->ManagedFunctions.MethodInfo_GetNumSlots = &MethodInfo_Interop.GetNumSlots;
         output->ManagedFunctions.MethodInfo_Invoke = &MethodInfo_Interop.Invoke;
         
         Logger.Log("====================== ZSharp Startup ======================");

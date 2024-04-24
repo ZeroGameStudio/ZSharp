@@ -21,6 +21,13 @@ internal static class __DllEntry
     {
         Logger.Log("===================== Glue Generator Begin =====================");
 
+        ProcessAsync((processed, total) => { rawArgs->OnUpdate(processed, total); }, () => { rawArgs->OnComplete(); });
+        
+        return 0;
+    }
+
+    private static async void ProcessAsync(Action<int32, int32> onUpdate, Action onComplete)
+    {
         int32 processed = 0;
         int32 numFiles = 10000;
         int32 blockSize = 64;
@@ -37,26 +44,9 @@ internal static class __DllEntry
             blocks.Add((i * blockSize, Math.Min((i + 1) * blockSize - 1, numFiles)));
         }
         
-        rawArgs->OnUpdate(processed, numFiles);
+        onUpdate(processed, numFiles);
         
-        // Task.Run(() =>
-        // {
-        //     for (int32 i = 0; i < numFiles; ++i)
-        //     {
-        //         Interlocked.Increment(ref processed);
-        //         Thread.Sleep(1);
-        //         rawArgs->OnUpdate(processed, numFiles);
-        //     }
-        // }).ContinueWith(_ =>
-        // {
-        //     Logger.Log("===================== Glue Generator End =====================");
-        //     
-        //     rawArgs->OnComplete();
-        //     
-        //     AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly())!.Unload();
-        // });
-
-        Parallel.ForEachAsync(blocks, (startEndPos, cancellationToken) =>
+        await Parallel.ForEachAsync(blocks, (startEndPos, cancellationToken) =>
         {
             return new(Task.Run(() =>
             {
@@ -64,19 +54,16 @@ internal static class __DllEntry
                 {
                     Interlocked.Increment(ref processed);
                     Thread.Sleep(1);
-                    rawArgs->OnUpdate(processed, numFiles);
+                    onUpdate(processed, numFiles);
                 }
             }, cancellationToken));
-        }).ContinueWith(_ =>
-        {
-            Logger.Log("===================== Glue Generator End =====================");
-            
-            rawArgs->OnComplete();
-            
-            AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly())!.Unload();
         });
-        
-        return 0;
+
+        Logger.Log("===================== Glue Generator End =====================");
+            
+        onComplete();
+            
+        AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly())!.Unload();
     }
     
 }

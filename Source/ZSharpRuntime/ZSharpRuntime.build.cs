@@ -41,6 +41,16 @@ public class ZSharpRuntime : ModuleRules
 			}
 		);
 		
+		if (Target.bBuildEditor)
+		{
+			PrivateDependencyModuleNames.AddRange(
+				new string[]
+				{
+					"UnrealEd",
+				}
+			);
+		}
+		
 		DynamicallyLoadedModuleNames.AddRange
 		(
 			new string[]

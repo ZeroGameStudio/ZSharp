@@ -20,7 +20,7 @@ internal static class Type_Interop
 
             return 0;
         }
-
+        
         return 1;
     }
 
@@ -29,9 +29,10 @@ internal static class Type_Interop
     {
         if (handle.Target is Type type)
         {
-            if (type.IsAssignableTo(typeof(IConjugate)))
+            Type conjugateType = typeof(IConjugate<>).MakeGenericType(type);
+            if (type.IsAssignableTo(conjugateType))
             {
-                return ConjugateHandle.FromConjugate((IConjugate)type.GetMethod(nameof(IConjugate.BuildConjugate))!.Invoke(null, new object[] { unmanaged })!);
+                return ConjugateHandle.FromConjugate((IConjugate)type.GetMethod("BuildConjugate")!.Invoke(null, new object[] { unmanaged })!);
             }
         }
 

@@ -13,9 +13,13 @@
 void ZSharp::FZMasterAssemblyLoadContext::Unload()
 {
 	check(IsInGameThread());
+
+	UnloadCallback();
+
+	// Check that all conjugates have been released correctly, otherwise there may be a memory leak.
+	check(ConjugateManaged2Unmanaged.IsEmpty() && ConjugateUnmanaged2Managed.IsEmpty());
 	
 	FZMasterAssemblyLoadContext_Interop::GUnload();
-	UnloadCallback();
 }
 
 const ZSharp::IZAssembly* ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const TArray<uint8>& buffer, void* args)

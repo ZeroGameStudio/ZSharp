@@ -22,8 +22,7 @@ namespace ZSharp
 	{
 		FString* string = FZConjugateRegistry::Get()->Conjugate<FString>(buffer->Slots[0].Conjugate);
 		FZConjugateRegistry::Get()->ReleaseConjugate(string);
-		delete string;
-		
+
 		return 0;
 	}};
 	

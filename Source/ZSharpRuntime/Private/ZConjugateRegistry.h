@@ -24,7 +24,8 @@ namespace ZSharp
 		struct TZConjugateRecord
 		{
 			T* Unmanaged;
-			bool bCaptured = false;
+			bool bCaptured;
+			TFunction<void(T*)> OnReleased;
 		};
 
 		template <typename T>
@@ -43,11 +44,11 @@ namespace ZSharp
 		void ReleaseConjugate(UObject* unmanaged);
 		
 		FZConjugateHandle Conjugate(FString* unmanaged);
-		void Conjugate(FString* unmanaged, FZConjugateHandle managed);
+		void Conjugate(FString* unmanaged, FZConjugateHandle managed, const TFunction<void(FString*)>& onReleased = nullptr);
 		void ReleaseConjugate(FString* unmanaged);
 
 		FZConjugateHandle Conjugate(FZTypedScriptStruct* unmanaged);
-        void Conjugate(FZTypedScriptStruct* unmanaged, FZConjugateHandle managed);
+        void Conjugate(FZTypedScriptStruct* unmanaged, FZConjugateHandle managed, const TFunction<void(FZTypedScriptStruct*)>& onReleased = nullptr);
         void ReleaseConjugate(FZTypedScriptStruct* unmanaged);
 
 		void* Conjugate(FZConjugateHandle managed) const;
@@ -61,6 +62,7 @@ namespace ZSharp
 		static void HandleMasterALCUnloaded();
 
 	private:
+		void ReleaseConjugates(bool bCapturedOnly);
 		void GuardRelease();
 		
 		bool IsGuarded() const { return !!ZCallToManagedDepth; }

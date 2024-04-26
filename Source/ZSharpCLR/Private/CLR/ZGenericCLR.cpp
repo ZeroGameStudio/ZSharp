@@ -246,9 +246,9 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::GetSlimALC(const FStrin
 
 void ZSharp::FZGenericCLR::HandleMasterALCUnloaded()
 {
-	MasterALC = nullptr;
-
 	OnMasterALCUnloaded.Broadcast();
+	
+	MasterALC = nullptr;
 }
 
 void ZSharp::FZGenericCLR::HandleSlimALCUnloaded(const FString& name)

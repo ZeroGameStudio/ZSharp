@@ -10,7 +10,7 @@ namespace ZSharp
 	{
 
 	public:
-		FZCallDispatcher_Export(const FString& name, const TFunction<int32(FZCallBuffer*)> function)
+		FZCallDispatcher_Export(const FString& name, const TFunction<int32(FZCallBuffer*)>& function)
 			: Name(name)
 			, Function(function){}
 

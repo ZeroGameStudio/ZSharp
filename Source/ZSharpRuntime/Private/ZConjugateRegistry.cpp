@@ -11,12 +11,12 @@
 namespace ZSharp::FZConjugateRegistry_Private
 {
 	template <typename T>
-	void ReleaseCapturedConjugates(FZConjugateRegistry& registry, FZConjugateRegistry::TZConjugateSubregistry<T>& subregistry)
+	void ReleaseConjugates(FZConjugateRegistry& registry, FZConjugateRegistry::TZConjugateSubregistry<T>& subregistry, bool bCapturedOnly)
 	{
 		TArray<T*> pendings;
 		for (const auto& pair : subregistry)
 		{
-			if (pair.Value.bCaptured)
+			if (bCapturedOnly && pair.Value.bCaptured)
 			{
 				pendings.Emplace(pair.Key);
 			}
@@ -56,7 +56,7 @@ ZSharp::FZConjugateRegistry::FZConjugateRegistry(IZMasterAssemblyLoadContext* ma
 ZSharp::FZConjugateRegistry::~FZConjugateRegistry()
 {
 	FCoreUObjectDelegates::GarbageCollectComplete.RemoveAll(this);
-	// Note that at this point MasterALC has been released and we have no need to remove delegates anymore.
+	// We have no need to remove ALC delegates because it's pending kill.
 }
 
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(UObject* unmanaged)
@@ -133,7 +133,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(FString* unmana
 	return handle;
 }
 
-void ZSharp::FZConjugateRegistry::Conjugate(FString* unmanaged, FZConjugateHandle managed)
+void ZSharp::FZConjugateRegistry::Conjugate(FString* unmanaged, FZConjugateHandle managed, const TFunction<void(FString*)>& onReleased)
 {
 	CheckGuarded();
 	
@@ -143,16 +143,22 @@ void ZSharp::FZConjugateRegistry::Conjugate(FString* unmanaged, FZConjugateHandl
 	}
 
 	MasterALC->BuildConjugate(unmanaged, managed);
-	StringRegistry.Emplace(unmanaged, { unmanaged });
+	StringRegistry.Emplace(unmanaged, { unmanaged, false, onReleased ? onReleased : [](FString* unmanaged){ delete unmanaged; } });
 }
 
 void ZSharp::FZConjugateRegistry::ReleaseConjugate(FString* unmanaged)
 {
 	CheckNoGuarded();
-	
-	if (!StringRegistry.Remove(unmanaged))
+
+	TZConjugateRecord<FString> rec;
+	if (!StringRegistry.RemoveAndCopyValue(unmanaged, rec))
 	{
 		return;
+	}
+
+	if (rec.OnReleased)
+	{
+		rec.OnReleased(rec.Unmanaged);
 	}
 
 	MasterALC->ReleaseConjugate(unmanaged);
@@ -166,7 +172,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(FZTypedScriptSt
 	return FZConjugateHandle{};
 }
 
-void ZSharp::FZConjugateRegistry::Conjugate(FZTypedScriptStruct* unmanaged, FZConjugateHandle managed)
+void ZSharp::FZConjugateRegistry::Conjugate(FZTypedScriptStruct* unmanaged, FZConjugateHandle managed, const TFunction<void(FZTypedScriptStruct*)>& onReleased)
 {
 	CheckGuarded();
 	
@@ -240,12 +246,19 @@ void ZSharp::FZConjugateRegistry::HandleMasterALCUnloaded()
 {
 	check(GSingleton);
 
+	GSingleton->ReleaseConjugates(false);
+
 	GSingleton = nullptr;
+}
+
+void ZSharp::FZConjugateRegistry::ReleaseConjugates(bool bCapturedOnly)
+{
+	FZConjugateRegistry_Private::ReleaseConjugates(*this, StringRegistry, bCapturedOnly);
 }
 
 void ZSharp::FZConjugateRegistry::GuardRelease()
 {
-	FZConjugateRegistry_Private::ReleaseCapturedConjugates(*this, StringRegistry);
+	ReleaseConjugates(true);
 }
 
 

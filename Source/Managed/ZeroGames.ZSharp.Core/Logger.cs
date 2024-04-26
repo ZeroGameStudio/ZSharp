@@ -1,47 +1,46 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Text;
+
 namespace ZeroGames.ZSharp.Core;
 
 public static class Logger
 {
 
-    public static void Log(object? message)
+    private static void Log(uint8 level, params object?[]? objects)
     {
-        string messageStr = message?.ToString() ?? "";
+        StringBuilder sb = new();
+        if (objects is not null)
+        {
+            bool bFirst = true;
+            foreach (var obj in objects)
+            {
+                if (bFirst)
+                {
+                    bFirst = false;
+                }
+                else
+                {
+                    sb.Append("\t");
+                }
+                
+                sb.Append(obj);
+            }
+        }
 
         unsafe
         {
-            fixed (char* buffer = messageStr.ToCharArray())
+            fixed (char* buffer = sb.ToString().ToCharArray())
             {
-                UnrealEngine_Interop.SLog(1, buffer);
+                UnrealEngine_Interop.SLog(level, buffer);
             }
         }
     }
+
+    public static void Log(params object?[]? objects) => Log(1, objects);
     
-    public static void Warning(object? message)
-    {
-        string messageStr = message?.ToString() ?? "";
-
-        unsafe
-        {
-            fixed (char* buffer = messageStr.ToCharArray())
-            {
-                UnrealEngine_Interop.SLog(2, buffer);
-            }
-        }
-    }
+    public static void Warning(params object?[]? objects) => Log(2, objects);
     
-    public static void Error(object? message)
-    {
-        string messageStr = message?.ToString() ?? "";
-
-        unsafe
-        {
-            fixed (char* buffer = messageStr.ToCharArray())
-            {
-                UnrealEngine_Interop.SLog(3, buffer);
-            }
-        }
-    }
+    public static void Error(params object?[]? objects) => Log(3, objects);
     
 }

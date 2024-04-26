@@ -32,8 +32,8 @@ namespace ZSharp
 		virtual void UnregisterMasterALCUnloaded(const void* userObject) = 0;
 		// Helpers
 	public:
-		int32 Run(const FString& path, void* args);
-		int32 RunAsync(const FString& path, void* args);
+		int32 Run(const FString& path, void* args = nullptr, const FString& alcName = "");
+		int32 RunAsync(const FString& path, void* args = nullptr, const FString& alcName = "");
 	};
 }
 

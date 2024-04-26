@@ -1,6 +1,4 @@
-﻿<!-- Copyright Zero Games. All Rights Reserved. -->
-
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -27,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ZeroGames.ZSharp.Core\ZeroGames.ZSharp.Core.csproj" />
+        <ProjectReference Include="..\ZeroGames.ZSharp.Core\ZeroGames.ZSharp.Core.csproj" />
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">

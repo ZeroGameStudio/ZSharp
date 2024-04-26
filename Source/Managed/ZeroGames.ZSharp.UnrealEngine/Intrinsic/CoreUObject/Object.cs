@@ -1,11 +1,11 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.InteropServices;
 using ZeroGames.ZSharp.Core;
+using ZeroGames.ZSharp.UnrealEngine.Export;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public class Object : IConjugate<Object>
+public class Object : UnrealClassExportedObjectBase, IConjugate<Object>
 {
 
     public static Object BuildConjugate(IntPtr unmanaged) => new(unmanaged);
@@ -18,7 +18,7 @@ public class Object : IConjugate<Object>
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
             {
                 new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Conjugate = new() },
+                new(),
             };
             ZCallBuffer buffer = new() { Slots = slots };
             alc.ZCall("ex://Object.GetClass", &buffer);
@@ -34,7 +34,7 @@ public class Object : IConjugate<Object>
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
             {
                 new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Conjugate = new() },
+                new(),
             };
             ZCallBuffer buffer = new() { Slots = slots };
             alc.ZCall("ex://Object.GetOuter", &buffer);
@@ -42,30 +42,29 @@ public class Object : IConjugate<Object>
         }
     }
 
-    public unsafe string Name
+    public unsafe UnrealString Name
     {
         get
         {
             MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
+            UnrealString str = new();
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
             {
                 new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Conjugate = new() },
+                new() { Conjugate = ConjugateHandle.FromConjugate(str) },
             };
             ZCallBuffer buffer = new() { Slots = slots };
             alc.ZCall("ex://Object.GetName", &buffer);
-            return ((UnrealString)slots[1].Conjugate.ToGCHandle().Target!).Data;
+            return str;
         }
     }
-    
-    public GCHandle GCHandle { get; }
-    public IntPtr Unmanaged { get; }
 
-    private Object(IntPtr unmanaged)
+    protected override void ReleaseUnmanagedResource()
     {
-        GCHandle = GCHandle.Alloc(this);
-        Unmanaged = unmanaged;
+        Logger.Log($"===================== Release Object {Unmanaged} =====================");
     }
+
+    private Object(IntPtr unmanaged) : base(unmanaged){}
     
 }
 

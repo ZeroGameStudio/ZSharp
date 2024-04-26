@@ -47,6 +47,19 @@ internal static class MasterAssemblyLoadContext_Interop
 
         return GCHandle.Alloc(asm);
     }
+
+    [UnmanagedCallersOnly]
+    public static int32 ReleaseConjugate(ConjugateHandle handle)
+    {
+        if (handle.ToGCHandle().Target is IConjugate conjugate)
+        {
+            conjugate.ReleaseConjugate();
+
+            return 0;
+        }
+
+        return -1;
+    }
     
     public static unsafe delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> SZCallByHandle;
     public static unsafe delegate* unmanaged<char*, ZCallBuffer*, ZCallHandle*, uint8, int32> SZCallByName;

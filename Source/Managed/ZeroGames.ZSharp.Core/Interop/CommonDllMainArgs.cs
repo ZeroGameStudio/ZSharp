@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.Core;
 [StructLayout(LayoutKind.Sequential)]
 public unsafe struct CommonDllMainArgs
 {
-    public string[] ToStringArray()
+    public string[] Parse()
     {
         string[] args = new string[Argc];
         for (int32 i = 0; i < Argc; ++i)

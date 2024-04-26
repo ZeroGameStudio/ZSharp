@@ -4,6 +4,7 @@
 
 #include "Interop/ZGCHandle.h"
 #include "Interop/ZCallHandle.h"
+#include "Interop/ZConjugateHandle.h"
 
 namespace ZSharp
 {
@@ -17,6 +18,7 @@ namespace ZSharp
 		
 		inline static int32(*GUnload)() = nullptr;
 		inline static FZGCHandle(*GLoadAssembly)(const uint8*, int32, void*) = nullptr;
+		inline static int32(*GReleaseConjugate)(FZConjugateHandle) = nullptr;
 	};
 }
 

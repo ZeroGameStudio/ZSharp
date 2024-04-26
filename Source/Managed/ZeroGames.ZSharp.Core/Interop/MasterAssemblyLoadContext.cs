@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.Core;
 public class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase
 {
 
-    public const string KName = "__Master";
+    public const string KName = "Master";
     
     public static MasterAssemblyLoadContext? Get()
     {

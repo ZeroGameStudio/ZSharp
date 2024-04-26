@@ -164,8 +164,7 @@ void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(void* unmanaged)
 	if (ConjugateUnmanaged2Managed.RemoveAndCopyValue(unmanaged, managed))
 	{
 		ConjugateManaged2Unmanaged.Remove(managed);
-		FZGCHandle handle { managed.Handle };
-		Free(handle);
+		FZMasterAssemblyLoadContext_Interop::GReleaseConjugate(managed);
 	}
 }
 
@@ -177,8 +176,7 @@ void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(FZConjugateHandle man
 	if (ConjugateManaged2Unmanaged.RemoveAndCopyValue(managed, unmanaged))
 	{
 		ConjugateUnmanaged2Managed.Remove(unmanaged);
-		FZGCHandle handle { managed.Handle };
-		Free(handle);
+		FZMasterAssemblyLoadContext_Interop::GReleaseConjugate(managed);
 	}
 }
 

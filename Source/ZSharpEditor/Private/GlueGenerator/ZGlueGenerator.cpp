@@ -14,6 +14,49 @@ static FAutoConsoleCommand GCmdDotnetRun(
 	}),
 	ECVF_Default);
 
+void ZSharp::FZGlueGenerator::Generate(const TFunction<void()>& onComplete)
+{
+	FWriteScopeLock _(Lock);
+	
+	if (bBusy)
+	{
+		return;
+	}
+	
+	if (!IZSharpCLR::Get().RunAsync(FPaths::Combine(FPaths::ProjectPluginsDir(), "ZeroGames", "ZSharp", "Binaries", "Managed", "ZeroGames.ZSharp.GlueGenerator.dll"), &Args, "GlueGenerator"))
+	{
+		OnComplete = onComplete;
+		bBusy = true;
+		StartSeconds = FPlatformTime::Seconds();
+
+		TickerDelegate = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([this](float)
+		{
+			if (!SlowTask)
+			{
+				SlowTask = MakeUnique<FScopedSlowTask>(Total);
+				SlowTask->MakeDialog();
+			}
+			
+			SlowTask->EnterProgressFrame(Processed - LastProcessed, FText::FromString("Generating glue code..."));
+			LastProcessed = Processed;
+			return true;
+		}));
+	}
+}
+
+bool ZSharp::FZGlueGenerator::IsBusy()
+{
+	FReadScopeLock _(Lock);
+	
+	return bBusy;
+}
+
+ZSharp::IZGlueGenerator* ZSharp::FZGlueGenerator::GetRunningTask()
+{
+	checkNoEntry();
+	return nullptr;
+}
+
 void ZSharp::FZGlueGenerator::HandleComplete()
 {
 	FZGlueGenerator& self = StaticCast<FZGlueGenerator&>(Get());
@@ -50,45 +93,4 @@ void ZSharp::FZGlueGenerator::HandleUpdate(int32 Processed, int32 Total)
 	self.Total = Total;
 }
 
-void ZSharp::FZGlueGenerator::Generate(const TFunction<void()>& onComplete)
-{
-	FWriteScopeLock _(Lock);
-	
-	if (bBusy)
-	{
-		return;
-	}
-	
-	if (!IZSharpCLR::Get().RunAsync(FPaths::Combine(FPaths::ProjectPluginsDir(), "ZeroGames", "ZSharp", "Binaries", "Managed", "ZeroGames.ZSharp.GlueGenerator.dll"), &Args))
-	{
-		OnComplete = onComplete;
-		bBusy = true;
-		StartSeconds = FPlatformTime::Seconds();
 
-		TickerDelegate = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([this](float)
-		{
-			if (!SlowTask)
-			{
-				SlowTask = MakeUnique<FScopedSlowTask>(Total);
-				SlowTask->MakeDialog();
-			}
-			
-			SlowTask->EnterProgressFrame(Processed - LastProcessed, FText::FromString("Generating glue code..."));
-			LastProcessed = Processed;
-			return true;
-		}));
-	}
-}
-
-bool ZSharp::FZGlueGenerator::IsBusy()
-{
-	FReadScopeLock _(Lock);
-	
-	return bBusy;
-}
-
-ZSharp::IZGlueGenerator* ZSharp::FZGlueGenerator::GetRunningTask()
-{
-	checkNoEntry();
-	return nullptr;
-}

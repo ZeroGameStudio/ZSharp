@@ -2,20 +2,37 @@
 
 using System.Runtime.InteropServices;
 using ZeroGames.ZSharp.Core;
+using ZeroGames.ZSharp.UnrealEngine.Export;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class String : IConjugate<String>
+public class String : PlainUnmanagedClassExportedObjectBase, IConjugate<String>
 {
 
     public static String BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
     public String() : this(string.Empty){}
 
-    public String(string content)
+    public unsafe String(string content)
     {
-        GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
-        _bNative = false;
+        MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
+        fixed (char* data = content.ToCharArray())
+        {
+            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
+            {
+                new() { Conjugate = ConjugateHandle.FromConjugate(this) },
+                new() { Pointer = (IntPtr)data },
+                new(),
+            };
+            ZCallBuffer buffer = new() { Slots = slots };
+            alc.ZCall("ex://String.Ctor", &buffer);
+            Unmanaged = buffer.Slots[2].Pointer;
+        }
+    }
+
+    public override string ToString()
+    {
+        return Data;
     }
 
     public unsafe int32 Len
@@ -64,25 +81,20 @@ public class String : IConjugate<String>
         }
     }
 
-    public GCHandle GCHandle { get; }
-    public IntPtr Unmanaged { get; }
-    
-    private String(IntPtr unmanaged)
+    protected override unsafe void ReleaseUnmanagedResource()
     {
-        GCHandle = GCHandle.Alloc(this);
-        Unmanaged = unmanaged;
-        _bNative = true;
-    }
-    
-    ~String()
-    {
-        if (!_bNative)
-        {
-            
-        }
+        Logger.Log($"===================== Release String {Unmanaged} =====================");
+        //
+        // MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
+        // ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
+        // {
+        //     new() { Conjugate = ConjugateHandle.FromConjugate(this) },
+        // };
+        // ZCallBuffer buffer = new() { Slots = slots };
+        // alc.ZCall("ex://String.Dtor", &buffer);
     }
 
-    private bool _bNative;
+    private String(IntPtr unmanaged) : base(unmanaged){}
 
 }
 

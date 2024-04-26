@@ -36,6 +36,7 @@ internal unsafe struct ManagedFunctions
 
     public delegate* unmanaged<int32> MasterAssemblyLoadContext_Unload;
     public delegate* unmanaged<uint8*, int32, void*, GCHandle> MasterAssemblyLoadContext_LoadAssembly;
+    public delegate* unmanaged<ConjugateHandle, int32> MasterAssemblyLoadContext_ReleaseConjugate;
 
     public delegate* unmanaged<GCHandle, int32> SlimAssemblyLoadContext_Unload;
     public delegate* unmanaged<GCHandle, uint8*, int32, void*, int32> SlimAssemblyLoadContext_LoadAssembly;
@@ -90,6 +91,7 @@ internal static class __DllEntry
         // MasterAssemblyLoadContext interop functions
         output->ManagedFunctions.MasterAssemblyLoadContext_Unload = &MasterAssemblyLoadContext_Interop.Unload;
         output->ManagedFunctions.MasterAssemblyLoadContext_LoadAssembly = &MasterAssemblyLoadContext_Interop.LoadAssembly;
+        output->ManagedFunctions.MasterAssemblyLoadContext_ReleaseConjugate = &MasterAssemblyLoadContext_Interop.ReleaseConjugate;
 
         // SlimAssemblyLoadContext interop functions
         output->ManagedFunctions.SlimAssemblyLoadContext_Unload = &SlimAssemblyLoadContext_Interop.Unload;

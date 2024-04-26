@@ -30,9 +30,8 @@ namespace ZSharp
 	static FZStaticExportZCall Export_Object_GetName{ "ex://Object.GetName", [](FZCallBuffer* buffer)
 	{
 		UObject* obj = FZConjugateRegistry::Get()->Conjugate<UObject>(buffer->Slots[0].Conjugate);
-		FZConjugateHandle* res = &buffer->Slots[1].Conjugate;
-		FString* name = new FString { obj->GetName() };
-		*res = FZConjugateRegistry::Get()->Conjugate(name);
+		FString* res = FZConjugateRegistry::Get()->Conjugate<FString>(buffer->Slots[1].Conjugate);
+		*res = obj->GetName();
 		
 		return 0;
 	}};

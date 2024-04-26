@@ -12,6 +12,7 @@
         <AssemblyVersion>0.0.1</AssemblyVersion>
         <FileVersion>0.0.1</FileVersion>
         <NeutralLanguage>zh</NeutralLanguage>
+        <WarningsAsErrors>$(WarningsAsErrors);CS8600;CS8601;CS8602;CS8603;CS8604;CS8609;CS8610;CS8614;CS8616;CS8618;CS8619;CS8622;CS8625</WarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
@@ -32,6 +33,10 @@
     <ItemGroup>
         <Using Include="ZeroGames.ZSharp.UnrealEngine.Core.String" Alias="UnrealString" />
         <Using Include="ZeroGames.ZSharp.UnrealEngine.CoreUObject.Object" Alias="UnrealObject" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Intrinsic\" />
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">

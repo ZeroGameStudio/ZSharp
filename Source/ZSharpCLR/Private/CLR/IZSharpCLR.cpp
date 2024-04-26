@@ -17,9 +17,10 @@ ZSharp::IZSharpCLR& ZSharp::IZSharpCLR::Get()
 	return GSingleton;
 }
 
-int32 ZSharp::IZSharpCLR::Run(const FString& path, void* args)
+int32 ZSharp::IZSharpCLR::Run(const FString& path, void* args, const FString& alcName)
 {
-	IZSlimAssemblyLoadContext* alc = CreateSlimALC(FString::Printf(TEXT("__Anonymous%llu"), IZSharpCLR_Private::GAnonymousSlimALCNameSerial++));
+	FString actualAlcName = alcName.IsEmpty() ? FString::Printf(TEXT("__Anonymous%llu"), IZSharpCLR_Private::GAnonymousSlimALCNameSerial++) : alcName;
+	IZSlimAssemblyLoadContext* alc = CreateSlimALC(actualAlcName);
 	if (!alc)
 	{
 		return -1;
@@ -30,9 +31,10 @@ int32 ZSharp::IZSharpCLR::Run(const FString& path, void* args)
 	return alc->LoadAssembly(path, args);
 }
 
-int32 ZSharp::IZSharpCLR::RunAsync(const FString& path, void* args)
+int32 ZSharp::IZSharpCLR::RunAsync(const FString& path, void* args, const FString& alcName)
 {
-	IZSlimAssemblyLoadContext* alc = CreateSlimALC(FString::Printf(TEXT("__Anonymous%llu"), IZSharpCLR_Private::GAnonymousSlimALCNameSerial++));
+	FString actualAlcName = alcName.IsEmpty() ? FString::Printf(TEXT("__Anonymous%llu"), IZSharpCLR_Private::GAnonymousSlimALCNameSerial++) : alcName;
+	IZSlimAssemblyLoadContext* alc = CreateSlimALC(actualAlcName);
 	if (!alc)
 	{
 		return -1;

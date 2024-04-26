@@ -10,13 +10,13 @@ namespace ZSharp
 	{
 
 	public:
-		static void HandleComplete();
-		static void HandleUpdate(int32 Processed, int32 Total);
-
-	public:
 		virtual void Generate(const TFunction<void()>& onComplete) override;
 		virtual bool IsBusy() override;
 		virtual IZGlueGenerator* GetRunningTask() override;
+
+	private:
+		static void HandleComplete();
+		static void HandleUpdate(int32 Processed, int32 Total);
 
 	private:
 		struct FArgs

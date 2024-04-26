@@ -98,6 +98,7 @@ void ZSharp::FZGenericCLR::Startup()
 
 			int32(*MasterAssemblyLoadContext_Unload)();
 			FZGCHandle(*MasterAssemblyLoadContext_LoadAssembly)(const uint8*, int32, void*);
+			int32(*MasterAssemblyLoadContext_ReleaseConjugate)(FZConjugateHandle);
 
 			int32(*SlimAssemblyLoadContext_Unload)(FZGCHandle);
 			int32(*SlimAssemblyLoadContext_LoadAssembly)(FZGCHandle, const uint8*, int32, void*);
@@ -135,7 +136,8 @@ void ZSharp::FZGenericCLR::Startup()
 
 	FZMasterAssemblyLoadContext_Interop::GUnload = output.ManagedFunctions.MasterAssemblyLoadContext_Unload;
 	FZMasterAssemblyLoadContext_Interop::GLoadAssembly = output.ManagedFunctions.MasterAssemblyLoadContext_LoadAssembly;
-
+	FZMasterAssemblyLoadContext_Interop::GReleaseConjugate = output.ManagedFunctions.MasterAssemblyLoadContext_ReleaseConjugate;
+	
 	FZSlimAssemblyLoadContext_Interop::GUnload = output.ManagedFunctions.SlimAssemblyLoadContext_Unload;
 	FZSlimAssemblyLoadContext_Interop::GLoadAssembly = output.ManagedFunctions.SlimAssemblyLoadContext_LoadAssembly;
 	FZSlimAssemblyLoadContext_Interop::GCallMethod = output.ManagedFunctions.SlimAssemblyLoadContext_CallMethod;

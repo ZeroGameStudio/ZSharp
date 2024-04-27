@@ -143,7 +143,11 @@ void ZSharp::FZConjugateRegistry::Conjugate(FString* unmanaged, FZConjugateHandl
 	}
 
 	MasterALC->BuildConjugate(unmanaged, managed);
-	StringRegistry.Emplace(unmanaged, { unmanaged, false, onReleased ? onReleased : [](FString* unmanaged){ delete unmanaged; } });
+	StringRegistry.Emplace(unmanaged, { unmanaged, false, onReleased ? onReleased : [](FString* unmanaged)
+	{
+		UE_LOG(LogZSharpRuntime, Log, TEXT("Release UnrealString: [%s] [%p]"), **unmanaged, unmanaged);
+		delete unmanaged;
+	} });
 }
 
 void ZSharp::FZConjugateRegistry::ReleaseConjugate(FString* unmanaged)

@@ -38,10 +38,7 @@ namespace ZSharp
 	static FZStaticExportZCall Export_String_GetData{ "ex://String.GetData", [](FZCallBuffer* buffer)
 	{
 		FString* string = FZConjugateRegistry::Get()->Conjugate<FString>(buffer->Slots[0].Conjugate);
-		const TCHAR* res = StaticCast<const TCHAR*>(buffer->Slots[1].Pointer);
-		const TCHAR** pRes = StaticCast<const TCHAR**>(&res);
-
-		*pRes = **string;
+		buffer->Slots[1].Pointer = const_cast<TCHAR*>(**string);
 		
 		return 0;
 	}};

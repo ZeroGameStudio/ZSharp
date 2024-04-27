@@ -9,10 +9,27 @@
 #include "ZSharpCLRLogChannels.h"
 #include "Interop/IZCallDispatcher.h"
 #include "Interop/IZType.h"
+#include "Interop/ZCallBuffer.h"
+
+ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle handle, const TFunction<void()>& unloadCallback)
+	: Handle(handle)
+	, UnloadCallback(unloadCallback)
+{
+	TickerHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(this, &ThisClass::Tick));
+}
+
+ZSharp::FZMasterAssemblyLoadContext::~FZMasterAssemblyLoadContext()
+{
+	FTSTicker::GetCoreTicker().RemoveTicker(TickerHandle);
+	
+	Free(Handle);
+}
 
 void ZSharp::FZMasterAssemblyLoadContext::Unload()
 {
 	check(IsInGameThread());
+
+	FlushDeferredZCalls();
 
 	UnloadCallback();
 
@@ -84,6 +101,42 @@ int32 ZSharp::FZMasterAssemblyLoadContext::ZCall(const FString& name, FZCallBuff
 
 int32 ZSharp::FZMasterAssemblyLoadContext::ZCall(const FString& name, FZCallBuffer* buffer, FZCallHandle* outHandle)
 {
+	FZCallHandle handle = GetOrResolveZCallHandle(name);
+	if (outHandle)
+	{
+		*outHandle = handle;
+	}
+
+	return ZCall(handle, buffer);
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::ZCall_AnyThread(FZCallHandle handle, FZCallBuffer* buffer, int32 numSlots)
+{
+	if (IsInGameThread())
+	{
+		ZCall(handle, buffer);
+		return;
+	}
+
+	const int32 numBytes = numSlots * sizeof(FZCallBufferSlot);
+	FZCallBufferSlot* slots = StaticCast<FZCallBufferSlot*>(FMemory::Malloc(numBytes));
+	FMemory::Memcpy(slots, buffer->Slots, numBytes);
+	FZCallBuffer copiedBuffer { slots };
+	
+	FWriteScopeLock _(DeferredZCallsLock);
+	DeferredZCalls.Enqueue(TTuple<FZCallHandle, FZCallBuffer> { handle, copiedBuffer });
+}
+
+ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const FString& name) const
+{
+	check(IsInGameThread());
+	
+	const FZCallHandle* pHandle = ZCallName2Handle.Find(name);
+	return pHandle ? *pHandle : FZCallHandle{};
+}
+
+ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetOrResolveZCallHandle(const FString& name)
+{
 	check(IsInGameThread());
 
 	FZCallHandle handle{};
@@ -103,27 +156,14 @@ int32 ZSharp::FZMasterAssemblyLoadContext::ZCall(const FString& name, FZCallBuff
 		handle = *pHandle;
 	}
 
-	if (outHandle)
-	{
-		*outHandle = handle;
-	}
-
-	return ZCall(handle, buffer);
-}
-
-ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const FString& name) const
-{
-	check(IsInGameThread());
-	
-	const FZCallHandle* pHandle = ZCallName2Handle.Find(name);
-	return pHandle ? *pHandle : FZCallHandle{};
+	return handle;
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::RegisterZCallResolver(IZCallResolver* resolver, uint64 priority)
 {
 	check(IsInGameThread());
 	
-	ZCallResolverLink.Emplace(TTuple<uint64, TUniquePtr<IZCallResolver>>(priority, resolver));
+	ZCallResolverLink.Emplace(TTuple<uint64, TUniquePtr<IZCallResolver>> { priority, resolver });
 	ZCallResolverLink.StableSort([](auto& lhs, auto& rhs){ return lhs.template Get<0>() < rhs.template Get<0>(); });
 }
 
@@ -227,6 +267,34 @@ void ZSharp::FZMasterAssemblyLoadContext::NotifyPostZCallToManaged() const
 	PostZCallToManaged.Broadcast();
 
 	UE_LOG(LogZSharpCLR, Verbose, TEXT("===================== Post ZCall To Managed ====================="));
+}
+
+bool ZSharp::FZMasterAssemblyLoadContext::Tick(float deltaTime)
+{
+	check(IsInGameThread());
+
+	FlushDeferredZCalls();
+
+	return true;
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::FlushDeferredZCalls()
+{
+	check(IsInGameThread());
+
+	FWriteScopeLock _(DeferredZCallsLock);
+
+	if (DeferredZCalls.IsEmpty())
+	{
+		return;
+	}
+
+	TTuple<FZCallHandle, FZCallBuffer> args;
+	while (DeferredZCalls.Dequeue(args))
+	{
+		ZCall(args.Get<0>(), &args.Get<1>());
+		FMemory::Free(args.Get<1>().Slots);
+	}
 }
 
 

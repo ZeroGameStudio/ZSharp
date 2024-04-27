@@ -14,6 +14,7 @@ namespace ZSharp
 	{
 		static int32 ZCallByHandle(FZCallHandle handle, FZCallBuffer* buffer);
 		static int32 ZCallByName(const TCHAR* name, FZCallBuffer* buffer, FZCallHandle* outHandle);
+		static void ZCallByHandle_AnyThread(FZCallHandle handle, FZCallBuffer* buffer, int32 numSlots);
 		static FZCallHandle GetZCallHandle(const TCHAR* name);
 		
 		inline static int32(*GUnload)() = nullptr;

@@ -29,7 +29,9 @@ namespace ZSharp
 		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) const = 0;
 		virtual int32 ZCall(const FString& name, FZCallBuffer* buffer) const = 0;
 		virtual int32 ZCall(const FString& name, FZCallBuffer* buffer, FZCallHandle* outHandle = nullptr) = 0;
+		virtual void ZCall_AnyThread(FZCallHandle handle, FZCallBuffer* buffer, int32 numSlots) = 0;
 		virtual FZCallHandle GetZCallHandle(const FString& name) const = 0;
+		virtual FZCallHandle GetOrResolveZCallHandle(const FString& name) = 0;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) = 0;
 
 		virtual FDelegateHandle RegisterPreZCallToManaged(FZPreZCallToManaged::FDelegate delegate) = 0;

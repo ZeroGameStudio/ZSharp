@@ -8,6 +8,7 @@ namespace ZeroGames.ZSharp.Core;
 internal unsafe struct UnmanagedFunctions
 {
     public delegate* unmanaged<uint8, char*, void> UnrealEngine_Log;
+    public delegate* unmanaged<uint8> UnrealEngine_IsInGameThread;
     
     public delegate* unmanaged<char*, IntPtr> InteropString_Alloc;
     public delegate* unmanaged<IntPtr, void> InteropString_Free;
@@ -16,6 +17,7 @@ internal unsafe struct UnmanagedFunctions
 
     public delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> MasterAssemblyLoadContext_ZCallByHandle;
     public delegate* unmanaged<char*, ZCallBuffer*, ZCallHandle*, int32> MasterAssemblyLoadContext_ZCallByName;
+    public delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32, void> MasterAssemblyLoadContext_ZCallByHandle_AnyThread;
     public delegate* unmanaged<char*, ZCallHandle> MasterAssemblyLoadContext_GetZCallHandle;
 }
 
@@ -68,6 +70,7 @@ internal static class __DllEntry
     {
         // UE
         UnrealEngine_Interop.SLog = input->UnmanagedFunctions.UnrealEngine_Log;
+        UnrealEngine_Interop.SIsInGameThread = input->UnmanagedFunctions.UnrealEngine_IsInGameThread;
         
         // InteropString
         InteropString_Interop.SAlloc = input->UnmanagedFunctions.InteropString_Alloc;
@@ -78,6 +81,7 @@ internal static class __DllEntry
         // MasterAssemblyLoadContext
         MasterAssemblyLoadContext_Interop.SZCallByHandle = input->UnmanagedFunctions.MasterAssemblyLoadContext_ZCallByHandle;
         MasterAssemblyLoadContext_Interop.SZCallByName = input->UnmanagedFunctions.MasterAssemblyLoadContext_ZCallByName;
+        MasterAssemblyLoadContext_Interop.SZCallByHandle_AnyThread = input->UnmanagedFunctions.MasterAssemblyLoadContext_ZCallByHandle_AnyThread;
         MasterAssemblyLoadContext_Interop.SGetZCallHandle = input->UnmanagedFunctions.MasterAssemblyLoadContext_GetZCallHandle;
         
         // CLR interop functions

@@ -89,10 +89,17 @@ public class String : PlainUnmanagedClassExportedObjectBase, IConjugate<String>
             new() { Conjugate = ConjugateHandle.FromConjugate(this) },
         };
         ZCallBuffer buffer = new() { Slots = slots };
-        alc.ZCall("ex://String.Dtor", &buffer, out var handle);
+        alc.ZCall_AnyThread(__sZCallHandle_Dtor, &buffer, 1);
+    }
+
+    static String()
+    {
+        __sZCallHandle_Dtor = MasterAssemblyLoadContext.Get()!.PrecacheZCall("ex://String.Dtor");
     }
 
     private String(IntPtr unmanaged) : base(unmanaged){}
+
+    private static ZCallHandle __sZCallHandle_Dtor;
 
 }
 

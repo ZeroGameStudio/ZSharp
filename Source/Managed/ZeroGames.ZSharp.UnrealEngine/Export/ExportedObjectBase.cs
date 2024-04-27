@@ -33,12 +33,13 @@ public abstract class ExportedObjectBase : IConjugate
 
     public void ReleaseConjugate()
     {
-        if (_bManaged)
+        if (!this.IsValid())
         {
-            throw new Exception("Try to dispose managed export object from unmanaged code.");
+            Logger.Error("Dispose exported object twice.");
+            return;
         }
         
-        InternalReleaseConjugate();
+        GCHandle.Free();
         
         GC.SuppressFinalize(this);
     }
@@ -65,21 +66,11 @@ public abstract class ExportedObjectBase : IConjugate
     {
         if (!_bManaged)
         {
-            throw new Exception("Finalize unmanaged export object.");
+            Logger.Error("Finalize unmanaged export object.");
+            return;
         }
         
         ReleaseUnmanagedResource();
-        InternalReleaseConjugate();
-    }
-
-    private void InternalReleaseConjugate()
-    {
-        if (!this.IsValid())
-        {
-            throw new Exception("Try to dispose managed export object from unmanaged code.");
-        }
-        
-        GCHandle.Free();
     }
 
     private readonly bool _bManaged;

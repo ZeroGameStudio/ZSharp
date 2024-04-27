@@ -13,12 +13,11 @@ namespace ZSharp
 	class FZMasterAssemblyLoadContext : public IZMasterAssemblyLoadContext
 	{
 
+		using ThisClass = FZMasterAssemblyLoadContext;
+
 	public:
-		FZMasterAssemblyLoadContext(FZGCHandle handle, const TFunction<void()>& unloadCallback)
-			: Handle(handle)
-			, UnloadCallback(unloadCallback){}
-		
-		virtual ~FZMasterAssemblyLoadContext() override { Free(Handle); }
+		FZMasterAssemblyLoadContext(FZGCHandle handle, const TFunction<void()>& unloadCallback);
+		virtual ~FZMasterAssemblyLoadContext() override;
 
 	public:
 		// IZGCHandle
@@ -35,7 +34,9 @@ namespace ZSharp
 		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) const override;
 		virtual int32 ZCall(const FString& name, FZCallBuffer* buffer) const override;
 		virtual int32 ZCall(const FString& name, FZCallBuffer* buffer, FZCallHandle* outHandle = nullptr) override;
+		virtual void ZCall_AnyThread(FZCallHandle handle, FZCallBuffer* buffer, int32 numSlots) override;
 		virtual FZCallHandle GetZCallHandle(const FString& name) const override;
+		virtual FZCallHandle GetOrResolveZCallHandle(const FString& name) override;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) override;
 
 		virtual FDelegateHandle RegisterPreZCallToManaged(FZPreZCallToManaged::FDelegate delegate) override;
@@ -57,6 +58,10 @@ namespace ZSharp
 		void NotifyPostZCallToManaged() const;
 
 	private:
+		bool Tick(float deltaTime);
+		void FlushDeferredZCalls();
+
+	private:
 		FZGCHandle Handle;
 		TFunction<void()> UnloadCallback;
 
@@ -66,6 +71,10 @@ namespace ZSharp
 		TMap<FString, FZCallHandle> ZCallName2Handle;
 
 		TArray<TTuple<uint64, TUniquePtr<IZCallResolver>>> ZCallResolverLink;
+
+		FRWLock DeferredZCallsLock;
+		TQueue<TTuple<FZCallHandle, FZCallBuffer>> DeferredZCalls;
+		FTSTicker::FDelegateHandle TickerHandle;
 
 		TMap<void*, FZConjugateHandle> ConjugateUnmanaged2Managed;
 		TMap<FZConjugateHandle, void*> ConjugateManaged2Unmanaged;

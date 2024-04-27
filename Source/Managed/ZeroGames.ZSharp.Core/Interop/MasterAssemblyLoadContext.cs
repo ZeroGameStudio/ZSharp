@@ -38,6 +38,11 @@ public class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase
         }
     }
 
+    public unsafe void ZCall_AnyThread(ZCallHandle handle, ZCallBuffer* buffer, int32 numSlots)
+    {
+        MasterAssemblyLoadContext_Interop.SZCallByHandle_AnyThread(handle, buffer, numSlots);
+    }
+
     public unsafe ZCallHandle PrecacheZCall(string name)
     {
         fixed (char* data = name.ToCharArray())

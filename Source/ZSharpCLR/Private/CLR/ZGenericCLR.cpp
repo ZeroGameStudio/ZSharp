@@ -74,6 +74,7 @@ void ZSharp::FZGenericCLR::Startup()
 		struct
 		{
 			void(*UnrealEngine_Log)(uint8, const TCHAR*) = FZUnrealEngine_Interop::Log;
+			uint8(*UnrealEngine_IsInGameThread)() = FZUnrealEngine_Interop::IsInGameThread;
 			
 			FString&(*InteropString_Alloc)(const TCHAR*) = FZInteropString_Interop::Alloc;
 			void(*InteropString_Free)(FString&) = FZInteropString_Interop::Free;
@@ -82,6 +83,7 @@ void ZSharp::FZGenericCLR::Startup()
 
 			int32(*MasterAssemblyLoadContext_ZCallByHandle)(FZCallHandle, FZCallBuffer*) = FZMasterAssemblyLoadContext_Interop::ZCallByHandle;
 			int32(*MasterAssemblyLoadContext_ZCallByName)(const TCHAR*, FZCallBuffer*, FZCallHandle*) = FZMasterAssemblyLoadContext_Interop::ZCallByName;
+			void(*MasterAssemblyLoadContext_ZCallByHandle_AnyThread)(FZCallHandle, FZCallBuffer*, int32) = FZMasterAssemblyLoadContext_Interop::ZCallByHandle_AnyThread;
 			FZCallHandle(*MasterAssemblyLoadContext_GetZCallHandle)(const TCHAR*) = FZMasterAssemblyLoadContext_Interop::GetZCallHandle;
 		} UnmanagedFunctions;
 	} input;
@@ -165,10 +167,12 @@ void ZSharp::FZGenericCLR::Shutdown()
 	{
 		return;
 	}
+	
+	FScopeLock _(&MasterALCCriticalSection);
 
 	FCoreUObjectDelegates::GarbageCollectComplete.RemoveAll(this);
 
-	if (MasterALC.Get())
+	if (MasterALC)
 	{
 		MasterALC->Unload();
 	}
@@ -189,6 +193,8 @@ void ZSharp::FZGenericCLR::CollectGarbage(int32 generation, bool bAggressive, bo
 ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::CreateMasterALC()
 {
 	check(IsInGameThread());
+
+	FScopeLock _(&MasterALCCriticalSection);
 	
 	if (MasterALC)
 	{
@@ -212,7 +218,19 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::GetMasterALC()
 {
 	check(IsInGameThread());
 	
+	FScopeLock _(&MasterALCCriticalSection);
+	
 	return MasterALC.Get();
+}
+
+void ZSharp::FZGenericCLR::GetMasterALC_AnyThread(TFunctionRef<void(IZMasterAssemblyLoadContext*)> action)
+{
+	FScopeLock _(&MasterALCCriticalSection);
+
+	if (MasterALC)
+	{
+		action(MasterALC.Get());
+	}
 }
 
 ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::CreateSlimALC(const FString& name)
@@ -261,9 +279,11 @@ void ZSharp::FZGenericCLR::HandleSlimALCUnloaded(const FString& name)
 FDelegateHandle ZSharp::FZGenericCLR::RegisterMasterALCLoaded(FZOnMasterALCLoaded::FDelegate delegate, bool bNotifyIfLoaded)
 {
 	check(IsInGameThread());
+
+	FScopeLock _(&MasterALCCriticalSection);
 	
 	FDelegateHandle handle = OnMasterALCLoaded.Add(delegate);
-	if (bNotifyIfLoaded && MasterALC.Get())
+	if (bNotifyIfLoaded && MasterALC)
 	{
 		delegate.ExecuteIfBound(MasterALC.Get());
 	}

@@ -31,4 +31,9 @@ void ZSharp::FZUnrealEngine_Interop::Log(uint8 level, const TCHAR* message)
 	}
 }
 
+uint8 ZSharp::FZUnrealEngine_Interop::IsInGameThread()
+{
+	return !!::IsInGameThread();
+}
+
 

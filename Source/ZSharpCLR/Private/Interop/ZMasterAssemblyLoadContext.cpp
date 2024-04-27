@@ -53,54 +53,69 @@ ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::RegisterZCall(IZCallDi
 	FZCallHandle handle = AllocateZCallHandle();
 
 	ZCallMap.Emplace(handle, dispatcher);
-	Name2ZCall.Emplace(dispatcher->GetName(), dispatcher);
-	ZCall2Handle.Emplace(dispatcher, handle);
+	ZCallName2Handle.Emplace(dispatcher->GetName(), handle);
 
 	return handle;
 }
 
-const ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetZCallDispatcher(FZCallHandle handle) const
+int32 ZSharp::FZMasterAssemblyLoadContext::ZCall(FZCallHandle handle, FZCallBuffer* buffer) const
 {
 	check(IsInGameThread());
 	
 	const TUniquePtr<IZCallDispatcher>* pDispatcher = ZCallMap.Find(handle);
-	return pDispatcher ? pDispatcher->Get() : nullptr;
-}
-
-const ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetZCallDispatcher(const FString& name) const
-{
-	check(IsInGameThread());
-	
-	IZCallDispatcher* const* pDispatcher = Name2ZCall.Find(name);
-	return pDispatcher ? *pDispatcher : nullptr;
-}
-
-const ZSharp::IZCallDispatcher* ZSharp::FZMasterAssemblyLoadContext::GetOrResolveZCallDispatcher(const FString& name)
-{
-	check(IsInGameThread());
-	
-	if (IZCallDispatcher* const* pDispatcher = Name2ZCall.Find(name))
+	if (!pDispatcher)
 	{
-		return *pDispatcher;
+		return -1;
 	}
 
-	for (const auto& resolver : ZCallResolverLink)
+	return (*pDispatcher)->Dispatch(buffer);
+}
+
+int32 ZSharp::FZMasterAssemblyLoadContext::ZCall(const FString& name, FZCallBuffer* buffer) const
+{
+	const FZCallHandle* handle = ZCallName2Handle.Find(name);
+	if (!handle)
 	{
-		if (IZCallDispatcher* dispatcher = resolver.Get<1>()->Resolve(name))
+		return -1;
+	}
+
+	return ZCall(*handle, buffer);
+}
+
+int32 ZSharp::FZMasterAssemblyLoadContext::ZCall(const FString& name, FZCallBuffer* buffer, FZCallHandle* outHandle)
+{
+	check(IsInGameThread());
+
+	FZCallHandle handle{};
+	const FZCallHandle* pHandle = ZCallName2Handle.Find(name);
+	if (!pHandle)
+	{
+		for (const auto& resolver : ZCallResolverLink)
 		{
-			RegisterZCall(dispatcher);
-			return dispatcher;
+			if (IZCallDispatcher* dispatcher = resolver.Get<1>()->Resolve(name))
+			{
+				handle = RegisterZCall(dispatcher);
+			}
 		}
 	}
-	
-	return nullptr;
+	else
+	{
+		handle = *pHandle;
+	}
+
+	if (outHandle)
+	{
+		*outHandle = handle;
+	}
+
+	return ZCall(handle, buffer);
 }
 
-ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const IZCallDispatcher* dispatcher) const
+ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const FString& name) const
 {
 	check(IsInGameThread());
 	
-	const FZCallHandle* pHandle = ZCall2Handle.Find(dispatcher);
+	const FZCallHandle* pHandle = ZCallName2Handle.Find(name);
 	return pHandle ? *pHandle : FZCallHandle{};
 }
 

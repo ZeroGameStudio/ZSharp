@@ -14,6 +14,7 @@ namespace ZSharp
 	class IZPropertyInfo;
 	class IZCallDispatcher;
 	class IZCallResolver;
+	struct FZCallBuffer;
 
 	DECLARE_MULTICAST_DELEGATE(FZPreZCallToManaged)
 	DECLARE_MULTICAST_DELEGATE(FZPostZCallToManaged)
@@ -25,10 +26,10 @@ namespace ZSharp
 		virtual const IZAssembly* GetAssembly(const FString& name) const = 0;
 	public:
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) = 0;
-		virtual const IZCallDispatcher* GetZCallDispatcher(FZCallHandle handle) const = 0;
-		virtual const IZCallDispatcher* GetZCallDispatcher(const FString& name) const = 0;
-		virtual const IZCallDispatcher* GetOrResolveZCallDispatcher(const FString& name) = 0;
-		virtual FZCallHandle GetZCallHandle(const IZCallDispatcher* dispatcher) const = 0;
+		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) const = 0;
+		virtual int32 ZCall(const FString& name, FZCallBuffer* buffer) const = 0;
+		virtual int32 ZCall(const FString& name, FZCallBuffer* buffer, FZCallHandle* outHandle = nullptr) = 0;
+		virtual FZCallHandle GetZCallHandle(const FString& name) const = 0;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) = 0;
 
 		virtual FDelegateHandle RegisterPreZCallToManaged(FZPreZCallToManaged::FDelegate delegate) = 0;

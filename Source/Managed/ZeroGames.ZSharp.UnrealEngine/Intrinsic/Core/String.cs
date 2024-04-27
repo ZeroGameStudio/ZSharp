@@ -25,7 +25,7 @@ public class String : PlainUnmanagedClassExportedObjectBase, IConjugate<String>
                 new(),
             };
             ZCallBuffer buffer = new() { Slots = slots };
-            alc.ZCall("ex://String.Ctor", &buffer);
+            alc.ZCall("ex://String.Ctor", &buffer, out var handle);
             Unmanaged = buffer.Slots[2].Pointer;
         }
     }
@@ -46,7 +46,7 @@ public class String : PlainUnmanagedClassExportedObjectBase, IConjugate<String>
                 new() { Int32 = 0 },
             };
             ZCallBuffer buffer = new() { Slots = slots };
-            alc.ZCall("ex://String.Len", &buffer);
+            alc.ZCall("ex://String.Len", &buffer, out var handle);
             return slots[1].Int32;
         }
     }
@@ -62,7 +62,7 @@ public class String : PlainUnmanagedClassExportedObjectBase, IConjugate<String>
                 new() { Pointer = IntPtr.Zero },
             };
             ZCallBuffer buffer = new() { Slots = slots };
-            alc.ZCall("ex://String.GetData", &buffer);
+            alc.ZCall("ex://String.GetData", &buffer, out var handle);
             return new((char*)slots[1].Pointer);
         }
         set
@@ -76,22 +76,20 @@ public class String : PlainUnmanagedClassExportedObjectBase, IConjugate<String>
                     new() { Pointer = (IntPtr)data },
                 };
                 ZCallBuffer buffer = new() { Slots = slots };
-                alc.ZCall("ex://String.SetData", &buffer);
+                alc.ZCall("ex://String.SetData", &buffer, out var handle);
             }
         }
     }
 
     protected override unsafe void ReleaseUnmanagedResource()
     {
-        Logger.Log($"===================== Release String {Unmanaged} =====================");
-        //
-        // MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
-        // ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
-        // {
-        //     new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-        // };
-        // ZCallBuffer buffer = new() { Slots = slots };
-        // alc.ZCall("ex://String.Dtor", &buffer);
+        MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
+        ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
+        {
+            new() { Conjugate = ConjugateHandle.FromConjugate(this) },
+        };
+        ZCallBuffer buffer = new() { Slots = slots };
+        alc.ZCall("ex://String.Dtor", &buffer, out var handle);
     }
 
     private String(IntPtr unmanaged) : base(unmanaged){}

@@ -81,7 +81,7 @@ void ZSharp::FZGenericCLR::Startup()
 			void(*InteropString_SetData)(FString&, const TCHAR*) = FZInteropString_Interop::SetData;
 
 			int32(*MasterAssemblyLoadContext_ZCallByHandle)(FZCallHandle, FZCallBuffer*) = FZMasterAssemblyLoadContext_Interop::ZCallByHandle;
-			int32(*MasterAssemblyLoadContext_ZCallByName)(const TCHAR*, FZCallBuffer*, FZCallHandle*, uint8) = FZMasterAssemblyLoadContext_Interop::ZCallByName;
+			int32(*MasterAssemblyLoadContext_ZCallByName)(const TCHAR*, FZCallBuffer*, FZCallHandle*) = FZMasterAssemblyLoadContext_Interop::ZCallByName;
 			FZCallHandle(*MasterAssemblyLoadContext_GetZCallHandle)(const TCHAR*) = FZMasterAssemblyLoadContext_Interop::GetZCallHandle;
 		} UnmanagedFunctions;
 	} input;

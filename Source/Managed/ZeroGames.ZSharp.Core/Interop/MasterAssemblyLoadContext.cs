@@ -19,12 +19,22 @@ public class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase
         return MasterAssemblyLoadContext_Interop.SZCallByHandle(handle, buffer);
     }
 
-    public unsafe int32 ZCall(string name, ZCallBuffer* buffer, bool bResolve = true)
+    public unsafe int32 ZCall(string name, ZCallBuffer* buffer)
     {
         fixed (char* data = name.ToCharArray())
         {
-            ZCallHandle handle;
-            return MasterAssemblyLoadContext_Interop.SZCallByName(data, buffer, &handle, (uint8)(bResolve ? 1 : 0));
+            return MasterAssemblyLoadContext_Interop.SZCallByName(data, buffer, null);
+        }
+    }
+    
+    public unsafe int32 ZCall(string name, ZCallBuffer* buffer, out ZCallHandle handle)
+    {
+        fixed (char* data = name.ToCharArray())
+        {
+            ZCallHandle fixedHandle;
+            int32 res = MasterAssemblyLoadContext_Interop.SZCallByName(data, buffer, &fixedHandle);
+            handle = fixedHandle;
+            return res;
         }
     }
 

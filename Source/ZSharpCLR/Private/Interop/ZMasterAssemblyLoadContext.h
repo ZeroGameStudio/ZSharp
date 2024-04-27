@@ -32,10 +32,10 @@ namespace ZSharp
 		virtual const IZAssembly* GetAssembly(const FString& name) const override;
 
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) override;
-		virtual const IZCallDispatcher* GetZCallDispatcher(FZCallHandle handle) const override;
-		virtual const IZCallDispatcher* GetZCallDispatcher(const FString& name) const override;
-		virtual const IZCallDispatcher* GetOrResolveZCallDispatcher(const FString& name) override;
-		virtual FZCallHandle GetZCallHandle(const IZCallDispatcher* dispatcher) const override;
+		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) const override;
+		virtual int32 ZCall(const FString& name, FZCallBuffer* buffer) const override;
+		virtual int32 ZCall(const FString& name, FZCallBuffer* buffer, FZCallHandle* outHandle = nullptr) override;
+		virtual FZCallHandle GetZCallHandle(const FString& name) const override;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) override;
 
 		virtual FDelegateHandle RegisterPreZCallToManaged(FZPreZCallToManaged::FDelegate delegate) override;
@@ -63,8 +63,7 @@ namespace ZSharp
 		TMap<FString, TUniquePtr<IZAssembly>> AssemblyMap;
 
 		TMap<FZCallHandle, TUniquePtr<IZCallDispatcher>> ZCallMap;
-		TMap<FString, IZCallDispatcher*> Name2ZCall;
-		TMap<IZCallDispatcher*, FZCallHandle> ZCall2Handle;
+		TMap<FString, FZCallHandle> ZCallName2Handle;
 
 		TArray<TTuple<uint64, TUniquePtr<IZCallResolver>>> ZCallResolverLink;
 

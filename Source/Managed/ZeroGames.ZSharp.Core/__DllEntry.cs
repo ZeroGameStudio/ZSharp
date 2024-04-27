@@ -15,7 +15,7 @@ internal unsafe struct UnmanagedFunctions
     public delegate* unmanaged<IntPtr, char*, void> InteropString_SetData;
 
     public delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> MasterAssemblyLoadContext_ZCallByHandle;
-    public delegate* unmanaged<char*, ZCallBuffer*, ZCallHandle*, uint8, int32> MasterAssemblyLoadContext_ZCallByName;
+    public delegate* unmanaged<char*, ZCallBuffer*, ZCallHandle*, int32> MasterAssemblyLoadContext_ZCallByName;
     public delegate* unmanaged<char*, ZCallHandle> MasterAssemblyLoadContext_GetZCallHandle;
 }
 

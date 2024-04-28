@@ -78,6 +78,7 @@ namespace ZSharp
 
 		TMap<void*, FZConjugateHandle> ConjugateUnmanaged2Managed;
 		TMap<FZConjugateHandle, void*> ConjugateManaged2Unmanaged;
+		TSet<FZConjugateHandle> UnmanagedConjugates;
 
 		FZPreZCallToManaged PreZCallToManaged;
 		FZPostZCallToManaged PostZCallToManaged;

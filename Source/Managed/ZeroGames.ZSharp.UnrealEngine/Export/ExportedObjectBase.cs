@@ -15,7 +15,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.Export;
  *     -> AllocManagedObject & BuildConjugate (request by unmanaged code)
  *     -> ...
  *     -> ReleaseUnmanagedResource (done by unmanaged code somewhen)
- *     -> ReleaseConjugate
+ *     -> MarkAsDead (request by unmanaged code from ReleaseConjugate)
  *     -> SuppressFinalize (done by ReleaseConjugate)
  *     -> ...
  *     -> ReleaseManagedObject (done by GC)
@@ -26,7 +26,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.Export;
  *     -> ...
  *     -> Finalize
  *     -> ReleaseUnmanagedResource
- *     -> ReleaseConjugate
+ *     -> MarkAsDead (request directly by finalizer)
  *     -> ...
  *     -> ReleaseManagedObject (done by GC)
  */
@@ -57,13 +57,19 @@ public abstract class ExportedObjectBase : IConjugate
 
     public void ReleaseConjugate()
     {
+        if (_bManaged)
+        {
+            Logger.Error("Dispose managed exported object from unmanaged code.");
+            return;
+        }
+        
         if (!this.IsValid())
         {
             Logger.Error("Dispose exported object twice.");
             return;
         }
         
-        GCHandle.Free();
+        MarkAsDead();
         
         GC.SuppressFinalize(this);
     }
@@ -95,7 +101,10 @@ public abstract class ExportedObjectBase : IConjugate
         }
         
         ReleaseUnmanagedResource();
+        MarkAsDead();
     }
+
+    private void MarkAsDead() => GCHandle.Free();
 
     private readonly bool _bManaged;
 

@@ -204,6 +204,8 @@ ZSharp::FZConjugateHandle ZSharp::FZMasterAssemblyLoadContext::BuildConjugate(vo
 	FZConjugateHandle managed = managedType->BuildConjugate(unmanaged);
 	BuildConjugate(unmanaged, managed);
 
+	UnmanagedConjugates.Emplace(managed);
+
 	return managed;
 }
 
@@ -223,7 +225,10 @@ void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(void* unmanaged)
 	if (ConjugateUnmanaged2Managed.RemoveAndCopyValue(unmanaged, managed))
 	{
 		ConjugateManaged2Unmanaged.Remove(managed);
-		FZMasterAssemblyLoadContext_Interop::GReleaseConjugate(managed);
+		if (UnmanagedConjugates.Remove(managed))
+		{
+			FZMasterAssemblyLoadContext_Interop::GReleaseConjugate(managed);
+		}
 	}
 }
 
@@ -235,7 +240,10 @@ void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(FZConjugateHandle man
 	if (ConjugateManaged2Unmanaged.RemoveAndCopyValue(managed, unmanaged))
 	{
 		ConjugateUnmanaged2Managed.Remove(unmanaged);
-		FZMasterAssemblyLoadContext_Interop::GReleaseConjugate(managed);
+		if (UnmanagedConjugates.Remove(managed))
+		{
+			FZMasterAssemblyLoadContext_Interop::GReleaseConjugate(managed);
+		}
 	}
 }
 

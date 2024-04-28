@@ -43,11 +43,11 @@ namespace ZSharp
 		FZConjugateHandle Conjugate(UObject* unmanaged);
 		void ReleaseConjugate(UObject* unmanaged);
 		
-		FZConjugateHandle Conjugate(FString* unmanaged);
+		FZConjugateHandle Conjugate(FString* unmanaged, const TFunction<void(FString*)>& onReleased = nullptr);
 		void Conjugate(FString* unmanaged, FZConjugateHandle managed, const TFunction<void(FString*)>& onReleased = nullptr);
 		void ReleaseConjugate(FString* unmanaged);
 
-		FZConjugateHandle Conjugate(FZTypedScriptStruct* unmanaged);
+		FZConjugateHandle Conjugate(FZTypedScriptStruct* unmanaged, const TFunction<void(FZTypedScriptStruct*)>& onReleased = nullptr);
         void Conjugate(FZTypedScriptStruct* unmanaged, FZConjugateHandle managed, const TFunction<void(FZTypedScriptStruct*)>& onReleased = nullptr);
         void ReleaseConjugate(FZTypedScriptStruct* unmanaged);
 

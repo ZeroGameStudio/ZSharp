@@ -31,11 +31,6 @@
     </ItemGroup>
     
     <ItemGroup>
-        <Using Include="ZeroGames.ZSharp.UnrealEngine.Core.String" Alias="UnrealString" />
-        <Using Include="ZeroGames.ZSharp.UnrealEngine.CoreUObject.Object" Alias="UnrealObject" />
-    </ItemGroup>
-    
-    <ItemGroup>
       <Folder Include="Intrinsic\" />
     </ItemGroup>
 

@@ -1,16 +1,17 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using ZeroGames.ZSharp.Core;
+using ZeroGames.ZSharp.UnrealEngine.Core;
 using ZeroGames.ZSharp.UnrealEngine.Export;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public class Object : UnrealClassExportedObjectBase, IConjugate<Object>
+public class UnrealObject : UnrealClassExportedObjectBase, IConjugate<UnrealObject>
 {
 
-    public static Object BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+    public static UnrealObject BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-    public unsafe Object Class
+    public unsafe UnrealObject Class
     {
         get
         {
@@ -18,15 +19,15 @@ public class Object : UnrealClassExportedObjectBase, IConjugate<Object>
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
             {
                 new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new(),
+                new() { Conjugate = default },
             };
             ZCallBuffer buffer = new() { Slots = slots };
             alc.ZCall("ex://Object.GetClass", &buffer);
-            return (Object)slots[1].Conjugate.ToGCHandle().Target!;
+            return (UnrealObject)slots[1].Conjugate.ToGCHandle().Target!;
         }
     }
 
-    public unsafe Object? Outer
+    public unsafe UnrealObject? Outer
     {
         get
         {
@@ -34,11 +35,11 @@ public class Object : UnrealClassExportedObjectBase, IConjugate<Object>
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
             {
                 new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new(),
+                new() { Conjugate = default },
             };
             ZCallBuffer buffer = new() { Slots = slots };
             alc.ZCall("ex://Object.GetOuter", &buffer);
-            return (Object)slots[1].Conjugate.ToGCHandle().Target!;
+            return slots[1].Conjugate.ToGCHandle().Target as UnrealObject;
         }
     }
 
@@ -47,15 +48,14 @@ public class Object : UnrealClassExportedObjectBase, IConjugate<Object>
         get
         {
             MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
-            UnrealString str = new();
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
             {
                 new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Conjugate = ConjugateHandle.FromConjugate(str) },
+                new() { Conjugate = default },
             };
             ZCallBuffer buffer = new() { Slots = slots };
             alc.ZCall("ex://Object.GetName", &buffer);
-            return str;
+            return slots[1].Conjugate.ToGCHandle().Target as UnrealString ?? throw new Exception();
         }
     }
 
@@ -64,7 +64,7 @@ public class Object : UnrealClassExportedObjectBase, IConjugate<Object>
         Logger.Log($"===================== Release Object {Unmanaged} =====================");
     }
 
-    private Object(IntPtr unmanaged) : base(unmanaged){}
+    private UnrealObject(IntPtr unmanaged) : base(unmanaged){}
     
 }
 

@@ -6,14 +6,14 @@ using ZeroGames.ZSharp.UnrealEngine.Export;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class String : PlainUnmanagedClassExportedObjectBase, IConjugate<String>
+public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<UnrealString>
 {
 
-    public static String BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+    public static UnrealString BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-    public String() : this(string.Empty){}
+    public UnrealString() : this(string.Empty){}
 
-    public unsafe String(string content)
+    public unsafe UnrealString(string content)
     {
         MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
         fixed (char* data = content.ToCharArray())
@@ -92,12 +92,12 @@ public class String : PlainUnmanagedClassExportedObjectBase, IConjugate<String>
         alc.ZCall_AnyThread(__sZCallHandle_Dtor, &buffer, 1);
     }
 
-    static String()
+    static UnrealString()
     {
         __sZCallHandle_Dtor = MasterAssemblyLoadContext.Get()!.PrecacheZCall("ex://String.Dtor");
     }
 
-    private String(IntPtr unmanaged) : base(unmanaged){}
+    private UnrealString(IntPtr unmanaged) : base(unmanaged){}
 
     private static ZCallHandle __sZCallHandle_Dtor;
 

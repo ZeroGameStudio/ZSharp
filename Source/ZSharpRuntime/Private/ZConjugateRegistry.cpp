@@ -76,7 +76,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(UObject* unmana
 	}
 
 	FString asmName = "ZeroGames.ZSharp.UnrealEngine";
-	FString managedTypeName = "ZeroGames.ZSharp.UnrealEngine.CoreUObject.Object";
+	FString managedTypeName = "ZeroGames.ZSharp.UnrealEngine.CoreUObject.UnrealObject";
 	const IZType* managedType = MasterALC->GetAssembly(asmName)->GetType(managedTypeName);
 	
 	if (!managedType)
@@ -105,7 +105,7 @@ void ZSharp::FZConjugateRegistry::ReleaseConjugate(UObject* unmanaged)
 	MasterALC->ReleaseConjugate(unmanaged);
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(FString* unmanaged)
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(FString* unmanaged, const TFunction<void(FString*)>& onReleased)
 {
 	CheckGuarded();
 	
@@ -116,7 +116,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(FString* unmana
 	}
 
 	FString asmName = "ZeroGames.ZSharp.UnrealEngine";
-	FString managedTypeName = "ZeroGames.ZSharp.UnrealEngine.Core.String";
+	FString managedTypeName = "ZeroGames.ZSharp.UnrealEngine.Core.UnrealString";
 	const IZType* managedType = MasterALC->GetAssembly(asmName)->GetType(managedTypeName);
 	
 	if (!managedType)
@@ -127,7 +127,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(FString* unmana
 	handle = MasterALC->BuildConjugate(unmanaged, managedType);
 	if (IsValid(handle))
 	{
-		StringRegistry.Emplace(unmanaged, { unmanaged, true });
+		StringRegistry.Emplace(unmanaged, { unmanaged, true, onReleased });
 	}
 
 	return handle;
@@ -147,7 +147,7 @@ void ZSharp::FZConjugateRegistry::Conjugate(FString* unmanaged, FZConjugateHandl
 	{
 		UE_LOG(LogZSharpRuntime, Log, TEXT("Release UnrealString: [%s] [%p]"), **unmanaged, unmanaged);
 		delete unmanaged;
-	} });
+	}});
 }
 
 void ZSharp::FZConjugateRegistry::ReleaseConjugate(FString* unmanaged)
@@ -168,7 +168,7 @@ void ZSharp::FZConjugateRegistry::ReleaseConjugate(FString* unmanaged)
 	MasterALC->ReleaseConjugate(unmanaged);
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(FZTypedScriptStruct* unmanaged)
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(FZTypedScriptStruct* unmanaged, const TFunction<void(FZTypedScriptStruct*)>& onReleased)
 {
 	CheckGuarded();
 	

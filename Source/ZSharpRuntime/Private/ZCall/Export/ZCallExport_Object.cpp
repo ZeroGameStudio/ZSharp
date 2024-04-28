@@ -2,6 +2,7 @@
 
 
 #include "ZConjugateRegistry.h"
+#include "ZSharpRuntimeLogChannels.h"
 #include "Interop/ZCallBuffer.h"
 #include "ZCall/ZStaticExportZCall.h"
 
@@ -30,8 +31,12 @@ namespace ZSharp
 	static FZStaticExportZCall Export_Object_GetName{ "ex://Object.GetName", [](FZCallBuffer* buffer)
 	{
 		UObject* obj = FZConjugateRegistry::Get()->Conjugate<UObject>(buffer->Slots[0].Conjugate);
-		FString* res = FZConjugateRegistry::Get()->Conjugate<FString>(buffer->Slots[1].Conjugate);
-		*res = obj->GetName();
+		FString* res = new FString { obj->GetName() };
+		buffer->Slots[1].Conjugate = FZConjugateRegistry::Get()->Conjugate(res, [](FString* unmanaged)
+		{
+			UE_LOG(LogZSharpRuntime, Log, TEXT("Release UnrealString: [%s] [%p]"), **unmanaged, unmanaged);
+			delete unmanaged;
+		});
 		
 		return 0;
 	}};

@@ -5,24 +5,88 @@
 
 /* Add '#region GENERATED CODE' for generated code */
 
+using ZeroGames.ZSharp.Core;
+using ZeroGames.ZSharp.UnrealEngine.Core;
+using ZeroGames.ZSharp.UnrealEngine.CoreUObject;
+
 namespace ZeroGames.ZSharp.UnrealEngine.ExportExample; /* Namespace = AssemblyName + ModuleName */
 
 /* Add an attribute [ZeroGames.ZSharp.UnrealEngine.Export.Intrinsic] for user provided glue, [ZeroGames.ZSharp.UnrealEngine.Export.Generated] for generated glue. */
 public class PlainUnmanagedClassExportedObjectExample /* Class name can be customized */
     : ZeroGames.ZSharp.UnrealEngine.Export.PlainUnmanagedClassExportedObjectBase /* Inherit from this if no base class */
-    , ZeroGames.ZSharp.Core.IConjugate<PlainUnmanagedClassExportedObjectExample> /* Implement IConjugate<> to provide factory */
+    , IConjugate<PlainUnmanagedClassExportedObjectExample> /* Implement IConjugate<> to provide factory */
 {
-    
-    public static PlainUnmanagedClassExportedObjectExample BuildConjugate(IntPtr unmanaged)
+
+    public static PlainUnmanagedClassExportedObjectExample BuildConjugate(IntPtr unmanaged) => new(unmanaged); /* BuildConjugate implementation */
+
+    public unsafe int32 MethodExample(
+        float inFloat, /* Input primitive parameter, this will copy into the buffer and won't copy back after zcall */
+        ref bool inOutBool, /* Input and output primitive parameter, this will copy into the buffer and copy back after zcall */
+        out int32 outInt32, /* Output primitive parameter, this will alloc an uninitialized buffer slot and copy back from that after zcall */
+        string inString, /* Input string parameter, this will firstly be marshalled to FString/FName/FText depending on what is exported and act the same as primitive */
+        ref string inOutString, /* Input and output string parameter, this will firstly be marshalled to FString/FName/FText depending on what is exported and act the same as primitive */
+        out string outString, /* Output string parameter, this will firstly be marshalled to FString/FName/FText depending on what is exported and act the same as primitive */
+        UnrealString inNonUObject, /* Input conjugate parameter */
+        /* ref UnrealString inOutNonUObject, inout conjugate parameter is not support */
+        out UnrealString outNonUObject, /* Output conjugate parameter */
+        UnrealObject inUObject, /* Input conjugate parameter */
+        /* ref UnrealObject inOutUObject, inout conjugate parameter is not support */
+        out UnrealObject outUObject) /* Output conjugate parameter */
     {
-        throw new NotImplementedException();
+        UnrealString marshalledInString = new(inString);
+        UnrealString marshalledInOutString = new(inOutString);
+        UnrealString marshalledOutString = new();
+        
+        ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[] /* Construct zcall buffer slots */
+        {
+            new() { Conjugate = ConjugateHandle.FromConjugate(this) }, /* this pointer at first, only for instance methods */
+            new() { Float = inFloat },
+            new() { Bool = (uint8)(inOutBool ? 1 : 0) },
+            new() { Int32 = default },
+            new() { Conjugate = ConjugateHandle.FromConjugate(marshalledInString) },
+            new() { Conjugate = ConjugateHandle.FromConjugate(marshalledInOutString) },
+            new() { Conjugate = ConjugateHandle.FromConjugate(marshalledOutString) },
+            new() { Conjugate = ConjugateHandle.FromConjugate(inNonUObject) },
+            new() { Conjugate = default },
+            new() { Conjugate = ConjugateHandle.FromConjugate(inUObject) },
+            new() { Conjugate = default },
+            new() { Int32 = default }, /* Return value at last */
+        };
+        ZCallBuffer buffer = new() { Slots = slots }; /* Construct zcall buffer */
+        GetOwningALC().ZCall(__sZCallHandle_Dtor, &buffer); /* ZCall */
+
+        inOutBool = slots[2].Bool > 0;
+        outInt32 = slots[3].Int32;
+        inOutString = marshalledInOutString.Data;
+        outString = marshalledOutString.Data;
+        outNonUObject = slots[8].Conjugate.ToGCHandle().Target as UnrealString ?? throw new Exception();
+        outUObject = slots[10].Conjugate.ToGCHandle().Target as UnrealObject ?? throw new Exception();
+
+        return slots[11].Int32;
+    }
+    
+    protected override unsafe void ReleaseUnmanagedResource() /* Managed finalizer */
+    {
+        ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[] /* Construct zcall buffer slots */
+        {
+            new() { Conjugate = ConjugateHandle.FromConjugate(this) }, /* this parameter */
+        };
+        ZCallBuffer buffer = new() { Slots = slots }; /* Construct zcall buffer */
+        GetOwningALC().ZCall_AnyThread(__sZCallHandle_Dtor, &buffer, 1); /* Use ZCall_AnyThread here */
     }
 
-    protected override void ReleaseUnmanagedResource()
+    static PlainUnmanagedClassExportedObjectExample() /* Precache zcalls */
     {
-        throw new NotImplementedException();
+        MasterAssemblyLoadContext alc = GetOwningALC(); /* Cache a reference to master alc */
+        __sZCallHandle_Dtor = alc.PrecacheZCall(__kZCallName_Dtor);
     }
-    
+
+    private PlainUnmanagedClassExportedObjectExample(IntPtr unmanaged) : base(unmanaged){} /* BuildConjugate constructor */
+
+    /* Cached zcall names and handles */
+    private const string __kZCallName_Dtor = "ex://String.Dtor";
+    private static ZCallHandle __sZCallHandle_Dtor;
+
 }
 
 /* Add '#endregion' for generated code */

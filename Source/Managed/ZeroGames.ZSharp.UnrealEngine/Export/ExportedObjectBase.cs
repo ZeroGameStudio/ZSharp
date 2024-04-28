@@ -1,6 +1,8 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Loader;
 using ZeroGames.ZSharp.Core;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Export;
@@ -30,6 +32,28 @@ namespace ZeroGames.ZSharp.UnrealEngine.Export;
  */
 public abstract class ExportedObjectBase : IConjugate
 {
+    
+    public static MasterAssemblyLoadContext GetOwningALC()
+    {
+        Assembly asm = typeof(ExportedObjectBase).Assembly;
+        AssemblyLoadContext? alc = AssemblyLoadContext.GetLoadContext(asm);
+        if (alc is null)
+        {
+            throw new Exception("Owning ALC not found.");
+        }
+
+        if (alc is MasterAssemblyLoadContext masterAlc)
+        {
+            if (alc != MasterAssemblyLoadContext.Get())
+            {
+                throw new Exception("Owning ALC is MasterAssemblyLoadContext but not the live one.");
+            }
+            
+            return masterAlc;
+        }
+
+        throw new Exception($"Owning ALC is not MasterAssemblyLoadContext but {alc.GetType().Name}");
+    }
 
     public void ReleaseConjugate()
     {

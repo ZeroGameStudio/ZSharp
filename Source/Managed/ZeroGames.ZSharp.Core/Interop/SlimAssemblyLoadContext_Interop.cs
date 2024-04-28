@@ -26,23 +26,11 @@ internal static class SlimAssemblyLoadContext_Interop
         if (handle.Target is SlimAssemblyLoadContext alc)
         {
             Assembly asm = alc.LoadFromStream(new UnmanagedMemoryStream(buffer, size));
-        
-            string asmName = asm.FullName!.Split(',')[0];
-            Type? entryType = asm.GetType($"{asmName}.__DllEntry");
-            if (entryType is not null)
+            if (AssemblyLoadContext_Interop.TryInvokeDllMain(asm, args, out var res) && res is not null)
             {
-                MethodInfo? dllMain = entryType.GetMethod("DllMain");
-                if (dllMain is not null)
-                {
-                    object?[]? parameters = args is not null ? new object?[] { new IntPtr(args) } : null;
-                    object? res = dllMain.Invoke(null, parameters);
-                    if (res?.GetType() == typeof(int32))
-                    {
-                        return (int32)res;
-                    }
-                }
+                return res.Value;
             }
-            
+
             return 0;
         }
         

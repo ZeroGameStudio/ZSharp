@@ -6,9 +6,9 @@ namespace ZeroGames.ZSharp.Test;
 
 internal static class __DllEntry
 {
-    public static unsafe void DllMain(CommonDllMainArgs* rawArgs)
+    public static void DllMain(string[] args)
     {
-        string[] args = rawArgs->Parse();
+        Logger.Log(args[0], args[1]);
     }
 }
 

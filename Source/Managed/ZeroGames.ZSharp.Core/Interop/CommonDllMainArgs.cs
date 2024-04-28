@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace ZeroGames.ZSharp.Core;
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct CommonDllMainArgs
+internal unsafe struct CommonDllMainArgs
 {
     public string[] Parse()
     {

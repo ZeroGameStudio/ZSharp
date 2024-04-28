@@ -6,6 +6,7 @@
 #include "hostfxr.h"
 #include "coreclr_delegates.h"
 #include "ZSharpCLRLogChannels.h"
+#include "Interfaces/IPluginManager.h"
 #include "Interop/IZSlimAssemblyLoadContext.h"
 #include "Interop/UnrealEngine_Interop.h"
 #include "Interop/ZAssembly_Interop.h"
@@ -31,14 +32,13 @@ void ZSharp::FZGenericCLR::Startup()
 	}
 
 	bInitialized = true;
-	
-	const FString pluginDir = FPaths::Combine(FPaths::ProjectPluginsDir(), "ZeroGames", "ZSharp");
+
+	const FString pluginDir = IPluginManager::Get().GetModuleOwnerPlugin(UE_MODULE_NAME)->GetBaseDir();
 	const FString pluginBinariesDir = FPaths::Combine(pluginDir, "Binaries");
 	const FString pluginContentDir = FPaths::Combine(pluginDir, "Content");
-	const FString platformName = "Win64";
-	const FString dotnetRoot = FPaths::Combine(pluginBinariesDir, platformName, "dotnet");
 	
-	const FString hostFXRPath = FPaths::Combine(dotnetRoot, "host", "fxr", "8.0.3", "hostfxr.dll");
+	const FString dotnetRoot = FPaths::Combine(pluginBinariesDir, ZSHARP_DOTNET_PATH);
+	const FString hostFXRPath = FPaths::Combine(dotnetRoot, ZSHARP_HOSTFXR_PATH);
 	void* hostFXR = FPlatformProcess::GetDllHandle(*hostFXRPath);
 	check(hostFXR);
 
@@ -52,7 +52,7 @@ void ZSharp::FZGenericCLR::Startup()
 	check(closeHostFXR);
 
 	hostfxr_handle handle = nullptr;
-	const FString runtimeConfigPath = FPaths::Combine(pluginContentDir, TEXT("ZSharp.runtimeconfig.json"));
+	const FString runtimeConfigPath = FPaths::Combine(pluginContentDir, ZSHARP_RUNTIME_CONFIG_FILE_NAME);
 	initializeHostFxr(*runtimeConfigPath, nullptr, &handle);
 	check(handle);
 
@@ -65,9 +65,10 @@ void ZSharp::FZGenericCLR::Startup()
 
 	closeHostFXR(handle);
 
-	const FString assembly = FPaths::Combine(pluginBinariesDir, "Managed", "ZeroGames.ZSharp.Core.dll");
-	const FString type = TEXT("ZeroGames.ZSharp.Core.__DllEntry, ZeroGames.ZSharp.Core");
-	const FString method = TEXT("DllMain");
+	const FString coreAssemblyName = ZSHARP_CORE_ASSEMBLY_NAME;
+	const FString coreAssemblyPath = FPaths::Combine(pluginBinariesDir, "Managed", coreAssemblyName + ".dll");
+	const FString entryTypeName = FString::Printf(TEXT("%s.__DllEntry, %s"), *coreAssemblyName, *coreAssemblyName);
+	const FString entryMethodName = TEXT("DllMain");
 
 	constexpr struct FStartupInput
 	{
@@ -123,9 +124,9 @@ void ZSharp::FZGenericCLR::Startup()
 	int(*startUp)(const FStartupInput&, FStartupOutput&) = nullptr;
 
 	TArray<uint8> content;
-	FFileHelper::LoadFileToArray(content, *assembly, FILEREAD_Silent);
+	FFileHelper::LoadFileToArray(content, *coreAssemblyPath, FILEREAD_Silent);
 	loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
-	getFunctionPointer(*type, *method, UNMANAGEDCALLERSONLY_METHOD, nullptr, nullptr, (void**)&startUp);
+	getFunctionPointer(*entryTypeName, *entryMethodName, UNMANAGEDCALLERSONLY_METHOD, nullptr, nullptr, (void**)&startUp);
 
 	check(startUp);
 	startUp(input, output);

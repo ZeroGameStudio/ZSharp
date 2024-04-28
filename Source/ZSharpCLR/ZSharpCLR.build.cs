@@ -36,6 +36,7 @@ public class ZSharpCLR : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
+				"Projects",
 				
 				"Dotnet",
 			}
@@ -61,5 +62,17 @@ public class ZSharpCLR : ModuleRules
 			PrivateDefinitions.Add("ZSHARP_WITH_CORECLR=0");
 			PrivateDefinitions.Add("ZSHARP_WITH_MONO=1");
 		}
+
+		string dotnetVersion = "8.0.3";
+		string runtimeConfigFileName = "ZSharp.runtimeconfig.json";
+		
+		PrivateDefinitions.Add($"ZSHARP_PLATFORM=\"{Target.Platform}\"");
+		
+		PrivateDefinitions.Add($"ZSHARP_DOTNET_VERSION=\"{dotnetVersion}\"");
+		PrivateDefinitions.Add($"ZSHARP_DOTNET_PATH=\"{Target.Platform}/dotnet\"");
+		PrivateDefinitions.Add($"ZSHARP_HOSTFXR_PATH=\"host/fxr/{dotnetVersion}/hostfxr.dll\"");
+		PrivateDefinitions.Add($"ZSHARP_RUNTIME_CONFIG_FILE_NAME=\"{runtimeConfigFileName}\"");
+		
+		PrivateDefinitions.Add($"ZSHARP_CORE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core\"");
 	}
 }

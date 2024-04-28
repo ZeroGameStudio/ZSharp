@@ -17,7 +17,7 @@ public abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IGCHa
 
     protected virtual void HandleUnload()
     {
-        WeakReferenceMonitor.Monit(new(this), GCHandle.ToIntPtr(GCHandle));
+
     }
     
     public GCHandle GCHandle { get; }

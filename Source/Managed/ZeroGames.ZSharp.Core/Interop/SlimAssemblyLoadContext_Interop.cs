@@ -26,7 +26,7 @@ internal static class SlimAssemblyLoadContext_Interop
         if (handle.Target is SlimAssemblyLoadContext alc)
         {
             Assembly asm = alc.LoadFromStream(new UnmanagedMemoryStream(buffer, size));
-            if (AssemblyLoadContext_Interop.TryInvokeDllMain(asm, args, out var res) && res is not null)
+            if (DllMainStatics.TryInvokeDllMain(asm, args, out var res) && res is not null)
             {
                 return res.Value;
             }

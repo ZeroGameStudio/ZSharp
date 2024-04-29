@@ -67,7 +67,7 @@ void ZSharp::FZGenericCLR::Startup()
 
 	const FString coreAssemblyName = ZSHARP_CORE_ASSEMBLY_NAME;
 	const FString coreAssemblyPath = FPaths::Combine(pluginBinariesDir, "Managed", coreAssemblyName + ".dll");
-	const FString entryTypeName = FString::Printf(TEXT("%s.__DllEntry, %s"), *coreAssemblyName, *coreAssemblyName);
+	const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *coreAssemblyName, *coreAssemblyName);
 	const FString entryMethodName = TEXT("DllMain");
 
 	constexpr struct FStartupInput

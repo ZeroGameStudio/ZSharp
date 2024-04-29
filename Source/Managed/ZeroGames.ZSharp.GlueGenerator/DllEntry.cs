@@ -5,19 +5,22 @@ using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using ZeroGames.ZSharp.Core;
 
+[assembly: DllEntry(typeof(ZeroGames.ZSharp.GlueGenerator.DllEntry))]
+
 namespace ZeroGames.ZSharp.GlueGenerator;
 
-internal static class __DllEntry
+internal static class DllEntry
 {
     
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct DllMainArgs
+    private unsafe struct DllMainArgs
     {
         public delegate* unmanaged<void> OnComplete;
         public delegate* unmanaged<int32, int32, void> OnUpdate;
     }
 
-    public static unsafe int32 DllMain(DllMainArgs* rawArgs)
+    [DllMain]
+    private static unsafe int32 DllMain(DllMainArgs* rawArgs)
     {
         Logger.Log("===================== Glue Generator Begin =====================");
 

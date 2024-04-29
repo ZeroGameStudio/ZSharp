@@ -2,16 +2,17 @@
 
 using ZeroGames.ZSharp.Core;
 
+[assembly: DllEntry(typeof(ZeroGames.ZSharp.UnrealEngine.DllEntry))]
+
 namespace ZeroGames.ZSharp.UnrealEngine;
 
-internal static class __DllEntry
+internal static class DllEntry
 {
-    
-    public static void DllMain()
+    [DllMain]
+    private static void DllMain()
     {
         Logger.Log("===================== UnrealEngine Assembly Loaded =====================");
     }
-    
 }
 
 

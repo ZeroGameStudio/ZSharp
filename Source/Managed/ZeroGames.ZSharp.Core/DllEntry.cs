@@ -63,7 +63,7 @@ internal struct StartupOutput
     public ManagedFunctions ManagedFunctions;
 }
 
-internal static class __DllEntry
+internal static class DllEntry
 {
     [UnmanagedCallersOnly]
     private static unsafe int32 DllMain(StartupInput* input, StartupOutput* output)

@@ -32,7 +32,7 @@ internal static class MasterAssemblyLoadContext_Interop
         }
         
         Assembly asm = alc.LoadFromStream(new UnmanagedMemoryStream(buffer, size));
-        AssemblyLoadContext_Interop.TryInvokeDllMain(asm, args, out var res);
+        DllMainStatics.TryInvokeDllMain(asm, args, out var res);
 
         return GCHandle.Alloc(asm);
     }

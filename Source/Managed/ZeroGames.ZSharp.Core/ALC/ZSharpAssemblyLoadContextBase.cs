@@ -23,3 +23,5 @@ public abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IGCHa
     public GCHandle GCHandle { get; }
     
 }
+
+

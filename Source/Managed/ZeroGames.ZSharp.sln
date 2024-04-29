@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroGames.ZSharp.GlueGenera
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroGames.ZSharp.Test", "ZeroGames.ZSharp.Test\ZeroGames.ZSharp.Test.csproj", "{6F0CE5E1-BC58-4A9D-A5DC-11F388B5F2D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroGames.ZSharp.UnrealEngine.Core", "ZeroGames.ZSharp.UnrealEngine.Core\ZeroGames.ZSharp.UnrealEngine.Core.csproj", "{ACD94C5B-0A82-4D51-BDBB-1E3F48C6EE6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{6F0CE5E1-BC58-4A9D-A5DC-11F388B5F2D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F0CE5E1-BC58-4A9D-A5DC-11F388B5F2D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F0CE5E1-BC58-4A9D-A5DC-11F388B5F2D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACD94C5B-0A82-4D51-BDBB-1E3F48C6EE6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACD94C5B-0A82-4D51-BDBB-1E3F48C6EE6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACD94C5B-0A82-4D51-BDBB-1E3F48C6EE6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACD94C5B-0A82-4D51-BDBB-1E3F48C6EE6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

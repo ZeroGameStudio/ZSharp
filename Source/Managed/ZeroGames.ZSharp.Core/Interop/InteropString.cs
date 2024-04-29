@@ -49,3 +49,5 @@ public readonly struct InteropString : IDisposable
     private readonly IntPtr _address;
 
 }
+
+

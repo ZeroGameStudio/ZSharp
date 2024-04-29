@@ -74,5 +74,6 @@ public class ZSharpCLR : ModuleRules
 		PrivateDefinitions.Add($"ZSHARP_RUNTIME_CONFIG_FILE_NAME=\"{runtimeConfigFileName}\"");
 		
 		PrivateDefinitions.Add($"ZSHARP_CORE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core\"");
+		PrivateDefinitions.Add($"ZSHARP_ENGINE_CORE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.UnrealEngine.Core\"");
 	}
 }

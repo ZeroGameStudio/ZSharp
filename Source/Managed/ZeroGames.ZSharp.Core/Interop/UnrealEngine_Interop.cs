@@ -9,3 +9,5 @@ internal static class UnrealEngine_Interop
     public static unsafe delegate* unmanaged<uint8> SIsInGameThread;
 
 }
+
+

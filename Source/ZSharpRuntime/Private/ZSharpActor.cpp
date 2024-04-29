@@ -5,11 +5,11 @@
 
 #include "ZConjugateRegistry.h"
 #include "CLR/IZSharpCLR.h"
-#include "Interop/IZAssembly.h"
-#include "Interop/IZMasterAssemblyLoadContext.h"
-#include "Interop/IZMethodInfo.h"
-#include "Interop/IZType.h"
-#include "Interop/ZCallBuffer.h"
+#include "ALC/IZAssembly.h"
+#include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/IZMethodInfo.h"
+#include "ALC/IZType.h"
+#include "ZCall/ZCallBuffer.h"
 
 AZSharpActor::AZSharpActor()
 {

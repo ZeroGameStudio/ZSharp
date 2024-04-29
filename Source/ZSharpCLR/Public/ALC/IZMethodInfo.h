@@ -3,7 +3,7 @@
 #pragma once
 
 #include "IZMemberInfo.h"
-#include "ZCallToManaged.h"
+#include "ZCall/ZCallToManaged.h"
 
 namespace ZSharp
 {

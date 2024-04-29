@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "Interop/IZAssembly.h"
-#include "Interop/IZType.h"
+#include "ALC/IZAssembly.h"
+#include "ALC/IZType.h"
 
 namespace ZSharp
 {

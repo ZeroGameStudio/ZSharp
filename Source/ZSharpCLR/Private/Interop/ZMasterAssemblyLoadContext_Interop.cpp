@@ -4,7 +4,7 @@
 #include "ZMasterAssemblyLoadContext_Interop.h"
 
 #include "CLR/IZSharpCLR.h"
-#include "Interop/IZMasterAssemblyLoadContext.h"
+#include "ALC/IZMasterAssemblyLoadContext.h"
 
 int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByHandle(FZCallHandle handle, FZCallBuffer* buffer)
 {

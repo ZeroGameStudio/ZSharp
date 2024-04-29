@@ -1,7 +1,7 @@
 // Copyright Zero Games. All Rights Reserved.
 
 
-#include "Interop/IZMasterAssemblyLoadContext.h"
+#include "ALC/IZMasterAssemblyLoadContext.h"
 
 const ZSharp::IZAssembly* ZSharp::IZMasterAssemblyLoadContext::LoadAssembly(const FString& path, void* args)
 {

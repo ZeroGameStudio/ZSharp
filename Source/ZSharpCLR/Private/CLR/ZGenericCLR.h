@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CLR/IZSharpCLR.h"
-#include "Interop/IZMasterAssemblyLoadContext.h"
-#include "Interop/IZSlimAssemblyLoadContext.h"
+#include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/IZSlimAssemblyLoadContext.h"
 
 namespace ZSharp
 {

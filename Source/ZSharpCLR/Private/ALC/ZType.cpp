@@ -3,7 +3,7 @@
 
 #include "ZType.h"
 
-#include "ZType_Interop.h"
+#include "Interop/ZType_Interop.h"
 #include "ZMethodInfo.h"
 #include "ZPropertyInfo.h"
 

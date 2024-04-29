@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Interop/IZCallResolver.h"
+#include "ZCall/IZCallResolver.h"
 
 namespace ZSharp
 {

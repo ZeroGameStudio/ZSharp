@@ -3,9 +3,9 @@
 
 #include "ZMethodInfo.h"
 
-#include "ZCallToManagedScope.h"
-#include "ZMethodInfo_Interop.h"
-#include "Interop/ZCallBuffer.h"
+#include "ZCall/ZCallToManagedScope.h"
+#include "Interop/ZMethodInfo_Interop.h"
+#include "ZCall/ZCallBuffer.h"
 
 const FString& ZSharp::FZMethodInfo::GetName() const
 {

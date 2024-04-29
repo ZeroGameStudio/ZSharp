@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "IZGCHandle.h"
+#include "Interop/IZGCHandle.h"
 
 namespace ZSharp
 {

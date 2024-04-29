@@ -3,8 +3,8 @@
 #pragma once
 
 #include "IZAssemblyLoadContext.h"
-#include "ZCallHandle.h"
-#include "ZConjugateHandle.h"
+#include "ZCall/ZCallHandle.h"
+#include "ZCall/ZConjugateHandle.h"
 
 namespace ZSharp
 {

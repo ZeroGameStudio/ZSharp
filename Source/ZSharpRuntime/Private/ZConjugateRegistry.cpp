@@ -5,8 +5,8 @@
 
 #include "ZSharpRuntimeLogChannels.h"
 #include "CLR/IZSharpCLR.h"
-#include "Interop/IZAssembly.h"
-#include "Interop/IZMasterAssemblyLoadContext.h"
+#include "ALC/IZAssembly.h"
+#include "ALC/IZMasterAssemblyLoadContext.h"
 
 namespace ZSharp::FZConjugateRegistry_Private
 {

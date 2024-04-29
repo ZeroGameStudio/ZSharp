@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "Interop/IZType.h"
-#include "Interop/ZConjugateHandle.h"
-#include "Interop/IZMethodInfo.h"
-#include "Interop/IZPropertyInfo.h"
+#include "ALC/IZType.h"
+#include "ZCall/ZConjugateHandle.h"
+#include "ALC/IZMethodInfo.h"
+#include "ALC/IZPropertyInfo.h"
 
 namespace ZSharp
 {

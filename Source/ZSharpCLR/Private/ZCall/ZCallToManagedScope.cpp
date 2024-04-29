@@ -3,7 +3,7 @@
 
 #include "ZCallToManagedScope.h"
 
-#include "ZMasterAssemblyLoadContext.h"
+#include "ALC/ZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpCLR.h"
 
 ZSharp::FZCallToManagedScope::FZCallToManagedScope()

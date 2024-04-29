@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Interop/IZSlimAssemblyLoadContext.h"
+#include "ALC/IZSlimAssemblyLoadContext.h"
 
 namespace ZSharp
 {

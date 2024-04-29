@@ -2,11 +2,12 @@
 
 #pragma once
 
-#include "Interop/IZMasterAssemblyLoadContext.h"
+#include "ALC/IZMasterAssemblyLoadContext.h"
 
-#include "Interop/IZAssembly.h"
-#include "Interop/IZCallDispatcher.h"
-#include "Interop/IZCallResolver.h"
+#include "ALC/IZAssembly.h"
+#include "Interop/ZGCHandle.h"
+#include "ZCall/IZCallDispatcher.h"
+#include "ZCall/IZCallResolver.h"
 
 namespace ZSharp
 {

@@ -1,7 +1,7 @@
 // Copyright Zero Games. All Rights Reserved.
 
 
-#include "Interop/IZSlimAssemblyLoadContext.h"
+#include "ALC/IZSlimAssemblyLoadContext.h"
 
 int32 ZSharp::IZSlimAssemblyLoadContext::LoadAssembly(const FString& path, void* args)
 {

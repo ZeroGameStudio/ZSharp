@@ -3,7 +3,7 @@
 
 #include "ZConjugateRegistry.h"
 #include "ZSharpRuntimeLogChannels.h"
-#include "Interop/ZCallBuffer.h"
+#include "ZCall/ZCallBuffer.h"
 #include "ZCall/ZStaticExportZCall.h"
 
 namespace ZSharp

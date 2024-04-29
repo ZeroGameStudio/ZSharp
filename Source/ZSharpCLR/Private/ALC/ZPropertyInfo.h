@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Interop/IZPropertyInfo.h"
+#include "ALC/IZPropertyInfo.h"
 
 namespace ZSharp
 {

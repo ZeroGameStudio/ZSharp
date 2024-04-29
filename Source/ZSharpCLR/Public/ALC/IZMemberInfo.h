@@ -2,17 +2,15 @@
 
 #pragma once
 
-#include "IZGCHandle.h"
+#include "Interop/IZGCHandle.h"
 
 namespace ZSharp
 {
-	class IZType;
-	
-	class ZSHARPCLR_API IZAssembly : public IZGCHandle
+	class ZSHARPCLR_API IZMemberInfo : public IZGCHandle
 	{
 	public:
 		virtual const FString& GetName() const = 0;
 	public:
-		virtual const IZType* GetType(const FString& name) const = 0;
+		virtual bool IsZCallable() const = 0;
 	};
 }

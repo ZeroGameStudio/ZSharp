@@ -3,7 +3,7 @@
 
 #include "ZAssembly.h"
 
-#include "ZAssembly_Interop.h"
+#include "Interop/ZAssembly_Interop.h"
 #include "ZType.h"
 
 const FString& ZSharp::FZAssembly::GetName() const

@@ -3,8 +3,7 @@
 
 #include "ZSlimAssemblyLoadContext.h"
 
-#include "ZGCHandle_Interop.h"
-#include "ZSlimAssemblyLoadContext_Interop.h"
+#include "Interop/ZSlimAssemblyLoadContext_Interop.h"
 
 void ZSharp::FZSlimAssemblyLoadContext::Unload()
 {

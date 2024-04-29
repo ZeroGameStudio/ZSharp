@@ -8,3 +8,5 @@ public interface IGCHandle
 {
     public GCHandle GCHandle { get; }
 }
+
+

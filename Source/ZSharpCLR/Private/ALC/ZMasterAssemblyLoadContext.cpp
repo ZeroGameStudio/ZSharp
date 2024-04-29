@@ -4,12 +4,11 @@
 #include "ZMasterAssemblyLoadContext.h"
 
 #include "ZAssembly.h"
-#include "ZGCHandle_Interop.h"
-#include "ZMasterAssemblyLoadContext_Interop.h"
+#include "Interop/ZMasterAssemblyLoadContext_Interop.h"
 #include "ZSharpCLRLogChannels.h"
-#include "Interop/IZCallDispatcher.h"
-#include "Interop/IZType.h"
-#include "Interop/ZCallBuffer.h"
+#include "ZCall/IZCallDispatcher.h"
+#include "ALC/IZType.h"
+#include "ZCall/ZCallBuffer.h"
 
 ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle handle, const TFunction<void()>& unloadCallback)
 	: Handle(handle)

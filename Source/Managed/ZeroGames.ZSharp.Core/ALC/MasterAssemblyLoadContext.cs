@@ -71,8 +71,6 @@ public class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase
         }
 
         _sSingleton = null;
-            
-        Logger.Log($"Master ALC Unloaded, name: {Name}, handle: {GCHandle.ToIntPtr(GCHandle)}");
     }
 
     private static MasterAssemblyLoadContext? _sSingleton;

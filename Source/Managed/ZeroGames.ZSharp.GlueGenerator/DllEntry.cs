@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using ZeroGames.ZSharp.Core;
+using ZeroGames.ZSharp.UnrealEngine.Core;
 
 [assembly: DllEntry(typeof(ZeroGames.ZSharp.GlueGenerator.DllEntry))]
 

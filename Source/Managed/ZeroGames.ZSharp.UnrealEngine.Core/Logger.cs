@@ -2,9 +2,9 @@
 
 using System.Text;
 
-namespace ZeroGames.ZSharp.Core;
+namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-internal static class Logger
+public static class Logger
 {
 
     private static void Log(uint8 level, params object?[]? objects)
@@ -32,7 +32,7 @@ internal static class Logger
         {
             fixed (char* buffer = sb.ToString().ToCharArray())
             {
-                Core_Interop.SCoreLog(level, buffer);
+                UnrealEngine_Interop.SLog(level, buffer);
             }
         }
     }

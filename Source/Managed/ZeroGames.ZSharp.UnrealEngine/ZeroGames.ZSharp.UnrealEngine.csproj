@@ -17,6 +17,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ZeroGames.ZSharp.Core\ZeroGames.ZSharp.Core.csproj" />
+      <ProjectReference Include="..\ZeroGames.ZSharp.UnrealEngine.Core\ZeroGames.ZSharp.UnrealEngine.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using ZeroGames.ZSharp.Core;
+using ZeroGames.ZSharp.UnrealEngine.Core;
 using ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 namespace ZeroGames.ZSharp.UnrealEngine;

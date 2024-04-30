@@ -28,8 +28,6 @@ public class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase
         }
 
         _sInstanceMap.Remove(Name!);
-            
-        Logger.Log($"Slim ALC Unloaded, name: {Name}, handle: {GCHandle.ToIntPtr(GCHandle)}");
     }
 
     private static readonly Dictionary<string, SlimAssemblyLoadContext> _sInstanceMap = new();

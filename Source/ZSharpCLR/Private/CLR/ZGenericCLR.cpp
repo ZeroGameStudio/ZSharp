@@ -8,6 +8,7 @@
 #include "ZSharpCLRLogChannels.h"
 #include "Interfaces/IPluginManager.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
+#include "Interop/Core_Interop.h"
 #include "Interop/UnrealEngine_Interop.h"
 #include "Interop/ZAssembly_Interop.h"
 #include "Interop/ZCLR_Interop.h"
@@ -38,7 +39,7 @@ namespace ZSharp::FZGenericCLR_Private
 	
 	static void LoadCoreAssembly(const FString& pluginBinariesDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
-		const TCHAR* UnrealEngine_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine_Interop");
+		const TCHAR* Core_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Core_Interop");
 		const TCHAR* InteropString_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropString_Interop");
 		const TCHAR* MasterAssemblyLoadContext_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.MasterAssemblyLoadContext_Interop");
 		
@@ -46,9 +47,8 @@ namespace ZSharp::FZGenericCLR_Private
         {
 #define TO_STRING(FieldName) TEXT(#FieldName)
 #define BUILD_UNMANAGED_FUNCTION(ShortTypeName, FieldName) { ShortTypeName##TypeName, TO_STRING(S##FieldName), FZ##ShortTypeName::FieldName }
-			
-        	BUILD_UNMANAGED_FUNCTION(UnrealEngine_Interop, Log),
-			BUILD_UNMANAGED_FUNCTION(UnrealEngine_Interop, IsInGameThread),
+
+			BUILD_UNMANAGED_FUNCTION(Core_Interop, CoreLog),
 			
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Alloc),
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Free),

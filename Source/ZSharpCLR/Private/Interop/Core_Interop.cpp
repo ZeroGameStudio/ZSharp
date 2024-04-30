@@ -21,9 +21,9 @@ void ZSharp::FZCore_Interop::CoreLog(uint8 level, const TCHAR* message)
 		LOG_CASE(6, Verbose)
 		LOG_CASE(7, VeryVerbose)
 	default:
-			{
-				break;
-			}
+		{
+			break;
+		}
 	}
 
 #undef Category

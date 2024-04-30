@@ -9,7 +9,7 @@ internal static class MethodInfo_Interop
 {
 
     [UnmanagedCallersOnly]
-    public static int32 GetName(GCHandle handle, IntPtr outNameAddr)
+    public static int32 GetName(GCHandle handle, IntPtr outNameAddr) => Uncaught.ErrorIfUncaught(() =>
     {
         if (handle.Target is MethodInfo method)
         {
@@ -21,11 +21,11 @@ internal static class MethodInfo_Interop
             return 0;
         }
 
-        return -1;
-    }
+        return 1;
+    }, -1);
 
     [UnmanagedCallersOnly]
-    public static int32 GetNumSlots(GCHandle handle)
+    public static int32 GetNumSlots(GCHandle handle) => Uncaught.ErrorIfUncaught(() =>
     {
         if (handle.Target is MethodInfo method)
         {
@@ -42,21 +42,21 @@ internal static class MethodInfo_Interop
             {
                 ++res;
             }
-            
+
             return res;
         }
 
-        return -1;
-    }
+        return 1;
+    }, -1);
 
     [UnmanagedCallersOnly]
-    public static unsafe int32 Invoke(GCHandle handle, ZCallBuffer* buffer)
+    public static unsafe int32 Invoke(GCHandle handle, ZCallBuffer* buffer) => Uncaught.ErrorIfUncaught(() =>
     {
         if (handle.Target is MethodInfo method)
         {
             object? obj = null;
             List<object?> parameters = new();
-            
+
             int32 pos = 0;
             if (!method.IsStatic)
             {
@@ -64,7 +64,7 @@ internal static class MethodInfo_Interop
                 obj = buffer->Slots[pos++].Conjugate.ToGCHandle().Target;
                 if (obj is null || !obj.GetType().IsAssignableTo(thisType))
                 {
-                    return -1;
+                    return 1;
                 }
             }
 
@@ -121,20 +121,20 @@ internal static class MethodInfo_Interop
                     parameter = buffer->Slots[pos++].Conjugate.ToGCHandle().Target;
                     if (parameter is not null && !parameter.GetType().IsAssignableTo(parameterType))
                     {
-                        return -1;
+                        return 2;
                     }
                 }
                 else
                 {
-                    return -1;
+                    return 3;
                 }
-                
+
                 parameters.Add(parameter);
             }
-            
+
             object? returnValue = method.Invoke(obj, parameters.ToArray());
             if (method.ReturnType != typeof(void))
-            { 
+            {
                 Type returnType = method.ReturnType;
                 if (returnType == typeof(uint8))
                 {
@@ -184,22 +184,23 @@ internal static class MethodInfo_Interop
                 {
                     if (returnValue is not null && !returnValue.GetType().IsAssignableTo(returnType))
                     {
-                        return -1;
+                        return 4;
                     }
+
                     buffer->Slots[pos++].Conjugate = ConjugateHandle.FromConjugate((IConjugate?)returnValue);
                 }
                 else
                 {
-                    return -1;
+                    return 5;
                 }
             }
-            
+
             return 0;
         }
 
         return -1;
-    }
-    
+    }, -1);
+
 }
 
 

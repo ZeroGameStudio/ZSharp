@@ -11,6 +11,7 @@ void ZSharp::FZUnrealEngine_Interop::Log(uint8 level, const TCHAR* message)
 {
 	switch (level)
 	{
+		LOG_CASE(1, Fatal)
 		LOG_CASE(2, Error)
 		LOG_CASE(3, Warning)
 		LOG_CASE(4, Display)
@@ -18,9 +19,9 @@ void ZSharp::FZUnrealEngine_Interop::Log(uint8 level, const TCHAR* message)
 		LOG_CASE(6, Verbose)
 		LOG_CASE(7, VeryVerbose)
 	default:
-			{
-				break;
-			}
+		{
+			break;
+		}
 	}
 }
 

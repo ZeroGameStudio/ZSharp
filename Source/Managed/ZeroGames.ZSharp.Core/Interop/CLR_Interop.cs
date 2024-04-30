@@ -9,27 +9,27 @@ internal static class CLR_Interop
 {
 
     [UnmanagedCallersOnly]
-    public static void CollectGarbage(int32 generation, uint8 bAggressive, uint8 bBlocking, uint8 bCompacting)
+    public static void CollectGarbage(int32 generation, uint8 bAggressive, uint8 bBlocking, uint8 bCompacting) => Uncaught.ErrorIfUncaught(() =>
     {
         GC.Collect();
-    }
-    
+    });
+
     [UnmanagedCallersOnly]
-    public static GCHandle CreateMasterALC()
+    public static GCHandle CreateMasterALC() => Uncaught.ErrorIfUncaught(() =>
     {
         MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Create();
 
         return alc.GCHandle;
-    }
-    
+    }, default);
+
     [UnmanagedCallersOnly]
-    public static unsafe GCHandle CreateSlimALC(char* name)
+    public static unsafe GCHandle CreateSlimALC(char* name) => Uncaught.ErrorIfUncaught(() =>
     {
         SlimAssemblyLoadContext alc = SlimAssemblyLoadContext.Create(new string(name));
 
         return alc.GCHandle;
-    }
-    
+    }, default);
+
 }
 
 

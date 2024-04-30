@@ -9,7 +9,7 @@ internal static class Assembly_Interop
 {
 
     [UnmanagedCallersOnly]
-    public static int32 GetName(GCHandle handle, IntPtr outNameAddr)
+    public static int32 GetName(GCHandle handle, IntPtr outNameAddr) => Uncaught.ErrorIfUncaught(() =>
     {
         if (handle.Target is Assembly asm)
         {
@@ -22,10 +22,10 @@ internal static class Assembly_Interop
         }
 
         return 1;
-    }
+    }, -1);
 
     [UnmanagedCallersOnly]
-    public static unsafe GCHandle GetType(GCHandle handle, char* name)
+    public static unsafe GCHandle GetType(GCHandle handle, char* name) => Uncaught.ErrorIfUncaught(() =>
     {
         if (handle.Target is Assembly asm)
         {
@@ -36,9 +36,9 @@ internal static class Assembly_Interop
             }
         }
 
-        return new();
-    }
-    
+        return default;
+    }, default);
+
 }
 
 

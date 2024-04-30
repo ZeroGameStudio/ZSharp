@@ -9,7 +9,7 @@ internal static class Type_Interop
 {
 
     [UnmanagedCallersOnly]
-    public static int32 GetName(GCHandle handle, IntPtr outNameAddr)
+    public static int32 GetName(GCHandle handle, IntPtr outNameAddr) => Uncaught.ErrorIfUncaught(() =>
     {
         if (handle.Target is Type type)
         {
@@ -20,27 +20,28 @@ internal static class Type_Interop
 
             return 0;
         }
-        
+
         return 1;
-    }
+    }, -1);
 
     [UnmanagedCallersOnly]
-    public static ConjugateHandle BuildConjugate(GCHandle handle, IntPtr unmanaged)
+    public static ConjugateHandle BuildConjugate(GCHandle handle, IntPtr unmanaged) => Uncaught.ErrorIfUncaught(() =>
     {
         if (handle.Target is Type type)
         {
             Type conjugateType = typeof(IConjugate<>).MakeGenericType(type);
             if (type.IsAssignableTo(conjugateType))
             {
-                return ConjugateHandle.FromConjugate((IConjugate)type.GetMethod("BuildConjugate")!.Invoke(null, new object[] { unmanaged })!);
+                return ConjugateHandle.FromConjugate(
+                    (IConjugate)type.GetMethod("BuildConjugate")!.Invoke(null, new object[] { unmanaged })!);
             }
         }
 
-        return new();
-    }
-    
+        return default;
+    }, default);
+
     [UnmanagedCallersOnly]
-    public static unsafe GCHandle GetMethodInfo(GCHandle handle, char* name)
+    public static unsafe GCHandle GetMethodInfo(GCHandle handle, char* name) => Uncaught.ErrorIfUncaught(() =>
     {
         if (handle.Target is Type type)
         {
@@ -51,11 +52,11 @@ internal static class Type_Interop
             }
         }
 
-        return new();
-    }
-    
+        return default;
+    }, default);
+
     [UnmanagedCallersOnly]
-    public static unsafe GCHandle GetPropertyInfo(GCHandle handle, char* name)
+    public static unsafe GCHandle GetPropertyInfo(GCHandle handle, char* name) => Uncaught.ErrorIfUncaught(() =>
     {
         if (handle.Target is Type type)
         {
@@ -66,9 +67,9 @@ internal static class Type_Interop
             }
         }
 
-        return new();
-    }
-    
+        return default;
+    }, default);
+
 }
 
 

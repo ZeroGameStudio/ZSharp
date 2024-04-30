@@ -10,7 +10,6 @@
 #include "ALC/IZSlimAssemblyLoadContext.h"
 #include "Interop/UnrealEngine_Interop.h"
 #include "Interop/ZAssembly_Interop.h"
-#include "ZCall/ZCallBuffer.h"
 #include "Interop/ZCLR_Interop.h"
 #include "Interop/ZGCHandle_Interop.h"
 #include "Interop/ZInteropString_Interop.h"
@@ -24,60 +23,87 @@
 
 namespace ZSharp::FZGenericCLR_Private
 {
+	struct FZUnmanagedFunction
+	{
+		const TCHAR* TypeName;
+		const TCHAR* FieldName;
+		void* Address;
+	};
+	
+	struct FZUnmanagedFunctions
+	{
+		int32 Count;
+		FZUnmanagedFunction* Functions;
+	};
+	
 	static void LoadCoreAssembly(const FString& pluginBinariesDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
-		constexpr struct
+		const TCHAR* UnrealEngine_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine_Interop");
+		const TCHAR* InteropString_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropString_Interop");
+		const TCHAR* MasterAssemblyLoadContext_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.MasterAssemblyLoadContext_Interop");
+		
+		FZUnmanagedFunction unmanagedFunctions[] =
+        {
+#define TO_STRING(FieldName) TEXT(#FieldName)
+#define BUILD_UNMANAGED_FUNCTION(ShortTypeName, FieldName) { ShortTypeName##TypeName, TO_STRING(S##FieldName), FZ##ShortTypeName::FieldName }
+			
+        	BUILD_UNMANAGED_FUNCTION(UnrealEngine_Interop, Log),
+			BUILD_UNMANAGED_FUNCTION(UnrealEngine_Interop, IsInGameThread),
+			
+			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Alloc),
+			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Free),
+			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, GetData),
+			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, SetData),
+
+			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ZCallByHandle),
+			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ZCallByName),
+			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ZCallByHandle_AnyThread),
+			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, GetZCallHandle),
+
+#undef BUILD_UNMANAGED_FUNCTION
+#undef TO_STRING
+        };
+
+		void** managedFunctions[] =
 		{
-			struct
-			{
-				void (*UnrealEngine_Log)(uint8, const TCHAR*) = FZUnrealEngine_Interop::Log;
-				uint8 (*UnrealEngine_IsInGameThread)() = FZUnrealEngine_Interop::IsInGameThread;
+#define ADDRESS_OF(Pointer) reinterpret_cast<void**>(&Pointer)
 
-				FString&(*InteropString_Alloc)(const TCHAR*) = FZInteropString_Interop::Alloc;
-				void (*InteropString_Free)(FString&) = FZInteropString_Interop::Free;
-				const TCHAR*(*InteropString_GetData)(FString&) = FZInteropString_Interop::GetData;
-				void (*InteropString_SetData)(FString&, const TCHAR*) = FZInteropString_Interop::SetData;
+			ADDRESS_OF(ZCLR_Interop::GCollectGarbage),
+			ADDRESS_OF(ZCLR_Interop::GCreateMasterALC),
+			ADDRESS_OF(ZCLR_Interop::GCreateSlimALC),
 
-				int32 (*MasterAssemblyLoadContext_ZCallByHandle)(FZCallHandle, FZCallBuffer*) = FZMasterAssemblyLoadContext_Interop::ZCallByHandle;
-				int32 (*MasterAssemblyLoadContext_ZCallByName)(const TCHAR*, FZCallBuffer*, FZCallHandle*) = FZMasterAssemblyLoadContext_Interop::ZCallByName;
-				void (*MasterAssemblyLoadContext_ZCallByHandle_AnyThread)(FZCallHandle, FZCallBuffer*, int32) = FZMasterAssemblyLoadContext_Interop::ZCallByHandle_AnyThread;
-				FZCallHandle (*MasterAssemblyLoadContext_GetZCallHandle)(const TCHAR*) = FZMasterAssemblyLoadContext_Interop::GetZCallHandle;
-			} UnmanagedFunctions;
-		} input;
+			ADDRESS_OF(FZGCHandle_Interop::GFree),
 
+			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GUnload),
+			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GLoadAssembly),
+			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GReleaseConjugate),
+
+			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GUnload),
+			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GLoadAssembly),
+			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GCallMethod),
+				
+			ADDRESS_OF(FZAssembly_Interop::GGetName),
+			ADDRESS_OF(FZAssembly_Interop::GGetType),
+
+			ADDRESS_OF(FZType_Interop::GGetName),
+			ADDRESS_OF(FZType_Interop::GBuildConjugate),
+			ADDRESS_OF(FZType_Interop::GGetMethodInfo),
+			ADDRESS_OF(FZType_Interop::GGetPropertyInfo),
+
+			ADDRESS_OF(FZMethodInfo_Interop::GGetName),
+			ADDRESS_OF(FZMethodInfo_Interop::GGetNumSlots),
+			ADDRESS_OF(FZMethodInfo_Interop::GInvoke),
+				
+#undef ADDRESS_OF
+		};
+		
 		struct
 		{
-			struct
-			{
-				void (*CLR_CollectGarbage)(int32, uint8, uint8, uint8);
-				FZGCHandle (*CLR_CreateMasterALC)();
-				FZGCHandle (*CLR_CreateSlimALC)(const TCHAR*);
+			FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(unmanagedFunctions), unmanagedFunctions };
+			void*** ManagedFunctions = managedFunctions;
+		} args{};
 
-				int32 (*GCHandle_Free)(FZGCHandle);
-
-				int32 (*MasterAssemblyLoadContext_Unload)();
-				FZGCHandle (*MasterAssemblyLoadContext_LoadAssembly)(const uint8*, int32, void*);
-				int32 (*MasterAssemblyLoadContext_ReleaseConjugate)(FZConjugateHandle);
-
-				int32 (*SlimAssemblyLoadContext_Unload)(FZGCHandle);
-				int32 (*SlimAssemblyLoadContext_LoadAssembly)(FZGCHandle, const uint8*, int32, void*);
-				int32 (*SlimAssemblyLoadContext_CallMethod)(FZGCHandle, const TCHAR*, const TCHAR*, const TCHAR*, void*);
-
-				int32 (*Assembly_GetName)(FZGCHandle, FString&);
-				FZGCHandle (*Assembly_GetType)(FZGCHandle, const TCHAR*);
-
-				int32 (*Type_GetName)(FZGCHandle, FString&);
-				FZConjugateHandle (*Type_BuildConjugate)(FZGCHandle, void*);
-				FZGCHandle (*Type_GetMethodInfo)(FZGCHandle, const TCHAR*);
-				FZGCHandle (*Type_GetPropertyInfo)(FZGCHandle, const TCHAR*);
-
-				int32 (*MethodInfo_GetName)(FZGCHandle, FString&);
-				int32 (*MethodInfo_GetNumSlots)(FZGCHandle);
-				int32 (*MethodInfo_Invoke)(FZGCHandle, FZCallBuffer*);
-			} ManagedFunctions;
-		} output{};
-
-		int32(*dllMain)(const decltype(input)&, const decltype(output)&) = nullptr;
+		int32(*dllMain)(const decltype(args)&) = nullptr;
 
 		const FString assemblyName = ZSHARP_CORE_ASSEMBLY_NAME;
 		const FString assemblyPath = FPaths::Combine(pluginBinariesDir, "Managed", assemblyName + ".dll");
@@ -90,48 +116,14 @@ namespace ZSharp::FZGenericCLR_Private
 		getFunctionPointer(*entryTypeName, *entryMethodName, UNMANAGEDCALLERSONLY_METHOD, nullptr, nullptr, reinterpret_cast<void**>(&dllMain));
 
 		check(dllMain);
-		dllMain(input, output);
-
-		ZCLR_Interop::GCollectGarbage = output.ManagedFunctions.CLR_CollectGarbage;
-		ZCLR_Interop::GCreateMasterALC = output.ManagedFunctions.CLR_CreateMasterALC;
-		ZCLR_Interop::GCreateSlimALC = output.ManagedFunctions.CLR_CreateSlimALC;
-
-		FZGCHandle_Interop::GFree = output.ManagedFunctions.GCHandle_Free;
-
-		FZMasterAssemblyLoadContext_Interop::GUnload = output.ManagedFunctions.MasterAssemblyLoadContext_Unload;
-		FZMasterAssemblyLoadContext_Interop::GLoadAssembly = output.ManagedFunctions.
-		                                                            MasterAssemblyLoadContext_LoadAssembly;
-		FZMasterAssemblyLoadContext_Interop::GReleaseConjugate = output.ManagedFunctions.
-		                                                                MasterAssemblyLoadContext_ReleaseConjugate;
-
-		FZSlimAssemblyLoadContext_Interop::GUnload = output.ManagedFunctions.SlimAssemblyLoadContext_Unload;
-		FZSlimAssemblyLoadContext_Interop::GLoadAssembly = output.ManagedFunctions.SlimAssemblyLoadContext_LoadAssembly;
-		FZSlimAssemblyLoadContext_Interop::GCallMethod = output.ManagedFunctions.SlimAssemblyLoadContext_CallMethod;
-
-		FZAssembly_Interop::GGetName = output.ManagedFunctions.Assembly_GetName;
-		FZAssembly_Interop::GGetType = output.ManagedFunctions.Assembly_GetType;
-
-		FZType_Interop::GGetName = output.ManagedFunctions.Type_GetName;
-		FZType_Interop::GBuildConjugate = output.ManagedFunctions.Type_BuildConjugate;
-		FZType_Interop::GGetMethodInfo = output.ManagedFunctions.Type_GetMethodInfo;
-		FZType_Interop::GGetPropertyInfo = output.ManagedFunctions.Type_GetPropertyInfo;
-
-		FZMethodInfo_Interop::GGetName = output.ManagedFunctions.MethodInfo_GetName;
-		FZMethodInfo_Interop::GGetNumSlots = output.ManagedFunctions.MethodInfo_GetNumSlots;
-		FZMethodInfo_Interop::GInvoke = output.ManagedFunctions.MethodInfo_Invoke;
+		dllMain(args);
 	}
 
 	static void LoadEngineCoreAssembly(const FString& pluginBinariesDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
 		const TCHAR* typeName = TEXT("ZeroGames.ZSharp.UnrealEngine.Core.UnrealEngine_Interop");
 
-		// This exists because UE_ARRAY_COUNT() doesn't work with static initialized member array.
-		struct FZArgv
-		{
-			const TCHAR* TypeName;
-			const TCHAR* FieldName;
-			void* Function;
-		} argv[] =
+		FZUnmanagedFunction unmanagedFunctions[] =
 		{
 			{ typeName, TEXT("SLog"), FZUnrealEngine_Interop::Log },
 			{ typeName, TEXT("SIsInGameThread"), FZUnrealEngine_Interop::IsInGameThread },
@@ -139,8 +131,7 @@ namespace ZSharp::FZGenericCLR_Private
 		
 		struct
         {
-        	int32 Argc = UE_ARRAY_COUNT(argv);
-        	FZArgv* Argv = argv;
+        	FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(unmanagedFunctions), unmanagedFunctions };
         } args{};
 
 		int32(*dllMain)(const decltype(args)&) = nullptr;

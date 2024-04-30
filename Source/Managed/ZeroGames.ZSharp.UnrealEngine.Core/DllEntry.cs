@@ -13,22 +13,28 @@ internal class DllEntry
     {
         public char* TypeName;
         public char* FieldName;
-        public void* Function;
+        public void* Address;
+    }
+    
+    [StructLayout(LayoutKind.Sequential)]
+    private unsafe struct UnmanagedFunctions
+    {
+        public int32 Count;
+        public UnmanagedFunction* Functions;
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    private unsafe struct Args
+    private struct Args
     {
-        public int32 Argc;
-        public UnmanagedFunction* Argv;
+        public UnmanagedFunctions UnmanagedFunctions;
     }
 
     [UnmanagedCallersOnly]
     private static unsafe int32 DllMain(Args* args)
     {
-        for (int32 i = 0; i < args->Argc; ++i)
+        for (int32 i = 0; i < args->UnmanagedFunctions.Count; ++i)
         {
-            UnmanagedFunction* function = args->Argv + i;
+            UnmanagedFunction* function = args->UnmanagedFunctions.Functions + i;
             string typeName = new(function->TypeName);
             Type? type = Assembly.GetExecutingAssembly().GetType(typeName);
             if (type is null)
@@ -53,13 +59,7 @@ internal class DllEntry
                 throw new Exception($"Binding failed, field is not unmanaged function pointer. {typeName}.{fieldName}");
             }
             
-            field.SetValue(null, (IntPtr)function->Function);
-        }
-
-        string x = $"=========================={UnrealEngine_Interop.SIsInGameThread() > 0}";
-        fixed (char* s = x.ToCharArray())
-        {
-            UnrealEngine_Interop.SLog(3, s);
+            field.SetValue(null, (IntPtr)function->Address);
         }
 
         return 0;

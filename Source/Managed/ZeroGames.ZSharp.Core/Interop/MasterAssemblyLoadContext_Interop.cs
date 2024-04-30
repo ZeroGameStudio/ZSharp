@@ -49,10 +49,10 @@ internal static class MasterAssemblyLoadContext_Interop
         return -1;
     }
     
-    public static unsafe delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> SZCallByHandle;
-    public static unsafe delegate* unmanaged<char*, ZCallBuffer*, ZCallHandle*, int32> SZCallByName;
-    public static unsafe delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32, void> SZCallByHandle_AnyThread;
-    public static unsafe delegate* unmanaged<char*, ZCallHandle> SGetZCallHandle;
+    public static unsafe delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> SZCallByHandle = null;
+    public static unsafe delegate* unmanaged<char*, ZCallBuffer*, ZCallHandle*, int32> SZCallByName = null;
+    public static unsafe delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32, void> SZCallByHandle_AnyThread = null;
+    public static unsafe delegate* unmanaged<char*, ZCallHandle> SGetZCallHandle = null;
     
 }
 

@@ -22,7 +22,8 @@ void ZSharp::FZGlueGenerator::Generate(const TFunction<void()>& onComplete)
 	{
 		return;
 	}
-	
+
+	// @FIXME: PluginDir
 	if (!IZSharpCLR::Get().RunAsync(FPaths::Combine(FPaths::ProjectPluginsDir(), "ZeroGames", "ZSharp", "Binaries", "Managed", "ZeroGames.ZSharp.GlueGenerator.dll"), &Args, "GlueGenerator"))
 	{
 		OnComplete = onComplete;

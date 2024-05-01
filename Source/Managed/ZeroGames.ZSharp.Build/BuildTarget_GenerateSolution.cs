@@ -124,6 +124,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
         await using FileStream fs = File.Create(path);
         await using StreamWriter sw = new(fs, Encoding.UTF8);
 
+        // @FIXME: PluginDir
         ProjectFileBuilder builder = new(project, _projectDir, Path.Combine(_projectDir, "Plugins/ZeroGames/ZSharp"));
 
         await sw.WriteAsync(builder.ToString());
@@ -133,6 +134,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
     
     private async Task<string> GenerateSolutionFile()
     {
+        // @FIXME: Solution file name
         string path = Path.Combine(_projectDir, "ZLabScript.sln");
         await using FileStream fs = File.Create(path);
         await using StreamWriter sw = new(fs, Encoding.UTF8);

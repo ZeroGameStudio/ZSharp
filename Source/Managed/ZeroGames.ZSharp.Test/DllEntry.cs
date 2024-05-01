@@ -7,12 +7,17 @@ using ZeroGames.ZSharp.UnrealEngine.Core;
 
 namespace ZeroGames.ZSharp.Test;
 
+public class A
+{
+    public int32 X { get; init; }
+}
+
 internal static class DllEntry
 {
     [DllMain]
     private static void DllMain(string[] args)
     {
-        Logger.Log(args[0], args[1]);
+        Logger.Error(Path.Combine("Intermediate/ZSharp/ProjectFiles", "ZeroGames.ZSharp.Build"));
     }
 }
 

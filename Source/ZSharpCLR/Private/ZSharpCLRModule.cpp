@@ -9,46 +9,46 @@
 namespace ZSharp::ZSharpCLRModule_Private
 {
 	static FAutoConsoleCommand GCmdDotnetRun(
-	TEXT("dotnet.Run"),
+	TEXT("zsharp.Run"),
 	TEXT("Load assembly of the specified path to an isolated slim assembly load context and invoke __DllEntry.DllMain(). Unloads the context when return from managed code."),
-	FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args)
+	FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& args)
 	{
-		if (Args.IsEmpty())
+		if (args.IsEmpty())
 		{
 			return;
 		}
 
-		const FString& path = Args[0];
+		const FString& path = args[0];
 		TArray<const TCHAR*> argv;
-		for (int32 i = 1; i < Args.Num(); ++i)
+		for (int32 i = 1; i < args.Num(); ++i)
 		{
-			argv.Emplace(*Args[i]);
+			argv.Emplace(*args[i]);
 		}
 		
-		FZCommonDllMainArgs args { argv.Num(), argv.GetData() };
-		IZSharpCLR::Get().Run(path, &args);
+		FZCommonDllMainArgs commonArgs { argv.Num(), argv.GetData() };
+		IZSharpCLR::Get().Run(path, &commonArgs);
 	}),
 	ECVF_Default);
 
 	static FAutoConsoleCommand GCmdDotnetRunAsync(
-		TEXT("dotnet.RunAsync"),
+		TEXT("zsharp.RunAsync"),
 		TEXT("Load assembly of the specified path to an isolated slim assembly load context and invoke __DllEntry.DllMain(). Requires user code to unload the context manually. Often used when need to await something."),
-		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args)
+		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& args)
 		{
-			if (Args.IsEmpty())
+			if (args.IsEmpty())
 			{
 				return;
 			}
 
-			const FString& path = Args[0];
+			const FString& path = args[0];
 			TArray<const TCHAR*> argv;
-			for (int32 i = 1; i < Args.Num(); ++i)
+			for (int32 i = 1; i < args.Num(); ++i)
 			{
-				argv.Emplace(*Args[i]);
+				argv.Emplace(*args[i]);
 			}
 		
-			FZCommonDllMainArgs args { argv.Num(), argv.GetData() };
-			IZSharpCLR::Get().RunAsync(path, &args);
+			FZCommonDllMainArgs commonArgs { argv.Num(), argv.GetData() };
+			IZSharpCLR::Get().RunAsync(path, &commonArgs);
 		}),
 		ECVF_Default);
 }

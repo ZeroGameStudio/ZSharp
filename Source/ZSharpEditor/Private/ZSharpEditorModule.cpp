@@ -2,6 +2,42 @@
 
 #include "ZSharpEditorModule.h"
 
+#include "ALC/ZCommonDllMainArgs.h"
+#include "CLR/IZSharpCLR.h"
+#include "Interfaces/IPluginManager.h"
+
+namespace ZSharp::FZSharpEditorModule_Private
+{
+	static FAutoConsoleCommand GCmdDotnetRun(
+		TEXT("zsharp.Gen"),
+		TEXT("Generate zsharp solution and project files."),
+		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& args)
+		{
+			const FString pluginDir = IPluginManager::Get().GetModuleOwnerPlugin(UE_MODULE_NAME)->GetBaseDir();
+			
+			FString dllPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed/ZeroGames.ZSharp.Build.dll");
+			if (!FPaths::FileExists(dllPath))
+			{
+				dllPath = FPaths::Combine(pluginDir, "Content/ZeroGames.ZSharp.Build.dll");
+				check(FPaths::FileExists(dllPath));
+			}
+
+			FString projectDirArg = FString::Printf(TEXT("projectdir=%s"), *FPaths::ConvertRelativePathToFull(FPaths::ProjectDir()));
+			FString projectManagedSourceDir = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectDir(), "Source/Managed"));
+			FString pluginManagedSourceDir = FPaths::ConvertRelativePathToFull(FPaths::Combine(pluginDir, "Source/Managed"));
+			FString sourceArg = FString::Printf(TEXT("source=%s"), *FString::Printf(TEXT("%s;%s"), *projectManagedSourceDir, *pluginManagedSourceDir));
+			const TCHAR* argv[] =
+			{
+				TEXT("target=1"),
+				*projectDirArg,
+				*sourceArg,
+			};
+			FZCommonDllMainArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
+			IZSharpCLR::Get().Run(dllPath, &commonArgs);
+		}),
+		ECVF_Default);
+}
+
 class FZSharpEditorModule : public IZSharpEditorModule
 {
 	// Begin IModuleInterface

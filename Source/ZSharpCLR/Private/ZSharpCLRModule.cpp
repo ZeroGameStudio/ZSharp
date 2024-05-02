@@ -3,7 +3,7 @@
 #include "ZSharpCLRModule.h"
 
 #include "CLR/ZSharpCLR.h"
-#include "CLR/IZSharpCLR.h"
+#include "CLR/IZSharpClr.h"
 #include "ALC/ZCommonDllMainArgs.h"
 
 namespace ZSharp::ZSharpCLRModule_Private
@@ -26,7 +26,7 @@ namespace ZSharp::ZSharpCLRModule_Private
 		}
 		
 		FZCommonDllMainArgs commonArgs { argv.Num(), argv.GetData() };
-		IZSharpCLR::Get().Run(path, &commonArgs);
+		IZSharpClr::Get().Run(path, &commonArgs);
 	}),
 	ECVF_Default);
 
@@ -48,7 +48,7 @@ namespace ZSharp::ZSharpCLRModule_Private
 			}
 		
 			FZCommonDllMainArgs commonArgs { argv.Num(), argv.GetData() };
-			IZSharpCLR::Get().RunAsync(path, &commonArgs);
+			IZSharpClr::Get().RunAsync(path, &commonArgs);
 		}),
 		ECVF_Default);
 }
@@ -65,12 +65,12 @@ IMPLEMENT_MODULE(FZSharpCLRModule, ZSharpCLR)
 
 void FZSharpCLRModule::StartupModule()
 {
-	FZSharpCLR::Get().Startup();
+	FZSharpClr::Get().Startup();
 }
 
 void FZSharpCLRModule::ShutdownModule()
 {
-	FZSharpCLR::Get().Shutdown();
+	FZSharpClr::Get().Shutdown();
 }
 
 

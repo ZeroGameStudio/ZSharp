@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "CLR/ZGenericCLR.h"
+#include "CLR/ZGenericClr.h"
 
 #include "hostfxr.h"
 #include "coreclr_delegates.h"
@@ -11,7 +11,7 @@
 #include "Interop/Core_Interop.h"
 #include "Interop/UnrealEngine_Interop.h"
 #include "Interop/ZAssembly_Interop.h"
-#include "Interop/ZCLR_Interop.h"
+#include "Interop/ZClr_Interop.h"
 #include "Interop/ZGCHandle_Interop.h"
 #include "Interop/ZInteropString_Interop.h"
 #include "ALC/ZMasterAssemblyLoadContext.h"
@@ -22,7 +22,7 @@
 #include "Interop/ZSlimAssemblyLoadContext_Interop.h"
 #include "Interop/ZType_Interop.h"
 
-namespace ZSharp::FZGenericCLR_Private
+namespace ZSharp::FZGenericClr_Private
 {
 	struct FZUnmanagedFunction
 	{
@@ -68,9 +68,9 @@ namespace ZSharp::FZGenericCLR_Private
 		{
 #define ADDRESS_OF(Pointer) reinterpret_cast<void**>(&Pointer)
 
-			ADDRESS_OF(ZCLR_Interop::GCollectGarbage),
-			ADDRESS_OF(ZCLR_Interop::GCreateMasterAlc),
-			ADDRESS_OF(ZCLR_Interop::GCreateSlimAlc),
+			ADDRESS_OF(ZClr_Interop::GCollectGarbage),
+			ADDRESS_OF(ZClr_Interop::GCreateMasterAlc),
+			ADDRESS_OF(ZClr_Interop::GCreateSlimAlc),
 
 			ADDRESS_OF(FZGCHandle_Interop::GFree),
 
@@ -165,7 +165,7 @@ namespace ZSharp::FZGenericCLR_Private
 	}
 }
 
-void ZSharp::FZGenericCLR::Startup()
+void ZSharp::FZGenericClr::Startup()
 {
 	check(IsInGameThread());
 	
@@ -208,13 +208,13 @@ void ZSharp::FZGenericCLR::Startup()
 
 	closeHostFXR(handle);
 
-	FZGenericCLR_Private::LoadCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
-	FZGenericCLR_Private::LoadEngineCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
+	FZGenericClr_Private::LoadCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
+	FZGenericClr_Private::LoadEngineCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
 	
 	FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);
 }
 
-void ZSharp::FZGenericCLR::Shutdown()
+void ZSharp::FZGenericClr::Shutdown()
 {
 	check(IsInGameThread());
 	
@@ -240,12 +240,12 @@ void ZSharp::FZGenericCLR::Shutdown()
 	bInitialized = false;
 }
 
-void ZSharp::FZGenericCLR::CollectGarbage(int32 generation, bool bAggressive, bool bBlocking, bool bCompacting)
+void ZSharp::FZGenericClr::CollectGarbage(int32 generation, bool bAggressive, bool bBlocking, bool bCompacting)
 {
-	ZCLR_Interop::GCollectGarbage(generation, bAggressive, bBlocking, bCompacting);
+	ZClr_Interop::GCollectGarbage(generation, bAggressive, bBlocking, bCompacting);
 }
 
-ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::CreateMasterAlc()
+ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
 {
 	check(IsInGameThread());
 
@@ -256,7 +256,7 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::CreateMasterAlc()
 		UE_LOG(LogZSharpCLR, Fatal, TEXT("Master ALC already exists!"));
 	}
 
-	FZGCHandle handle = ZCLR_Interop::GCreateMasterAlc();
+	FZGCHandle handle = ZClr_Interop::GCreateMasterAlc();
 	if (!IsValid(handle))
 	{
 		return nullptr;
@@ -269,7 +269,7 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::CreateMasterAlc()
 	return MasterAlc.Get();
 }
 
-ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::GetMasterAlc()
+ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::GetMasterAlc()
 {
 	check(IsInGameThread());
 	
@@ -278,7 +278,7 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericCLR::GetMasterAlc()
 	return MasterAlc.Get();
 }
 
-void ZSharp::FZGenericCLR::GetMasterAlc_AnyThread(TFunctionRef<void(IZMasterAssemblyLoadContext*)> action)
+void ZSharp::FZGenericClr::GetMasterAlc_AnyThread(TFunctionRef<void(IZMasterAssemblyLoadContext*)> action)
 {
 	FScopeLock _(&MasterAlcCriticalSection);
 
@@ -288,7 +288,7 @@ void ZSharp::FZGenericCLR::GetMasterAlc_AnyThread(TFunctionRef<void(IZMasterAsse
 	}
 }
 
-ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::CreateSlimAlc(const FString& name)
+ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericClr::CreateSlimAlc(const FString& name)
 {
 	FWriteScopeLock _(SlimAlcMapLock);
 	
@@ -297,7 +297,7 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::CreateSlimAlc(const FSt
 		UE_LOG(LogZSharpCLR, Fatal, TEXT("Slim ALC [%s] already exists!"), *name);
 	}
 
-	FZGCHandle handle = ZCLR_Interop::GCreateSlimAlc(*name);
+	FZGCHandle handle = ZClr_Interop::GCreateSlimAlc(*name);
 	if (!IsValid(handle))
 	{
 		return nullptr;
@@ -309,7 +309,7 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::CreateSlimAlc(const FSt
 	return alc;
 }
 
-ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::GetSlimAlc(const FString& name)
+ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericClr::GetSlimAlc(const FString& name)
 {
 	FReadScopeLock _(SlimAlcMapLock);
 	
@@ -317,21 +317,21 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericCLR::GetSlimAlc(const FStrin
 	return pAlc ? pAlc->Get() : nullptr;
 }
 
-void ZSharp::FZGenericCLR::HandleMasterAlcUnloaded()
+void ZSharp::FZGenericClr::HandleMasterAlcUnloaded()
 {
 	OnMasterAlcUnloaded.Broadcast();
 	
 	MasterAlc = nullptr;
 }
 
-void ZSharp::FZGenericCLR::HandleSlimAlcUnloaded(const FString& name)
+void ZSharp::FZGenericClr::HandleSlimAlcUnloaded(const FString& name)
 {
 	FWriteScopeLock _(SlimAlcMapLock);
 	
 	SlimAlcMap.Remove(name);
 }
 
-FDelegateHandle ZSharp::FZGenericCLR::RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate, bool bNotifyIfLoaded)
+FDelegateHandle ZSharp::FZGenericClr::RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate, bool bNotifyIfLoaded)
 {
 	check(IsInGameThread());
 
@@ -346,42 +346,42 @@ FDelegateHandle ZSharp::FZGenericCLR::RegisterMasterAlcLoaded(FZOnMasterAlcLoade
 	return handle;
 }
 
-void ZSharp::FZGenericCLR::UnregisterMasterAlcLoaded(FDelegateHandle delegate)
+void ZSharp::FZGenericClr::UnregisterMasterAlcLoaded(FDelegateHandle delegate)
 {
 	check(IsInGameThread());
 	
 	OnMasterAlcLoaded.Remove(delegate);
 }
 
-void ZSharp::FZGenericCLR::UnregisterMasterAlcLoaded(const void* userObject)
+void ZSharp::FZGenericClr::UnregisterMasterAlcLoaded(const void* userObject)
 {
 	check(IsInGameThread());
 	
 	OnMasterAlcLoaded.RemoveAll(userObject);
 }
 
-FDelegateHandle ZSharp::FZGenericCLR::RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate delegate)
+FDelegateHandle ZSharp::FZGenericClr::RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate delegate)
 {
 	check(IsInGameThread());
 	
 	return OnMasterAlcUnloaded.Add(delegate);
 }
 
-void ZSharp::FZGenericCLR::UnregisterMasterAlcUnloaded(FDelegateHandle delegate)
+void ZSharp::FZGenericClr::UnregisterMasterAlcUnloaded(FDelegateHandle delegate)
 {
 	check(IsInGameThread());
 	
 	OnMasterAlcUnloaded.Remove(delegate);
 }
 
-void ZSharp::FZGenericCLR::UnregisterMasterAlcUnloaded(const void* userObject)
+void ZSharp::FZGenericClr::UnregisterMasterAlcUnloaded(const void* userObject)
 {
 	check(IsInGameThread());
 	
 	OnMasterAlcUnloaded.RemoveAll(userObject);
 }
 
-void ZSharp::FZGenericCLR::HandleGarbageCollectComplete()
+void ZSharp::FZGenericClr::HandleGarbageCollectComplete()
 {
 	CollectGarbage();
 }

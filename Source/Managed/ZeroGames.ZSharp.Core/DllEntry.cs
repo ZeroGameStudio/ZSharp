@@ -67,9 +67,9 @@ internal static class DllEntry
         int32 offset = 0;
         // CLR interop functions
         *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<int32, uint8, uint8, uint8, void>)&CLR_Interop.CollectGarbage;
-        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle>)&CLR_Interop.CreateMasterAlc;
-        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, GCHandle>)&CLR_Interop.CreateSlimAlc;
+            (delegate* unmanaged<int32, uint8, uint8, uint8, void>)&Clr_Interop.CollectGarbage;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle>)&Clr_Interop.CreateMasterAlc;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, GCHandle>)&Clr_Interop.CreateSlimAlc;
 
         // GCHandle interop functions
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, int32>)&GCHandle_Interop.Free;

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CLR/IZSharpCLR.h"
+#include "CLR/IZSharpClr.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
 
@@ -10,13 +10,13 @@ namespace ZSharp
 {
 	class IZAssemblyLoadContext;
 	
-	class FZGenericCLR : public IZSharpCLR
+	class FZGenericClr : public IZSharpClr
 	{
 
-		using ThisClass = FZGenericCLR;
+		using ThisClass = FZGenericClr;
 
 	public:
-		static FZGenericCLR& Get() { return StaticCast<FZGenericCLR&>(IZSharpCLR::Get()); }
+		static FZGenericClr& Get() { return StaticCast<FZGenericClr&>(IZSharpClr::Get()); }
 
 	public:
 		void Startup();

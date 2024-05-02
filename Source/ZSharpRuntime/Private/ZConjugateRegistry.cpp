@@ -4,7 +4,7 @@
 #include "ZConjugateRegistry.h"
 
 #include "ZSharpRuntimeLogChannels.h"
-#include "CLR/IZSharpCLR.h"
+#include "CLR/IZSharpClr.h"
 #include "ALC/IZAssembly.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 
@@ -33,10 +33,10 @@ TUniquePtr<ZSharp::FZConjugateRegistry> ZSharp::FZConjugateRegistry::GSingleton;
 
 void ZSharp::FZConjugateRegistry::Startup()
 {
-	UE_CLOG(!!IZSharpCLR::Get().GetMasterAlc(), LogZSharpRuntime, Fatal, TEXT("Conjugate Registry must startup before any master ALC!!!"));
+	UE_CLOG(!!IZSharpClr::Get().GetMasterAlc(), LogZSharpRuntime, Fatal, TEXT("Conjugate Registry must startup before any master ALC!!!"));
 	
-	IZSharpCLR::Get().RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate::CreateStatic(&ThisClass::HandleMasterAlcLoaded));
-	IZSharpCLR::Get().RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate::CreateStatic(&ThisClass::HandleMasterAlcUnloaded));
+	IZSharpClr::Get().RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate::CreateStatic(&ThisClass::HandleMasterAlcLoaded));
+	IZSharpClr::Get().RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate::CreateStatic(&ThisClass::HandleMasterAlcUnloaded));
 }
 
 ZSharp::FZConjugateRegistry* ZSharp::FZConjugateRegistry::Get()

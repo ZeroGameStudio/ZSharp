@@ -3,7 +3,7 @@
 
 #include "ZGlueGenerator.h"
 
-#include "CLR/IZSharpCLR.h"
+#include "CLR/IZSharpClr.h"
 
 static FAutoConsoleCommand GCmdDotnetRun(
 	TEXT("gluegenerator"),
@@ -24,7 +24,7 @@ void ZSharp::FZGlueGenerator::Generate(const TFunction<void()>& onComplete)
 	}
 
 	// @FIXME: PluginDir
-	if (!IZSharpCLR::Get().RunAsync(FPaths::Combine(FPaths::ProjectPluginsDir(), "ZeroGames", "ZSharp", "Binaries", "Managed", "ZeroGames.ZSharp.GlueGenerator.dll"), &Args, "GlueGenerator"))
+	if (!IZSharpClr::Get().RunAsync(FPaths::Combine(FPaths::ProjectPluginsDir(), "ZeroGames", "ZSharp", "Binaries", "Managed", "ZeroGames.ZSharp.GlueGenerator.dll"), &Args, "GlueGenerator"))
 	{
 		OnComplete = onComplete;
 		bBusy = true;

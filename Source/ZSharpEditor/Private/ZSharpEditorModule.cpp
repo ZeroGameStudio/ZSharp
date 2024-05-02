@@ -3,7 +3,7 @@
 #include "ZSharpEditorModule.h"
 
 #include "ALC/ZCommonDllMainArgs.h"
-#include "CLR/IZSharpCLR.h"
+#include "CLR/IZSharpClr.h"
 #include "Interfaces/IPluginManager.h"
 
 namespace ZSharp::FZSharpEditorModule_Private
@@ -33,7 +33,7 @@ namespace ZSharp::FZSharpEditorModule_Private
 				*sourceArg,
 			};
 			FZCommonDllMainArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
-			IZSharpCLR::Get().Run(dllPath, &commonArgs);
+			IZSharpClr::Get().Run(dllPath, &commonArgs);
 		}),
 		ECVF_Default);
 }

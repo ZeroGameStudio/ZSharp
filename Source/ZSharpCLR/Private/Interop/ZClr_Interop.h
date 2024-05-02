@@ -6,7 +6,7 @@
 
 namespace ZSharp
 {
-	struct ZCLR_Interop
+	struct ZClr_Interop
 	{
 		inline static void(*GCollectGarbage)(int32, uint8, uint8, uint8) = nullptr;
 		inline static FZGCHandle(*GCreateMasterAlc)() = nullptr;

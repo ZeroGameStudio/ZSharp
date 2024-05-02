@@ -10,12 +10,12 @@ namespace ZSharp
 	DECLARE_MULTICAST_DELEGATE_OneParam(FZOnMasterAlcLoaded, IZMasterAssemblyLoadContext*)
 	DECLARE_MULTICAST_DELEGATE(FZOnMasterAlcUnloaded)
 	
-	class ZSHARPCLR_API IZSharpCLR
+	class ZSHARPCLR_API IZSharpClr
 	{
 	public:
-		static IZSharpCLR& Get();
+		static IZSharpClr& Get();
 	public:
-		virtual ~IZSharpCLR(){}
+		virtual ~IZSharpClr(){}
 	public:
 		virtual void CollectGarbage(int32 generation = -1, bool bAggressive = true, bool bBlocking = false, bool bCompacting = true) = 0;
 	public:

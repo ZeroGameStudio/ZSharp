@@ -3,7 +3,7 @@
 #include "ZSharpRuntimeModule.h"
 
 #include "ZConjugateRegistry.h"
-#include "CLR/IZSharpCLR.h"
+#include "CLR/IZSharpClr.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ZCall/ZCallResolver_Export.h"
 #include "ZCall/ZCallResolver_UFunction.h"
@@ -54,7 +54,7 @@ void FZSharpRuntimeModule::ShutdownModule()
 
 void FZSharpRuntimeModule::CreateMasterAlc()
 {
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().CreateMasterAlc();
+	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().CreateMasterAlc();
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_Export{}, 0);
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UFunction{}, 1);
 	alc->LoadAssembly(FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "ZeroGames.ZSharp.UnrealEngine.dll"));
@@ -62,7 +62,7 @@ void FZSharpRuntimeModule::CreateMasterAlc()
 
 void FZSharpRuntimeModule::UnloadMasterAlc()
 {
-	ZSharp::IZSharpCLR::Get().GetMasterAlc()->Unload();
+	ZSharp::IZSharpClr::Get().GetMasterAlc()->Unload();
 }
 
 void FZSharpRuntimeModule::HandleBeginPIE(const bool bSimulating)

@@ -1,11 +1,10 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.Core;
 
-internal static class CLR_Interop
+internal static class Clr_Interop
 {
 
     [UnmanagedCallersOnly]

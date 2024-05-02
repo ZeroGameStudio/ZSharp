@@ -45,7 +45,7 @@ public class ProjectDefinition
 	public string ProjectFileExtension => Language.ToLower() switch
 	{
 		"c#" or "cs" or "csharp" => ".csproj",
-		_ => throw new InvalidOperationException($"Unknown language: {Language}")
+		_ => throw new ArgumentException($"Unknown language: {Language}")
 	};
 
 	public string ProjectFileName => $"{Name}{ProjectFileExtension}";

@@ -8,13 +8,14 @@ using System.Xml;
 
 namespace ZeroGames.ZSharp.Build.Solution;
 
+[BuildTarget("Solution")]
 public class BuildTarget_GenerateSolution : BuildTargetBase
 {
 
     public BuildTarget_GenerateSolution(IBuildEngine engine) : base(engine)
     {
-        _projectDir = engine.GetArgument("projectdir") ?? throw new InvalidOperationException("Argument [projectdir] does not exist.");
-        string sourcePaths = engine.GetArgument("source") ?? throw new InvalidOperationException("Argument [source] does not exist.");
+        _projectDir = engine.GetArgument("projectdir") ?? throw new ArgumentException("Argument [projectdir] does not exist.");
+        string sourcePaths = engine.GetArgument("source") ?? throw new ArgumentException("Argument [source] does not exist.");
         _sourcePaths = sourcePaths.Split(';').ToList();
         
         _projectMap = new(GatherProjectDefinitions());

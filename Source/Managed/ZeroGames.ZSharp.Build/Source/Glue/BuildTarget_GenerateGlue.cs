@@ -2,6 +2,7 @@
 
 namespace ZeroGames.ZSharp.Build.Glue;
 
+[BuildTarget("Glue")]
 public class BuildTarget_GenerateGlue : BuildTargetBase
 {
 	

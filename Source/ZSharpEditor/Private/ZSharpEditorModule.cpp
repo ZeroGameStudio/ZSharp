@@ -28,7 +28,7 @@ namespace ZSharp::FZSharpEditorModule_Private
 			FString sourceArg = FString::Printf(TEXT("source=%s"), *FString::Printf(TEXT("%s;%s"), *projectManagedSourceDir, *pluginManagedSourceDir));
 			const TCHAR* argv[] =
 			{
-				TEXT("target=1"),
+				TEXT("target=solution"),
 				*projectDirArg,
 				*sourceArg,
 			};

@@ -3,8 +3,6 @@
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Xml;
 
 namespace ZeroGames.ZSharp.Build.Solution;
 
@@ -66,7 +64,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
         {
             if (bSearchFile)
             {
-                string fileName = $"{new DirectoryInfo(subpath).Name}.json";
+                string fileName = $"{new DirectoryInfo(subpath).Name}.zsproj";
                 string? filePath = Directory.GetFiles(subpath, fileName, SearchOption.AllDirectories).FirstOrDefault();
                 if (filePath is not null)
                 {

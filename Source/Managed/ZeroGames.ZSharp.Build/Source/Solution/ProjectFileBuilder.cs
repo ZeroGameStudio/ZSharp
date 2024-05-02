@@ -101,6 +101,10 @@ public class ProjectFileBuilder
 		Append("ZSharpProjectDir", Path.Combine(_unrealProjectDir, "Intermediate/ZSharp/ProjectFiles"));
 		Append("ZSharpDir", _zsharpPluginDir);
 		Append("SourceDir", _project.SourceDir);
+		if (_project.bHasGlue)
+		{
+			Append("GlueDir", Path.Combine(_unrealProjectDir, "Intermediate/ZSharp/Glue", _project.Name));
+		}
 
 		projectNode.AppendChild(propertyGroupNode);
 		return propertyGroupNode;
@@ -189,13 +193,20 @@ public class ProjectFileBuilder
 		XmlElement compileNode = doc.CreateElement("Compile");
 		compileNode.SetAttribute("Include", "$(SourceDir)/**/*.cs");
 		itemGroupNode.AppendChild(compileNode);
-
+		
 		XmlElement contentNode = doc.CreateElement("Content");
-		contentNode.SetAttribute("Include", "$(SourceDir)/$(ProjectName).json");
+		contentNode.SetAttribute("Include", "$(SourceDir)/$(ProjectName).zsproj");
 		XmlElement contentLinkNode = doc.CreateElement("Link");
-		contentLinkNode.InnerText = $"{_project.Name}.json";
+		contentLinkNode.InnerText = $"{_project.Name}.zsproj";
 		contentNode.AppendChild(contentLinkNode);
 		itemGroupNode.AppendChild(contentNode);
+		
+		if (_project.bHasGlue)
+		{
+			XmlElement glueNode = doc.CreateElement("Compile");
+			glueNode.SetAttribute("Include", "$(GlueDir)/**/*.cs");
+			itemGroupNode.AppendChild(glueNode);
+		}
 
 		projectNode.AppendChild(itemGroupNode);
 		return itemGroupNode;

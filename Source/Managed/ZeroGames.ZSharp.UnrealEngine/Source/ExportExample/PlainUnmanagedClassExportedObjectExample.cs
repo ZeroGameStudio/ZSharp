@@ -11,7 +11,7 @@ using ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 namespace ZeroGames.ZSharp.UnrealEngine.ExportExample; /* Namespace = AssemblyName + ModuleName */
 
-/* Add an attribute [ZeroGames.ZSharp.UnrealEngine.Export.Intrinsic] for user provided glue, [ZeroGames.ZSharp.UnrealEngine.Export.Generated] for generated glue. */
+[System.CodeDom.Compiler.GeneratedCode("ZSharp", "0.0.1")]
 public class PlainUnmanagedClassExportedObjectExample /* Class name can be customized */
     : ZeroGames.ZSharp.UnrealEngine.Export.PlainUnmanagedClassExportedObjectBase /* Inherit from this if no base class */
     , IConjugate<PlainUnmanagedClassExportedObjectExample> /* Implement IConjugate<> to provide factory */

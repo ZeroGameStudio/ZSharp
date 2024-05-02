@@ -81,8 +81,8 @@ public class SolutionFileBuilder
 			sb.Append(pair.Value).Append("\n");
 		}
 
-		sb.Append("Global");
-		sb.Append(@"
+		sb.Append(
+@"Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		DebugGame|Any CPU = DebugGame|Any CPU
 		DebugGame Editor|Any CPU = DebugGame Editor|Any CPU

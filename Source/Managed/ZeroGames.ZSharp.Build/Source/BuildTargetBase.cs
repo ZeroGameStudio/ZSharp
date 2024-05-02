@@ -9,11 +9,8 @@ public abstract class BuildTargetBase : IBuildTarget
     {
         Engine = engine;
     }
-    
-    public virtual Task<string> BuildAsync()
-    {
-        return Task.Run(() => "");
-    }
+
+    public abstract Task<string> BuildAsync();
     
     public IBuildEngine Engine { get; }
     

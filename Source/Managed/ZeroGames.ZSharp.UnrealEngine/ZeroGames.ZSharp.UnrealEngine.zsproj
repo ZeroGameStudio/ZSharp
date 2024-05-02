@@ -1,11 +1,13 @@
 {
 	"ParentFolder": "ZSharp",
+	"HasGlue": true,
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
 	"AssemblyVersion": "0.0.1",
 	"FileVersion": "0.0.1",
 	"NeutralLanguage": "zh",
-	"ProjectReferences": [
+	"ProjectReferences":
+	[
 		"ZeroGames.ZSharp.Core",
 		"ZeroGames.ZSharp.UnrealEngine.Core"
 	]

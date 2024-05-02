@@ -25,6 +25,8 @@ public class ProjectDefinition
 	[JsonPropertyName("UnrealStylePrimitiveTypeAliases")]
 	public bool bUnrealStylePrimitiveTypeAliases { get; init; } = true;
 
+	[JsonPropertyName("HasGlue")] public bool bHasGlue { get; init; } = false;
+
 	public string Authors { get; init; } = string.Empty;
 	public string Company { get; init; } = string.Empty;
 	public string AssemblyVersion { get; init; } = string.Empty;

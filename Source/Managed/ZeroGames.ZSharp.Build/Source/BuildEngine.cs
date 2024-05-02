@@ -40,7 +40,7 @@ public class BuildEngine : IBuildEngine
             throw new InvalidOperationException("BuildEngine runs with no target.");
         }
 
-        return new BuildTarget_GenerateSolution(this);
+        return new Solution.BuildTarget_GenerateSolution(this);
     }
 
     private Dictionary<string, string> _argumentMap;

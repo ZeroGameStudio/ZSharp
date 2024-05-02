@@ -26,35 +26,35 @@ namespace ZSharp
 		virtual void CollectGarbage(int32 generation = -1, bool bAggressive = true, bool bBlocking = false, bool bCompacting = true) override;
 		
 	public:
-		virtual IZMasterAssemblyLoadContext* CreateMasterALC() override;
-		virtual IZMasterAssemblyLoadContext* GetMasterALC() override;
-		virtual void GetMasterALC_AnyThread(TFunctionRef<void(IZMasterAssemblyLoadContext*)> action) override;
-		virtual IZSlimAssemblyLoadContext* CreateSlimALC(const FString& name) override;
-		virtual IZSlimAssemblyLoadContext* GetSlimALC(const FString& name) override;
+		virtual IZMasterAssemblyLoadContext* CreateMasterAlc() override;
+		virtual IZMasterAssemblyLoadContext* GetMasterAlc() override;
+		virtual void GetMasterAlc_AnyThread(TFunctionRef<void(IZMasterAssemblyLoadContext*)> action) override;
+		virtual IZSlimAssemblyLoadContext* CreateSlimAlc(const FString& name) override;
+		virtual IZSlimAssemblyLoadContext* GetSlimAlc(const FString& name) override;
 
 	public:
-		virtual FDelegateHandle RegisterMasterALCLoaded(FZOnMasterALCLoaded::FDelegate delegate, bool bNotifyIfLoaded = true) override;
-		virtual void UnregisterMasterALCLoaded(FDelegateHandle delegate) override;
-		virtual void UnregisterMasterALCLoaded(const void* userObject) override;
-		virtual FDelegateHandle RegisterMasterALCUnloaded(FZOnMasterALCUnloaded::FDelegate delegate) override;
-		virtual void UnregisterMasterALCUnloaded(FDelegateHandle delegate) override;
-		virtual void UnregisterMasterALCUnloaded(const void* userObject) override;
+		virtual FDelegateHandle RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate, bool bNotifyIfLoaded = true) override;
+		virtual void UnregisterMasterAlcLoaded(FDelegateHandle delegate) override;
+		virtual void UnregisterMasterAlcLoaded(const void* userObject) override;
+		virtual FDelegateHandle RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate delegate) override;
+		virtual void UnregisterMasterAlcUnloaded(FDelegateHandle delegate) override;
+		virtual void UnregisterMasterAlcUnloaded(const void* userObject) override;
 
 	private:
 		void HandleGarbageCollectComplete();
-		void HandleMasterALCUnloaded();
-		void HandleSlimALCUnloaded(const FString& name);
+		void HandleMasterAlcUnloaded();
+		void HandleSlimAlcUnloaded(const FString& name);
 
 	private:
 		bool bInitialized = false;
-		FCriticalSection MasterALCCriticalSection;
-		TUniquePtr<IZMasterAssemblyLoadContext> MasterALC;
-		FRWLock SlimALCMapLock;
-		TMap<FString, TUniquePtr<IZSlimAssemblyLoadContext>> SlimALCMap;
+		FCriticalSection MasterAlcCriticalSection;
+		TUniquePtr<IZMasterAssemblyLoadContext> MasterAlc;
+		FRWLock SlimAlcMapLock;
+		TMap<FString, TUniquePtr<IZSlimAssemblyLoadContext>> SlimAlcMap;
 
 	private:
-		FZOnMasterALCLoaded OnMasterALCLoaded;
-		FZOnMasterALCUnloaded OnMasterALCUnloaded;
+		FZOnMasterAlcLoaded OnMasterAlcLoaded;
+		FZOnMasterAlcUnloaded OnMasterAlcUnloaded;
 		
 	};
 }

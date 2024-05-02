@@ -36,7 +36,7 @@ namespace ZSharp
 		static FZConjugateRegistry* Get();
 
 	public:
-		explicit FZConjugateRegistry(IZMasterAssemblyLoadContext* masterALC);
+		explicit FZConjugateRegistry(IZMasterAssemblyLoadContext* masterAlc);
 		~FZConjugateRegistry();
 
 	public:
@@ -58,8 +58,8 @@ namespace ZSharp
 		T* Conjugate(FZConjugateHandle managed) const { return StaticCast<T*>(Conjugate(managed)); }
 
 	private:
-		static void HandleMasterALCLoaded(IZMasterAssemblyLoadContext* alc);
-		static void HandleMasterALCUnloaded();
+		static void HandleMasterAlcLoaded(IZMasterAssemblyLoadContext* alc);
+		static void HandleMasterAlcUnloaded();
 
 	private:
 		void ReleaseConjugates(bool bCapturedOnly);
@@ -78,7 +78,7 @@ namespace ZSharp
 		static TUniquePtr<FZConjugateRegistry> GSingleton;
 
 	private:
-		IZMasterAssemblyLoadContext* MasterALC;
+		IZMasterAssemblyLoadContext* MasterAlc;
 
 	private:
 		// Registries

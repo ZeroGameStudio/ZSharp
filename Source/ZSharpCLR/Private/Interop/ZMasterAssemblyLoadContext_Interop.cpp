@@ -8,7 +8,7 @@
 
 int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByHandle(FZCallHandle handle, FZCallBuffer* buffer)
 {
-	const IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
+	const IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterAlc();
 	if (!alc)
 	{
 		return -1;
@@ -19,7 +19,7 @@ int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByHandle(FZCallHandle ha
 
 int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByName(const TCHAR* name, FZCallBuffer* buffer, FZCallHandle* outHandle)
 {
-	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
+	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterAlc();
 	if (!alc)
 	{
 		return -1;
@@ -30,7 +30,7 @@ int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByName(const TCHAR* name
 
 void ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByHandle_AnyThread(FZCallHandle handle, FZCallBuffer* buffer, int32 numSlots)
 {
-	IZSharpCLR::Get().GetMasterALC_AnyThread([handle, buffer, numSlots](IZMasterAssemblyLoadContext* alc)
+	IZSharpCLR::Get().GetMasterAlc_AnyThread([handle, buffer, numSlots](IZMasterAssemblyLoadContext* alc)
 	{
 		alc->ZCall_AnyThread(handle, buffer, numSlots);
 	});
@@ -38,7 +38,7 @@ void ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByHandle_AnyThread(FZCall
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext_Interop::GetZCallHandle(const TCHAR* name)
 {
-	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterALC();
+	IZMasterAssemblyLoadContext* alc = IZSharpCLR::Get().GetMasterAlc();
 	if (!alc)
 	{
 		return FZCallHandle{};

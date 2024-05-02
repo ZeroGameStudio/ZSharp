@@ -15,7 +15,7 @@ internal static class CLR_Interop
     });
 
     [UnmanagedCallersOnly]
-    public static GCHandle CreateMasterALC() => Uncaught.ErrorIfUncaught(() =>
+    public static GCHandle CreateMasterAlc() => Uncaught.ErrorIfUncaught(() =>
     {
         MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Create();
 
@@ -23,7 +23,7 @@ internal static class CLR_Interop
     }, default);
 
     [UnmanagedCallersOnly]
-    public static unsafe GCHandle CreateSlimALC(char* name) => Uncaught.ErrorIfUncaught(() =>
+    public static unsafe GCHandle CreateSlimAlc(char* name) => Uncaught.ErrorIfUncaught(() =>
     {
         SlimAssemblyLoadContext alc = SlimAssemblyLoadContext.Create(new string(name));
 

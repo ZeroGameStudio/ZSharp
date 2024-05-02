@@ -18,8 +18,8 @@ class FZSharpRuntimeModule : public IZSharpRuntimeModule
 	virtual void ShutdownModule() override;
 	// End IModuleInterface
 
-	void CreateMasterALC();
-	void UnloadMasterALC();
+	void CreateMasterAlc();
+	void UnloadMasterAlc();
 
 #if WITH_EDITOR
 	void HandleBeginPIE(const bool bSimulating);
@@ -38,7 +38,7 @@ void FZSharpRuntimeModule::StartupModule()
 	FEditorDelegates::PreBeginPIE.AddRaw(this, &ThisClass::HandleBeginPIE);
 	FEditorDelegates::ShutdownPIE.AddRaw(this, &ThisClass::HandleEndPIE);
 #else
-	CreateMasterALC();
+	CreateMasterAlc();
 #endif
 }
 
@@ -48,31 +48,31 @@ void FZSharpRuntimeModule::ShutdownModule()
 	FEditorDelegates::PreBeginPIE.RemoveAll(this);
 	FEditorDelegates::ShutdownPIE.RemoveAll(this);
 #else
-	UnloadMasterALC();
+	UnloadMasterAlc();
 #endif
 }
 
-void FZSharpRuntimeModule::CreateMasterALC()
+void FZSharpRuntimeModule::CreateMasterAlc()
 {
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().CreateMasterALC();
+	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().CreateMasterAlc();
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_Export{}, 0);
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UFunction{}, 1);
 	alc->LoadAssembly(FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "ZeroGames.ZSharp.UnrealEngine.dll"));
 }
 
-void FZSharpRuntimeModule::UnloadMasterALC()
+void FZSharpRuntimeModule::UnloadMasterAlc()
 {
-	ZSharp::IZSharpCLR::Get().GetMasterALC()->Unload();
+	ZSharp::IZSharpCLR::Get().GetMasterAlc()->Unload();
 }
 
 void FZSharpRuntimeModule::HandleBeginPIE(const bool bSimulating)
 {
-	CreateMasterALC();
+	CreateMasterAlc();
 }
 
 void FZSharpRuntimeModule::HandleEndPIE(const bool bSimulating)
 {
-	UnloadMasterALC();
+	UnloadMasterAlc();
 }
 
 

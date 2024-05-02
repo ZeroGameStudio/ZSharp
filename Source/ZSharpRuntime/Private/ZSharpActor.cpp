@@ -20,7 +20,7 @@ void AZSharpActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().GetMasterALC();
+	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().GetMasterAlc();
 	if (alc)
 	{
 		const ZSharp::IZAssembly* assembly = alc->GetAssembly("ZeroGames.ZSharp.UnrealEngine");
@@ -36,7 +36,7 @@ void AZSharpActor::BeginPlay()
 
 void AZSharpActor::EndPlay(const EEndPlayReason::Type endPlayReason)
 {
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().GetMasterALC();
+	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().GetMasterAlc();
 	if (alc)
 	{
 		const ZSharp::IZAssembly* assembly = alc->GetAssembly("ZeroGames.ZSharp.UnrealEngine");
@@ -56,7 +56,7 @@ void AZSharpActor::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
 
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().GetMasterALC();
+	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpCLR::Get().GetMasterAlc();
 	if (alc)
 	{
 		const ZSharp::IZAssembly* assembly = alc->GetAssembly("ZeroGames.ZSharp.UnrealEngine");

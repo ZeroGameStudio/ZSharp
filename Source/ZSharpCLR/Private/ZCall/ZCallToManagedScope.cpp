@@ -8,12 +8,12 @@
 
 ZSharp::FZCallToManagedScope::FZCallToManagedScope()
 {
-	StaticCast<FZMasterAssemblyLoadContext*>(IZSharpCLR::Get().GetMasterALC())->NotifyPreZCallToManaged();
+	StaticCast<FZMasterAssemblyLoadContext*>(IZSharpCLR::Get().GetMasterAlc())->NotifyPreZCallToManaged();
 }
 
 ZSharp::FZCallToManagedScope::~FZCallToManagedScope()
 {
-	StaticCast<FZMasterAssemblyLoadContext*>(IZSharpCLR::Get().GetMasterALC())->NotifyPostZCallToManaged();
+	StaticCast<FZMasterAssemblyLoadContext*>(IZSharpCLR::Get().GetMasterAlc())->NotifyPostZCallToManaged();
 }
 
 

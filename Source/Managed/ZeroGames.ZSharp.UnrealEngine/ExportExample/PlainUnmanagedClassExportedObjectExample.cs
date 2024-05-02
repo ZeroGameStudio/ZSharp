@@ -53,7 +53,7 @@ public class PlainUnmanagedClassExportedObjectExample /* Class name can be custo
             new() { Int32 = default }, /* Return value at last */
         };
         ZCallBuffer buffer = new() { Slots = slots }; /* Construct zcall buffer */
-        GetOwningALC().ZCall(__sZCallHandle_Dtor, &buffer); /* ZCall */
+        GetOwningAlc().ZCall(__sZCallHandle_Dtor, &buffer); /* ZCall */
 
         inOutBool = slots[2].Bool > 0;
         outInt32 = slots[3].Int32;
@@ -72,12 +72,12 @@ public class PlainUnmanagedClassExportedObjectExample /* Class name can be custo
             new() { Conjugate = ConjugateHandle.FromConjugate(this) }, /* this parameter */
         };
         ZCallBuffer buffer = new() { Slots = slots }; /* Construct zcall buffer */
-        GetOwningALC().ZCall_AnyThread(__sZCallHandle_Dtor, &buffer, 1); /* Use ZCall_AnyThread here */
+        GetOwningAlc().ZCall_AnyThread(__sZCallHandle_Dtor, &buffer, 1); /* Use ZCall_AnyThread here */
     }
 
     static PlainUnmanagedClassExportedObjectExample() /* Precache zcalls */
     {
-        MasterAssemblyLoadContext alc = GetOwningALC(); /* Cache a reference to master alc */
+        MasterAssemblyLoadContext alc = GetOwningAlc(); /* Cache a reference to master alc */
         __sZCallHandle_Dtor = alc.PrecacheZCall(__kZCallName_Dtor);
     }
 

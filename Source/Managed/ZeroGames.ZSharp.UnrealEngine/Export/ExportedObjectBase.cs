@@ -34,7 +34,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.Export;
 public abstract class ExportedObjectBase : IConjugate
 {
     
-    public static MasterAssemblyLoadContext GetOwningALC()
+    public static MasterAssemblyLoadContext GetOwningAlc()
     {
         Assembly asm = typeof(ExportedObjectBase).Assembly;
         AssemblyLoadContext? alc = AssemblyLoadContext.GetLoadContext(asm);

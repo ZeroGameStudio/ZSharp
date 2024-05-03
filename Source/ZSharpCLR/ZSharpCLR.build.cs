@@ -34,8 +34,6 @@ public class ZSharpCLR : ModuleRules
 		(
 			new string[]
 			{
-				"CoreUObject",
-				"Engine",
 				"Projects",
 				
 				"Dotnet",

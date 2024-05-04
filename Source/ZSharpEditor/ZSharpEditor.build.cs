@@ -41,6 +41,8 @@ public class ZSharpEditor : ModuleRules
 				
 				"ZSharpCLR",
 				"ZSharpRuntime",
+				
+				"ZSharpExport",
 			}
 		);
 		

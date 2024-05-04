@@ -13,7 +13,7 @@ namespace ZSharp
 		InOut,
 	};
 	
-	class ZSHARPRUNTIME_API IZExportedParameter : public IZExportedVariable
+	class ZSHARPEXPORT_API IZExportedParameter : public IZExportedVariable
 	{
 	public:
 		virtual EZExportedParameterDirection GetDirection() const = 0;

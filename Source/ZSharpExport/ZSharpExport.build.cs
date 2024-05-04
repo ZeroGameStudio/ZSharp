@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class ZSharpRuntime : ModuleRules
+public class ZSharpExport : ModuleRules
 {
-	public ZSharpRuntime(ReadOnlyTargetRules Target) : base(Target)
+	public ZSharpExport(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -36,23 +36,8 @@ public class ZSharpRuntime : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
-				"DeveloperSettings",
-				
-				"ZSharpCLR",
 			}
 		);
-		
-		if (Target.bBuildEditor)
-		{
-			PrivateDependencyModuleNames.AddRange(
-				new string[]
-				{
-					"UnrealEd",
-					
-					"ZSharpExport",
-				}
-			);
-		}
 		
 		DynamicallyLoadedModuleNames.AddRange
 		(
@@ -60,7 +45,5 @@ public class ZSharpRuntime : ModuleRules
 			{
 			}
 		);
-		
-		PublicDefinitions.Add($"ZSHARP_ENGINE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.UnrealEngine\"");
 	}
 }

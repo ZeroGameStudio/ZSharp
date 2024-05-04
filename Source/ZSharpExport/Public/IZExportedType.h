@@ -9,7 +9,7 @@ namespace ZSharp
 {
 	class IZExportedMethod;
 	
-	class ZSHARPRUNTIME_API IZExportedType : public IZExportedMember
+	class ZSHARPEXPORT_API IZExportedType : public IZExportedMember
 	{
 	public:
 		virtual const FString& GetAssemblyName() const = 0;

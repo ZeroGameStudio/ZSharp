@@ -4,13 +4,13 @@
 
 namespace ZSharp
 {
-	class ZSHARPRUNTIME_API IZExportedMember
+	class ZSHARPEXPORT_API IZExportedVariable
 	{
 	public:
-		virtual ~IZExportedMember(){}
+		virtual ~IZExportedVariable(){}
 	public:
 		virtual const FString& GetName() const = 0;
-		virtual bool IsStatic() const = 0;
+		virtual const FString& GetTypeName() const = 0;
 	};
 }
 

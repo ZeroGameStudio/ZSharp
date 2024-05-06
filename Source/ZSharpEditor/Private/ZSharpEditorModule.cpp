@@ -77,10 +77,10 @@ namespace ZSharp::FZSharpEditorModule_Private
 
 			IZExportedTypeRegistry::Get().ForeachExportedEnum([](IZExportedEnum& enm)
 			{
-				UE_LOG(LogTemp, Error, TEXT("Exported Enum Name: [%s] Module: [%s] SlotType: [%d] UnderlyingType: [%s]"),
+				UE_LOG(LogTemp, Error, TEXT("Exported Enum Name: [%s] Module: [%s] SlotType: [%s] UnderlyingType: [%s]"),
 					*enm.GetName(),
 					*enm.GetModule(),
-					enm.GetSlotType(),
+					*ToString(enm.GetSlotType()),
 					*enm.GetUnderlyingType());
 			});
 		}),

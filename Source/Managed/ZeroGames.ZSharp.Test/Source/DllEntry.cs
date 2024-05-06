@@ -2,6 +2,7 @@
 
 using ZeroGames.ZSharp.Core;
 using ZeroGames.ZSharp.UnrealEngine.Core;
+using BindingFlags = System.Reflection.BindingFlags;
 
 [assembly: DllEntry(typeof(ZeroGames.ZSharp.Test.DllEntry))]
 
@@ -9,7 +10,10 @@ namespace ZeroGames.ZSharp.Test;
 
 public class A
 {
-    public int32 X { get; init; }
+    public A(int32 t = 6)
+    {
+        Logger.Log(t);
+    }
 }
 
 internal static class DllEntry
@@ -17,7 +21,8 @@ internal static class DllEntry
     [DllMain]
     private static void DllMain(string[] args)
     {
-        Logger.Error(Path.Combine("Intermediate/ZSharp/ProjectFiles", "ZeroGames.ZSharp.Build"));
+        var ctor = typeof(A).GetConstructor(BindingFlags.Public | BindingFlags.Instance, new Type[] { typeof(int32) })!;
+        ctor.Invoke(new object[] { ctor.GetParameters()[0].DefaultValue! });
     }
 }
 

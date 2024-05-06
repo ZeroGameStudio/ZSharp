@@ -8,31 +8,6 @@ namespace ZeroGames.ZSharp.Build.Glue;
 [BuildTarget("Glue")]
 public class BuildTarget_GenerateGlue : BuildTargetBase
 {
-	
-	public BuildTarget_GenerateGlue(IBuildEngine engine) : base(engine)
-	{
-		_glueDir = "D:/Projects/UE5/ZLab/Intermediate/ZSharp/Glue";
-		_createDirectoryLock = new();
-		
-		string path = "D:/Projects/UE5/ZLab/Intermediate";
-		if (!Directory.Exists(path))
-		{
-			Directory.CreateDirectory(path);
-		}
-        
-		path = Path.Combine(path, "ZSharp");
-		if (!Directory.Exists(path))
-		{
-			Directory.CreateDirectory(path);
-		}
-        
-		path = Path.Combine(path, "Glue");
-		if (Directory.Exists(path))
-		{
-			Directory.Delete(path, true);
-		}
-		Directory.CreateDirectory(path);
-	}
 
 	public override async Task<string> BuildAsync()
 	{
@@ -72,6 +47,32 @@ $@"{{
 
 		await Task.WhenAll([enumTask]);
 		return "success";
+	}
+	
+	[FactoryConstructor]
+	private BuildTarget_GenerateGlue(IBuildEngine engine) : base(engine)
+	{
+		_glueDir = "D:/Projects/UE5/ZLab/Intermediate/ZSharp/Glue";
+		_createDirectoryLock = new();
+		
+		string path = "D:/Projects/UE5/ZLab/Intermediate";
+		if (!Directory.Exists(path))
+		{
+			Directory.CreateDirectory(path);
+		}
+        
+		path = Path.Combine(path, "ZSharp");
+		if (!Directory.Exists(path))
+		{
+			Directory.CreateDirectory(path);
+		}
+        
+		path = Path.Combine(path, "Glue");
+		if (Directory.Exists(path))
+		{
+			Directory.Delete(path, true);
+		}
+		Directory.CreateDirectory(path);
 	}
 
 	private async ValueTask GenerateEnum(ExportedEnum exportedEnum)

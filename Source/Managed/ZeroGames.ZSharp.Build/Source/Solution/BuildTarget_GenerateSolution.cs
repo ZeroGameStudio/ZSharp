@@ -9,12 +9,26 @@ namespace ZeroGames.ZSharp.Build.Solution;
 [BuildTarget("Solution")]
 public class BuildTarget_GenerateSolution : BuildTargetBase
 {
-
-    public BuildTarget_GenerateSolution(IBuildEngine engine) : base(engine)
+    
+    public override async Task<string> BuildAsync()
     {
-        _projectDir = engine.GetArgument("projectdir") ?? throw new ArgumentException("Argument [projectdir] does not exist.");
-        string sourcePaths = engine.GetArgument("source") ?? throw new ArgumentException("Argument [source] does not exist.");
-        _sourcePaths = sourcePaths.Split(';').ToList();
+        if (!Directory.Exists(_projectDir))
+        {
+            throw new FileNotFoundException($"Project dir {_projectDir} not exists.");
+        }
+
+        List<Task<string>> tasks = _projectMap.Select(pair => GenerateProjectFile(pair.Value)).ToList();
+        tasks.Add(GenerateSolutionFile());
+        await Task.WhenAll(tasks);
+
+        return string.Join("\n", tasks.Select(task => task.Result));
+    }
+    
+    [FactoryConstructor]
+    private BuildTarget_GenerateSolution(IBuildEngine engine, [Argument("projectdir")] string projectDir, [Argument("source")] string source) : base(engine)
+    {
+        _projectDir = projectDir;
+        _sourcePaths = source.Split(';').ToList();
         
         _projectMap = new(GatherProjectDefinitions());
         if (_projectMap.Count > 0)
@@ -38,20 +52,6 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
             }
             Directory.CreateDirectory(path);
         }
-    }
-    
-    public override async Task<string> BuildAsync()
-    {
-        if (!Directory.Exists(_projectDir))
-        {
-            throw new FileNotFoundException($"Project dir {_projectDir} not exists.");
-        }
-
-        List<Task<string>> tasks = _projectMap.Select(pair => GenerateProjectFile(pair.Value)).ToList();
-        tasks.Add(GenerateSolutionFile());
-        await Task.WhenAll(tasks);
-
-        return string.Join("\n", tasks.Select(task => task.Result));
     }
 
     private Dictionary<string, ProjectDefinition> GatherProjectDefinitions() => Task.WhenAll(_sourcePaths.Select(GatherProjectDefinition)).Result.SelectMany(projects => projects).ToDictionary(project => project.Name);

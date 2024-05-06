@@ -98,12 +98,12 @@ public class ProjectFileBuilder
 		Append("Configurations", "DebugGame;DebugGame Editor;Development;Development Editor;Shipping;Shipping Editor");
 		Append("Platforms", "AnyCPU");
 		Append("UnrealProjectDir", _unrealProjectDir);
-		Append("ZSharpProjectDir", Path.Combine(_unrealProjectDir, "Intermediate/ZSharp/ProjectFiles"));
+		Append("ZSharpProjectDir", $"{_unrealProjectDir}/Intermediate/ZSharp/ProjectFiles");
 		Append("ZSharpDir", _zsharpPluginDir);
 		Append("SourceDir", _project.SourceDir);
 		if (_project.HasGlue)
 		{
-			Append("GlueDir", Path.Combine(_unrealProjectDir, "Intermediate/ZSharp/Glue", _project.Name));
+			Append("GlueDir", $"{_unrealProjectDir}/Intermediate/ZSharp/Glue/{_project.Name}");
 		}
 
 		projectNode.AppendChild(propertyGroupNode);

@@ -44,9 +44,9 @@ public class ProjectDefinition
 
 	public string ProjectFileName => $"{Name}{ProjectFileExtension}";
 
-	public string ProjectFileDir => Path.Combine("Intermediate/ZSharp/ProjectFiles", Name);
+	public string ProjectFileDir => $"Intermediate/ZSharp/ProjectFiles/{Name}";
 
-	public string ProjectFilePath => Path.Combine(ProjectFileDir, ProjectFileName);
+	public string ProjectFilePath => $"{ProjectFileDir}/{ProjectFileName}";
 }
 
 

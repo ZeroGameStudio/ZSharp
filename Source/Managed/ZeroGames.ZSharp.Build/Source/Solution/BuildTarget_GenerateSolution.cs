@@ -33,19 +33,19 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
         _projectMap = new(GatherProjectDefinitions());
         if (_projectMap.Count > 0)
         {
-            string path = Path.Combine(_projectDir, "Intermediate");
+            string path = $"{_projectDir}/Intermediate";
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
         
-            path = Path.Combine(path, "ZSharp");
+            path = $"{path}/ZSharp";
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
         
-            path = Path.Combine(path, "ProjectFiles");
+            path = $"{path}/ProjectFiles";
             if (Directory.Exists(path))
             {
                 Directory.Delete(path, true);
@@ -76,7 +76,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
             Array.ForEach(Directory.GetDirectories(subpath), p => GetProjectDefinition(p));
         }
 
-        GetProjectDefinition(Path.Combine(_projectDir, path), false);
+        GetProjectDefinition(path, false);
 
         List<FileStream> openFiles = new();
         List<ProjectDefinition> projects = new();
@@ -111,20 +111,20 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
 
     private async Task<string> GenerateProjectFile(ProjectDefinition project)
     {
-        string projectFileDir = Path.Combine(_projectDir, project.ProjectFileDir);
+        string projectFileDir = $"{_projectDir}/{project.ProjectFileDir}";
         if (Directory.Exists(projectFileDir))
         {
             throw new InvalidOperationException($"Directory {projectFileDir} already exists.");
         }
         Directory.CreateDirectory(projectFileDir);
 
-        string path = Path.Combine(_projectDir, project.ProjectFilePath);
+        string path = $"{_projectDir}/{project.ProjectFilePath}";
 
         await using FileStream fs = File.Create(path);
         await using StreamWriter sw = new(fs, Encoding.UTF8);
 
         // @FIXME: PluginDir
-        ProjectFileBuilder builder = new(project, _projectDir, Path.Combine(_projectDir, "Plugins/ZeroGames/ZSharp"));
+        ProjectFileBuilder builder = new(project, _projectDir, $"{_projectDir}/Plugins/ZeroGames/ZSharp");
 
         await sw.WriteAsync(builder.ToString());
 
@@ -134,7 +134,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
     private async Task<string> GenerateSolutionFile()
     {
         // @FIXME: Solution file name
-        string path = Path.Combine(_projectDir, "ZLabScript.sln");
+        string path = $"{_projectDir}/ZLabScript.sln";
         await using FileStream fs = File.Create(path);
         await using StreamWriter sw = new(fs, Encoding.UTF8);
 

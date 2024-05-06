@@ -12,7 +12,7 @@ public class BuildTarget_GenerateGlue : BuildTargetBase
 	public override async Task<string> BuildAsync()
 	{
 		{
-			await using FileStream f = File.Create(Path.Combine(_glueDir, ".glue"));
+			await using FileStream f = File.Create($"{_glueDir}/.glue");
 			await using StreamWriter sw = new(f, Encoding.UTF8);
 			sw.Write(
 $@"{{
@@ -36,7 +36,7 @@ $@"{{
 ");
 		}
 		
-		await using FileStream fs = File.OpenRead(Path.Combine(_glueDir, ".glue"));
+		await using FileStream fs = File.OpenRead($"{_glueDir}/.glue");
 		_registry = await JsonSerializer.DeserializeAsync<ExportedTypeRegistry>(fs);
 		if (_registry is null)
 		{
@@ -50,35 +50,17 @@ $@"{{
 	}
 	
 	[FactoryConstructor]
-	private BuildTarget_GenerateGlue(IBuildEngine engine) : base(engine)
+	private BuildTarget_GenerateGlue(IBuildEngine engine, [Argument("projectdir")] string projectDir) : base(engine)
 	{
+		_projectDir = projectDir;
 		_glueDir = "D:/Projects/UE5/ZLab/Intermediate/ZSharp/Glue";
 		_createDirectoryLock = new();
-
-		string path = "D:/Projects/UE5/ZLab/Intermediate";
-		if (!Directory.Exists(path))
-		{
-			Directory.CreateDirectory(path);
-		}
-        
-		path = Path.Combine(path, "ZSharp");
-		if (!Directory.Exists(path))
-		{
-			Directory.CreateDirectory(path);
-		}
-        
-		path = Path.Combine(path, "Glue");
-		if (Directory.Exists(path))
-		{
-			Directory.Delete(path, true);
-		}
-		Directory.CreateDirectory(path);
 	}
 
 	private async ValueTask GenerateEnum(ExportedEnum exportedEnum)
 	{
 		CreateDirectoryForAssemblyIfNotExists(exportedEnum.Assembly);
-		await using FileStream fs = File.Create(Path.Combine(_glueDir, exportedEnum.Assembly, "Glue", $"{exportedEnum.Name}.cs"));
+		await using FileStream fs = File.Create($"{_glueDir}/{exportedEnum.Assembly}/Glue/{exportedEnum.Name}.cs");
 		await using EnumWriter ew = new(exportedEnum, fs);
 		await ew.WriteAsync();
 	}
@@ -87,8 +69,8 @@ $@"{{
 	{
 		lock (_createDirectoryLock)
 		{
-			string dir = Path.Combine(_glueDir, assembly);
-			string glueDir = Path.Combine(dir, "Glue");
+			string dir = $"{_glueDir}/{assembly}";
+			string glueDir = $"{dir}/Glue";
 			if (!Directory.Exists(dir))
 			{
 				Directory.CreateDirectory(dir);
@@ -102,6 +84,7 @@ $@"{{
 	}
 	
 	private ExportedTypeRegistry? _registry;
+	private string _projectDir;
 	private string _glueDir;
 	private object _createDirectoryLock;
 

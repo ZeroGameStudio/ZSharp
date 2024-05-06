@@ -35,7 +35,8 @@ public class ZSharpExport : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Engine",
+				
+				"ZSharpCLR",
 			}
 		);
 		

@@ -2,13 +2,24 @@
 
 #include "ZSharpEditorModule.h"
 
+#include "IZExportedTypeRegistry.h"
+#include "ZSharpRuntimeSettings.h"
 #include "ALC/ZCommonDllMainArgs.h"
 #include "CLR/IZSharpClr.h"
+#include "Dynamic/ZDynamicExportedEnum.h"
 #include "Interfaces/IPluginManager.h"
+#include "Static/ZStaticExportedEnum.h"
+
+ZSHARP_DECLARE_EXPORTED_ENUM(EForceInit, EForceInit, Core)
+
+ZSHARP_BEGIN_EXPORT_ENUM(EForceInit)
+	ZSHARP_EXPORT_ENUM_VALUE(ForceInit)
+	ZSHARP_EXPORT_ENUM_VALUE(ForceInitToZero)
+ZSHARP_END_EXPORT_ENUM(EForceInit)
 
 namespace ZSharp::FZSharpEditorModule_Private
 {
-	static FAutoConsoleCommand GCmdDotnetRun(
+	static FAutoConsoleCommand GCmdZSharpGen(
 		TEXT("zsharp.Gen"),
 		TEXT("Generate zsharp solution and project files."),
 		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& args)
@@ -34,6 +45,44 @@ namespace ZSharp::FZSharpEditorModule_Private
 			};
 			FZCommonDllMainArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
 			IZSharpClr::Get().Run(dllPath, &commonArgs);
+		}),
+		ECVF_Default);
+
+	static FAutoConsoleCommand GCmdZSharpGlue(
+		TEXT("zsharp.Glue"),
+		TEXT("Generate zsharp glue code."),
+		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& args)
+		{
+			for (TObjectIterator<UEnum> It; It; ++It)
+			{
+				UEnum* enm = *It;
+				if (!enm->IsNative())
+				{
+					continue;
+				}
+
+				FString module;
+				bool bSuc = enm->GetPackage()->GetName().Split("/", nullptr, &module, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+				if (!bSuc || !GetDefault<UZSharpRuntimeSettings>()->IsModuleMapped(module))
+				{
+					continue;
+				}
+
+				const auto* exportedEnum = new FZDynamicExportedEnum { enm };
+				if (!exportedEnum->IsRegistered())
+				{
+					delete exportedEnum;
+				}
+			}
+
+			IZExportedTypeRegistry::Get().ForeachExportedEnum([](IZExportedEnum& enm)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Exported Enum Name: [%s] Module: [%s] SlotType: [%d] UnderlyingType: [%s]"),
+					*enm.GetName(),
+					*enm.GetModule(),
+					enm.GetSlotType(),
+					*enm.GetUnderlyingType());
+			});
 		}),
 		ECVF_Default);
 }

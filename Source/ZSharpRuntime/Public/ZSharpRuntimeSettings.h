@@ -19,6 +19,10 @@ public:
 public:
 	virtual FName GetCategoryName() const override { return TEXT("ZSharp"); }
 
+public:
+	bool IsModuleMapped(const FString& module) const;
+	void ForeachMappedModule(TFunctionRef<void(const FString&, const FString&)> action) const;
+
 private:
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Assembly")
 	FString CoreAssemblyName = ZSHARP_CORE_ASSEMBLY_NAME;

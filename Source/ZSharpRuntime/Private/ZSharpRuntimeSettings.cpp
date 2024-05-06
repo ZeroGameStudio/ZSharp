@@ -10,4 +10,22 @@ UZSharpRuntimeSettings::UZSharpRuntimeSettings()
 	IntrinsicModuleAssemblyMapping.Emplace("Engine", EngineAssemblyName);
 }
 
+bool UZSharpRuntimeSettings::IsModuleMapped(const FString& module) const
+{
+	return ModuleAssemblyMapping.Contains(module) || IntrinsicModuleAssemblyMapping.Contains(module);
+}
+
+void UZSharpRuntimeSettings::ForeachMappedModule(TFunctionRef<void(const FString&, const FString&)> action) const
+{
+	for (const auto& pair : IntrinsicModuleAssemblyMapping)
+	{
+		action(pair.Key, pair.Value);
+	}
+
+	for (const auto& pair : ModuleAssemblyMapping)
+	{
+		action(pair.Key, pair.Value);
+	}
+}
+
 

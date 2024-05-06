@@ -5,7 +5,7 @@
 
 #include "CLR/IZSharpClr.h"
 
-static FAutoConsoleCommand GCmdDotnetRun(
+static FAutoConsoleCommand GCmdGlueGenerator(
 	TEXT("gluegenerator"),
 	TEXT(""),
 	FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args)

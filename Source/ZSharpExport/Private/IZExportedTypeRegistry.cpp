@@ -7,9 +7,17 @@
 
 ZSharp::IZExportedTypeRegistry& ZSharp::IZExportedTypeRegistry::Get()
 {
-	static FZExportedTypeRegistry GSingleton;
+	return FZExportedTypeRegistry::Get();
+}
 
-	return GSingleton;
+bool ZSharp::IZExportedTypeRegistry_Private::RegisterClass(IZExportedClass* cls)
+{
+	return FZExportedTypeRegistry::Get().RegisterClass(cls);
+}
+
+bool ZSharp::IZExportedTypeRegistry_Private::RegisterEnum(IZExportedEnum* enm)
+{
+	return FZExportedTypeRegistry::Get().RegisterEnum(enm);
 }
 
 

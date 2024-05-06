@@ -11,7 +11,7 @@ public readonly struct ConjugateHandle
     public static ConjugateHandle FromGCHandle(GCHandle handle) => new(handle);
     public GCHandle ToGCHandle() => GCHandle.FromIntPtr(_handle);
 
-    public bool bValid => _handle != IntPtr.Zero;
+    public bool Valid => _handle != IntPtr.Zero;
 
     private ConjugateHandle(GCHandle handle)
     {

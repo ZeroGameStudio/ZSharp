@@ -78,9 +78,9 @@ public class ProjectFileBuilder
 		void Append(string childName, string childInnerText) => AppendSimpleChild(doc, propertyGroupNode, childName, childInnerText);
 		Append("ProjectName", _project.Name);
 		Append("TargetFramework", "net8.0");
-		Append("ImplicitUsings", _project.bImplicitUsings ? "enable" : "disable");
-		Append("Nullable", _project.bNullable ? "enable" : "disable");
-		Append("AllowUnsafeBlocks", _project.bAllowUnsafeBlocks.ToString().ToLower());
+		Append("ImplicitUsings", _project.ImplicitUsingEnabled ? "enable" : "disable");
+		Append("Nullable", _project.Nullable ? "enable" : "disable");
+		Append("AllowUnsafeBlocks", _project.UnsafeBlockEnabled.ToString().ToLower());
 		Append("Authors", _project.Authors);
 		Append("Company", _project.Company);
 		Append("AssemblyVersion", _project.AssemblyVersion);
@@ -88,7 +88,7 @@ public class ProjectFileBuilder
 		Append("NeutralLanguage", _project.NeutralLanguage);
 
 		List<string> finalWarningsToErros = [.._project.WarningsAsErrors];
-		if (_project.bStrongRestrictedNullable)
+		if (_project.StrongRestrictedNullable)
 		{
 			finalWarningsToErros.Add("CS8600;CS8601;CS8602;CS8603;CS8604;CS8609;CS8610;CS8614;CS8616;CS8618;CS8619;CS8622;CS8625");
 		}
@@ -101,7 +101,7 @@ public class ProjectFileBuilder
 		Append("ZSharpProjectDir", Path.Combine(_unrealProjectDir, "Intermediate/ZSharp/ProjectFiles"));
 		Append("ZSharpDir", _zsharpPluginDir);
 		Append("SourceDir", _project.SourceDir);
-		if (_project.bHasGlue)
+		if (_project.HasGlue)
 		{
 			Append("GlueDir", Path.Combine(_unrealProjectDir, "Intermediate/ZSharp/Glue", _project.Name));
 		}
@@ -147,18 +147,17 @@ public class ProjectFileBuilder
 			itemGroupNode.AppendChild(usingNode);
 		});
 
-		Dictionary<string, string> finalAliases = new(_project.Aliases);
-		if (_project.bUnrealStylePrimitiveTypeAliases)
+		Dictionary<string, string> finalAliases = new(_project.Aliases)
 		{
-			finalAliases["System.Byte"] = "uint8";
-			finalAliases["System.UInt16"] = "uint16";
-			finalAliases["System.UInt32"] = "uint32";
-			finalAliases["System.UInt64"] = "uint64";
-			finalAliases["System.SByte"] = "int8";
-			finalAliases["System.Int16"] = "int16";
-			finalAliases["System.Int32"] = "int32";
-			finalAliases["System.Int64"] = "int64";
-		}
+			{ "System.Byte", "uint8" },
+			{ "System.UInt16", "uint16" },
+			{ "System.UInt32", "uint32" },
+			{ "System.UInt64", "uint64" },
+			{ "System.SByte", "int8" },
+			{ "System.Int16", "int16" },
+			{ "System.Int32", "int32" },
+			{ "System.Int64", "int64" },
+		};
 
 		foreach (var pair in finalAliases)
 		{
@@ -201,7 +200,7 @@ public class ProjectFileBuilder
 		contentNode.AppendChild(contentLinkNode);
 		itemGroupNode.AppendChild(contentNode);
 		
-		if (_project.bHasGlue)
+		if (_project.HasGlue)
 		{
 			XmlElement glueNode = doc.CreateElement("Compile");
 			glueNode.SetAttribute("Include", "$(GlueDir)/**/*.cs");

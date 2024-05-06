@@ -8,7 +8,7 @@ namespace ZeroGames.ZSharp.Core;
 public struct ZCallHandle
 {
     
-    public bool bValid => _handle > 0;
+    public bool Valid => _handle > 0;
 
     private uint64 _handle;
 

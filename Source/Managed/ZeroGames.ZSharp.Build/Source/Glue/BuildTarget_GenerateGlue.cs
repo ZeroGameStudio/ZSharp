@@ -54,7 +54,7 @@ $@"{{
 	{
 		_glueDir = "D:/Projects/UE5/ZLab/Intermediate/ZSharp/Glue";
 		_createDirectoryLock = new();
-		
+
 		string path = "D:/Projects/UE5/ZLab/Intermediate";
 		if (!Directory.Exists(path))
 		{

@@ -60,9 +60,9 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
     {
         List<string> projectFilePaths = new List<string>();
 
-        void GetProjectDefinition(string subpath, bool bSearchFile = true)
+        void GetProjectDefinition(string subpath, bool searchFile = true)
         {
-            if (bSearchFile)
+            if (searchFile)
             {
                 string fileName = $"{new DirectoryInfo(subpath).Name}.zsproj";
                 string? filePath = Directory.GetFiles(subpath, fileName, SearchOption.AllDirectories).FirstOrDefault();

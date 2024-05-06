@@ -13,19 +13,11 @@ public class ProjectDefinition
 
 	public string TargetFramework { get; init; } = "net8.0";
 	public string Language { get; init; } = "C#";
-	[JsonPropertyName("ImplicitUsings")] public bool bImplicitUsings { get; init; } = true;
-	[JsonPropertyName("Nullable")] public bool bNullable { get; init; } = true;
-
-	[JsonPropertyName("StrongRestrictedNullable")]
-	public bool bStrongRestrictedNullable { get; init; } = true;
-
-	[JsonPropertyName("AllowUnsafeBlocks")]
-	public bool bAllowUnsafeBlocks { get; init; } = true;
-
-	[JsonPropertyName("UnrealStylePrimitiveTypeAliases")]
-	public bool bUnrealStylePrimitiveTypeAliases { get; init; } = true;
-
-	[JsonPropertyName("HasGlue")] public bool bHasGlue { get; init; } = false;
+	public bool ImplicitUsingEnabled { get; init; } = true;
+	public bool Nullable { get; init; } = true;
+	public bool StrongRestrictedNullable { get; init; } = true;
+	public bool UnsafeBlockEnabled { get; init; } = true;
+	public bool HasGlue { get; init; } = false;
 
 	public string Authors { get; init; } = string.Empty;
 	public string Company { get; init; } = string.Empty;

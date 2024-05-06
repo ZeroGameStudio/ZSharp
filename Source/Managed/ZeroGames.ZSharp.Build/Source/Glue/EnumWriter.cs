@@ -26,16 +26,16 @@ public class EnumWriter : IDisposable, IAsyncDisposable
 	public Task WriteAsync() => Task.Run(() =>
 	{
 		StringBuilder enumBody = new();
-		bool bFirstLine = true;
+		bool first = true;
 		foreach (var pair in _exportedEnum.ValueMap)
 		{
-			if (!bFirstLine)
+			if (!first)
 			{
 				enumBody.Append('\n');
 			}
 			else
 			{
-				bFirstLine = false;
+				first = false;
 			}
 
 			enumBody.Append($"\t{pair.Key} = {pair.Value},");

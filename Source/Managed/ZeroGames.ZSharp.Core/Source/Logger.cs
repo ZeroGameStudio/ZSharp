@@ -20,12 +20,12 @@ internal static class Logger
         StringBuilder sb = new();
         if (objects is not null)
         {
-            bool bFirst = true;
+            bool first = true;
             foreach (var obj in objects)
             {
-                if (bFirst)
+                if (first)
                 {
-                    bFirst = false;
+                    first = false;
                 }
                 else
                 {

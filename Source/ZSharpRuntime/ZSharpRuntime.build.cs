@@ -27,6 +27,7 @@ public class ZSharpRuntime : ModuleRules
 			new string[]
 			{
 				"Core",
+				"Engine",
 			}
 		);
 		
@@ -35,7 +36,6 @@ public class ZSharpRuntime : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Engine",
 				"DeveloperSettings",
 				
 				"ZSharpCLR",

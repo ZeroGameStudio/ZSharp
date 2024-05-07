@@ -35,8 +35,11 @@ public class ZSharpBuild : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
+				"Projects",
 				
+				"ZSharpCLR",
 				"ZSharpExport",
+				"ZSharpRuntime",
 			}
 		);
 		

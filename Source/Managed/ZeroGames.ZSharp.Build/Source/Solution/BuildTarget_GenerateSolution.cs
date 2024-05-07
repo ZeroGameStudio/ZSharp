@@ -7,14 +7,14 @@ using System.Text.Json;
 namespace ZeroGames.ZSharp.Build.Solution;
 
 [BuildTarget("Solution")]
-public class BuildTarget_GenerateSolution : BuildTargetBase
+public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
 {
     
     public override async Task<string> BuildAsync()
     {
-        if (!Directory.Exists(_projectDir))
+        if (!Directory.Exists(UnrealProjectDir))
         {
-            throw new FileNotFoundException($"Project dir {_projectDir} not exists.");
+            throw new FileNotFoundException($"Project dir {UnrealProjectDir} not exists.");
         }
 
         List<Task<string>> tasks = _projectMap.Select(pair => GenerateProjectFile(pair.Value)).ToList();
@@ -24,16 +24,22 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
         return string.Join("\n", tasks.Select(task => task.Result));
     }
     
+    public string UnrealProjectDir { get; }
+    
     [FactoryConstructor]
     private BuildTarget_GenerateSolution(IBuildEngine engine, [Argument("projectdir")] string projectDir, [Argument("source")] string source) : base(engine)
     {
-        _projectDir = projectDir;
+        UnrealProjectDir = projectDir;
+        if (!((IUnrealProjectDir)this).Valid)
+        {
+            throw new ArgumentException($"Invalid argument projectdir={projectDir}.");
+        }
         _sourcePaths = source.Split(';').ToList();
         
         _projectMap = new(GatherProjectDefinitions());
         if (_projectMap.Count > 0)
         {
-            string path = $"{_projectDir}/Intermediate";
+            string path = $"{UnrealProjectDir}/Intermediate";
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
@@ -111,20 +117,20 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
 
     private async Task<string> GenerateProjectFile(ProjectDefinition project)
     {
-        string projectFileDir = $"{_projectDir}/{project.ProjectFileDir}";
+        string projectFileDir = $"{UnrealProjectDir}/{project.ProjectFileDir}";
         if (Directory.Exists(projectFileDir))
         {
             throw new InvalidOperationException($"Directory {projectFileDir} already exists.");
         }
         Directory.CreateDirectory(projectFileDir);
 
-        string path = $"{_projectDir}/{project.ProjectFilePath}";
+        string path = $"{UnrealProjectDir}/{project.ProjectFilePath}";
 
         await using FileStream fs = File.Create(path);
         await using StreamWriter sw = new(fs, Encoding.UTF8);
 
         // @FIXME: PluginDir
-        ProjectFileBuilder builder = new(project, _projectDir, $"{_projectDir}/Plugins/ZeroGames/ZSharp");
+        ProjectFileBuilder builder = new(project, UnrealProjectDir, $"{UnrealProjectDir}/Plugins/ZeroGames/ZSharp");
 
         await sw.WriteAsync(builder.ToString());
 
@@ -134,7 +140,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
     private async Task<string> GenerateSolutionFile()
     {
         // @FIXME: Solution file name
-        string path = $"{_projectDir}/ZLabScript.sln";
+        string path = $"{UnrealProjectDir}/ZLabScript.sln";
         await using FileStream fs = File.Create(path);
         await using StreamWriter sw = new(fs, Encoding.UTF8);
 
@@ -153,10 +159,8 @@ public class BuildTarget_GenerateSolution : BuildTargetBase
         return $"Solution file generated: {path}";
     }
 
-    private string _projectDir;
     private List<string> _sourcePaths;
     private ReadOnlyDictionary<string, ProjectDefinition> _projectMap;
-
 }
 
 

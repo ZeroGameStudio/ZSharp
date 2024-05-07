@@ -6,22 +6,43 @@ using System.Text.Json;
 namespace ZeroGames.ZSharp.Build.Glue;
 
 [BuildTarget("Glue")]
-public class BuildTarget_GenerateGlue : BuildTargetBase
+public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 {
 
 	public override async Task<string> BuildAsync()
 	{
+		SetupTestData();
+		
+		await SetupRegistry();
+		await Parallel.ForEachAsync(_registry.ExportedTypes, (type, _) => GenerateType(type));
+
+		return "success";
+	}
+	
+	public string UnrealProjectDir { get; }
+	
+	[FactoryConstructor]
+	private BuildTarget_GenerateGlue(IBuildEngine engine, [Argument("projectdir")] string projectDir) : base(engine)
+	{
+		UnrealProjectDir = projectDir;
+		if (!((IUnrealProjectDir)this).Valid)
 		{
-			await using FileStream f = File.Create($"{_glueDir}/.glue");
-			await using StreamWriter sw = new(f, Encoding.UTF8);
-			sw.Write(
+			throw new ArgumentException($"Invalid argument projectdir={projectDir}.");
+		}
+		_glueDir = $"{projectDir}/Intermediate/ZSharp/Glue";
+	}
+
+	private void SetupTestData()
+	{
+		using FileStream f = File.Create($"{_glueDir}/Game/Manifest.json");
+		using StreamWriter sw = new(f, Encoding.UTF8);
+		sw.Write(
 $@"{{
 	""Enums"":
 	[
 		{{
 			""Name"": ""DamageType"",
 			""Module"": ""ZHotel"",
-			""Assembly"": ""Game"",
 			""UnderlyingType"": ""uint8"",
 			""ValueMap"":
 			{{
@@ -34,60 +55,89 @@ $@"{{
 	]
 }}
 ");
+	}
+
+	private async Task SetupRegistry()
+	{
+		List<string> assemblyPaths = GatherAssemblies();
+		await Parallel.ForEachAsync(assemblyPaths, (path, _) => GenerateAssembly(path));
+		_registry.FinishRegister();
+	}
+
+	private List<string> GatherAssemblies()
+	{
+		List<string> res = new();
+		
+		foreach (var dir in Directory.GetDirectories(_glueDir))
+		{
+			if (!File.Exists($"{dir}/Manifest.json"))
+			{
+				continue;
+			}
+			
+			if (File.Exists($"{dir}/.timestamp"))
+			{
+				continue;
+			}
+			
+			res.Add(dir);
+		}
+
+		return res;
+	}
+
+	private async ValueTask GenerateAssembly(string dir)
+	{
+		await using FileStream fs = File.OpenRead($"{dir}/Manifest.json");
+		ExportedAssembly? assembly = await JsonSerializer.DeserializeAsync<ExportedAssembly>(fs);
+		if (assembly is null)
+		{
+			return;
+		}
+
+		assembly.Name = new DirectoryInfo(dir).Name;
+		foreach (var exportedEnum in assembly.Enums)
+		{
+			exportedEnum.Assembly = assembly;
 		}
 		
-		await using FileStream fs = File.OpenRead($"{_glueDir}/.glue");
-		_registry = await JsonSerializer.DeserializeAsync<ExportedTypeRegistry>(fs);
-		if (_registry is null)
+		_registry.RegisterAssembly(assembly);
+
+		string codeDir = $"{dir}/Glue";
+		if (Directory.Exists(codeDir))
 		{
-			return "no glue";
+			Directory.Delete(codeDir, true);
 		}
 
-		Task enumTask = Parallel.ForEachAsync(_registry.Enums, (exportedEnum, token) => GenerateEnum(exportedEnum));
-
-		await Task.WhenAll([enumTask]);
-		return "success";
+		Directory.CreateDirectory(codeDir);
 	}
-	
-	[FactoryConstructor]
-	private BuildTarget_GenerateGlue(IBuildEngine engine, [Argument("projectdir")] string projectDir) : base(engine)
+
+	private async ValueTask GenerateType(ExportedType exportedType)
 	{
-		_projectDir = projectDir;
-		_glueDir = "D:/Projects/UE5/ZLab/Intermediate/ZSharp/Glue";
-		_createDirectoryLock = new();
+		if (exportedType is ExportedClass exportedClass)
+		{
+			await GenerateClass(exportedClass);
+		}
+		else if (exportedType is ExportedEnum exportedEnum)
+		{
+			await GenerateEnum(exportedEnum);
+		}
+	}
+
+	private ValueTask GenerateClass(ExportedClass exportedClass)
+	{
+		return ValueTask.CompletedTask;
 	}
 
 	private async ValueTask GenerateEnum(ExportedEnum exportedEnum)
 	{
-		CreateDirectoryForAssemblyIfNotExists(exportedEnum.Assembly);
-		await using FileStream fs = File.Create($"{_glueDir}/{exportedEnum.Assembly}/Glue/{exportedEnum.Name}.cs");
+		await using FileStream fs = File.Create($"{_glueDir}/{exportedEnum.Assembly.Name}/Glue/{exportedEnum.Name}.cs");
 		await using EnumWriter ew = new(exportedEnum, fs);
 		await ew.WriteAsync();
 	}
-
-	private void CreateDirectoryForAssemblyIfNotExists(string assembly)
-	{
-		lock (_createDirectoryLock)
-		{
-			string dir = $"{_glueDir}/{assembly}";
-			string glueDir = $"{dir}/Glue";
-			if (!Directory.Exists(dir))
-			{
-				Directory.CreateDirectory(dir);
-				Directory.CreateDirectory(glueDir);
-			}
-			else if (!Directory.Exists(glueDir))
-			{
-				Directory.CreateDirectory(glueDir);
-			}
-		}
-	}
 	
-	private ExportedTypeRegistry? _registry;
-	private string _projectDir;
+	private ExportedAssemblyRegistry _registry = new();
 	private string _glueDir;
-	private object _createDirectoryLock;
-
 }
 
 

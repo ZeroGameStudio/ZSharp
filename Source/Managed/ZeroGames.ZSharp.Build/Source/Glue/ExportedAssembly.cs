@@ -2,8 +2,9 @@
 
 namespace ZeroGames.ZSharp.Build.Glue;
 
-public class ExportedTypeRegistry
+public class ExportedAssembly
 {
+	public string Name { get; set; } = string.Empty;
 	public List<ExportedEnum> Enums { get; set; } = new();
 }
 

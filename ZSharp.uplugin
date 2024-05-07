@@ -31,6 +31,11 @@
 			"LoadingPhase": "EarliestPossible"
 		},
 		{
+			"Name": "ZSharpBuild",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		},
+		{
 			"Name": "ZSharpEditor",
 			"Type": "Editor",
 			"LoadingPhase": "Default"

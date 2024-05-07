@@ -9,7 +9,7 @@
 namespace ZSharp::ZSharpCLRModule_Private
 {
 	static FAutoConsoleCommand GCmdZSharpRun(
-	TEXT("zsharp.Run"),
+	TEXT("zs.run"),
 	TEXT("Load assembly of the specified path to an isolated slim assembly load context and invoke __DllEntry.DllMain(). Unloads the context when return from managed code."),
 	FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& args)
 	{
@@ -31,7 +31,7 @@ namespace ZSharp::ZSharpCLRModule_Private
 	ECVF_Default);
 
 	static FAutoConsoleCommand GCmdZSharpRunAsync(
-		TEXT("zsharp.RunAsync"),
+		TEXT("zs.runa"),
 		TEXT("Load assembly of the specified path to an isolated slim assembly load context and invoke __DllEntry.DllMain(). Requires user code to unload the context manually. Often used when need to await something."),
 		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& args)
 		{

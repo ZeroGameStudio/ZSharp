@@ -6,7 +6,7 @@ using System.Runtime.Loader;
 using ZeroGames.ZSharp.Core;
 using ZeroGames.ZSharp.UnrealEngine.Core;
 
-namespace ZeroGames.ZSharp.UnrealEngine.Export;
+namespace ZeroGames.ZSharp.UnrealEngine;
 
 /**
  * Unmanaged Lifecycle:
@@ -78,7 +78,7 @@ public abstract class ExportedObjectBase : IConjugate
     public GCHandle GCHandle { get; }
     public IntPtr Unmanaged { get; protected init; }
 
-    protected abstract void ReleaseUnmanagedResource();
+    protected virtual void ReleaseUnmanagedResource(){}
 
     private protected ExportedObjectBase()
     {

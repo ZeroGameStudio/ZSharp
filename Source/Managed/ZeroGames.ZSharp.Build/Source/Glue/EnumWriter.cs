@@ -25,22 +25,6 @@ public class EnumWriter : IDisposable, IAsyncDisposable
 
 	public Task WriteAsync() => Task.Run(() =>
 	{
-		StringBuilder enumBody = new();
-		bool first = true;
-		foreach (var pair in _exportedEnum.ValueMap)
-		{
-			if (!first)
-			{
-				enumBody.Append('\n');
-			}
-			else
-			{
-				first = false;
-			}
-
-			enumBody.Append($"\t{pair.Key} = {pair.Value},");
-		}
-		
 		_sw.Write(
 @$"// Copyright Zero Games. All Rights Reserved.
 
@@ -54,7 +38,7 @@ namespace {_exportedEnum.Namespace};
 [System.CodeDom.Compiler.GeneratedCode(""ZSharp"", ""0.0.1"")]
 public enum {_exportedEnum.Name} : {_exportedEnum.UnderlyingType}
 {{
-{enumBody}
+{_enumBody}
 }}
 
 #endregion
@@ -62,6 +46,30 @@ public enum {_exportedEnum.Name} : {_exportedEnum.UnderlyingType}
 
 ");
 	});
+
+	private string _enumBody
+	{
+		get
+		{
+			StringBuilder enumBody = new();
+			bool first = true;
+			foreach (var pair in _exportedEnum.ValueMap)
+			{
+				if (!first)
+				{
+					enumBody.Append('\n');
+				}
+				else
+				{
+					first = false;
+				}
+
+				enumBody.Append($"\t{pair.Key} = {pair.Value},");
+			}
+
+			return enumBody.ToString();
+		}
+	}
 
 	private ExportedEnum _exportedEnum;
 	private StreamWriter _sw;

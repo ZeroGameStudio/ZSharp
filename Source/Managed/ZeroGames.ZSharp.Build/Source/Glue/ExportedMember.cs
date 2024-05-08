@@ -2,11 +2,10 @@
 
 namespace ZeroGames.ZSharp.Build.Glue;
 
-public class ExportedAssembly
+public class ExportedMember
 {
 	public string Name { get; set; } = string.Empty;
-	public List<ExportedEnum> Enums { get; set; } = new();
-	public List<ExportedClass> Classes { get; set; } = new();
+	public bool Static { get; set; }
 }
 
 

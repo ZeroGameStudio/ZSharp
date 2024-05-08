@@ -11,6 +11,8 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 
 	public override async Task<string> BuildAsync()
 	{
+		SetupTestData();
+		
 		await SetupRegistry();
 		await Parallel.ForEachAsync(_registry.ExportedTypes, (type, _) => GenerateType(type));
 
@@ -28,6 +30,11 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 			throw new ArgumentException($"Invalid argument projectdir={projectDir}.");
 		}
 		_glueDir = $"{projectDir}/Intermediate/ZSharp/Glue";
+	}
+	
+	private void SetupTestData()
+	{
+		File.Copy($"{_glueDir}/../../../Content/Manifest.json", $"{_glueDir}/Game/Manifest.json", true);
 	}
 
 	private async Task SetupRegistry()
@@ -69,9 +76,9 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		}
 
 		assembly.Name = new DirectoryInfo(dir).Name;
-		foreach (var exportedEnum in assembly.Enums)
+		foreach (var type in assembly.Classes.AsEnumerable<ExportedType>().Concat(assembly.Enums))
 		{
-			exportedEnum.Assembly = assembly;
+			type.Assembly = assembly.Name;
 		}
 		
 		_registry.RegisterAssembly(assembly);
@@ -90,35 +97,31 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 
 	private async ValueTask GenerateType(ExportedType exportedType)
 	{
+		string moduleDir = $"{_glueDir}/{exportedType.Assembly}/Glue/{exportedType.Module}";
+		CreateModuleDirectory(moduleDir);
+		
+		await using FileStream fs = File.Create($"{moduleDir}/{exportedType.Name}.cs");
 		if (exportedType is ExportedClass exportedClass)
 		{
-			await GenerateClass(exportedClass);
+			await using ClassWriter cw = new(exportedClass, fs);
+			await cw.WriteAsync();
 		}
 		else if (exportedType is ExportedEnum exportedEnum)
 		{
-			await GenerateEnum(exportedEnum);
+			await using EnumWriter ew = new(exportedEnum, fs);
+			await ew.WriteAsync();
 		}
 	}
 
-	private ValueTask GenerateClass(ExportedClass exportedClass)
+	private void CreateModuleDirectory(string dir)
 	{
-		return ValueTask.CompletedTask;
-	}
-
-	private async ValueTask GenerateEnum(ExportedEnum exportedEnum)
-	{
-		string moduleDir = $"{_glueDir}/{exportedEnum.Assembly.Name}/Glue/{exportedEnum.Module}";
 		lock (_moduleDirLock)
 		{
-			if (!Directory.Exists(moduleDir))
+			if (!Directory.Exists(dir))
 			{
-				Directory.CreateDirectory(moduleDir);
+				Directory.CreateDirectory(dir);
 			}
 		}
-		
-		await using FileStream fs = File.Create($"{moduleDir}/{exportedEnum.Name}.cs");
-		await using EnumWriter ew = new(exportedEnum, fs);
-		await ew.WriteAsync();
 	}
 	
 	private ExportedAssemblyRegistry _registry = new();

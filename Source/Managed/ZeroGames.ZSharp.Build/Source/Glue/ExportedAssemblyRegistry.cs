@@ -22,7 +22,7 @@ public class ExportedAssemblyRegistry
 		Volatile.Write(ref _locked, true);
 	}
 
-	public IEnumerable<ExportedType> ExportedTypes => _assemblyMap.SelectMany(pair => pair.Value.Enums);
+	public IEnumerable<ExportedType> ExportedTypes => _assemblyMap.SelectMany(pair => pair.Value.Classes.AsEnumerable<ExportedType>().Concat(pair.Value.Enums));
 
 	private bool _locked;
 	private ConcurrentDictionary<string, ExportedAssembly> _assemblyMap = new();

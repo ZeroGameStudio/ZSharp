@@ -1,6 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ZeroGames.ZSharp.Build.Glue;
 
@@ -58,9 +59,19 @@ public partial class {_exportedClass.Name} : {_baseType}
 			return
 @"using ZeroGames.ZSharp.Core;
 using ZeroGames.ZSharp.UnrealEngine.Core;
-using ZeroGames.ZSharp.UnrealEngine;
-";
+using ZeroGames.ZSharp.UnrealEngine;";
 		}
+	}
+
+	private string GetTypeIdentifier(string type)
+	{
+		if (!Regex.IsMatch(type, "^.+\\..+$"))
+		{
+			throw new ArgumentException($"Invalid type name {type}.");
+		}
+
+		string[] pair = type.Split('.');
+		return pair[0] == "__Primitive" ? pair[1] : type;
 	}
 
 	private string _baseType
@@ -78,7 +89,7 @@ using ZeroGames.ZSharp.UnrealEngine;
 				};
 			}
 
-			return _exportedClass.BaseType;
+			return GetTypeIdentifier(_exportedClass.BaseType);
 		}
 	}
 
@@ -94,3 +105,5 @@ using ZeroGames.ZSharp.UnrealEngine;
 	private StreamWriter _sw;
 	
 }
+
+

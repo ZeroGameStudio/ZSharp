@@ -15,8 +15,8 @@ namespace ZSharp
 	public:
 		virtual ~IZExportedTypeRegistry(){}
 	public:
-		virtual void ForeachExportedClass(TFunctionRef<void(IZExportedClass&)> action) const = 0;
-		virtual void ForeachExportedEnum(TFunctionRef<void(IZExportedEnum&)> action) const = 0;
+		virtual void ForeachExportedClass(TFunctionRef<void(const IZExportedClass&)> action) const = 0;
+		virtual void ForeachExportedEnum(TFunctionRef<void(const IZExportedEnum&)> action) const = 0;
 	};
 }
 

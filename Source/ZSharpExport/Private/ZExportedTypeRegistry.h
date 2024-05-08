@@ -14,8 +14,8 @@ namespace ZSharp
 		static FZExportedTypeRegistry& Get();
 
 	public:
-		virtual void ForeachExportedClass(TFunctionRef<void(IZExportedClass&)> action) const override;
-		virtual void ForeachExportedEnum(TFunctionRef<void(IZExportedEnum&)> action) const override;
+		virtual void ForeachExportedClass(TFunctionRef<void(const IZExportedClass&)> action) const override;
+		virtual void ForeachExportedEnum(TFunctionRef<void(const IZExportedEnum&)> action) const override;
 
 	public:
 		bool RegisterClass(IZExportedClass* cls);

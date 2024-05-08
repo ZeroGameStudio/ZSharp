@@ -49,10 +49,6 @@ public class EnumWriter : IDisposable, IAsyncDisposable
 
 #region GENERATED CODE
 
-using ZeroGames.ZSharp.Core;
-using ZeroGames.ZSharp.UnrealEngine.Core;
-using ZeroGames.ZSharp.UnrealEngine.CoreUObject;
-
 namespace {_exportedEnum.Namespace};
 
 [System.CodeDom.Compiler.GeneratedCode(""ZSharp"", ""0.0.1"")]
@@ -62,7 +58,6 @@ public enum {_exportedEnum.Name} : {_exportedEnum.UnderlyingType}
 }}
 
 #endregion
-
 
 
 ");

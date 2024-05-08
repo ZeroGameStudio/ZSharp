@@ -22,6 +22,7 @@ public:
 
 public:
 	bool IsModuleMapped(const FString& module) const;
+	bool TryGetModuleAssembly(const FString& module, FString& outAssembly) const;
 	void ForeachMappedModule(TFunctionRef<void(const FString&, const FString&)> action) const;
 
 private:

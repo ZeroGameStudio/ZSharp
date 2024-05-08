@@ -10,9 +10,9 @@
 #include "Interfaces/IPluginManager.h"
 #include "Static/ZStaticExportedEnum.h"
 
+// @TODO: Remove
 ZSHARP_DECLARE_EXPORTED_ENUM(EForceInit, EForceInit, Core)
 
-// @TODO: Remove
 ZSHARP_BEGIN_EXPORT_ENUM(EForceInit)
 	ZSHARP_EXPORT_ENUM_VALUE(ForceInit)
 	ZSHARP_EXPORT_ENUM_VALUE(ForceInitToZero)
@@ -102,6 +102,20 @@ void ZSharp::FZBuildEngine::GenerateGlue() const
 {
 	FZDynamicTypeExporter{}.Export();
 	FZGlueManifestWriter{}.Write();
+
+	const FString assemblyDir = FZBuildEngine_Private::LocateBuildAssembly();
+	const FString projectDir = FZBuildEngine_Private::GetProjectDir();
+
+	const FString targetArg = FZBuildEngine_Private::BuildArgument("target", "glue");
+	const FString projectDirArg = FZBuildEngine_Private::BuildArgument("projectdir", projectDir);
+
+	const TCHAR* argv[] =
+	{
+		*targetArg,
+		*projectDirArg,
+	};
+	FZCommonDllMainArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
+	IZSharpClr::Get().Run(assemblyDir, &commonArgs);
 }
 
 void ZSharp::FZBuildEngine::BuildSolution() const

@@ -10,12 +10,12 @@ ZSharp::FZExportedTypeRegistry& ZSharp::FZExportedTypeRegistry::Get()
 	return GSingleton;
 }
 
-void ZSharp::FZExportedTypeRegistry::ForeachExportedClass(TFunctionRef<void(IZExportedClass&)> action) const
+void ZSharp::FZExportedTypeRegistry::ForeachExportedClass(TFunctionRef<void(const IZExportedClass&)> action) const
 {
 	checkNoEntry();
 }
 
-void ZSharp::FZExportedTypeRegistry::ForeachExportedEnum(TFunctionRef<void(IZExportedEnum&)> action) const
+void ZSharp::FZExportedTypeRegistry::ForeachExportedEnum(TFunctionRef<void(const IZExportedEnum&)> action) const
 {
 	for (const auto& pair : EnumMap)
 	{

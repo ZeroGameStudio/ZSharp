@@ -36,7 +36,7 @@ FString ZSharp::FZDynamicExportedEnum::GetUnderlyingType() const
 	return "int64"; // @FIXME
 }
 
-void ZSharp::FZDynamicExportedEnum::ForeachEnumValue(TFunctionRef<void(FString, FString)> action) const
+void ZSharp::FZDynamicExportedEnum::ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const
 {
 	for (int32 i = 0; i < Enum->NumEnums(); ++i)
 	{

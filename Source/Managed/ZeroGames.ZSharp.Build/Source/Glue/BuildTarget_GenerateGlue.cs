@@ -11,8 +11,6 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 
 	public override async Task<string> BuildAsync()
 	{
-		SetupTestData();
-		
 		await SetupRegistry();
 		await Parallel.ForEachAsync(_registry.ExportedTypes, (type, _) => GenerateType(type));
 
@@ -30,31 +28,6 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 			throw new ArgumentException($"Invalid argument projectdir={projectDir}.");
 		}
 		_glueDir = $"{projectDir}/Intermediate/ZSharp/Glue";
-	}
-
-	private void SetupTestData()
-	{
-		using FileStream f = File.Create($"{_glueDir}/Game/Manifest.json");
-		using StreamWriter sw = new(f, Encoding.UTF8);
-		sw.Write(
-$@"{{
-	""Enums"":
-	[
-		{{
-			""Name"": ""DamageType"",
-			""Module"": ""ZHotel"",
-			""UnderlyingType"": ""uint8"",
-			""ValueMap"":
-			{{
-				""None"": ""0"",
-				""Physical"": ""1"",
-				""Mana"": ""2"",
-				""Absolute"": ""3""
-			}}
-		}}
-	]
-}}
-");
 	}
 
 	private async Task SetupRegistry()
@@ -104,12 +77,15 @@ $@"{{
 		_registry.RegisterAssembly(assembly);
 
 		string codeDir = $"{dir}/Glue";
-		if (Directory.Exists(codeDir))
+		lock (_codeDirLock)
 		{
-			Directory.Delete(codeDir, true);
-		}
+			if (Directory.Exists(codeDir))
+			{
+				Directory.Delete(codeDir, true);
+			}
 
-		Directory.CreateDirectory(codeDir);
+			Directory.CreateDirectory(codeDir);
+		}
 	}
 
 	private async ValueTask GenerateType(ExportedType exportedType)
@@ -131,13 +107,24 @@ $@"{{
 
 	private async ValueTask GenerateEnum(ExportedEnum exportedEnum)
 	{
-		await using FileStream fs = File.Create($"{_glueDir}/{exportedEnum.Assembly.Name}/Glue/{exportedEnum.Name}.cs");
+		string moduleDir = $"{_glueDir}/{exportedEnum.Assembly.Name}/Glue/{exportedEnum.Module}";
+		lock (_moduleDirLock)
+		{
+			if (!Directory.Exists(moduleDir))
+			{
+				Directory.CreateDirectory(moduleDir);
+			}
+		}
+		
+		await using FileStream fs = File.Create($"{moduleDir}/{exportedEnum.Name}.cs");
 		await using EnumWriter ew = new(exportedEnum, fs);
 		await ew.WriteAsync();
 	}
 	
 	private ExportedAssemblyRegistry _registry = new();
 	private string _glueDir;
+	private object _codeDirLock = new();
+	private object _moduleDirLock = new();
 }
 
 

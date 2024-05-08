@@ -15,6 +15,18 @@ bool UZSharpRuntimeSettings::IsModuleMapped(const FString& module) const
 	return ModuleAssemblyMapping.Contains(module) || IntrinsicModuleAssemblyMapping.Contains(module);
 }
 
+bool UZSharpRuntimeSettings::TryGetModuleAssembly(const FString& module, FString& outAssembly) const
+{
+	const FString* assembly = ModuleAssemblyMapping.Find(module);
+	if (!assembly)
+	{
+		assembly = IntrinsicModuleAssemblyMapping.Find(module);
+	}
+
+	outAssembly = assembly ? *assembly : "";
+	return !!assembly;
+}
+
 void UZSharpRuntimeSettings::ForeachMappedModule(TFunctionRef<void(const FString&, const FString&)> action) const
 {
 	for (const auto& pair : IntrinsicModuleAssemblyMapping)

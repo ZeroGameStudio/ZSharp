@@ -18,7 +18,7 @@ namespace ZSharp
 		virtual FString GetModule() const override;
 		virtual EZCallBufferSlotType GetSlotType() const override;
 		virtual FString GetUnderlyingType() const override;
-		virtual void ForeachEnumValue(TFunctionRef<void(FString, FString)> action) const override;
+		virtual void ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const override;
 
 	private:
 		bool bRegistered;

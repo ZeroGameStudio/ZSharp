@@ -1,6 +1,9 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.Reflection;
+using System.Runtime.Loader;
+using System.Security;
 
 namespace ZeroGames.ZSharp.Core;
 
@@ -11,6 +14,26 @@ public class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase
     
     public static MasterAssemblyLoadContext? Get()
     {
+        string err = "Code has no permission to access Master ALC.";
+        StackFrame stack = new(1);
+        MethodBase? method = stack.GetMethod();
+        if (method is null)
+        {
+            throw new SecurityException(err);
+        }
+
+        Type? type = method.DeclaringType;
+        if (type is null)
+        {
+            throw new SecurityException(err);
+        }
+
+        AssemblyLoadContext? callerAlc = GetLoadContext(type.Assembly);
+        if (callerAlc != _sSingleton && callerAlc != Default)
+        {
+            throw new SecurityException(err);
+        }
+        
         return _sSingleton;
     }
     

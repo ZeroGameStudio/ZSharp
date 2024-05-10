@@ -343,6 +343,9 @@ public struct ZCallBufferSlot
 		Value.Conjugate = value;
 	}
 
+	public T? ReadConjugate<T>() where T : class, IConjugate => ReadConjugate().ToConjugate<T>();
+	public void WriteConjugate<T>(T? value) where T : class, IConjugate => WriteConjugate(value.GetConjugateHandle());
+
 	private ZCallBufferSlot(EZCallBufferSlotType type) => Type = type;
 	
 	private readonly EZCallBufferSlotType Type;

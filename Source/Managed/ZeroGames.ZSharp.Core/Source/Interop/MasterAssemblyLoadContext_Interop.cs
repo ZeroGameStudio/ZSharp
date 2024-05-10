@@ -39,7 +39,7 @@ internal static class MasterAssemblyLoadContext_Interop
     [UnmanagedCallersOnly]
     public static int32 ReleaseConjugate(ConjugateHandle handle) => Uncaught.ErrorIfUncaught(() =>
     {
-        if (handle.ToGCHandle().Target is IConjugate conjugate)
+        if (handle.ToConjugate<IConjugate>() is {} conjugate)
         {
             conjugate.ReleaseConjugate();
 

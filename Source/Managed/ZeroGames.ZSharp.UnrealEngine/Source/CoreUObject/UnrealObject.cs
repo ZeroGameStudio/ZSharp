@@ -23,7 +23,7 @@ public class UnrealObject : UnrealClassExportedObjectBase, IConjugate<UnrealObje
             };
             ZCallBuffer buffer = new(slots, numSlots);
             alc.ZCall("ex://Object.GetClass", &buffer);
-            return (UnrealObject)slots[1].ReadConjugate().ToGCHandle().Target!;
+            return slots[1].ReadConjugate<UnrealObject>() ?? throw new InvalidOperationException();
         }
     }
 
@@ -40,7 +40,7 @@ public class UnrealObject : UnrealClassExportedObjectBase, IConjugate<UnrealObje
             };
             ZCallBuffer buffer = new(slots, numSlots);
             alc.ZCall("ex://Object.GetOuter", &buffer);
-            return slots[1].ReadConjugate().ToGCHandle().Target as UnrealObject;
+            return slots[1].ReadConjugate<UnrealObject>() ?? throw new InvalidOperationException();
         }
     }
 
@@ -57,7 +57,7 @@ public class UnrealObject : UnrealClassExportedObjectBase, IConjugate<UnrealObje
             };
             ZCallBuffer buffer = new(slots, numSlots);
             alc.ZCall("ex://Object.GetName", &buffer);
-            return slots[1].ReadConjugate().ToGCHandle().Target as UnrealString ?? throw new Exception();
+            return slots[1].ReadConjugate<UnrealString>() ?? throw new InvalidOperationException();
         }
     }
 

@@ -8,8 +8,8 @@ public readonly struct ConjugateHandle
 {
 
     public static ConjugateHandle FromConjugate(IConjugate? conjugate) => conjugate is not null ? new(conjugate.GCHandle) : new();
-    public static ConjugateHandle FromGCHandle(GCHandle handle) => new(handle);
     public GCHandle ToGCHandle() => GCHandle.FromIntPtr(_handle);
+    public T? ToConjugate<T>() where T : class, IConjugate => ToGCHandle().Target as T;
 
     public bool Valid => _handle != IntPtr.Zero;
 

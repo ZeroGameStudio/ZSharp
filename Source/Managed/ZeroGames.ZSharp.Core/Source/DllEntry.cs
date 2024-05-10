@@ -105,13 +105,6 @@ internal static class DllEntry
         *args->ManagedFunctions[offset++] =
             (delegate* unmanaged<GCHandle, char*, GCHandle>)&Type_Interop.GetPropertyInfo;
 
-        // MethodInfo interop functions
-        *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<GCHandle, IntPtr, int32>)&MethodInfo_Interop.GetName;
-        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, int32>)&MethodInfo_Interop.GetNumSlots;
-        *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<GCHandle, ZCallBuffer*, int32>)&MethodInfo_Interop.Invoke;
-
         Logger.Log("===================== ZSharp Startup =====================");
 
         return 0;

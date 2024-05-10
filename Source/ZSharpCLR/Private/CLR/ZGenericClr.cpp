@@ -17,7 +17,6 @@
 #include "ALC/ZMasterAssemblyLoadContext.h"
 #include "Interop/ZMasterAssemblyLoadContext_Interop.h"
 #include "Interop/ZGCHandle.h"
-#include "Interop/ZMethodInfo_Interop.h"
 #include "ALC/ZSlimAssemblyLoadContext.h"
 #include "Interop/ZSlimAssemblyLoadContext_Interop.h"
 #include "Interop/ZType_Interop.h"
@@ -89,10 +88,6 @@ namespace ZSharp::FZGenericClr_Private
 			ADDRESS_OF(FZType_Interop::GBuildConjugate),
 			ADDRESS_OF(FZType_Interop::GGetMethodInfo),
 			ADDRESS_OF(FZType_Interop::GGetPropertyInfo),
-
-			ADDRESS_OF(FZMethodInfo_Interop::GGetName),
-			ADDRESS_OF(FZMethodInfo_Interop::GGetNumSlots),
-			ADDRESS_OF(FZMethodInfo_Interop::GInvoke),
 				
 #undef ADDRESS_OF
 		};

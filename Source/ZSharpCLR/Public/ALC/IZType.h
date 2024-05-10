@@ -7,14 +7,11 @@
 
 namespace ZSharp
 {
-	class IZMethodInfo;
 	struct FZCallBuffer;
 	
 	class ZSHARPCLR_API IZType : public IZMemberInfo
 	{
 	public:
 		virtual FZConjugateHandle BuildConjugate(void* unmanaged) const = 0;
-	public:
-		virtual const IZMethodInfo* GetMethod(const FString& name) const = 0;
 	};
 }

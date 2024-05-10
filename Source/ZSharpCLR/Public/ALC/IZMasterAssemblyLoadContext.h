@@ -10,7 +10,6 @@ namespace ZSharp
 {
 	class IZAssembly;
 	class IZType;
-	class IZMethodInfo;
 	class IZCallDispatcher;
 	class IZCallResolver;
 	struct FZCallBuffer;

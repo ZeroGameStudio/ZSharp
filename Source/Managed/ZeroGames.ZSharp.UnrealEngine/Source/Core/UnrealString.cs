@@ -13,7 +13,7 @@ public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<Un
 
     public unsafe UnrealString(string content)
     {
-        MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
+        IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
         fixed (char* data = content.ToCharArray())
         {
             const int32 numSlots = 3;
@@ -38,7 +38,7 @@ public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<Un
     {
         get
         {
-            MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
+            IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
             const int32 numSlots = 2;
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
@@ -55,7 +55,7 @@ public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<Un
     {
         get
         {
-            MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
+            IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
             const int32 numSlots = 2;
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
@@ -68,7 +68,7 @@ public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<Un
         }
         set
         {
-            MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
+            IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
             fixed (char* data = value.ToCharArray())
             {
                 const int32 numSlots = 2;
@@ -85,7 +85,7 @@ public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<Un
 
     protected override unsafe void ReleaseUnmanagedResource()
     {
-        MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
+        IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
         const int32 numSlots = 1;
         ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
         {
@@ -97,7 +97,7 @@ public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<Un
 
     static UnrealString()
     {
-        __sZCallHandle_Dtor = MasterAssemblyLoadContext.Get()!.PrecacheZCall("ex://String.Dtor");
+        __sZCallHandle_Dtor = IMasterAssemblyLoadContext.Get()!.GetZCallHandle("ex://String.Dtor");
     }
 
     private UnrealString(IntPtr unmanaged) : base(unmanaged){}

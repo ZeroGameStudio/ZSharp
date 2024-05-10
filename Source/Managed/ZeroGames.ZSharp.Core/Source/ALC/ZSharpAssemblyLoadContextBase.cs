@@ -5,7 +5,7 @@ using System.Runtime.Loader;
 
 namespace ZeroGames.ZSharp.Core;
 
-public abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IGCHandle
+internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZSharpAssemblyLoadContext
 {
     
     protected ZSharpAssemblyLoadContextBase(string name) : base(name, true)

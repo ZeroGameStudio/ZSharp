@@ -7,7 +7,7 @@ using System.Security;
 
 namespace ZeroGames.ZSharp.Core;
 
-public class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase
+internal class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMasterAssemblyLoadContext
 {
 
     public const string KName = "Master";
@@ -66,7 +66,7 @@ public class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase
         MasterAssemblyLoadContext_Interop.SZCallByHandle_AnyThread(handle, buffer, numSlots);
     }
 
-    public unsafe ZCallHandle PrecacheZCall(string name)
+    public unsafe ZCallHandle GetZCallHandle(string name)
     {
         fixed (char* data = name.ToCharArray())
         {

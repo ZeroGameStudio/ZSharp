@@ -34,7 +34,7 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 public abstract class ExportedObjectBase : IConjugate
 {
     
-    public static MasterAssemblyLoadContext GetOwningAlc()
+    public static IMasterAssemblyLoadContext GetOwningAlc()
     {
         Assembly asm = typeof(ExportedObjectBase).Assembly;
         AssemblyLoadContext? alc = AssemblyLoadContext.GetLoadContext(asm);
@@ -43,9 +43,9 @@ public abstract class ExportedObjectBase : IConjugate
             throw new Exception("Owning ALC not found.");
         }
 
-        if (alc is MasterAssemblyLoadContext masterAlc)
+        if (alc is IMasterAssemblyLoadContext masterAlc)
         {
-            if (alc != MasterAssemblyLoadContext.Get())
+            if (alc != IMasterAssemblyLoadContext.Get())
             {
                 throw new Exception("Owning ALC is MasterAssemblyLoadContext but not the live one.");
             }

@@ -1,11 +1,10 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 
 namespace ZeroGames.ZSharp.Core;
 
-public class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase
+internal class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, ISlimAssemblyLoadContext
 {
     
     internal static SlimAssemblyLoadContext Create(string name)

@@ -14,7 +14,7 @@ public class UnrealObject : UnrealClassExportedObjectBase, IConjugate<UnrealObje
     {
         get
         {
-            MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
+            IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
             const int32 numSlots = 2;
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
@@ -31,7 +31,7 @@ public class UnrealObject : UnrealClassExportedObjectBase, IConjugate<UnrealObje
     {
         get
         {
-            MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
+            IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
             const int32 numSlots = 2;
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
@@ -48,7 +48,7 @@ public class UnrealObject : UnrealClassExportedObjectBase, IConjugate<UnrealObje
     {
         get
         {
-            MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
+            IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
             const int32 numSlots = 2;
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {

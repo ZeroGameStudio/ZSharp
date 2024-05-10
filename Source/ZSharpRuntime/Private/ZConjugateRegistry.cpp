@@ -66,7 +66,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(UObject* unmana
 	CheckGuarded();
 	
 	FZConjugateHandle handle = MasterAlc->Conjugate(unmanaged);
-	if (IsValid(handle))
+	if (handle)
 	{
 		return handle;
 	}
@@ -87,7 +87,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(UObject* unmana
 	}
 	
 	handle = MasterAlc->BuildConjugate(unmanaged, managedType);
-	if (IsValid(handle))
+	if (handle)
 	{
 		ObjectRegistry.Emplace(unmanaged, unmanaged);
 	}
@@ -112,7 +112,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(FString* unmana
 	CheckGuarded();
 	
 	FZConjugateHandle handle = MasterAlc->Conjugate(unmanaged);
-	if (IsValid(handle))
+	if (handle)
 	{
 		return handle;
 	}
@@ -127,7 +127,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry::Conjugate(FString* unmana
 	}
 	
 	handle = MasterAlc->BuildConjugate(unmanaged, managedType);
-	if (IsValid(handle))
+	if (handle)
 	{
 		StringRegistry.Emplace(unmanaged, { unmanaged, true, onReleased });
 	}
@@ -139,7 +139,7 @@ void ZSharp::FZConjugateRegistry::Conjugate(FString* unmanaged, FZConjugateHandl
 {
 	CheckGuarded();
 	
-	if (!IsValid(managed))
+	if (!managed)
 	{
 		return;
 	}

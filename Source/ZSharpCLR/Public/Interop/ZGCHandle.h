@@ -6,18 +6,20 @@ namespace ZSharp
 {
 	struct FZGCHandle
 	{
+
+		void Free();
+		
+		operator bool() const
+		{
+			return !!Handle;
+		}
+		
 		void* Handle;
+		
 	};
 	
 	static_assert(TIsPODType<FZGCHandle>::Value, "GCHandle must be POD type!");
 	static_assert(sizeof(FZGCHandle) == sizeof(void*), "GCHandle must only have a void* member!");
-
-	void Free(FZGCHandle handle);
-
-	inline bool IsValid(const FZGCHandle& handle)
-	{
-		return !!handle.Handle;
-	}
 
 	inline bool operator ==(const FZGCHandle& lhs, const FZGCHandle& rhs)
 	{

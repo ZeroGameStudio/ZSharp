@@ -4,9 +4,8 @@
 
 #include "ZGCHandle_Interop.h"
 
-void ZSharp::Free(FZGCHandle handle)
+void ZSharp::FZGCHandle::Free()
 {
-	FZGCHandle_Interop::GFree(handle);
+	FZGCHandle_Interop::GFree(*this);
+	Handle = nullptr;
 }
-
-

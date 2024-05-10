@@ -21,7 +21,7 @@ ZSharp::FZMasterAssemblyLoadContext::~FZMasterAssemblyLoadContext()
 {
 	FTSTicker::GetCoreTicker().RemoveTicker(TickerHandle);
 	
-	Free(Handle);
+	Handle.Free();
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::Unload()
@@ -66,7 +66,7 @@ ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::RegisterZCall(IZCallDi
 {
 	check(IsInGameThread());
 	
-	FZCallHandle handle = AllocateZCallHandle();
+	FZCallHandle handle = FZCallHandle::Alloc();
 
 	ZCallMap.Emplace(handle, dispatcher);
 	ZCallName2Handle.Emplace(dispatcher->GetName(), handle);

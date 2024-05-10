@@ -14,7 +14,7 @@ namespace ZSharp
 		FZAssembly(FZGCHandle handle)
 			: Handle(handle){}
 		
-		virtual ~FZAssembly() override { Free(Handle); }
+		virtual ~FZAssembly() override { Handle.Free(); }
 
 	public:
 		// IZGCHandle

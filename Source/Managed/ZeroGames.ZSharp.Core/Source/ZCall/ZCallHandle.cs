@@ -5,12 +5,20 @@ using System.Runtime.InteropServices;
 namespace ZeroGames.ZSharp.Core;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct ZCallHandle
+public readonly struct ZCallHandle
 {
-    
-    public bool Valid => _handle > 0;
 
-    private uint64 _handle;
+    public static ZCallHandle Alloc() => new(--_sCurrentHandle);
+    
+    public bool Valid => _handle != 0;
+    public bool Red => _handle < 0;
+    public bool Black => _handle > 0;
+
+    private ZCallHandle(int64 handle) => _handle = handle;
+    
+    private static int64 _sCurrentHandle = 0;
+
+    private readonly int64 _handle;
 
 }
 

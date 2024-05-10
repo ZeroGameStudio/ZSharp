@@ -17,7 +17,7 @@ namespace ZSharp
 			, RunningCount(0)
 			, bUnloading(false){}
 
-		virtual ~FZSlimAssemblyLoadContext() override { Free(Handle); }
+		virtual ~FZSlimAssemblyLoadContext() override { Handle.Free(); }
 
 	public:
 		// IZGCHandle

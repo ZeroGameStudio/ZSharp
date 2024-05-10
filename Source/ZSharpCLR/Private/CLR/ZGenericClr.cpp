@@ -252,7 +252,7 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
 	}
 
 	FZGCHandle handle = ZClr_Interop::GCreateMasterAlc();
-	if (!IsValid(handle))
+	if (!handle)
 	{
 		return nullptr;
 	}
@@ -293,7 +293,7 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericClr::CreateSlimAlc(const FSt
 	}
 
 	FZGCHandle handle = ZClr_Interop::GCreateSlimAlc(*name);
-	if (!IsValid(handle))
+	if (!handle)
 	{
 		return nullptr;
 	}

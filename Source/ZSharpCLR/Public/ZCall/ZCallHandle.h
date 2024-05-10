@@ -6,18 +6,23 @@ namespace ZSharp
 {
 	struct FZCallHandle
 	{
-		uint64 Handle;
+
+		static FZCallHandle Alloc();
+
+		bool IsRed() const { return Handle < 0; }
+		bool IsBlack() const { return Handle > 0; }
+
+		operator bool() const
+		{
+			return !!Handle;
+		}
+		
+		int64 Handle;
+		
 	};
 	
 	static_assert(TIsPODType<FZCallHandle>::Value, "ZCallHandle must be POD type!");
 	static_assert(sizeof(FZCallHandle) == sizeof(uint64), "ZCallHandle must only have a uint64 member!");
-
-	FZCallHandle AllocateZCallHandle();
-
-	inline bool IsValid(const FZCallHandle& handle)
-	{
-		return !!handle.Handle;
-	}
 
 	inline bool operator ==(const FZCallHandle& lhs, const FZCallHandle& rhs)
 	{

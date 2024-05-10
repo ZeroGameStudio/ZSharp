@@ -3,12 +3,14 @@
 
 #include "ZCall/ZCallHandle.h"
 
-ZSharp::FZCallHandle ZSharp::AllocateZCallHandle()
+ZSharp::FZCallHandle ZSharp::FZCallHandle::Alloc()
 {
-	static uint64 GCurrentHandle = 0;
+	static int64 GCurrentHandle = 0;
 
 	FZCallHandle handle;
 	handle.Handle = ++GCurrentHandle;
 	
 	return handle;
 }
+
+

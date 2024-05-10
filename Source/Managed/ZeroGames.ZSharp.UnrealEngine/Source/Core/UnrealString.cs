@@ -16,15 +16,16 @@ public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<Un
         MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
         fixed (char* data = content.ToCharArray())
         {
-            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
+            const int32 numSlots = 3;
+            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
-                new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Pointer = (IntPtr)data },
-                new(),
+                ZCallBufferSlot.FromConjugate(this),
+                ZCallBufferSlot.FromPointer(data),
+                ZCallBufferSlot.FromPointer(null),
             };
-            ZCallBuffer buffer = new() { Slots = slots };
+            ZCallBuffer buffer = new(slots, numSlots);
             alc.ZCall("ex://String.Ctor", &buffer, out var handle);
-            Unmanaged = buffer.Slots[2].Pointer;
+            Unmanaged = slots[2].ReadPointer();
         }
     }
 
@@ -38,14 +39,15 @@ public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<Un
         get
         {
             MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
-            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
+            const int32 numSlots = 2;
+            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
-                new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Int32 = 0 },
+                ZCallBufferSlot.FromConjugate(this),
+                ZCallBufferSlot.FromInt32(default),
             };
-            ZCallBuffer buffer = new() { Slots = slots };
+            ZCallBuffer buffer = new(slots, numSlots);
             alc.ZCall("ex://String.Len", &buffer, out var handle);
-            return slots[1].Int32;
+            return slots[1].ReadInt32();
         }
     }
     
@@ -54,26 +56,28 @@ public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<Un
         get
         {
             MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
-            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
+            const int32 numSlots = 2;
+            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
-                new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Pointer = IntPtr.Zero },
+                ZCallBufferSlot.FromConjugate(this),
+                ZCallBufferSlot.FromPointer(null),
             };
-            ZCallBuffer buffer = new() { Slots = slots };
+            ZCallBuffer buffer = new(slots, numSlots);
             alc.ZCall("ex://String.GetData", &buffer, out var handle);
-            return new((char*)slots[1].Pointer);
+            return new((char*)slots[1].ReadPointer());
         }
         set
         {
             MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
             fixed (char* data = value.ToCharArray())
             {
-                ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
+                const int32 numSlots = 2;
+                ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
                 {
-                    new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                    new() { Pointer = (IntPtr)data },
+                    ZCallBufferSlot.FromConjugate(this),
+                    ZCallBufferSlot.FromPointer(data),
                 };
-                ZCallBuffer buffer = new() { Slots = slots };
+                ZCallBuffer buffer = new(slots, numSlots);
                 alc.ZCall("ex://String.SetData", &buffer, out var handle);
             }
         }
@@ -82,11 +86,12 @@ public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<Un
     protected override unsafe void ReleaseUnmanagedResource()
     {
         MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
-        ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
+        const int32 numSlots = 1;
+        ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
         {
-            new() { Conjugate = ConjugateHandle.FromConjugate(this) },
+            ZCallBufferSlot.FromConjugate(this),
         };
-        ZCallBuffer buffer = new() { Slots = slots };
+        ZCallBuffer buffer = new(slots, numSlots);
         alc.ZCall_AnyThread(__sZCallHandle_Dtor, &buffer, 1);
     }
 

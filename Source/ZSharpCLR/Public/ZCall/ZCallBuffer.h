@@ -50,77 +50,68 @@ namespace ZSharp
 		FZConjugateHandle Conjugate;
 	};
 
-	struct FZCallBufferSlot
+	struct ZSHARPCLR_API FZCallBufferSlot
 	{
+		
+		static FZCallBufferSlot FromUInt8(uint8 value);
+		static FZCallBufferSlot FromUInt16(uint16 value);
+		static FZCallBufferSlot FromUInt32(uint32 value);
+		static FZCallBufferSlot FromUInt64(uint64 value);
+		static FZCallBufferSlot FromInt8(int8 value);
+		static FZCallBufferSlot FromInt16(int16 value);
+		static FZCallBufferSlot FromInt32(int32 value);
+		static FZCallBufferSlot FromInt64(int64 value);
+		static FZCallBufferSlot FromFloat(float value);
+		static FZCallBufferSlot FromDouble(double value);
+		static FZCallBufferSlot FromBool(bool value);
+		static FZCallBufferSlot FromPointer(void* value);
+		static FZCallBufferSlot FromGCHandle(FZGCHandle value);
+		static FZCallBufferSlot FromConjugate(FZConjugateHandle value);
+	
+		uint8 ReadUInt8() const;
+		uint16 ReadUInt16() const;
+		uint32 ReadUInt32() const;
+		uint64 ReadUInt64() const;
+		int8 ReadInt8() const;
+		int16 ReadInt16() const;
+		int32 ReadInt32() const;
+		int64 ReadInt64() const;
+		float ReadFloat() const;
+		double ReadDouble() const;
+		bool ReadBool() const;
+		void* ReadPointer() const;
+		FZGCHandle ReadGCHandle() const;
+		FZConjugateHandle ReadConjugate() const;
+		
+		void WriteUInt8(uint8 value);
+		void WriteUInt16(uint16 value);
+		void WriteUInt32(uint32 value);
+		void WriteUInt64(uint64 value);
+		void WriteInt8(int8 value);
+		void WriteInt16(int16 value);
+		void WriteInt32(int32 value);
+		void WriteInt64(int64 value);
+		void WriteFloat(float value);
+		void WriteDouble(double value);
+		void WriteBool(bool value);
+		void WritePointer(void* value);
+		void WriteGCHandle(FZGCHandle value);
+		void WriteConjugate(FZConjugateHandle value);
+		
 		EZCallBufferSlotType Type;
 		FZCallBufferSlotValue Value;
+		
 	};
 
 	// NOTE: Do NOT Construct/Read/Write this directly, use helper functions and macros below.
 	struct ZSHARPCLR_API FZCallBuffer
 	{
+		
+		FZCallBufferSlot& operator[](int32 index);
+		
 		FZCallBufferSlot* Slots;
 		int32 NumSlots;
-	};
-
-	ZSHARPCLR_API uint8 ReadUInt8(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API uint16 ReadUInt16(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API uint32 ReadUInt32(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API uint64 ReadUInt64(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API int8 ReadInt8(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API int16 ReadInt16(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API int32 ReadInt32(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API int64 ReadInt64(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API float ReadFloat(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API double ReadDouble(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API bool ReadBool(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API void* ReadPointer(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API FZGCHandle ReadGCHandle(FZCallBuffer* buffer, int32 index);
-	ZSHARPCLR_API FZConjugateHandle ReadConjugate(FZCallBuffer* buffer, int32 index);
-
-	ZSHARPCLR_API void WriteUInt8(FZCallBuffer* buffer, int32 index, uint8 value);
-	ZSHARPCLR_API void WriteUInt16(FZCallBuffer* buffer, int32 index, uint16 value);
-	ZSHARPCLR_API void WriteUInt32(FZCallBuffer* buffer, int32 index, uint32 value);
-	ZSHARPCLR_API void WriteUInt64(FZCallBuffer* buffer, int32 index, uint64 value);
-	ZSHARPCLR_API void WriteInt8(FZCallBuffer* buffer, int32 index, int8 value);
-	ZSHARPCLR_API void WriteInt16(FZCallBuffer* buffer, int32 index, int16 value);
-	ZSHARPCLR_API void WriteInt32(FZCallBuffer* buffer, int32 index, int32 value);
-	ZSHARPCLR_API void WriteInt64(FZCallBuffer* buffer, int32 index, int64 value);
-	ZSHARPCLR_API void WriteFloat(FZCallBuffer* buffer, int32 index, float value);
-	ZSHARPCLR_API void WriteDouble(FZCallBuffer* buffer, int32 index, double value);
-	ZSHARPCLR_API void WriteBool(FZCallBuffer* buffer, int32 index, bool value);
-	ZSHARPCLR_API void WritePointer(FZCallBuffer* buffer, int32 index, void* value);
-	ZSHARPCLR_API void WriteGCHandle(FZCallBuffer* buffer, int32 index, FZGCHandle value);
-	ZSHARPCLR_API void WriteConjugate(FZCallBuffer* buffer, int32 index, FZConjugateHandle value);
-}
-
-namespace ZSharp::ZCallBuffer_Private
-{
-	template <EZCallBufferSlotType SlotType>
-	struct TZCallBufferSlotValueType;
-
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::UInt8> { using ValueType = uint8; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::UInt16> { using ValueType = uint16; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::UInt32> { using ValueType = uint32; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::UInt64> { using ValueType = uint64; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::Int8> { using ValueType = int8; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::Int16> { using ValueType = int16; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::Int32> { using ValueType = int32; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::Int64> { using ValueType = int64; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::Float> { using ValueType = float; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::Double> { using ValueType = double; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::Bool> { using ValueType = bool; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::Pointer> { using ValueType = void*; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::GCHandle> { using ValueType = FZGCHandle; };
-	template <> struct TZCallBufferSlotValueType<EZCallBufferSlotType::Conjugate> { using ValueType = FZConjugateHandle; };
-	
-	template <EZCallBufferSlotType SlotType>
-	struct TZCallBufferSlotFactory
-	{
-		static FZCallBufferSlot Get(typename TZCallBufferSlotValueType<SlotType>::ValueType value)
-		{
-			return { SlotType, *reinterpret_cast<FZCallBufferSlotValue*>(&value) };
-		}
+		
 	};
 }
 
@@ -131,20 +122,5 @@ namespace ZSharp::ZCallBuffer_Private
 	ZSharp::FZCallBuffer BufferVariableName { ZSHARP_COMBINE(__SLOTS, __LINE__), UE_ARRAY_COUNT(ZSHARP_COMBINE(__SLOTS, __LINE__)) };
 
 #define ZSHARP_STACK_ALLOC_ZCALL_BUFFER(...) ZSHARP_STACK_ALLOC_NAMED_ZCALL_BUFFER(buffer, __VA_ARGS__)
-
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_UINT8(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::UInt8>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_UINT16(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::UInt16>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_UINT32(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::UInt32>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_UINT64(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::UInt64>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_INT8(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::Int8>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_INT16(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::Int16>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_INT32(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::Int32>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_INT64(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::Int64>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_FLOAT(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::Float>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_DOUBLE(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::Double>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_BOOL(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::Bool>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_POINTER(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::Pointer>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_GCHANDLE(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::GCHandle>::Get(Value)
-#define ZSHARP_CONSTRUCT_ZCALL_BUFFER_SLOT_CONJUGATE(Value) ZSharp::ZCallBuffer_Private::TZCallBufferSlotFactory<ZSharp::EZCallBufferSlotType::Conjugate>::Get(Value)
 
 

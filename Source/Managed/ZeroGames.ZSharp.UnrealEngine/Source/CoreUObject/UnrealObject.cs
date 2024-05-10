@@ -15,14 +15,15 @@ public class UnrealObject : UnrealClassExportedObjectBase, IConjugate<UnrealObje
         get
         {
             MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
-            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
+            const int32 numSlots = 2;
+            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
-                new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Conjugate = default },
+                ZCallBufferSlot.FromConjugate(this),
+                ZCallBufferSlot.FromConjugate(null),
             };
-            ZCallBuffer buffer = new() { Slots = slots };
+            ZCallBuffer buffer = new(slots, numSlots);
             alc.ZCall("ex://Object.GetClass", &buffer);
-            return (UnrealObject)slots[1].Conjugate.ToGCHandle().Target!;
+            return (UnrealObject)slots[1].ReadConjugate().ToGCHandle().Target!;
         }
     }
 
@@ -31,14 +32,15 @@ public class UnrealObject : UnrealClassExportedObjectBase, IConjugate<UnrealObje
         get
         {
             MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
-            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
+            const int32 numSlots = 2;
+            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
-                new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Conjugate = default },
+                ZCallBufferSlot.FromConjugate(this),
+                ZCallBufferSlot.FromConjugate(null),
             };
-            ZCallBuffer buffer = new() { Slots = slots };
+            ZCallBuffer buffer = new(slots, numSlots);
             alc.ZCall("ex://Object.GetOuter", &buffer);
-            return slots[1].Conjugate.ToGCHandle().Target as UnrealObject;
+            return slots[1].ReadConjugate().ToGCHandle().Target as UnrealObject;
         }
     }
 
@@ -47,14 +49,15 @@ public class UnrealObject : UnrealClassExportedObjectBase, IConjugate<UnrealObje
         get
         {
             MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Get()!;
-            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[]
+            const int32 numSlots = 2;
+            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
-                new() { Conjugate = ConjugateHandle.FromConjugate(this) },
-                new() { Conjugate = default },
+                ZCallBufferSlot.FromConjugate(this),
+                ZCallBufferSlot.FromConjugate(null),
             };
-            ZCallBuffer buffer = new() { Slots = slots };
+            ZCallBuffer buffer = new(slots, numSlots);
             alc.ZCall("ex://Object.GetName", &buffer);
-            return slots[1].Conjugate.ToGCHandle().Target as UnrealString ?? throw new Exception();
+            return slots[1].ReadConjugate().ToGCHandle().Target as UnrealString ?? throw new Exception();
         }
     }
 

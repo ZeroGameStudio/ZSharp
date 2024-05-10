@@ -16,228 +16,248 @@ FString ZSharp::ToString(EZCallBufferSlotType type)
 	return res ? *res : "Unknown";
 }
 
-uint8 ZSharp::ReadUInt8(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromUInt8(uint8 value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::UInt8);
-
-	return buffer->Slots->Value.UInt8;
+	return { EZCallBufferSlotType::UInt8, { .UInt8 = value } };
 }
 
-uint16 ZSharp::ReadUInt16(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromUInt16(uint16 value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::UInt16);
-
-	return buffer->Slots->Value.UInt16;
+	return { EZCallBufferSlotType::UInt16, { .UInt16 = value } };
 }
 
-uint32 ZSharp::ReadUInt32(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromUInt32(uint32 value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::UInt32);
-
-	return buffer->Slots->Value.UInt32;
+	return { EZCallBufferSlotType::UInt32, { .UInt32 = value } };
 }
 
-uint64 ZSharp::ReadUInt64(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromUInt64(uint64 value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::UInt64);
-
-	return buffer->Slots->Value.UInt64;
+	return { EZCallBufferSlotType::UInt64, { .UInt64 = value } };
 }
 
-int8 ZSharp::ReadInt8(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromInt8(int8 value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Int8);
-
-	return buffer->Slots->Value.Int8;
+	return { EZCallBufferSlotType::Int8, { .Int8 = value } };
 }
 
-int16 ZSharp::ReadInt16(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromInt16(int16 value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Int16);
-
-	return buffer->Slots->Value.Int16;
+	return { EZCallBufferSlotType::Int16, { .Int16 = value } };
 }
 
-int32 ZSharp::ReadInt32(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromInt32(int32 value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Int32);
-
-	return buffer->Slots->Value.Int32;
+	return { EZCallBufferSlotType::Int32, { .Int32 = value } };
 }
 
-int64 ZSharp::ReadInt64(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromInt64(int64 value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Int64);
-
-	return buffer->Slots->Value.Int64;
+	return { EZCallBufferSlotType::Int64, { .Int64 = value } };
 }
 
-float ZSharp::ReadFloat(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromFloat(float value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Float);
-
-	return buffer->Slots->Value.Float;
+	return { EZCallBufferSlotType::Float, { .Float = value } };
 }
 
-double ZSharp::ReadDouble(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromDouble(double value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Double);
-
-	return buffer->Slots->Value.Double;
+	return { EZCallBufferSlotType::Double, { .Double = value } };
 }
 
-bool ZSharp::ReadBool(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromBool(bool value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Bool);
-
-	return buffer->Slots->Value.Bool > 0;
+	return { EZCallBufferSlotType::Bool, { .Bool = value } };
 }
 
-void* ZSharp::ReadPointer(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromPointer(void* value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Pointer);
-
-	return buffer->Slots->Value.Pointer;
+	return { EZCallBufferSlotType::Pointer, { .Pointer = value } };
 }
 
-ZSharp::FZGCHandle ZSharp::ReadGCHandle(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromGCHandle(FZGCHandle value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::GCHandle);
-
-	return buffer->Slots->Value.GCHandle;
+	return { EZCallBufferSlotType::GCHandle, { .GCHandle = value } };
 }
 
-ZSharp::FZConjugateHandle ZSharp::ReadConjugate(FZCallBuffer* buffer, int32 index)
+ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromConjugate(FZConjugateHandle value)
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Conjugate);
-
-	return buffer->Slots->Value.Conjugate;
+	return { EZCallBufferSlotType::Conjugate, { .Conjugate = value } };
 }
 
-void ZSharp::WriteUInt8(FZCallBuffer* buffer, int32 index, uint8 value)
+uint8 ZSharp::FZCallBufferSlot::ReadUInt8() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::UInt8);
-
-	buffer->Slots->Value.UInt8 = value;
+	check(Type == EZCallBufferSlotType::UInt8);
+	return Value.UInt8;
 }
 
-void ZSharp::WriteUInt16(FZCallBuffer* buffer, int32 index, uint16 value)
+uint16 ZSharp::FZCallBufferSlot::ReadUInt16() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::UInt16);
-
-	buffer->Slots->Value.UInt16 = value;
+	check(Type == EZCallBufferSlotType::UInt16);
+	return Value.UInt16;
 }
 
-void ZSharp::WriteUInt32(FZCallBuffer* buffer, int32 index, uint32 value)
+uint32 ZSharp::FZCallBufferSlot::ReadUInt32() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::UInt32);
-
-	buffer->Slots->Value.UInt32 = value;
+	check(Type == EZCallBufferSlotType::UInt32);
+	return Value.UInt32;
 }
 
-void ZSharp::WriteUInt64(FZCallBuffer* buffer, int32 index, uint64 value)
+uint64 ZSharp::FZCallBufferSlot::ReadUInt64() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::UInt64);
-
-	buffer->Slots->Value.UInt64 = value;
+	check(Type == EZCallBufferSlotType::UInt64);
+	return Value.UInt64;
 }
 
-void ZSharp::WriteInt8(FZCallBuffer* buffer, int32 index, int8 value)
+int8 ZSharp::FZCallBufferSlot::ReadInt8() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Int8);
-
-	buffer->Slots->Value.Int8 = value;
+	check(Type == EZCallBufferSlotType::Int8);
+	return Value.Int8;
 }
 
-void ZSharp::WriteInt16(FZCallBuffer* buffer, int32 index, int16 value)
+int16 ZSharp::FZCallBufferSlot::ReadInt16() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Int16);
-
-	buffer->Slots->Value.Int16 = value;
+	check(Type == EZCallBufferSlotType::Int16);
+	return Value.Int16;
 }
 
-void ZSharp::WriteInt32(FZCallBuffer* buffer, int32 index, int32 value)
+int32 ZSharp::FZCallBufferSlot::ReadInt32() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Int32);
-
-	buffer->Slots->Value.Int32 = value;
+	check(Type == EZCallBufferSlotType::Int32);
+	return Value.Int32;
 }
 
-void ZSharp::WriteInt64(FZCallBuffer* buffer, int32 index, int64 value)
+int64 ZSharp::FZCallBufferSlot::ReadInt64() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Int64);
-
-	buffer->Slots->Value.Int64 = value;
+	check(Type == EZCallBufferSlotType::Int64);
+	return Value.Int64;
 }
 
-void ZSharp::WriteFloat(FZCallBuffer* buffer, int32 index, float value)
+float ZSharp::FZCallBufferSlot::ReadFloat() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Float);
-
-	buffer->Slots->Value.Float = value;
+	check(Type == EZCallBufferSlotType::Float);
+	return Value.Float;
 }
 
-void ZSharp::WriteDouble(FZCallBuffer* buffer, int32 index, double value)
+double ZSharp::FZCallBufferSlot::ReadDouble() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Double);
-
-	buffer->Slots->Value.Double = value;
+	check(Type == EZCallBufferSlotType::Double);
+	return Value.Double;
 }
 
-void ZSharp::WriteBool(FZCallBuffer* buffer, int32 index, bool value)
+bool ZSharp::FZCallBufferSlot::ReadBool() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Bool);
-
-	buffer->Slots->Value.Bool = value;
+	check(Type == EZCallBufferSlotType::Bool);
+	return Value.Bool > 0;
 }
 
-void ZSharp::WritePointer(FZCallBuffer* buffer, int32 index, void* value)
+void* ZSharp::FZCallBufferSlot::ReadPointer() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Pointer);
-
-	buffer->Slots->Value.Pointer = value;
+	check(Type == EZCallBufferSlotType::Pointer);
+	return Value.Pointer;
 }
 
-void ZSharp::WriteGCHandle(FZCallBuffer* buffer, int32 index, FZGCHandle value)
+ZSharp::FZGCHandle ZSharp::FZCallBufferSlot::ReadGCHandle() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::GCHandle);
-
-	buffer->Slots->Value.GCHandle = value;
+	check(Type == EZCallBufferSlotType::GCHandle);
+	return Value.GCHandle;
 }
 
-void ZSharp::WriteConjugate(FZCallBuffer* buffer, int32 index, FZConjugateHandle value)
+ZSharp::FZConjugateHandle ZSharp::FZCallBufferSlot::ReadConjugate() const
 {
-	check(index >= 0 && index < buffer->NumSlots);
-	check(buffer->Slots[index].Type == EZCallBufferSlotType::Conjugate);
+	check(Type == EZCallBufferSlotType::Conjugate);
+	return Value.Conjugate;
+}
 
-	buffer->Slots->Value.Conjugate = value;
+void ZSharp::FZCallBufferSlot::WriteUInt8(uint8 value)
+{
+	check(Type == EZCallBufferSlotType::UInt8);
+	Value.UInt8 = value;
+}
+
+void ZSharp::FZCallBufferSlot::WriteUInt16(uint16 value)
+{
+	check(Type == EZCallBufferSlotType::UInt16);
+	Value.UInt16 = value;
+}
+
+void ZSharp::FZCallBufferSlot::WriteUInt32(uint32 value)
+{
+	check(Type == EZCallBufferSlotType::UInt32);
+	Value.UInt32 = value;
+}
+
+void ZSharp::FZCallBufferSlot::WriteUInt64(uint64 value)
+{
+	check(Type == EZCallBufferSlotType::UInt64);
+	Value.UInt64 = value;
+}
+
+void ZSharp::FZCallBufferSlot::WriteInt8(int8 value)
+{
+	check(Type == EZCallBufferSlotType::Int8);
+	Value.Int8 = value;
+}
+
+void ZSharp::FZCallBufferSlot::WriteInt16(int16 value)
+{
+	check(Type == EZCallBufferSlotType::Int16);
+	Value.Int16 = value;
+}
+
+void ZSharp::FZCallBufferSlot::WriteInt32(int32 value)
+{
+	check(Type == EZCallBufferSlotType::Int32);
+	Value.Int32 = value;
+}
+
+void ZSharp::FZCallBufferSlot::WriteInt64(int64 value)
+{
+	check(Type == EZCallBufferSlotType::Int64);
+	Value.Int64 = value;
+}
+
+void ZSharp::FZCallBufferSlot::WriteFloat(float value)
+{
+	check(Type == EZCallBufferSlotType::Float);
+	Value.Float = value;
+}
+
+void ZSharp::FZCallBufferSlot::WriteDouble(double value)
+{
+	check(Type == EZCallBufferSlotType::Double);
+	Value.Double = value;
+}
+
+void ZSharp::FZCallBufferSlot::WriteBool(bool value)
+{
+	check(Type == EZCallBufferSlotType::Bool);
+	Value.Bool = value;
+}
+
+void ZSharp::FZCallBufferSlot::WritePointer(void* value)
+{
+	check(Type == EZCallBufferSlotType::Pointer);
+	Value.Pointer = value;
+}
+
+void ZSharp::FZCallBufferSlot::WriteGCHandle(FZGCHandle value)
+{
+	check(Type == EZCallBufferSlotType::GCHandle);
+	Value.GCHandle = value;
+}
+
+void ZSharp::FZCallBufferSlot::WriteConjugate(FZConjugateHandle value)
+{
+	check(Type == EZCallBufferSlotType::Conjugate);
+	Value.Conjugate = value;
+}
+
+ZSharp::FZCallBufferSlot& ZSharp::FZCallBuffer::operator[](int32 index)
+{
+	check(index >= 0 && index < NumSlots);
+	return Slots[index];
 }
 
 

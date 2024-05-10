@@ -10,27 +10,30 @@ namespace ZSharp
 {
 	static FZStaticExportZCall Export_Object_GetClass{ "ex://Object.GetClass", [](FZCallBuffer* buffer)
 	{
-		UObject* obj = FZConjugateRegistry::Get()->Conjugate<UObject>(ReadConjugate(buffer, 0));
+		FZCallBuffer& buf = *buffer;
+		UObject* obj = FZConjugateRegistry::Get()->Conjugate<UObject>(buf[0].ReadConjugate());
 		UObject* cls = obj->GetClass();
-		WriteConjugate(buffer, 1, FZConjugateRegistry::Get()->Conjugate(cls));
+		buf[1].WriteConjugate(FZConjugateRegistry::Get()->Conjugate(cls));
 		
 		return 0;
 	}};
 
 	static FZStaticExportZCall Export_Object_GetOuter{ "ex://Object.GetOuter", [](FZCallBuffer* buffer)
 	{
-		UObject* obj = FZConjugateRegistry::Get()->Conjugate<UObject>(ReadConjugate(buffer, 0));
+		FZCallBuffer& buf = *buffer;
+		UObject* obj = FZConjugateRegistry::Get()->Conjugate<UObject>(buf[0].ReadConjugate());
 		UObject* outer = obj->GetOuter();
-		WriteConjugate(buffer, 1, FZConjugateRegistry::Get()->Conjugate(outer));
+		buf[1].WriteConjugate(FZConjugateRegistry::Get()->Conjugate(outer));
 		
 		return 0;
 	}};
 
 	static FZStaticExportZCall Export_Object_GetName{ "ex://Object.GetName", [](FZCallBuffer* buffer)
 	{
-		UObject* obj = FZConjugateRegistry::Get()->Conjugate<UObject>(ReadConjugate(buffer, 0));
+		FZCallBuffer& buf = *buffer;
+		UObject* obj = FZConjugateRegistry::Get()->Conjugate<UObject>(buf[0].ReadConjugate());
 		FString* res = new FString { obj->GetName() };
-		WriteConjugate(buffer, 1, FZConjugateRegistry::Get()->Conjugate(res, [](FString* unmanaged)
+		buf[1].WriteConjugate(FZConjugateRegistry::Get()->Conjugate(res, [](FString* unmanaged)
 		{
 			UE_LOG(LogZSharpRuntime, Log, TEXT("Release UnrealString: [%s] [%p]"), **unmanaged, unmanaged);
 			delete unmanaged;

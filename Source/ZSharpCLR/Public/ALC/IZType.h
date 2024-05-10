@@ -8,7 +8,6 @@
 namespace ZSharp
 {
 	class IZMethodInfo;
-	class IZPropertyInfo;
 	struct FZCallBuffer;
 	
 	class ZSHARPCLR_API IZType : public IZMemberInfo
@@ -17,6 +16,5 @@ namespace ZSharp
 		virtual FZConjugateHandle BuildConjugate(void* unmanaged) const = 0;
 	public:
 		virtual const IZMethodInfo* GetMethod(const FString& name) const = 0;
-		virtual const IZPropertyInfo* GetProperty(const FString& name) const = 0;
 	};
 }

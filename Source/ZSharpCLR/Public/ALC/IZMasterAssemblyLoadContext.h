@@ -11,7 +11,6 @@ namespace ZSharp
 	class IZAssembly;
 	class IZType;
 	class IZMethodInfo;
-	class IZPropertyInfo;
 	class IZCallDispatcher;
 	class IZCallResolver;
 	struct FZCallBuffer;

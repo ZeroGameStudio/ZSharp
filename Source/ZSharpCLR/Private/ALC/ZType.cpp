@@ -5,7 +5,6 @@
 
 #include "Interop/ZType_Interop.h"
 #include "ZMethodInfo.h"
-#include "ZPropertyInfo.h"
 
 const FString& ZSharp::FZType::GetName() const
 {
@@ -49,17 +48,4 @@ const ZSharp::IZMethodInfo* ZSharp::FZType::GetMethod(const FString& name) const
 	return method;
 }
 
-const ZSharp::IZPropertyInfo* ZSharp::FZType::GetProperty(const FString& name) const
-{
-	const TUniquePtr<IZPropertyInfo>* pProperty = PropertyMap.Find(name);
-	if (pProperty)
-	{
-		return pProperty->Get();
-	}
-	
-	FZGCHandle handle = FZType_Interop::GGetPropertyInfo(Handle, *name);
-	IZPropertyInfo* property = new FZPropertyInfo { handle };
-	PropertyMap.Emplace(name, property);
 
-	return property;
-}

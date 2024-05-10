@@ -5,7 +5,6 @@
 #include "ALC/IZType.h"
 #include "ZCall/ZConjugateHandle.h"
 #include "ALC/IZMethodInfo.h"
-#include "ALC/IZPropertyInfo.h"
 
 namespace ZSharp
 {
@@ -30,14 +29,12 @@ namespace ZSharp
 		virtual FZConjugateHandle BuildConjugate(void* unmanaged) const override;
 
 		virtual const IZMethodInfo* GetMethod(const FString& name) const override;
-		virtual const IZPropertyInfo* GetProperty(const FString& name) const override;
 
 	private:
 		FZGCHandle Handle;
 		mutable TOptional<FString> CachedName;
 
 		mutable TMap<FString, TUniquePtr<IZMethodInfo>> MethodMap;
-		mutable TMap<FString, TUniquePtr<IZPropertyInfo>> PropertyMap;
 		
 	};
 }

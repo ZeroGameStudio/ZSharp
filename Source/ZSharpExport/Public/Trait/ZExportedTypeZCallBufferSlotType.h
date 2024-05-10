@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ZCallBufferSlotType.h"
+#include "ZCall/ZCallBuffer.h"
 #include "ZIsDynamicExportableType.h"
 
 namespace ZSharp

@@ -23,14 +23,14 @@ void AZSharpActor::BeginPlay()
 	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
 	if (alc)
 	{
-		const ZSharp::IZAssembly* assembly = alc->GetAssembly("ZeroGames.ZSharp.UnrealEngine");
-		const ZSharp::IZType* type = assembly->GetType("ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics");
-		const ZSharp::IZMethodInfo* beginplay = type->GetMethod("BeginPlay");
-		
-		beginplay->Invoke([this](ZSharp::FZCallBuffer& buffer, int32 numSlots)
-		{
-			buffer.Slots[0].Conjugate = ZSharp::FZConjugateRegistry::Get()->Conjugate(this);
-		});
+		// const ZSharp::IZAssembly* assembly = alc->GetAssembly("ZeroGames.ZSharp.UnrealEngine");
+		// const ZSharp::IZType* type = assembly->GetType("ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics");
+		// const ZSharp::IZMethodInfo* beginplay = type->GetMethod("BeginPlay");
+		//
+		// beginplay->Invoke([this](ZSharp::FZCallBuffer& buffer, int32 numSlots)
+		// {
+		// 	buffer.Slots[0].Conjugate = ZSharp::FZConjugateRegistry::Get()->Conjugate(this);
+		// });
 	}
 }
 
@@ -39,16 +39,16 @@ void AZSharpActor::EndPlay(const EEndPlayReason::Type endPlayReason)
 	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
 	if (alc)
 	{
-		const ZSharp::IZAssembly* assembly = alc->GetAssembly("ZeroGames.ZSharp.UnrealEngine");
-		const ZSharp::IZType* type = assembly->GetType("ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics");
-		const ZSharp::IZMethodInfo* endplay = type->GetMethod("EndPlay");
-
-		endplay->Invoke([this](ZSharp::FZCallBuffer& buffer, int32 numSlots)
-		{
-			buffer.Slots[0].Conjugate = ZSharp::FZConjugateRegistry::Get()->Conjugate(this);
-		});
+		// const ZSharp::IZAssembly* assembly = alc->GetAssembly("ZeroGames.ZSharp.UnrealEngine");
+		// const ZSharp::IZType* type = assembly->GetType("ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics");
+		// const ZSharp::IZMethodInfo* endplay = type->GetMethod("EndPlay");
+		//
+		// endplay->Invoke([this](ZSharp::FZCallBuffer& buffer, int32 numSlots)
+		// {
+		// 	buffer.Slots[0].Conjugate = ZSharp::FZConjugateRegistry::Get()->Conjugate(this);
+		// });
 	}
-	
+
 	Super::EndPlay(endPlayReason);
 }
 
@@ -59,15 +59,15 @@ void AZSharpActor::Tick(float deltaTime)
 	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
 	if (alc)
 	{
-		const ZSharp::IZAssembly* assembly = alc->GetAssembly("ZeroGames.ZSharp.UnrealEngine");
-		const ZSharp::IZType* type = assembly->GetType("ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics");
-		const ZSharp::IZMethodInfo* tick = type->GetMethod("Tick");
-		
-		tick->Invoke([this, deltaTime](ZSharp::FZCallBuffer& buffer, int32 numSlots)
-		{
-			buffer.Slots[0].Conjugate = ZSharp::FZConjugateRegistry::Get()->Conjugate(this);
-			buffer.Slots[1].Float = deltaTime;
-		});
+		// const ZSharp::IZAssembly* assembly = alc->GetAssembly("ZeroGames.ZSharp.UnrealEngine");
+		// const ZSharp::IZType* type = assembly->GetType("ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics");
+		// const ZSharp::IZMethodInfo* tick = type->GetMethod("Tick");
+		//
+		// tick->Invoke([this, deltaTime](ZSharp::FZCallBuffer& buffer, int32 numSlots)
+		// {
+		// 	buffer.Slots[0].Conjugate = ZSharp::FZConjugateRegistry::Get()->Conjugate(this);
+		// 	buffer.Slots[1].Float = deltaTime;
+		// });
 	}
 }
 

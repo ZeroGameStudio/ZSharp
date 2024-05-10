@@ -9,18 +9,18 @@ namespace ZSharp
 {
 	static FZStaticExportZCall Export_String_Ctor{ "ex://String.Ctor", [](FZCallBuffer* buffer)
 	{
-		FZConjugateHandle managed = buffer->Slots[0].Conjugate;
-		const TCHAR* data = StaticCast<const TCHAR*>(buffer->Slots[1].Pointer);
+		FZConjugateHandle managed = ReadConjugate(buffer, 0);
+		const TCHAR* data = StaticCast<const TCHAR*>(ReadPointer(buffer, 1));
 		FString* unmanaged = new FString { data };
 		FZConjugateRegistry::Get()->Conjugate(unmanaged, managed);
-		buffer->Slots[2].Pointer = unmanaged;
+		WritePointer(buffer, 2, unmanaged);
 		
 		return 0;
 	}};
 
 	static FZStaticExportZCall Export_String_Dtor{ "ex://String.Dtor", [](FZCallBuffer* buffer)
 	{
-		FString* string = FZConjugateRegistry::Get()->Conjugate<FString>(buffer->Slots[0].Conjugate);
+		FString* string = FZConjugateRegistry::Get()->Conjugate<FString>(ReadConjugate(buffer, 0));
 		FZConjugateRegistry::Get()->ReleaseConjugate(string);
 
 		return 0;
@@ -28,25 +28,24 @@ namespace ZSharp
 	
 	static FZStaticExportZCall Export_String_Len{ "ex://String.Len", [](FZCallBuffer* buffer)
 	{
-		FString* string = FZConjugateRegistry::Get()->Conjugate<FString>(buffer->Slots[0].Conjugate);
-		int32* res = &buffer->Slots[1].Int32;
-		*res = string->Len();
+		FString* string = FZConjugateRegistry::Get()->Conjugate<FString>(ReadConjugate(buffer, 0));
+		WriteInt32(buffer, 1, string->Len());
 		
 		return 0;
 	}};
 
 	static FZStaticExportZCall Export_String_GetData{ "ex://String.GetData", [](FZCallBuffer* buffer)
 	{
-		FString* string = FZConjugateRegistry::Get()->Conjugate<FString>(buffer->Slots[0].Conjugate);
-		buffer->Slots[1].Pointer = const_cast<TCHAR*>(**string);
+		FString* string = FZConjugateRegistry::Get()->Conjugate<FString>(ReadConjugate(buffer, 0));
+		WritePointer(buffer, 1, const_cast<TCHAR*>(**string));
 		
 		return 0;
 	}};
 
 	static FZStaticExportZCall Export_String_SetData{ "ex://String.SetData", [](FZCallBuffer* buffer)
 	{
-		FString* string = FZConjugateRegistry::Get()->Conjugate<FString>(buffer->Slots[0].Conjugate);
-		const TCHAR* data = StaticCast<const TCHAR*>(buffer->Slots[1].Pointer);
+		FString* string = FZConjugateRegistry::Get()->Conjugate<FString>(ReadConjugate(buffer, 0));
+		const TCHAR* data = StaticCast<const TCHAR*>(ReadPointer(buffer, 1));
 		*string = data;
 		
 		return 0;

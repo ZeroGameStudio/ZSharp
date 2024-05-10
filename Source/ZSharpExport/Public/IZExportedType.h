@@ -3,7 +3,7 @@
 #pragma once
 
 #include "IZExportedMember.h"
-#include "ZCallBufferSlotType.h"
+#include "ZCall/ZCallBuffer.h"
 
 namespace ZSharp
 {

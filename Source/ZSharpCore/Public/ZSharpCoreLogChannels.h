@@ -2,6 +2,6 @@
 
 #pragma once
 
-DECLARE_LOG_CATEGORY_EXTERN(LogZSharpCLR, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogZSharpCore, Log, All);
 
 

@@ -39,7 +39,7 @@ public class ZSharpEditor : ModuleRules
 				
 				"Projects",
 				
-				"ZSharpCLR",
+				"ZSharpCore",
 				"ZSharpRuntime",
 				
 				"ZSharpExport",

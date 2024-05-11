@@ -6,7 +6,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPCLR_API IZGCHandle : public FNoncopyable
+	class ZSHARPCORE_API IZGCHandle : public FNoncopyable
 	{
 	public:
 		virtual ~IZGCHandle(){}

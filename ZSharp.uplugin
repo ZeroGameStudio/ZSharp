@@ -16,7 +16,7 @@
 	"Installed": false,
 	"Modules": [
 		{
-			"Name": "ZSharpCLR",
+			"Name": "ZSharpCore",
 			"Type": "Runtime",
 			"LoadingPhase": "EarliestPossible"
 		},

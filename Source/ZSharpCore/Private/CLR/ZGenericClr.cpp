@@ -5,7 +5,7 @@
 
 #include "hostfxr.h"
 #include "coreclr_delegates.h"
-#include "ZSharpCLRLogChannels.h"
+#include "ZSharpCoreLogChannels.h"
 #include "Interfaces/IPluginManager.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
 #include "Interop/Core_Interop.h"
@@ -248,7 +248,7 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
 	
 	if (MasterAlc)
 	{
-		UE_LOG(LogZSharpCLR, Fatal, TEXT("Master ALC already exists!"));
+		UE_LOG(LogZSharpCore, Fatal, TEXT("Master ALC already exists!"));
 	}
 
 	FZGCHandle handle = ZClr_Interop::GCreateMasterAlc();
@@ -289,7 +289,7 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericClr::CreateSlimAlc(const FSt
 	
 	if (SlimAlcMap.Contains(name))
 	{
-		UE_LOG(LogZSharpCLR, Fatal, TEXT("Slim ALC [%s] already exists!"), *name);
+		UE_LOG(LogZSharpCore, Fatal, TEXT("Slim ALC [%s] already exists!"), *name);
 	}
 
 	FZGCHandle handle = ZClr_Interop::GCreateSlimAlc(*name);

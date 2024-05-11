@@ -5,7 +5,7 @@
 
 #include "ZAssembly.h"
 #include "Interop/ZMasterAssemblyLoadContext_Interop.h"
-#include "ZSharpCLRLogChannels.h"
+#include "ZSharpCoreLogChannels.h"
 #include "ZCall/IZCallDispatcher.h"
 #include "ALC/IZType.h"
 #include "ZCall/ZCallBuffer.h"
@@ -264,7 +264,7 @@ void* ZSharp::FZMasterAssemblyLoadContext::Conjugate(FZConjugateHandle managed) 
 
 void ZSharp::FZMasterAssemblyLoadContext::NotifyPreZCallToManaged() const
 {
-	UE_LOG(LogZSharpCLR, Verbose, TEXT("===================== Pre ZCall To Managed ====================="));
+	UE_LOG(LogZSharpCore, Verbose, TEXT("===================== Pre ZCall To Managed ====================="));
 	
 	PreZCallToManaged.Broadcast();
 }
@@ -273,7 +273,7 @@ void ZSharp::FZMasterAssemblyLoadContext::NotifyPostZCallToManaged() const
 {
 	PostZCallToManaged.Broadcast();
 
-	UE_LOG(LogZSharpCLR, Verbose, TEXT("===================== Post ZCall To Managed ====================="));
+	UE_LOG(LogZSharpCore, Verbose, TEXT("===================== Post ZCall To Managed ====================="));
 }
 
 bool ZSharp::FZMasterAssemblyLoadContext::Tick(float deltaTime)

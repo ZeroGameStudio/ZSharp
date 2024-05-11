@@ -6,7 +6,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPCLR_API IZSlimAssemblyLoadContext : public IZAssemblyLoadContext
+	class ZSHARPCORE_API IZSlimAssemblyLoadContext : public IZAssemblyLoadContext
 	{
 	public:
 		virtual const FString& GetName() const = 0;

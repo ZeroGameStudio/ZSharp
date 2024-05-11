@@ -10,7 +10,7 @@ namespace ZSharp
 	DECLARE_MULTICAST_DELEGATE_OneParam(FZOnMasterAlcLoaded, IZMasterAssemblyLoadContext*)
 	DECLARE_MULTICAST_DELEGATE(FZOnMasterAlcUnloaded)
 	
-	class ZSHARPCLR_API IZSharpClr
+	class ZSHARPCORE_API IZSharpClr
 	{
 	public:
 		static IZSharpClr& Get();

@@ -9,7 +9,7 @@ namespace ZSharp
 {
 	struct FZCallBuffer;
 	
-	class ZSHARPCLR_API IZType : public IZMemberInfo
+	class ZSHARPCORE_API IZType : public IZMemberInfo
 	{
 	public:
 		virtual FZConjugateHandle BuildConjugate(void* unmanaged) const = 0;

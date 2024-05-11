@@ -30,7 +30,7 @@ namespace ZSharp
 #undef Op
 	};
 
-	ZSHARPCLR_API FString ToString(EZCallBufferSlotType type);
+	ZSHARPCORE_API FString ToString(EZCallBufferSlotType type);
 	
 	union FZCallBufferSlotValue
 	{
@@ -50,7 +50,7 @@ namespace ZSharp
 		FZConjugateHandle Conjugate;
 	};
 
-	struct ZSHARPCLR_API FZCallBufferSlot
+	struct ZSHARPCORE_API FZCallBufferSlot
 	{
 		
 		static FZCallBufferSlot FromUInt8(uint8 value);
@@ -104,7 +104,7 @@ namespace ZSharp
 	};
 
 	// NOTE: Do NOT Construct/Read/Write this directly, use helper functions and macros below.
-	struct ZSHARPCLR_API FZCallBuffer
+	struct ZSHARPCORE_API FZCallBuffer
 	{
 		
 		FZCallBufferSlot& operator[](int32 index);

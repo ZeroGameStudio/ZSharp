@@ -8,7 +8,7 @@ namespace ZSharp
 {
 	class IZType;
 	
-	class ZSHARPCLR_API IZAssembly : public IZGCHandle
+	class ZSHARPCORE_API IZAssembly : public IZGCHandle
 	{
 	public:
 		virtual const FString& GetName() const = 0;

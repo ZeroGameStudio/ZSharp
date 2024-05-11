@@ -38,7 +38,7 @@ public class ZSharpRuntime : ModuleRules
 				"CoreUObject",
 				"DeveloperSettings",
 				
-				"ZSharpCLR",
+				"ZSharpCore",
 			}
 		);
 		

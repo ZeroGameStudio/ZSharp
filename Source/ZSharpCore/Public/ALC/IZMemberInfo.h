@@ -6,7 +6,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPCLR_API IZMemberInfo : public IZGCHandle
+	class ZSHARPCORE_API IZMemberInfo : public IZGCHandle
 	{
 	public:
 		virtual const FString& GetName() const = 0;

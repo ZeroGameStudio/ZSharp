@@ -2,7 +2,7 @@
 
 #include "CLR/IZSharpClr.h"
 
-#include "ZSharpCLR.h"
+#include "ZSharpClr.h"
 #include "ZGenericClr.h"
 
 namespace ZSharp::IZSharpClr_Private

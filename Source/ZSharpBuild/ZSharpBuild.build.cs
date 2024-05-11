@@ -39,7 +39,7 @@ public class ZSharpBuild : ModuleRules
 				"Projects",
 				"Json",
 				
-				"ZSharpCLR",
+				"ZSharpCore",
 				"ZSharpExport",
 				"ZSharpRuntime",
 			}

@@ -36,7 +36,7 @@ public class ZSharpExport : ModuleRules
 			{
 				"CoreUObject",
 				
-				"ZSharpCLR",
+				"ZSharpCore",
 			}
 		);
 		

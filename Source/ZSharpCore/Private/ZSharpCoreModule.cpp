@@ -1,12 +1,12 @@
 // Copyright Zero Games. All Rights Reserved.
 
-#include "ZSharpCLRModule.h"
+#include "ZSharpCoreModule.h"
 
-#include "CLR/ZSharpCLR.h"
+#include "CLR/ZSharpClr.h"
 #include "CLR/IZSharpClr.h"
 #include "ALC/ZCommonDllMainArgs.h"
 
-namespace ZSharp::ZSharpCLRModule_Private
+namespace ZSharp::ZSharpCoreModule_Private
 {
 	static FAutoConsoleCommand GCmdZSharpRun(
 	TEXT("zs.run"),
@@ -53,7 +53,7 @@ namespace ZSharp::ZSharpCLRModule_Private
 		ECVF_Default);
 }
 
-class FZSharpCLRModule : public IZSharpCLRModule
+class FZSharpCoreModule : public IZSharpCoreModule
 {
 	// Begin IModuleInterface
 	virtual void StartupModule() override;
@@ -61,14 +61,14 @@ class FZSharpCLRModule : public IZSharpCLRModule
 	// End IModuleInterface
 };
 
-IMPLEMENT_MODULE(FZSharpCLRModule, ZSharpCLR)
+IMPLEMENT_MODULE(FZSharpCoreModule, ZSharpCore)
 
-void FZSharpCLRModule::StartupModule()
+void FZSharpCoreModule::StartupModule()
 {
 	FZSharpClr::Get().Startup();
 }
 
-void FZSharpCLRModule::ShutdownModule()
+void FZSharpCoreModule::ShutdownModule()
 {
 	FZSharpClr::Get().Shutdown();
 }

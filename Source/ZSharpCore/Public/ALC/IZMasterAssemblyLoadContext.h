@@ -17,7 +17,7 @@ namespace ZSharp
 	DECLARE_MULTICAST_DELEGATE(FZPreZCallToManaged)
 	DECLARE_MULTICAST_DELEGATE(FZPostZCallToManaged)
 	
-	class ZSHARPCLR_API IZMasterAssemblyLoadContext : public IZAssemblyLoadContext
+	class ZSHARPCORE_API IZMasterAssemblyLoadContext : public IZAssemblyLoadContext
 	{
 	public:
 		virtual const IZAssembly* LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) = 0;

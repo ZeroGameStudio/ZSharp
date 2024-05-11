@@ -6,7 +6,7 @@ namespace ZSharp
 {
 	class IZCallDispatcher;
 	
-	class ZSHARPCLR_API IZCallResolver
+	class ZSHARPCORE_API IZCallResolver
 	{
 	public:
 		virtual ~IZCallResolver(){}

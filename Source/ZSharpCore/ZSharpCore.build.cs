@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class ZSharpCLR : ModuleRules
+public class ZSharpCore : ModuleRules
 {
-	public ZSharpCLR(ReadOnlyTargetRules Target) : base(Target)
+	public ZSharpCore(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		

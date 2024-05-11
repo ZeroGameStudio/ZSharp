@@ -22,8 +22,6 @@ namespace ZSharp::FZConjugateRegistry_Private
 			}
 		}
 
-		auto x = TBaseStructure<FTableRowBase>::Get();
-
 		for (const auto& unmanaged : pendings)
 		{
 			registry.ReleaseConjugate(unmanaged);

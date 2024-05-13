@@ -16,7 +16,7 @@ public readonly struct ZCallHandle
 
     private ZCallHandle(int64 handle) => _handle = handle;
     
-    private static int64 _sCurrentHandle = 0;
+    private static int64 _sCurrentHandle;
 
     private readonly int64 _handle;
 

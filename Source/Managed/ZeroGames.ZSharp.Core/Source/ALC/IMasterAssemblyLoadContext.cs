@@ -8,10 +8,9 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 	public static IMasterAssemblyLoadContext? Get() => MasterAssemblyLoadContext.Get();
 
 	int32 ZCall(ZCallHandle handle, ZCallBuffer* buffer);
-	int32 ZCall(string name, ZCallBuffer* buffer);
-	int32 ZCall(string name, ZCallBuffer* buffer, out ZCallHandle handle);
-	void ZCall_AnyThread(ZCallHandle handle, ZCallBuffer* buffer, int32 numSlots);
 	ZCallHandle GetZCallHandle(string name);
+	IntPtr BuildConjugate(uint16 registryId, IConjugate managed);
+	void ReleaseConjugate(uint16 registryId, IntPtr unmanaged);
 
 }
 

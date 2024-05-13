@@ -61,7 +61,7 @@ public struct ZCallBufferSlot
 	public static ZCallBufferSlot FromConjugate(ConjugateHandle value) => new(EZCallBufferSlotType.Conjugate) { Value = new() { Conjugate = value } };
 	
 	public static unsafe ZCallBufferSlot FromPointer(void* value) => FromPointer(new IntPtr(value));
-	public static ZCallBufferSlot FromConjugate(IConjugate? value) => FromConjugate(value.GetConjugateHandle());
+	public static ZCallBufferSlot FromConjugate(IConjugate? value) => FromConjugate(new ConjugateHandle(value));
 	
 	public uint8 ReadUInt8()
 	{
@@ -343,8 +343,8 @@ public struct ZCallBufferSlot
 		Value.Conjugate = value;
 	}
 
-	public T? ReadConjugate<T>() where T : class, IConjugate => ReadConjugate().ToConjugate<T>();
-	public void WriteConjugate<T>(T? value) where T : class, IConjugate => WriteConjugate(value.GetConjugateHandle());
+	public T? ReadConjugate<T>() where T : class, IConjugate => ReadConjugate().GetTarget<T>();
+	public void WriteConjugate<T>(T? value) where T : class, IConjugate => WriteConjugate(new ConjugateHandle(value));
 
 	private ZCallBufferSlot(EZCallBufferSlotType type) => Type = type;
 	

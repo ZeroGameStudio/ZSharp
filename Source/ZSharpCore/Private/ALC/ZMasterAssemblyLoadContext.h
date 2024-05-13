@@ -4,10 +4,10 @@
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
 
-#include "ALC/IZAssembly.h"
 #include "Interop/ZGCHandle.h"
 #include "ZCall/IZCallDispatcher.h"
 #include "ZCall/IZCallResolver.h"
+#include "ZCall/IZConjugateRegistry.h"
 
 namespace ZSharp
 {
@@ -28,61 +28,47 @@ namespace ZSharp
 		virtual void Unload() override;
 
 		// IZMasterAssemblyLoadContext
-		virtual const IZAssembly* LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) override;
-		virtual const IZAssembly* GetAssembly(const FString& name) const override;
+		virtual void LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) override;
+		virtual FZRuntimeTypeHandle GetType(const FString& assemblyName, const FString& typeName) override;
 
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) override;
-		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) const override;
-		virtual int32 ZCall(const FString& name, FZCallBuffer* buffer) const override;
-		virtual int32 ZCall(const FString& name, FZCallBuffer* buffer, FZCallHandle* outHandle = nullptr) override;
-		virtual void ZCall_AnyThread(FZCallHandle handle, FZCallBuffer* buffer, int32 numSlots) override;
-		virtual FZCallHandle GetZCallHandle(const FString& name) const override;
-		virtual FZCallHandle GetOrResolveZCallHandle(const FString& name) override;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) override;
 
-		virtual FDelegateHandle RegisterPreZCallToManaged(FZPreZCallToManaged::FDelegate delegate) override;
-		virtual void UnregisterPreZCallToManaged(FDelegateHandle delegate) override;
-		virtual void UnregisterPreZCallToManaged(const void* userObject) override;
-		virtual FDelegateHandle RegisterPostZCallToManaged(FZPostZCallToManaged::FDelegate delegate) override;
-		virtual void UnregisterPostZCallToManaged(FDelegateHandle delegate) override;
-		virtual void UnregisterPostZCallToManaged(const void* userObject) override;
-
-		virtual FZConjugateHandle BuildConjugate(void* unmanaged, const IZType* managedType) override;
-		virtual void BuildConjugate(void* unmanaged, FZConjugateHandle managed) override;
+		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) override;
+		virtual FZCallHandle GetZCallHandle(const FString& name) override;
+		virtual void* BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type) override;
 		virtual void ReleaseConjugate(void* unmanaged) override;
-		virtual void ReleaseConjugate(FZConjugateHandle managed) override;
-		virtual FZConjugateHandle Conjugate(void* unmanaged) const override;
-		virtual void* Conjugate(FZConjugateHandle managed) const override;
+		
+		virtual void VisitConjugateRegistry(uint16 id, const TFunctionRef<void(IZConjugateRegistry&)> action) override;
 
 	public:
-		void NotifyPreZCallToManaged() const;
-		void NotifyPostZCallToManaged() const;
+		int32 ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const;
+		FZCallHandle GetZCallHandle_Black(const FString& name);
+		void* BuildConjugate_Black(uint16 registryId);
+		void ReleaseConjugate_Black(uint16 registryId, void* unmanaged);
 
 	private:
-		bool Tick(float deltaTime);
-		void FlushDeferredZCalls();
+		int32 ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer);
+		FZCallHandle GetZCallHandle_Red(const FString& name);
+		void* BuildConjugate_Red(void* unmanaged, FZRuntimeTypeHandle type);
+		void ReleaseConjugate_Red(void* unmanaged);
+
+		void PushRedFrame();
+		void PopRedFrame();
+
+		bool IsInsideOfRedZCall() const { return !!RedZCallDepth; }
 
 	private:
 		FZGCHandle Handle;
 		TFunction<void()> UnloadCallback;
-
-		TMap<FString, TUniquePtr<IZAssembly>> AssemblyMap;
 
 		TMap<FZCallHandle, TUniquePtr<IZCallDispatcher>> ZCallMap;
 		TMap<FString, FZCallHandle> ZCallName2Handle;
 
 		TArray<TTuple<uint64, TUniquePtr<IZCallResolver>>> ZCallResolverLink;
 
-		FRWLock DeferredZCallsLock;
-		TQueue<TTuple<FZCallHandle, FZCallBuffer>> DeferredZCalls;
-		FTSTicker::FDelegateHandle TickerHandle;
-
-		TMap<void*, FZConjugateHandle> ConjugateUnmanaged2Managed;
-		TMap<FZConjugateHandle, void*> ConjugateManaged2Unmanaged;
-		TSet<FZConjugateHandle> UnmanagedConjugates;
-
-		FZPreZCallToManaged PreZCallToManaged;
-		FZPostZCallToManaged PostZCallToManaged;
+		TSparseArray<TUniquePtr<IZConjugateRegistry>> ConjugateRegistries;
+		int32 RedZCallDepth;
 		
 	};
 }

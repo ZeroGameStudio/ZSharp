@@ -32,8 +32,6 @@ IMPLEMENT_MODULE(FZSharpRuntimeModule, ZSharpRuntime)
 
 void FZSharpRuntimeModule::StartupModule()
 {
-	ZSharp::FZConjugateRegistry::Startup();
-
 #if WITH_EDITOR
 	FEditorDelegates::PreBeginPIE.AddRaw(this, &ThisClass::HandleBeginPIE);
 	FEditorDelegates::ShutdownPIE.AddRaw(this, &ThisClass::HandleEndPIE);

@@ -4,6 +4,8 @@
 
 namespace ZSharp
 {
+	static_assert(sizeof(void*) == 8, "Only 64-bit platforms are supported!");
+	
 	struct FZConjugateHandle
 	{
 		

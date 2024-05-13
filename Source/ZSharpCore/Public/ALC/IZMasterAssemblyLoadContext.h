@@ -3,51 +3,41 @@
 #pragma once
 
 #include "IZAssemblyLoadContext.h"
+#include "Interop/ZRuntimeTypeHandle.h"
 #include "ZCall/ZCallHandle.h"
-#include "ZCall/ZConjugateHandle.h"
+#include "ZCall/CZConjugateRegistryImpl.h"
 
 namespace ZSharp
 {
-	class IZAssembly;
-	class IZType;
 	class IZCallDispatcher;
 	class IZCallResolver;
 	struct FZCallBuffer;
-
-	DECLARE_MULTICAST_DELEGATE(FZPreZCallToManaged)
-	DECLARE_MULTICAST_DELEGATE(FZPostZCallToManaged)
+	class IZConjugateRegistry;
 	
 	class ZSHARPCORE_API IZMasterAssemblyLoadContext : public IZAssemblyLoadContext
 	{
 	public:
-		virtual const IZAssembly* LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) = 0;
-		virtual const IZAssembly* GetAssembly(const FString& name) const = 0;
+		virtual void LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) = 0;
+		virtual FZRuntimeTypeHandle GetType(const FString& assemblyName, const FString& typeName) = 0;
 	public:
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) = 0;
-		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) const = 0;
-		virtual int32 ZCall(const FString& name, FZCallBuffer* buffer) const = 0;
-		virtual int32 ZCall(const FString& name, FZCallBuffer* buffer, FZCallHandle* outHandle = nullptr) = 0;
-		virtual void ZCall_AnyThread(FZCallHandle handle, FZCallBuffer* buffer, int32 numSlots) = 0;
-		virtual FZCallHandle GetZCallHandle(const FString& name) const = 0;
-		virtual FZCallHandle GetOrResolveZCallHandle(const FString& name) = 0;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) = 0;
 
-		virtual FDelegateHandle RegisterPreZCallToManaged(FZPreZCallToManaged::FDelegate delegate) = 0;
-		virtual void UnregisterPreZCallToManaged(FDelegateHandle delegate) = 0;
-		virtual void UnregisterPreZCallToManaged(const void* userObject) = 0;
-		virtual FDelegateHandle RegisterPostZCallToManaged(FZPostZCallToManaged::FDelegate delegate) = 0;
-		virtual void UnregisterPostZCallToManaged(FDelegateHandle delegate) = 0;
-		virtual void UnregisterPostZCallToManaged(const void* userObject) = 0;
-	public:
-		virtual FZConjugateHandle BuildConjugate(void* unmanaged, const IZType* managedType) = 0;
-		virtual void BuildConjugate(void* unmanaged, FZConjugateHandle managed) = 0;
+		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) = 0;
+		virtual FZCallHandle GetZCallHandle(const FString& name) = 0;
+		virtual void* BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type) = 0;
 		virtual void ReleaseConjugate(void* unmanaged) = 0;
-		virtual void ReleaseConjugate(FZConjugateHandle managed) = 0;
-		virtual FZConjugateHandle Conjugate(void* unmanaged) const = 0;
-		virtual void* Conjugate(FZConjugateHandle managed) const = 0;
+		
+		virtual void VisitConjugateRegistry(uint16 id, const TFunctionRef<void(IZConjugateRegistry&)> action) = 0;
 		// Helpers
 	public:
-		const IZAssembly* LoadAssembly(const FString& path, void* args = nullptr);
+		void LoadAssembly(const FString& path, void* args = nullptr);
+
+		template <CZConjugateRegistryImpl T>
+		void VisitConjugateRegistry(const TFunctionRef<void(T&)> action)
+		{
+			VisitConjugateRegistry(T::RegistryId, [action](IZConjugateRegistry& registry){ action(StaticCast<T&>(registry)); });
+		}
 	};
 }
 

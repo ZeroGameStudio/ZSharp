@@ -10,7 +10,6 @@
 #include "ALC/IZSlimAssemblyLoadContext.h"
 #include "Interop/Core_Interop.h"
 #include "Interop/UnrealEngine_Interop.h"
-#include "Interop/ZAssembly_Interop.h"
 #include "Interop/ZClr_Interop.h"
 #include "Interop/ZGCHandle_Interop.h"
 #include "Interop/ZInteropString_Interop.h"
@@ -19,7 +18,6 @@
 #include "Interop/ZGCHandle.h"
 #include "ALC/ZSlimAssemblyLoadContext.h"
 #include "Interop/ZSlimAssemblyLoadContext_Interop.h"
-#include "Interop/ZType_Interop.h"
 
 namespace ZSharp::FZGenericClr_Private
 {
@@ -54,10 +52,10 @@ namespace ZSharp::FZGenericClr_Private
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, GetData),
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, SetData),
 
-			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ZCallByHandle),
-			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ZCallByName),
-			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ZCallByHandle_AnyThread),
-			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, GetZCallHandle),
+			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ZCall_Black),
+			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, GetZCallHandle_Black),
+			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, BuildConjugate_Black),
+			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ReleaseConjugate_Black),
 
 #undef BUILD_UNMANAGED_FUNCTION
 #undef TO_STRING
@@ -75,19 +73,15 @@ namespace ZSharp::FZGenericClr_Private
 
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GUnload),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GLoadAssembly),
-			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GReleaseConjugate),
+			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GGetType),
+			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GZCall_Red),
+			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GGetZCallHandle_Red),
+			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GBuildConjugate_Red),
+			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GReleaseConjugate_Red),
 
 			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GUnload),
 			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GLoadAssembly),
 			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GCallMethod),
-				
-			ADDRESS_OF(FZAssembly_Interop::GGetName),
-			ADDRESS_OF(FZAssembly_Interop::GGetType),
-
-			ADDRESS_OF(FZType_Interop::GGetName),
-			ADDRESS_OF(FZType_Interop::GBuildConjugate),
-			ADDRESS_OF(FZType_Interop::GGetMethodInfo),
-			ADDRESS_OF(FZType_Interop::GGetPropertyInfo),
 				
 #undef ADDRESS_OF
 		};

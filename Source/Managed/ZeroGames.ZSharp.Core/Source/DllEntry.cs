@@ -66,8 +66,7 @@ internal static class DllEntry
 
         int32 offset = 0;
         // CLR interop functions
-        *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<int32, uint8, uint8, uint8, void>)&Clr_Interop.CollectGarbage;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<int32, uint8, uint8, uint8, void>)&Clr_Interop.CollectGarbage;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle>)&Clr_Interop.CreateMasterAlc;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, GCHandle>)&Clr_Interop.CreateSlimAlc;
 
@@ -76,34 +75,17 @@ internal static class DllEntry
 
         // MasterAssemblyLoadContext interop functions
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<int32>)&MasterAssemblyLoadContext_Interop.Unload;
-        *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<uint8*, int32, void*, GCHandle>)&MasterAssemblyLoadContext_Interop.LoadAssembly;
-        *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<ConjugateHandle, int32>)&MasterAssemblyLoadContext_Interop.ReleaseConjugate;
-
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<uint8*, int32, void*, void>)&MasterAssemblyLoadContext_Interop.LoadAssembly;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, char*, InteropRuntimeTypeHandle>)&MasterAssemblyLoadContext_Interop.GetType;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32>)&MasterAssemblyLoadContext_Interop.ZCall_Red;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, ZCallHandle>)&MasterAssemblyLoadContext_Interop.GetZCallHandle_Red;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, InteropRuntimeTypeHandle, IntPtr>)&MasterAssemblyLoadContext_Interop.BuildConjugate_Red;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, void>)&MasterAssemblyLoadContext_Interop.ReleaseConjugate_Red;
+        
         // SlimAssemblyLoadContext interop functions
-        *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<GCHandle, int32>)&SlimAssemblyLoadContext_Interop.Unload;
-        *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<GCHandle, uint8*, int32, void*, int32>)&SlimAssemblyLoadContext_Interop
-                .LoadAssembly;
-        *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<GCHandle, char*, char*, char*, void*, int32>)&SlimAssemblyLoadContext_Interop
-                .CallMethod;
-
-        // Assembly interop functions
-        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, IntPtr, int32>)&Assembly_Interop.GetName;
-        *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<GCHandle, char*, GCHandle>)&Assembly_Interop.GetType;
-
-        // Type interop functions
-        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, IntPtr, int32>)&Type_Interop.GetName;
-        *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<GCHandle, IntPtr, ConjugateHandle>)&Type_Interop.BuildConjugate;
-        *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<GCHandle, char*, GCHandle>)&Type_Interop.GetMethodInfo;
-        *args->ManagedFunctions[offset++] =
-            (delegate* unmanaged<GCHandle, char*, GCHandle>)&Type_Interop.GetPropertyInfo;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, int32>)&SlimAssemblyLoadContext_Interop.Unload;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, uint8*, int32, void*, int32>)&SlimAssemblyLoadContext_Interop.LoadAssembly;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, char*, char*, void*, int32>)&SlimAssemblyLoadContext_Interop.CallMethod;
 
         Logger.Log("===================== ZSharp Startup =====================");
 

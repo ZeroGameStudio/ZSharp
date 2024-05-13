@@ -28,6 +28,8 @@ public class ZSharpRuntime : ModuleRules
 			{
 				"Core",
 				"Engine",
+				
+				"ZSharpCore",
 			}
 		);
 		
@@ -37,8 +39,6 @@ public class ZSharpRuntime : ModuleRules
 			{
 				"CoreUObject",
 				"DeveloperSettings",
-				
-				"ZSharpCore",
 			}
 		);
 		

@@ -56,7 +56,14 @@ public abstract class ExportedObjectBase : IConjugate
         throw new Exception($"Owning ALC is not MasterAssemblyLoadContext but {alc.GetType().Name}");
     }
 
-    public void ReleaseConjugate()
+    public void Dispose()
+    {
+        InternalDispose();
+        
+        GC.SuppressFinalize(this);
+    }
+
+    public void Release()
     {
         if (_bManaged)
         {
@@ -94,6 +101,11 @@ public abstract class ExportedObjectBase : IConjugate
     }
 
     ~ExportedObjectBase()
+    {
+        InternalDispose();
+    }
+
+    private void InternalDispose()
     {
         if (!_bManaged)
         {

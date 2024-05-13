@@ -6,8 +6,6 @@
 
 namespace ZSharp
 {
-	class IZAssembly;
-	
 	class ZSHARPCORE_API IZAssemblyLoadContext : public IZGCHandle
 	{
 	public:

@@ -4,47 +4,50 @@
 #include "ZMasterAssemblyLoadContext_Interop.h"
 
 #include "CLR/IZSharpClr.h"
-#include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZMasterAssemblyLoadContext.h"
 
-int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByHandle(FZCallHandle handle, FZCallBuffer* buffer)
+int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer)
 {
-	const IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
+	FZMasterAssemblyLoadContext* alc = StaticCast<FZMasterAssemblyLoadContext*>(IZSharpClr::Get().GetMasterAlc());
 	if (!alc)
 	{
 		return -1;
 	}
 
-	return alc->ZCall(handle, buffer);
+	return alc->ZCall_Black(handle, buffer);
 }
 
-int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByName(const TCHAR* name, FZCallBuffer* buffer, FZCallHandle* outHandle)
+ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext_Interop::GetZCallHandle_Black(const TCHAR* name)
 {
-	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
-	if (!alc)
-	{
-		return -1;
-	}
-
-	return outHandle ? alc->ZCall(name, buffer, outHandle) : alc->ZCall(name, buffer);
-}
-
-void ZSharp::FZMasterAssemblyLoadContext_Interop::ZCallByHandle_AnyThread(FZCallHandle handle, FZCallBuffer* buffer, int32 numSlots)
-{
-	IZSharpClr::Get().GetMasterAlc_AnyThread([handle, buffer, numSlots](IZMasterAssemblyLoadContext* alc)
-	{
-		alc->ZCall_AnyThread(handle, buffer, numSlots);
-	});
-}
-
-ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext_Interop::GetZCallHandle(const TCHAR* name)
-{
-	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
+	FZMasterAssemblyLoadContext* alc = StaticCast<FZMasterAssemblyLoadContext*>(IZSharpClr::Get().GetMasterAlc());
 	if (!alc)
 	{
 		return FZCallHandle{};
 	}
 
-	return alc->GetOrResolveZCallHandle({ name });
+	return alc->GetZCallHandle_Black({ name });
+}
+
+void* ZSharp::FZMasterAssemblyLoadContext_Interop::BuildConjugate_Black(uint16 registryId)
+{
+	FZMasterAssemblyLoadContext* alc = StaticCast<FZMasterAssemblyLoadContext*>(IZSharpClr::Get().GetMasterAlc());
+	if (!alc)
+	{
+		return nullptr;
+	}
+
+	return alc->BuildConjugate_Black(registryId);
+}
+
+void ZSharp::FZMasterAssemblyLoadContext_Interop::ReleaseConjugate_Black(uint16 registryId, void* unmanaged)
+{
+	FZMasterAssemblyLoadContext* alc = StaticCast<FZMasterAssemblyLoadContext*>(IZSharpClr::Get().GetMasterAlc());
+	if (!alc)
+	{
+		return;
+	}
+
+	return alc->ReleaseConjugate_Black(registryId, unmanaged);
 }
 
 

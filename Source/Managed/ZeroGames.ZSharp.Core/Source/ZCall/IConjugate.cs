@@ -2,9 +2,9 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-public interface IConjugate : IGCHandle
+public interface IConjugate : IGCHandle, IDisposable
 {
-    protected internal void ReleaseConjugate();
+    protected internal void Release();
     IntPtr Unmanaged { get; }
 }
 

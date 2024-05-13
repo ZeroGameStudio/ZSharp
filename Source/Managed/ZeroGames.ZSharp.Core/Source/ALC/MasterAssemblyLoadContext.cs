@@ -55,7 +55,29 @@ internal class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMaste
     
     internal unsafe int32 ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
     {
-        throw new NotImplementedException();
+        for (int32 i = 0; i < buffer->NumSlots; ++i)
+        {
+            switch ((*buffer)[i].Type)
+            {
+                case EZCallBufferSlotType.Conjugate:
+                {
+                    Logger.Log($"SlotValue: {(*buffer)[i].ReadConjugate<IConjugate>()!.Unmanaged}");
+                    break;
+                }
+                case EZCallBufferSlotType.Float:
+                {
+                    Logger.Log($"SlotValue: {(*buffer)[i].ReadFloat()}");
+                    break;
+                }
+                default:
+                {
+                    Logger.Log($"SlotType: [{(*buffer)[i].Type}]");
+                    break;
+                }
+            }
+        }
+
+        return 0;
     }
 
     internal ZCallHandle GetZCallHandle_Red(string name)
@@ -68,7 +90,8 @@ internal class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMaste
         Type conjugateType = typeof(IConjugate<>).MakeGenericType(type);
         if (type.IsAssignableTo(conjugateType))
         {
-            type.GetMethod("BuildConjugate")!.Invoke(null, new object[] { unmanaged });
+            IConjugate conjugate = (IConjugate)type.GetMethod("BuildConjugate")!.Invoke(null, new object[] { unmanaged })!;
+            _conjugateMap[unmanaged] = new(conjugate);
             return unmanaged;
         }
 
@@ -92,7 +115,7 @@ internal class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMaste
 
     internal IConjugate? Conjugate(IntPtr unmanaged)
     {
-        if (!_conjugateMap.Remove(unmanaged, out var wref))
+        if (!_conjugateMap.TryGetValue(unmanaged, out var wref))
         {
             throw new InvalidOperationException($"Conjugate [{unmanaged}] does not exists.");
         }

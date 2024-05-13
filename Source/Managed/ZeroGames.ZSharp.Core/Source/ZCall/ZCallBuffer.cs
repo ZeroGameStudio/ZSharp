@@ -45,311 +45,313 @@ public struct ZCallBufferSlotValue
 public struct ZCallBufferSlot
 {
 
-	public static ZCallBufferSlot FromUInt8(uint8 value) => new(EZCallBufferSlotType.UInt8) { Value = new() { UInt8 = value } };
-	public static ZCallBufferSlot FromUInt16(uint16 value) => new(EZCallBufferSlotType.UInt16) { Value = new() { UInt16 = value } };
-	public static ZCallBufferSlot FromUInt32(uint32 value) => new(EZCallBufferSlotType.UInt32) { Value = new() { UInt32 = value } };
-	public static ZCallBufferSlot FromUInt64(uint64 value) => new(EZCallBufferSlotType.UInt64) { Value = new() { UInt64 = value } };
-	public static ZCallBufferSlot FromInt8(int8 value) => new(EZCallBufferSlotType.Int8) { Value = new() { Int8 = value } };
-	public static ZCallBufferSlot FromInt16(int16 value) => new(EZCallBufferSlotType.Int16) { Value = new() { Int16 = value } };
-	public static ZCallBufferSlot FromInt32(int32 value) => new(EZCallBufferSlotType.Int32) { Value = new() { Int32 = value } };
-	public static ZCallBufferSlot FromInt64(int64 value) => new(EZCallBufferSlotType.Int64) { Value = new() { Int64 = value } };
-	public static ZCallBufferSlot FromFloat(float value) => new(EZCallBufferSlotType.Float) { Value = new() { Float = value } };
-	public static ZCallBufferSlot FromDouble(double value) => new(EZCallBufferSlotType.Double) { Value = new() { Double = value } };
-	public static ZCallBufferSlot FromBool(bool value) => new(EZCallBufferSlotType.Bool) { Value = new() { Bool = (uint8)(value ? 1 : 0) } };
-	public static ZCallBufferSlot FromPointer(IntPtr value) => new(EZCallBufferSlotType.Pointer) { Value = new() { Pointer = value } };
-	public static ZCallBufferSlot FromGCHandle(GCHandle value) => new(EZCallBufferSlotType.GCHandle) { Value = new() { GCHandle = value } };
-	public static ZCallBufferSlot FromConjugate(ConjugateHandle value) => new(EZCallBufferSlotType.Conjugate) { Value = new() { Conjugate = value } };
+	public static ZCallBufferSlot FromUInt8(uint8 value) => new(EZCallBufferSlotType.UInt8) { _value = new() { UInt8 = value } };
+	public static ZCallBufferSlot FromUInt16(uint16 value) => new(EZCallBufferSlotType.UInt16) { _value = new() { UInt16 = value } };
+	public static ZCallBufferSlot FromUInt32(uint32 value) => new(EZCallBufferSlotType.UInt32) { _value = new() { UInt32 = value } };
+	public static ZCallBufferSlot FromUInt64(uint64 value) => new(EZCallBufferSlotType.UInt64) { _value = new() { UInt64 = value } };
+	public static ZCallBufferSlot FromInt8(int8 value) => new(EZCallBufferSlotType.Int8) { _value = new() { Int8 = value } };
+	public static ZCallBufferSlot FromInt16(int16 value) => new(EZCallBufferSlotType.Int16) { _value = new() { Int16 = value } };
+	public static ZCallBufferSlot FromInt32(int32 value) => new(EZCallBufferSlotType.Int32) { _value = new() { Int32 = value } };
+	public static ZCallBufferSlot FromInt64(int64 value) => new(EZCallBufferSlotType.Int64) { _value = new() { Int64 = value } };
+	public static ZCallBufferSlot FromFloat(float value) => new(EZCallBufferSlotType.Float) { _value = new() { Float = value } };
+	public static ZCallBufferSlot FromDouble(double value) => new(EZCallBufferSlotType.Double) { _value = new() { Double = value } };
+	public static ZCallBufferSlot FromBool(bool value) => new(EZCallBufferSlotType.Bool) { _value = new() { Bool = (uint8)(value ? 1 : 0) } };
+	public static ZCallBufferSlot FromPointer(IntPtr value) => new(EZCallBufferSlotType.Pointer) { _value = new() { Pointer = value } };
+	public static ZCallBufferSlot FromGCHandle(GCHandle value) => new(EZCallBufferSlotType.GCHandle) { _value = new() { GCHandle = value } };
+	public static ZCallBufferSlot FromConjugate(ConjugateHandle value) => new(EZCallBufferSlotType.Conjugate) { _value = new() { Conjugate = value } };
 	
 	public static unsafe ZCallBufferSlot FromPointer(void* value) => FromPointer(new IntPtr(value));
 	public static ZCallBufferSlot FromConjugate(IConjugate? value) => FromConjugate(new ConjugateHandle(value));
 	
 	public uint8 ReadUInt8()
 	{
-		if (Type != EZCallBufferSlotType.UInt8)
+		if (_type != EZCallBufferSlotType.UInt8)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.UInt8;
+		return _value.UInt8;
 	}
 	
 	public uint16 ReadUInt16()
 	{
-		if (Type != EZCallBufferSlotType.UInt16)
+		if (_type != EZCallBufferSlotType.UInt16)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.UInt16;
+		return _value.UInt16;
 	}
 	
 	public uint32 ReadUInt32()
 	{
-		if (Type != EZCallBufferSlotType.UInt32)
+		if (_type != EZCallBufferSlotType.UInt32)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.UInt32;
+		return _value.UInt32;
 	}
 	
 	public uint64 ReadUInt64()
 	{
-		if (Type != EZCallBufferSlotType.UInt64)
+		if (_type != EZCallBufferSlotType.UInt64)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.UInt64;
+		return _value.UInt64;
 	}
 	
 	public int8 ReadInt8()
 	{
-		if (Type != EZCallBufferSlotType.Int8)
+		if (_type != EZCallBufferSlotType.Int8)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.Int8;
+		return _value.Int8;
 	}
 	
 	public int16 ReadInt16()
 	{
-		if (Type != EZCallBufferSlotType.Int16)
+		if (_type != EZCallBufferSlotType.Int16)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.Int16;
+		return _value.Int16;
 	}
 	
 	public int32 ReadInt32()
 	{
-		if (Type != EZCallBufferSlotType.Int32)
+		if (_type != EZCallBufferSlotType.Int32)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.Int32;
+		return _value.Int32;
 	}
 	
 	public int64 ReadInt64()
 	{
-		if (Type != EZCallBufferSlotType.Int64)
+		if (_type != EZCallBufferSlotType.Int64)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.Int64;
+		return _value.Int64;
 	}
 	
 	public float ReadFloat()
 	{
-		if (Type != EZCallBufferSlotType.Float)
+		if (_type != EZCallBufferSlotType.Float)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.Float;
+		return _value.Float;
 	}
 	
 	public double ReadDouble()
 	{
-		if (Type != EZCallBufferSlotType.Double)
+		if (_type != EZCallBufferSlotType.Double)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.Double;
+		return _value.Double;
 	}
 	
 	public bool ReadBool()
 	{
-		if (Type != EZCallBufferSlotType.Bool)
+		if (_type != EZCallBufferSlotType.Bool)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.Bool > 0;
+		return _value.Bool > 0;
 	}
 	
 	public IntPtr ReadPointer()
 	{
-		if (Type != EZCallBufferSlotType.Pointer)
+		if (_type != EZCallBufferSlotType.Pointer)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.Pointer;
+		return _value.Pointer;
 	}
 	
 	public GCHandle ReadGCHandle()
 	{
-		if (Type != EZCallBufferSlotType.GCHandle)
+		if (_type != EZCallBufferSlotType.GCHandle)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.GCHandle;
+		return _value.GCHandle;
 	}
 	
 	public ConjugateHandle ReadConjugate()
 	{
-		if (Type != EZCallBufferSlotType.Conjugate)
+		if (_type != EZCallBufferSlotType.Conjugate)
 		{
 			throw new InvalidOperationException();
 		}
 
-		return Value.Conjugate;
+		return _value.Conjugate;
 	}
 	
 	public void WriteUInt8(uint8 value)
 	{
-		if (Type != EZCallBufferSlotType.UInt8)
+		if (_type != EZCallBufferSlotType.UInt8)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.UInt8 = value;
+		_value.UInt8 = value;
 	}
 	
 	public void WriteUInt16(uint16 value)
 	{
-		if (Type != EZCallBufferSlotType.UInt16)
+		if (_type != EZCallBufferSlotType.UInt16)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.UInt16 = value;
+		_value.UInt16 = value;
 	}
 	
 	public void WriteUInt32(uint32 value)
 	{
-		if (Type != EZCallBufferSlotType.UInt32)
+		if (_type != EZCallBufferSlotType.UInt32)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.UInt32 = value;
+		_value.UInt32 = value;
 	}
 	
 	public void WriteUInt64(uint64 value)
 	{
-		if (Type != EZCallBufferSlotType.UInt64)
+		if (_type != EZCallBufferSlotType.UInt64)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.UInt64 = value;
+		_value.UInt64 = value;
 	}
 	
 	public void WriteInt8(int8 value)
 	{
-		if (Type != EZCallBufferSlotType.Int8)
+		if (_type != EZCallBufferSlotType.Int8)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.Int8 = value;
+		_value.Int8 = value;
 	}
 	
 	public void WriteInt16(int16 value)
 	{
-		if (Type != EZCallBufferSlotType.Int16)
+		if (_type != EZCallBufferSlotType.Int16)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.Int16 = value;
+		_value.Int16 = value;
 	}
 	
 	public void WriteInt32(int32 value)
 	{
-		if (Type != EZCallBufferSlotType.Int32)
+		if (_type != EZCallBufferSlotType.Int32)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.Int32 = value;
+		_value.Int32 = value;
 	}
 	
 	public void WriteInt64(int64 value)
 	{
-		if (Type != EZCallBufferSlotType.Int64)
+		if (_type != EZCallBufferSlotType.Int64)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.Int64 = value;
+		_value.Int64 = value;
 	}
 	
 	public void WriteFloat(float value)
 	{
-		if (Type != EZCallBufferSlotType.Float)
+		if (_type != EZCallBufferSlotType.Float)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.Float = value;
+		_value.Float = value;
 	}
 	
 	public void WriteDouble(double value)
 	{
-		if (Type != EZCallBufferSlotType.Double)
+		if (_type != EZCallBufferSlotType.Double)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.Double = value;
+		_value.Double = value;
 	}
 	
 	public void WriteBool(bool value)
 	{
-		if (Type != EZCallBufferSlotType.Bool)
+		if (_type != EZCallBufferSlotType.Bool)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.Bool = (uint8)(value ? 1 : 0);
+		_value.Bool = (uint8)(value ? 1 : 0);
 	}
 	
 	public void WritePointer(IntPtr value)
 	{
-		if (Type != EZCallBufferSlotType.Pointer)
+		if (_type != EZCallBufferSlotType.Pointer)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.Pointer = value;
+		_value.Pointer = value;
 	}
 	
 	public void WriteGCHandle(GCHandle value)
 	{
-		if (Type != EZCallBufferSlotType.GCHandle)
+		if (_type != EZCallBufferSlotType.GCHandle)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.GCHandle = value;
+		_value.GCHandle = value;
 	}
 	
 	public void WriteConjugate(ConjugateHandle value)
 	{
-		if (Type != EZCallBufferSlotType.Conjugate)
+		if (_type != EZCallBufferSlotType.Conjugate)
 		{
 			throw new InvalidOperationException();
 		}
 
-		Value.Conjugate = value;
+		_value.Conjugate = value;
 	}
 
 	public T? ReadConjugate<T>() where T : class, IConjugate => ReadConjugate().GetTarget<T>();
 	public void WriteConjugate<T>(T? value) where T : class, IConjugate => WriteConjugate(new ConjugateHandle(value));
 
-	private ZCallBufferSlot(EZCallBufferSlotType type) => Type = type;
+	public EZCallBufferSlotType Type => _type;
+
+	private ZCallBufferSlot(EZCallBufferSlotType type) => _type = type;
 	
-	private readonly EZCallBufferSlotType Type;
-	private ZCallBufferSlotValue Value;
+	private readonly EZCallBufferSlotType _type;
+	private ZCallBufferSlotValue _value;
 	
 }
 
@@ -359,25 +361,27 @@ public unsafe struct ZCallBuffer
 
 	public ZCallBuffer(ZCallBufferSlot* slots, int32 numSlots)
 	{
-		Slots = slots;
-		NumSlots = numSlots;
+		this._slots = slots;
+		_numSlots = numSlots;
 	}
 
 	public ref ZCallBufferSlot this[int32 index]
 	{
 		get
 		{
-			if (index < 0 || index >= NumSlots)
+			if (index < 0 || index >= _numSlots)
 			{
 				throw new ArgumentOutOfRangeException();
 			}
 
-			return ref Slots[index];
+			return ref _slots[index];
 		}
 	}
+
+	public int32 NumSlots => _numSlots;
 	
-    private ZCallBufferSlot* Slots;
-    private int32 NumSlots;
+    private ZCallBufferSlot* _slots;
+    private int32 _numSlots;
     
 }
 

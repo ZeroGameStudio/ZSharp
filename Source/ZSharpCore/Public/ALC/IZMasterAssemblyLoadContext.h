@@ -27,16 +27,17 @@ namespace ZSharp
 		virtual FZCallHandle GetZCallHandle(const FString& name) = 0;
 		virtual void* BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type) = 0;
 		virtual void ReleaseConjugate(void* unmanaged) = 0;
+
+		virtual IZConjugateRegistry& GetConjugateRegistry(uint16 id) = 0;
 		
-		virtual void VisitConjugateRegistry(uint16 id, const TFunctionRef<void(IZConjugateRegistry&)> action) = 0;
 		// Helpers
 	public:
 		void LoadAssembly(const FString& path, void* args = nullptr);
 
 		template <CZConjugateRegistryImpl T>
-		void VisitConjugateRegistry(const TFunctionRef<void(T&)> action)
+		T& GetConjugateRegistry()
 		{
-			VisitConjugateRegistry(T::RegistryId, [action](IZConjugateRegistry& registry){ action(StaticCast<T&>(registry)); });
+			return StaticCast<T&>(GetConjugateRegistry(T::RegistryId));
 		}
 	};
 }

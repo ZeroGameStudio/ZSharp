@@ -21,7 +21,6 @@ namespace ZSharp
 	public:
 		virtual IZMasterAssemblyLoadContext* CreateMasterAlc() = 0;
 		virtual IZMasterAssemblyLoadContext* GetMasterAlc() = 0;
-		virtual void GetMasterAlc_AnyThread(TFunctionRef<void(IZMasterAssemblyLoadContext*)> action) = 0;
 		virtual IZSlimAssemblyLoadContext* CreateSlimAlc(const FString& name) = 0;
 		virtual IZSlimAssemblyLoadContext* GetSlimAlc(const FString& name) = 0;
 	public:

@@ -38,9 +38,9 @@ namespace ZSharp
 		virtual FZCallHandle GetZCallHandle(const FString& name) override;
 		virtual void* BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type) override;
 		virtual void ReleaseConjugate(void* unmanaged) override;
-		
-		virtual void VisitConjugateRegistry(uint16 id, const TFunctionRef<void(IZConjugateRegistry&)> action) override;
 
+		virtual IZConjugateRegistry& GetConjugateRegistry(uint16 id) override;
+		
 	public:
 		int32 ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const;
 		FZCallHandle GetZCallHandle_Black(const FString& name);

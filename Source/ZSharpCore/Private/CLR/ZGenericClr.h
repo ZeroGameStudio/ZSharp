@@ -28,7 +28,6 @@ namespace ZSharp
 	public:
 		virtual IZMasterAssemblyLoadContext* CreateMasterAlc() override;
 		virtual IZMasterAssemblyLoadContext* GetMasterAlc() override;
-		virtual void GetMasterAlc_AnyThread(TFunctionRef<void(IZMasterAssemblyLoadContext*)> action) override;
 		virtual IZSlimAssemblyLoadContext* CreateSlimAlc(const FString& name) override;
 		virtual IZSlimAssemblyLoadContext* GetSlimAlc(const FString& name) override;
 
@@ -47,7 +46,6 @@ namespace ZSharp
 
 	private:
 		bool bInitialized = false;
-		FCriticalSection MasterAlcCriticalSection;
 		TUniquePtr<IZMasterAssemblyLoadContext> MasterAlc;
 		FRWLock SlimAlcMapLock;
 		TMap<FString, TUniquePtr<IZSlimAssemblyLoadContext>> SlimAlcMap;

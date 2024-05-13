@@ -39,6 +39,8 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UObject::Conjugate(UObject
 	else
 	{
 		ConjugateMap.Emplace(unmanaged, { unmanaged });
+		FZRuntimeTypeHandle type = Alc.GetType("ZeroGames.ZSharp.UnrealEngine", "ZeroGames.ZSharp.UnrealEngine.CoreUObject.UnrealObject");
+		Alc.BuildConjugate(unmanaged, type);
 		return { unmanaged };
 	}
 }

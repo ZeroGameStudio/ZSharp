@@ -4,7 +4,6 @@
 #include "ZMasterAssemblyLoadContext.h"
 
 #include "Interop/ZMasterAssemblyLoadContext_Interop.h"
-#include "ZSharpCoreLogChannels.h"
 #include "ZCall/IZCallDispatcher.h"
 #include "ZCall/ZConjugateRegistryDeclarations.h"
 
@@ -15,7 +14,6 @@ ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle hand
 {
 	FZConjugateRegistryDeclarations::ForeachDeclaration([this](uint16 id, IZConjugateRegistry*(*factory)(IZMasterAssemblyLoadContext&))
 	{
-		ConjugateRegistries.AllocateIndex(id);
 		ConjugateRegistries.EmplaceAt(id, factory(*this));
 	});
 }
@@ -102,16 +100,12 @@ void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(void* unmanaged)
 	ReleaseConjugate_Red(unmanaged);
 }
 
-void ZSharp::FZMasterAssemblyLoadContext::VisitConjugateRegistry(uint16 id, const TFunctionRef<void(IZConjugateRegistry&)> action)
+ZSharp::IZConjugateRegistry& ZSharp::FZMasterAssemblyLoadContext::GetConjugateRegistry(uint16 id)
 {
 	check(IsInGameThread());
-	
-	if (!ConjugateRegistries.IsValidIndex(id))
-	{
-		UE_LOG(LogZSharpCore, Fatal, TEXT("Invalid conjugate registry id [%d]"), id);
-	}
+	check(ConjugateRegistries.IsValidIndex(id));
 
-	action(*ConjugateRegistries[id]);
+	return *ConjugateRegistries[id];
 }
 
 int32 ZSharp::FZMasterAssemblyLoadContext::ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const
@@ -160,17 +154,15 @@ ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle_Black(c
 void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate_Black(uint16 registryId)
 {
 	check(IsInGameThread());
-	
-	void* unmanaged;
-	VisitConjugateRegistry(registryId, [&unmanaged](IZConjugateRegistry& registry){ unmanaged = registry.BuildConjugate(); });
-	return unmanaged;
+
+	return GetConjugateRegistry(registryId).BuildConjugate();
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate_Black(uint16 registryId, void* unmanaged)
 {
 	check(IsInGameThread());
 
-	VisitConjugateRegistry(registryId, [unmanaged](IZConjugateRegistry& registry){ registry.ReleaseConjugate(unmanaged); });
+	GetConjugateRegistry(registryId).ReleaseConjugate(unmanaged);
 }
 
 int32 ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer)

@@ -212,8 +212,6 @@ void ZSharp::FZGenericClr::Shutdown()
 		return;
 	}
 	
-	FScopeLock _(&MasterAlcCriticalSection);
-
 	FCoreUObjectDelegates::GarbageCollectComplete.RemoveAll(this);
 
 	if (MasterAlc)
@@ -238,8 +236,6 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
 {
 	check(IsInGameThread());
 
-	FScopeLock _(&MasterAlcCriticalSection);
-	
 	if (MasterAlc)
 	{
 		UE_LOG(LogZSharpCore, Fatal, TEXT("Master ALC already exists!"));
@@ -262,19 +258,7 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::GetMasterAlc()
 {
 	check(IsInGameThread());
 	
-	FScopeLock _(&MasterAlcCriticalSection);
-	
 	return MasterAlc.Get();
-}
-
-void ZSharp::FZGenericClr::GetMasterAlc_AnyThread(TFunctionRef<void(IZMasterAssemblyLoadContext*)> action)
-{
-	FScopeLock _(&MasterAlcCriticalSection);
-
-	if (MasterAlc)
-	{
-		action(MasterAlc.Get());
-	}
 }
 
 ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericClr::CreateSlimAlc(const FString& name)
@@ -324,8 +308,6 @@ FDelegateHandle ZSharp::FZGenericClr::RegisterMasterAlcLoaded(FZOnMasterAlcLoade
 {
 	check(IsInGameThread());
 
-	FScopeLock _(&MasterAlcCriticalSection);
-	
 	FDelegateHandle handle = OnMasterAlcLoaded.Add(delegate);
 	if (bNotifyIfLoaded && MasterAlc)
 	{

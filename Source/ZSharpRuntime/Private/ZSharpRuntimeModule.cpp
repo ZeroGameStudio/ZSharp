@@ -2,7 +2,6 @@
 
 #include "ZSharpRuntimeModule.h"
 
-#include "ZConjugateRegistry.h"
 #include "CLR/IZSharpClr.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ZCall/ZCallResolver_Export.h"

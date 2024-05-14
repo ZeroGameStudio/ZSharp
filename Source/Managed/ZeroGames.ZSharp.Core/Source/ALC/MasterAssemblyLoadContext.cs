@@ -7,7 +7,7 @@ using System.Security;
 
 namespace ZeroGames.ZSharp.Core;
 
-internal class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMasterAssemblyLoadContext
+internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMasterAssemblyLoadContext
 {
 
     public const string KName = "Master";
@@ -38,7 +38,46 @@ internal class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMaste
         return _sSingleton;
     }
 
-    public unsafe int32 ZCall(ZCallHandle handle, ZCallBuffer* buffer) => ZCall_Black(handle, buffer);
+    public Assembly? LoadAssembly(string name)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Type? GetType(string assemblyName, string typeName)
+    {
+        Assembly? asm = Assemblies.FirstOrDefault(asm => asm.GetName().Name == new string(assemblyName));
+        if (asm is null)
+        {
+            return null;
+        }
+
+        return asm.GetType(new string(typeName));
+    }
+
+    public ZCallHandle RegisterZCall(IZCallDispatcher dispatcher)
+    {
+        ZCallHandle handle = ZCallHandle.Alloc();
+        _zcallMap[handle] = dispatcher;
+        _zcallName2Handle[dispatcher.Name] = handle;
+
+        return handle;
+    }
+
+    public void RegisterZCallResolver(IZCallResolver resolver, uint64 priority)
+    {
+        _zcallResolverLink.Add((resolver, priority));
+        _zcallResolverLink.Sort((lhs, rhs) =>
+        {
+            if (lhs.Priority == rhs.Priority)
+            {
+                return 0;
+            }
+
+            return lhs.Priority < rhs.Priority ? -1 : 1;
+        });
+    }
+
+    public int32 ZCall(ZCallHandle handle, ZCallBuffer* buffer) => ZCall_Black(handle, buffer);
     public ZCallHandle GetZCallHandle(string name) => GetZCallHandle_Black(name);
     public IntPtr BuildConjugate(uint16 registryId, IConjugate managed) => BuildConjugate_Black(registryId, managed);
     public void ReleaseConjugate(uint16 registryId, IntPtr unmanaged) => ReleaseConjugate_Black(registryId, unmanaged);
@@ -53,36 +92,32 @@ internal class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMaste
         return new();
     }
     
-    internal unsafe int32 ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
+    internal int32 ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
     {
-        for (int32 i = 0; i < buffer->NumSlots; ++i)
+        if (!_zcallMap.TryGetValue(handle, out var dispatcher))
         {
-            switch ((*buffer)[i].Type)
+            return -1;
+        }
+
+        return dispatcher.Dispatch(buffer);
+    }
+
+    internal ZCallHandle GetZCallHandle_Red(string name)
+    {
+        if (!_zcallName2Handle.TryGetValue(name, out var handle))
+        {
+            foreach (var pair in _zcallResolverLink)
             {
-                case EZCallBufferSlotType.Conjugate:
+                IZCallDispatcher? dispatcher = pair.Resolver.Resolve(name);
+                if (dispatcher is not null)
                 {
-                    Logger.Log($"SlotValue: {(*buffer)[i].ReadConjugate<IConjugate>()!.Unmanaged}");
-                    break;
-                }
-                case EZCallBufferSlotType.Float:
-                {
-                    Logger.Log($"SlotValue: {(*buffer)[i].ReadFloat()}");
-                    break;
-                }
-                default:
-                {
-                    Logger.Log($"SlotType: [{(*buffer)[i].Type}]");
+                    handle = RegisterZCall(dispatcher);
                     break;
                 }
             }
         }
 
-        return 0;
-    }
-
-    internal ZCallHandle GetZCallHandle_Red(string name)
-    {
-        throw new NotImplementedException();
+        return handle;
     }
 
     internal IntPtr BuildConjugate_Red(IntPtr unmanaged, Type type)
@@ -135,13 +170,28 @@ internal class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMaste
 
         _sSingleton = null;
     }
+
+    private const int32 KDefaultConjugateMapCapacity = 65536;
+
+    private static MasterAssemblyLoadContext? _sSingleton;
     
-    private unsafe int32 ZCall_Black(ZCallHandle handle, ZCallBuffer* buffer)
+    private MasterAssemblyLoadContext() : base(KName)
+    {
+        _sSingleton = this;
+
+        Resolving += (_, fullName) => LoadAssembly(fullName.Name!);
+
+        RegisterZCall(new ZCallDispatcher_Delegate());
+        RegisterZCallResolver(new ZCallResolver_Method(), 1);
+        RegisterZCallResolver(new ZCallResolver_Property(), 2);
+    }
+    
+    private int32 ZCall_Black(ZCallHandle handle, ZCallBuffer* buffer)
     {
         return MasterAssemblyLoadContext_Interop.SZCall_Black(handle, buffer);
     }
 
-    private unsafe ZCallHandle GetZCallHandle_Black(string name)
+    private ZCallHandle GetZCallHandle_Black(string name)
     {
         fixed (char* data = name.ToCharArray())
         {
@@ -149,7 +199,7 @@ internal class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMaste
         }
     }
 
-    private unsafe IntPtr BuildConjugate_Black(uint16 registryId, IConjugate managed)
+    private IntPtr BuildConjugate_Black(uint16 registryId, IConjugate managed)
     {
         IntPtr unmanaged = MasterAssemblyLoadContext_Interop.SBuildConjugate_Black(registryId);
         if (unmanaged != IntPtr.Zero)
@@ -160,21 +210,15 @@ internal class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMaste
         return unmanaged;
     }
 
-    private unsafe void ReleaseConjugate_Black(uint16 registryId, IntPtr unmanaged)
+    private void ReleaseConjugate_Black(uint16 registryId, IntPtr unmanaged)
     {
         _conjugateMap.Remove(unmanaged);
         MasterAssemblyLoadContext_Interop.SReleaseConjugate_Black(registryId, unmanaged);
     }
-
-    private const int32 KDefaultConjugateMapCapacity = 65536;
-
-    private static MasterAssemblyLoadContext? _sSingleton;
     
-    private MasterAssemblyLoadContext() : base(KName)
-    {
-        _sSingleton = this;
-    }
-
+    private Dictionary<ZCallHandle, IZCallDispatcher> _zcallMap = new();
+    private Dictionary<string, ZCallHandle> _zcallName2Handle = new();
+    private List<(IZCallResolver Resolver, uint64 Priority)> _zcallResolverLink = new();
     private Dictionary<IntPtr, WeakReference<IConjugate>> _conjugateMap = new(KDefaultConjugateMapCapacity);
 
 }

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.Core;
 
-internal static class MasterAssemblyLoadContext_Interop
+internal static unsafe class MasterAssemblyLoadContext_Interop
 {
 
     [UnmanagedCallersOnly]
@@ -22,7 +22,7 @@ internal static class MasterAssemblyLoadContext_Interop
     }, -1);
 
     [UnmanagedCallersOnly]
-    public static unsafe void LoadAssembly(uint8* buffer, int32 size, void* args) => Uncaught.ErrorIfUncaught(() =>
+    public static void LoadAssembly(uint8* buffer, int32 size, void* args) => Uncaught.ErrorIfUncaught(() =>
     {
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
@@ -35,7 +35,7 @@ internal static class MasterAssemblyLoadContext_Interop
     });
 
     [UnmanagedCallersOnly]
-    public static unsafe InteropRuntimeTypeHandle GetType(char* assemblyName, char* typeName) => Uncaught.ErrorIfUncaught(() =>
+    public static InteropRuntimeTypeHandle GetType(char* assemblyName, char* typeName) => Uncaught.ErrorIfUncaught(() =>
     {
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
@@ -43,18 +43,11 @@ internal static class MasterAssemblyLoadContext_Interop
             return new InteropRuntimeTypeHandle();
         }
 
-        Assembly? asm = alc.Assemblies.FirstOrDefault(asm => asm.GetName().Name == new string(assemblyName));
-        if (asm is null)
-        {
-            return new InteropRuntimeTypeHandle();
-        }
-
-        Type? type = asm.GetType(new string(typeName));
-        return new InteropRuntimeTypeHandle(type);
+        return new InteropRuntimeTypeHandle(alc.GetType(new string(assemblyName), new string(typeName)));
     }, default);
 
     [UnmanagedCallersOnly]
-    public static unsafe int32 ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer) => Uncaught.ErrorIfUncaught(() =>
+    public static int32 ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer) => Uncaught.ErrorIfUncaught(() =>
     {
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
@@ -66,7 +59,7 @@ internal static class MasterAssemblyLoadContext_Interop
     }, -1);
     
     [UnmanagedCallersOnly]
-    public static unsafe ZCallHandle GetZCallHandle_Red(char* name) => Uncaught.ErrorIfUncaught(() =>
+    public static ZCallHandle GetZCallHandle_Red(char* name) => Uncaught.ErrorIfUncaught(() =>
     {
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
@@ -78,7 +71,7 @@ internal static class MasterAssemblyLoadContext_Interop
     }, default);
     
     [UnmanagedCallersOnly]
-    public static unsafe IntPtr BuildConjugate_Red(IntPtr unmanaged, InteropRuntimeTypeHandle type) => Uncaught.ErrorIfUncaught(() =>
+    public static IntPtr BuildConjugate_Red(IntPtr unmanaged, InteropRuntimeTypeHandle type) => Uncaught.ErrorIfUncaught(() =>
     {
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
@@ -96,7 +89,7 @@ internal static class MasterAssemblyLoadContext_Interop
     }, default);
     
     [UnmanagedCallersOnly]
-    public static unsafe void ReleaseConjugate_Red(IntPtr unmanaged) => Uncaught.ErrorIfUncaught(() =>
+    public static void ReleaseConjugate_Red(IntPtr unmanaged) => Uncaught.ErrorIfUncaught(() =>
     {
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
@@ -107,10 +100,10 @@ internal static class MasterAssemblyLoadContext_Interop
         alc.ReleaseConjugate_Red(unmanaged);
     });
     
-    public static unsafe delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> SZCall_Black = null;
-    public static unsafe delegate* unmanaged<char*, ZCallHandle> SGetZCallHandle_Black = null;
-    public static unsafe delegate* unmanaged<uint16, IntPtr> SBuildConjugate_Black = null;
-    public static unsafe delegate* unmanaged<uint16, IntPtr, void> SReleaseConjugate_Black = null;
+    public static delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> SZCall_Black = null;
+    public static delegate* unmanaged<char*, ZCallHandle> SGetZCallHandle_Black = null;
+    public static delegate* unmanaged<uint16, IntPtr> SBuildConjugate_Black = null;
+    public static delegate* unmanaged<uint16, IntPtr, void> SReleaseConjugate_Black = null;
 
 }
 

@@ -348,6 +348,90 @@ public struct ZCallBufferSlot
 
 	public EZCallBufferSlotType Type => _type;
 
+	public uint8 UInt8
+	{
+		get => ReadUInt8();
+		set => WriteUInt8(value);
+	}
+	
+	public uint16 UInt16
+	{
+		get => ReadUInt16();
+		set => WriteUInt16(value);
+	}
+	
+	public uint32 UInt32
+	{
+		get => ReadUInt32();
+		set => WriteUInt32(value);
+	}
+	
+	public uint64 UInt64
+	{
+		get => ReadUInt64();
+		set => WriteUInt64(value);
+	}
+	
+	public int8 Int8
+	{
+		get => ReadInt8();
+		set => WriteInt8(value);
+	}
+	
+	public int16 Int16
+	{
+		get => ReadInt16();
+		set => WriteInt16(value);
+	}
+	
+	public int32 Int32
+	{
+		get => ReadInt32();
+		set => WriteInt32(value);
+	}
+	
+	public int64 Int64
+	{
+		get => ReadInt64();
+		set => WriteInt64(value);
+	}
+	
+	public float Float
+	{
+		get => ReadFloat();
+		set => WriteDouble(value);
+	}
+	
+	public double Double
+	{
+		get => ReadDouble();
+		set => WriteDouble(value);
+	}
+	
+	public bool Bool
+	{
+		get => ReadBool();
+		set => WriteBool(value);
+	}
+	
+	public IntPtr Pointer
+	{
+		get => ReadPointer();
+		set => WritePointer(value);
+	}
+	
+	public GCHandle GCHandle
+	{
+		get => ReadGCHandle();
+		set => WriteGCHandle(value);
+	}
+	
+	public ConjugateHandle Conjugate
+	{
+		get => ReadConjugate();
+		set => WriteConjugate(value);
+	}
+
 	private ZCallBufferSlot(EZCallBufferSlotType type) => _type = type;
 	
 	private readonly EZCallBufferSlotType _type;

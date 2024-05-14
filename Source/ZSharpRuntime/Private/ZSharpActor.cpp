@@ -21,8 +21,9 @@ void AZSharpActor::BeginPlay()
 	if (alc)
 	{
 		ZSHARP_STACK_ALLOC_ZCALL_BUFFER(ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UObject>().Conjugate(this)));
-		
-		alc->ZCall({}, &buffer);
+
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle("m://ZeroGames.ZSharp.UnrealEngine:ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics:BeginPlay");
+		alc->ZCall(handle, &buffer);
 	}
 }
 
@@ -32,8 +33,9 @@ void AZSharpActor::EndPlay(const EEndPlayReason::Type endPlayReason)
 	if (alc)
 	{
 		ZSHARP_STACK_ALLOC_ZCALL_BUFFER(ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UObject>().Conjugate(this)));
-		
-		alc->ZCall({}, &buffer);
+
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle("m://ZeroGames.ZSharp.UnrealEngine:ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics:EndPlay");
+		alc->ZCall(handle, &buffer);
 	}
 	
 	Super::EndPlay(endPlayReason);
@@ -49,8 +51,10 @@ void AZSharpActor::Tick(float deltaTime)
 		ZSHARP_STACK_ALLOC_ZCALL_BUFFER(
 			ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UObject>().Conjugate(this)),
 			ZSharp::FZCallBufferSlot::FromFloat(deltaTime));
-		
-		alc->ZCall({}, &buffer);
+
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle("m://ZeroGames.ZSharp.UnrealEngine:ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics:Tick");
+		alc->ZCall(handle, &buffer);
 	}
 }
+
 

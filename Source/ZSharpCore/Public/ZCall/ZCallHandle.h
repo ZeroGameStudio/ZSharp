@@ -22,7 +22,7 @@ namespace ZSharp
 	};
 	
 	static_assert(TIsPODType<FZCallHandle>::Value, "ZCallHandle must be POD type!");
-	static_assert(sizeof(FZCallHandle) == sizeof(uint64), "ZCallHandle must only have a uint64 member!");
+	static_assert(sizeof(FZCallHandle) == sizeof(int64), "ZCallHandle must only have a int64 member!");
 
 	inline bool operator ==(const FZCallHandle& lhs, const FZCallHandle& rhs)
 	{

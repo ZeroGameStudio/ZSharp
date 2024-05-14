@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -81,6 +82,11 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
     public ZCallHandle GetZCallHandle(string name) => GetZCallHandle_Black(name);
     public IntPtr BuildConjugate(uint16 registryId, IConjugate managed) => BuildConjugate_Black(registryId, managed);
     public void ReleaseConjugate(uint16 registryId, IntPtr unmanaged) => ReleaseConjugate_Black(registryId, unmanaged);
+    
+    public void PushPendingDisposeConjugate(IConjugate conjugate)
+    {
+        _pendingDisposeConjugates.Enqueue(conjugate);
+    }
 
     internal static MasterAssemblyLoadContext Create()
     {
@@ -90,6 +96,16 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         }
 
         return new();
+    }
+
+    internal void Tick(float deltaTime)
+    {
+        Logger.Log($"MasterALC Tick dt: {deltaTime}");
+        
+        while (_pendingDisposeConjugates.TryDequeue(out var conjugate))
+        {
+            conjugate.Dispose();
+        }
     }
     
     internal int32 ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
@@ -220,6 +236,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
     private Dictionary<string, ZCallHandle> _zcallName2Handle = new();
     private List<(IZCallResolver Resolver, uint64 Priority)> _zcallResolverLink = new();
     private Dictionary<IntPtr, WeakReference<IConjugate>> _conjugateMap = new(KDefaultConjugateMapCapacity);
+    private ConcurrentQueue<IConjugate> _pendingDisposeConjugates = new();
 
 }
 

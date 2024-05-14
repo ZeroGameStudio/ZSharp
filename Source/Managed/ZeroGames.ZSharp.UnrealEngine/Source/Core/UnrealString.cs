@@ -14,20 +14,13 @@ public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<Un
     public unsafe UnrealString(string content)
     {
         IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
-        fixed (char* data = content.ToCharArray())
+        Unmanaged = alc.BuildConjugate(2, this);
+        if (Unmanaged == IntPtr.Zero)
         {
-            const int32 numSlots = 3;
-            ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
-            {
-                ZCallBufferSlot.FromConjugate(this),
-                ZCallBufferSlot.FromPointer(data),
-                ZCallBufferSlot.FromPointer(null),
-            };
-            ZCallBuffer buffer = new(slots, numSlots);
-            ZCallHandle handle = alc.GetZCallHandle("ex://String.Ctor");
-            alc.ZCall(handle, &buffer);
-            Unmanaged = slots[2].ReadPointer();
+            throw new InvalidOperationException();
         }
+
+        Data = content;
     }
 
     public override string ToString()
@@ -89,7 +82,9 @@ public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<Un
 
     protected override unsafe void ReleaseUnmanagedResource()
     {
-
+        IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
+        alc.ReleaseConjugate(2, Unmanaged);
+        Logger.Log("Release String");
     }
 
     static UnrealString()

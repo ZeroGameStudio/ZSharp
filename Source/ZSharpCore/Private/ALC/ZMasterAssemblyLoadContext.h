@@ -48,6 +48,8 @@ namespace ZSharp
 		void ReleaseConjugate_Black(uint16 registryId, void* unmanaged);
 
 	private:
+		bool Tick(float deltaTime);
+		
 		int32 ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer);
 		FZCallHandle GetZCallHandle_Red(const FString& name);
 		void* BuildConjugate_Red(void* unmanaged, FZRuntimeTypeHandle type);
@@ -69,6 +71,8 @@ namespace ZSharp
 
 		TSparseArray<TUniquePtr<IZConjugateRegistry>> ConjugateRegistries;
 		int32 RedZCallDepth;
+
+		
 		
 	};
 }

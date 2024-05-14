@@ -56,16 +56,11 @@ public abstract class ExportedObjectBase : IConjugate
         throw new Exception($"Owning ALC is not MasterAssemblyLoadContext but {alc.GetType().Name}");
     }
 
-    public void Dispose()
-    {
-        InternalDispose();
-        
-        GC.SuppressFinalize(this);
-    }
+    public void Dispose() => InternalDispose(false);
 
     public void Release()
     {
-        if (_bManaged)
+        if (_managed)
         {
             Logger.Error("Dispose managed exported object from unmanaged code.");
             return;
@@ -83,43 +78,63 @@ public abstract class ExportedObjectBase : IConjugate
     }
 
     public GCHandle GCHandle { get; }
-    public IntPtr Unmanaged { get; protected init; }
+    public IntPtr Unmanaged { get; protected set; }
 
     protected virtual void ReleaseUnmanagedResource(){}
 
     private protected ExportedObjectBase()
     {
         GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
-        _bManaged = true;
+        _managed = true;
     }
 
     private protected ExportedObjectBase(IntPtr unmanaged)
     {
         GCHandle = GCHandle.Alloc(this);
         Unmanaged = unmanaged;
-        _bManaged = false;
+        _managed = false;
     }
 
-    ~ExportedObjectBase()
-    {
-        InternalDispose();
-    }
+    ~ExportedObjectBase() => InternalDispose(true);
 
-    private void InternalDispose()
+    private void InternalDispose(bool fromFinalizer)
     {
-        if (!_bManaged)
+        if (!_managed)
         {
             Logger.Error("Finalize unmanaged export object.");
             return;
         }
         
+        if (fromFinalizer)
+        {
+            GetOwningAlc().PushPendingDisposeConjugate(this);
+            return;
+        }
+        
+        if (Volatile.Read(ref _disposed))
+        {
+            return;
+        }
+        
+        Volatile.Write(ref _disposed, true);
+        
         ReleaseUnmanagedResource();
         MarkAsDead();
+
+        if (!fromFinalizer)
+        {
+            GC.SuppressFinalize(this);
+        }
     }
 
-    private void MarkAsDead() => GCHandle.Free();
+    private void MarkAsDead()
+    {
+        GCHandle.Free();
+        Unmanaged = IConjugate.KDead;
+    }
 
-    private readonly bool _bManaged;
+    private readonly bool _managed;
+    private bool _disposed;
 
 }
 

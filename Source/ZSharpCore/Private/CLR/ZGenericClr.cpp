@@ -71,6 +71,7 @@ namespace ZSharp::FZGenericClr_Private
 
 			ADDRESS_OF(FZGCHandle_Interop::GFree),
 
+			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GTick),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GUnload),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GLoadAssembly),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GGetType),

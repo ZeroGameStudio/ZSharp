@@ -18,13 +18,13 @@ public readonly struct InteropString : IDisposable
 
     public InteropString(IntPtr address)
     {
-        _bNative = true;
+        _native = true;
         _address = address;
     }
 
     public void Dispose()
     {
-        if (!_bNative)
+        if (!_native)
         {
             unsafe
             {
@@ -45,7 +45,7 @@ public readonly struct InteropString : IDisposable
         }
     }
 
-    private readonly bool _bNative;
+    private readonly bool _native;
     private readonly IntPtr _address;
 
 }

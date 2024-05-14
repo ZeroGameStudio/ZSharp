@@ -15,7 +15,8 @@ namespace ZSharp
 		static FZCallHandle GetZCallHandle_Black(const TCHAR* name);
 		static void* BuildConjugate_Black(uint16 registryId);
 		static void ReleaseConjugate_Black(uint16 registryId, void* unmanaged);
-		
+
+		inline static uint8(*GTick)(float) = nullptr;
 		inline static int32(*GUnload)() = nullptr;
 		inline static void(*GLoadAssembly)(const uint8*, int32, void*) = nullptr;
 		inline static FZRuntimeTypeHandle(*GGetType)(const TCHAR*, const TCHAR*) = nullptr;

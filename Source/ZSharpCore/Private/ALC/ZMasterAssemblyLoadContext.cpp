@@ -16,6 +16,8 @@ ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle hand
 	{
 		ConjugateRegistries.EmplaceAt(id, factory(*this));
 	});
+
+	FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(this, &ThisClass::Tick));
 }
 
 ZSharp::FZMasterAssemblyLoadContext::~FZMasterAssemblyLoadContext()
@@ -163,6 +165,11 @@ void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate_Black(uint16 registry
 	check(IsInGameThread());
 
 	GetConjugateRegistry(registryId).ReleaseConjugate(unmanaged);
+}
+
+bool ZSharp::FZMasterAssemblyLoadContext::Tick(float deltaTime)
+{
+	return FZMasterAssemblyLoadContext_Interop::GTick(deltaTime) > 0;
 }
 
 int32 ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer)

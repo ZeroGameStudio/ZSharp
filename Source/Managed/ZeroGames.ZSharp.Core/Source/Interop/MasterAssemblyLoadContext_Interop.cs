@@ -7,6 +7,19 @@ namespace ZeroGames.ZSharp.Core;
 
 internal static unsafe class MasterAssemblyLoadContext_Interop
 {
+    
+    [UnmanagedCallersOnly]
+    public static uint8 Tick(float deltaTime) => Uncaught.ErrorIfUncaught<uint8>(() =>
+    {
+        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
+        if (alc is null)
+        {
+            return 0;
+        }
+        
+        alc.Tick(deltaTime);
+        return 1;
+    }, default);
 
     [UnmanagedCallersOnly]
     public static int32 Unload() => Uncaught.ErrorIfUncaught(() =>

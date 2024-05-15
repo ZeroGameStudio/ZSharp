@@ -9,8 +9,8 @@ namespace ZSharp
 	
 	struct FZConjugateRegistryDeclarations
 	{
-		static void Declare(uint16 id, IZConjugateRegistry*(*factory)(IZMasterAssemblyLoadContext&));
-		static void ForeachDeclaration(const TFunctionRef<void(uint16, IZConjugateRegistry*(*)(IZMasterAssemblyLoadContext&))> action);
+		static void Declare(uint16 id, TUniqueFunction<IZConjugateRegistry*(IZMasterAssemblyLoadContext&)>&& factory);
+		static void ForeachDeclaration(const TFunctionRef<void(uint16, const TUniqueFunction<IZConjugateRegistry*(IZMasterAssemblyLoadContext&)>&)> action);
 	};
 }
 

@@ -11,7 +11,7 @@ namespace ZSharp
 
 	namespace ZDeclareConjugateRegistry_Private
 	{
-		ZSHARPCORE_API void DeclareConjugateRegistry(uint16 id, IZConjugateRegistry*(*factory)(IZMasterAssemblyLoadContext&));
+		ZSHARPCORE_API void DeclareConjugateRegistry(uint16 id, TUniqueFunction<IZConjugateRegistry*(IZMasterAssemblyLoadContext&)>&& factory);
 	}
 	
 	template <CZConjugateRegistryImpl T>

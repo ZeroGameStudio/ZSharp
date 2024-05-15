@@ -10,9 +10,9 @@ namespace ZSharp
 	{
 
 	public:
-		FZSlimAssemblyLoadContext(FZGCHandle handle, const TFunction<void()>& unloadCallback, const FString& name)
+		FZSlimAssemblyLoadContext(FZGCHandle handle, TUniqueFunction<void()>&& unloadCallback, const FString& name)
 			: Handle(handle)
-			, UnloadCallback(unloadCallback)
+			, UnloadCallback(MoveTemp(unloadCallback))
 			, Name(name)
 			, RunningCount(0)
 			, bUnloading(false){}
@@ -35,7 +35,7 @@ namespace ZSharp
 
 	private:
 		FZGCHandle Handle;
-		TFunction<void()> UnloadCallback;
+		TUniqueFunction<void()>&& UnloadCallback;
 		FString Name;
 
 		mutable TAtomic<uint64> RunningCount;

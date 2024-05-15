@@ -17,7 +17,7 @@ namespace ZSharp
 		using ThisClass = FZMasterAssemblyLoadContext;
 
 	public:
-		FZMasterAssemblyLoadContext(FZGCHandle handle, const TFunction<void()>& unloadCallback);
+		FZMasterAssemblyLoadContext(FZGCHandle handle, TUniqueFunction<void()>&& unloadCallback);
 		virtual ~FZMasterAssemblyLoadContext() override;
 
 	public:
@@ -62,7 +62,7 @@ namespace ZSharp
 
 	private:
 		FZGCHandle Handle;
-		TFunction<void()> UnloadCallback;
+		TUniqueFunction<void()> UnloadCallback;
 
 		TMap<FZCallHandle, TUniquePtr<IZCallDispatcher>> ZCallMap;
 		TMap<FString, FZCallHandle> ZCallName2Handle;

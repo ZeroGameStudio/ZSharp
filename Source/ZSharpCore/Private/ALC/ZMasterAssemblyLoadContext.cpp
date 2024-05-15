@@ -7,12 +7,12 @@
 #include "ZCall/IZCallDispatcher.h"
 #include "ZCall/ZConjugateRegistryDeclarations.h"
 
-ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle handle, const TFunction<void()>& unloadCallback)
+ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle handle, TUniqueFunction<void()>&& unloadCallback)
 	: Handle(handle)
-	, UnloadCallback(unloadCallback)
+	, UnloadCallback(MoveTemp(unloadCallback))
 	, RedZCallDepth(0)
 {
-	FZConjugateRegistryDeclarations::ForeachDeclaration([this](uint16 id, IZConjugateRegistry*(*factory)(IZMasterAssemblyLoadContext&))
+	FZConjugateRegistryDeclarations::ForeachDeclaration([this](uint16 id, const TUniqueFunction<IZConjugateRegistry*(IZMasterAssemblyLoadContext&)>& factory)
 	{
 		ConjugateRegistries.EmplaceAt(id, factory(*this));
 	});

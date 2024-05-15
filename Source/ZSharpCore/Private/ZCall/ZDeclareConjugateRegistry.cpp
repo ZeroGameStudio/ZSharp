@@ -5,9 +5,9 @@
 
 #include "ZConjugateRegistryDeclarations.h"
 
-void ZSharp::ZDeclareConjugateRegistry_Private::DeclareConjugateRegistry(uint16 id, IZConjugateRegistry*(*factory)(IZMasterAssemblyLoadContext&))
+void ZSharp::ZDeclareConjugateRegistry_Private::DeclareConjugateRegistry(uint16 id, TUniqueFunction<IZConjugateRegistry*(IZMasterAssemblyLoadContext&)>&& factory)
 {
-	FZConjugateRegistryDeclarations::Declare(id, factory);
+	FZConjugateRegistryDeclarations::Declare(id, MoveTemp(factory));
 }
 
 

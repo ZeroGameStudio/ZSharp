@@ -10,14 +10,4 @@ ZSharp::IZExportedTypeRegistry& ZSharp::IZExportedTypeRegistry::Get()
 	return FZExportedTypeRegistry::Get();
 }
 
-bool ZSharp::IZExportedTypeRegistry_Private::RegisterClass(IZExportedClass* cls)
-{
-	return FZExportedTypeRegistry::Get().RegisterClass(cls);
-}
-
-bool ZSharp::IZExportedTypeRegistry_Private::RegisterEnum(IZExportedEnum* enm)
-{
-	return FZExportedTypeRegistry::Get().RegisterEnum(enm);
-}
-
 

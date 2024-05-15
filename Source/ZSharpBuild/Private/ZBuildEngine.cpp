@@ -18,7 +18,7 @@ ZSHARP_BEGIN_EXPORT_ENUM(EForceInit)
 	ZSHARP_EXPORT_ENUM_VALUE(ForceInitToZero)
 ZSHARP_END_EXPORT_ENUM(EForceInit)
 
-namespace ZSharp::FZBuildEngine_Private
+namespace ZSharp::ZBuildEngine_Private
 {
 	static FAutoConsoleCommand GCmdZSharpGens(
 		TEXT("zs.gens"),
@@ -78,15 +78,15 @@ ZSharp::FZBuildEngine& ZSharp::FZBuildEngine::Get()
 
 void ZSharp::FZBuildEngine::GenerateSolution() const
 {
-	const FString assemblyDir = FZBuildEngine_Private::LocateBuildAssembly();
-	const FString projectDir = FZBuildEngine_Private::GetProjectDir();
-	const FString pluginDir = FZBuildEngine_Private::GetPluginDir();
+	const FString assemblyDir = ZBuildEngine_Private::LocateBuildAssembly();
+	const FString projectDir = ZBuildEngine_Private::GetProjectDir();
+	const FString pluginDir = ZBuildEngine_Private::GetPluginDir();
 
-	const FString targetArg = FZBuildEngine_Private::BuildArgument("target", "solution");
-	const FString projectDirArg = FZBuildEngine_Private::BuildArgument("projectdir", projectDir);
+	const FString targetArg = ZBuildEngine_Private::BuildArgument("target", "solution");
+	const FString projectDirArg = ZBuildEngine_Private::BuildArgument("projectdir", projectDir);
 	const FString projectManagedSourceDir = FPaths::Combine(projectDir, "Source/Managed");
 	const FString pluginManagedSourceDir = FPaths::Combine(pluginDir, "Source/Managed");
-	const FString sourceArg = FZBuildEngine_Private::BuildArgument("source", FString::Printf(TEXT("%s;%s"), *projectManagedSourceDir, *pluginManagedSourceDir));
+	const FString sourceArg = ZBuildEngine_Private::BuildArgument("source", FString::Printf(TEXT("%s;%s"), *projectManagedSourceDir, *pluginManagedSourceDir));
 
 	const TCHAR* argv[] =
 	{
@@ -103,11 +103,11 @@ void ZSharp::FZBuildEngine::GenerateGlue() const
 	FZDynamicTypeExporter{}.Export();
 	FZGlueManifestWriter{}.Write();
 
-	const FString assemblyDir = FZBuildEngine_Private::LocateBuildAssembly();
-	const FString projectDir = FZBuildEngine_Private::GetProjectDir();
+	const FString assemblyDir = ZBuildEngine_Private::LocateBuildAssembly();
+	const FString projectDir = ZBuildEngine_Private::GetProjectDir();
 
-	const FString targetArg = FZBuildEngine_Private::BuildArgument("target", "glue");
-	const FString projectDirArg = FZBuildEngine_Private::BuildArgument("projectdir", projectDir);
+	const FString targetArg = ZBuildEngine_Private::BuildArgument("target", "glue");
+	const FString projectDirArg = ZBuildEngine_Private::BuildArgument("projectdir", projectDir);
 
 	const TCHAR* argv[] =
 	{

@@ -8,7 +8,7 @@
 #include "ZSharpRuntimeSettings.h"
 #include "Policies/PrettyJsonPrintPolicy.h"
 
-namespace ZSharp::FZGlueManifestWriter_Private
+namespace ZSharp::ZGlueManifestWriter_Private
 {
 	// FJsonObjectConverter is so fucking buggy that we have to write manually.
 	TSharedRef<FJsonObject> AssemblyToJson(const FZExportedAssemblyDto& dto)
@@ -91,9 +91,9 @@ void ZSharp::FZGlueManifestWriter::Write()
 	const FString glueDir = FPaths::Combine(FPaths::ProjectDir(), "Intermediate/ZSharp/Glue");
 	for (const auto& pair : AssemblyDtoMap)
 	{
-		TSharedRef<FJsonObject> jsonObj = FZGlueManifestWriter_Private::AssemblyToJson(*pair.Value);
+		TSharedRef<FJsonObject> jsonObj = ZGlueManifestWriter_Private::AssemblyToJson(*pair.Value);
 		FString jsonStr;
-		if (!FZGlueManifestWriter_Private::JsonToString(jsonObj, jsonStr))
+		if (!ZGlueManifestWriter_Private::JsonToString(jsonObj, jsonStr))
 		{
 			checkNoEntry();
 		}

@@ -6,7 +6,7 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ZCall/ZDeclareConjugateRegistry.h"
 
-namespace ZSharp::FZConjugateRegistry_UObject_Private
+namespace ZSharp::ZConjugateRegistry_UObject_Private
 {
 	static TZDeclareConjugateRegistry<FZConjugateRegistry_String> GDeclare;
 }

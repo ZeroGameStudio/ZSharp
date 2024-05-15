@@ -5,14 +5,14 @@
 
 #include "ZCallDispatcher_Export.h"
 
-namespace ZSharp::FZCallResolver_Export_Private
+namespace ZSharp::ZCallResolver_Export_Private
 {
 	static TMap<FString, TFunction<IZCallDispatcher*()>> GResolveFunctionMap;
 }
 
 void ZSharp::FZCallResolver_Export::RegisterFunction(const FString& name, const TFunction<int32(FZCallBuffer*)>& function)
 {
-	FZCallResolver_Export_Private::GResolveFunctionMap.Emplace(name, [name, function]
+	ZCallResolver_Export_Private::GResolveFunctionMap.Emplace(name, [name, function]
 	{
 		return new FZCallDispatcher_Export { name, function };
 	});
@@ -20,7 +20,7 @@ void ZSharp::FZCallResolver_Export::RegisterFunction(const FString& name, const 
 
 ZSharp::IZCallDispatcher* ZSharp::FZCallResolver_Export::Resolve(const FString& name) const
 {
-	const TFunction<IZCallDispatcher*()>* resolveFunction = FZCallResolver_Export_Private::GResolveFunctionMap.Find(name);
+	const TFunction<IZCallDispatcher*()>* resolveFunction = ZCallResolver_Export_Private::GResolveFunctionMap.Find(name);
 	if (resolveFunction)
 	{
 		return (*resolveFunction)();

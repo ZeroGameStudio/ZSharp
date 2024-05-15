@@ -11,6 +11,11 @@
 
 namespace ZSharp
 {
+	namespace ZStaticExportedEnum_Private
+	{
+		ZSHARPEXPORT_API bool RegisterEnum(IZExportedEnum* enm);
+	}
+	
 	template <CZStaticExportableEnum T>
 	class TZStaticExportedEnum : public IZExportedEnum
 	{
@@ -39,7 +44,7 @@ namespace ZSharp
 			TZStaticExportedEnum* Enum;
 			~FZFinalizer()
 			{
-				 Enum->bRegistered = IZExportedTypeRegistry_Private::RegisterEnum(Enum);
+				 Enum->bRegistered = ZStaticExportedEnum_Private::RegisterEnum(Enum);
 			}
 		};
 

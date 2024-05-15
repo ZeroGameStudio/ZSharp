@@ -19,7 +19,7 @@
 #include "ALC/ZSlimAssemblyLoadContext.h"
 #include "Interop/ZSlimAssemblyLoadContext_Interop.h"
 
-namespace ZSharp::FZGenericClr_Private
+namespace ZSharp::ZGenericClr_Private
 {
 	struct FZUnmanagedFunction
 	{
@@ -198,8 +198,8 @@ void ZSharp::FZGenericClr::Startup()
 
 	closeHostFXR(handle);
 
-	FZGenericClr_Private::LoadCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
-	FZGenericClr_Private::LoadEngineCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
+	ZGenericClr_Private::LoadCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
+	ZGenericClr_Private::LoadEngineCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
 	
 	FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);
 }

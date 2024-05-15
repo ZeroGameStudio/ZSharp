@@ -20,10 +20,4 @@ namespace ZSharp
 	};
 }
 
-namespace ZSharp::IZExportedTypeRegistry_Private
-{
-	ZSHARPEXPORT_API bool RegisterClass(IZExportedClass* cls);
-	ZSHARPEXPORT_API bool RegisterEnum(IZExportedEnum* enm);
-}
-
 

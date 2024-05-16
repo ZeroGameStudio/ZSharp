@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "ZFullyDecay.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_String.h"
@@ -30,7 +29,35 @@ namespace ZSharp
 	{
 		using DecodedType = T*;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(value)); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return Cast<T>(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(slot.ReadConjugate())); }
+	};
+
+	template <CZIsDecayed T>
+	struct TZCallBufferSlotEncoder<const T*, std::enable_if_t<TPointerIsConvertibleFromTo<T, UObjectBase>::Value>>
+	{
+		using DecodedType = const T*;
+		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(value)); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
+		static DecodedType Decode(const FZCallBufferSlot& slot) { return Cast<T>(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(slot.ReadConjugate())); }
+	};
+
+	template <>
+	struct TZCallBufferSlotEncoder<TCHAR*>
+	{
+		using DecodedType = const TCHAR*;
+		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WritePointer(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
+		static DecodedType Decode(const FZCallBufferSlot& slot) { return StaticCast<DecodedType>(slot.ReadPointer()); }
+	};
+
+	template <>
+	struct TZCallBufferSlotEncoder<const TCHAR*>
+	{
+		using DecodedType = const TCHAR*;
+		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WritePointer(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
+		static DecodedType Decode(const FZCallBufferSlot& slot) { return StaticCast<DecodedType>(slot.ReadPointer()); }
 	};
 
 	template <>
@@ -38,6 +65,7 @@ namespace ZSharp
 	{
 		using DecodedType = uint8;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteUInt8(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadUInt8(); }
 	};
 
@@ -46,6 +74,7 @@ namespace ZSharp
 	{
 		using DecodedType = uint16;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteUInt16(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadUInt16(); }
 	};
 
@@ -54,6 +83,7 @@ namespace ZSharp
 	{
 		using DecodedType = uint32;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteUInt32(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadUInt32(); }
 	};
 
@@ -62,6 +92,7 @@ namespace ZSharp
 	{
 		using DecodedType = uint64;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteUInt64(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadUInt64(); }
 	};
 
@@ -70,6 +101,7 @@ namespace ZSharp
 	{
 		using DecodedType = int8;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteInt8(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadInt8(); }
 	};
 
@@ -78,6 +110,7 @@ namespace ZSharp
 	{
 		using DecodedType = int16;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteInt16(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadInt16(); }
 	};
 
@@ -86,6 +119,7 @@ namespace ZSharp
 	{
 		using DecodedType = int32;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteInt32(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadInt32(); }
 	};
 
@@ -94,6 +128,7 @@ namespace ZSharp
 	{
 		using DecodedType = int64;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteInt64(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadInt64(); }
 	};
 
@@ -102,6 +137,7 @@ namespace ZSharp
 	{
 		using DecodedType = float;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteFloat(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadFloat(); }
 	};
 
@@ -110,6 +146,7 @@ namespace ZSharp
 	{
 		using DecodedType = double;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteDouble(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadDouble(); }
 	};
 
@@ -118,6 +155,7 @@ namespace ZSharp
 	{
 		using DecodedType = bool;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteBool(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadBool(); }
 	};
 
@@ -126,7 +164,8 @@ namespace ZSharp
 	{
 		using DecodedType = FString;
 		static void Encode(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(const_cast<FString*>(&value), false)); }
-		static DecodedType Decode(const FZCallBufferSlot& slot) { return *IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(slot.ReadConjugate()); }
+		static void EncodeRet(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(new FString { value }, true)); }
+		static DecodedType& Decode(const FZCallBufferSlot& slot) { return *IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(slot.ReadConjugate()); }
 		static DecodedType* DecodeThis(const FZCallBufferSlot& slot) { return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(slot.ReadConjugate()); }
 	};
 	

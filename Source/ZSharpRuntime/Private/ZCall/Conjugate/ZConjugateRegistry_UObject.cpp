@@ -29,19 +29,20 @@ UObject* ZSharp::FZConjugateRegistry_UObject::Conjugate(FZConjugateHandle handle
 	return rec ? rec->TypedUnmanaged.ResolveObjectPtrEvenIfGarbage() : nullptr;
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UObject::Conjugate(UObject* unmanaged)
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UObject::Conjugate(const UObjectBase* unmanaged)
 {
-	FZRec* rec = ConjugateMap.Find(unmanaged);
+	UObject* typedUnmanaged = StaticCast<UObject*>(const_cast<UObjectBase*>(unmanaged));
+	FZRec* rec = ConjugateMap.Find(typedUnmanaged);
 	if (rec)
 	{
 		return { rec->TypedUnmanaged.ResolveObjectPtrEvenIfGarbage() };
 	}
 	else
 	{
-		ConjugateMap.Emplace(unmanaged, { unmanaged });
+		ConjugateMap.Emplace(typedUnmanaged, { typedUnmanaged });
 		FZRuntimeTypeHandle type = Alc.GetType("ZeroGames.ZSharp.UnrealEngine", "ZeroGames.ZSharp.UnrealEngine.CoreUObject.UnrealObject");
-		Alc.BuildConjugate(unmanaged, type);
-		return { unmanaged };
+		Alc.BuildConjugate(typedUnmanaged, type);
+		return { typedUnmanaged };
 	}
 }
 

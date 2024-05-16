@@ -236,10 +236,10 @@ void ZSharp::FZCallBufferSlot::WriteBool(bool value)
 	Value.Bool = value;
 }
 
-void ZSharp::FZCallBufferSlot::WritePointer(void* value)
+void ZSharp::FZCallBufferSlot::WritePointer(const void* value)
 {
 	check(Type == EZCallBufferSlotType::Pointer);
-	Value.Pointer = value;
+	Value.Pointer = const_cast<void*>(value);
 }
 
 void ZSharp::FZCallBufferSlot::WriteGCHandle(FZGCHandle value)

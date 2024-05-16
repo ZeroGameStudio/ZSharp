@@ -94,7 +94,7 @@ namespace ZSharp
 		void WriteFloat(float value);
 		void WriteDouble(double value);
 		void WriteBool(bool value);
-		void WritePointer(void* value);
+		void WritePointer(const void* value);
 		void WriteGCHandle(FZGCHandle value);
 		void WriteConjugate(FZConjugateHandle value);
 		

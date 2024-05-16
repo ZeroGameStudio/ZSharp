@@ -7,7 +7,7 @@
 
 namespace ZSharp::ZCallResolver_Export_Private
 {
-	static TMap<FString, TFunction<IZCallDispatcher*()>> GResolveFunctionMap;
+	static TMap<FString,	 TFunction<IZCallDispatcher*()>> GResolveFunctionMap;
 }
 
 void ZSharp::FZCallResolver_Export::RegisterFunction(const FString& name, const TFunction<int32(FZCallBuffer*)>& function)

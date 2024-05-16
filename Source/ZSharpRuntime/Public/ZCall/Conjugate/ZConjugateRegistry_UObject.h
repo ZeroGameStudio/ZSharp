@@ -23,7 +23,7 @@ namespace ZSharp
 
 	public:
 		UObject* Conjugate(FZConjugateHandle handle) const;
-		FZConjugateHandle Conjugate(UObject* unmanaged);
+		FZConjugateHandle Conjugate(const UObjectBase* unmanaged);
 	
 	private:
 		virtual void Release() override;

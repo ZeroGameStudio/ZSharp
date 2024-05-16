@@ -28,6 +28,8 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_String::Conjugate(FString*
 	FZRec* rec = ConjugateMap.Find(unmanaged);
 	if (rec)
 	{
+		// This branch means conjugating an unmanaged object that doesn't owned by the caller.
+		check(!bOwning);
 		return { rec->TypedUnmanaged };
 	}
 	else

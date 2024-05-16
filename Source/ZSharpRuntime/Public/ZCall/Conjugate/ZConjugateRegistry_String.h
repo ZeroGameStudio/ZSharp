@@ -23,6 +23,7 @@ namespace ZSharp
 	public:
 		FString* Conjugate(FZConjugateHandle handle) const;
 		FZConjugateHandle Conjugate(FString* unmanaged, bool bOwning);
+		FZConjugateHandle BuildConjugate(FString* unmanaged, bool bOwning);
 	
 	private:
 		virtual void Release() override;

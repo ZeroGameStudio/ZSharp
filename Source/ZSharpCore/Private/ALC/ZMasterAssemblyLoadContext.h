@@ -59,6 +59,9 @@ namespace ZSharp
 		void PopRedFrame();
 
 		bool IsInsideOfRedZCall() const { return !!RedZCallDepth; }
+		
+	private:
+		void HandleGarbageCollectComplete();
 
 	private:
 		FZGCHandle Handle;
@@ -72,7 +75,8 @@ namespace ZSharp
 		TSparseArray<TUniquePtr<IZConjugateRegistry>> ConjugateRegistries;
 		int32 RedZCallDepth;
 
-		
+		FTSTicker::FDelegateHandle TickDelegate;
+		FDelegateHandle GCDelegate;
 		
 	};
 }

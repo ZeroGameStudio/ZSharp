@@ -3,6 +3,7 @@
 
 #include "ZMasterAssemblyLoadContext.h"
 
+#include "ZSharpCoreLogChannels.h"
 #include "Interop/ZMasterAssemblyLoadContext_Interop.h"
 #include "ZCall/IZCallDispatcher.h"
 #include "ZCall/ZConjugateRegistryDeclarations.h"
@@ -17,11 +18,15 @@ ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle hand
 		ConjugateRegistries.EmplaceAt(id, factory(*this));
 	});
 
-	FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(this, &ThisClass::Tick));
+	TickDelegate = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(this, &ThisClass::Tick));
+	GCDelegate = FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);
 }
 
 ZSharp::FZMasterAssemblyLoadContext::~FZMasterAssemblyLoadContext()
 {
+	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegate);
+	FCoreUObjectDelegates::GarbageCollectComplete.Remove(GCDelegate);
+	
 	Handle.Free();
 }
 
@@ -213,6 +218,11 @@ void ZSharp::FZMasterAssemblyLoadContext::PopRedFrame()
 	}
 
 	--RedZCallDepth;
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::HandleGarbageCollectComplete()
+{
+	UE_CLOG(IsInsideOfRedZCall(), LogZSharpCore, Fatal, TEXT("Collect Garbage inside of Red ZCall!!!"));
 }
 
 

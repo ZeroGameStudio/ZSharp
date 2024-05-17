@@ -11,7 +11,7 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 
 	public override async Task<string> BuildAsync()
 	{
-		SetupTestData();
+		// SetupTestData();
 		
 		await SetupRegistry();
 		await Parallel.ForEachAsync(_registry.ExportedTypes, (type, _) => GenerateType(type));
@@ -103,7 +103,7 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		await using FileStream fs = File.Create($"{moduleDir}/{exportedType.Name}.cs");
 		if (exportedType is ExportedClass exportedClass)
 		{
-			await using ClassWriter cw = new(exportedClass, fs);
+			await using ClassWriter cw = new(_registry, exportedClass, fs);
 			await cw.WriteAsync();
 		}
 		else if (exportedType is ExportedEnum exportedEnum)

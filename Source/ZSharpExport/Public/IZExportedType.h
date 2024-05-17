@@ -14,7 +14,11 @@ namespace ZSharp
 	public:
 		virtual bool IsRegistered() const = 0;
 		virtual FString GetModule() const = 0;
+		virtual FString GetOuterExportName() const = 0;
 		virtual EZCallBufferSlotType GetSlotType() const = 0;
+	public:
+		// NOTE: This will run in constructor so can't be virtual.
+		FString GetInnerExportName() const;
 	};
 }
 

@@ -5,8 +5,8 @@ namespace ZeroGames.ZSharp.Build.Glue;
 public class ExportedEnum : ExportedType
 {
 	public ExportedEnum() => Static = true;
-	public string UnderlyingType { get; set; } = string.Empty;
-	public Dictionary<string, string> ValueMap { get; set; } = new();
+	public required string UnderlyingType { get; set; }
+	public required Dictionary<string, string> ValueMap { get; set; }
 }
 
 

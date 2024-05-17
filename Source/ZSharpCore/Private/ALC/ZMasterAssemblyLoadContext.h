@@ -66,6 +66,7 @@ namespace ZSharp
 	private:
 		FZGCHandle Handle;
 		TUniqueFunction<void()> UnloadCallback;
+		bool bUnloaded;
 
 		TMap<FZCallHandle, TUniquePtr<IZCallDispatcher>> ZCallMap;
 		TMap<FString, FZCallHandle> ZCallName2Handle;

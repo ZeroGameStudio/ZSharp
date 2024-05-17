@@ -4,9 +4,11 @@ namespace ZeroGames.ZSharp.Build.Glue;
 
 public class ExportedAssembly
 {
-	public string Name { get; set; } = string.Empty;
-	public List<ExportedEnum> Enums { get; set; } = new();
-	public List<ExportedClass> Classes { get; set; } = new();
+	public string Name { get; set; } = null!;
+	public required List<ExportedEnum> Enums { get; set; }
+	public required List<ExportedClass> Classes { get; set; }
+	
+	public IEnumerable<ExportedType> ExportedTypes => Classes.AsEnumerable<ExportedType>().Concat(Enums);
 }
 
 

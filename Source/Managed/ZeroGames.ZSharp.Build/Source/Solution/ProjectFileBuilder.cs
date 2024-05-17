@@ -139,15 +139,23 @@ public class ProjectFileBuilder
 	{
 		XmlElement itemGroupNode = doc.CreateElement("ItemGroup");
 
-		List<string> finalUsings = [.._project.Usings];
-		finalUsings.ForEach(us =>
+		List<string> intrinsicUsings = [];
+		if (!_project.Tags.Contains("ExcludeIntrinsicUsings"))
+		{
+			intrinsicUsings.Add("ZeroGames.ZSharp.Core");
+			intrinsicUsings.Add("ZeroGames.ZSharp.UnrealEngine");
+			intrinsicUsings.Add("ZeroGames.ZSharp.UnrealEngine.Core");
+			intrinsicUsings.Add("ZeroGames.ZSharp.UnrealEngine.CoreUObject");
+			intrinsicUsings.Add("ZeroGames.ZSharp.UnrealEngine.Engine");
+		}
+		foreach (var us in intrinsicUsings.Concat(_project.Usings))
 		{
 			XmlElement usingNode = doc.CreateElement("Using");
 			usingNode.SetAttribute("Include", us);
 			itemGroupNode.AppendChild(usingNode);
-		});
+		}
 
-		Dictionary<string, string> finalAliases = new(_project.Aliases)
+		Dictionary<string, string> intrinsicAliases = new()
 		{
 			{ "System.Byte", "uint8" },
 			{ "System.UInt16", "uint16" },
@@ -159,7 +167,7 @@ public class ProjectFileBuilder
 			{ "System.Int64", "int64" },
 		};
 
-		foreach (var pair in finalAliases)
+		foreach (var pair in intrinsicAliases.Concat(_project.Aliases))
 		{
 			XmlElement aliasNode = doc.CreateElement("Using");
 			aliasNode.SetAttribute("Include", pair.Key);

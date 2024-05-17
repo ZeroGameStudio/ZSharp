@@ -12,6 +12,7 @@ namespace ZSharp
 		virtual FString GetUnderlyingType() const = 0;
 		virtual void ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const = 0;
 	private:
+		virtual FString GetOuterExportName() const override { return GetInnerExportName(); }
 		virtual bool IsStatic() const override final { return true; }
 	};
 }

@@ -6,6 +6,8 @@
 
 namespace ZSharp
 {
+	class IZExportedType;
+	class IZExportedClass;
 	class IZExportedEnum;
 	
 	class FZGlueManifestWriter
@@ -13,6 +15,12 @@ namespace ZSharp
 
 	public:
 		void Write();
+
+	private:
+		void WriteClass(const IZExportedClass& cls);
+		void WriteEnum(const IZExportedEnum& enm);
+
+		TUniquePtr<FZExportedAssemblyDto>* GetAssemblyDto(const IZExportedType& type);
 
 	private:
 		TMap<FString, TUniquePtr<FZExportedAssemblyDto>> AssemblyDtoMap; // DTO can be extreme large so we save pointer to map.

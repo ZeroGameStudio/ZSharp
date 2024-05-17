@@ -11,6 +11,7 @@
 ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle handle, TUniqueFunction<void()>&& unloadCallback)
 	: Handle(handle)
 	, UnloadCallback(MoveTemp(unloadCallback))
+	, bUnloaded(false)
 	, RedZCallDepth(0)
 {
 	FZConjugateRegistryDeclarations::ForeachDeclaration([this](uint16 id, const TUniqueFunction<IZConjugateRegistry*(IZMasterAssemblyLoadContext&)>& factory)
@@ -24,6 +25,8 @@ ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle hand
 
 ZSharp::FZMasterAssemblyLoadContext::~FZMasterAssemblyLoadContext()
 {
+	check(bUnloaded);
+	
 	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegate);
 	FCoreUObjectDelegates::GarbageCollectComplete.Remove(GCDelegate);
 	
@@ -35,14 +38,21 @@ void ZSharp::FZMasterAssemblyLoadContext::Unload()
 	check(IsInGameThread());
 	check(!IsInsideOfRedZCall());
 
+	if (bUnloaded)
+	{
+		return;
+	}
+
 	for (const auto& registry : ConjugateRegistries)
 	{
 		registry->Release();
 	}
 
-	UnloadCallback();
-
 	FZMasterAssemblyLoadContext_Interop::GUnload();
+
+	bUnloaded = true;
+
+	UnloadCallback();
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const TArray<uint8>& buffer, void* args)

@@ -5,10 +5,8 @@ using ZeroGames.ZSharp.UnrealEngine.Core;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public class UnrealObject : UnrealClassExportedObjectBase, IConjugate<UnrealObject>
+public partial class UnrealObject
 {
-
-    public static UnrealObject BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
     public unsafe UnrealObject Class
     {
@@ -64,8 +62,6 @@ public class UnrealObject : UnrealClassExportedObjectBase, IConjugate<UnrealObje
         }
     }
 
-    private UnrealObject(IntPtr unmanaged) : base(unmanaged){}
-    
 }
 
 

@@ -4,6 +4,7 @@
 #include "Dynamic/ZDynamicExportedEnum.h"
 
 #include "ZExportedTypeRegistry.h"
+#include "ZSharpExportHelpers.h"
 
 ZSharp::FZDynamicExportedEnum::FZDynamicExportedEnum(UEnum* uenum)
 	: Enum(uenum)
@@ -20,10 +21,7 @@ FString ZSharp::FZDynamicExportedEnum::GetName() const
 
 FString ZSharp::FZDynamicExportedEnum::GetModule() const
 {
-	FString res;
-	const bool bSuc = Enum->GetPackage()->GetName().Split("/", nullptr, &res, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
-	check(bSuc);
-	return res;
+	return FZSharpExportHelpers::GetUFieldModuleName(Enum);
 }
 
 ZSharp::EZCallBufferSlotType ZSharp::FZDynamicExportedEnum::GetSlotType() const

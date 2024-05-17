@@ -12,7 +12,10 @@ ZSharp::FZExportedTypeRegistry& ZSharp::FZExportedTypeRegistry::Get()
 
 void ZSharp::FZExportedTypeRegistry::ForeachExportedClass(TFunctionRef<void(const IZExportedClass&)> action) const
 {
-	checkNoEntry();
+	for (const auto& pair : ClassMap)
+	{
+		action(*pair.Value);
+	}
 }
 
 void ZSharp::FZExportedTypeRegistry::ForeachExportedEnum(TFunctionRef<void(const IZExportedEnum&)> action) const
@@ -25,13 +28,19 @@ void ZSharp::FZExportedTypeRegistry::ForeachExportedEnum(TFunctionRef<void(const
 
 bool ZSharp::FZExportedTypeRegistry::RegisterClass(IZExportedClass* cls)
 {
-	checkNoEntry();
-	return false;
+	FString key = cls->GetInnerExportName();
+	if (EnumMap.Contains(key))
+	{
+		return false;
+	}
+	
+	ClassMap.Emplace(key, cls);
+	return true;
 }
 
 bool ZSharp::FZExportedTypeRegistry::RegisterEnum(IZExportedEnum* enm)
 {
-	FString key = FString::Printf(TEXT("%s.%s"), *enm->GetModule(), *enm->GetName());
+	FString key = enm->GetInnerExportName();
 	if (EnumMap.Contains(key))
 	{
 		return false;

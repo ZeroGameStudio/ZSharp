@@ -9,6 +9,10 @@
 	[
 		"ZeroGames.ZSharp.Core",
 		"ZeroGames.ZSharp.UnrealEngine.Core"
+	],
+	"Tags":
+	[
+		"ExcludeIntrinsicUsings"
 	]
 }
 

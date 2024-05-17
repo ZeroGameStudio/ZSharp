@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ZIsDynamicExportableType.h"
+#include "ZSharpExportHelpers.h"
 #include "ZUField.h"
 
 namespace ZSharp
@@ -15,10 +16,7 @@ namespace ZSharp
 	{
 		static FString Get()
 		{
-			FString res;
-			const bool bSuc = TZUField<T>::Get()->GetPackage()->GetName().Split("/", nullptr, &res, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
-			check(bSuc);
-			return res;
+			return FZSharpExportHelpers::GetUFieldModuleName(TZUField<T>::Get());
 		}
 	};
 }

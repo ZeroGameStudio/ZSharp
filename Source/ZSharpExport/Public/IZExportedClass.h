@@ -11,9 +11,12 @@ namespace ZSharp
 	class ZSHARPEXPORT_API IZExportedClass : public IZExportedType
 	{
 	public:
-		virtual FString GetBaseTypeName() const = 0;
+		virtual FString GetBaseType() const = 0;
 		virtual TArray<FString> GetInterfaces() const = 0;
 		virtual void ForeachMethod(TFunctionRef<void(IZExportedMethod&)> action) const = 0;
+	private:
+		virtual bool IsStatic() const override { return false; }
+		virtual EZCallBufferSlotType GetSlotType() const override { return EZCallBufferSlotType::Conjugate; }
 	};
 }
 

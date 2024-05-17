@@ -6,10 +6,9 @@
 
 namespace ZSharp
 {
-	struct FZExportedEnumDto : FZExportedTypeDto
+	struct FZExportedClassDto : FZExportedTypeDto
 	{
-		FString UnderlyingType;
-		TMap<FString, FString> ValueMap;
+		FString BaseType;
 	};
 }
 

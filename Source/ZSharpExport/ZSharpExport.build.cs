@@ -27,6 +27,7 @@ public class ZSharpExport : ModuleRules
 			new string[]
 			{
 				"Core",
+				"DeveloperSettings",
 			}
 		);
 		
@@ -46,5 +47,7 @@ public class ZSharpExport : ModuleRules
 			{
 			}
 		);
+		
+		PublicDefinitions.Add($"ZSHARP_ENGINE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.UnrealEngine\"");
 	}
 }

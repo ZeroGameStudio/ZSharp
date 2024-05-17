@@ -3,7 +3,9 @@
 
 #include "ZDynamicTypeExporter.h"
 
-#include "ZSharpRuntimeSettings.h"
+#include "ZSharpExportHelpers.h"
+#include "ZSharpExportSettings.h"
+#include "Dynamic/ZDynamicExportedClass.h"
 #include "Dynamic/ZDynamicExportedEnum.h"
 
 void ZSharp::FZDynamicTypeExporter::Export() const
@@ -16,9 +18,8 @@ void ZSharp::FZDynamicTypeExporter::Export() const
 			continue;
 		}
 
-		FString module;
-		bool bSuc = enm->GetPackage()->GetName().Split("/", nullptr, &module, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
-		if (!bSuc || !GetDefault<UZSharpRuntimeSettings>()->IsModuleMapped(module))
+		FString module = FZSharpExportHelpers::GetUFieldModuleName(enm);
+		if (!GetDefault<UZSharpExportSettings>()->IsModuleMapped(module))
 		{
 			continue;
 		}
@@ -27,6 +28,48 @@ void ZSharp::FZDynamicTypeExporter::Export() const
 		if (!exportedEnum->IsRegistered())
 		{
 			delete exportedEnum;
+		}
+	}
+
+	for (TObjectIterator<UScriptStruct> It; It; ++It)
+	{
+		UScriptStruct* strct = *It;
+		if (!strct->IsNative())
+		{
+			continue;
+		}
+
+		FString module = FZSharpExportHelpers::GetUFieldModuleName(strct);
+		if (!GetDefault<UZSharpExportSettings>()->IsModuleMapped(module))
+		{
+			continue;
+		}
+
+		const auto* exportedClass = new FZDynamicExportedClass { strct };
+		if (!exportedClass->IsRegistered())
+		{
+			delete exportedClass;
+		}
+	}
+
+	for (TObjectIterator<UClass> It; It; ++It)
+	{
+		UClass* cls = *It;
+		if (!cls->IsNative())
+		{
+			continue;
+		}
+
+		FString module = FZSharpExportHelpers::GetUFieldModuleName(cls);
+		if (!GetDefault<UZSharpExportSettings>()->IsModuleMapped(module))
+		{
+			continue;
+		}
+
+		const auto* exportedClass = new FZDynamicExportedClass { cls };
+		if (!exportedClass->IsRegistered())
+		{
+			delete exportedClass;
 		}
 	}
 }

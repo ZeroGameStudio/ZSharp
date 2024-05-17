@@ -4,7 +4,7 @@ using ZeroGames.ZSharp.Core;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<UnrealString>
+public partial class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<UnrealString>
 {
 
     public static UnrealString BuildConjugate(IntPtr unmanaged) => new(unmanaged);

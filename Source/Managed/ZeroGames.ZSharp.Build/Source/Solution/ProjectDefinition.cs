@@ -34,7 +34,7 @@ public class ProjectDefinition
 
 	public List<string> PostBuildCommands { get; init; } = new();
 
-	public List<string> Tags { get; init; } = new();
+	public HashSet<string> Tags { get; init; } = new();
 
 	public string ProjectFileExtension => Language.ToLower() switch
 	{

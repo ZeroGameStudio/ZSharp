@@ -3,6 +3,7 @@
 #pragma once
 
 #include "IZExportedTypeRegistry.h"
+#include "IZExportedClass.h"
 #include "IZExportedEnum.h"
 
 namespace ZSharp
@@ -22,6 +23,7 @@ namespace ZSharp
 		bool RegisterEnum(IZExportedEnum* enm);
 
 	private:
+		TMap<FString, TUniquePtr<IZExportedClass>> ClassMap;
 		TMap<FString, TUniquePtr<IZExportedEnum>> EnumMap;
 		
 	};

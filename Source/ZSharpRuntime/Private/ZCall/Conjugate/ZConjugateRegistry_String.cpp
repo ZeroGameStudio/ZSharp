@@ -57,7 +57,7 @@ void ZSharp::FZConjugateRegistry_String::Release()
 
 void* ZSharp::FZConjugateRegistry_String::BuildConjugate()
 {
-	FString* conjugate = new FString;
+	auto conjugate = new FString;
 	ConjugateMap.Emplace(conjugate, { conjugate, true, true });
 	return conjugate;
 }

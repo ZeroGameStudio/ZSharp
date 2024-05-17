@@ -2,11 +2,16 @@
 
 #pragma once
 
+#include "ZExportedClassDto.h"
 #include "ZExportedEnumDto.h"
 
-struct FZExportedAssemblyDto
+namespace ZSharp
 {
-	TArray<FZExportedEnumDto> Enums;
-};
+	struct FZExportedAssemblyDto
+	{
+		TArray<FZExportedEnumDto> Enums;
+		TArray<FZExportedClassDto> Classes;
+	};
+}
 
 

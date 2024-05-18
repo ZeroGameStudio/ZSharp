@@ -36,22 +36,16 @@ public class ClassWriter : IDisposable, IAsyncDisposable
 
 #region GENERATED CODE
 
+#pragma warning disable CS0109 // Member does not hide an inherited member; new keyword is not required
+
 using ZeroGames.ZSharp.Core;
 using ZeroGames.ZSharp.UnrealEngine;
 {_extraUsingBlock}
 
 namespace {_exportedClass.Namespace};
 
-[System.CodeDom.Compiler.GeneratedCode(""ZSharp"", ""0.0.1"")]
-public partial class {_exportedClass.Name} : {_baseType}, IConjugate<{_exportedClass.Name}>
-{{
-
-{_classBody}
-
-    public {_newIfSubclass}static {_exportedClass.Name} BuildConjugate(IntPtr unmanaged) => new(unmanaged);
-	protected {_exportedClass.Name}(IntPtr unmanaged) : base(unmanaged){{}}
-
-}}
+[System.CodeDom.Compiler.GeneratedCode(""ZSharp"", ""0.0.4"")]
+{_classDeclaration}{_classBody}
 
 #endregion
 
@@ -86,8 +80,11 @@ public partial class {_exportedClass.Name} : {_baseType}, IConjugate<{_exportedC
 		get
 		{
 			List<string> relevantModules = [ "Core", "CoreUObject", "Engine" ];
-			
-			relevantModules.Add(GetTypeModule(_baseType));
+
+			if (_baseType is {} baseType)
+			{
+				relevantModules.Add(GetTypeModule(baseType));
+			}
 			
 			relevantModules.RemoveAll(module => string.IsNullOrWhiteSpace(module) || module == _exportedClass.Module);
 
@@ -95,10 +92,29 @@ public partial class {_exportedClass.Name} : {_baseType}, IConjugate<{_exportedC
 		}
 	}
 
-	private bool _topLevelClass => _exportedClass.BaseType[0] == '@';
-	private string _newIfSubclass => _topLevelClass ? string.Empty : "new ";
+	private string _classDeclaration
+	{
+		get
+		{
+			string? @abstract = _exportedClass.Abstract ? "abstract " : null;
+			string @class = _exportedClass.Interface ? "interface " : "class ";
+			string? @base = _baseType;
+			string? conjugate = _implementsBuildConjugate ? $"IConjugate<{_exportedClass.Name}>" : null;
+			List<string?> bases = [ @base, conjugate ];
+			
+			string classModifiers = $"public {@abstract}partial {@class}";
+			string baseTypes = string.Join(", ", bases.Where(b => b is not null));
+			if (!string.IsNullOrWhiteSpace(baseTypes))
+			{
+				baseTypes = baseTypes.Insert(0, " : ");
+			}
+			return $"{classModifiers}{_exportedClass.Name}{baseTypes}";
+		}
+	}
 
-	private string _baseType
+	private bool _implementsBuildConjugate => !_exportedClass.Interface && !_exportedClass.Abstract;
+
+	private string? _baseType
 	{
 		get
 		{
@@ -109,6 +125,7 @@ public partial class {_exportedClass.Name} : {_baseType}, IConjugate<{_exportedC
 					"@UCLASS" => "UnrealClassExportedObjectBase",
 					"@USTRUCT" => "UnrealStructExportedObjectBase",
 					"@PLAIN" => "PlainUnmanagedClassExportedObjectBase",
+					"@NONE" => null,
 					_ => throw new ArgumentException($"Invalid special base type {_exportedClass.BaseType}")
 				};
 			}
@@ -121,7 +138,25 @@ public partial class {_exportedClass.Name} : {_baseType}, IConjugate<{_exportedC
 	{
 		get
 		{
-			return string.Empty;
+			StringBuilder body = new();
+			
+			string? methodBuildConjugate = _implementsBuildConjugate ? $"\tpublic new static {_exportedClass.Name} BuildConjugate(IntPtr unmanaged) => new(unmanaged);" : null;
+			string? constructorRed = _exportedClass.Interface ? null : $"\tprotected {_exportedClass.Name}(IntPtr unmanaged) : base(unmanaged){{}}";
+			List<string?> intrinsicMethods = [ methodBuildConjugate, constructorRed ];
+			string intrinsicMethodBlock = string.Join('\n', intrinsicMethods.Where(m => m is not null));
+			body.Append(intrinsicMethodBlock);
+
+			if (body.Length > 0)
+			{
+				body.Insert(0, "\n{\n\n");
+				body.Append("\n\n}");
+			}
+			else
+			{
+				body.Append(';');
+			}
+
+			return body.ToString();
 		}
 	}
 

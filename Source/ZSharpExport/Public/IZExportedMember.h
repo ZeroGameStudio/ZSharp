@@ -10,7 +10,6 @@ namespace ZSharp
 		virtual ~IZExportedMember(){}
 	public:
 		virtual FString GetName() const = 0;
-		virtual bool IsStatic() const = 0;
 	};
 }
 

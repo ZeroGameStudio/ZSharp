@@ -18,9 +18,7 @@ public static class ZSharpActorStatics
     [ZCall]
     public static void Tick(UnrealObject actor, float deltaTime)
     {
-        UnrealString s1 = new("123");
-        using UnrealString s2 = new("ABC");
-        Logger.Log($"ZSharp Tick Actor Name: {actor.Name} DeltaTime: {deltaTime} Str: {s1}");
+        Logger.Log($"ZSharp Tick Actor Name: {actor.Name} DeltaTime: {deltaTime} ManagedType: {actor.GetType().FullName} UnrealClass: {actor.Class.Name}");
     }
 
     [ZCall]

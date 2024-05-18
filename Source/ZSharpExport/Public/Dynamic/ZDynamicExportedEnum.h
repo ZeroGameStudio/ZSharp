@@ -13,7 +13,7 @@ namespace ZSharp
 		explicit FZDynamicExportedEnum(UEnum* uenum);
 
 	public:
-		virtual bool IsRegistered() const override { return bRegistered; }
+		virtual bool IsRegistered() const override;
 		virtual FString GetName() const override;
 		virtual FString GetModule() const override;
 		virtual EZCallBufferSlotType GetSlotType() const override;

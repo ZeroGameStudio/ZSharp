@@ -4,13 +4,18 @@
 
 #include "ZExportedTypeDto.h"
 
-namespace ZSharp
+#include "ZExportedEnumDto.generated.h"
+
+USTRUCT()
+struct FZExportedEnumDto : public FZExportedTypeDto
 {
-	struct FZExportedEnumDto : FZExportedTypeDto
-	{
-		FString UnderlyingType;
-		TMap<FString, FString> ValueMap;
-	};
-}
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString UnderlyingType;
+
+	UPROPERTY()
+	TMap<FString, FString> ValueMap;
+};
 
 

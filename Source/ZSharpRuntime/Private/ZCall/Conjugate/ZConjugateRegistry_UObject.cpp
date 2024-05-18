@@ -40,7 +40,16 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UObject::Conjugate(const U
 	else
 	{
 		ConjugateMap.Emplace(typedUnmanaged, { typedUnmanaged });
-		FZRuntimeTypeHandle type = Alc.GetType("ZeroGames.ZSharp.UnrealEngine", "ZeroGames.ZSharp.UnrealEngine.CoreUObject.UnrealObject");
+		FString assemblyName = "ZeroGames.ZSharp.UnrealEngine"; // @TODO
+		FString moduleName;
+		unmanaged->GetClass()->GetPackage()->GetName().Split("/", nullptr, &moduleName, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+		FString className = unmanaged->GetClass()->GetName();
+		if (className == "Class")
+		{
+			className = "UnrealClass";
+		}
+		FString typeName = FString::Printf(TEXT("%s.%s.%s"), *assemblyName, *moduleName, *className); // @FIXME
+		FZRuntimeTypeHandle type = Alc.GetType(assemblyName, typeName);
 		Alc.BuildConjugate(typedUnmanaged, type);
 		return { typedUnmanaged };
 	}

@@ -14,6 +14,11 @@ ZSharp::FZDynamicExportedEnum::FZDynamicExportedEnum(UEnum* uenum)
 	bRegistered = FZExportedTypeRegistry::Get().RegisterEnum(this);
 }
 
+bool ZSharp::FZDynamicExportedEnum::IsRegistered() const
+{
+	return bRegistered;
+}
+
 FString ZSharp::FZDynamicExportedEnum::GetName() const
 {
 	return Enum->GetName();

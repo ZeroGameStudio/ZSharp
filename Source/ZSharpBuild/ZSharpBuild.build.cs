@@ -38,6 +38,7 @@ public class ZSharpBuild : ModuleRules
 				
 				"Projects",
 				"Json",
+				"JsonUtilities",
 				
 				"ZSharpCore",
 				"ZSharpExport",

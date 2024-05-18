@@ -14,6 +14,7 @@ FString ZSharp::FZSharpExportHelpers::GetUFieldAliasedName(const UField* field)
 		{ "Field", "UnrealField" },
 		{ "Struct", "UnrealStruct" },
 		{ "Class", "UnrealClass" },
+		{ "Interface", "UnrealInterface" },
 		{ "ScriptStruct", "UnrealScriptStruct" },
 		{ "Enum", "UnrealEnum" },
 		
@@ -22,8 +23,19 @@ FString ZSharp::FZSharpExportHelpers::GetUFieldAliasedName(const UField* field)
 	};
 
 	FString name = field->GetName();
-	const FString* alias = GAliasMap.Find(name);
-	return alias ? *alias : name;
+	if (const FString* alias = GAliasMap.Find(name))
+	{
+		name = *alias;
+	}
+	if (auto cls = Cast<UClass>(field))
+	{
+		if (cls->HasAnyClassFlags(CLASS_Interface))
+		{
+			name.InsertAt(0, 'I');
+		}
+	}
+
+	return name;
 }
 
 FString ZSharp::FZSharpExportHelpers::GetUFieldModuleName(const UField* field)

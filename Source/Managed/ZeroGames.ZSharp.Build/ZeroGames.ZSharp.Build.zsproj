@@ -2,8 +2,8 @@
 	"ParentFolder": "Program",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
-	"AssemblyVersion": "0.0.1",
-	"FileVersion": "0.0.1",
+	"AssemblyVersion": "0.0.4",
+	"FileVersion": "0.0.4",
 	"NeutralLanguage": "zh",
 	"ProjectReferences":
 	[

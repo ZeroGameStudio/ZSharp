@@ -35,7 +35,7 @@ public class EnumWriter : IDisposable, IAsyncDisposable
 
 namespace {_exportedEnum.Namespace};
 
-[System.CodeDom.Compiler.GeneratedCode(""ZSharp"", ""0.0.1"")]
+[System.CodeDom.Compiler.GeneratedCode(""ZSharp"", ""0.0.4"")]
 public enum {_exportedEnum.Name} : {_exportedEnum.UnderlyingType}
 {{
 {_enumBody}

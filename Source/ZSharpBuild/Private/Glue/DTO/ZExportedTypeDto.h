@@ -2,13 +2,18 @@
 
 #pragma once
 
-namespace ZSharp
+#include "ZExportedTypeDto.generated.h"
+
+USTRUCT()
+struct FZExportedTypeDto
 {
-	struct FZExportedTypeDto
-	{
-		FString Name;
-		FString Module;
-	};
-}
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString Name;
+
+	UPROPERTY()
+	FString Module;
+};
 
 

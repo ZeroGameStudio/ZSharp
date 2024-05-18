@@ -4,12 +4,18 @@
 
 #include "ZExportedTypeDto.h"
 
-namespace ZSharp
+#include "ZExportedClassDto.generated.h"
+
+USTRUCT()
+struct FZExportedClassDto : public FZExportedTypeDto
 {
-	struct FZExportedClassDto : FZExportedTypeDto
-	{
-		FString BaseType;
-	};
-}
+	GENERATED_BODY()
+
+	UPROPERTY()
+	uint64 Flags;
+
+	UPROPERTY()
+	FString BaseType;
+};
 
 

@@ -7,69 +7,7 @@
 #include "IZExportedTypeRegistry.h"
 #include "ZSharpExportSettings.h"
 #include "DTO/ZExportedClassDto.h"
-#include "Policies/PrettyJsonPrintPolicy.h"
-
-namespace ZSharp::ZGlueManifestWriter_Private
-{
-	// FJsonObjectConverter is so fucking buggy that we have to write manually.
-	TSharedRef<FJsonObject> AssemblyToJson(const FZExportedAssemblyDto& dto)
-	{
-		auto jsonObj = MakeShared<FJsonObject>();
-
-		{ // Enums
-			TArray<TSharedPtr<FJsonValue>> enums;
-			for (const auto& enm : dto.Enums)
-			{
-				auto enmJsonObj = MakeShared<FJsonObject>();
-				enmJsonObj->SetStringField("Name", enm.Name);
-				enmJsonObj->SetStringField("Module", enm.Module);
-				enmJsonObj->SetStringField("UnderlyingType", enm.UnderlyingType);
-				{
-					auto valueMapJsonObj = MakeShared<FJsonObject>();
-					for (const auto& pair : enm.ValueMap)
-					{
-						valueMapJsonObj->SetStringField(pair.Key, pair.Value);
-					}
-					enmJsonObj->SetObjectField("ValueMap", valueMapJsonObj);
-				}
-
-				auto enmJsonValue = MakeShared<FJsonValueObject>(enmJsonObj);
-				enums.Emplace(enmJsonValue);
-			}
-
-			jsonObj->SetArrayField("Enums", MoveTemp(enums));
-		}
-
-		{ // Classes
-			TArray<TSharedPtr<FJsonValue>> classes;
-			for (const auto& cls : dto.Classes)
-			{
-				auto clsJsonObj = MakeShared<FJsonObject>();
-				clsJsonObj->SetStringField("Name", cls.Name);
-				clsJsonObj->SetStringField("Module", cls.Module);
-				clsJsonObj->SetStringField("BaseType", cls.BaseType);
-
-				auto clsJsonValue = MakeShared<FJsonValueObject>(clsJsonObj);
-				classes.Emplace(clsJsonValue);
-			}
-
-			jsonObj->SetArrayField("Classes", MoveTemp(classes));
-		}
-		
-		return jsonObj;
-	}
-
-	bool JsonToString(TSharedRef<FJsonObject> json, FString& outString)
-	{
-		TSharedRef<TJsonWriter<>> jw = TJsonWriterFactory<>::Create(&outString);
-		ON_SCOPE_EXIT
-		{
-			jw->Close();
-		};
-
-		return FJsonSerializer::Serialize(json, jw);
-	}
-}
+#include "JsonObjectConverter.h"
 
 void ZSharp::FZGlueManifestWriter::Write()
 {
@@ -79,9 +17,8 @@ void ZSharp::FZGlueManifestWriter::Write()
 	const FString glueDir = FPaths::Combine(FPaths::ProjectDir(), "Intermediate/ZSharp/Glue");
 	for (const auto& pair : AssemblyDtoMap)
 	{
-		TSharedRef<FJsonObject> jsonObj = ZGlueManifestWriter_Private::AssemblyToJson(*pair.Value);
 		FString jsonStr;
-		if (!ZGlueManifestWriter_Private::JsonToString(jsonObj, jsonStr))
+		if (!FJsonObjectConverter::UStructToJsonObjectString<FZExportedAssemblyDto>(*pair.Value, jsonStr))
 		{
 			checkNoEntry();
 		}
@@ -103,6 +40,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 	FZExportedClassDto classDto;
 	classDto.Name = cls.GetName();
 	classDto.Module = cls.GetModule();
+	classDto.Flags = StaticCast<__underlying_type(EZExportedClassFlags)>(cls.GetFlags());
 	classDto.BaseType = cls.GetBaseType();
 	
 	assemblyDto->Classes.Emplace(MoveTemp(classDto));
@@ -141,7 +79,7 @@ void ZSharp::FZGlueManifestWriter::WriteEnum(const IZExportedEnum& enm)
 		*enm.GetUnderlyingType());
 }
 
-TUniquePtr<ZSharp::FZExportedAssemblyDto>* ZSharp::FZGlueManifestWriter::GetAssemblyDto(const IZExportedType& type)
+TUniquePtr<FZExportedAssemblyDto>* ZSharp::FZGlueManifestWriter::GetAssemblyDto(const IZExportedType& type)
 {
 	const UZSharpExportSettings* settings = GetDefault<UZSharpExportSettings>();
 	const FString module = type.GetModule();

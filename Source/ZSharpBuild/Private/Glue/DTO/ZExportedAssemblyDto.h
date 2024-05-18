@@ -5,13 +5,18 @@
 #include "ZExportedClassDto.h"
 #include "ZExportedEnumDto.h"
 
-namespace ZSharp
+#include "ZExportedAssemblyDto.generated.h"
+
+USTRUCT()
+struct FZExportedAssemblyDto
 {
-	struct FZExportedAssemblyDto
-	{
-		TArray<FZExportedEnumDto> Enums;
-		TArray<FZExportedClassDto> Classes;
-	};
-}
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TArray<FZExportedEnumDto> Enums;
+
+	UPROPERTY()
+	TArray<FZExportedClassDto> Classes;
+};
 
 

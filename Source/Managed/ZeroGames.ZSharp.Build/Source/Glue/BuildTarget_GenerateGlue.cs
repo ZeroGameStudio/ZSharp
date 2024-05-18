@@ -2,6 +2,7 @@
 
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ZeroGames.ZSharp.Build.Glue;
 
@@ -69,7 +70,11 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 	private async ValueTask GenerateAssembly(string dir)
 	{
 		await using FileStream fs = File.OpenRead($"{dir}/Manifest.json");
-		ExportedAssembly? assembly = await JsonSerializer.DeserializeAsync<ExportedAssembly>(fs);
+		JsonSerializerOptions options = new()
+		{
+			PropertyNameCaseInsensitive = true,
+		};
+		ExportedAssembly? assembly = await JsonSerializer.DeserializeAsync<ExportedAssembly>(fs, options);
 		if (assembly is null)
 		{
 			return;
@@ -100,7 +105,7 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		string moduleDir = $"{_glueDir}/{exportedType.Assembly}/Glue/{exportedType.Module}";
 		CreateModuleDirectory(moduleDir);
 		
-		await using FileStream fs = File.Create($"{moduleDir}/{exportedType.Name}.cs");
+		await using FileStream fs = File.Create($"{moduleDir}/{exportedType.Name}.g.cs");
 		if (exportedType is ExportedClass exportedClass)
 		{
 			await using ClassWriter cw = new(_registry, exportedClass, fs);

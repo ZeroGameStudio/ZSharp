@@ -8,6 +8,7 @@ UZSharpExportSettings::UZSharpExportSettings()
 	IntrinsicModuleAssemblyMapping.Emplace("Core", EngineAssemblyName);
 	IntrinsicModuleAssemblyMapping.Emplace("CoreUObject", EngineAssemblyName);
 	IntrinsicModuleAssemblyMapping.Emplace("Engine", EngineAssemblyName);
+	IntrinsicModuleAssemblyMapping.Emplace("ZSharpRuntime", EngineAssemblyName);
 }
 
 bool UZSharpExportSettings::IsModuleMapped(const FString& module) const

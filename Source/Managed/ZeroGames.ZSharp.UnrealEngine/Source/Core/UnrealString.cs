@@ -84,7 +84,6 @@ public partial class UnrealString : PlainUnmanagedClassExportedObjectBase, IConj
     {
         IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
         alc.ReleaseConjugate(2, Unmanaged);
-        Logger.Log("Release String");
     }
 
     static UnrealString()

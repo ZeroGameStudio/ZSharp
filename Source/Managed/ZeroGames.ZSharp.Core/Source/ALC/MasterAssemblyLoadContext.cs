@@ -100,8 +100,6 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
 
     internal void Tick(float deltaTime)
     {
-        Logger.Log($"MasterALC Tick dt: {deltaTime}");
-        
         while (_pendingDisposeConjugates.TryDequeue(out var conjugate))
         {
             conjugate.Dispose();

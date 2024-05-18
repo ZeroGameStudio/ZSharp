@@ -3,6 +3,8 @@
 
 #include "ZCall/Conjugate/ZConjugateRegistry_UObject.h"
 
+#include "ZSharpExportHelpers.h"
+#include "ZSharpExportRuntimeSettings.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ZCall/ZDeclareConjugateRegistry.h"
 
@@ -39,19 +41,23 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UObject::Conjugate(const U
 	}
 	else
 	{
-		ConjugateMap.Emplace(typedUnmanaged, { typedUnmanaged });
-		FString assemblyName = "ZeroGames.ZSharp.UnrealEngine"; // @TODO
-		FString moduleName;
-		unmanaged->GetClass()->GetPackage()->GetName().Split("/", nullptr, &moduleName, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
-		FString className = unmanaged->GetClass()->GetName();
-		if (className == "Class")
+		UClass* cls = unmanaged->GetClass();
+		FString moduleName = FZSharpExportHelpers::GetUFieldModuleName(cls);
+		FString assemblyName;
+		if (!GetDefault<UZSharpExportRuntimeSettings>()->TryGetModuleAssembly(moduleName, assemblyName))
 		{
-			className = "UnrealClass";
+			assemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
 		}
-		FString typeName = FString::Printf(TEXT("%s.%s.%s"), *assemblyName, *moduleName, *className); // @FIXME
+		FString outerExportName = FZSharpExportHelpers::GetUFieldOuterExportName(cls);
+		FString typeName = FString::Printf(TEXT("%s.%s"), *assemblyName, *outerExportName);
 		FZRuntimeTypeHandle type = Alc.GetType(assemblyName, typeName);
-		Alc.BuildConjugate(typedUnmanaged, type);
-		return { typedUnmanaged };
+		if (Alc.BuildConjugate(typedUnmanaged, type))
+		{
+			ConjugateMap.Emplace(typedUnmanaged, { typedUnmanaged });
+			return { typedUnmanaged };
+		}
+		
+		return {};
 	}
 }
 

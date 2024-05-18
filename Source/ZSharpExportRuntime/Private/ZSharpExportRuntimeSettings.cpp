@@ -13,15 +13,15 @@ UZSharpExportRuntimeSettings::UZSharpExportRuntimeSettings()
 
 bool UZSharpExportRuntimeSettings::IsModuleMapped(const FString& module) const
 {
-	return ModuleAssemblyMapping.Contains(module) || IntrinsicModuleAssemblyMapping.Contains(module);
+	return IntrinsicModuleAssemblyMapping.Contains(module) || ModuleAssemblyMapping.Contains(module);
 }
 
 bool UZSharpExportRuntimeSettings::TryGetModuleAssembly(const FString& module, FString& outAssembly) const
 {
-	const FString* assembly = ModuleAssemblyMapping.Find(module);
+	const FString* assembly = IntrinsicModuleAssemblyMapping.Find(module);
 	if (!assembly)
 	{
-		assembly = IntrinsicModuleAssemblyMapping.Find(module);
+		assembly = ModuleAssemblyMapping.Find(module);
 	}
 
 	outAssembly = assembly ? *assembly : "";

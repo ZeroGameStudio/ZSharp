@@ -37,7 +37,7 @@ namespace ZSharp
 		template <CZConjugateRegistryImpl T>
 		T& GetConjugateRegistry()
 		{
-			return StaticCast<T&>(GetConjugateRegistry(T::RegistryId));
+			return static_cast<T&>(GetConjugateRegistry(T::RegistryId));
 		}
 	};
 }

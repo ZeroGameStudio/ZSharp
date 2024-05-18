@@ -64,7 +64,7 @@ namespace ZSharp
 			}
 			else
 			{
-				return FString::Printf(TEXT("%lld"), StaticCast<int64>(value));
+				return FString::Printf(TEXT("%lld"), static_cast<int64>(value));
 			}
 		}
 

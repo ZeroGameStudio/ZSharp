@@ -16,7 +16,7 @@ namespace ZSharp
 		using ThisClass = FZGenericClr;
 
 	public:
-		static FZGenericClr& Get() { return StaticCast<FZGenericClr&>(IZSharpClr::Get()); }
+		static FZGenericClr& Get() { return static_cast<FZGenericClr&>(IZSharpClr::Get()); }
 
 	public:
 		void Startup();

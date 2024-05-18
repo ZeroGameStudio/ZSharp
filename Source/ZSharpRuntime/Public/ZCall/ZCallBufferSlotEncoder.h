@@ -48,7 +48,7 @@ namespace ZSharp
 		using DecodedType = const TCHAR*;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WritePointer(value); }
 		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
-		static DecodedType Decode(const FZCallBufferSlot& slot) { return StaticCast<DecodedType>(slot.ReadPointer()); }
+		static DecodedType Decode(const FZCallBufferSlot& slot) { return static_cast<DecodedType>(slot.ReadPointer()); }
 	};
 
 	template <>
@@ -57,7 +57,7 @@ namespace ZSharp
 		using DecodedType = const TCHAR*;
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WritePointer(value); }
 		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
-		static DecodedType Decode(const FZCallBufferSlot& slot) { return StaticCast<DecodedType>(slot.ReadPointer()); }
+		static DecodedType Decode(const FZCallBufferSlot& slot) { return static_cast<DecodedType>(slot.ReadPointer()); }
 	};
 
 	template <>

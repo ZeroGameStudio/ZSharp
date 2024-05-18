@@ -33,7 +33,7 @@ UObject* ZSharp::FZConjugateRegistry_UObject::Conjugate(FZConjugateHandle handle
 
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UObject::Conjugate(const UObjectBase* unmanaged)
 {
-	UObject* typedUnmanaged = StaticCast<UObject*>(const_cast<UObjectBase*>(unmanaged));
+	auto typedUnmanaged = (UObject*)unmanaged;
 	FZRec* rec = ConjugateMap.Find(typedUnmanaged);
 	if (rec)
 	{

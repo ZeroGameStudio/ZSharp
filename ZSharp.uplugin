@@ -21,6 +21,11 @@
 			"LoadingPhase": "EarliestPossible"
 		},
 		{
+			"Name": "ZSharpExportRuntime",
+			"Type": "Runtime",
+			"LoadingPhase": "EarliestPossible"
+		},
+		{
 			"Name": "ZSharpExport",
 			"Type": "Editor",
 			"LoadingPhase": "EarliestPossible"

@@ -4,7 +4,7 @@
 #include "ZDynamicTypeExporter.h"
 
 #include "ZSharpExportHelpers.h"
-#include "ZSharpExportSettings.h"
+#include "ZSharpExportRuntimeSettings.h"
 #include "Dynamic/ZDynamicExportedClass.h"
 #include "Dynamic/ZDynamicExportedEnum.h"
 
@@ -19,7 +19,7 @@ void ZSharp::FZDynamicTypeExporter::Export() const
 		}
 
 		FString module = FZSharpExportHelpers::GetUFieldModuleName(enm);
-		if (!GetDefault<UZSharpExportSettings>()->IsModuleMapped(module))
+		if (!GetDefault<UZSharpExportRuntimeSettings>()->IsModuleMapped(module))
 		{
 			continue;
 		}
@@ -40,7 +40,7 @@ void ZSharp::FZDynamicTypeExporter::Export() const
 		}
 
 		FString module = FZSharpExportHelpers::GetUFieldModuleName(strct);
-		if (!GetDefault<UZSharpExportSettings>()->IsModuleMapped(module))
+		if (!GetDefault<UZSharpExportRuntimeSettings>()->IsModuleMapped(module))
 		{
 			continue;
 		}
@@ -61,7 +61,7 @@ void ZSharp::FZDynamicTypeExporter::Export() const
 		}
 
 		FString module = FZSharpExportHelpers::GetUFieldModuleName(cls);
-		if (!GetDefault<UZSharpExportSettings>()->IsModuleMapped(module))
+		if (!GetDefault<UZSharpExportRuntimeSettings>()->IsModuleMapped(module))
 		{
 			continue;
 		}

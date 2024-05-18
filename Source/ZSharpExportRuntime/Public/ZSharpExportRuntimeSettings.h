@@ -4,21 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DeveloperSettings.h"
-#include "ZSharpExportSettings.generated.h"
+#include "ZSharpExportRuntimeSettings.generated.h"
 
 /**
  * 
  */
-UCLASS(Config = ZSharpEditor, DefaultConfig)
-class ZSHARPEXPORT_API UZSharpExportSettings : public UDeveloperSettings
+UCLASS(Config = ZSharp, DefaultConfig)
+class ZSHARPEXPORTRUNTIME_API UZSharpExportRuntimeSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 
 public:
-	UZSharpExportSettings();
+	UZSharpExportRuntimeSettings();
 
 public:
-	virtual FName GetContainerName() const override { return TEXT("Editor"); }
 	virtual FName GetCategoryName() const override { return TEXT("ZSharp"); }
 
 public:
@@ -43,3 +42,5 @@ private:
 	TMap<FString, FString> IntrinsicModuleAssemblyMapping;
 	
 };
+
+

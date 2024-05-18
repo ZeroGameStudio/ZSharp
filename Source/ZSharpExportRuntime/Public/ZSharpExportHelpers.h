@@ -4,7 +4,7 @@
 
 namespace ZSharp
 {
-	struct ZSHARPEXPORT_API FZSharpExportHelpers
+	struct ZSHARPEXPORTRUNTIME_API FZSharpExportHelpers
 	{
 		static FString GetUFieldAliasedName(const UField* field);
 		static FString GetUFieldModuleName(const UField* field);
@@ -13,3 +13,5 @@ namespace ZSharp
 		static FString GetUFieldInnerExportName(const UField* field);
 	};
 }
+
+

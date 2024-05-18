@@ -3,7 +3,7 @@
 
 #include "ZSharpExportHelpers.h"
 
-#include "ZSharpExportSettings.h"
+#include "ZSharpExportRuntimeSettings.h"
 
 FString ZSharp::FZSharpExportHelpers::GetUFieldAliasedName(const UField* field)
 {
@@ -48,7 +48,7 @@ FString ZSharp::FZSharpExportHelpers::GetUFieldModuleName(const UField* field)
 
 bool ZSharp::FZSharpExportHelpers::IsUFieldModuleMapped(const UField* field)
 {
-	return GetDefault<UZSharpExportSettings>()->IsModuleMapped(GetUFieldModuleName(field));
+	return GetDefault<UZSharpExportRuntimeSettings>()->IsModuleMapped(GetUFieldModuleName(field));
 }
 
 FString ZSharp::FZSharpExportHelpers::GetUFieldOuterExportName(const UField* field)

@@ -39,6 +39,8 @@ public class ZSharpRuntime : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
+				
+				"ZSharpExportRuntime",
 			}
 		);
 		

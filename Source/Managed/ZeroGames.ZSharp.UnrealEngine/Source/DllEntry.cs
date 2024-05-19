@@ -1,9 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using ZeroGames.ZSharp.Core;
-using ZeroGames.ZSharp.UnrealEngine.Core;
-
-[assembly: DllEntry(typeof(ZeroGames.ZSharp.UnrealEngine.DllEntry))]
+[assembly: DllEntry(typeof(DllEntry))]
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 

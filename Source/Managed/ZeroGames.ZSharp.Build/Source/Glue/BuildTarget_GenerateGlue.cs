@@ -1,8 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace ZeroGames.ZSharp.Build.Glue;
 

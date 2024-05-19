@@ -10,9 +10,10 @@
 		"ZeroGames.ZSharp.Core",
 		"ZeroGames.ZSharp.UnrealEngine.Core"
 	],
-	"Tags":
+	"Usings":
 	[
-		"ExcludeIntrinsicUsings"
+		"ZeroGames.ZSharp.Core",
+		"ZeroGames.ZSharp.UnrealEngine.Core"
 	]
 }
 

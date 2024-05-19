@@ -4,11 +4,7 @@
 	"Company": "ZeroGames",
 	"AssemblyVersion": "0.0.4",
 	"FileVersion": "0.0.4",
-	"NeutralLanguage": "zh",
-	"Tags":
-	[
-		"ExcludeIntrinsicUsings"
-	]
+	"NeutralLanguage": "zh"
 }
 
 

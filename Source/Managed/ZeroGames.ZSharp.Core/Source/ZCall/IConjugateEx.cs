@@ -1,7 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.InteropServices;
-
 namespace ZeroGames.ZSharp.Core;
 
 public static class IConjugateEx

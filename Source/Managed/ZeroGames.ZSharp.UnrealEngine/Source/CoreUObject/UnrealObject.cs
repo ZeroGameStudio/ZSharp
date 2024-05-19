@@ -1,8 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using ZeroGames.ZSharp.Core;
-using ZeroGames.ZSharp.UnrealEngine.Core;
-
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 public partial class UnrealObject

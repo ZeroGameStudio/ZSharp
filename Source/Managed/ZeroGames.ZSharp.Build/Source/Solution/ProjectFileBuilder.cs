@@ -139,16 +139,7 @@ public class ProjectFileBuilder
 	{
 		XmlElement itemGroupNode = doc.CreateElement("ItemGroup");
 
-		List<string> intrinsicUsings = [];
-		if (!_project.Tags.Contains("ExcludeIntrinsicUsings"))
-		{
-			intrinsicUsings.Add("ZeroGames.ZSharp.Core");
-			intrinsicUsings.Add("ZeroGames.ZSharp.UnrealEngine");
-			intrinsicUsings.Add("ZeroGames.ZSharp.UnrealEngine.Core");
-			intrinsicUsings.Add("ZeroGames.ZSharp.UnrealEngine.CoreUObject");
-			intrinsicUsings.Add("ZeroGames.ZSharp.UnrealEngine.Engine");
-		}
-		foreach (var us in intrinsicUsings.Concat(_project.Usings))
+		foreach (var us in _project.Usings)
 		{
 			XmlElement usingNode = doc.CreateElement("Using");
 			usingNode.SetAttribute("Include", us);

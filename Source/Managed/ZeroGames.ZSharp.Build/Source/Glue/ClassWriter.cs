@@ -1,8 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Text;
-using System.Text.RegularExpressions;
-using ZeroGames.ZSharp.UnrealEngine.Core;
 
 namespace ZeroGames.ZSharp.Build.Glue;
 

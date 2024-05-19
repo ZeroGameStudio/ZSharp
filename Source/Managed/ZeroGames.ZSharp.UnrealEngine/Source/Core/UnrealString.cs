@@ -1,7 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using ZeroGames.ZSharp.Core;
-
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
 public partial class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<UnrealString>

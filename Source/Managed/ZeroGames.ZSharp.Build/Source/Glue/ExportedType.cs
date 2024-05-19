@@ -1,7 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using ZeroGames.ZSharp.Core;
-
 namespace ZeroGames.ZSharp.Build.Glue;
 
 public abstract class ExportedType : ExportedMember

@@ -163,7 +163,7 @@ namespace ZSharp
 	struct TZCallBufferSlotEncoder<FString>
 	{
 		using DecodedType = FString;
-		static void Encode(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(const_cast<FString*>(&value), false)); }
+		static void Encode(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(&value, false)); }
 		static void EncodeRet(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(new FString { value }, true)); }
 		static DecodedType& Decode(const FZCallBufferSlot& slot) { return *IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(slot.ReadConjugate()); }
 		static DecodedType* DecodeThis(const FZCallBufferSlot& slot) { return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(slot.ReadConjugate()); }

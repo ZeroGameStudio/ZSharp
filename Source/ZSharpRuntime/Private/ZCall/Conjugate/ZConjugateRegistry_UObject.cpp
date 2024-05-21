@@ -14,7 +14,7 @@ namespace ZSharp::ZConjugateRegistry_UObject_Private
 }
 
 ZSharp::FZConjugateRegistry_UObject::FZConjugateRegistry_UObject(IZMasterAssemblyLoadContext& alc)
-	: Alc(alc)
+	: Super(alc)
 {
 	GCDelegate = FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);
 }
@@ -24,55 +24,41 @@ ZSharp::FZConjugateRegistry_UObject::~FZConjugateRegistry_UObject()
 	FCoreUObjectDelegates::GarbageCollectComplete.Remove(GCDelegate);
 }
 
-UObject* ZSharp::FZConjugateRegistry_UObject::Conjugate(FZConjugateHandle handle) const
+ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UObject::GetManagedType(const UObject* unmanaged) const
 {
-	void* unmanaged = handle.Handle;
-	const FZRec* rec = ConjugateMap.Find(unmanaged);
-	return rec ? rec->TypedUnmanaged.ResolveObjectPtrEvenIfGarbage() : nullptr;
+	const UClass* cls = unmanaged->GetClass();
+	const FString moduleName = FZSharpExportHelpers::GetUFieldModuleName(cls);
+	FString assemblyName;
+	if (!GetDefault<UZSharpExportRuntimeSettings>()->TryGetModuleAssembly(moduleName, assemblyName))
+	{
+		assemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
+	}
+	const FString outerExportName = FZSharpExportHelpers::GetUFieldOuterExportName(cls);
+	const FString typeName = FString::Printf(TEXT("%s.%s"), *assemblyName, *outerExportName);
+	
+	return Alc.GetType(assemblyName, typeName);
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UObject::Conjugate(const UObjectBase* unmanaged)
+ZSharp::FZConjugateRegistry_UObject::ConjugateType* ZSharp::FZConjugateRegistry_UObject::GetUnmanaged(const RecordType* rec) const
 {
-	auto typedUnmanaged = (UObject*)unmanaged;
-	FZRec* rec = ConjugateMap.Find(typedUnmanaged);
-	if (rec)
-	{
-		return { rec->TypedUnmanaged.ResolveObjectPtrEvenIfGarbage() };
-	}
-	else
-	{
-		UClass* cls = unmanaged->GetClass();
-		FString moduleName = FZSharpExportHelpers::GetUFieldModuleName(cls);
-		FString assemblyName;
-		if (!GetDefault<UZSharpExportRuntimeSettings>()->TryGetModuleAssembly(moduleName, assemblyName))
-		{
-			assemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
-		}
-		FString outerExportName = FZSharpExportHelpers::GetUFieldOuterExportName(cls);
-		FString typeName = FString::Printf(TEXT("%s.%s"), *assemblyName, *outerExportName);
-		FZRuntimeTypeHandle type = Alc.GetType(assemblyName, typeName);
-		if (Alc.BuildConjugate(typedUnmanaged, type))
-		{
-			ConjugateMap.Emplace(typedUnmanaged, { typedUnmanaged });
-			return { typedUnmanaged };
-		}
-		
-		return {};
-	}
+	return rec->TypedUnmanaged.ResolveObjectPtrEvenIfGarbage();
 }
 
-void ZSharp::FZConjugateRegistry_UObject::Release()
+ZSharp::FZConjugateRegistry_UObject::RecordType ZSharp::FZConjugateRegistry_UObject::BuildRedConjugateRec(ConjugateType* unmanaged, bool bOwning)
 {
-	TArray<void*> conjugates;
-	for (const auto& pair : ConjugateMap)
-	{
-		conjugates.Emplace(pair.Key);
-	}
+	check(!bOwning);
+	return { unmanaged };
+}
 
-	for (const auto& conjugate : conjugates)
-	{
-		InternalReleaseConjugate(conjugate);
-	}
+ZSharp::FZConjugateRegistry_UObject::ConjugateType* ZSharp::FZConjugateRegistry_UObject::BuildBlackConjugateRec()
+{
+	// There is no black UObject conjugate.
+	checkNoEntry();
+	return {};
+}
+
+void ZSharp::FZConjugateRegistry_UObject::InternalReleaseConjugate(void* unmanaged, const RecordType* rec)
+{
 }
 
 void* ZSharp::FZConjugateRegistry_UObject::BuildConjugate()
@@ -86,33 +72,6 @@ void ZSharp::FZConjugateRegistry_UObject::ReleaseConjugate(void* unmanaged)
 {
 	// There is no black UObject conjugate.
 	checkNoEntry();
-}
-
-void ZSharp::FZConjugateRegistry_UObject::PushRedFrame()
-{
-	RedStack.Push({});
-}
-
-void ZSharp::FZConjugateRegistry_UObject::PopRedFrame()
-{
-	FZRedFrame frame = RedStack.Pop();
-	for (const auto& conjugate : frame.CapturedConjugates)
-	{
-		InternalReleaseConjugate(conjugate);
-	}
-}
-
-void ZSharp::FZConjugateRegistry_UObject::InternalReleaseConjugate(void* unmanaged)
-{
-	const FZRec* rec = ConjugateMap.Find(unmanaged);
-	if (!rec)
-	{
-		return;
-	}
-
-	Alc.ReleaseConjugate(unmanaged);
-
-	ConjugateMap.Remove(unmanaged);
 }
 
 void ZSharp::FZConjugateRegistry_UObject::HandleGarbageCollectComplete()

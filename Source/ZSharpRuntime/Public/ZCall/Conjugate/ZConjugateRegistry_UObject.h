@@ -2,56 +2,50 @@
 
 #pragma once
 
-#include "ZCall/IZConjugateRegistry.h"
-#include "ZCall/ZConjugateHandle.h"
+#include "ZCall/Conjugate/ZConjugateRegistryBase.h"
 
 namespace ZSharp
 {
-	class IZMasterAssemblyLoadContext;
-	
-	class ZSHARPRUNTIME_API FZConjugateRegistry_UObject : public IZConjugateRegistry
+	namespace ZConjugateRegistry_UObject_Private
+	{
+		struct FZConjugateRec
+		{
+			FObjectKey TypedUnmanaged;
+		};
+	}
+
+	class ZSHARPRUNTIME_API FZConjugateRegistry_UObject : public TZConjugateRegistryBase<FZConjugateRegistry_UObject, UObject, ZConjugateRegistry_UObject_Private::FZConjugateRec>
 	{
 
-		using ThisClass = FZConjugateRegistry_UObject;
-
-	public:
-		static constexpr uint16 RegistryId = 1;
+		friend class Super;
 
 	public:
 		explicit FZConjugateRegistry_UObject(IZMasterAssemblyLoadContext& alc);
 		virtual ~FZConjugateRegistry_UObject() override;
 
 	public:
-		UObject* Conjugate(FZConjugateHandle handle) const;
-		FZConjugateHandle Conjugate(const UObjectBase* unmanaged);
-	
-	private:
-		virtual void Release() override;
-		virtual void* BuildConjugate() override;
-		virtual void ReleaseConjugate(void* unmanaged) override;
-		virtual void PushRedFrame() override;
-		virtual void PopRedFrame() override;
+		UObject* Conjugate(FZConjugateHandle handle) const { return Super::Conjugate(handle); }
+		FZConjugateHandle Conjugate(const UObjectBase* unmanaged) { return Conjugate(static_cast<const UObject*>(unmanaged), false); }
 
 	private:
-		void InternalReleaseConjugate(void* unmanaged);
+		FZRuntimeTypeHandle GetManagedType(const UObject* unmanaged) const;
+		ConjugateType* GetUnmanaged(const RecordType* rec) const;
+		RecordType BuildRedConjugateRec(ConjugateType* unmanaged, bool bOwning);
+		ConjugateType* BuildBlackConjugateRec();
+		void InternalReleaseConjugate(void* unmanaged, const RecordType* rec);
+		
+	private:
+		// Hide base function
+		FZConjugateHandle Conjugate(const UObject* unmanaged, bool bOwning) { return Super::Conjugate(unmanaged, bOwning); }
+	
+	private:
+		virtual void* BuildConjugate() override;
+		virtual void ReleaseConjugate(void* unmanaged) override;
 
 	private:
 		void HandleGarbageCollectComplete();
 
 	private:
-		IZMasterAssemblyLoadContext& Alc;
-		
-		struct FZRec
-		{
-			FObjectKey TypedUnmanaged;
-		};
-		TMap<void*, FZRec> ConjugateMap;
-		struct FZRedFrame
-		{
-			TArray<void*> CapturedConjugates;
-		};
-		TArray<FZRedFrame> RedStack;
-		
 		FDelegateHandle GCDelegate;
 		
 	};

@@ -164,10 +164,11 @@ namespace {_exportedClass.Namespace};
 		get
 		{
 			StringBuilder body = new();
-			
+
+			string? constructorDefault = _exportedClass.Class | _exportedClass.Interface ? null : $"\tpublic {_exportedClass.Name}(){{}}";
 			string? methodBuildConjugate = _implementsBuildConjugate ? $"\tpublic new static {_exportedClass.Name} BuildConjugate(IntPtr unmanaged) => new(unmanaged);" : null;
 			string? constructorRed = _exportedClass.Interface ? null : $"\tprotected {_exportedClass.Name}(IntPtr unmanaged) : base(unmanaged){{}}";
-			List<string?> intrinsicMethods = [ methodBuildConjugate, constructorRed ];
+			List<string?> intrinsicMethods = [ constructorDefault, methodBuildConjugate, constructorRed ];
 			string intrinsicMethodBlock = string.Join('\n', intrinsicMethods.Where(m => m is not null));
 			body.Append(intrinsicMethodBlock);
 

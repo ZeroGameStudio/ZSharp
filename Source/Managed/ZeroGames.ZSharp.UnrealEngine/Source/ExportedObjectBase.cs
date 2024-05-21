@@ -1,6 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 
@@ -78,8 +79,6 @@ public abstract class ExportedObjectBase : IConjugate
     public GCHandle GCHandle { get; }
     public IntPtr Unmanaged { get; protected set; }
 
-    protected virtual void ReleaseUnmanagedResource(){}
-
     private protected ExportedObjectBase()
     {
         GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
@@ -116,7 +115,7 @@ public abstract class ExportedObjectBase : IConjugate
         
         Volatile.Write(ref _disposed, true);
         
-        ReleaseUnmanagedResource();
+        GetOwningAlc().ReleaseConjugate(Unmanaged);
         MarkAsDead();
 
         if (!fromFinalizer)
@@ -125,6 +124,7 @@ public abstract class ExportedObjectBase : IConjugate
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void MarkAsDead()
     {
         GCHandle.Free();

@@ -5,9 +5,17 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 public abstract class PlainExportedObjectBase : ExportedObjectBase
 {
 
-    protected PlainExportedObjectBase(){}
-    protected PlainExportedObjectBase(IntPtr unmanaged) : base(unmanaged){}
+    public PlainExportedObjectBase()
+    {
+        Unmanaged = GetOwningAlc().BuildConjugate(this);
+        if (Unmanaged == IntPtr.Zero)
+        {
+            throw new InvalidOperationException();
+        }
+    }
     
+    protected PlainExportedObjectBase(IntPtr unmanaged) : base(unmanaged){}
+
 }
 
 

@@ -5,25 +5,9 @@ namespace ZeroGames.ZSharp.UnrealEngine.Core;
 public partial class UnrealString
 {
 
-    public UnrealString()
-    {
-        IMasterAssemblyLoadContext alc = GetOwningAlc();
-        Unmanaged = alc.BuildConjugate(this);
-        if (Unmanaged == IntPtr.Zero)
-        {
-            throw new InvalidOperationException();
-        }
-    }
+    public UnrealString(string content) => Data = content;
 
-    public UnrealString(string content) : this()
-    {
-        Data = content;
-    }
-
-    public override string ToString()
-    {
-        return Data;
-    }
+    public override string ToString() => Data;
 
     public unsafe int32 Len
     {
@@ -75,12 +59,6 @@ public partial class UnrealString
                 alc.ZCall(handle, &buffer);
             }
         }
-    }
-
-    protected override void ReleaseUnmanagedResource()
-    {
-        IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
-        alc.ReleaseConjugate(Unmanaged);
     }
 
 }

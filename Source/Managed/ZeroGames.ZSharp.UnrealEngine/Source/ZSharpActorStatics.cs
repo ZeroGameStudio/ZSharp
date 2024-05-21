@@ -8,6 +8,7 @@ public static class ZSharpActorStatics
     [ZCall]
     public static void BeginPlay(UnrealObject actor)
     {
+        var x = new UnrealString();
         Logger.Log($"ZSharp BeginPlay Actor Name: {actor.Name}");
     }
 

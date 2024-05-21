@@ -4,6 +4,7 @@
 
 #include "IZExportedClass.h"
 #include "Concept/ZStaticExportableClass.h"
+#include "Trait/ZConjugateRegistryId.h"
 #include "Trait/ZExportedTypeModule.h"
 #include "Trait/ZExportedTypeName.h"
 
@@ -25,6 +26,7 @@ namespace ZSharp
 		virtual FString GetName() const override { return TZExportedTypeName<T>::Get(); }
 		virtual FString GetModule() const override { return TZExportedTypeModule<T>::Get(); }
 		virtual FString GetOuterExportName() const override { return GetInnerExportName(); }
+		virtual uint16 GetConjugateRegistryId() const override { return TZConjugateRegistryId_V<T>; }
 		virtual EZExportedClassFlags GetFlags() const override { return Flags; }
 		virtual FString GetBaseType() const override { return {}; }
 
@@ -50,9 +52,10 @@ namespace ZSharp
 	};
 }
 
-#define ZSHARP_DECLARE_EXPORTED_CLASS(Class, Name, Module) \
+#define ZSHARP_DECLARE_EXPORTED_CLASS(Class, Name, Module, ConjugateRegistryId) \
 ZSHARP_EXPORT_TYPE_NAME_EX(Class, Name) \
-ZSHARP_EXPORT_TYPE_MODULE(Class, Module)
+ZSHARP_EXPORT_TYPE_MODULE(Class, Module) \
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(Class, ConjugateRegistryId)
 
 #define ZSHARP_BEGIN_EXPORT_CLASS(Class) \
 namespace __ZSharpExport_Private \

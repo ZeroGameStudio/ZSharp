@@ -22,6 +22,7 @@ namespace ZSharp
 	class ZSHARPEXPORT_API IZExportedClass : public IZExportedType
 	{
 	public:
+		virtual uint16 GetConjugateRegistryId() const = 0;
 		virtual EZExportedClassFlags GetFlags() const = 0;
 		virtual FString GetBaseType() const = 0;
 	public:

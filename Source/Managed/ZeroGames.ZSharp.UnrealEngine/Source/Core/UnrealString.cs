@@ -2,7 +2,6 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-[ConjugateRegistryId(3)]
 public partial class UnrealString
 {
 
@@ -78,7 +77,7 @@ public partial class UnrealString
         }
     }
 
-    protected override unsafe void ReleaseUnmanagedResource()
+    protected override void ReleaseUnmanagedResource()
     {
         IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
         alc.ReleaseConjugate(Unmanaged);

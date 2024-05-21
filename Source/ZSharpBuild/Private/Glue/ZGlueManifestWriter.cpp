@@ -40,6 +40,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 	FZExportedClassDto classDto;
 	classDto.Name = cls.GetName();
 	classDto.Module = cls.GetModule();
+	classDto.ConjugateRegistryId = cls.GetConjugateRegistryId();
 	classDto.Flags = static_cast<__underlying_type(EZExportedClassFlags)>(cls.GetFlags());
 	classDto.BaseType = cls.GetBaseType();
 	

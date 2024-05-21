@@ -42,7 +42,7 @@ using ZeroGames.ZSharp.UnrealEngine;
 
 namespace {_exportedClass.Namespace};
 
-[System.CodeDom.Compiler.GeneratedCode(""ZSharp"", ""0.0.4"")]
+{_classAttributes}
 {_classDeclaration}{_classBody}
 
 #endregion
@@ -87,6 +87,20 @@ namespace {_exportedClass.Namespace};
 			relevantModules.RemoveAll(module => string.IsNullOrWhiteSpace(module) || module == _exportedClass.Module);
 
 			return string.Join('\n', relevantModules.Distinct().Select(module => $"using {_registry.GetModuleAssembly(module)?.Name ?? throw new InvalidOperationException($"Unmapped module {module}")}.{module};"));
+		}
+	}
+
+	private string _classAttributes
+	{
+		get
+		{
+			List<string> attrs = [ "[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"0.0.4\")]" ];
+			if (_exportedClass.ConjugateRegistryId > 0)
+			{
+				attrs.Add($"[ConjugateRegistryId({_exportedClass.ConjugateRegistryId})]");
+			}
+			
+			return string.Join('\n', attrs);
 		}
 	}
 

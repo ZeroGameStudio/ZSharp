@@ -12,6 +12,9 @@ struct FZExportedClassDto : public FZExportedTypeDto
 	GENERATED_BODY()
 
 	UPROPERTY()
+	uint16 ConjugateRegistryId;
+
+	UPROPERTY()
 	uint64 Flags;
 
 	UPROPERTY()

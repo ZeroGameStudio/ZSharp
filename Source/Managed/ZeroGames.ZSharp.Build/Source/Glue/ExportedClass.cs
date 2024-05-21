@@ -16,6 +16,7 @@ public enum EExportedClassFlags : uint64
 public class ExportedClass : ExportedType
 {
 	public ExportedClass() => SlotType = EZCallBufferSlotType.Conjugate;
+	public uint16 ConjugateRegistryId { get; set; }
 	public required EExportedClassFlags Flags { get; set; }
 	public string? BaseType { get; set; }
 	

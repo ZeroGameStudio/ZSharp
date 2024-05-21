@@ -5,6 +5,7 @@
 
 #include "ZExportedTypeRegistry.h"
 #include "ZSharpExportHelpers.h"
+#include "Trait/ZConjugateRegistryId.h"
 
 ZSharp::FZDynamicExportedClass::FZDynamicExportedClass(UStruct* ustruct)
 	: Struct(ustruct)
@@ -58,6 +59,11 @@ FString ZSharp::FZDynamicExportedClass::GetModule() const
 FString ZSharp::FZDynamicExportedClass::GetOuterExportName() const
 {
 	return FZSharpExportHelpers::GetUFieldOuterExportName(Struct);
+}
+
+uint16 ZSharp::FZDynamicExportedClass::GetConjugateRegistryId() const
+{
+	return 0;
 }
 
 ZSharp::EZExportedClassFlags ZSharp::FZDynamicExportedClass::GetFlags() const

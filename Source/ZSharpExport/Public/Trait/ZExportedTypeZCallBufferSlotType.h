@@ -11,25 +11,22 @@ namespace ZSharp
 	struct TZExportedTypeZCallBufferSlotType;
 
 	template <typename T>
+	constexpr EZCallBufferSlotType TZExportedTypeZCallBufferSlotType_V = TZExportedTypeZCallBufferSlotType<T>::Value;
+
+	template <typename T>
 	struct TZExportedTypeZCallBufferSlotType<T, std::enable_if_t<TIsEnum<T>::Value>>
 	{
-		static constexpr EZCallBufferSlotType Get()
-		{
-			return TZExportedTypeZCallBufferSlotType<__underlying_type(T)>::Get();
-		}
+		static constexpr EZCallBufferSlotType Value = TZExportedTypeZCallBufferSlotType_V<T>;
 	};
 
 	template <typename T>
 	struct TZExportedTypeZCallBufferSlotType<T, std::enable_if_t<TZIsDynamicExportableClass_V<T>>>
 	{
-		static constexpr EZCallBufferSlotType Get()
-		{
-			return EZCallBufferSlotType::Conjugate;
-		}
+		static constexpr EZCallBufferSlotType Value = EZCallBufferSlotType::Conjugate;
 	};
 }
 
-#define ZSHARP_EXPORT_SLOT_TYPE(ExportedType, SlotType) template<> struct ZSharp::TZExportedTypeZCallBufferSlotType<ExportedType> { static_assert(!ZSharp::TZIsDynamicExportableType_V<ExportedType>); static constexpr EZCallBufferSlotType Get() { return EZCallBufferSlotType::SlotType; } };
+#define ZSHARP_EXPORT_SLOT_TYPE(ExportedType, SlotType) template<> struct ZSharp::TZExportedTypeZCallBufferSlotType<ExportedType> { static_assert(!ZSharp::TZIsDynamicExportableType_V<ExportedType>); static constexpr EZCallBufferSlotType Value = EZCallBufferSlotType::SlotType; };
 
 ZSHARP_EXPORT_SLOT_TYPE(uint8, UInt8)
 ZSHARP_EXPORT_SLOT_TYPE(uint16, UInt16)

@@ -13,7 +13,7 @@ namespace ZSharp
 		void SetData(FString& str, const TCHAR* data) { str = data; }
 	}
 
-	ZSHARP_DECLARE_EXPORTED_CLASS(FString, UnrealString, Core)
+	ZSHARP_DECLARE_EXPORTED_CLASS(FString, UnrealString, Core, 3)
 	ZSHARP_BEGIN_EXPORT_CLASS(FString)
 	ZSHARP_END_EXPORT_Class(FString)
 	

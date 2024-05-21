@@ -28,7 +28,7 @@ namespace ZSharp
 		virtual bool IsRegistered() const override { return bRegistered; }
 		virtual FString GetName() const override { return TZExportedTypeName<T>::Get(); }
 		virtual FString GetModule() const override { return TZExportedTypeModule<T>::Get(); }
-		virtual EZCallBufferSlotType GetSlotType() const override { return TZExportedTypeZCallBufferSlotType<UnderlyingType>::Get(); }
+		virtual EZCallBufferSlotType GetSlotType() const override { return TZExportedTypeZCallBufferSlotType_V<UnderlyingType>; }
 		virtual FString GetUnderlyingType() const override { return TZExportedTypeName<UnderlyingType>::Get(); }
 		virtual void ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const override
 		{

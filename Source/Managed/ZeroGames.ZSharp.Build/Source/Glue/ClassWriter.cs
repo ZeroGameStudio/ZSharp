@@ -120,9 +120,9 @@ namespace {_exportedClass.Namespace};
 			{
 				return _exportedClass.BaseType switch
 				{
-					"@UCLASS" => "UnrealClassExportedObjectBase",
-					"@USTRUCT" => "UnrealStructExportedObjectBase",
-					"@PLAIN" => "PlainUnmanagedClassExportedObjectBase",
+					"@UCLASS" => "UnrealObjectBase",
+					"@USTRUCT" => "UnrealStructBase",
+					"@PLAIN" => "PlainExportedObjectBase",
 					"@NONE" => null,
 					_ => throw new ArgumentException($"Invalid special base type {_exportedClass.BaseType}")
 				};

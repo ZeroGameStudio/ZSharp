@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class Map
+public class UnrealMap<TKey, TValue>
 {
     
 }

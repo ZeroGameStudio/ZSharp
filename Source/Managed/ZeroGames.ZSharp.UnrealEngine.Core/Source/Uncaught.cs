@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
+
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
 public static class Uncaught
@@ -13,6 +15,7 @@ public static class Uncaught
         }
         catch (Exception ex)
         {
+            Debugger.Break();
             Logger.Error($"Unhandled Exception Detected.\n{ex}");
             return fallback;
         }
@@ -26,6 +29,7 @@ public static class Uncaught
         }
         catch (Exception ex)
         {
+            Debugger.Break();
             Logger.Error($"Unhandled Exception Detected.\n{ex}");
         }
     }
@@ -38,6 +42,7 @@ public static class Uncaught
         }
         catch (Exception ex)
         {
+            Debugger.Break();
             Logger.Fatal($"Unhandled Fatal Exception!!!\n{ex}");
             return fallback;
         }
@@ -51,6 +56,7 @@ public static class Uncaught
         }
         catch (Exception ex)
         {
+            Debugger.Break();
             Logger.Fatal($"Unhandled Fatal Exception!!!\n{ex}");
         }
     }

@@ -2,8 +2,10 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public partial class UnrealString : PlainUnmanagedClassExportedObjectBase, IConjugate<UnrealString>
+public partial class UnrealString : PlainExportedObjectBase, IConjugate<UnrealString>
 {
+
+    public const uint16 KConjugateRegistryId = 2;
 
     public static UnrealString BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
@@ -12,7 +14,7 @@ public partial class UnrealString : PlainUnmanagedClassExportedObjectBase, IConj
     public unsafe UnrealString(string content)
     {
         IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
-        Unmanaged = alc.BuildConjugate(2, this);
+        Unmanaged = alc.BuildConjugate(KConjugateRegistryId, this);
         if (Unmanaged == IntPtr.Zero)
         {
             throw new InvalidOperationException();
@@ -81,17 +83,10 @@ public partial class UnrealString : PlainUnmanagedClassExportedObjectBase, IConj
     protected override unsafe void ReleaseUnmanagedResource()
     {
         IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
-        alc.ReleaseConjugate(2, Unmanaged);
-    }
-
-    static UnrealString()
-    {
-        __sZCallHandle_Dtor = IMasterAssemblyLoadContext.Get()!.GetZCallHandle("ex://String.Dtor");
+        alc.ReleaseConjugate(KConjugateRegistryId, Unmanaged);
     }
 
     private UnrealString(IntPtr unmanaged) : base(unmanaged){}
-
-    private static ZCallHandle __sZCallHandle_Dtor;
 
 }
 

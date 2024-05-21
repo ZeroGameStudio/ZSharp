@@ -36,7 +36,7 @@ public class ExportedAssemblyRegistry
 			}
 		}
 
-		_moduleAssemblyMap = new(map);
+		_moduleAssemblyMap = map;
 	}
 
 	public ExportedAssembly? GetModuleAssembly(string module)
@@ -55,6 +55,6 @@ public class ExportedAssemblyRegistry
 
 	private bool _locked;
 	private ConcurrentDictionary<string, ExportedAssembly> _assemblyMap = new();
-	private ReadOnlyDictionary<string, ExportedAssembly>? _moduleAssemblyMap;
+	private IReadOnlyDictionary<string, ExportedAssembly>? _moduleAssemblyMap;
 
 }

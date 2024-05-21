@@ -36,7 +36,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
         }
         _sourcePaths = source.Split(';').ToList();
         
-        _projectMap = new(GatherProjectDefinitions());
+        _projectMap = GatherProjectDefinitions();
         if (_projectMap.Count > 0)
         {
             string path = $"{UnrealProjectDir}/Intermediate";
@@ -160,7 +160,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
     }
 
     private List<string> _sourcePaths;
-    private ReadOnlyDictionary<string, ProjectDefinition> _projectMap;
+    private IReadOnlyDictionary<string, ProjectDefinition> _projectMap;
 }
 
 

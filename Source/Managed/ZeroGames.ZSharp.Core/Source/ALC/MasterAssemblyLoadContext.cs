@@ -185,7 +185,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         _sSingleton = null;
     }
 
-    private const int32 KDefaultConjugateMapCapacity = 65536;
+    private const int32 _kDefaultConjugateMapCapacity = 65536;
 
     private static MasterAssemblyLoadContext? _sSingleton;
     
@@ -233,7 +233,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
     private Dictionary<ZCallHandle, IZCallDispatcher> _zcallMap = new();
     private Dictionary<string, ZCallHandle> _zcallName2Handle = new();
     private List<(IZCallResolver Resolver, uint64 Priority)> _zcallResolverLink = new();
-    private Dictionary<IntPtr, WeakReference<IConjugate>> _conjugateMap = new(KDefaultConjugateMapCapacity);
+    private Dictionary<IntPtr, WeakReference<IConjugate>> _conjugateMap = new(_kDefaultConjugateMapCapacity);
     private ConcurrentQueue<IConjugate> _pendingDisposeConjugates = new();
 
 }

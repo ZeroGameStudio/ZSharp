@@ -116,16 +116,29 @@ namespace {_exportedClass.Namespace};
 	{
 		get
 		{
-			if (_exportedClass.BaseType[0] == '@')
+			if (string.IsNullOrWhiteSpace(_exportedClass.BaseType))
 			{
-				return _exportedClass.BaseType switch
+				if (_exportedClass.Plain)
 				{
-					"@UCLASS" => "UnrealObjectBase",
-					"@USTRUCT" => "UnrealStructBase",
-					"@PLAIN" => "PlainExportedObjectBase",
-					"@NONE" => null,
-					_ => throw new ArgumentException($"Invalid special base type {_exportedClass.BaseType}")
-				};
+					return "PlainExportedObjectBase";
+				}
+
+				if (_exportedClass.Class)
+				{
+					return "UnrealObjectBase";
+				}
+
+				if (_exportedClass.Struct)
+				{
+					return "UnrealStructBase";
+				}
+
+				if (_exportedClass.Interface)
+				{
+					return null;
+				}
+
+				throw new InvalidOperationException($"Invalid exported class {_exportedClass.Name}");
 			}
 
 			return GetTypeName(_exportedClass.BaseType);

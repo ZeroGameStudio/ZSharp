@@ -10,6 +10,11 @@ ZSharp::FZExportedTypeRegistry& ZSharp::FZExportedTypeRegistry::Get()
 	return GSingleton;
 }
 
+ZSharp::FZExportedTypeRegistry::FZExportedTypeRegistry()
+	: bFinished(false)
+{
+}
+
 void ZSharp::FZExportedTypeRegistry::ForeachExportedClass(TFunctionRef<void(const IZExportedClass&)> action) const
 {
 	for (const auto& pair : ClassMap)
@@ -48,6 +53,25 @@ bool ZSharp::FZExportedTypeRegistry::RegisterEnum(IZExportedEnum* enm)
 	
 	EnumMap.Emplace(key, enm);
 	return true;
+}
+
+bool ZSharp::FZExportedTypeRegistry::RegisterMixinMethod(IZExportedMethod* method)
+{
+	checkNoEntry();
+	return false;
+}
+
+bool ZSharp::FZExportedTypeRegistry::RegisterMixinProperty(IZExportedProperty* property)
+{
+	checkNoEntry();
+	return false;
+}
+
+void ZSharp::FZExportedTypeRegistry::FinishRegister()
+{
+	check(!bFinished);
+	
+	bFinished = true;
 }
 
 

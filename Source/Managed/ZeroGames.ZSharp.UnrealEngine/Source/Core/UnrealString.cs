@@ -2,16 +2,14 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public partial class UnrealString : PlainExportedObjectBase, IConjugate<UnrealString>
+public partial class UnrealString
 {
 
     public const uint16 KConjugateRegistryId = 2;
 
-    public static UnrealString BuildConjugate(IntPtr unmanaged) => new(unmanaged);
-
     public UnrealString() : this(string.Empty){}
 
-    public unsafe UnrealString(string content)
+    public UnrealString(string content)
     {
         IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
         Unmanaged = alc.BuildConjugate(KConjugateRegistryId, this);
@@ -85,8 +83,6 @@ public partial class UnrealString : PlainExportedObjectBase, IConjugate<UnrealSt
         IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
         alc.ReleaseConjugate(KConjugateRegistryId, Unmanaged);
     }
-
-    private UnrealString(IntPtr unmanaged) : base(unmanaged){}
 
 }
 

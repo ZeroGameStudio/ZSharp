@@ -58,22 +58,19 @@ FString ZSharp::FZSharpExportHelpers::GetUFieldOuterExportName(const UField* fie
 		return GetUFieldInnerExportName(field);
 	}
 
-	const UClass* cls = Cast<UClass>(field);
-	if (!cls)
+	const auto strct = Cast<UStruct>(field);
+	if (strct)
 	{
-		return "@NONE";
-	}
-	
-	for (const UClass* current = cls->GetSuperClass(); current; current = current->GetSuperClass())
-	{
-		if (IsUFieldModuleMapped(current))
+		for (const UStruct* current = strct->GetSuperStruct(); current; current = current->GetSuperStruct())
 		{
-			return GetUFieldInnerExportName(current);
+			if (IsUFieldModuleMapped(current))
+			{
+				return GetUFieldInnerExportName(current);
+			}
 		}
 	}
 
-	checkNoEntry();
-	return "@NONE";
+	return {};
 }
 
 FString ZSharp::FZSharpExportHelpers::GetUFieldInnerExportName(const UField* field)

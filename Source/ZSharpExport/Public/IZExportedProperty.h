@@ -6,7 +6,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPEXPORT_API IZExportedParameter : public IZExportedVariable
+	class ZSHARPEXPORT_API IZExportedProperty : public IZExportedVariable
 	{
 	public:
 		virtual bool CanRead() const = 0;

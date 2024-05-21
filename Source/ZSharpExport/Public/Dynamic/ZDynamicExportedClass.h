@@ -18,8 +18,6 @@ namespace ZSharp
 		virtual FString GetOuterExportName() const override;
 		virtual EZExportedClassFlags GetFlags() const override;
 		virtual FString GetBaseType() const override;
-		virtual TArray<FString> GetInterfaces() const override;
-		virtual void ForeachMethod(TFunctionRef<void(IZExportedMethod&)> action) const override;
 
 	private:
 		bool bRegistered;

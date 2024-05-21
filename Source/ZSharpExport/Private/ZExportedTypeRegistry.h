@@ -5,6 +5,8 @@
 #include "IZExportedTypeRegistry.h"
 #include "IZExportedClass.h"
 #include "IZExportedEnum.h"
+#include "IZExportedMethod.h"
+#include "IZExportedProperty.h"
 
 namespace ZSharp
 {
@@ -15,16 +17,29 @@ namespace ZSharp
 		static FZExportedTypeRegistry& Get();
 
 	public:
+		FZExportedTypeRegistry();
+
+	public:
 		virtual void ForeachExportedClass(TFunctionRef<void(const IZExportedClass&)> action) const override;
 		virtual void ForeachExportedEnum(TFunctionRef<void(const IZExportedEnum&)> action) const override;
 
 	public:
 		bool RegisterClass(IZExportedClass* cls);
 		bool RegisterEnum(IZExportedEnum* enm);
+		
+		bool RegisterMixinMethod(IZExportedMethod* method);
+		bool RegisterMixinProperty(IZExportedProperty* property);
+
+		void FinishRegister();
 
 	private:
 		TMap<FString, TUniquePtr<IZExportedClass>> ClassMap;
 		TMap<FString, TUniquePtr<IZExportedEnum>> EnumMap;
+		
+		TMap<FString, TUniquePtr<IZExportedMethod>> MixinMethodMap;
+		TMap<FString, TUniquePtr<IZExportedProperty>> MixinPropertyMap;
+
+		bool bFinished;
 		
 	};
 }

@@ -12,7 +12,7 @@ ZSharp::FZDynamicExportedClass::FZDynamicExportedClass(UStruct* ustruct)
 {
 	check(Struct->IsNative());
 
-	if (auto uclass = Cast<UClass>(ustruct))
+	if (const auto uclass = Cast<UClass>(ustruct))
 	{
 		if (uclass->HasAnyClassFlags(CLASS_Interface))
 		{
@@ -28,7 +28,7 @@ ZSharp::FZDynamicExportedClass::FZDynamicExportedClass(UStruct* ustruct)
 			}
 		}
 	}
-	else if (auto ustrct = Cast<UScriptStruct>(ustruct))
+	else if (const auto ustrct = Cast<UScriptStruct>(ustruct))
 	{
 		Flags |= EZExportedClassFlags::Struct;
 	}
@@ -69,34 +69,16 @@ FString ZSharp::FZDynamicExportedClass::GetBaseType() const
 {
 	if (Struct == UInterface::StaticClass())
 	{
-		return "@NONE";
+		return {};
 	}
 	
 	const UStruct* super = Struct->GetSuperStruct();
 	if (!super)
 	{
-		if (Struct->IsA<UClass>())
-		{
-			return "@UCLASS";
-		}
-		else
-		{
-			return "@USTRUCT";
-		}
+		return {};
 	}
 
 	return FZSharpExportHelpers::GetUFieldOuterExportName(super);
-}
-
-TArray<FString> ZSharp::FZDynamicExportedClass::GetInterfaces() const
-{
-	checkNoEntry();
-	return {};
-}
-
-void ZSharp::FZDynamicExportedClass::ForeachMethod(TFunctionRef<void(IZExportedMethod&)> action) const
-{
-	checkNoEntry();
 }
 
 

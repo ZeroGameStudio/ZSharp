@@ -28,7 +28,7 @@ namespace ZSharp
 			}
 
 			checkNoEntry();
-			return "";
+			return {};
 		}
 	};
 }

@@ -6,18 +6,20 @@ namespace ZeroGames.ZSharp.Build.Glue;
 public enum EExportedClassFlags : uint64
 {
 	None = 0,
-	Class = 1 << 0,
-	Struct = 1 << 1,
-	Interface = 1 << 2,
-	Abstract = 1 << 3,
+	Plain = 1 << 0,
+	Class = 1 << 1,
+	Struct = 1 << 2,
+	Interface = 1 << 3,
+	Abstract = 1 << 4,
 }
 
 public class ExportedClass : ExportedType
 {
 	public ExportedClass() => SlotType = EZCallBufferSlotType.Conjugate;
 	public required EExportedClassFlags Flags { get; set; }
-	public required string BaseType { get; set; }
+	public string? BaseType { get; set; }
 	
+	public bool Plain => (Flags & EExportedClassFlags.Plain) != EExportedClassFlags.None;
 	public bool Class => (Flags & EExportedClassFlags.Class) != EExportedClassFlags.None;
 	public bool Struct => (Flags & EExportedClassFlags.Struct) != EExportedClassFlags.None;
 	public bool Interface => (Flags & EExportedClassFlags.Interface) != EExportedClassFlags.None;

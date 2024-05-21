@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class UnrealText
+public partial class UnrealText
 {
 	
 }

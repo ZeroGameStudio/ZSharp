@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class UnrealName
+public partial class UnrealName
 {
 	
 }

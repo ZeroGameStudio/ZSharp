@@ -4,6 +4,8 @@
 
 #include "ZCall/IZConjugateRegistry.h"
 #include "ZCall/ZConjugateHandle.h"
+#include "Trait/ZConjugateRegistryId.h"
+#include "ZCall/Export/ZExport_String.h"
 
 namespace ZSharp
 {
@@ -15,7 +17,7 @@ namespace ZSharp
 		using ThisClass = FZConjugateRegistry_String;
 
 	public:
-		static constexpr uint16 RegistryId = 3;
+		static constexpr uint16 RegistryId = TZConjugateRegistryId_V<FString>;
 
 	public:
 		explicit FZConjugateRegistry_String(IZMasterAssemblyLoadContext& alc);

@@ -80,8 +80,8 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
 
     public int32 ZCall(ZCallHandle handle, ZCallBuffer* buffer) => ZCall_Black(handle, buffer);
     public ZCallHandle GetZCallHandle(string name) => GetZCallHandle_Black(name);
-    public IntPtr BuildConjugate(uint16 registryId, IConjugate managed) => BuildConjugate_Black(registryId, managed);
-    public void ReleaseConjugate(uint16 registryId, IntPtr unmanaged) => ReleaseConjugate_Black(registryId, unmanaged);
+    public IntPtr BuildConjugate(IConjugate managed) => BuildConjugate_Black(managed);
+    public void ReleaseConjugate(IntPtr unmanaged) => ReleaseConjugate_Black(unmanaged);
     
     public void PushPendingDisposeConjugate(IConjugate conjugate)
     {
@@ -140,7 +140,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         if (type.IsAssignableTo(conjugateType))
         {
             IConjugate conjugate = (IConjugate)type.GetMethod("BuildConjugate")!.Invoke(null, new object[] { unmanaged })!;
-            _conjugateMap[unmanaged] = new(conjugate);
+            _conjugateMap[unmanaged] = new(0, new(conjugate));
             return unmanaged;
         }
 
@@ -149,12 +149,12 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
 
     internal void ReleaseConjugate_Red(IntPtr unmanaged)
     {
-        if (!_conjugateMap.Remove(unmanaged, out var wref))
+        if (!_conjugateMap.Remove(unmanaged, out var rec))
         {
             throw new InvalidOperationException($"Conjugate [{unmanaged}] does not exists.");
         }
 
-        if (!wref.TryGetTarget(out var conjugate))
+        if (!rec.Wref.TryGetTarget(out var conjugate))
         {
             throw new InvalidOperationException($"Conjugate [{unmanaged}] has already dead.");
         }
@@ -164,12 +164,12 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
 
     internal IConjugate? Conjugate(IntPtr unmanaged)
     {
-        if (!_conjugateMap.TryGetValue(unmanaged, out var wref))
+        if (!_conjugateMap.TryGetValue(unmanaged, out var rec))
         {
             throw new InvalidOperationException($"Conjugate [{unmanaged}] does not exists.");
         }
 
-        wref.TryGetTarget(out var conjugate);
+        rec.Wref.TryGetTarget(out var conjugate);
         return conjugate;
     }
 
@@ -213,28 +213,64 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         }
     }
 
-    private IntPtr BuildConjugate_Black(uint16 registryId, IConjugate managed)
+    private IntPtr BuildConjugate_Black(IConjugate managed)
     {
+        uint16 registryId = GetTypeConjugateRegistryId(managed.GetType());
+        if (registryId == 0)
+        {
+            throw new InvalidOperationException($"ConjugateRegistryId of type {managed.GetType().FullName} is 0.");
+        }
+        
         IntPtr unmanaged = MasterAssemblyLoadContext_Interop.SBuildConjugate_Black(registryId);
         if (unmanaged != IntPtr.Zero)
         {
-            _conjugateMap[unmanaged] = new(managed);
+            _conjugateMap[unmanaged] = new(registryId, new(managed));
         }
 
         return unmanaged;
     }
 
-    private void ReleaseConjugate_Black(uint16 registryId, IntPtr unmanaged)
+    private void ReleaseConjugate_Black(IntPtr unmanaged)
     {
+        if (!_conjugateMap.TryGetValue(unmanaged, out var rec))
+        {
+            throw new InvalidOperationException($"Conjugate [{unmanaged}] does not exists.");
+        }
+
+        uint16 registryId = rec.RegistryId;
+        if (registryId == 0)
+        {
+            throw new InvalidOperationException($"ConjugateRegistryId of unmanaged {unmanaged} is 0.");
+        }
+
         _conjugateMap.Remove(unmanaged);
         MasterAssemblyLoadContext_Interop.SReleaseConjugate_Black(registryId, unmanaged);
+    }
+
+    private uint16 GetTypeConjugateRegistryId(Type type)
+    {
+        if (_conjugateRegistryIdLookup.TryGetValue(type, out var cachedId))
+        {
+            return cachedId;
+        }
+        
+        if (type.GetCustomAttribute<ConjugateRegistryIdAttribute>()?.Id is {} id)
+        {
+            _conjugateRegistryIdLookup[type] = id;
+            return id;
+        }
+
+        return 0;
     }
     
     private Dictionary<ZCallHandle, IZCallDispatcher> _zcallMap = new();
     private Dictionary<string, ZCallHandle> _zcallName2Handle = new();
     private List<(IZCallResolver Resolver, uint64 Priority)> _zcallResolverLink = new();
-    private Dictionary<IntPtr, WeakReference<IConjugate>> _conjugateMap = new(_kDefaultConjugateMapCapacity);
+    private Dictionary<IntPtr, ConjugateRec> _conjugateMap = new(_kDefaultConjugateMapCapacity);
+    private Dictionary<Type, uint16> _conjugateRegistryIdLookup = new();
     private ConcurrentQueue<IConjugate> _pendingDisposeConjugates = new();
+    
+    private readonly record struct ConjugateRec(uint16 RegistryId, WeakReference<IConjugate> Wref);
 
 }
 

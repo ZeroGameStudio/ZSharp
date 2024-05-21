@@ -2,22 +2,22 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
+[ConjugateRegistryId(3)]
 public partial class UnrealString
 {
 
-    public const uint16 KConjugateRegistryId = 2;
-
-    public UnrealString() : this(string.Empty){}
-
-    public UnrealString(string content)
+    public UnrealString()
     {
-        IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
-        Unmanaged = alc.BuildConjugate(KConjugateRegistryId, this);
+        IMasterAssemblyLoadContext alc = GetOwningAlc();
+        Unmanaged = alc.BuildConjugate(this);
         if (Unmanaged == IntPtr.Zero)
         {
             throw new InvalidOperationException();
         }
+    }
 
+    public UnrealString(string content) : this()
+    {
         Data = content;
     }
 
@@ -81,7 +81,7 @@ public partial class UnrealString
     protected override unsafe void ReleaseUnmanagedResource()
     {
         IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
-        alc.ReleaseConjugate(KConjugateRegistryId, Unmanaged);
+        alc.ReleaseConjugate(Unmanaged);
     }
 
 }

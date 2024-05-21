@@ -2,6 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
+[ConjugateRegistryId(1)]
 public abstract class UnrealObjectBase : ExportedObjectBase
 {
 

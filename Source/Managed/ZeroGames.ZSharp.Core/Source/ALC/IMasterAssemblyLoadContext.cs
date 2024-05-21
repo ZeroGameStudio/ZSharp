@@ -17,8 +17,8 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 	
 	int32 ZCall(ZCallHandle handle, ZCallBuffer* buffer);
 	ZCallHandle GetZCallHandle(string name);
-	IntPtr BuildConjugate(uint16 registryId, IConjugate managed);
-	void ReleaseConjugate(uint16 registryId, IntPtr unmanaged);
+	IntPtr BuildConjugate(IConjugate managed);
+	void ReleaseConjugate(IntPtr unmanaged);
 	void PushPendingDisposeConjugate(IConjugate conjugate);
 }
 

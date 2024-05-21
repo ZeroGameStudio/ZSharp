@@ -15,7 +15,7 @@ namespace ZSharp
 		using ThisClass = FZConjugateRegistry_String;
 
 	public:
-		static constexpr uint16 RegistryId = 2;
+		static constexpr uint16 RegistryId = 3;
 
 	public:
 		explicit FZConjugateRegistry_String(IZMasterAssemblyLoadContext& alc);
@@ -23,7 +23,6 @@ namespace ZSharp
 	public:
 		FString* Conjugate(FZConjugateHandle handle) const;
 		FZConjugateHandle Conjugate(FString* unmanaged, bool bOwning);
-		FZConjugateHandle BuildConjugate(FString* unmanaged, bool bOwning);
 	
 	private:
 		virtual void Release() override;

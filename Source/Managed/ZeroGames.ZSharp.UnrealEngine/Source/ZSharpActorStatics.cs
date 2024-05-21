@@ -15,6 +15,19 @@ public static class ZSharpActorStatics
     [ZCall]
     public static void Tick(UnrealObject actor, float deltaTime)
     {
+        PlainExportedObjectBase? o = new Random().Next(0, 10) switch
+        {
+            1 => new UnrealString(),
+            2 => new UnrealName(),
+            3 => new UnrealText(),
+            4 => new WeakObjectPtr(),
+            5 => new SoftObjectPtr(),
+            6 => new LazyObjectPtr(),
+            7 => new StrongObjectPtr(),
+            8 => new SoftClassPtr(),
+            9 => new ScriptInterface(),
+            _ => null,
+        };
         Logger.Log($"ZSharp Tick Actor Name: {actor.Name} DeltaTime: {deltaTime} ManagedType: {actor.GetType().FullName} UnrealClass: {actor.Class.Name}");
     }
 

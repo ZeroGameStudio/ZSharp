@@ -4,7 +4,7 @@
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
-#include "Conjugate/ZConjugateRegistry_String.h"
+#include "Conjugate/ZRegularConjugateRegistries.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "ZCall/ZCallBuffer.h"
 

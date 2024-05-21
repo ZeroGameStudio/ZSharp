@@ -31,6 +31,7 @@ public class ZSharpRuntime : ModuleRules
 				"DeveloperSettings",
 				
 				"ZSharpCore",
+				"ZSharpExportRuntime",
 			}
 		);
 		
@@ -39,8 +40,6 @@ public class ZSharpRuntime : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				
-				"ZSharpExportRuntime",
 			}
 		);
 		

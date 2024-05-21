@@ -1,7 +1,7 @@
 // Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZCall/Export/ZExport_ScriptInterface.h"
+#include "ZCall/Export/ZExports.h"
 
 #include "ZCall/ZStaticExportZCall.h"
 #include "ZCall/ZStaticExportZCallMacros.h"

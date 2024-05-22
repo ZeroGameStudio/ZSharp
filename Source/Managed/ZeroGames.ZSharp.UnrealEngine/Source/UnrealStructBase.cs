@@ -3,7 +3,7 @@
 namespace ZeroGames.ZSharp.UnrealEngine;
 
 [ConjugateRegistryId(2)]
-public abstract class UnrealStructBase : ExportedObjectBase
+public abstract class UnrealStructBase : ExportedObjectBase, IStaticStruct
 {
 
     public UnrealStructBase()
@@ -17,6 +17,11 @@ public abstract class UnrealStructBase : ExportedObjectBase
     
     protected UnrealStructBase(IntPtr unmanaged) : base(unmanaged){}
 
+    public static string SUnrealFieldPath => throw new NotSupportedException();
+    public static UnrealScriptStruct SStaticStruct => throw new NotSupportedException();
+    
+    public abstract string UnrealFieldPath { get; }
+    
 }
 
 

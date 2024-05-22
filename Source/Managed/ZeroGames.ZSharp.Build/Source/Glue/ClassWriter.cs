@@ -117,8 +117,7 @@ namespace {_exportedClass.Namespace};
 			string @class = _exportedClass.Interface ? "interface " : "class ";
 			string? @base = _baseType;
 			string? conjugate = _implementsBuildConjugate ? $"IConjugate<{_exportedClass.Name}>" : null;
-			string? staticField = _exportedClass.Class | _exportedClass.Interface ? "IStaticClass" : (_exportedClass.Struct ? "IStaticStruct" : null);
-			List<string?> bases = [ @base, conjugate, staticField ];
+			List<string?> bases = [ @base, conjugate ];
 			
 			string classModifiers = $"public {@abstract}partial {@class}";
 			string baseTypes = string.Join(", ", bases.Where(b => b is not null));
@@ -165,23 +164,36 @@ namespace {_exportedClass.Namespace};
 		}
 	}
 
-	private string? _methodStaticField
+	private string? _interfaceStaticField
 	{
 		get
 		{
 			if (_exportedClass.Class | _exportedClass.Interface)
 			{
 				return
-@"	public new static string UnrealFieldPath => __kUnrealFieldPath;
-	public new static UnrealClass StaticClass => UObjectGlobals.FindObjectChecked<UnrealClass>(__kUnrealFieldPath);";
+@"	public new static string SUnrealFieldPath => __kUnrealFieldPath;
+	public new static UnrealClass SStaticClass => UObjectGlobals.FindObjectChecked<UnrealClass>(__kUnrealFieldPath);";
 			}
 			if (_exportedClass.Struct)
 			{
 				return
-@"	public new static string UnrealFieldPath => __kUnrealFieldPath;
-	public new static UnrealScriptStruct StaticStruct => UObjectGlobals.FindObjectChecked<UnrealScriptStruct>(__kUnrealFieldPath);";
+@"	public new static string SUnrealFieldPath => __kUnrealFieldPath;
+	public new static UnrealScriptStruct SStaticStruct => UObjectGlobals.FindObjectChecked<UnrealScriptStruct>(__kUnrealFieldPath);";
 			}
 
+			return null;
+		}
+	}
+
+	private string? _interfaceInstanceField
+	{
+		get
+		{
+			if (_exportedClass.Class | _exportedClass.Struct)
+			{
+				return "\tpublic override string UnrealFieldPath => __kUnrealFieldPath;";
+			}
+			
 			return null;
 		}
 	}
@@ -209,7 +221,7 @@ namespace {_exportedClass.Namespace};
 			string? constructorRed = _exportedClass.Interface ? null : $"\tprotected {_exportedClass.Name}(IntPtr unmanaged) : base(unmanaged){{}}";
 			string? constUnrealFieldPath = string.IsNullOrWhiteSpace(_exportedClass.UnrealFieldPath) ? null : $"\tprivate const string __kUnrealFieldPath = \"{_exportedClass.UnrealFieldPath}\";";
 			
-			List<string?> intrinsicMethods = [ constructorDefault, methodBuildConjugate, _methodStaticField, constructorRed/*, _constructorStatic*/, constUnrealFieldPath ];
+			List<string?> intrinsicMethods = [ constructorDefault, methodBuildConjugate, _interfaceStaticField, _interfaceInstanceField, constructorRed/*, _constructorStatic*/, constUnrealFieldPath ];
 			string intrinsicMethodBlock = string.Join('\n', intrinsicMethods.Where(m => m is not null));
 			body.Append(intrinsicMethodBlock);
 

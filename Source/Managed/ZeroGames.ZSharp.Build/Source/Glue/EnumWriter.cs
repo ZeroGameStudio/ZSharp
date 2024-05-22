@@ -35,7 +35,7 @@ public class EnumWriter : IDisposable, IAsyncDisposable
 
 namespace {_exportedEnum.Namespace};
 
-[System.CodeDom.Compiler.GeneratedCode(""ZSharp"", ""0.0.4"")]
+{_enumAttributes}
 public enum {_exportedEnum.Name} : {_exportedEnum.UnderlyingType}
 {{
 {_enumBody}
@@ -46,6 +46,25 @@ public enum {_exportedEnum.Name} : {_exportedEnum.UnderlyingType}
 
 ");
 	});
+	
+	private string _enumAttributes
+	{
+		get
+		{
+			List<string> attrs = [ "[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"0.0.4\")]" ];
+			if ((_exportedEnum.Flags & EExportedEnumFlags.Flags) != EExportedEnumFlags.None)
+			{
+				attrs.Add("[Flags]");
+			}
+
+			if (!string.IsNullOrWhiteSpace(_exportedEnum.UnrealFieldPath))
+			{
+				attrs.Add($"[UnrealFieldPath(\"{_exportedEnum.UnrealFieldPath}\")]");
+			}
+			
+			return string.Join('\n', attrs);
+		}
+	}
 
 	private string _enumBody
 	{

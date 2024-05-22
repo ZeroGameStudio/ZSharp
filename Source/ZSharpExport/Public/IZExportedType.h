@@ -14,6 +14,7 @@ namespace ZSharp
 	public:
 		virtual bool IsRegistered() const = 0;
 		virtual FString GetModule() const = 0;
+		virtual FString GetUnrealFieldPath() const = 0;
 		virtual FString GetOuterExportName() const = 0;
 		virtual EZCallBufferSlotType GetSlotType() const = 0;
 	public:

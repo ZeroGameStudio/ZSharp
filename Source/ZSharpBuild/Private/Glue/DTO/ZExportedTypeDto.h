@@ -14,6 +14,9 @@ struct FZExportedTypeDto
 
 	UPROPERTY()
 	FString Module;
+
+	UPROPERTY()
+	FString UnrealFieldPath;
 };
 
 

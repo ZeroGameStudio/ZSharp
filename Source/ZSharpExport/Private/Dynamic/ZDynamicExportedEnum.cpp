@@ -8,8 +8,14 @@
 
 ZSharp::FZDynamicExportedEnum::FZDynamicExportedEnum(UEnum* uenum)
 	: Enum(uenum)
+	, Flags(EZExportedEnumFlags::None)
 {
 	check(Enum->IsNative());
+
+	if (Enum->HasAnyEnumFlags(EEnumFlags::Flags))
+	{
+		Flags |= EZExportedEnumFlags::Flags;
+	}
 	
 	bRegistered = FZExportedTypeRegistry::Get().RegisterEnum(this);
 }
@@ -29,9 +35,19 @@ FString ZSharp::FZDynamicExportedEnum::GetModule() const
 	return FZSharpExportHelpers::GetUFieldModuleName(Enum);
 }
 
+FString ZSharp::FZDynamicExportedEnum::GetUnrealFieldPath() const
+{
+	return Enum->GetPathName();
+}
+
 ZSharp::EZCallBufferSlotType ZSharp::FZDynamicExportedEnum::GetSlotType() const
 {
 	return EZCallBufferSlotType::Int64; // @FIXME: UnderlyingType
+}
+
+ZSharp::EZExportedEnumFlags ZSharp::FZDynamicExportedEnum::GetFlags() const
+{
+	return Flags;
 }
 
 FString ZSharp::FZDynamicExportedEnum::GetUnderlyingType() const

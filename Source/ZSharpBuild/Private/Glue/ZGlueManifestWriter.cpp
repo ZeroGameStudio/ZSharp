@@ -40,6 +40,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 	FZExportedClassDto classDto;
 	classDto.Name = cls.GetName();
 	classDto.Module = cls.GetModule();
+	classDto.UnrealFieldPath = cls.GetUnrealFieldPath();
 	classDto.ConjugateRegistryId = cls.GetConjugateRegistryId();
 	classDto.Flags = static_cast<__underlying_type(EZExportedClassFlags)>(cls.GetFlags());
 	classDto.BaseType = cls.GetBaseType();
@@ -65,6 +66,8 @@ void ZSharp::FZGlueManifestWriter::WriteEnum(const IZExportedEnum& enm)
 	FZExportedEnumDto enumDto;
 	enumDto.Name = enm.GetName();
 	enumDto.Module = enm.GetModule();
+	enumDto.UnrealFieldPath = enm.GetUnrealFieldPath();
+	enumDto.Flags = static_cast<__underlying_type(EZExportedEnumFlags)>(enm.GetFlags());
 	enumDto.UnderlyingType = enm.GetUnderlyingType();
 	enm.ForeachEnumValue([&enumDto](const FString& name, const FString& value)
 	{

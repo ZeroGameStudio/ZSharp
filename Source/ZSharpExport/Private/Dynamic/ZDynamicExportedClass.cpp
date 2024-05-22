@@ -56,6 +56,11 @@ FString ZSharp::FZDynamicExportedClass::GetModule() const
 	return FZSharpExportHelpers::GetUFieldModuleName(Struct);
 }
 
+FString ZSharp::FZDynamicExportedClass::GetUnrealFieldPath() const
+{
+	return Struct->GetPathName();
+}
+
 FString ZSharp::FZDynamicExportedClass::GetOuterExportName() const
 {
 	return FZSharpExportHelpers::GetUFieldOuterExportName(Struct);

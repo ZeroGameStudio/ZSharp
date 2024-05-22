@@ -25,6 +25,7 @@ namespace ZSharp
 		virtual bool IsRegistered() const override { return bRegistered; }
 		virtual FString GetName() const override { return TZExportedTypeName<T>::Get(); }
 		virtual FString GetModule() const override { return TZExportedTypeModule<T>::Get(); }
+		virtual FString GetUnrealFieldPath() const override { return {}; }
 		virtual FString GetOuterExportName() const override { return GetInnerExportName(); }
 		virtual uint16 GetConjugateRegistryId() const override { return TZConjugateRegistryId_V<T>; }
 		virtual EZExportedClassFlags GetFlags() const override { return Flags; }

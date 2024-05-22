@@ -28,7 +28,9 @@ namespace ZSharp
 		virtual bool IsRegistered() const override { return bRegistered; }
 		virtual FString GetName() const override { return TZExportedTypeName<T>::Get(); }
 		virtual FString GetModule() const override { return TZExportedTypeModule<T>::Get(); }
+		virtual FString GetUnrealFieldPath() const override { return {}; }
 		virtual EZCallBufferSlotType GetSlotType() const override { return TZExportedTypeZCallBufferSlotType_V<UnderlyingType>; }
+		virtual EZExportedEnumFlags GetFlags() const override { return Flags; }
 		virtual FString GetUnderlyingType() const override { return TZExportedTypeName<UnderlyingType>::Get(); }
 		virtual void ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const override
 		{
@@ -49,8 +51,9 @@ namespace ZSharp
 		};
 
 	protected:
-		explicit TZStaticExportedEnum(const FZFinalizer&)
-			: bRegistered(false){}
+		explicit TZStaticExportedEnum(bool bFlag, const FZFinalizer&)
+			: bRegistered(false)
+			, Flags(bFlag ? EZExportedEnumFlags::Flags : EZExportedEnumFlags::None){}
 
 	protected:
 		void AddEnumValue(const FString& name, T value) { Values.Emplace(TPair<FString, FString> { name, ValueToString(value) }); }
@@ -70,6 +73,7 @@ namespace ZSharp
 
 	private:
 		bool bRegistered;
+		EZExportedEnumFlags Flags;
 		TArray<TPair<FString, FString>> Values;
 		
 	};
@@ -79,14 +83,14 @@ namespace ZSharp
 ZSHARP_EXPORT_TYPE_NAME_EX(Enum, Name) \
 ZSHARP_EXPORT_TYPE_MODULE(Enum, Module)
 
-#define ZSHARP_BEGIN_EXPORT_ENUM(Enum) \
+#define ZSHARP_BEGIN_EXPORT_ENUM(Enum, bFlags) \
 namespace __ZSharpExport_Private \
 { \
 	static struct __FZStaticExportedEnum_##Enum : public ZSharp::TZStaticExportedEnum<Enum> \
 	{ \
 		using EnumClass = Enum; \
 		using ThisClass = __FZStaticExportedEnum_##Enum; \
-		explicit __FZStaticExportedEnum_##Enum(const FZFinalizer& finalizer) : ZSharp::TZStaticExportedEnum<Enum>(finalizer) \
+		explicit __FZStaticExportedEnum_##Enum(const FZFinalizer& finalizer) : ZSharp::TZStaticExportedEnum<Enum>(bFlags, finalizer) \
 		{
 
 #define ZSHARP_EXPORT_ENUM_VALUE(Value) AddEnumValue(#Value, EnumClass::Value);

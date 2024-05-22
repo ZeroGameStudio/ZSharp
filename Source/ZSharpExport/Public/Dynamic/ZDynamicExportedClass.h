@@ -15,6 +15,7 @@ namespace ZSharp
 		virtual bool IsRegistered() const override;
 		virtual FString GetName() const override;
 		virtual FString GetModule() const override;
+		virtual FString GetUnrealFieldPath() const override;
 		virtual FString GetOuterExportName() const override;
 		virtual uint16 GetConjugateRegistryId() const override;
 		virtual EZExportedClassFlags GetFlags() const override;

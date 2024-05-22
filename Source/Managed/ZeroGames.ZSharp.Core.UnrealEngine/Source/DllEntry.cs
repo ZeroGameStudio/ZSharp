@@ -3,7 +3,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace ZeroGames.ZSharp.UnrealEngine.Core;
+namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
 internal class DllEntry
 {

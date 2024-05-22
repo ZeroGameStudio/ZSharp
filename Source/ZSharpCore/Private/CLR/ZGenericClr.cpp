@@ -118,12 +118,12 @@ namespace ZSharp::ZGenericClr_Private
 
 	static void LoadEngineCoreAssembly(const FString& pluginContentDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
-		const TCHAR* typeName = TEXT("ZeroGames.ZSharp.UnrealEngine.Core.UnrealEngine_Interop");
+		FString typeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("UnrealEngine_Interop"));
 
 		FZUnmanagedFunction unmanagedFunctions[] =
 		{
-			{ typeName, TEXT("SLog"), FZUnrealEngine_Interop::Log },
-			{ typeName, TEXT("SIsInGameThread"), FZUnrealEngine_Interop::IsInGameThread },
+			{ *typeName, TEXT("SLog"), FZUnrealEngine_Interop::Log },
+			{ *typeName, TEXT("SIsInGameThread"), FZUnrealEngine_Interop::IsInGameThread },
 		};
 		
 		struct
@@ -133,7 +133,7 @@ namespace ZSharp::ZGenericClr_Private
 
 		int32(*dllMain)(const decltype(args)&) = nullptr;
 
-		const FString assemblyName = ZSHARP_ENGINE_CORE_ASSEMBLY_NAME;
+		const FString assemblyName = ZSHARP_CORE_ENGINE_ASSEMBLY_NAME;
 		FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed", assemblyName + ".dll");
 		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
 		const FString entryMethodName = TEXT("DllMain");

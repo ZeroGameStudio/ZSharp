@@ -8,12 +8,12 @@
 	"ProjectReferences":
 	[
 		"ZeroGames.ZSharp.Core",
-		"ZeroGames.ZSharp.UnrealEngine.Core"
+		"ZeroGames.ZSharp.Core.UnrealEngine"
 	],
 	"Usings":
 	[
 		"ZeroGames.ZSharp.Core",
-		"ZeroGames.ZSharp.UnrealEngine.Core"
+		"ZeroGames.ZSharp.Core.UnrealEngine"
 	]
 }
 

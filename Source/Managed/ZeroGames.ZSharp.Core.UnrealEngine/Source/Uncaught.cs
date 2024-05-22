@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 
-namespace ZeroGames.ZSharp.UnrealEngine.Core;
+namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
 public static class Uncaught
 {

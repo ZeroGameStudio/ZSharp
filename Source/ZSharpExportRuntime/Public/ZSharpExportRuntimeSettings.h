@@ -30,7 +30,7 @@ private:
 	FString CoreAssemblyName = ZSHARP_CORE_ASSEMBLY_NAME;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Assembly")
-	FString EngineCoreAssemblyName = ZSHARP_ENGINE_CORE_ASSEMBLY_NAME;
+	FString EngineCoreAssemblyName = ZSHARP_CORE_ENGINE_ASSEMBLY_NAME;
 	
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Assembly")
 	FString EngineAssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;

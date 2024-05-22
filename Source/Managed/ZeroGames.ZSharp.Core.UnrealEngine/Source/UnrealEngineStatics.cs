@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-namespace ZeroGames.ZSharp.UnrealEngine.Core;
+namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
 public static class UnrealEngineStatics
 {

@@ -24,11 +24,11 @@ namespace ZSharp
 		virtual ~FZConjugateRegistry_UObject() override;
 
 	public:
-		UObject* Conjugate(FZConjugateHandle handle) const { return Super::Conjugate(handle); }
+		ConjugateType* Conjugate(FZConjugateHandle handle) const { return Super::Conjugate(handle); }
 		FZConjugateHandle Conjugate(const UObjectBase* unmanaged) { return Conjugate(static_cast<const UObject*>(unmanaged), false); }
 
 	private:
-		FZRuntimeTypeHandle GetManagedType(const UObject* unmanaged) const;
+		FZRuntimeTypeHandle GetManagedType(const ConjugateType* unmanaged) const;
 		ConjugateType* GetUnmanaged(const RecordType* rec) const;
 		RecordType BuildRedConjugateRec(ConjugateType* unmanaged, bool bOwning);
 		ConjugateType* BuildBlackConjugateRec();
@@ -36,7 +36,7 @@ namespace ZSharp
 		
 	private:
 		// Hide base function
-		FZConjugateHandle Conjugate(const UObject* unmanaged, bool bOwning) { return Super::Conjugate(unmanaged, bOwning); }
+		FZConjugateHandle Conjugate(const ConjugateType* unmanaged, bool bOwning) { return Super::Conjugate(unmanaged, bOwning); }
 	
 	private:
 		virtual void* BuildConjugate() override;

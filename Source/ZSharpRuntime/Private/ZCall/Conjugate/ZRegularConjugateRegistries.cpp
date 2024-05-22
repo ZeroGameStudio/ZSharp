@@ -7,17 +7,12 @@
 #include "ZCall/ZDeclareConjugateRegistry.h"
 #include "ZCall/Export/ZExports.h"
 
-namespace ZSharp::ZRegularConjugateRegistries_Private
-{
-	static const FString GAssemblyName = "ZeroGames.ZSharp.UnrealEngine";
-}
-
 #define COMBINE_INNER(A, B) A##B
 #define COMBINE(A, B) COMBINE_INNER(A, B)
 #define IMPLEMENT_REGISTRY(Type) \
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_##Type::GetManagedType(const ConjugateType* unmanaged) const \
 { \
-	return Alc.GetType(ZRegularConjugateRegistries_Private::GAssemblyName, FString::Printf(TEXT("%s.%s.%s"), *ZRegularConjugateRegistries_Private::GAssemblyName, *TZExportedTypeModule<F##Type>::Get(), *TZExportedTypeName<F##Type>::Get())); \
+	return Alc.GetType(ZSHARP_ENGINE_ASSEMBLY_NAME, FString::Printf(TEXT("%s.%s.%s"), TEXT(ZSHARP_ENGINE_ASSEMBLY_NAME), *TZExportedTypeModule<F##Type>::Get(), *TZExportedTypeName<F##Type>::Get())); \
 } \
 namespace ZSharp::ZRegularConjugateRegistries_Private \
 { \

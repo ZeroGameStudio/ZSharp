@@ -24,7 +24,7 @@ ZSharp::FZConjugateRegistry_UObject::~FZConjugateRegistry_UObject()
 	FCoreUObjectDelegates::GarbageCollectComplete.Remove(GCDelegate);
 }
 
-ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UObject::GetManagedType(const UObject* unmanaged) const
+ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UObject::GetManagedType(const ConjugateType* unmanaged) const
 {
 	const UClass* cls = unmanaged->GetClass();
 	const FString moduleName = FZSharpExportHelpers::GetUFieldModuleName(cls);

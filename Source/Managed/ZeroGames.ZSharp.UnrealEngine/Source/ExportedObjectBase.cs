@@ -116,7 +116,7 @@ public abstract class ExportedObjectBase : IConjugate
         Volatile.Write(ref _disposed, true);
         
         GetOwningAlc().ReleaseConjugate(Unmanaged);
-        Logger.Log($"Release conjugate type: {GetType().FullName} unmanaged: {Unmanaged}");
+        Logger.VeryVerbose($"Release conjugate type: {GetType().FullName} unmanaged: {Unmanaged}");
         MarkAsDead();
 
         if (!fromFinalizer)

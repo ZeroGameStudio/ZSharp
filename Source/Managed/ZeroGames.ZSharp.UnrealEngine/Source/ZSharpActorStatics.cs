@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using Console = System.Console;
+
 namespace ZeroGames.ZSharp.UnrealEngine;
 
 public static class ZSharpActorStatics
@@ -28,7 +30,8 @@ public static class ZSharpActorStatics
             9 => new ScriptInterface(),
             _ => null,
         };
-        Logger.Log($"ZSharp Tick Actor Name: {actor.Name} DeltaTime: {deltaTime} ManagedType: {actor.GetType().FullName} UnrealClass: {actor.Class.Name}");
+
+        Logger.Verbose($"ZSharp Tick Actor Name: {actor.Name} DeltaTime: {deltaTime} ManagedType: {actor.GetType().FullName} UnrealClass: {actor.Class.Name}");
 
         GameplayStatics.GetPlayerCharacter(actor, 0)?.Jump();
     }

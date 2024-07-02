@@ -64,6 +64,10 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 
 bool ZSharp::FZCallDispatcher_UFunction::InvalidateCache() const
 {
+	ParameterProperties.Empty();
+	ReturnProperty.Reset();
+	OutParamIndices.Empty();
+	
 	for (TFieldIterator<FProperty> it(Function.Get()); it && it->HasAllPropertyFlags(CPF_Parm); ++it)
 	{
 		FProperty* prop = *it;

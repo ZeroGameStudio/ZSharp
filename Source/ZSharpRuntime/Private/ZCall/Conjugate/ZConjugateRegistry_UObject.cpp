@@ -79,14 +79,10 @@ void ZSharp::FZConjugateRegistry_UObject::ReleaseConjugate(void* unmanaged)
 	checkNoEntry();
 }
 
-void ZSharp::FZConjugateRegistry_UObject::PushRedFrame()
-{
-	// UObject conjugate is released by UEGC, not red frame.
-}
-
 void ZSharp::FZConjugateRegistry_UObject::PopRedFrame()
 {
-	// UObject conjugate is released by UEGC, not red frame.
+	// UObject conjugate is released by UEGC, not red frame, so we just pop a frame.
+	RedStack.Pop();
 }
 
 void ZSharp::FZConjugateRegistry_UObject::HandleGarbageCollectComplete()

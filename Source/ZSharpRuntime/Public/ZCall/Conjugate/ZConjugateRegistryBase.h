@@ -108,12 +108,13 @@ namespace ZSharp
 				if constexpr (bRegularRec)
 				{
 					ConjugateMap.Emplace(mutableUnmanaged, { mutableUnmanaged, bOwning, false });
-					RedStack.Top().CapturedConjugates.Emplace(mutableUnmanaged);
 				}
 				else
 				{
 					ConjugateMap.Emplace(mutableUnmanaged, AsImpl().BuildRedConjugateRec(mutableUnmanaged, bOwning));
 				}
+
+				RedStack.Top().CapturedConjugates.Emplace(mutableUnmanaged);
 					
 				return { mutableUnmanaged };
 			}

@@ -34,6 +34,7 @@ namespace ZSharp
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) override;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) override;
 
+		virtual void PrepareForZCall() override;
 		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) override;
 		virtual FZCallHandle GetZCallHandle(const FString& name) override;
 		virtual void* BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type) override;
@@ -75,6 +76,7 @@ namespace ZSharp
 
 		TSparseArray<TUniquePtr<IZConjugateRegistry>> ConjugateRegistries;
 		int32 RedZCallDepth;
+		bool bZCallPrepared;
 
 		FTSTicker::FDelegateHandle TickDelegate;
 		FDelegateHandle GCDelegate;

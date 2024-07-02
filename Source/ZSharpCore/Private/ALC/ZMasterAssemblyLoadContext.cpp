@@ -13,6 +13,7 @@ ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle hand
 	, UnloadCallback(MoveTemp(unloadCallback))
 	, bUnloaded(false)
 	, RedZCallDepth(0)
+	, bZCallPrepared(false)
 {
 	FZConjugateRegistryDeclarations::ForeachDeclaration([this](uint16 id, const TUniqueFunction<IZConjugateRegistry*(IZMasterAssemblyLoadContext&)>& factory)
 	{
@@ -89,10 +90,21 @@ void ZSharp::FZMasterAssemblyLoadContext::RegisterZCallResolver(IZCallResolver* 
 	ZCallResolverLink.StableSort([](auto& lhs, auto& rhs){ return lhs.template Get<0>() < rhs.template Get<0>(); });
 }
 
+void ZSharp::FZMasterAssemblyLoadContext::PrepareForZCall()
+{
+	check(IsInGameThread());
+	check(!bZCallPrepared);
+	
+	PushRedFrame();
+	bZCallPrepared = true;
+}
+
 int32 ZSharp::FZMasterAssemblyLoadContext::ZCall(FZCallHandle handle, FZCallBuffer* buffer)
 {
 	check(IsInGameThread());
-	
+	check(bZCallPrepared);
+
+	bZCallPrepared = false;
 	return ZCall_Red(handle, buffer);
 }
 
@@ -189,7 +201,6 @@ bool ZSharp::FZMasterAssemblyLoadContext::Tick(float deltaTime)
 
 int32 ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer)
 {
-	PushRedFrame();
 	ON_SCOPE_EXIT { PopRedFrame(); };
 
 	return FZMasterAssemblyLoadContext_Interop::GZCall_Red(handle, buffer);

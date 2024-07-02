@@ -23,6 +23,7 @@ namespace ZSharp
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) = 0;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) = 0;
 
+		virtual void PrepareForZCall() = 0;
 		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) = 0;
 		virtual FZCallHandle GetZCallHandle(const FString& name) = 0;
 		virtual void* BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type) = 0;

@@ -41,7 +41,6 @@ namespace ZSharp
 	private:
 		virtual void* BuildConjugate() override;
 		virtual void ReleaseConjugate(void* unmanaged) override;
-		virtual void PushRedFrame() override;
 		virtual void PopRedFrame() override;
 
 	private:

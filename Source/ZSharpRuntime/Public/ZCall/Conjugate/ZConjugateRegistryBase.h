@@ -108,6 +108,7 @@ namespace ZSharp
 				if constexpr (bRegularRec)
 				{
 					ConjugateMap.Emplace(mutableUnmanaged, { mutableUnmanaged, bOwning, false });
+					RedStack.Top().CapturedConjugates.Emplace(mutableUnmanaged);
 				}
 				else
 				{
@@ -120,7 +121,7 @@ namespace ZSharp
 			return {};
 		}
 	
-	private:
+	public:
 		virtual void Release() override
 		{
 			TArray<void*> conjugates;
@@ -168,7 +169,7 @@ namespace ZSharp
 			}
 		}
 
-	private:
+	protected:
 		TConjugate* BaseGetUnmanaged(const TRec* rec) const
 		{
 			if constexpr (bRegularRec)

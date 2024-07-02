@@ -63,6 +63,7 @@ ZSharp::FZConjugateRegistry_UObject::ConjugateType* ZSharp::FZConjugateRegistry_
 
 void ZSharp::FZConjugateRegistry_UObject::InternalReleaseConjugate(void* unmanaged, const RecordType* rec)
 {
+	Alc.ReleaseConjugate(unmanaged);
 }
 
 void* ZSharp::FZConjugateRegistry_UObject::BuildConjugate()
@@ -78,6 +79,16 @@ void ZSharp::FZConjugateRegistry_UObject::ReleaseConjugate(void* unmanaged)
 	checkNoEntry();
 }
 
+void ZSharp::FZConjugateRegistry_UObject::PushRedFrame()
+{
+	// UObject conjugate is released by UEGC, not red frame.
+}
+
+void ZSharp::FZConjugateRegistry_UObject::PopRedFrame()
+{
+	// UObject conjugate is released by UEGC, not red frame.
+}
+
 void ZSharp::FZConjugateRegistry_UObject::HandleGarbageCollectComplete()
 {
 	TArray<void*> pendingRemoves;
@@ -88,10 +99,10 @@ void ZSharp::FZConjugateRegistry_UObject::HandleGarbageCollectComplete()
 			pendingRemoves.Emplace(pair.Key);
 		}
 	}
-
+	
 	for (const auto& key : pendingRemoves)
 	{
-		ConjugateMap.Remove(key);
+		Super::InternalReleaseConjugate(key);
 	}
 }
 

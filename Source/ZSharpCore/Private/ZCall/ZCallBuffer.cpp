@@ -256,6 +256,11 @@ void ZSharp::FZCallBufferSlot::WriteConjugate(FZConjugateHandle value)
 
 ZSharp::FZCallBufferSlot& ZSharp::FZCallBuffer::operator[](int32 index)
 {
+	if (index < 0)
+	{
+		index = NumSlots + index;
+	}
+	
 	check(index >= 0 && index < NumSlots);
 	return Slots[index];
 }

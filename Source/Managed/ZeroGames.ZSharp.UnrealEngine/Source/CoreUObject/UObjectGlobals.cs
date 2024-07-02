@@ -9,7 +9,7 @@ public static class UObjectGlobals
 	
 	public static T? FindObject<T>(UnrealObject? outer, string path, bool exactClass) where T : UnrealObject
 	{
-		return null;
+		throw new NotImplementedException();
 	}
 
 	public static T FindObjectChecked<T>(string path) where T : UnrealObject => FindObjectChecked<T>(null, path, false);

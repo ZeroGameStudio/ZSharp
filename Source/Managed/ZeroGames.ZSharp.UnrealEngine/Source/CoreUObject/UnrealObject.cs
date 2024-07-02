@@ -9,7 +9,7 @@ public partial class UnrealObject
     {
         get
         {
-            IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
+            IMasterAssemblyLoadContext alc = GetOwningAlc();
             const int32 numSlots = 2;
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
@@ -27,7 +27,7 @@ public partial class UnrealObject
     {
         get
         {
-            IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
+            IMasterAssemblyLoadContext alc = GetOwningAlc();
             const int32 numSlots = 2;
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
@@ -45,7 +45,7 @@ public partial class UnrealObject
     {
         get
         {
-            IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
+            IMasterAssemblyLoadContext alc = GetOwningAlc();
             const int32 numSlots = 2;
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {

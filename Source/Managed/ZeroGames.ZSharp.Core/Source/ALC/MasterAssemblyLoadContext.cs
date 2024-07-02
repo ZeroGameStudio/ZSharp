@@ -46,13 +46,13 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
 
     public Type? GetType(string assemblyName, string typeName)
     {
-        Assembly? asm = Assemblies.FirstOrDefault(asm => asm.GetName().Name == new string(assemblyName));
+        Assembly? asm = Assemblies.FirstOrDefault(asm => asm.GetName().Name == assemblyName);
         if (asm is null)
         {
             return null;
         }
 
-        return asm.GetType(new string(typeName));
+        return asm.GetType(typeName);
     }
 
     public ZCallHandle RegisterZCall(IZCallDispatcher dispatcher)

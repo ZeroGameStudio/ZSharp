@@ -27,6 +27,10 @@ ZSharp::FZConjugateRegistry_UObject::~FZConjugateRegistry_UObject()
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UObject::GetManagedType(const ConjugateType* unmanaged) const
 {
 	const UClass* cls = unmanaged->GetClass();
+	while (!cls->IsNative())
+	{
+		cls = cls->GetSuperClass();
+	}
 	const FString moduleName = FZSharpExportHelpers::GetUFieldModuleName(cls);
 	FString assemblyName;
 	if (!GetDefault<UZSharpExportRuntimeSettings>()->TryGetModuleAssembly(moduleName, assemblyName))

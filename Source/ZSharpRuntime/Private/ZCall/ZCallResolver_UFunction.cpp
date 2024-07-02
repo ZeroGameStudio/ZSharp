@@ -10,11 +10,11 @@ ZSharp::IZCallDispatcher* ZSharp::FZCallResolver_UFunction::Resolve(const FStrin
 	if (name.StartsWith("uf:/"))
 	{
 		FString functionName = name.RightChop(4);
-		FRegexPattern pattern{ "^[/.+]+\\..+:.+$" };
+		FRegexPattern pattern{ "^(/.+)+\\..+:.+$" };
 		FRegexMatcher matcher{ pattern, functionName };
 		if (matcher.FindNext())
 		{
-			return new FZCallDispatcher_UFunction { functionName };
+			return new FZCallDispatcher_UFunction { name };
 		}
 	}
 

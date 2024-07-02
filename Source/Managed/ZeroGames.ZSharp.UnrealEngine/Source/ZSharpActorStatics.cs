@@ -29,6 +29,8 @@ public static class ZSharpActorStatics
             _ => null,
         };
         Logger.Log($"ZSharp Tick Actor Name: {actor.Name} DeltaTime: {deltaTime} ManagedType: {actor.GetType().FullName} UnrealClass: {actor.Class.Name}");
+
+        GameplayStatics.GetPlayerCharacter(actor, 0)?.Jump();
     }
 
     [ZCall]

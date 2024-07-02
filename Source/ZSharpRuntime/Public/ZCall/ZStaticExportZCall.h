@@ -38,7 +38,7 @@ namespace ZSharp
 				}
 				else
 				{
-					TZCallBufferSlotEncoder<std::decay_t<TRet>>::EncodeRet((*Function)(std::forward<TArgs>(args.template Get<Indices>())...), buf[sizeof...(TArgs)]);
+					TZCallBufferSlotEncoder<std::decay_t<TRet>>::EncodeRet((*Function)(std::forward<TArgs>(args.template Get<Indices>())...), buf[-1]);
 				}
 				TZTryDecodeZCallBufferSlot<TArgs...>::template EncodeStatic(args, buf);
 				
@@ -70,7 +70,7 @@ namespace ZSharp
 				}
 				else
 				{
-					TZCallBufferSlotEncoder<std::decay_t<TRet>>::EncodeRet((pThis->*Function)(std::forward<TArgs>(args.template Get<Indices>())...), buf[sizeof...(TArgs) + 1]);
+					TZCallBufferSlotEncoder<std::decay_t<TRet>>::EncodeRet((pThis->*Function)(std::forward<TArgs>(args.template Get<Indices>())...), buf[-1]);
 				}
 				TZTryDecodeZCallBufferSlot<TArgs...>::template EncodeInstance(args, buf);
 				
@@ -102,7 +102,7 @@ namespace ZSharp
 				}
 				else
 				{
-					TZCallBufferSlotEncoder<std::decay_t<TRet>>::EncodeRet((pThis->*Function)(std::forward<TArgs>(args.template Get<Indices>())...), buf[sizeof...(TArgs) + 1]);
+					TZCallBufferSlotEncoder<std::decay_t<TRet>>::EncodeRet((pThis->*Function)(std::forward<TArgs>(args.template Get<Indices>())...), buf[-1]);
 				}
 				TZTryDecodeZCallBufferSlot<TArgs...>::template EncodeInstance(args, buf);
 					

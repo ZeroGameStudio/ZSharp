@@ -26,7 +26,7 @@ int32 ZSharp::IZSharpClr::Run(const FString& path, void* args, const FString& al
 		return -1;
 	}
 
-	ON_SCOPE_EXIT{ alc->Unload(); };
+	ON_SCOPE_EXIT { alc->Unload(); };
 
 	return alc->LoadAssembly(path, args);
 }

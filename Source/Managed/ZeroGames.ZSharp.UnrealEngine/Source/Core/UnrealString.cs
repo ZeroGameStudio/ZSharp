@@ -13,7 +13,7 @@ public partial class UnrealString
     {
         get
         {
-            IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
+            IMasterAssemblyLoadContext alc = GetOwningAlc();
             const int32 numSlots = 2;
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
@@ -31,7 +31,7 @@ public partial class UnrealString
     {
         get
         {
-            IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
+            IMasterAssemblyLoadContext alc = GetOwningAlc();
             const int32 numSlots = 2;
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
@@ -45,7 +45,7 @@ public partial class UnrealString
         }
         set
         {
-            IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
+            IMasterAssemblyLoadContext alc = GetOwningAlc();
             fixed (char* data = value.ToCharArray())
             {
                 const int32 numSlots = 2;

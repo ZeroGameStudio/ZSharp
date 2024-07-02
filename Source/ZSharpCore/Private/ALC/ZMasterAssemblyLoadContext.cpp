@@ -190,7 +190,7 @@ bool ZSharp::FZMasterAssemblyLoadContext::Tick(float deltaTime)
 int32 ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer)
 {
 	PushRedFrame();
-	ON_SCOPE_EXIT{ PopRedFrame(); };
+	ON_SCOPE_EXIT { PopRedFrame(); };
 
 	return FZMasterAssemblyLoadContext_Interop::GZCall_Red(handle, buffer);
 }

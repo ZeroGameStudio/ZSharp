@@ -445,7 +445,7 @@ public unsafe struct ZCallBuffer
 
 	public ZCallBuffer(ZCallBufferSlot* slots, int32 numSlots)
 	{
-		this._slots = slots;
+		_slots = slots;
 		_numSlots = numSlots;
 	}
 
@@ -453,6 +453,11 @@ public unsafe struct ZCallBuffer
 	{
 		get
 		{
+			if (index < 0)
+			{
+				index = NumSlots + index;
+			}
+			
 			if (index < 0 || index >= _numSlots)
 			{
 				throw new ArgumentOutOfRangeException();

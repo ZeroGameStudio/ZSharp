@@ -27,7 +27,7 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 	FZCallBuffer& buf = *buffer;
 	UFunction* func = Function.Get();
 	const bool staticFunc = func->HasAllFunctionFlags(FUNC_Static);
-	UObject* self = nullptr;
+	UObject* self;
 	if (!staticFunc)
 	{
 		self = TZCallBufferSlotEncoder<UObject*>::Decode(buf[0]);

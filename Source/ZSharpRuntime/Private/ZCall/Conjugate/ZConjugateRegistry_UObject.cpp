@@ -48,9 +48,9 @@ ZSharp::FZConjugateRegistry_UObject::ConjugateType* ZSharp::FZConjugateRegistry_
 	return rec->TypedUnmanaged.ResolveObjectPtrEvenIfGarbage();
 }
 
-ZSharp::FZConjugateRegistry_UObject::RecordType ZSharp::FZConjugateRegistry_UObject::BuildRedConjugateRec(ConjugateType* unmanaged, bool bOwning)
+ZSharp::FZConjugateRegistry_UObject::RecordType ZSharp::FZConjugateRegistry_UObject::BuildRedConjugateRec(ConjugateType* unmanaged, bool owning)
 {
-	check(!bOwning);
+	check(!owning);
 	return { unmanaged };
 }
 

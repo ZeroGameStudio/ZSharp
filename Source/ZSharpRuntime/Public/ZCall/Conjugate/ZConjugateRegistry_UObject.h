@@ -30,13 +30,13 @@ namespace ZSharp
 	private:
 		FZRuntimeTypeHandle GetManagedType(const ConjugateType* unmanaged) const;
 		ConjugateType* GetUnmanaged(const RecordType* rec) const;
-		RecordType BuildRedConjugateRec(ConjugateType* unmanaged, bool bOwning);
+		RecordType BuildRedConjugateRec(ConjugateType* unmanaged, bool owning);
 		ConjugateType* BuildBlackConjugateRec();
 		void InternalReleaseConjugate(void* unmanaged, const RecordType* rec);
 		
 	private:
 		// Hide base function
-		FZConjugateHandle Conjugate(const ConjugateType* unmanaged, bool bOwning) { return Super::Conjugate(unmanaged, bOwning); }
+		FZConjugateHandle Conjugate(const ConjugateType* unmanaged, bool owning) { return Super::Conjugate(unmanaged, owning); }
 	
 	private:
 		virtual void* BuildConjugate() override;

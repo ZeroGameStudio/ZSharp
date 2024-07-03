@@ -36,6 +36,7 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 		}
 	}
 
+	const bool staticFunc = !self;
 	void* params = FMemory::Malloc(func->ParmsSize, func->MinAlignment);
 	ON_SCOPE_EXIT { FMemory::Free(params); };
 
@@ -43,15 +44,17 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 	{
 		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
 		visitor->InitializeValue_InContainer(params);
-		visitor->SetValue_InContainer(params, buf[self ? i + 1 : i]);
+		visitor->SetValue_InContainer(params, buf[staticFunc ? i : i + 1]);
 	}
 
-	(self ? self : func->GetOuterUClass()->GetDefaultObject())->ProcessEvent(func, params);
+	self = staticFunc ? func->GetOuterUClass()->GetDefaultObject() : self;
+	check(self);
+	self->ProcessEvent(func, params);
 
 	for (const auto index : OutParamIndices)
 	{
 		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
-		visitor->GetValue_InContainer(params, buf[self ? index + 1 : index]);
+		visitor->GetValue_InContainer(params, buf[staticFunc ? index : index + 1]);
 	}
 
 	if (ReturnProperty)

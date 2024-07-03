@@ -17,14 +17,14 @@ namespace ZSharp
 	public:
 		virtual ~IZSharpClr(){}
 	public:
-		virtual void CollectGarbage(int32 generation = -1, bool bAggressive = true, bool bBlocking = false, bool bCompacting = true) = 0;
+		virtual void CollectGarbage(int32 generation = -1, bool aggressive = true, bool blocking = false, bool compacting = true) = 0;
 	public:
 		virtual IZMasterAssemblyLoadContext* CreateMasterAlc() = 0;
 		virtual IZMasterAssemblyLoadContext* GetMasterAlc() = 0;
 		virtual IZSlimAssemblyLoadContext* CreateSlimAlc(const FString& name) = 0;
 		virtual IZSlimAssemblyLoadContext* GetSlimAlc(const FString& name) = 0;
 	public:
-		virtual FDelegateHandle RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate, bool bNotifyIfLoaded = true) = 0;
+		virtual FDelegateHandle RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate, bool notifyIfLoaded = true) = 0;
 		virtual void UnregisterMasterAlcLoaded(FDelegateHandle delegate) = 0;
 		virtual void UnregisterMasterAlcLoaded(const void* userObject) = 0;
 		virtual FDelegateHandle RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate delegate) = 0;

@@ -21,8 +21,8 @@ class FZSharpRuntimeModule : public IZSharpRuntimeModule
 	void UnloadMasterAlc();
 
 #if WITH_EDITOR
-	void HandleBeginPIE(const bool bSimulating);
-	void HandleEndPIE(const bool bSimulating);
+	void HandleBeginPIE(const bool simulating);
+	void HandleEndPIE(const bool simulating);
 #endif
 	
 };
@@ -63,12 +63,12 @@ void FZSharpRuntimeModule::UnloadMasterAlc()
 	ZSharp::IZSharpClr::Get().GetMasterAlc()->Unload();
 }
 
-void FZSharpRuntimeModule::HandleBeginPIE(const bool bSimulating)
+void FZSharpRuntimeModule::HandleBeginPIE(const bool simulating)
 {
 	CreateMasterAlc();
 }
 
-void FZSharpRuntimeModule::HandleEndPIE(const bool bSimulating)
+void FZSharpRuntimeModule::HandleEndPIE(const bool simulating)
 {
 	UnloadMasterAlc();
 }

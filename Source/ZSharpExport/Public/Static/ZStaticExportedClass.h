@@ -42,9 +42,9 @@ namespace ZSharp
 		};
 
 	protected:
-		TZStaticExportedClass(bool bAbstract, const FZFinalizer&)
+		TZStaticExportedClass(bool abstract, const FZFinalizer&)
 			: bRegistered(false)
-			, Flags(EZExportedClassFlags::Plain | (bAbstract ? EZExportedClassFlags::Abstract : EZExportedClassFlags::None)){}
+			, Flags(EZExportedClassFlags::Plain | (abstract ? EZExportedClassFlags::Abstract : EZExportedClassFlags::None)){}
 
 	private:
 		bool bRegistered;

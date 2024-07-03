@@ -228,9 +228,9 @@ void ZSharp::FZGenericClr::Shutdown()
 	bInitialized = false;
 }
 
-void ZSharp::FZGenericClr::CollectGarbage(int32 generation, bool bAggressive, bool bBlocking, bool bCompacting)
+void ZSharp::FZGenericClr::CollectGarbage(int32 generation, bool aggressive, bool blocking, bool compacting)
 {
-	ZClr_Interop::GCollectGarbage(generation, bAggressive, bBlocking, bCompacting);
+	ZClr_Interop::GCollectGarbage(generation, aggressive, blocking, compacting);
 }
 
 ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
@@ -305,12 +305,12 @@ void ZSharp::FZGenericClr::HandleSlimAlcUnloaded(const FString& name)
 	SlimAlcMap.Remove(name);
 }
 
-FDelegateHandle ZSharp::FZGenericClr::RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate, bool bNotifyIfLoaded)
+FDelegateHandle ZSharp::FZGenericClr::RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate, bool notifyIfLoaded)
 {
 	check(IsInGameThread());
 
 	FDelegateHandle handle = OnMasterAlcLoaded.Add(delegate);
-	if (bNotifyIfLoaded && MasterAlc)
+	if (notifyIfLoaded && MasterAlc)
 	{
 		delegate.ExecuteIfBound(MasterAlc.Get());
 	}

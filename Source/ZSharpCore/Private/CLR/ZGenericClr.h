@@ -23,7 +23,7 @@ namespace ZSharp
 		void Shutdown();
 
 	public:
-		virtual void CollectGarbage(int32 generation = -1, bool bAggressive = true, bool bBlocking = false, bool bCompacting = true) override;
+		virtual void CollectGarbage(int32 generation = -1, bool aggressive = true, bool blocking = false, bool compacting = true) override;
 		
 	public:
 		virtual IZMasterAssemblyLoadContext* CreateMasterAlc() override;
@@ -32,7 +32,7 @@ namespace ZSharp
 		virtual IZSlimAssemblyLoadContext* GetSlimAlc(const FString& name) override;
 
 	public:
-		virtual FDelegateHandle RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate, bool bNotifyIfLoaded = true) override;
+		virtual FDelegateHandle RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate, bool notifyIfLoaded = true) override;
 		virtual void UnregisterMasterAlcLoaded(FDelegateHandle delegate) override;
 		virtual void UnregisterMasterAlcLoaded(const void* userObject) override;
 		virtual FDelegateHandle RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate delegate) override;

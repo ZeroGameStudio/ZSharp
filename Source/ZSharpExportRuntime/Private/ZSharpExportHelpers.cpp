@@ -41,8 +41,8 @@ FString ZSharp::FZSharpExportHelpers::GetUFieldAliasedName(const UField* field)
 FString ZSharp::FZSharpExportHelpers::GetUFieldModuleName(const UField* field)
 {
 	FString res;
-	const bool bSuc = field->GetPackage()->GetName().Split("/", nullptr, &res, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
-	check(bSuc);
+	const bool suc = field->GetPackage()->GetName().Split("/", nullptr, &res, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+	check(suc);
 	return res;
 }
 

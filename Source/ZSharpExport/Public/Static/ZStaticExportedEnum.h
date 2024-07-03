@@ -51,9 +51,9 @@ namespace ZSharp
 		};
 
 	protected:
-		explicit TZStaticExportedEnum(bool bFlag, const FZFinalizer&)
+		explicit TZStaticExportedEnum(bool flag, const FZFinalizer&)
 			: bRegistered(false)
-			, Flags(bFlag ? EZExportedEnumFlags::Flags : EZExportedEnumFlags::None){}
+			, Flags(flag ? EZExportedEnumFlags::Flags : EZExportedEnumFlags::None){}
 
 	protected:
 		void AddEnumValue(const FString& name, T value) { Values.Emplace(TPair<FString, FString> { name, ValueToString(value) }); }

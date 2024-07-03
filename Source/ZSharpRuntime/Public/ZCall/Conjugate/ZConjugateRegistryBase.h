@@ -58,7 +58,7 @@ namespace ZSharp
 	 * 
 	 * In addition, if TRec is not ZConjugateRegistryBase_Private::TZConjugateRec<TConjugate>, then implementation class is also supposed to:
 	 * 1. Implement private function ConjugateType* GetUnmanaged(const RecordType* rec) const;
-	 * 2. Implement private function RecordType BuildRedConjugateRec(ConjugateType* unmanaged, bool bOwning);
+	 * 2. Implement private function RecordType BuildRedConjugateRec(ConjugateType* unmanaged, bool owning);
 	 * 3. Implement private function ConjugateType* BuildBlackConjugateRec();
 	 * 4. Implement private function void InternalReleaseConjugate(void* unmanaged, const RecordType* rec);
 	 * 
@@ -77,7 +77,7 @@ namespace ZSharp
 		using RecordType = TRec;
 
 	public:
-		static constexpr bool bRegularRec = std::is_same_v<TRec, ZConjugateRegistryBase_Private::TZConjugateRec<TConjugate>>;
+		static constexpr bool RegularRec = std::is_same_v<TRec, ZConjugateRegistryBase_Private::TZConjugateRec<TConjugate>>;
 		static constexpr uint16 RegistryId = ZConjugateRegistryBase_Private::GetConjugateId<TConjugate>();
 		
 	public:
@@ -92,26 +92,26 @@ namespace ZSharp
 			return rec ? BaseGetUnmanaged(rec) : nullptr;
 		}
 		
-		FZConjugateHandle Conjugate(const TConjugate* unmanaged, bool bOwning)
+		FZConjugateHandle Conjugate(const TConjugate* unmanaged, bool owning)
 		{
 			auto mutableUnmanaged = const_cast<TConjugate*>(unmanaged);
 			if (const TRec* rec = ConjugateMap.Find(mutableUnmanaged))
 			{
 				// This branch means conjugating an unmanaged object that doesn't owned by the caller.
-				check(!bOwning);
+				check(!owning);
 				return { BaseGetUnmanaged(rec) };
 			}
 
 			const FZRuntimeTypeHandle type = const_cast<const TImpl&>(AsImpl()).GetManagedType(unmanaged);
 			if (Alc.BuildConjugate(mutableUnmanaged, type))
 			{
-				if constexpr (bRegularRec)
+				if constexpr (RegularRec)
 				{
-					ConjugateMap.Emplace(mutableUnmanaged, { mutableUnmanaged, bOwning, false });
+					ConjugateMap.Emplace(mutableUnmanaged, { mutableUnmanaged, owning, false });
 				}
 				else
 				{
-					ConjugateMap.Emplace(mutableUnmanaged, AsImpl().BuildRedConjugateRec(mutableUnmanaged, bOwning));
+					ConjugateMap.Emplace(mutableUnmanaged, AsImpl().BuildRedConjugateRec(mutableUnmanaged, owning));
 				}
 
 				RedStack.Top().CapturedConjugates.Emplace(mutableUnmanaged);
@@ -139,7 +139,7 @@ namespace ZSharp
 		
 		virtual void* BuildConjugate() override
 		{
-			if constexpr (bRegularRec)
+			if constexpr (RegularRec)
 			{
 				auto unmanaged = new TConjugate;
 				ConjugateMap.Emplace(unmanaged, { unmanaged, true, true });
@@ -173,7 +173,7 @@ namespace ZSharp
 	protected:
 		TConjugate* BaseGetUnmanaged(const TRec* rec) const
 		{
-			if constexpr (bRegularRec)
+			if constexpr (RegularRec)
 			{
 				return rec->TypedUnmanaged;
 			}
@@ -191,7 +191,7 @@ namespace ZSharp
 				return;
 			}
 
-			if constexpr (bRegularRec)
+			if constexpr (RegularRec)
 			{
 				if (rec->bOwning)
 				{

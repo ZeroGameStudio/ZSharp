@@ -16,9 +16,17 @@ namespace ZSharp
 		virtual ~IZPropertyVisitor(){}
 
 	public:
+		virtual bool IsPrimitive() const = 0;
+		virtual bool IsValueSemantics() const = 0;
+
+	public:
 		virtual void InitializeValue_InContainer(void* dest) const = 0;
 		virtual void GetValue_InContainer(const void* src, FZCallBufferSlot& dest) const = 0;
+		virtual void GetRef_InContainer(const void* src, FZCallBufferSlot& dest) const = 0;
 		virtual void SetValue_InContainer(void* dest, const FZCallBufferSlot& src) const = 0;
+
+	public:
+		bool IsObjectSemantics() const { return !IsValueSemantics(); }
 		
 	};
 }

@@ -15,6 +15,10 @@ namespace ZSharp
 	public:
 		FZPropertyVisitorBase(const FProperty* underlyingProperty)
 			: UnderlyingProperty(underlyingProperty){}
+
+	public:
+		virtual bool IsPrimitive() const override { return false; }
+		virtual bool IsValueSemantics() const override { return true; }
 		
 	public:
 		virtual void InitializeValue_InContainer(void* dest) const override;

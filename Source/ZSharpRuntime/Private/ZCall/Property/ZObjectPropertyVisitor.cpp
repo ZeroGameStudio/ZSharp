@@ -5,7 +5,7 @@
 
 #include "ZCall/ZCallBufferSlotEncoder.h"
 
-void ZSharp::FZObjectPropertyVisitor::GetValue_InContainer(const void* src, FZCallBufferSlot& dest) const
+void ZSharp::FZObjectPropertyVisitor::GetRef_InContainer(const void* src, FZCallBufferSlot& dest) const
 {
 	TZCallBufferSlotEncoder<UObject*>::Encode(UnderlyingObjectProperty->GetObjectPropertyValue_InContainer(src), dest);
 }

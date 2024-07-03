@@ -2,20 +2,20 @@
 
 #pragma once
 
-#include "ZPropertyVisitorBase.h"
+#include "ZObjectPropertyVisitorBase.h"
 
 namespace ZSharp
 {
-	class FZObjectPropertyVisitor : public FZPropertyVisitorBase
+	class FZObjectPropertyVisitor : public FZObjectPropertyVisitorBase
 	{
 	
 	public:
 		FZObjectPropertyVisitor(const FObjectProperty* underlyingProperty)
-			: FZPropertyVisitorBase(underlyingProperty)
+			: FZObjectPropertyVisitorBase(underlyingProperty)
 			, UnderlyingObjectProperty(underlyingProperty){}
 
 	public:
-		virtual void GetValue_InContainer(const void* src, FZCallBufferSlot& dest) const override;
+		virtual void GetRef_InContainer(const void* src, FZCallBufferSlot& dest) const override;
 		virtual void SetValue_InContainer(void* dest, const FZCallBufferSlot& src) const override;
 
 	private:

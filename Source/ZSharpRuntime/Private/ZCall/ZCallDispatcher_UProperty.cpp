@@ -41,7 +41,7 @@ int32 ZSharp::FZCallDispatcher_UProperty::Dispatch(FZCallBuffer* buffer) const
 	}
 	else
 	{
-		Property->GetValue_InContainer(self, buf[2]);
+		Property->GetRef_InContainer(self, buf[2]);
 	}
 	
 	return 0;

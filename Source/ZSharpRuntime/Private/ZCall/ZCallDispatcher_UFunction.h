@@ -11,7 +11,7 @@ namespace ZSharp
 	{
 
 	public:
-		FZCallDispatcher_UFunction(const FString& name)
+		explicit FZCallDispatcher_UFunction(const FString& name)
 			: Name(name)
 			, Path(name.RightChop(4))
 			, bAvailable(false){}

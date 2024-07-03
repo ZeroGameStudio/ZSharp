@@ -10,7 +10,7 @@ namespace ZSharp
 	{
 	
 	public:
-		FZObjectPropertyVisitor(const FObjectProperty* underlyingProperty)
+		explicit FZObjectPropertyVisitor(const FObjectProperty* underlyingProperty)
 			: FZObjectPropertyVisitorBase(underlyingProperty)
 			, UnderlyingObjectProperty(underlyingProperty){}
 

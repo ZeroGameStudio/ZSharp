@@ -11,7 +11,7 @@ namespace ZSharp
 	{
 
 	public:
-		FZCallDispatcher_UProperty(const FString& name);
+		explicit FZCallDispatcher_UProperty(const FString& name);
 		
 	public:
 		virtual const FString& GetName() const override { return Name; }

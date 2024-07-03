@@ -26,8 +26,9 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 
 	FZCallBuffer& buf = *buffer;
 	UFunction* func = Function.Get();
+	const bool staticFunc = func->HasAllFunctionFlags(FUNC_Static);
 	UObject* self = nullptr;
-	if (!func->HasAllFunctionFlags(FUNC_Static))
+	if (!staticFunc)
 	{
 		self = TZCallBufferSlotEncoder<UObject*>::Decode(buf[0]);
 		if (!self)
@@ -35,8 +36,13 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 			return 3;
 		}
 	}
+	else
+	{
+		self = func->GetOuterUClass()->GetDefaultObject();
+	}
 
-	const bool staticFunc = !self;
+	check(self);
+	
 	void* params = FMemory::Malloc(func->ParmsSize, func->MinAlignment);
 	ON_SCOPE_EXIT { FMemory::Free(params); };
 
@@ -47,8 +53,6 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 		visitor->SetValue_InContainer(params, buf[staticFunc ? i : i + 1]);
 	}
 
-	self = staticFunc ? func->GetOuterUClass()->GetDefaultObject() : self;
-	check(self);
 	self->ProcessEvent(func, params);
 
 	for (const auto index : OutParamIndices)

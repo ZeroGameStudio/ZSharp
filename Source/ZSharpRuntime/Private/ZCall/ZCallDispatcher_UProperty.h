@@ -22,9 +22,9 @@ namespace ZSharp
 
 	private:
 		FString Name;
-		FString ClassPath;
+		FString StructPath;
 		FString PropertyName;
-		mutable TWeakObjectPtr<UClass> GCRoot; // FProperty's lifetime is not managed by GC, but follows it's outer class.
+		mutable TWeakObjectPtr<UStruct> GCRoot; // FProperty's lifetime is not managed by GC, but follows it's outer.
 		mutable TUniquePtr<IZPropertyVisitor> Property;
 
 		mutable bool bAvailable;

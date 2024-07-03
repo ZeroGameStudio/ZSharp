@@ -80,7 +80,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
 
     public int32 ZCall(ZCallHandle handle, ZCallBuffer* buffer) => ZCall_Black(handle, buffer);
     public ZCallHandle GetZCallHandle(string name) => GetZCallHandle_Black(name);
-    public IntPtr BuildConjugate(IConjugate managed) => BuildConjugate_Black(managed);
+    public IntPtr BuildConjugate(IConjugate managed, void* userdata) => BuildConjugate_Black(managed, userdata);
     public void ReleaseConjugate(IntPtr unmanaged) => ReleaseConjugate_Black(unmanaged);
     
     public void PushPendingDisposeConjugate(IConjugate conjugate)
@@ -213,15 +213,15 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         }
     }
 
-    private IntPtr BuildConjugate_Black(IConjugate managed)
+    private IntPtr BuildConjugate_Black(IConjugate managed, void* userdata)
     {
         uint16 registryId = GetTypeConjugateRegistryId(managed.GetType());
         if (registryId == 0)
         {
             throw new InvalidOperationException($"ConjugateRegistryId of type {managed.GetType().FullName} is 0.");
         }
-        
-        IntPtr unmanaged = MasterAssemblyLoadContext_Interop.SBuildConjugate_Black(registryId);
+
+        IntPtr unmanaged = MasterAssemblyLoadContext_Interop.SBuildConjugate_Black(registryId, userdata);
         if (unmanaged != IntPtr.Zero)
         {
             _conjugateMap[unmanaged] = new(registryId, new(managed));

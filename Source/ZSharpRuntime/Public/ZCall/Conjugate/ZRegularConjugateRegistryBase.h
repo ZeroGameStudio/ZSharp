@@ -93,7 +93,7 @@ namespace ZSharp
 		}
 	
 	protected:
-		virtual void* BuildConjugate() override
+		virtual void* BuildConjugate(void* userdata) override
 		{
 			auto unmanaged = new TConjugate;
 			ConjugateMap.Emplace(unmanaged, { unmanaged, true, true });

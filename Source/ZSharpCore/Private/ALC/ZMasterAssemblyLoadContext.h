@@ -45,7 +45,7 @@ namespace ZSharp
 	public:
 		int32 ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const;
 		FZCallHandle GetZCallHandle_Black(const FString& name);
-		void* BuildConjugate_Black(uint16 registryId);
+		void* BuildConjugate_Black(uint16 registryId, void* userdata);
 		void ReleaseConjugate_Black(uint16 registryId, void* unmanaged);
 
 	private:

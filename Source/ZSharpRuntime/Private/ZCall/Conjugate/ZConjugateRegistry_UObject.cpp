@@ -50,7 +50,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UObject::Conjugate(const U
 	return {};
 }
 
-void* ZSharp::FZConjugateRegistry_UObject::BuildConjugate()
+void* ZSharp::FZConjugateRegistry_UObject::BuildConjugate(void* userdata)
 {
 	// There is no black UObject conjugate.
 	checkNoEntry();

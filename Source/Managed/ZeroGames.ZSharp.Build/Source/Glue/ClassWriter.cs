@@ -172,13 +172,13 @@ namespace {_exportedClass.Namespace};
 			{
 				return
 @"	public new static string SUnrealFieldPath => __kUnrealFieldPath;
-	public new static UnrealClass SStaticClass => UObjectGlobals.FindObjectChecked<UnrealClass>(__kUnrealFieldPath);";
+	public new static UnrealClass SStaticClass => UObjectGlobals.LowLevelFindObject<UnrealClass>(__kUnrealFieldPath);";
 			}
 			if (_exportedClass.Struct)
 			{
 				return
 @"	public new static string SUnrealFieldPath => __kUnrealFieldPath;
-	public new static UnrealScriptStruct SStaticStruct => UObjectGlobals.FindObjectChecked<UnrealScriptStruct>(__kUnrealFieldPath);";
+	public new static UnrealScriptStruct SStaticStruct => UObjectGlobals.LowLevelFindObject<UnrealScriptStruct>(__kUnrealFieldPath);";
 			}
 
 			return null;

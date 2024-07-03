@@ -13,7 +13,7 @@ namespace ZSharp
 	{
 		static int32 ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer);
 		static FZCallHandle GetZCallHandle_Black(const TCHAR* name);
-		static void* BuildConjugate_Black(uint16 registryId);
+		static void* BuildConjugate_Black(uint16 registryId, void* userdata);
 		static void ReleaseConjugate_Black(uint16 registryId, void* unmanaged);
 
 		inline static uint8(*GTick)(float) = nullptr;

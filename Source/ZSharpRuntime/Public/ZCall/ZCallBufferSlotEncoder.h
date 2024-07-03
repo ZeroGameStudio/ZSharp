@@ -6,6 +6,7 @@
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZRegularConjugateRegistries.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
+#include "Conjugate/ZConjugateRegistry_UScriptStruct.h"
 #include "ZCall/ZCallBuffer.h"
 
 namespace ZSharp
@@ -40,6 +41,22 @@ namespace ZSharp
 		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(value)); }
 		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return Cast<T>(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(slot.ReadConjugate())); }
+	};
+
+	template <CZIsDecayed T>
+	struct TZCallBufferSlotEncoder<T, std::enable_if_t<TZIsUScriptStruct_V<T>>>
+	{
+		using DecodedType = T;
+		static void Encode(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(&value, false)); }
+		static void EncodeRet(const DecodedType& value, FZCallBufferSlot& slot)
+		{
+			const UScriptStruct* scriptStruct = TBaseStructure<T>::Get();
+			void* unmanaged = FMemory::Malloc(scriptStruct->GetStructureSize(), scriptStruct->GetMinAlignment());
+			scriptStruct->CopyScriptStruct(unmanaged, &value);
+			slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(scriptStruct, unmanaged, true));
+		}
+		static DecodedType& Decode(const FZCallBufferSlot& slot) { return *IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate<T>(slot.ReadConjugate()); }
+		static DecodedType* DecodeThis(const FZCallBufferSlot& slot) { return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate<T>(slot.ReadConjugate()); }
 	};
 
 	template <>

@@ -6,9 +6,10 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 public abstract class UnrealStructBase : ExportedObjectBase, IStaticStruct
 {
 
-    public UnrealStructBase()
+    public unsafe UnrealStructBase()
     {
-	    Unmanaged = GetOwningAlc().BuildConjugate(this);
+	    UnrealScriptStruct scriptStruct = (UnrealScriptStruct)GetType().GetProperty(nameof(IStaticStruct.SStaticStruct))?.GetValue(null)!;
+	    Unmanaged = GetOwningAlc().BuildConjugate(this, (void*)scriptStruct.Unmanaged);
 	    if (Unmanaged == IntPtr.Zero)
 	    {
 		    throw new InvalidOperationException();

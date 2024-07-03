@@ -28,7 +28,7 @@ ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext_Interop::GetZCallHandle
 	return alc->GetZCallHandle_Black({ name });
 }
 
-void* ZSharp::FZMasterAssemblyLoadContext_Interop::BuildConjugate_Black(uint16 registryId)
+void* ZSharp::FZMasterAssemblyLoadContext_Interop::BuildConjugate_Black(uint16 registryId, void* userdata)
 {
 	auto alc = static_cast<FZMasterAssemblyLoadContext*>(IZSharpClr::Get().GetMasterAlc());
 	if (!alc)
@@ -36,7 +36,7 @@ void* ZSharp::FZMasterAssemblyLoadContext_Interop::BuildConjugate_Black(uint16 r
 		return nullptr;
 	}
 
-	return alc->BuildConjugate_Black(registryId);
+	return alc->BuildConjugate_Black(registryId, userdata);
 }
 
 void ZSharp::FZMasterAssemblyLoadContext_Interop::ReleaseConjugate_Black(uint16 registryId, void* unmanaged)

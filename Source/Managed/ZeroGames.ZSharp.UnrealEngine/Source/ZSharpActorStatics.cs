@@ -1,7 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using Console = System.Console;
-
 namespace ZeroGames.ZSharp.UnrealEngine;
 
 public static class ZSharpActorStatics
@@ -10,7 +8,6 @@ public static class ZSharpActorStatics
     [ZCall]
     public static void BeginPlay(UnrealObject actor)
     {
-        var x = new UnrealString();
         Logger.Log($"ZSharp BeginPlay Actor Name: {actor.Name}");
     }
 
@@ -38,6 +35,9 @@ public static class ZSharpActorStatics
         {
             cmc.MaxWalkSpeed = new Random().NextSingle() * 500 + 500; 
         }
+
+        // Random r = new();
+        // mainPlayer?.SetActorLocation(new(r.NextDouble() * 500, r.NextDouble() * 500, r.NextDouble() * 500), false, out var hr, true);
     }
 
     [ZCall]

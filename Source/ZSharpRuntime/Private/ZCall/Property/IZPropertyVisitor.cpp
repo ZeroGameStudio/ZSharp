@@ -5,6 +5,7 @@
 
 #include "ZObjectPropertyVisitor.h"
 #include "ZPrimitivePropertyVisitor.h"
+#include "ZStructPropertyVisitor.h"
 
 TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FProperty* prop)
 {
@@ -15,6 +16,10 @@ TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FP
 	if (const auto objectProp = CastField<FObjectProperty>(prop))
 	{
 		return MakeUnique<FZObjectPropertyVisitor>(objectProp);
+	}
+	if (const auto structProp = CastField<FStructProperty>(prop))
+	{
+		return MakeUnique<FZStructPropertyVisitor>(structProp);
 	}
 
 	checkNoEntry();

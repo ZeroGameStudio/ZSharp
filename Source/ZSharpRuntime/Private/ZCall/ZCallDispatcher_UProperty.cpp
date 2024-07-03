@@ -11,7 +11,7 @@ ZSharp::FZCallDispatcher_UProperty::FZCallDispatcher_UProperty(const FString& na
 	, Property(nullptr)
 	, bAvailable(false)
 {
-	Name.RightChop(4).Split(TEXT(":"), &ClassPath, &PropertyName, ESearchCase::CaseSensitive, ESearchDir::FromEnd);
+	Name.RightChop(4).Split(TEXT(":"), &StructPath, &PropertyName, ESearchCase::CaseSensitive, ESearchDir::FromEnd);
 }
 
 int32 ZSharp::FZCallDispatcher_UProperty::Dispatch(FZCallBuffer* buffer) const
@@ -30,9 +30,18 @@ int32 ZSharp::FZCallDispatcher_UProperty::Dispatch(FZCallBuffer* buffer) const
 	}
 
 	FZCallBuffer& buf = *buffer;
-	UObject* self = TZCallBufferSlotEncoder<UObject*>::Decode(buf[0]);
-	check(self);
-	check(self->IsA(GCRoot.Get()));
+	void* self;
+	if (const UClass* cls = Cast<UClass>(GCRoot.Get()))
+	{
+		UObject* typedSelf = TZCallBufferSlotEncoder<UObject*>::Decode(buf[0]);
+		check(typedSelf);
+		check(typedSelf->IsA(cls));
+		self = typedSelf;
+	}
+	else
+	{
+		self = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate<void>(buf[0].ReadConjugate());
+	}
 
 	const bool write = buf[1].ReadBool();
 	if (write)
@@ -51,7 +60,7 @@ bool ZSharp::FZCallDispatcher_UProperty::InvalidateCache() const
 {
 	Property.Reset();
 	
-	GCRoot = LoadClass<UObject>(nullptr, *ClassPath);
+	GCRoot = LoadObject<UStruct>(nullptr, *StructPath);
 	if (!GCRoot.IsValid(true))
 	{
 		return false;

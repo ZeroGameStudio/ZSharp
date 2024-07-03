@@ -180,11 +180,11 @@ ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle_Black(c
 	return handle;
 }
 
-void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate_Black(uint16 registryId)
+void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate_Black(uint16 registryId, void* userdata)
 {
 	check(IsInGameThread());
 
-	return GetConjugateRegistry(registryId).BuildConjugate();
+	return GetConjugateRegistry(registryId).BuildConjugate(userdata);
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate_Black(uint16 registryId, void* unmanaged)

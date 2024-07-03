@@ -5,6 +5,28 @@ namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 public partial class Character
 {
 
+	public unsafe bool SetActorLocation(Vector location, bool sweep, out HitResult sweepHitResult, bool teleport)
+	{
+		sweepHitResult = new();
+		
+		IMasterAssemblyLoadContext alc = GetOwningAlc();
+		const int32 numSlots = 6;
+		ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
+		{
+			ZCallBufferSlot.FromConjugate(this),
+			ZCallBufferSlot.FromConjugate(location),
+			ZCallBufferSlot.FromBool(sweep),
+			ZCallBufferSlot.FromConjugate(sweepHitResult),
+			ZCallBufferSlot.FromBool(teleport),
+			ZCallBufferSlot.FromBool(false),
+		};
+		ZCallBuffer buffer = new(slots, numSlots);
+		ZCallHandle handle = alc.GetZCallHandle("uf://Script/Engine.Actor:K2_SetActorLocation");
+		alc.ZCall(handle, &buffer);
+
+		return slots[5].ReadBool();
+	}
+
 	public unsafe void Jump()
 	{
 		IMasterAssemblyLoadContext alc = GetOwningAlc();

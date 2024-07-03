@@ -5,9 +5,9 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 public abstract class PlainExportedObjectBase : ExportedObjectBase
 {
 
-    public PlainExportedObjectBase()
+    public unsafe PlainExportedObjectBase()
     {
-        Unmanaged = GetOwningAlc().BuildConjugate(this);
+        Unmanaged = GetOwningAlc().BuildConjugate(this, null);
         if (Unmanaged == IntPtr.Zero)
         {
             throw new InvalidOperationException();

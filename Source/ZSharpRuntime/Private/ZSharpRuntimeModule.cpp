@@ -6,6 +6,7 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ZCall/ZCallResolver_Export.h"
 #include "ZCall/ZCallResolver_UFunction.h"
+#include "ZCall/ZCallResolver_UProperty.h"
 
 class FZSharpRuntimeModule : public IZSharpRuntimeModule
 {
@@ -54,6 +55,7 @@ void FZSharpRuntimeModule::CreateMasterAlc()
 	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().CreateMasterAlc();
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_Export{}, 0);
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UFunction{}, 1);
+	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UProperty{}, 2);
 	alc->LoadAssembly(FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "ZeroGames.ZSharp.UnrealEngine.dll"));
 	alc->LoadAssembly(FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Game.dll"));
 }

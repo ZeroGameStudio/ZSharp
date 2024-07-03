@@ -6,7 +6,7 @@
 #include "ZObjectPropertyVisitor.h"
 #include "ZPrimitivePropertyVisitor.h"
 
-TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(FProperty* prop)
+TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FProperty* prop)
 {
 	if (prop->IsA<FNumericProperty>() || prop->IsA<FBoolProperty>() || prop->IsA<FEnumProperty>())
 	{

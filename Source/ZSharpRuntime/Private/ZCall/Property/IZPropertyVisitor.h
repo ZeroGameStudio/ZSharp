@@ -10,7 +10,7 @@ namespace ZSharp
 	{
 
 	public:
-		static TUniquePtr<IZPropertyVisitor> Create(FProperty* prop);
+		static TUniquePtr<IZPropertyVisitor> Create(const FProperty* prop);
 
 	public:
 		virtual ~IZPropertyVisitor(){}

@@ -31,9 +31,13 @@ public static class ZSharpActorStatics
             _ => null,
         };
 
-        Logger.Verbose($"ZSharp Tick Actor Name: {actor.Name} DeltaTime: {deltaTime} ManagedType: {actor.GetType().FullName} UnrealClass: {actor.Class.Name}");
-
-        GameplayStatics.GetPlayerCharacter(actor, 0)?.Jump();
+        Character? mainPlayer = GameplayStatics.GetPlayerCharacter(actor, 0);
+        CharacterMovementComponent? cmc = mainPlayer?.CharacterMovement;
+        mainPlayer?.Jump();
+        if (cmc is not null)
+        {
+            cmc.MaxWalkSpeed = new Random().NextSingle() * 500 + 500; 
+        }
     }
 
     [ZCall]

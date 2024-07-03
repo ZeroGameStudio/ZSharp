@@ -10,13 +10,10 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 {
 	if (!Function.IsValid(true))
 	{
-		Function = LoadObject<UFunction>(nullptr, *Path);
-		if (!Function.IsValid(true))
+		if (bAvailable = InvalidateCache(); !bAvailable)
 		{
 			return 1;
 		}
-		
-		bAvailable = InvalidateCache();
 	}
 
 	if (!bAvailable)
@@ -42,6 +39,7 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 	}
 
 	check(self);
+	check(self->IsA(func->GetOuterUClass()));
 	
 	void* params = FMemory::Malloc(func->ParmsSize, func->MinAlignment);
 	ON_SCOPE_EXIT { FMemory::Free(params); };
@@ -71,6 +69,12 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 
 bool ZSharp::FZCallDispatcher_UFunction::InvalidateCache() const
 {
+	Function = LoadObject<UFunction>(nullptr, *Path);
+	if (!Function.IsValid(true))
+	{
+		return false;
+	}
+	
 	ParameterProperties.Empty();
 	ReturnProperty.Reset();
 	OutParamIndices.Empty();

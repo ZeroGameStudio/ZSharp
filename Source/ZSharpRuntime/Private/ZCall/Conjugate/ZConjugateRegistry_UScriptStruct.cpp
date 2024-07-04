@@ -44,9 +44,9 @@ const ZSharp::FZSelfDescriptiveScriptStruct* ZSharp::FZConjugateRegistry_UScript
 void* ZSharp::FZConjugateRegistry_UScriptStruct::BuildConjugate(void* userdata)
 {
 	const UScriptStruct* scriptStruct = static_cast<UScriptStruct*>(userdata);
-	auto unmanaged = FMemory::Malloc(scriptStruct->GetStructureSize(), scriptStruct->GetMinAlignment());
-	scriptStruct->InitializeStruct(unmanaged);
-	ConjugateMap.Emplace(unmanaged, { MakeUnique<FZSelfDescriptiveScriptStruct>(scriptStruct, unmanaged, true), true });
+	auto pSdss = MakeUnique<FZSelfDescriptiveScriptStruct>(scriptStruct);
+	void* unmanaged = pSdss->GetUnderlyingInstance();
+	ConjugateMap.Emplace(unmanaged, { MoveTemp(pSdss), true });
 	return unmanaged;
 }
 

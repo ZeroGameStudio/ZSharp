@@ -55,8 +55,16 @@ namespace ZSharp
 			scriptStruct->CopyScriptStruct(unmanaged, &value);
 			slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(scriptStruct, unmanaged, true));
 		}
-		static DecodedType& Decode(const FZCallBufferSlot& slot) { return *IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate<T>(slot.ReadConjugate()); }
-		static DecodedType* DecodeThis(const FZCallBufferSlot& slot) { return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate<T>(slot.ReadConjugate()); }
+		static DecodedType& Decode(const FZCallBufferSlot& slot)
+		{
+			const FZSelfDescriptiveScriptStruct* sdss = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(slot.ReadConjugate());
+			return *sdss->GetUnderlyingInstance<T>();
+		}
+		static DecodedType* DecodeThis(const FZCallBufferSlot& slot)
+		{
+			const FZSelfDescriptiveScriptStruct* sdss = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(slot.ReadConjugate());
+			return sdss->GetUnderlyingInstance<T>();
+		}
 	};
 
 	template <>

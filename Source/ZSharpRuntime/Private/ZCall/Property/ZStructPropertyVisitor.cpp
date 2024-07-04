@@ -11,8 +11,10 @@
 void ZSharp::FZStructPropertyVisitor::GetValue_InContainer(const void* src, FZCallBufferSlot& dest) const
 {
 	void const* ref = UnderlyingStructProperty->ContainerPtrToValuePtr<void>(src);
-	const UScriptStruct* scriptStruct = UnderlyingStructProperty->Struct;
-	void* unmanaged = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate<void>(dest.ReadConjugate());
+	const FZSelfDescriptiveScriptStruct* sdss = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(dest.ReadConjugate());
+	const UScriptStruct* scriptStruct = sdss->GetDescriptor();
+	check(scriptStruct == UnderlyingStructProperty->Struct);
+	void* unmanaged = sdss ? sdss->GetUnderlyingInstance() : nullptr;
 	if (!unmanaged)
 	{
 		unmanaged = FMemory::Malloc(scriptStruct->GetStructureSize(), scriptStruct->GetMinAlignment());
@@ -30,7 +32,13 @@ void ZSharp::FZStructPropertyVisitor::GetRef_InContainer(const void* src, FZCall
 
 void ZSharp::FZStructPropertyVisitor::SetValue_InContainer(void* dest, const FZCallBufferSlot& src) const
 {
-	UnderlyingStructProperty->CopyCompleteValue_InContainer(dest, IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate<void>(src.ReadConjugate()));
+	const FZSelfDescriptiveScriptStruct* sdss = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(src.ReadConjugate());
+	const UScriptStruct* scriptStruct = sdss->GetDescriptor();
+	check(scriptStruct == UnderlyingStructProperty->Struct);
+	if (void* unmanaged = sdss ? sdss->GetUnderlyingInstance() : nullptr)
+	{
+		UnderlyingStructProperty->CopyCompleteValue_InContainer(dest, unmanaged);
+	}
 }
 
 

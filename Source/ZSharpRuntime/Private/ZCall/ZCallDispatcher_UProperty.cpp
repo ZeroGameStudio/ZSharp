@@ -40,7 +40,8 @@ int32 ZSharp::FZCallDispatcher_UProperty::Dispatch(FZCallBuffer* buffer) const
 	}
 	else
 	{
-		self = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate<void>(buf[0].ReadConjugate());
+		const FZSelfDescriptiveScriptStruct* sdss = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(buf[0].ReadConjugate());
+		self = sdss ? sdss->GetUnderlyingInstance() : nullptr;
 	}
 
 	const bool write = buf[1].ReadBool();

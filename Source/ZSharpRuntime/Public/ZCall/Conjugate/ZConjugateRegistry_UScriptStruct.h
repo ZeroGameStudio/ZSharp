@@ -2,17 +2,17 @@
 
 #pragma once
 
+#include "SelfDescriptiveScriptStruct.h"
 #include "ZConjugateRegistryBase.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "Trait/ZConjugateRegistryId.h"
-#include "Trait/ZIsUScriptStruct.h"
 #include "ZCall/ZConjugateHandle.h"
 
 namespace ZSharp
 {
 	class IZMasterAssemblyLoadContext;
 	
-	class ZSHARPRUNTIME_API FZConjugateRegistry_UScriptStruct : public FZConjugateRegistryBase
+	class ZSHARPRUNTIME_API FZConjugateRegistry_UScriptStruct : public FZConjugateRegistryBase, FNoncopyable
 	{
 
 		using Super = FZConjugateRegistryBase;
@@ -24,9 +24,7 @@ namespace ZSharp
 	private:
 		struct FZConjugateRec
 		{
-			TStrongObjectPtr<UScriptStruct> ScriptStruct;
-			void* Instance;
-			bool bOwning;
+			TUniquePtr<FZSelfDescriptiveScriptStruct> ScriptStruct;
 			bool bBlack;
 		};
 
@@ -35,27 +33,7 @@ namespace ZSharp
 
 	public:
 		FZConjugateHandle Conjugate(const UScriptStruct* scriptStruct, const void* unmanaged, bool owning);
-		
-		template <typename T>
-		requires TZIsUScriptStruct_V<T> || std::is_same_v<T, void>
-		T* Conjugate(FZConjugateHandle handle)
-		{
-			const FZConjugateRec* rec = Conjugate(handle);
-			if (!rec)
-			{
-				return nullptr;
-			}
-			
-			if constexpr (std::is_same_v<T, void>)
-			{
-				return rec->Instance;
-			}
-			else
-			{
-				check(rec->ScriptStruct.Get() == TBaseStructure<T>::Get());
-				return static_cast<T*>(rec->Instance);
-			}
-		}
+		const FZSelfDescriptiveScriptStruct* Conjugate(FZConjugateHandle handle) const;
 
 	private:
 		virtual void* BuildConjugate(void* userdata) override;
@@ -63,7 +41,6 @@ namespace ZSharp
 		virtual void GetAllConjugates(TArray<void*>& outConjugates) const override;
 
 	private:
-		const FZConjugateRec* Conjugate(FZConjugateHandle handle);
 		FZRuntimeTypeHandle GetManagedType(const UScriptStruct* scriptStruct) const;
 		
 	private:

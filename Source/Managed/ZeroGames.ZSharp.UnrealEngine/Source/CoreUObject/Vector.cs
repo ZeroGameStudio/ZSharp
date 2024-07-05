@@ -5,7 +5,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public partial class Vector
 {
 
-	public Vector(double x, double y, double z)
+	public Vector(double x, double y, double z) : this()
 	{
 		X = x;
 		Y = y;

@@ -32,7 +32,7 @@ namespace ZeroGames.ZSharp.UnrealEngine;
  */
 public abstract class ExportedObjectBase : IConjugate
 {
-    
+
     public static IMasterAssemblyLoadContext GetOwningAlc()
     {
         Assembly asm = typeof(ExportedObjectBase).Assembly;
@@ -130,7 +130,7 @@ public abstract class ExportedObjectBase : IConjugate
         GCHandle.Free();
         Unmanaged = IConjugate.KDead;
     }
-
+    
     private readonly bool _managed;
     private bool _disposed;
 

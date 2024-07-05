@@ -43,9 +43,8 @@ namespace ZSharp
 	 * 
 	 * @tparam TImpl Implement type
 	 * @tparam TConjugate Conjugate type
-	 * @tparam TRec Conjugate record type
 	 */
-	template <typename TImpl, typename TConjugate, typename TRec = ZRegularConjugateRegistryBase_Private::TZConjugateRec<TConjugate>>
+	template <typename TImpl, typename TConjugate>
 	class TZRegularConjugateRegistryBase : public FZConjugateRegistryBase
 	{
 
@@ -53,7 +52,7 @@ namespace ZSharp
 		using Super = TZRegularConjugateRegistryBase;
 		using ThisClass = TImpl;
 		using ConjugateType = TConjugate;
-		using RecordType = TRec;
+		using RecordType = ZRegularConjugateRegistryBase_Private::TZConjugateRec<TConjugate>;
 
 	public:
 		static constexpr uint16 RegistryId = ZRegularConjugateRegistryBase_Private::GetConjugateId<TConjugate>();
@@ -66,14 +65,14 @@ namespace ZSharp
 		TConjugate* Conjugate(FZConjugateHandle handle) const
 		{
 			void* unmanaged = handle.Handle;
-			const TRec* rec = ConjugateMap.Find(unmanaged);
+			const RecordType* rec = ConjugateMap.Find(unmanaged);
 			return rec ? rec->TypedUnmanaged : nullptr;
 		}
 		
 		FZConjugateHandle Conjugate(const TConjugate* unmanaged, bool owning)
 		{
 			const auto mutableUnmanaged = const_cast<TConjugate*>(unmanaged);
-			if (const TRec* rec = ConjugateMap.Find(mutableUnmanaged))
+			if (const RecordType* rec = ConjugateMap.Find(mutableUnmanaged))
 			{
 				// This branch means conjugating an unmanaged object that doesn't owned by the caller.
 				check(!owning);
@@ -102,7 +101,7 @@ namespace ZSharp
 		
 		virtual void ReleaseConjugate(void* unmanaged) override
 		{
-			const TRec* rec = ConjugateMap.Find(unmanaged);
+			const RecordType* rec = ConjugateMap.Find(unmanaged);
 			if (!rec)
 			{
 				return;
@@ -133,7 +132,7 @@ namespace ZSharp
 		TImpl& AsImpl() { return *static_cast<TImpl*>(this); }
 
 	protected:
-		TMap<void*, TRec> ConjugateMap;
+		TMap<void*, RecordType> ConjugateMap;
 		
 	};
 }

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "SelfDescriptiveScriptStruct.h"
+#include "ZCall\Container\ZSelfDescriptiveScriptStruct.h"
 #include "ZConjugateRegistryBase.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "Trait/ZConjugateRegistryId.h"
@@ -45,7 +45,6 @@ namespace ZSharp
 		
 	private:
 		TMap<void*, FZConjugateRec> ConjugateMap;
-		
 	
 	};
 }

@@ -80,7 +80,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
 
     public int32 ZCall(ZCallHandle handle, ZCallBuffer* buffer) => ZCall_Black(handle, buffer);
     public ZCallHandle GetZCallHandle(string name) => GetZCallHandle_Black(name);
-    public IntPtr BuildConjugate(IConjugate managed, void* userdata) => BuildConjugate_Black(managed, userdata);
+    public IntPtr BuildConjugate(IConjugate managed, IntPtr userdata) => BuildConjugate_Black(managed, userdata);
     public void ReleaseConjugate(IntPtr unmanaged) => ReleaseConjugate_Black(unmanaged);
     
     public void PushPendingDisposeConjugate(IConjugate conjugate)
@@ -213,7 +213,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         }
     }
 
-    private IntPtr BuildConjugate_Black(IConjugate managed, void* userdata)
+    private IntPtr BuildConjugate_Black(IConjugate managed, IntPtr userdata)
     {
         uint16 registryId = GetTypeConjugateRegistryId(managed.GetType());
         if (registryId == 0)

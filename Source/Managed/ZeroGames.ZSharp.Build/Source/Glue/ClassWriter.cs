@@ -216,7 +216,8 @@ namespace {_exportedClass.Namespace};
 		{
 			StringBuilder body = new();
 
-			string? constructorDefault = _exportedClass.Class | _exportedClass.Interface ? null : $"\tpublic {_exportedClass.Name}(){{}}";
+			string userdata = _exportedClass.Struct ? "SStaticStruct.Unmanaged" : "IntPtr.Zero";
+			string? constructorDefault = _exportedClass.Class || _exportedClass.Interface ? null : $"\tpublic {_exportedClass.Name}(){{ Unmanaged = GetOwningAlc().BuildConjugate(this, {userdata}); }}";
 			string? methodBuildConjugate = _implementsBuildConjugate ? $"\tpublic new static {_exportedClass.Name} BuildConjugate(IntPtr unmanaged) => new(unmanaged);" : null;
 			string? constructorRed = _exportedClass.Interface ? null : $"\tprotected {_exportedClass.Name}(IntPtr unmanaged) : base(unmanaged){{}}";
 			string? constUnrealFieldPath = string.IsNullOrWhiteSpace(_exportedClass.UnrealFieldPath) ? null : $"\tprivate const string __kUnrealFieldPath = \"{_exportedClass.UnrealFieldPath}\";";

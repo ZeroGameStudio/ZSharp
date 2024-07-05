@@ -16,9 +16,8 @@ namespace ZSharp
 	ZSHARP_STATIC_EXPORT_ZCALL(UObject::GetClass)
 	ZSHARP_STATIC_EXPORT_ZCALL(UObject::GetOuter)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(ZCallExport_Object_Private::GetName, UObject::GetName)
-
-	static TZStaticExportZCall<decltype(&ZCallExport_Object_Private::LowLevelFindObject), &ZCallExport_Object_Private::LowLevelFindObject> LowLevelFindObject { "ex://UObjectGlobals.LowLevelFindObject" };
-	static TZStaticExportZCall<decltype(&ZCallExport_Object_Private::FindObject), &ZCallExport_Object_Private::FindObject> FindObject { "ex://UObjectGlobals.FindObject" };
+	ZSHARP_STATIC_EXPORT_ZCALL_EX(ZCallExport_Object_Private::LowLevelFindObject, _UObjectGlobals::LowLevelFindObject)
+	ZSHARP_STATIC_EXPORT_ZCALL_EX(ZCallExport_Object_Private::FindObject, _UObjectGlobals::FindObject)
 }
 
 

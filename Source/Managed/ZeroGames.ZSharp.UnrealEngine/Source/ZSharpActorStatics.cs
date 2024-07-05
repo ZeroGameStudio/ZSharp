@@ -14,28 +14,33 @@ public static class ZSharpActorStatics
     [ZCall]
     public static void Tick(UnrealObject actor, float deltaTime)
     {
-        PlainExportedObjectBase? o = new Random().Next(0, 10) switch
-        {
-            1 => new UnrealString(),
-            2 => new UnrealName(),
-            3 => new UnrealText(),
-            4 => new WeakObjectPtr(),
-            5 => new SoftObjectPtr(),
-            6 => new LazyObjectPtr(),
-            7 => new StrongObjectPtr(),
-            8 => new SoftClassPtr(),
-            9 => new ScriptInterface(),
-            _ => null,
-        };
-
-        Character? mainPlayer = GameplayStatics.GetPlayerCharacter(actor, 0);
-        CharacterMovementComponent? cmc = mainPlayer?.CharacterMovement;
-        mainPlayer?.Jump();
-        if (cmc is not null)
-        {
-            cmc.MaxWalkSpeed = new Random().NextSingle() * 500 + 500; 
-        }
-
+        UnrealArray<int32> arr = new();
+        arr.InsertAt(0);
+        arr[0] = 100;
+        Logger.Log($"arr[0]: {arr[0]}    #arr: {arr.Count}");
+        
+        // PlainExportedObjectBase? o = new Random().Next(0, 10) switch
+        // {
+        //     1 => new UnrealString(),
+        //     2 => new UnrealName(),
+        //     3 => new UnrealText(),
+        //     4 => new WeakObjectPtr(),
+        //     5 => new SoftObjectPtr(),
+        //     6 => new LazyObjectPtr(),
+        //     7 => new StrongObjectPtr(),
+        //     8 => new SoftClassPtr(),
+        //     9 => new ScriptInterface(),
+        //     _ => null,
+        // };
+        //
+        // Character? mainPlayer = GameplayStatics.GetPlayerCharacter(actor, 0);
+        // CharacterMovementComponent? cmc = mainPlayer?.CharacterMovement;
+        // mainPlayer?.Jump();
+        // if (cmc is not null)
+        // {
+        //     cmc.MaxWalkSpeed = new Random().NextSingle() * 500 + 500; 
+        // }
+        //
         // Random r = new();
         // mainPlayer?.SetActorLocation(new(r.NextDouble() * 500, r.NextDouble() * 500, r.NextDouble() * 500), false, out var hr, true);
     }

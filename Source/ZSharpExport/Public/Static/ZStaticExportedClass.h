@@ -53,9 +53,10 @@ namespace ZSharp
 	};
 }
 
-#define ZSHARP_DECLARE_EXPORTED_CLASS(Class, Name, Module) \
+#define ZSHARP_DECLARE_EXPORTED_CLASS(Class, Name, Module, RegistryId) \
 ZSHARP_EXPORT_TYPE_NAME_EX(Class, Name) \
-ZSHARP_EXPORT_TYPE_MODULE(Class, Module)
+ZSHARP_EXPORT_TYPE_MODULE(Class, Module) \
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(Class, RegistryId)
 
 #define ZSHARP_BEGIN_EXPORT_CLASS(Class) \
 namespace __ZSharpExport_Private \

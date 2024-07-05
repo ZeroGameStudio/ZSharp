@@ -4,6 +4,7 @@
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
+#include "Conjugate/ZConjugateRegistry_Array.h"
 #include "Conjugate/ZRegularConjugateRegistries.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Conjugate/ZConjugateRegistry_UScriptStruct.h"
@@ -192,6 +193,15 @@ namespace ZSharp
 		static void EncodeRet(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(new FString { value }, true)); }
 		static DecodedType& Decode(const FZCallBufferSlot& slot) { return *IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(slot.ReadConjugate()); }
 		static DecodedType* DecodeThis(const FZCallBufferSlot& slot) { return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(slot.ReadConjugate()); }
+	};
+
+	template <>
+	struct TZCallBufferSlotEncoder<FZSelfDescriptiveScriptArray>
+	{
+		using DecodedType = FZSelfDescriptiveScriptArray;
+		// Containers cannot be output value so there is no Encode function.
+		static DecodedType& Decode(const FZCallBufferSlot& slot) { return *IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Array>().Conjugate(slot.ReadConjugate()); }
+		static DecodedType* DecodeThis(const FZCallBufferSlot& slot) { return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Array>().Conjugate(slot.ReadConjugate()); }
 	};
 	
 	template <typename... TArgs>

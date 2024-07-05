@@ -5,7 +5,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.Core;
 public partial class UnrealString
 {
 
-    public UnrealString(string content) => Data = content;
+    public UnrealString(string content) : this() => Data = content;
 
     public override string ToString() => Data;
 

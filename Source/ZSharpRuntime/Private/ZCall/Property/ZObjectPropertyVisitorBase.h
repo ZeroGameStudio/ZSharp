@@ -17,7 +17,7 @@ namespace ZSharp
 		virtual bool IsValueSemantics() const override { return false; }
 
 	public:
-		virtual void GetValue_InContainer(const void* src, FZCallBufferSlot& dest) const override { GetRef_InContainer(src, dest); }
+		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override { GetRef(src, dest); }
 		
 	};
 }

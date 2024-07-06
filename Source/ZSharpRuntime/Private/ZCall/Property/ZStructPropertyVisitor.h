@@ -14,9 +14,9 @@ namespace ZSharp
 			, UnderlyingStructProperty(underlyingProperty){}
 
 	public:
-		virtual void GetValue_InContainer(const void* src, FZCallBufferSlot& dest) const override;
-		virtual void GetRef_InContainer(const void* src, FZCallBufferSlot& dest) const override;
-		virtual void SetValue_InContainer(void* dest, const FZCallBufferSlot& src) const override;
+		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override;
+		virtual void GetRef(const void* src, FZCallBufferSlot& dest) const override;
+		virtual void SetValue(void* dest, const FZCallBufferSlot& src) const override;
 
 	private:
 		const FStructProperty* UnderlyingStructProperty;

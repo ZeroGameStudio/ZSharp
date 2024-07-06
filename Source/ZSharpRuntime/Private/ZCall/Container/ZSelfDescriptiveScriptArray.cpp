@@ -5,6 +5,7 @@
 
 ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const FProperty* elementProperty)
 	: ElementProperty(elementProperty)
+	, ElementPropertyVisitor(IZPropertyVisitor::Create(elementProperty))
 	, UnderlyingInstance(new FScriptArray)
 	, bOwning(true)
 {
@@ -12,6 +13,7 @@ ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const FProper
 
 ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const FProperty* elementProperty, FScriptArray* underlyingInstance, bool owning)
 	: ElementProperty(elementProperty)
+	, ElementPropertyVisitor(IZPropertyVisitor::Create(elementProperty))
 	, UnderlyingInstance(underlyingInstance)
 	, bOwning(owning)
 {
@@ -53,16 +55,18 @@ void ZSharp::FZSelfDescriptiveScriptArray::RemoveAt(int32 index)
 	helper.RemoveValues(index);
 }
 
-void* ZSharp::FZSelfDescriptiveScriptArray::Get(int32 index) const
+void ZSharp::FZSelfDescriptiveScriptArray::Get(int32 index, FZCallBufferSlot& dest) const
 {
 	FScriptArrayHelper helper = GetHelper();
-	return helper.GetElementPtr(index);
+	const void* src = helper.GetElementPtr(index);
+	ElementPropertyVisitor->GetValue(src, dest);
 }
 
-void ZSharp::FZSelfDescriptiveScriptArray::Set(int32 index, const void* item)
+void ZSharp::FZSelfDescriptiveScriptArray::Set(int32 index, const FZCallBufferSlot& src)
 {
 	FScriptArrayHelper helper = GetHelper();
-	ElementProperty->CopyCompleteValue(helper.GetElementPtr(index), item);
+	void* dest = helper.GetElementPtr(index);
+	ElementPropertyVisitor->SetValue(dest, src);
 }
 
 int32 ZSharp::FZSelfDescriptiveScriptArray::Num() const

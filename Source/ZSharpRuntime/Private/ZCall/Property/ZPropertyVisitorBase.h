@@ -21,7 +21,10 @@ namespace ZSharp
 		virtual bool IsValueSemantics() const override { return true; }
 		
 	public:
-		virtual void InitializeValue_InContainer(void* dest) const override;
+		virtual void InitializeValue(void* dest) const override;
+
+	protected:
+		virtual const FProperty* GetUnderlyingProperty() const override { return UnderlyingProperty; }
 
 	protected:
 		const FProperty* UnderlyingProperty;

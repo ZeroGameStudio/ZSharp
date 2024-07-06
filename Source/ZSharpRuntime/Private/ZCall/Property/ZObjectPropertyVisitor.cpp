@@ -5,15 +5,15 @@
 
 #include "ZCall/ZCallBufferSlotEncoder.h"
 
-void ZSharp::FZObjectPropertyVisitor::GetRef_InContainer(const void* src, FZCallBufferSlot& dest) const
+void ZSharp::FZObjectPropertyVisitor::GetRef(const void* src, FZCallBufferSlot& dest) const
 {
-	TZCallBufferSlotEncoder<UObject*>::Encode(UnderlyingObjectProperty->GetObjectPropertyValue_InContainer(src), dest);
+	TZCallBufferSlotEncoder<UObject*>::Encode(UnderlyingObjectProperty->GetObjectPropertyValue(src), dest);
 }
 
-void ZSharp::FZObjectPropertyVisitor::SetValue_InContainer(void* dest, const FZCallBufferSlot& src) const
+void ZSharp::FZObjectPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const
 {
 	UObject* value = TZCallBufferSlotEncoder<UObject*>::Decode(src);
-	UnderlyingProperty->SetValue_InContainer(dest, &value);
+	UnderlyingProperty->CopyCompleteValue(dest, &value);
 }
 
 

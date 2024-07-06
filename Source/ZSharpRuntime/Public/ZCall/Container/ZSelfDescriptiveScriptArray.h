@@ -2,8 +2,12 @@
 
 #pragma once
 
+#include "ZCall/Property/IZPropertyVisitor.h"
+
 namespace ZSharp
 {
+	struct FZCallBufferSlot;
+	
 	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptArray
 	{
 
@@ -18,8 +22,8 @@ namespace ZSharp
 
 		void InsertAt(int32 index);
 		void RemoveAt(int32 index);
-		void* Get(int32 index) const;
-		void Set(int32 index, const void* item);
+		void Get(int32 index, FZCallBufferSlot& dest) const;
+		void Set(int32 index, const FZCallBufferSlot& src);
 
 		int32 Num() const;
 
@@ -35,6 +39,7 @@ namespace ZSharp
 	private:
 		TStrongObjectPtr<UStruct> GCRoot;
 		const FProperty* ElementProperty;
+		TUniquePtr<IZPropertyVisitor> ElementPropertyVisitor;
 		FScriptArray* UnderlyingInstance;
 		bool bOwning;
 		

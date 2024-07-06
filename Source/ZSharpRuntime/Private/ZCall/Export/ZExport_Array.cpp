@@ -14,9 +14,9 @@ namespace ZSharp
 	static FZStaticExportZCall GGet { "ex://Array.Get", [](FZCallBuffer* buffer)
 	{
 		FZCallBuffer& buf = *buffer;
-		FZSelfDescriptiveScriptArray* sdsa = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Array>().Conjugate(buf[0].ReadConjugate());
+		FZSelfDescriptiveScriptArray& sdsa = TZCallBufferSlotEncoder<FZSelfDescriptiveScriptArray>::Decode(buf[0]);
 		int32 index = buf[1].ReadInt32();
-		buf[2].WriteInt32(*(int32*)sdsa->Get(index));
+		sdsa.Get(index, buf[2]);
 		
 		return 0;
 	}};
@@ -24,10 +24,9 @@ namespace ZSharp
 	static FZStaticExportZCall GSet { "ex://Array.Set", [](FZCallBuffer* buffer)
 	{
 		FZCallBuffer& buf = *buffer;
-		FZSelfDescriptiveScriptArray* sdsa = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Array>().Conjugate(buf[0].ReadConjugate());
+		FZSelfDescriptiveScriptArray& sdsa = TZCallBufferSlotEncoder<FZSelfDescriptiveScriptArray>::Decode(buf[0]);
 		int32 index = buf[1].ReadInt32();
-		int32 value = buf[2].ReadInt32();
-		sdsa->Set(index, &value);
+		sdsa.Set(index, buf[2]);
 		
 		return 0;
 	}};

@@ -17,9 +17,9 @@ namespace ZSharp
 		virtual bool IsPrimitive() const override { return true; }
 
 	public:
-		virtual void GetValue_InContainer(const void* src, FZCallBufferSlot& dest) const override;
-		virtual void GetRef_InContainer(const void* src, FZCallBufferSlot& dest) const override { GetValue_InContainer(src, dest); }
-		virtual void SetValue_InContainer(void* dest, const FZCallBufferSlot& src) const override;
+		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override;
+		virtual void GetRef(const void* src, FZCallBufferSlot& dest) const override { GetValue(src, dest); }
+		virtual void SetValue(void* dest, const FZCallBufferSlot& src) const override;
 		
 	};
 }

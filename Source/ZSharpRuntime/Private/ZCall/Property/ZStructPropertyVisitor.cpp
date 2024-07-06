@@ -11,13 +11,16 @@
 void ZSharp::FZStructPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const
 {
 	const FZSelfDescriptiveScriptStruct* sdss = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(dest.ReadConjugate());
-	const UScriptStruct* scriptStruct = sdss->GetDescriptor();
-	check(scriptStruct == UnderlyingStructProperty->Struct);
+	const UScriptStruct* scriptStruct = UnderlyingStructProperty->Struct;
 	void* unmanaged = sdss ? sdss->GetUnderlyingInstance() : nullptr;
 	if (!unmanaged)
 	{
 		unmanaged = FMemory::Malloc(scriptStruct->GetStructureSize(), scriptStruct->GetMinAlignment());
 		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(scriptStruct, unmanaged, true));
+	}
+	else
+	{
+		check(sdss->GetDescriptor() == scriptStruct);
 	}
 	scriptStruct->CopyScriptStruct(unmanaged, src);
 }

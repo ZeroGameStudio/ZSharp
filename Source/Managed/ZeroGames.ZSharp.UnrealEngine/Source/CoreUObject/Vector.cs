@@ -12,6 +12,11 @@ public partial class Vector
 		Z = z;
 	}
 
+	public override string ToString()
+	{
+		return $"Vector {{ X={X}, Y={Y}, Z={Z} }}";
+	}
+
 	public unsafe double X
 	{
 		get

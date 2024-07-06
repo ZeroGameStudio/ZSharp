@@ -14,10 +14,13 @@ public static class ZSharpActorStatics
     [ZCall]
     public static void Tick(UnrealObject actor, float deltaTime)
     {
-        UnrealArray<int32> arr = new();
-        arr.InsertAt(0);
-        arr[0] = 100;
-        Logger.Log($"arr[0]: {arr[0]}    #arr: {arr.Count}");
+        for (int i = 0; i < 100; ++i)
+        {
+            UnrealArray<Vector> arr = new();
+            arr.InsertAt(0);
+            arr[0] = new(100, 200, 300);
+            // Logger.Log($"arr[0]: {arr[0]}    #arr: {arr.Count}");
+        }
         
         PlainExportedObjectBase? o = new Random().Next(0, 10) switch
         {

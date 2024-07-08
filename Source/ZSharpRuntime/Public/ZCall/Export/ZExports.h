@@ -18,6 +18,8 @@ ZSHARP_DECLARE_EXPORTED_CLASS(FStrongObjectPtr, StrongObjectPtr, CoreUObject, 24
 ZSHARP_DECLARE_EXPORTED_CLASS(FSoftClassPtr, SoftClassPtr, CoreUObject, 25)
 ZSHARP_DECLARE_EXPORTED_CLASS(FScriptInterface, ScriptInterface, CoreUObject, 26)
 
+ZSHARP_DECLARE_EXPORTED_CLASS(FFieldPath, ScriptInterface, CoreUObject, 9)
+
 ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveScriptArray, 31)
 
 

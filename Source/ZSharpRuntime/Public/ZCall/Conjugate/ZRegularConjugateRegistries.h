@@ -27,6 +27,8 @@ namespace ZSharp
 	DECLARE_REGISTRY(SoftClassPtr)
 	DECLARE_REGISTRY(ScriptInterface)
 
+	DECLARE_REGISTRY(FieldPath)
+
 #undef DECLARE_REGISTRY
 }
 

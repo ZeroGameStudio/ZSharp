@@ -185,15 +185,31 @@ namespace ZSharp
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadBool(); }
 	};
 
-	template <>
-	struct TZCallBufferSlotEncoder<FString>
-	{
-		using DecodedType = FString;
-		static void Encode(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(&value, false)); }
-		static void EncodeRet(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(new FString { value }, true)); }
-		static DecodedType& Decode(const FZCallBufferSlot& slot) { return *IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(slot.ReadConjugate()); }
-		static DecodedType* DecodeThis(const FZCallBufferSlot& slot) { return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(slot.ReadConjugate()); }
+#define IMPLEMENT_REGULAR_ENCODER(Type) \
+	template <> \
+	struct TZCallBufferSlotEncoder<F##Type> \
+	{ \
+		using DecodedType = F##Type; \
+		static void Encode(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_##Type>().Conjugate(&value, false)); } \
+		static void EncodeRet(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_##Type>().Conjugate(new F##Type { value }, true)); } \
+		static DecodedType& Decode(const FZCallBufferSlot& slot) { return *IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_##Type>().Conjugate(slot.ReadConjugate()); } \
+		static DecodedType* DecodeThis(const FZCallBufferSlot& slot) { return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_##Type>().Conjugate(slot.ReadConjugate()); } \
 	};
+
+	IMPLEMENT_REGULAR_ENCODER(String)
+	IMPLEMENT_REGULAR_ENCODER(Name)
+	IMPLEMENT_REGULAR_ENCODER(Text)
+
+	IMPLEMENT_REGULAR_ENCODER(SoftObjectPtr)
+	IMPLEMENT_REGULAR_ENCODER(WeakObjectPtr)
+	IMPLEMENT_REGULAR_ENCODER(LazyObjectPtr)
+	IMPLEMENT_REGULAR_ENCODER(StrongObjectPtr)
+	IMPLEMENT_REGULAR_ENCODER(SoftClassPtr)
+	IMPLEMENT_REGULAR_ENCODER(ScriptInterface)
+
+	IMPLEMENT_REGULAR_ENCODER(FieldPath)
+
+#undef IMPLEMENT_REGULAR_ENCODER
 
 	template <>
 	struct TZCallBufferSlotEncoder<FZSelfDescriptiveScriptArray>

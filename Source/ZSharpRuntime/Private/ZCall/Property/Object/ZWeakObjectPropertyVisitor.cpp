@@ -12,8 +12,16 @@ void ZSharp::FZWeakObjectPropertyVisitor::GetRef(const void* src, FZCallBufferSl
 
 void ZSharp::FZWeakObjectPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const
 {
-	const FWeakObjectPtr& value = TZCallBufferSlotEncoder<FWeakObjectPtr>::Decode(src);
-	check(value.IsExplicitlyNull() || value.Get()->IsA(UnderlyingObjectProperty->PropertyClass));
+	static const FWeakObjectPtr GDefault{};
+	
+	const FWeakObjectPtr* value = TZCallBufferSlotEncoder<FWeakObjectPtr>::DecodePointer(src);
+	if (!value)
+	{
+		UnderlyingProperty->CopySingleValue(dest, &GDefault);
+		return;
+	}
+	
+	check(value->IsExplicitlyNull() || value->Get()->IsA(UnderlyingObjectProperty->PropertyClass));
 	UnderlyingProperty->CopySingleValue(dest, &value);
 }
 

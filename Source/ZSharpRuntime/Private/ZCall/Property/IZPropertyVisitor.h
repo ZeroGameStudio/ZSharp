@@ -16,10 +16,6 @@ namespace ZSharp
 		virtual ~IZPropertyVisitor(){}
 
 	public:
-		virtual bool IsPrimitive() const = 0;
-		virtual bool IsValueSemantics() const = 0;
-
-	public:
 		virtual void InitializeValue(void* dest) const = 0;
 		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const = 0;
 		virtual void GetRef(const void* src, FZCallBufferSlot& dest) const = 0;
@@ -30,8 +26,6 @@ namespace ZSharp
 		T* ContainerPtrToValuePtr(const void* container, int32 index) const { return const_cast<T*>(GetUnderlyingProperty()->ContainerPtrToValuePtr<T>(container, index)); }
 
 	public:
-		bool IsObjectSemantics() const { return !IsValueSemantics(); }
-
 		void InitializeValue_InContainer(void* dest) const { InitializeValue(ContainerPtrToValuePtr(dest, 0)); }
 		void GetValue_InContainer(const void* src, FZCallBufferSlot& dest, int32 index) const { GetValue(ContainerPtrToValuePtr(src, index), dest); }
 		void GetRef_InContainer(const void* src, FZCallBufferSlot& dest, int32 index) const { GetRef(ContainerPtrToValuePtr(src, index), dest); }

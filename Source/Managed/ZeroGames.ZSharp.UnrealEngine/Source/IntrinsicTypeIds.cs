@@ -27,6 +27,8 @@ public static class IntrinsicTypeIds
 	public const IntPtr KSoftClassPtr = 18;
 	public const IntPtr KScriptInterface = 19;
 
+	public const IntPtr KFieldPath = 20;
+
 	public static Dictionary<Type, IntPtr> STypeMap => new()
 	{
 		{ typeof(uint8), KUInt8 },
@@ -50,6 +52,8 @@ public static class IntrinsicTypeIds
 		{ typeof(LazyObjectPtr), KLazyObjectPtr },
 		{ typeof(SoftClassPtr), KSoftClassPtr },
 		{ typeof(ScriptInterface), KScriptInterface },
+		
+		{ typeof(FieldPath), KFieldPath },
 	};
 }
 

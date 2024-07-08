@@ -20,6 +20,6 @@
 // }
 
 ZSHARP_BEGIN_EXPORT_CLASS(FLazyObjectPtr)
-ZSHARP_END_EXPORT_Class(FLazyObjectPtr)
+ZSHARP_END_EXPORT_CLASS(FLazyObjectPtr)
 
 

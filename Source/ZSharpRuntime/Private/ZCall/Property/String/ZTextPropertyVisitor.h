@@ -1,17 +1,18 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 #pragma once
-#include "ZPropertyVisitorBase.h"
+
+#include "ZCall/Property/ZPropertyVisitorBase.h"
 
 namespace ZSharp
 {
-	class FZStructPropertyVisitor final : public FZPropertyVisitorBase
+	class FZTextPropertyVisitor : public FZPropertyVisitorBase
 	{
 
 	public:
-		explicit FZStructPropertyVisitor(const FStructProperty* underlyingProperty)
+		explicit FZTextPropertyVisitor(const FTextProperty* underlyingProperty)
 			: FZPropertyVisitorBase(underlyingProperty)
-			, UnderlyingStructProperty(underlyingProperty){}
+			, UnderlyingTextProperty(underlyingProperty){}
 
 	public:
 		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override;
@@ -19,7 +20,7 @@ namespace ZSharp
 		virtual void SetValue(void* dest, const FZCallBufferSlot& src) const override;
 
 	private:
-		const FStructProperty* UnderlyingStructProperty;
+		const FTextProperty* UnderlyingTextProperty;
 		
 	};
 }

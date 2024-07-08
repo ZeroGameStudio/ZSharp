@@ -17,10 +17,6 @@ namespace ZSharp
 			: UnderlyingProperty(underlyingProperty){}
 
 	public:
-		virtual bool IsPrimitive() const override { return false; }
-		virtual bool IsValueSemantics() const override { return true; }
-		
-	public:
 		virtual void InitializeValue(void* dest) const override;
 
 	protected:

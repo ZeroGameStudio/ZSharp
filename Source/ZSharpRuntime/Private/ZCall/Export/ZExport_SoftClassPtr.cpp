@@ -20,6 +20,6 @@
 // }
 
 ZSHARP_BEGIN_EXPORT_CLASS(FSoftClassPtr)
-ZSHARP_END_EXPORT_Class(FSoftClassPtr)
+ZSHARP_END_EXPORT_CLASS(FSoftClassPtr)
 
 

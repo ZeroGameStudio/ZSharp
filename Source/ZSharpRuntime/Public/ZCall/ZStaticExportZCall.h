@@ -62,7 +62,7 @@ namespace ZSharp
 			{
 				FZCallBuffer& buf = *buffer;
 
-				TThis* pThis = TZCallBufferSlotEncoder<TThis>::DecodeThis(buf[0]);
+				TThis* pThis = TZCallBufferSlotEncoder<TThis>::DecodePointer(buf[0]);
 				TTuple<TArgs...> args { TZCallBufferSlotEncoder<std::decay_t<TArgs>>::Decode(buf[Indices + 1])... };
 				if constexpr (std::is_same_v<TRet, void>)
 				{
@@ -94,7 +94,7 @@ namespace ZSharp
 			{
 				FZCallBuffer& buf = *buffer;
 
-				TThis* pThis = TZCallBufferSlotEncoder<TThis>::DecodeThis(buf[0]);
+				TThis* pThis = TZCallBufferSlotEncoder<TThis>::DecodePointer(buf[0]);
 				TTuple<TArgs...> args { TZCallBufferSlotEncoder<std::decay_t<TArgs>>::Decode(buf[Indices + 1])... };
 				if constexpr (std::is_same_v<TRet, void>)
 				{

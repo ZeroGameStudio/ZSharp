@@ -27,6 +27,8 @@ namespace ZSharp::PropertyFactory_Private
 	static const void* GLazyObjectPtrTypeId = reinterpret_cast<void*>(17);
 	static const void* GSoftClassPtrTypeId = reinterpret_cast<void*>(18);
 	static const void* GScriptInterfaceTypeId = reinterpret_cast<void*>(19);
+	
+	static const void* GFieldPathTypeId = reinterpret_cast<void*>(19);
 
 	template <std::derived_from<FProperty> T>
 	T* Create(EPropertyFlags flags)
@@ -61,6 +63,8 @@ namespace ZSharp::PropertyFactory_Private
 		{ GLazyObjectPtrTypeId, [](const FZPropertyDesc&){ return Create<FLazyObjectProperty>(CPF_IsPlainOldData | CPF_NoDestructor | CPF_UObjectWrapper | CPF_HasGetValueTypeHash); } },
 		{ GSoftClassPtrTypeId, [](const FZPropertyDesc&){ return Create<FSoftClassProperty>(CPF_UObjectWrapper | CPF_HasGetValueTypeHash); } },
 		{ GScriptInterfaceTypeId, [](const FZPropertyDesc&){ return Create<FInterfaceProperty>(PrimitiveFlags | CPF_UObjectWrapper); } },
+
+		{ GFieldPathTypeId, [](const FZPropertyDesc&){ return Create<FFieldPathProperty>(CPF_HasGetValueTypeHash); } },
 	};
 }
 

@@ -20,6 +20,6 @@
 // }
 
 ZSHARP_BEGIN_EXPORT_CLASS(FScriptInterface)
-ZSHARP_END_EXPORT_Class(FScriptInterface)
+ZSHARP_END_EXPORT_CLASS(FScriptInterface)
 
 

@@ -20,6 +20,6 @@
 // }
 
 ZSHARP_BEGIN_EXPORT_CLASS(FWeakObjectPtr)
-ZSHARP_END_EXPORT_Class(FWeakObjectPtr)
+ZSHARP_END_EXPORT_CLASS(FWeakObjectPtr)
 
 

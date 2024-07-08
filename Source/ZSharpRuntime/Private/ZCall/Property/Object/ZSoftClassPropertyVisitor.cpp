@@ -13,8 +13,16 @@ void ZSharp::FZSoftClassPropertyVisitor::GetRef(const void* src, FZCallBufferSlo
 
 void ZSharp::FZSoftClassPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const
 {
-	const FSoftClassPtr& value = TZCallBufferSlotEncoder<FSoftClassPtr>::Decode(src);
-	check(value.IsNull() || value.LoadSynchronous()->IsChildOf(UnderlyingClassProperty->MetaClass));
+	static const FSoftClassPtr GDefault{};
+	
+	const FSoftClassPtr* value = TZCallBufferSlotEncoder<FSoftClassPtr>::DecodePointer(src);
+	if (!value)
+	{
+		UnderlyingProperty->CopySingleValue(dest, &GDefault);
+		return;
+	}
+	
+	check(value->IsNull() || value->LoadSynchronous()->IsChildOf(UnderlyingClassProperty->MetaClass));
 	UnderlyingProperty->CopySingleValue(dest, &value);
 }
 

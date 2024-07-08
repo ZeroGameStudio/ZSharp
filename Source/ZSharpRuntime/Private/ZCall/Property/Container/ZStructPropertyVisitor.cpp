@@ -16,6 +16,7 @@ void ZSharp::FZStructPropertyVisitor::GetValue(const void* src, FZCallBufferSlot
 	if (!unmanaged)
 	{
 		unmanaged = FMemory::Malloc(scriptStruct->GetStructureSize(), scriptStruct->GetMinAlignment());
+		scriptStruct->InitializeStruct(unmanaged);
 		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(scriptStruct, unmanaged, true));
 	}
 	else
@@ -34,9 +35,18 @@ void ZSharp::FZStructPropertyVisitor::GetRef(const void* src, FZCallBufferSlot& 
 void ZSharp::FZStructPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const
 {
 	const FZSelfDescriptiveScriptStruct* sdss = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(src.ReadConjugate());
+	if (!sdss)
+	{
+		const UScriptStruct* scriptStruct = UnderlyingStructProperty->Struct;
+		void* unmanaged = FMemory_Alloca_Aligned(scriptStruct->GetStructureSize(), scriptStruct->GetMinAlignment());
+		scriptStruct->InitializeStruct(unmanaged);
+		UnderlyingStructProperty->CopySingleValue(dest, unmanaged);
+		return;
+	}
+	
 	const UScriptStruct* scriptStruct = sdss->GetDescriptor();
 	check(scriptStruct == UnderlyingStructProperty->Struct);
-	if (void* unmanaged = sdss ? sdss->GetUnderlyingInstance() : nullptr)
+	if (const void* unmanaged = sdss->GetUnderlyingInstance())
 	{
 		UnderlyingStructProperty->CopySingleValue(dest, unmanaged);
 	}

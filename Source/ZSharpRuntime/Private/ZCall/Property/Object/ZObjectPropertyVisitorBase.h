@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ZPropertyVisitorBase.h"
+#include "ZCall/Property/ZPropertyVisitorBase.h"
 
 namespace ZSharp
 {
@@ -12,9 +12,6 @@ namespace ZSharp
 	public:
 		explicit FZObjectPropertyVisitorBase(const FProperty* underlyingProperty)
 			: FZPropertyVisitorBase(underlyingProperty){}
-
-	public:
-		virtual bool IsValueSemantics() const override final { return false; }
 
 	public:
 		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override final { GetRef(src, dest); }

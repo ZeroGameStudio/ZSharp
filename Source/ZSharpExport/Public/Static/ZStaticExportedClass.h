@@ -68,7 +68,7 @@ namespace __ZSharpExport_Private \
 		explicit __FZStaticExportedClass_##Class(const FZFinalizer& finalizer) : ZSharp::TZStaticExportedClass<Class>(false, finalizer) \
 		{
 
-#define ZSHARP_END_EXPORT_Class(Class) \
+#define ZSHARP_END_EXPORT_CLASS(Class) \
 			static_assert(std::is_same_v<ThisClass, __FZStaticExportedClass_##Class>, "Class name doesn't match between BEGIN_EXPORT and END_EXPORT!"); \
 		} \
 	} __GExportedClass_##Class { { &__GExportedClass_##Class } }; \

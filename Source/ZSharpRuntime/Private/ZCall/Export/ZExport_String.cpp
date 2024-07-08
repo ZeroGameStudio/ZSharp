@@ -20,6 +20,6 @@ namespace ZSharp
 }
 
 ZSHARP_BEGIN_EXPORT_CLASS(FString)
-ZSHARP_END_EXPORT_Class(FString)
+ZSHARP_END_EXPORT_CLASS(FString)
 
 

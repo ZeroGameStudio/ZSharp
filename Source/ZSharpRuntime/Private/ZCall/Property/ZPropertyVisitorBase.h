@@ -24,7 +24,7 @@ namespace ZSharp
 		virtual void InitializeValue(void* dest) const override;
 
 	protected:
-		virtual const FProperty* GetUnderlyingProperty() const override { return UnderlyingProperty; }
+		virtual const FProperty* GetUnderlyingProperty() const override final { return UnderlyingProperty; }
 
 	protected:
 		const FProperty* UnderlyingProperty;

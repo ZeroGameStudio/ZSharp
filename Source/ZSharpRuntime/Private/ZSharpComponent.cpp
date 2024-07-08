@@ -1,19 +1,23 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZSharpActor.h"
+#include "ZSharpComponent.h"
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "ZCall/ZCallBuffer.h"
 #include "ZCall/Conjugate/ZConjugateRegistry_UObject.h"
 
-AZSharpActor::AZSharpActor()
+UZSharpComponent::UZSharpComponent()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = true;
+
+	BeginPlayZCall.MethodName = "BeginPlay";
+	EndPlayZCall.MethodName = "EndPlay";
+	TickZCall.MethodName = "Tick";
 }
 
-void AZSharpActor::BeginPlay()
+void UZSharpComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -23,12 +27,12 @@ void AZSharpActor::BeginPlay()
 		alc->PrepareForZCall();
 		ZSHARP_STACK_ALLOC_ZCALL_BUFFER(ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UObject>().Conjugate(this)));
 
-		ZSharp::FZCallHandle handle = alc->GetZCallHandle("m://ZeroGames.ZSharp.UnrealEngine:ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics:BeginPlay");
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle(*BeginPlayZCall);
 		alc->ZCall(handle, &buffer);
 	}
 }
 
-void AZSharpActor::EndPlay(const EEndPlayReason::Type endPlayReason)
+void UZSharpComponent::EndPlay(const EEndPlayReason::Type endPlayReason)
 {
 	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
 	if (alc)
@@ -36,16 +40,16 @@ void AZSharpActor::EndPlay(const EEndPlayReason::Type endPlayReason)
 		alc->PrepareForZCall();
 		ZSHARP_STACK_ALLOC_ZCALL_BUFFER(ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UObject>().Conjugate(this)));
 
-		ZSharp::FZCallHandle handle = alc->GetZCallHandle("m://ZeroGames.ZSharp.UnrealEngine:ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics:EndPlay");
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle(*EndPlayZCall);
 		alc->ZCall(handle, &buffer);
 	}
 	
 	Super::EndPlay(endPlayReason);
 }
 
-void AZSharpActor::Tick(float deltaTime)
+void UZSharpComponent::TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction)
 {
-	Super::Tick(deltaTime);
+	Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
 	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
 	if (alc)
@@ -55,9 +59,7 @@ void AZSharpActor::Tick(float deltaTime)
 			ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UObject>().Conjugate(this)),
 			ZSharp::FZCallBufferSlot::FromFloat(deltaTime));
 
-		ZSharp::FZCallHandle handle = alc->GetZCallHandle("m://ZeroGames.ZSharp.UnrealEngine:ZeroGames.ZSharp.UnrealEngine.ZSharpActorStatics:Tick");
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle(*TickZCall);
 		alc->ZCall(handle, &buffer);
 	}
 }
-
-

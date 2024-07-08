@@ -15,11 +15,12 @@ public static class UObjectGlobals
 			ZCallBufferSlot.FromConjugate(outer),
 			ZCallBufferSlot.FromConjugate(new UnrealString(path)),
 			ZCallBufferSlot.FromBool(exactClass),
-			ZCallBufferSlot.FromConjugate(null),
+			ZCallBufferSlot.FromConjugate(),
 		};
 		ZCallBuffer buffer = new(slots, numSlots);
 		ZCallHandle handle = alc.GetZCallHandle("ex://UObjectGlobals.FindObject");
 		alc.ZCall(handle, &buffer);
+		
 		return slots[4].ReadConjugate<UnrealObject>();
 	}
 	
@@ -47,11 +48,12 @@ public static class UObjectGlobals
 		ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
 		{
 			ZCallBufferSlot.FromConjugate(new UnrealString(path)),
-			ZCallBufferSlot.FromConjugate(null),
+			ZCallBufferSlot.FromConjugate(),
 		};
 		ZCallBuffer buffer = new(slots, numSlots);
 		ZCallHandle handle = alc.GetZCallHandle("ex://UObjectGlobals.LowLevelFindObject");
 		alc.ZCall(handle, &buffer);
+		
 		return slots[1].ReadConjugate<UnrealObject>();
 	}
 

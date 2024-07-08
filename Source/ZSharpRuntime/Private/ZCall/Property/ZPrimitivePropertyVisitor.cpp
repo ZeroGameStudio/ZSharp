@@ -76,52 +76,52 @@ void ZSharp::FZPrimitivePropertyVisitor::SetValue(void* dest, const FZCallBuffer
 		if (prop->IsA<FByteProperty>())
 		{
 			const uint8 value = src.ReadUInt8();
-			prop->CopyCompleteValue(dest, &value);
+			prop->CopySingleValue(dest, &value);
 		}
 		else if (prop->IsA<FUInt16Property>())
 		{
 			const uint16 value = src.ReadUInt16();
-			prop->CopyCompleteValue(dest, &value);
+			prop->CopySingleValue(dest, &value);
 		}
 		else if (prop->IsA<FUInt32Property>())
 		{
 			const uint32 value = src.ReadUInt32();
-			prop->CopyCompleteValue(dest, &value);
+			prop->CopySingleValue(dest, &value);
 		}
 		else if (prop->IsA<FUInt64Property>())
 		{
 			const uint64 value = src.ReadUInt64();
-			prop->CopyCompleteValue(dest, &value);
+			prop->CopySingleValue(dest, &value);
 		}
 		else if (prop->IsA<FInt8Property>())
 		{
 			const int8 value = src.ReadInt8();
-			prop->CopyCompleteValue(dest, &value);
+			prop->CopySingleValue(dest, &value);
 		}
 		else if (prop->IsA<FInt16Property>())
 		{
 			const int16 value = src.ReadInt16();
-			prop->CopyCompleteValue(dest, &value);
+			prop->CopySingleValue(dest, &value);
 		}
 		else if (prop->IsA<FIntProperty>())
 		{
 			const int32 value = src.ReadInt32();
-			prop->CopyCompleteValue(dest, &value);
+			prop->CopySingleValue(dest, &value);
 		}
 		else if (prop->IsA<FInt64Property>())
 		{
 			const int64 value = src.ReadInt64();
-			prop->CopyCompleteValue(dest, &value);
+			prop->CopySingleValue(dest, &value);
 		}
 		else if (prop->IsA<FFloatProperty>())
 		{
 			const float value = src.ReadFloat();
-			prop->CopyCompleteValue(dest, &value);
+			prop->CopySingleValue(dest, &value);
 		}
 		else if (prop->IsA<FDoubleProperty>())
 		{
 			const double value = src.ReadDouble();
-			prop->CopyCompleteValue(dest, &value);
+			prop->CopySingleValue(dest, &value);
 		}
 	};
 	
@@ -132,7 +132,7 @@ void ZSharp::FZPrimitivePropertyVisitor::SetValue(void* dest, const FZCallBuffer
 	else if (UnderlyingProperty->IsA<FBoolProperty>())
 	{
 		const bool value = src.ReadBool();
-		UnderlyingProperty->CopyCompleteValue(dest, &value);
+		UnderlyingProperty->CopySingleValue(dest, &value);
 	}
 	else if (const auto enumProp = CastField<FEnumProperty>(UnderlyingProperty))
 	{

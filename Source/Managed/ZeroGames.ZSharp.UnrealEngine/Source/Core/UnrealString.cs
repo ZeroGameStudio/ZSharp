@@ -18,12 +18,13 @@ public partial class UnrealString
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
                 ZCallBufferSlot.FromConjugate(this),
-                ZCallBufferSlot.FromInt32(default),
+                ZCallBufferSlot.FromInt32(),
             };
             ZCallBuffer buffer = new(slots, numSlots);
             ZCallHandle handle = alc.GetZCallHandle("ex://String.Len");
             alc.ZCall(handle, &buffer);
-            return slots[1].ReadInt32();
+            
+            return slots[1].Int32;
         }
     }
     
@@ -36,12 +37,13 @@ public partial class UnrealString
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
                 ZCallBufferSlot.FromConjugate(this),
-                ZCallBufferSlot.FromPointer(null),
+                ZCallBufferSlot.FromPointer(),
             };
             ZCallBuffer buffer = new(slots, numSlots);
             ZCallHandle handle = alc.GetZCallHandle("ex://String.GetData");
             alc.ZCall(handle, &buffer);
-            return new((char*)slots[1].ReadPointer());
+            
+            return new((char*)slots[1].Pointer);
         }
         set
         {

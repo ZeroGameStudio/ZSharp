@@ -14,7 +14,7 @@ void ZSharp::FZObjectPropertyVisitor::SetValue(void* dest, const FZCallBufferSlo
 {
 	UObject* value = TZCallBufferSlotEncoder<UObject*>::Decode(src);
 	check(!value || value->IsA(UnderlyingObjectProperty->PropertyClass));
-	UnderlyingProperty->CopyCompleteValue(dest, &value);
+	UnderlyingProperty->CopySingleValue(dest, &value);
 }
 
 

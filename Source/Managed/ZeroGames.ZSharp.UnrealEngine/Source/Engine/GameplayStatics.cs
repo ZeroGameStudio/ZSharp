@@ -13,13 +13,13 @@ public partial class GameplayStatics
 		{
 			ZCallBufferSlot.FromConjugate(worldContextObject),
 			ZCallBufferSlot.FromInt32(playerIndex),
-			ZCallBufferSlot.FromConjugate(null),
+			ZCallBufferSlot.FromConjugate(),
 		};
 		ZCallBuffer buffer = new(slots, numSlots);
 		ZCallHandle handle = alc.GetZCallHandle("uf://Script/Engine.GameplayStatics:GetPlayerCharacter");
 		alc.ZCall(handle, &buffer);
 
-		return slots[2].ReadConjugate<Character>();
+		return slots[3].ReadConjugate<Character>();
 	}
 	
 }

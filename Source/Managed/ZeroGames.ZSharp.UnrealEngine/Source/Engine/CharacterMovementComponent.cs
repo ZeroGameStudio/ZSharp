@@ -10,27 +10,29 @@ public partial class CharacterMovementComponent
 		get
 		{
 			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 3;
+			const int32 numSlots = 4;
 			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
 			{
 				ZCallBufferSlot.FromConjugate(this),
-				ZCallBufferSlot.FromBool(false),
-				ZCallBufferSlot.FromFloat(0.0f),
+				ZCallBufferSlot.FromBool(),
+				ZCallBufferSlot.FromInt32(),
+				ZCallBufferSlot.FromFloat(),
 			};
 			ZCallBuffer buffer = new(slots, numSlots);
 			ZCallHandle handle = alc.GetZCallHandle("up://Script/Engine.CharacterMovementComponent:MaxWalkSpeed");
 			alc.ZCall(handle, &buffer);
 
-			return slots[2].ReadFloat();
+			return slots[3].Float;
 		}
 		set
 		{
 			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 3;
+			const int32 numSlots = 4;
 			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
 			{
 				ZCallBufferSlot.FromConjugate(this),
 				ZCallBufferSlot.FromBool(true),
+				ZCallBufferSlot.FromInt32(),
 				ZCallBufferSlot.FromFloat(value),
 			};
 			ZCallBuffer buffer = new(slots, numSlots);

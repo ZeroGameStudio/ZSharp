@@ -41,17 +41,17 @@ public abstract class UnrealArray : PlainExportedObjectBase
 			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
 			{
 				ZCallBufferSlot.FromConjugate(this),
-				ZCallBufferSlot.FromInt32(default),
+				ZCallBufferSlot.FromInt32(),
 			};
 			ZCallBuffer buffer = new(slots, numSlots);
 			ZCallHandle handle = alc.GetZCallHandle("ex://Array.Num");
 			alc.ZCall(handle, &buffer);
 
-			return slots[1].ReadInt32();
+			return slots[1].Int32;
 		}
 	}
 	
-	public unsafe object this[int32 index]
+	public unsafe object? this[int32 index]
 	{
 		get
 		{
@@ -67,7 +67,7 @@ public abstract class UnrealArray : PlainExportedObjectBase
 			ZCallHandle handle = alc.GetZCallHandle("ex://Array.Get");
 			alc.ZCall(handle, &buffer);
 
-			return slots[2].Object!;
+			return slots[2].Object;
 		}
 		set
 		{
@@ -136,9 +136,9 @@ public class UnrealArray<T> : UnrealArray
 
 	public UnrealArray() : base(typeof(T)){}
 
-	public new T this[int32 index]
+	public new T? this[int32 index]
 	{
-		get => (T)((UnrealArray)this)[index];
+		get => (T?)((UnrealArray)this)[index];
 		set => ((UnrealArray)this)[index] = value!;
 	}
 	

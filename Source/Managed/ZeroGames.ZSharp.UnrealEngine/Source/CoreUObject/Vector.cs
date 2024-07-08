@@ -22,27 +22,29 @@ public partial class Vector
 		get
 		{
 			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 3;
+			const int32 numSlots = 4;
 			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
 			{
 				ZCallBufferSlot.FromConjugate(this),
-				ZCallBufferSlot.FromBool(false),
-				ZCallBufferSlot.FromDouble(0.0),
+				ZCallBufferSlot.FromBool(),
+				ZCallBufferSlot.FromInt32(),
+				ZCallBufferSlot.FromDouble(),
 			};
 			ZCallBuffer buffer = new(slots, numSlots);
 			ZCallHandle handle = alc.GetZCallHandle("up://Script/CoreUObject.Vector:X");
 			alc.ZCall(handle, &buffer);
 
-			return slots[2].ReadDouble();
+			return slots[3].ReadDouble();
 		}
 		set
 		{
 			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 3;
+			const int32 numSlots = 4;
 			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
 			{
 				ZCallBufferSlot.FromConjugate(this),
 				ZCallBufferSlot.FromBool(true),
+				ZCallBufferSlot.FromInt32(),
 				ZCallBufferSlot.FromDouble(value),
 			};
 			ZCallBuffer buffer = new(slots, numSlots);
@@ -56,27 +58,29 @@ public partial class Vector
 		get
 		{
 			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 3;
+			const int32 numSlots = 4;
 			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
 			{
 				ZCallBufferSlot.FromConjugate(this),
-				ZCallBufferSlot.FromBool(false),
-				ZCallBufferSlot.FromDouble(0.0),
+				ZCallBufferSlot.FromBool(),
+				ZCallBufferSlot.FromInt32(),
+				ZCallBufferSlot.FromDouble(),
 			};
 			ZCallBuffer buffer = new(slots, numSlots);
 			ZCallHandle handle = alc.GetZCallHandle("up://Script/CoreUObject.Vector:Y");
 			alc.ZCall(handle, &buffer);
 
-			return slots[2].ReadDouble();
+			return slots[3].ReadDouble();
 		}
 		set
 		{
 			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 3;
+			const int32 numSlots = 4;
 			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
 			{
 				ZCallBufferSlot.FromConjugate(this),
 				ZCallBufferSlot.FromBool(true),
+				ZCallBufferSlot.FromInt32(),
 				ZCallBufferSlot.FromDouble(value),
 			};
 			ZCallBuffer buffer = new(slots, numSlots);
@@ -90,27 +94,29 @@ public partial class Vector
 		get
 		{
 			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 3;
+			const int32 numSlots = 4;
 			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
 			{
 				ZCallBufferSlot.FromConjugate(this),
-				ZCallBufferSlot.FromBool(false),
-				ZCallBufferSlot.FromDouble(0.0),
+				ZCallBufferSlot.FromBool(),
+				ZCallBufferSlot.FromInt32(),
+				ZCallBufferSlot.FromDouble(),
 			};
 			ZCallBuffer buffer = new(slots, numSlots);
 			ZCallHandle handle = alc.GetZCallHandle("up://Script/CoreUObject.Vector:Z");
 			alc.ZCall(handle, &buffer);
 
-			return slots[2].ReadDouble();
+			return slots[3].ReadDouble();
 		}
 		set
 		{
 			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 3;
+			const int32 numSlots = 4;
 			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
 			{
 				ZCallBufferSlot.FromConjugate(this),
 				ZCallBufferSlot.FromBool(true),
+				ZCallBufferSlot.FromInt32(),
 				ZCallBufferSlot.FromDouble(value),
 			};
 			ZCallBuffer buffer = new(slots, numSlots);

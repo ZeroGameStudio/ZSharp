@@ -38,7 +38,7 @@ void ZSharp::FZStructPropertyVisitor::SetValue(void* dest, const FZCallBufferSlo
 	check(scriptStruct == UnderlyingStructProperty->Struct);
 	if (void* unmanaged = sdss ? sdss->GetUnderlyingInstance() : nullptr)
 	{
-		UnderlyingStructProperty->CopyCompleteValue(dest, unmanaged);
+		UnderlyingStructProperty->CopySingleValue(dest, unmanaged);
 	}
 }
 

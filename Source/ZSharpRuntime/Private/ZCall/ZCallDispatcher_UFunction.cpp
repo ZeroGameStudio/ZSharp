@@ -48,7 +48,7 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 	{
 		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
 		visitor->InitializeValue_InContainer(params);
-		visitor->SetValue_InContainer(params, buf[staticFunc ? i : i + 1]);
+		visitor->SetValue_InContainer(params, buf[staticFunc ? i : i + 1], 0);
 	}
 
 	self->ProcessEvent(func, params);
@@ -56,12 +56,12 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 	for (const auto index : OutParamIndices)
 	{
 		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
-		visitor->GetValue_InContainer(params, buf[staticFunc ? index : index + 1]);
+		visitor->GetValue_InContainer(params, buf[staticFunc ? index : index + 1], 0);
 	}
 
 	if (ReturnProperty)
 	{
-		ReturnProperty->GetValue_InContainer(params, buf[-1]);
+		ReturnProperty->GetValue_InContainer(params, buf[-1], 0);
 	}
 	
 	return 0;
@@ -82,6 +82,7 @@ bool ZSharp::FZCallDispatcher_UFunction::InvalidateCache() const
 	for (TFieldIterator<FProperty> it(Function.Get()); it && it->HasAllPropertyFlags(CPF_Parm); ++it)
 	{
 		FProperty* prop = *it;
+		check(prop->ArrayDim == 1);
 		TUniquePtr<IZPropertyVisitor> visitor = IZPropertyVisitor::Create(prop);
 		if (!visitor)
 		{

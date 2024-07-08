@@ -45,13 +45,14 @@ int32 ZSharp::FZCallDispatcher_UProperty::Dispatch(FZCallBuffer* buffer) const
 	}
 
 	const bool write = buf[1].ReadBool();
+	const int32 index = buf[2].ReadInt32();
 	if (write)
 	{
-		Property->SetValue_InContainer(self, buf[2]);
+		Property->SetValue_InContainer(self, buf[3], index);
 	}
 	else
 	{
-		Property->GetRef_InContainer(self, buf[2]);
+		Property->GetRef_InContainer(self, buf[3], index);
 	}
 	
 	return 0;

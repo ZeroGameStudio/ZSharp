@@ -14,7 +14,7 @@ void ZSharp::FZWeakObjectPropertyVisitor::SetValue(void* dest, const FZCallBuffe
 {
 	const FWeakObjectPtr& value = TZCallBufferSlotEncoder<FWeakObjectPtr>::Decode(src);
 	check(value.IsExplicitlyNull() || value.Get()->IsA(UnderlyingObjectProperty->PropertyClass));
-	UnderlyingProperty->CopyCompleteValue(dest, &value);
+	UnderlyingProperty->CopySingleValue(dest, &value);
 }
 
 

@@ -18,13 +18,13 @@ public partial class Character
 			ZCallBufferSlot.FromBool(sweep),
 			ZCallBufferSlot.FromConjugate(sweepHitResult),
 			ZCallBufferSlot.FromBool(teleport),
-			ZCallBufferSlot.FromBool(false),
+			ZCallBufferSlot.FromBool(),
 		};
 		ZCallBuffer buffer = new(slots, numSlots);
 		ZCallHandle handle = alc.GetZCallHandle("uf://Script/Engine.Actor:K2_SetActorLocation");
 		alc.ZCall(handle, &buffer);
 
-		return slots[5].ReadBool();
+		return slots[5].Bool;
 	}
 
 	public unsafe void Jump()
@@ -45,18 +45,19 @@ public partial class Character
 		get
 		{
 			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 3;
+			const int32 numSlots = 4;
 			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
 			{
 				ZCallBufferSlot.FromConjugate(this),
-				ZCallBufferSlot.FromBool(false),
-				ZCallBufferSlot.FromConjugate(null),
+				ZCallBufferSlot.FromBool(),
+				ZCallBufferSlot.FromInt32(),
+				ZCallBufferSlot.FromConjugate(),
 			};
 			ZCallBuffer buffer = new(slots, numSlots);
 			ZCallHandle handle = alc.GetZCallHandle("up://Script/Engine.Character:CharacterMovement");
 			alc.ZCall(handle, &buffer);
 
-			return slots[2].ReadConjugate<CharacterMovementComponent>();
+			return slots[3].ReadConjugate<CharacterMovementComponent>();
 		}
 	}
 	

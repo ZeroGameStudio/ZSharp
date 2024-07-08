@@ -14,11 +14,12 @@ public partial class UnrealObject
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
                 ZCallBufferSlot.FromConjugate(this),
-                ZCallBufferSlot.FromConjugate(null),
+                ZCallBufferSlot.FromConjugate(),
             };
             ZCallBuffer buffer = new(slots, numSlots);
             ZCallHandle handle = alc.GetZCallHandle("ex://Object.GetClass");
             alc.ZCall(handle, &buffer);
+            
             return slots[1].ReadConjugate<UnrealObject>() ?? throw new InvalidOperationException();
         }
     }
@@ -32,12 +33,13 @@ public partial class UnrealObject
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
                 ZCallBufferSlot.FromConjugate(this),
-                ZCallBufferSlot.FromConjugate(null),
+                ZCallBufferSlot.FromConjugate(),
             };
             ZCallBuffer buffer = new(slots, numSlots);
             ZCallHandle handle = alc.GetZCallHandle("ex://Object.GetOuter");
             alc.ZCall(handle, &buffer);
-            return slots[1].ReadConjugate<UnrealObject>() ?? throw new InvalidOperationException();
+            
+            return slots[1].ReadConjugate<UnrealObject>();
         }
     }
 
@@ -50,11 +52,12 @@ public partial class UnrealObject
             ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
             {
                 ZCallBufferSlot.FromConjugate(this),
-                ZCallBufferSlot.FromConjugate(null),
+                ZCallBufferSlot.FromConjugate(),
             };
             ZCallBuffer buffer = new(slots, numSlots);
             ZCallHandle handle = alc.GetZCallHandle("ex://Object.GetName");
             alc.ZCall(handle, &buffer);
+            
             return slots[1].ReadConjugate<UnrealString>() ?? throw new InvalidOperationException();
         }
     }

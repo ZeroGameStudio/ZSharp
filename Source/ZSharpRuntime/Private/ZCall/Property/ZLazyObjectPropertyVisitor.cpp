@@ -14,7 +14,7 @@ void ZSharp::FZLazyObjectPropertyVisitor::SetValue(void* dest, const FZCallBuffe
 {
 	const FLazyObjectPtr& value = TZCallBufferSlotEncoder<FLazyObjectPtr>::Decode(src);
 	check(value.IsNull() || value->IsA(UnderlyingObjectProperty->PropertyClass));
-	UnderlyingProperty->CopyCompleteValue(dest, &value);
+	UnderlyingProperty->CopySingleValue(dest, &value);
 }
 
 

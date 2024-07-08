@@ -3,8 +3,9 @@
 
 #include "IZPropertyVisitor.h"
 
-#include "ZFieldPathPropertyVisitor.h"
+#include "UObject/PropertyOptional.h"
 #include "ZSharpRuntimeLogChannels.h"
+#include "ZFieldPathPropertyVisitor.h"
 #include "Container/ZStructPropertyVisitor.h"
 #include "Object/ZClassPropertyVisitor.h"
 #include "Object/ZLazyObjectPropertyVisitor.h"

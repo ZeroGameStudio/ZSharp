@@ -5,7 +5,7 @@
 
 namespace ZSharp
 {
-	class FZStructPropertyVisitor : public FZPropertyVisitorBase
+	class FZStructPropertyVisitor final : public FZPropertyVisitorBase
 	{
 
 	public:

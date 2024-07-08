@@ -14,10 +14,10 @@ namespace ZSharp
 			: FZPropertyVisitorBase(underlyingProperty){}
 
 	public:
-		virtual bool IsValueSemantics() const override { return false; }
+		virtual bool IsValueSemantics() const override final { return false; }
 
 	public:
-		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override { GetRef(src, dest); }
+		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override final { GetRef(src, dest); }
 		
 	};
 }

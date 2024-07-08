@@ -6,7 +6,7 @@
 
 namespace ZSharp
 {
-	class FZObjectPropertyVisitor : public FZObjectPropertyVisitorBase
+	class FZObjectPropertyVisitor final : public FZObjectPropertyVisitorBase
 	{
 	
 	public:

@@ -15,6 +15,7 @@ namespace ZSharp
 			, UnderlyingObjectProperty(underlyingProperty){}
 
 	public:
+		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override { GetRef(src, dest); }
 		virtual void GetRef(const void* src, FZCallBufferSlot& dest) const override;
 		virtual void SetValue(void* dest, const FZCallBufferSlot& src) const override;
 

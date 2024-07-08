@@ -12,9 +12,6 @@ namespace ZSharp
 	public:
 		explicit FZObjectPropertyVisitorBase(const FProperty* underlyingProperty)
 			: FZPropertyVisitorBase(underlyingProperty){}
-
-	public:
-		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override final { GetRef(src, dest); }
 		
 	};
 }

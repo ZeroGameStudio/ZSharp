@@ -5,6 +5,17 @@
 
 #include "ZCall/ZCallBufferSlotEncoder.h"
 
+void ZSharp::FZLazyObjectPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const
+{
+	FLazyObjectPtr* unmanaged = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_LazyObjectPtr>().Conjugate(dest.ReadConjugate());
+	if (!unmanaged)
+	{
+		unmanaged = new FLazyObjectPtr;
+		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_LazyObjectPtr>().Conjugate(unmanaged, true));
+	}
+	UnderlyingProperty->CopySingleValue(unmanaged, src);
+}
+
 void ZSharp::FZLazyObjectPropertyVisitor::GetRef(const void* src, FZCallBufferSlot& dest) const
 {
 	TZCallBufferSlotEncoder<FLazyObjectPtr>::Encode(UnderlyingObjectProperty->GetPropertyValue(src), dest);

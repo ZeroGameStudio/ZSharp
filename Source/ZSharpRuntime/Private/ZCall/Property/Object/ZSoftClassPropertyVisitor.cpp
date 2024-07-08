@@ -5,6 +5,17 @@
 
 #include "ZCall/ZCallBufferSlotEncoder.h"
 
+void ZSharp::FZSoftClassPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const
+{
+	FSoftClassPtr* unmanaged = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_SoftClassPtr>().Conjugate(dest.ReadConjugate());
+	if (!unmanaged)
+	{
+		unmanaged = new FSoftClassPtr;
+		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_SoftClassPtr>().Conjugate(unmanaged, true));
+	}
+	UnderlyingProperty->CopySingleValue(unmanaged, src);
+}
+
 void ZSharp::FZSoftClassPropertyVisitor::GetRef(const void* src, FZCallBufferSlot& dest) const
 {
 	// We assume that FSoftClassPtr has the same memory layout as FSoftObjectPtr, so does the engine...

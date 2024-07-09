@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ZCall/Property/IZPropertyVisitor.h"
+#include "Trait/ZConjugateRegistryId.h"
 
 namespace ZSharp
 {
@@ -45,5 +46,7 @@ namespace ZSharp
 		
 	};
 }
+
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveScriptArray, 31)
 
 

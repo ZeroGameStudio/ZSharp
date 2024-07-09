@@ -34,6 +34,7 @@ public class ClassWriter : IDisposable, IAsyncDisposable
 
 #region GENERATED CODE
 
+#nullable enable
 #pragma warning disable CS0109 // Member does not hide an inherited member; new keyword is not required
 
 using ZeroGames.ZSharp.Core;
@@ -71,6 +72,32 @@ namespace {_exportedClass.Namespace};
 			2 => split[1],
 			_ => throw new InvalidOperationException($"Wrong export type name [{type}]")
 		};
+	}
+
+	private string GetPropertyBlock(ExportedProperty property)
+	{
+		bool nullable = property.Type.EndsWith('?');
+		string nullForgivingModifier = nullable ? string.Empty : "!";
+		string nonNullableType = property.Type.Substring(0, nullable ? property.Type.Length - 1 : property.Type.Length);
+		string accessModifier = property.Public ? "public" : property.Protected ? "protected" : "private";
+		string getBlock = property.Readable ?
+@$"		get
+		{{
+			return ({property.Type})this.ZCall(""{property.ZCallName}"", false, {property.Index}, typeof({nonNullableType}))[3].Object{nullForgivingModifier};
+		}}" : string.Empty;
+		string setBlock = property.Writable ?
+@$"
+		set
+		{{
+			this.ZCall(""{property.ZCallName}"", true, {property.Index}, value);
+		}}" : string.Empty;
+		string block =
+@$"	{accessModifier} {property.Type} {property.Name}
+	{{
+{getBlock}{setBlock}
+	}}";
+
+		return block;
 	}
 
 	private string _extraUsingBlock
@@ -172,13 +199,13 @@ namespace {_exportedClass.Namespace};
 			{
 				return
 @"	public new static string SUnrealFieldPath => __kUnrealFieldPath;
-	public new static UnrealClass SStaticClass => UObjectGlobals.LowLevelFindObject<UnrealClass>(__kUnrealFieldPath);";
+	public new static UnrealClass SStaticClass => UObjectGlobals.LowLevelFindObject<UnrealClass>(__kUnrealFieldPath)!;";
 			}
 			if (_exportedClass.Struct)
 			{
 				return
 @"	public new static string SUnrealFieldPath => __kUnrealFieldPath;
-	public new static UnrealScriptStruct SStaticStruct => UObjectGlobals.LowLevelFindObject<UnrealScriptStruct>(__kUnrealFieldPath);";
+	public new static UnrealScriptStruct SStaticStruct => UObjectGlobals.LowLevelFindObject<UnrealScriptStruct>(__kUnrealFieldPath)!;";
 			}
 
 			return null;
@@ -215,7 +242,18 @@ namespace {_exportedClass.Namespace};
 		get
 		{
 			StringBuilder body = new();
+			
+			// Methods
+			
+			// Properties
+			foreach (var pair in _exportedClass.PropertyMap.OrderBy(pair => pair.Value.Public ? 1 : pair.Value.Protected ? 2 : 3))
+			{
+				string block = GetPropertyBlock(pair.Value);
+				body.Append(block);
+				body.Append("\n\n");
+			}
 
+			// Intrinsics
 			string userdata = _exportedClass.Struct ? "SStaticStruct.Unmanaged" : "IntPtr.Zero";
 			string? constructorDefault = _exportedClass.Class || _exportedClass.Interface ? null : $"\tpublic {_exportedClass.Name}(){{ Unmanaged = GetOwningAlc().BuildConjugate(this, {userdata}); }}";
 			string? methodBuildConjugate = _implementsBuildConjugate ? $"\tpublic new static {_exportedClass.Name} BuildConjugate(IntPtr unmanaged) => new(unmanaged);" : null;

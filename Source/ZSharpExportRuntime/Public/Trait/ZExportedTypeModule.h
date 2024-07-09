@@ -5,6 +5,8 @@
 #include "ZIsDynamicExportableType.h"
 #include "ZSharpExportHelpers.h"
 #include "ZUField.h"
+#include "StrongObjectPtr.h"
+#include "SoftClassPtr.h"
 
 namespace ZSharp
 {
@@ -22,5 +24,18 @@ namespace ZSharp
 }
 
 #define ZSHARP_EXPORT_TYPE_MODULE(Type, Module) template<> struct ZSharp::TZExportedTypeModule<Type> { static_assert(!ZSharp::TZIsDynamicExportableType_V<Type>); static FString Get() { return #Module; } };
+
+ZSHARP_EXPORT_TYPE_MODULE(FString, Core)
+ZSHARP_EXPORT_TYPE_MODULE(FName, Core)
+ZSHARP_EXPORT_TYPE_MODULE(FText, Core)
+
+ZSHARP_EXPORT_TYPE_MODULE(FSoftObjectPtr, CoreUObject)
+ZSHARP_EXPORT_TYPE_MODULE(FSoftClassPtr, CoreUObject)
+ZSHARP_EXPORT_TYPE_MODULE(FWeakObjectPtr, CoreUObject)
+ZSHARP_EXPORT_TYPE_MODULE(FLazyObjectPtr, CoreUObject)
+ZSHARP_EXPORT_TYPE_MODULE(FStrongObjectPtr, CoreUObject)
+ZSHARP_EXPORT_TYPE_MODULE(FScriptInterface, CoreUObject)
+
+ZSHARP_EXPORT_TYPE_MODULE(FFieldPath, CoreUObject)
 
 

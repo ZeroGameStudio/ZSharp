@@ -23,4 +23,17 @@ namespace ZSharp
 
 #define ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ExportedType, RegistryId) template<> struct ZSharp::TZConjugateRegistryId<ExportedType> { static_assert(RegistryId != GUObjectConjugateRegistryId && RegistryId != GUStructConjugateRegistryId); static constexpr uint16 Value = RegistryId; };
 
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(FString, 11)
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(FName, 12)
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(FText, 13)
+
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(FSoftObjectPtr, 21)
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(FSoftClassPtr, 22)
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(FWeakObjectPtr, 23)
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(FLazyObjectPtr, 24)
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(FStrongObjectPtr, 25)
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(FScriptInterface, 26)
+
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(FFieldPath, 9)
+
 

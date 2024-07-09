@@ -17,22 +17,4 @@ public partial class Vector
 		return $"Vector {{ X={X}, Y={Y}, Z={Z} }}";
 	}
 	
-	public double X
-	{
-		get => ReadUnrealProperty<double>("X");
-		set => WriteUnrealProperty("X", value);
-	}
-
-	public double Y
-	{
-		get => ReadUnrealProperty<double>("Y");
-		set => WriteUnrealProperty("Y", value);
-	}
-	
-	public double Z
-	{
-		get => ReadUnrealProperty<double>("Z");
-		set => WriteUnrealProperty("Z", value);
-	}
-	
 }

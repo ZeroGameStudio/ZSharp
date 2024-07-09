@@ -1,0 +1,36 @@
+﻿// Copyright Zero Games. All Rights Reserved.
+
+#pragma once
+
+#include "IZExportedProperty.h"
+
+namespace ZSharp
+{
+	class ZSHARPEXPORT_API FZDynamicExportedProperty : public IZExportedProperty
+	{
+
+	public:
+		static FZDynamicExportedProperty* Create(FProperty* property, int32 index);
+
+	public:
+		virtual FString GetName() const override;
+		virtual FString GetZCallName() const override;
+		virtual FString GetType() const override;
+		virtual EZExportedPropertyFlags GetFlags() const override;
+		virtual int32 GetIndex() const override;
+
+	private:
+		explicit FZDynamicExportedProperty(FProperty* property, int32 index);
+
+	private:
+		bool IsValid() const;
+
+	private:
+		FProperty* Property;
+		int32 Index;
+		EZExportedPropertyFlags Flags;
+		
+	};
+}
+
+

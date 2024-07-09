@@ -24,11 +24,7 @@ void ZSharp::FZDynamicTypeExporter::Export() const
 			continue;
 		}
 
-		const auto* exportedEnum = new FZDynamicExportedEnum { enm };
-		if (!exportedEnum->IsRegistered())
-		{
-			delete exportedEnum;
-		}
+		FZDynamicExportedEnum::Create(enm);
 	}
 
 	for (TObjectIterator<UScriptStruct> It; It; ++It)
@@ -45,11 +41,7 @@ void ZSharp::FZDynamicTypeExporter::Export() const
 			continue;
 		}
 
-		const auto* exportedClass = new FZDynamicExportedClass { strct };
-		if (!exportedClass->IsRegistered())
-		{
-			delete exportedClass;
-		}
+		FZDynamicExportedClass::Create(strct);
 	}
 
 	for (TObjectIterator<UClass> It; It; ++It)
@@ -66,11 +58,7 @@ void ZSharp::FZDynamicTypeExporter::Export() const
 			continue;
 		}
 
-		const auto* exportedClass = new FZDynamicExportedClass { cls };
-		if (!exportedClass->IsRegistered())
-		{
-			delete exportedClass;
-		}
+		FZDynamicExportedClass::Create(cls);
 	}
 }
 

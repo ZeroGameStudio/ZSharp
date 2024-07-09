@@ -25,7 +25,6 @@ namespace ZSharp
 		using UnderlyingType = __underlying_type(T);
 
 	public:
-		virtual bool IsRegistered() const override { return bRegistered; }
 		virtual FString GetName() const override { return TZExportedTypeName<T>::Get(); }
 		virtual FString GetModule() const override { return TZExportedTypeModule<T>::Get(); }
 		virtual FString GetUnrealFieldPath() const override { return {}; }
@@ -46,14 +45,13 @@ namespace ZSharp
 			TZStaticExportedEnum* Enum;
 			~FZFinalizer()
 			{
-				 Enum->bRegistered = ZStaticExportedEnum_Private::RegisterEnum(Enum);
+				 ZStaticExportedEnum_Private::RegisterEnum(Enum);
 			}
 		};
 
 	protected:
 		explicit TZStaticExportedEnum(bool flag, const FZFinalizer&)
-			: bRegistered(false)
-			, Flags(flag ? EZExportedEnumFlags::Flags : EZExportedEnumFlags::None){}
+			: Flags(flag ? EZExportedEnumFlags::Flags : EZExportedEnumFlags::None){}
 
 	protected:
 		void AddEnumValue(const FString& name, T value) { Values.Emplace(TPair<FString, FString> { name, ValueToString(value) }); }
@@ -72,7 +70,6 @@ namespace ZSharp
 		}
 
 	private:
-		bool bRegistered;
 		EZExportedEnumFlags Flags;
 		TArray<TPair<FString, FString>> Values;
 		

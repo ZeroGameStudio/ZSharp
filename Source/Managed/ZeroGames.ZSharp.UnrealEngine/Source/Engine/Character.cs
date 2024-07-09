@@ -13,10 +13,5 @@ public partial class Character
 	}
 
 	public void Jump() => CallUnrealFunction("Jump");
-
-	public CharacterMovementComponent? CharacterMovement
-	{
-		get => ReadUnrealProperty<CharacterMovementComponent>("CharacterMovement");
-	}
 	
 }

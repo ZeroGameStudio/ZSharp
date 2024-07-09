@@ -1,18 +1,19 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 #pragma once
+
 #include "IZExportedClass.h"
+#include "IZExportedProperty.h"
 
 namespace ZSharp
 {
-	class ZSHARPEXPORT_API FZDynamicExportedClass : public IZExportedClass
+	class ZSHARPEXPORT_API FZDynamicExportedClass : public IZExportedClass, public FNoncopyable
 	{
 
 	public:
-		explicit FZDynamicExportedClass(UStruct* ustruct);
+		static FZDynamicExportedClass* Create(UStruct* ustruct);
 
 	public:
-		virtual bool IsRegistered() const override;
 		virtual FString GetName() const override;
 		virtual FString GetModule() const override;
 		virtual FString GetUnrealFieldPath() const override;
@@ -20,11 +21,15 @@ namespace ZSharp
 		virtual uint16 GetConjugateRegistryId() const override;
 		virtual EZExportedClassFlags GetFlags() const override;
 		virtual FString GetBaseType() const override;
+		virtual void ForeachProperty(TFunctionRef<void(const FString&, const IZExportedProperty&)> action) const override;
 
 	private:
-		bool bRegistered;
+		explicit FZDynamicExportedClass(UStruct* ustruct);
+		
+	private:
 		UStruct* Struct;
 		EZExportedClassFlags Flags;
+		TMap<FString, TUniquePtr<IZExportedProperty>> PropertyMap;
 		
 	};
 }

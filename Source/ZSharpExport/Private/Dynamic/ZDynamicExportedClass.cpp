@@ -5,45 +5,18 @@
 
 #include "ZExportedTypeRegistry.h"
 #include "ZSharpExportHelpers.h"
-#include "Trait/ZConjugateRegistryId.h"
+#include "Dynamic/ZDynamicExportedProperty.h"
 
-ZSharp::FZDynamicExportedClass::FZDynamicExportedClass(UStruct* ustruct)
-	: Struct(ustruct)
-	, Flags(EZExportedClassFlags::None)
+ZSharp::FZDynamicExportedClass* ZSharp::FZDynamicExportedClass::Create(UStruct* ustruct)
 {
-	check(Struct->IsNative());
-
-	if (const auto uclass = Cast<UClass>(ustruct))
+	auto cls = new FZDynamicExportedClass { ustruct };
+	if (!FZExportedTypeRegistry::Get().RegisterClass(cls))
 	{
-		if (uclass->HasAnyClassFlags(CLASS_Interface))
-		{
-			Flags |= EZExportedClassFlags::Interface;
-		}
-		else
-		{
-			Flags |= EZExportedClassFlags::Class;
-			// Force UObject to non-abstract because it is used as the fallback concrete type for those non-exported conjugates.
-			if (uclass->HasAnyClassFlags(CLASS_Abstract) && uclass != UObject::StaticClass())
-			{
-				Flags |= EZExportedClassFlags::Abstract;
-			}
-		}
-	}
-	else if (const auto ustrct = Cast<UScriptStruct>(ustruct))
-	{
-		Flags |= EZExportedClassFlags::Struct;
-	}
-	else
-	{
-		checkNoEntry();
+		delete cls;
+		cls = nullptr;
 	}
 
-	bRegistered = FZExportedTypeRegistry::Get().RegisterClass(this);
-}
-
-bool ZSharp::FZDynamicExportedClass::IsRegistered() const
-{
-	return bRegistered;
+	return cls;
 }
 
 FString ZSharp::FZDynamicExportedClass::GetName() const
@@ -90,6 +63,61 @@ FString ZSharp::FZDynamicExportedClass::GetBaseType() const
 	}
 
 	return FZSharpExportHelpers::GetUFieldOuterExportName(super);
+}
+
+void ZSharp::FZDynamicExportedClass::ForeachProperty(TFunctionRef<void(const FString&, const IZExportedProperty&)> action) const
+{
+	for (const auto& pair : PropertyMap)
+	{
+		action(pair.Key, *pair.Value);
+	}
+}
+
+ZSharp::FZDynamicExportedClass::FZDynamicExportedClass(UStruct* ustruct)
+	: Struct(ustruct)
+	, Flags(EZExportedClassFlags::None)
+{
+	check(Struct->IsNative());
+
+	if (const auto uclass = Cast<UClass>(ustruct))
+	{
+		if (uclass->HasAnyClassFlags(CLASS_Interface))
+		{
+			Flags |= EZExportedClassFlags::Interface;
+		}
+		else
+		{
+			Flags |= EZExportedClassFlags::Class;
+			// Force UObject to non-abstract because it is used as the fallback concrete type for those non-exported conjugates.
+			if (uclass->HasAnyClassFlags(CLASS_Abstract) && uclass != UObject::StaticClass())
+			{
+				Flags |= EZExportedClassFlags::Abstract;
+			}
+		}
+	}
+	else if (const auto ustrct = Cast<UScriptStruct>(ustruct))
+	{
+		Flags |= EZExportedClassFlags::Struct;
+	}
+	else
+	{
+		checkNoEntry();
+	}
+
+	for (TFieldIterator<FProperty> it(Struct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+	{
+		FProperty* property = *it;
+		for (int32 i = 0; i < property->ArrayDim; ++i)
+		{
+			FZDynamicExportedProperty* exportedProperty = FZDynamicExportedProperty::Create(property, i);
+			if (!exportedProperty)
+			{
+				continue;
+			}
+
+			PropertyMap.Emplace(exportedProperty->GetName(), exportedProperty);
+		}
+	}
 }
 
 

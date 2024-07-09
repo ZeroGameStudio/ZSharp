@@ -3,7 +3,6 @@
 #pragma once
 
 #include "ZCall/IZConjugateRegistry.h"
-#include "ZCall/Export/ZExports.h" // This must be here to provide type traits.
 
 namespace ZSharp
 {

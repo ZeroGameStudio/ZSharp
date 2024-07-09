@@ -4,6 +4,7 @@
 #include "ZGlueManifestWriter.h"
 
 #include "IZExportedEnum.h"
+#include "IZExportedProperty.h"
 #include "IZExportedTypeRegistry.h"
 #include "ZSharpExportRuntimeSettings.h"
 #include "DTO/ZExportedClassDto.h"
@@ -44,6 +45,20 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 	classDto.ConjugateRegistryId = cls.GetConjugateRegistryId();
 	classDto.Flags = static_cast<__underlying_type(EZExportedClassFlags)>(cls.GetFlags());
 	classDto.BaseType = cls.GetBaseType();
+	cls.ForeachProperty([&classDto](const FString& name, const IZExportedProperty& property)
+	{
+		if (!property.HasAnyFlags(EZExportedPropertyFlags::Readable | EZExportedPropertyFlags::Writable))
+		{
+			return;
+		}
+		
+		FZExportedPropertyDto propertyDto;
+		propertyDto.Name = property.GetName();
+		propertyDto.ZCallName = property.GetZCallName();
+		propertyDto.Type = property.GetType();
+		propertyDto.Flags = static_cast<__underlying_type(EZExportedPropertyFlags)>(property.GetFlags());
+		classDto.PropertyMap.Emplace(name, MoveTemp(propertyDto));
+	});
 	
 	assemblyDto->Classes.Emplace(MoveTemp(classDto));
 	

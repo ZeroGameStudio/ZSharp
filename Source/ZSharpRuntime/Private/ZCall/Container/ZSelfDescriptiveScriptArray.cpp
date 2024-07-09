@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "..\..\..\Public\ZCall\Container\ZSelfDescriptiveScriptArray.h"
+#include "ZCall/Container/ZSelfDescriptiveScriptArray.h"
 
 ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const FProperty* elementProperty)
 	: ElementProperty(elementProperty)

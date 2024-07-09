@@ -10,10 +10,9 @@ namespace ZSharp
 	{
 
 	public:
-		explicit FZDynamicExportedEnum(UEnum* uenum);
+		static FZDynamicExportedEnum* Create(UEnum* uenum);
 
 	public:
-		virtual bool IsRegistered() const override;
 		virtual FString GetName() const override;
 		virtual FString GetModule() const override;
 		virtual FString GetUnrealFieldPath() const override;
@@ -23,7 +22,9 @@ namespace ZSharp
 		virtual void ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const override;
 
 	private:
-		bool bRegistered;
+		explicit FZDynamicExportedEnum(UEnum* uenum);
+
+	private:
 		UEnum* Enum;
 		EZExportedEnumFlags Flags;
 		

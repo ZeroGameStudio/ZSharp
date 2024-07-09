@@ -19,6 +19,7 @@ public class ExportedClass : ExportedType
 	public uint16 ConjugateRegistryId { get; set; }
 	public required EExportedClassFlags Flags { get; set; }
 	public string? BaseType { get; set; }
+	public required Dictionary<string, ExportedProperty> PropertyMap { get; set; }
 	
 	public bool Plain => (Flags & EExportedClassFlags.Plain) != EExportedClassFlags.None;
 	public bool Class => (Flags & EExportedClassFlags.Class) != EExportedClassFlags.None;

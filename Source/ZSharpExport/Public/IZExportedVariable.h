@@ -9,8 +9,8 @@ namespace ZSharp
 	public:
 		virtual ~IZExportedVariable(){}
 	public:
-		virtual const FString& GetName() const = 0;
-		virtual const FString& GetType() const = 0;
+		virtual FString GetName() const = 0;
+		virtual FString GetType() const = 0;
 	};
 }
 

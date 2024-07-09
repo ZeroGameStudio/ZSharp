@@ -1,8 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZCall\Container\ZSelfDescriptiveScriptStruct.h"
-
+#include "ZCall/Container/ZSelfDescriptiveScriptStruct.h"
 
 ZSharp::FZSelfDescriptiveScriptStruct::FZSelfDescriptiveScriptStruct(const UScriptStruct* descriptor)
 	: Descriptor(descriptor)

@@ -3,9 +3,9 @@
 
 #include "ZCall/Conjugate/ZRegularConjugateRegistries.h"
 
+#include "Trait/ZExportedTypeName.h"
 #include "Trait/ZExportedTypeModule.h"
 #include "ZCall/ZDeclareConjugateRegistry.h"
-#include "ZCall/Export/ZExports.h"
 
 #define COMBINE_INNER(A, B) A##B
 #define COMBINE(A, B) COMBINE_INNER(A, B)

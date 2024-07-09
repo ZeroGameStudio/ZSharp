@@ -11,6 +11,9 @@ struct FZExportedEnumDto : public FZExportedTypeDto
 {
 	GENERATED_BODY()
 
+	FZExportedEnumDto()
+		: Flags(0){}
+
 	UPROPERTY()
 	uint64 Flags;
 

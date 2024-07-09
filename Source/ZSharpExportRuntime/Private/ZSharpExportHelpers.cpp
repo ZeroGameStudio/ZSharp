@@ -20,6 +20,8 @@ FString ZSharp::FZSharpExportHelpers::GetUFieldAliasedName(const UField* field)
 		
 		{ "Function", "UnrealFunction" },
 		{ "Property", "UnrealProperty" },
+
+		{ "Guid", "UnrealGuid" },
 	};
 
 	FString name = field->GetName();

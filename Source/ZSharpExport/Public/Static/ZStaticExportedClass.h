@@ -22,7 +22,6 @@ namespace ZSharp
 		friend struct FZFinalizer;
 
 	public:
-		virtual bool IsRegistered() const override { return bRegistered; }
 		virtual FString GetName() const override { return TZExportedTypeName<T>::Get(); }
 		virtual FString GetModule() const override { return TZExportedTypeModule<T>::Get(); }
 		virtual FString GetUnrealFieldPath() const override { return {}; }
@@ -30,6 +29,10 @@ namespace ZSharp
 		virtual uint16 GetConjugateRegistryId() const override { return TZConjugateRegistryId_V<T>; }
 		virtual EZExportedClassFlags GetFlags() const override { return Flags; }
 		virtual FString GetBaseType() const override { return {}; }
+		virtual void ForeachProperty(TFunctionRef<void(const FString&, const IZExportedProperty&)> action) const override
+		{
+			
+		}
 
 	protected:
 		struct FZFinalizer
@@ -37,17 +40,15 @@ namespace ZSharp
 			TZStaticExportedClass* Class;
 			~FZFinalizer()
 			{
-				Class->bRegistered = ZStaticExportedClass_Private::RegisterClass(Class);
+				ZStaticExportedClass_Private::RegisterClass(Class);
 			}
 		};
 
 	protected:
 		TZStaticExportedClass(bool abstract, const FZFinalizer&)
-			: bRegistered(false)
-			, Flags(EZExportedClassFlags::Plain | (abstract ? EZExportedClassFlags::Abstract : EZExportedClassFlags::None)){}
+			: Flags(EZExportedClassFlags::Plain | (abstract ? EZExportedClassFlags::Abstract : EZExportedClassFlags::None)){}
 
 	private:
-		bool bRegistered;
 		EZExportedClassFlags Flags;
 		
 	};

@@ -12,7 +12,6 @@ namespace ZSharp
 	class ZSHARPEXPORT_API IZExportedType : public IZExportedMember
 	{
 	public:
-		virtual bool IsRegistered() const = 0;
 		virtual FString GetModule() const = 0;
 		virtual FString GetUnrealFieldPath() const = 0;
 		virtual FString GetOuterExportName() const = 0;

@@ -2,7 +2,30 @@
 
 namespace ZeroGames.ZSharp.Build.Glue;
 
+[Flags]
+public enum EExportedPropertyFlags : uint64
+{
+	None = 0,
+	Readable = 1 << 0,
+	Writable = 1 << 1,
+	Public = 1 << 2,
+	Protected = 1 << 3,
+	Private = 1 << 4,
+}
+
 public class ExportedProperty
 {
+	public required string Name { get; set; }
+	public required string ZCallName { get; set; }
+	public required string Type { get; set; }
+	public required EExportedPropertyFlags Flags { get; set; }
+	public required int32 Index { get; set; }
 	
+	public bool Readable => (Flags & EExportedPropertyFlags.Readable) != EExportedPropertyFlags.None;
+	public bool Writable => (Flags & EExportedPropertyFlags.Writable) != EExportedPropertyFlags.None;
+	public bool Public => (Flags & EExportedPropertyFlags.Public) != EExportedPropertyFlags.None;
+	public bool Protected => (Flags & EExportedPropertyFlags.Protected) != EExportedPropertyFlags.None;
+	public bool Private => (Flags & EExportedPropertyFlags.Private) != EExportedPropertyFlags.None;
 }
+
+

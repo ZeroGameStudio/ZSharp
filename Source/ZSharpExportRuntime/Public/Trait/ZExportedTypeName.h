@@ -3,6 +3,8 @@
 #pragma once
 
 #include "ZIsDynamicExportableType.h"
+#include "StrongObjectPtr.h"
+#include "SoftClassPtr.h"
 
 namespace ZSharp
 {
@@ -47,5 +49,18 @@ ZSHARP_EXPORT_TYPE_NAME(int64)
 ZSHARP_EXPORT_TYPE_NAME(float)
 ZSHARP_EXPORT_TYPE_NAME(double)
 ZSHARP_EXPORT_TYPE_NAME(bool)
+
+ZSHARP_EXPORT_TYPE_NAME_EX(FString, UnrealString)
+ZSHARP_EXPORT_TYPE_NAME_EX(FName, UnrealName)
+ZSHARP_EXPORT_TYPE_NAME_EX(FText, UnrealText)
+
+ZSHARP_EXPORT_TYPE_NAME_EX(FSoftObjectPtr, SoftObjectPtr)
+ZSHARP_EXPORT_TYPE_NAME_EX(FSoftClassPtr, SoftClassPtr)
+ZSHARP_EXPORT_TYPE_NAME_EX(FWeakObjectPtr, WeakObjectPtr)
+ZSHARP_EXPORT_TYPE_NAME_EX(FLazyObjectPtr, LazyObjectPtr)
+ZSHARP_EXPORT_TYPE_NAME_EX(FStrongObjectPtr, StrongObjectPtr)
+ZSHARP_EXPORT_TYPE_NAME_EX(FScriptInterface, ScriptInterface)
+
+ZSHARP_EXPORT_TYPE_NAME_EX(FFieldPath, FieldPath)
 
 

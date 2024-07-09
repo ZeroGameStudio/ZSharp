@@ -6,23 +6,16 @@
 #include "ZExportedTypeRegistry.h"
 #include "ZSharpExportHelpers.h"
 
-ZSharp::FZDynamicExportedEnum::FZDynamicExportedEnum(UEnum* uenum)
-	: Enum(uenum)
-	, Flags(EZExportedEnumFlags::None)
+ZSharp::FZDynamicExportedEnum* ZSharp::FZDynamicExportedEnum::Create(UEnum* uenum)
 {
-	check(Enum->IsNative());
-
-	if (Enum->HasAnyEnumFlags(EEnumFlags::Flags))
+	auto enm = new FZDynamicExportedEnum { uenum };
+	if (!FZExportedTypeRegistry::Get().RegisterEnum(enm))
 	{
-		Flags |= EZExportedEnumFlags::Flags;
+		delete enm;
+		enm = nullptr;
 	}
-	
-	bRegistered = FZExportedTypeRegistry::Get().RegisterEnum(this);
-}
 
-bool ZSharp::FZDynamicExportedEnum::IsRegistered() const
-{
-	return bRegistered;
+	return enm;
 }
 
 FString ZSharp::FZDynamicExportedEnum::GetName() const
@@ -62,6 +55,18 @@ void ZSharp::FZDynamicExportedEnum::ForeachEnumValue(TFunctionRef<void(const FSt
 		const FString Name = Enum->GetNameStringByIndex(i);
 		const FString Value = FString::Printf(TEXT("%lld"), Enum->GetValueByIndex(i));
 		action(Name, Value);
+	}
+}
+
+ZSharp::FZDynamicExportedEnum::FZDynamicExportedEnum(UEnum* uenum)
+	: Enum(uenum)
+	, Flags(EZExportedEnumFlags::None)
+{
+	check(Enum->IsNative());
+
+	if (Enum->HasAnyEnumFlags(EEnumFlags::Flags))
+	{
+		Flags |= EZExportedEnumFlags::Flags;
 	}
 }
 

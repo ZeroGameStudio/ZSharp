@@ -34,7 +34,7 @@ public abstract class UnrealExportedObjectBase : ExportedObjectBase, IUnrealFiel
 	{
 		string zcallName = $"uf:/{UnrealFieldPath}:{name}";
 		object?[] parametersRet = new object?[parameters.Length + 1];
-		parameters?.CopyTo(parametersRet, 0);
+		parameters.CopyTo(parametersRet, 0);
 		parametersRet[^1] = typeof(T);
 		return this.ZCall(zcallName, parametersRet);
 	}

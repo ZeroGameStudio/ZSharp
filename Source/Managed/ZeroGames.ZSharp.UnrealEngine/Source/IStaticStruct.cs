@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
-public interface IStaticStruct : IUnrealFieldPath
+public interface IStaticStruct
 {
 	static abstract UnrealScriptStruct SStaticStruct { get; }
 }

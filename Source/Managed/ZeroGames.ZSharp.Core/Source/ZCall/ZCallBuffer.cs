@@ -137,6 +137,14 @@ public struct ZCallBufferSlot
 		}
 		
 		Type t = value.GetType();
+		if (t == typeof(ZCallBufferSlot))
+		{
+			return (ZCallBufferSlot)value;
+		}
+		if (t.IsAssignableTo(typeof(Type)))
+		{
+			return FromType((Type)value);
+		}
 		if (t.IsAssignableTo(typeof(IConjugate)))
 		{
 			return FromConjugate((IConjugate)value);
@@ -201,7 +209,7 @@ public struct ZCallBufferSlot
 		throw new InvalidOperationException();
 	}
 	
-	public uint8 ReadUInt8()
+	public readonly uint8 ReadUInt8()
 	{
 		if (_type != EZCallBufferSlotType.UInt8)
 		{
@@ -211,7 +219,7 @@ public struct ZCallBufferSlot
 		return _value.UInt8;
 	}
 	
-	public uint16 ReadUInt16()
+	public readonly uint16 ReadUInt16()
 	{
 		if (_type != EZCallBufferSlotType.UInt16)
 		{
@@ -221,7 +229,7 @@ public struct ZCallBufferSlot
 		return _value.UInt16;
 	}
 	
-	public uint32 ReadUInt32()
+	public readonly uint32 ReadUInt32()
 	{
 		if (_type != EZCallBufferSlotType.UInt32)
 		{
@@ -231,7 +239,7 @@ public struct ZCallBufferSlot
 		return _value.UInt32;
 	}
 	
-	public uint64 ReadUInt64()
+	public readonly uint64 ReadUInt64()
 	{
 		if (_type != EZCallBufferSlotType.UInt64)
 		{
@@ -241,7 +249,7 @@ public struct ZCallBufferSlot
 		return _value.UInt64;
 	}
 	
-	public int8 ReadInt8()
+	public readonly int8 ReadInt8()
 	{
 		if (_type != EZCallBufferSlotType.Int8)
 		{
@@ -251,7 +259,7 @@ public struct ZCallBufferSlot
 		return _value.Int8;
 	}
 	
-	public int16 ReadInt16()
+	public readonly int16 ReadInt16()
 	{
 		if (_type != EZCallBufferSlotType.Int16)
 		{
@@ -261,7 +269,7 @@ public struct ZCallBufferSlot
 		return _value.Int16;
 	}
 	
-	public int32 ReadInt32()
+	public readonly int32 ReadInt32()
 	{
 		if (_type != EZCallBufferSlotType.Int32)
 		{
@@ -271,7 +279,7 @@ public struct ZCallBufferSlot
 		return _value.Int32;
 	}
 	
-	public int64 ReadInt64()
+	public readonly int64 ReadInt64()
 	{
 		if (_type != EZCallBufferSlotType.Int64)
 		{
@@ -281,7 +289,7 @@ public struct ZCallBufferSlot
 		return _value.Int64;
 	}
 	
-	public float ReadFloat()
+	public readonly float ReadFloat()
 	{
 		if (_type != EZCallBufferSlotType.Float)
 		{
@@ -291,7 +299,7 @@ public struct ZCallBufferSlot
 		return _value.Float;
 	}
 	
-	public double ReadDouble()
+	public readonly double ReadDouble()
 	{
 		if (_type != EZCallBufferSlotType.Double)
 		{
@@ -301,7 +309,7 @@ public struct ZCallBufferSlot
 		return _value.Double;
 	}
 	
-	public bool ReadBool()
+	public readonly bool ReadBool()
 	{
 		if (_type != EZCallBufferSlotType.Bool)
 		{
@@ -311,7 +319,7 @@ public struct ZCallBufferSlot
 		return _value.Bool > 0;
 	}
 	
-	public IntPtr ReadPointer()
+	public readonly IntPtr ReadPointer()
 	{
 		if (_type != EZCallBufferSlotType.Pointer)
 		{
@@ -321,7 +329,7 @@ public struct ZCallBufferSlot
 		return _value.Pointer;
 	}
 	
-	public GCHandle ReadGCHandle()
+	public readonly GCHandle ReadGCHandle()
 	{
 		if (_type != EZCallBufferSlotType.GCHandle)
 		{
@@ -331,7 +339,7 @@ public struct ZCallBufferSlot
 		return _value.GCHandle;
 	}
 	
-	public ConjugateHandle ReadConjugate()
+	public readonly ConjugateHandle ReadConjugate()
 	{
 		if (_type != EZCallBufferSlotType.Conjugate)
 		{
@@ -481,10 +489,10 @@ public struct ZCallBufferSlot
 		_value.Conjugate = value;
 	}
 
-	public T? ReadConjugate<T>() where T : class, IConjugate => ReadConjugate().GetTarget<T>();
+	public readonly T? ReadConjugate<T>() where T : class, IConjugate => ReadConjugate().GetTarget<T>();
 	public void WriteConjugate<T>(T? value) where T : class, IConjugate => WriteConjugate(new ConjugateHandle(value));
 
-	public object? ReadObject()
+	public readonly object? ReadObject()
 	{
 		return _type switch
 		{
@@ -583,91 +591,91 @@ public struct ZCallBufferSlot
 
 	public uint8 UInt8
 	{
-		get => ReadUInt8();
+		readonly get => ReadUInt8();
 		set => WriteUInt8(value);
 	}
 	
 	public uint16 UInt16
 	{
-		get => ReadUInt16();
+		readonly get => ReadUInt16();
 		set => WriteUInt16(value);
 	}
 	
 	public uint32 UInt32
 	{
-		get => ReadUInt32();
+		readonly get => ReadUInt32();
 		set => WriteUInt32(value);
 	}
 	
 	public uint64 UInt64
 	{
-		get => ReadUInt64();
+		readonly get => ReadUInt64();
 		set => WriteUInt64(value);
 	}
 	
 	public int8 Int8
 	{
-		get => ReadInt8();
+		readonly get => ReadInt8();
 		set => WriteInt8(value);
 	}
 	
 	public int16 Int16
 	{
-		get => ReadInt16();
+		readonly get => ReadInt16();
 		set => WriteInt16(value);
 	}
 	
 	public int32 Int32
 	{
-		get => ReadInt32();
+		readonly get => ReadInt32();
 		set => WriteInt32(value);
 	}
 	
 	public int64 Int64
 	{
-		get => ReadInt64();
+		readonly get => ReadInt64();
 		set => WriteInt64(value);
 	}
 	
 	public float Float
 	{
-		get => ReadFloat();
+		readonly get => ReadFloat();
 		set => WriteDouble(value);
 	}
 	
 	public double Double
 	{
-		get => ReadDouble();
+		readonly get => ReadDouble();
 		set => WriteDouble(value);
 	}
 	
 	public bool Bool
 	{
-		get => ReadBool();
+		readonly get => ReadBool();
 		set => WriteBool(value);
 	}
 	
 	public IntPtr Pointer
 	{
-		get => ReadPointer();
+		readonly get => ReadPointer();
 		set => WritePointer(value);
 	}
 	
 	public GCHandle GCHandle
 	{
-		get => ReadGCHandle();
+		readonly get => ReadGCHandle();
 		set => WriteGCHandle(value);
 	}
 	
 	public ConjugateHandle Conjugate
 	{
-		get => ReadConjugate();
+		readonly get => ReadConjugate();
 		set => WriteConjugate(value);
 	}
 
 	public object? Object
 	{
-		get => ReadObject();
+		readonly get => ReadObject();
 		set => WriteObject(value);
 	}
 
@@ -694,7 +702,7 @@ public unsafe struct ZCallBuffer
 		{
 			if (index < 0)
 			{
-				index = NumSlots + index;
+				index = _numSlots + index;
 			}
 			
 			if (index < 0 || index >= _numSlots)

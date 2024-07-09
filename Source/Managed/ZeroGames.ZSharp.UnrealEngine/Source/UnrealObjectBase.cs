@@ -3,15 +3,12 @@
 namespace ZeroGames.ZSharp.UnrealEngine;
 
 [ConjugateRegistryId(1)]
-public abstract class UnrealObjectBase : ExportedObjectBase, IStaticClass
+public abstract class UnrealObjectBase : UnrealExportedObjectBase, IStaticClass
 {
 
     protected UnrealObjectBase(IntPtr unmanaged) : base(unmanaged){}
 
-    public static string SUnrealFieldPath => throw new NotSupportedException();
     public static UnrealClass SStaticClass => throw new NotSupportedException();
-    
-    public abstract string UnrealFieldPath { get; }
     
 }
 

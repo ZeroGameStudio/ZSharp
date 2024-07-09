@@ -18,71 +18,14 @@ public abstract class UnrealArray : PlainExportedObjectBase
 		Unmanaged = GetOwningAlc().BuildConjugate(this, (IntPtr)pUserdata);
 	}
 	
-	public unsafe void InsertAt(int32 index)
-	{
-		IMasterAssemblyLoadContext alc = GetOwningAlc();
-		const int32 numSlots = 2;
-		ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
-		{
-			ZCallBufferSlot.FromConjugate(this),
-			ZCallBufferSlot.FromInt32(index),
-		};
-		ZCallBuffer buffer = new(slots, numSlots);
-		ZCallHandle handle = alc.GetZCallHandle("ex://Array.InsertAt");
-		alc.ZCall(handle, &buffer);
-	}
-	
-	public unsafe int32 Count
-	{
-		get
-		{
-			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 2;
-			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
-			{
-				ZCallBufferSlot.FromConjugate(this),
-				ZCallBufferSlot.FromInt32(),
-			};
-			ZCallBuffer buffer = new(slots, numSlots);
-			ZCallHandle handle = alc.GetZCallHandle("ex://Array.Num");
-			alc.ZCall(handle, &buffer);
+	public void InsertAt(int32 index) => this.ZCall("ex://Array.InsertAt", index);
 
-			return slots[1].Int32;
-		}
-	}
+	public int32 Count => this.ZCall("ex://Array.Num", 0)[1].Int32;
 	
-	public unsafe object? this[int32 index]
+	public object? this[int32 index]
 	{
-		get
-		{
-			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 3;
-			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
-			{
-				ZCallBufferSlot.FromConjugate(this),
-				ZCallBufferSlot.FromInt32(index),
-				ZCallBufferSlot.FromType(_elementType),
-			};
-			ZCallBuffer buffer = new(slots, numSlots);
-			ZCallHandle handle = alc.GetZCallHandle("ex://Array.Get");
-			alc.ZCall(handle, &buffer);
-
-			return slots[2].Object;
-		}
-		set
-		{
-			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 3;
-			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
-			{
-				ZCallBufferSlot.FromConjugate(this),
-				ZCallBufferSlot.FromInt32(index),
-				ZCallBufferSlot.FromObject(value),
-			};
-			ZCallBuffer buffer = new(slots, numSlots);
-			ZCallHandle handle = alc.GetZCallHandle("ex://Array.Set");
-			alc.ZCall(handle, &buffer);
-		}
+		get => this.ZCall("ex://Array.Get", index, _elementType)[2].Object;
+		set => this.ZCall("ex://Array.Set", index, value);
 	}
 	
 	private void ValidateElementType()

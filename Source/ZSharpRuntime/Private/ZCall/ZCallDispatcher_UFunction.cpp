@@ -32,6 +32,10 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 		{
 			return 3;
 		}
+		const UFunction* proto = func;
+		func = self->GetClass()->FindFunctionByName(func->GetFName()); // Instance function may be polymorphism
+		check(func->IsChildOf(proto));
+		check(func->IsSignatureCompatibleWith(proto));
 	}
 	else
 	{
@@ -69,7 +73,16 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 
 bool ZSharp::FZCallDispatcher_UFunction::InvalidateCache() const
 {
-	Function = LoadObject<UFunction>(nullptr, *Path);
+	FString ClassPath;
+	FString FunctionName;
+	Path.Split(TEXT(":"), &ClassPath, &FunctionName, ESearchCase::CaseSensitive, ESearchDir::FromEnd);
+	const UClass* cls = LoadClass<UObject>(nullptr, *ClassPath);
+	if (!cls)
+	{
+		return false;
+	}
+	
+	Function = cls->FindFunctionByName(FName(FunctionName));
 	if (!Function.IsValid(true))
 	{
 		return false;

@@ -5,60 +5,18 @@ namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 public partial class Character
 {
 
-	public unsafe bool SetActorLocation(Vector location, bool sweep, out HitResult sweepHitResult, bool teleport)
+	public bool SetActorLocation(Vector location, bool sweep, out HitResult sweepHitResult, bool teleport)
 	{
 		sweepHitResult = new();
-		
-		IMasterAssemblyLoadContext alc = GetOwningAlc();
-		const int32 numSlots = 6;
-		ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
-		{
-			ZCallBufferSlot.FromConjugate(this),
-			ZCallBufferSlot.FromConjugate(location),
-			ZCallBufferSlot.FromBool(sweep),
-			ZCallBufferSlot.FromConjugate(sweepHitResult),
-			ZCallBufferSlot.FromBool(teleport),
-			ZCallBufferSlot.FromBool(),
-		};
-		ZCallBuffer buffer = new(slots, numSlots);
-		ZCallHandle handle = alc.GetZCallHandle("uf://Script/Engine.Actor:K2_SetActorLocation");
-		alc.ZCall(handle, &buffer);
 
-		return slots[5].Bool;
+		return CallUnrealFunction<bool>("K2_SetActorLocation", location, sweep, sweepHitResult, teleport, false);
 	}
 
-	public unsafe void Jump()
-	{
-		IMasterAssemblyLoadContext alc = GetOwningAlc();
-		const int32 numSlots = 1;
-		ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
-		{
-			ZCallBufferSlot.FromConjugate(this),
-		};
-		ZCallBuffer buffer = new(slots, numSlots);
-		ZCallHandle handle = alc.GetZCallHandle("uf://Script/Engine.Character:Jump");
-		alc.ZCall(handle, &buffer);
-	}
+	public void Jump() => CallUnrealFunction("Jump");
 
-	public unsafe CharacterMovementComponent? CharacterMovement
+	public CharacterMovementComponent? CharacterMovement
 	{
-		get
-		{
-			IMasterAssemblyLoadContext alc = GetOwningAlc();
-			const int32 numSlots = 4;
-			ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[numSlots]
-			{
-				ZCallBufferSlot.FromConjugate(this),
-				ZCallBufferSlot.FromBool(),
-				ZCallBufferSlot.FromInt32(),
-				ZCallBufferSlot.FromConjugate(),
-			};
-			ZCallBuffer buffer = new(slots, numSlots);
-			ZCallHandle handle = alc.GetZCallHandle("up://Script/Engine.Character:CharacterMovement");
-			alc.ZCall(handle, &buffer);
-
-			return slots[3].ReadConjugate<CharacterMovementComponent>();
-		}
+		get => ReadUnrealProperty<CharacterMovementComponent>("CharacterMovement");
 	}
 	
 }

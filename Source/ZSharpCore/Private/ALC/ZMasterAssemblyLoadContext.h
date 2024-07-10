@@ -29,7 +29,7 @@ namespace ZSharp
 
 		// IZMasterAssemblyLoadContext
 		virtual void LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) override;
-		virtual FZRuntimeTypeHandle GetType(const FString& assemblyName, const FString& typeName) override;
+		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeLocatorWrapper& locator) override;
 
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) override;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) override;

@@ -13,12 +13,19 @@ namespace ZSharp
 	class IZCallResolver;
 	struct FZCallBuffer;
 	class IZConjugateRegistry;
+
+	struct FZRuntimeTypeLocatorWrapper
+	{
+		FString AssemblyName;
+		FString TypeName;
+		TArray<FZRuntimeTypeLocatorWrapper> TypeParameters;
+	};
 	
 	class ZSHARPCORE_API IZMasterAssemblyLoadContext : public IZAssemblyLoadContext
 	{
 	public:
 		virtual void LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) = 0;
-		virtual FZRuntimeTypeHandle GetType(const FString& assemblyName, const FString& typeName) = 0;
+		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeLocatorWrapper& locator) = 0;
 	public:
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) = 0;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) = 0;

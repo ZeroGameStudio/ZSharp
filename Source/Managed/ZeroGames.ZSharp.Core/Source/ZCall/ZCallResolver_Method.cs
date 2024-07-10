@@ -27,7 +27,8 @@ internal class ZCallResolver_Method : IZCallResolver
 		}
 		
 		(string assemblyName, string typeName, string methodName) = (paths[0], paths[1], paths[2]);
-		Type? type = alc.GetType(assemblyName, typeName);
+		RuntimeTypeLocator locator = new(assemblyName, typeName);
+		Type? type = alc.GetType(ref locator);
 		if (type is null)
 		{
 			return null;

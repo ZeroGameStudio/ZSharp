@@ -3,7 +3,10 @@
 
 #include "ZCall/Conjugate/ZConjugateRegistry_Array.h"
 
+#include "ZSharpExportHelpers.h"
+#include "ZSharpExportRuntimeSettings.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "Trait/ZExportedTypeName.h"
 #include "ZCall/ZDeclareConjugateRegistry.h"
 #include "ZCall/Property/ZPropertyFactory.h"
 
@@ -12,12 +15,30 @@ namespace ZSharp::ZConjugateRegistry_Array_Private
 	static TZDeclareConjugateRegistry<FZConjugateRegistry_Array> GDeclare;
 }
 
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FProperty* elementPropertyProto, TFunctionRef<void(const FZSelfDescriptiveScriptArray&)> initialize)
+{
+	const FZRuntimeTypeHandle type = GetManagedType(elementPropertyProto);
+	FProperty* elementProperty = CastField<FProperty>(FField::Duplicate(elementPropertyProto, nullptr));
+	FZSelfDescriptiveScriptArray* sdsa = new FZSelfDescriptiveScriptArray { elementProperty };
+	initialize(*sdsa);
+	void* unmanaged = sdsa->GetUnderlyingInstance();
+	if (Alc.BuildConjugate(unmanaged, type))
+	{
+		ConjugateMap.Emplace(unmanaged, { TUniquePtr<FZSelfDescriptiveScriptArray>(sdsa), false });
+		CaptureConjugate(unmanaged);
+
+		return { unmanaged };
+	}
+
+	return {};
+}
+
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FProperty* elementProperty, const FScriptArray* unmanaged, bool owning)
 {
 	const auto mutableUnmanaged = const_cast<FScriptArray*>(unmanaged);
 	if (const FZConjugateRec* rec = ConjugateMap.Find(mutableUnmanaged))
 	{
-		check(rec->Array->GetElementProperty() == elementProperty);
+		check(rec->Array->GetElementProperty()->GetClass() == elementProperty->GetClass());
 		return { mutableUnmanaged };
 	}
 
@@ -79,18 +100,35 @@ void ZSharp::FZConjugateRegistry_Array::GetAllConjugates(TArray<void*>& outConju
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Array::GetManagedType(const FProperty* elementProperty) const
 {
-	checkNoEntry();
-	return {};
-	// check(scriptStruct->IsNative()); // @TODO
-	//
-	// const FString moduleName = FZSharpExportHelpers::GetUFieldModuleName(scriptStruct);
-	// FString assemblyName;
-	// if (!GetDefault<UZSharpExportRuntimeSettings>()->TryGetModuleAssembly(moduleName, assemblyName))
-	// {
-	// 	assemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
-	// }
-	// const FString outerExportName = FZSharpExportHelpers::GetUFieldOuterExportName(scriptStruct);
-	// const FString typeName = FString::Printf(TEXT("%s.%s"), *assemblyName, *outerExportName);
-	//
-	// return Alc.GetType(assemblyName, typeName);
+	const auto objectProp = CastField<FObjectProperty>(elementProperty);
+	if (!objectProp)
+	{
+		checkNoEntry();
+		return {};
+	}
+	
+	FZRuntimeTypeLocatorWrapper locator;
+	locator.AssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
+	locator.TypeName = "ZeroGames.ZSharp.UnrealEngine.Core.UnrealArray`1";
+	FZRuntimeTypeLocatorWrapper& inner = locator.TypeParameters.AddDefaulted_GetRef();
+
+	const UClass* cls = objectProp->PropertyClass;
+	while (!cls->IsNative())
+	{
+		cls = cls->GetSuperClass();
+	}
+	const FString moduleName = FZSharpExportHelpers::GetUFieldModuleName(cls);
+	FString assemblyName;
+	if (!GetDefault<UZSharpExportRuntimeSettings>()->TryGetModuleAssembly(moduleName, assemblyName))
+	{
+		assemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
+	}
+	const FString outerExportName = FZSharpExportHelpers::GetUFieldOuterExportName(cls);
+	const FString typeName = FString::Printf(TEXT("%s.%s"), *assemblyName, *outerExportName);
+	inner.AssemblyName = assemblyName;
+	inner.TypeName = typeName;
+
+	return Alc.GetType(locator);
 }
+
+

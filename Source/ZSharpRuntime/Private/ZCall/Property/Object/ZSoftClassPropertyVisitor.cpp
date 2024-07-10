@@ -24,12 +24,10 @@ void ZSharp::FZSoftClassPropertyVisitor::GetRef(const void* src, FZCallBufferSlo
 
 void ZSharp::FZSoftClassPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const
 {
-	static const FSoftClassPtr GDefault{};
-	
 	const FSoftClassPtr* value = TZCallBufferSlotEncoder<FSoftClassPtr>::DecodePointer(src);
 	if (!value)
 	{
-		UnderlyingProperty->CopySingleValue(dest, &GDefault);
+		UnderlyingProperty->InitializeValue(dest);
 		return;
 	}
 	

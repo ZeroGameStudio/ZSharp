@@ -77,7 +77,7 @@ internal static class DllEntry
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<float, uint8>)&MasterAssemblyLoadContext_Interop.Tick;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<int32>)&MasterAssemblyLoadContext_Interop.Unload;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<uint8*, int32, void*, void>)&MasterAssemblyLoadContext_Interop.LoadAssembly;
-        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, char*, InteropRuntimeTypeHandle>)&MasterAssemblyLoadContext_Interop.GetType;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<InteropRuntimeTypeLocator*, InteropRuntimeTypeHandle>)&MasterAssemblyLoadContext_Interop.GetType;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32>)&MasterAssemblyLoadContext_Interop.ZCall_Red;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, ZCallHandle>)&MasterAssemblyLoadContext_Interop.GetZCallHandle_Red;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, InteropRuntimeTypeHandle, IntPtr>)&MasterAssemblyLoadContext_Interop.BuildConjugate_Red;

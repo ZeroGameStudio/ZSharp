@@ -17,6 +17,11 @@ public readonly struct ConjugateHandle
 
     public T? GetTarget<T>() where T : class, IConjugate
     {
+        if (!Valid)
+        {
+            return null;
+        }
+        
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
         {

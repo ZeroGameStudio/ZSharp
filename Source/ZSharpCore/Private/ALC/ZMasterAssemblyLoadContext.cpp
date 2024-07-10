@@ -5,6 +5,7 @@
 
 #include "ZSharpCoreLogChannels.h"
 #include "Interop/ZMasterAssemblyLoadContext_Interop.h"
+#include "Interop/ZRuntimeTypeLocator.h"
 #include "ZCall/IZCallDispatcher.h"
 #include "ZCall/ZConjugateRegistryDeclarations.h"
 
@@ -63,11 +64,46 @@ void ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const TArray<uint8>& buff
 	FZMasterAssemblyLoadContext_Interop::GLoadAssembly(buffer.GetData(), buffer.Num(), args);
 }
 
-ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const FString& assemblyName, const FString& typeName)
+ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const FZRuntimeTypeLocatorWrapper& locator)
 {
 	check(IsInGameThread());
+
+	TFunction<FZRuntimeTypeLocator(const FZRuntimeTypeLocatorWrapper&)> convert;
+	convert = [&convert](const FZRuntimeTypeLocatorWrapper& cur)
+	{
+		const int32 num = cur.TypeParameters.Num();
+		
+		FZRuntimeTypeLocator interopLocator;
+		interopLocator.AssemblyName = *cur.AssemblyName;
+		interopLocator.TypeName = *cur.TypeName;
+		interopLocator.TypeParameters = num ? new FZRuntimeTypeLocator[cur.TypeParameters.Num()] : nullptr;
+		interopLocator.NumTypeParameters = num;
+		for (int32 i = 0; i < num; ++i)
+		{
+			interopLocator.TypeParameters[i] = convert(cur.TypeParameters[i]);
+		}
+		
+		return interopLocator;
+	};
+
+	TFunction<void(const FZRuntimeTypeLocator&)> free;
+	free = [&free](const FZRuntimeTypeLocator& cur)
+	{
+		for (int32 i = cur.NumTypeParameters - 1; i >= 0; --i)
+		{
+			free(cur.TypeParameters[i]);
+		}
+		
+		delete[] cur.TypeParameters;
+	};
+
+	const FZRuntimeTypeLocator interopLocator = convert(locator);
 	
-	return FZMasterAssemblyLoadContext_Interop::GGetType(*assemblyName, *typeName);
+	FZRuntimeTypeHandle handle = FZMasterAssemblyLoadContext_Interop::GGetType(interopLocator);
+
+	free(interopLocator); // Do NOT use ON_SCOPE_EXIT because we don't know destruction order.
+
+	return handle;
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::RegisterZCall(IZCallDispatcher* dispatcher)

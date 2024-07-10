@@ -6,29 +6,29 @@
 namespace ZSharp::PropertyFactory_Private
 {
 	// NOTE: KEEP SYNC WITH IntrinsicTypeId.cs
-	static const void* GUInt8TypeId = reinterpret_cast<void*>(1);
-	static const void* GUInt16TypeId = reinterpret_cast<void*>(2);
-	static const void* GUInt32TypeId = reinterpret_cast<void*>(3);
-	static const void* GUInt64TypeId = reinterpret_cast<void*>(4);
-	static const void* GInt8TypeId = reinterpret_cast<void*>(5);
-	static const void* GInt16TypeId = reinterpret_cast<void*>(6);
-	static const void* GInt32TypeId = reinterpret_cast<void*>(7);
-	static const void* GInt64TypeId = reinterpret_cast<void*>(8);
-	static const void* GFloatTypeId = reinterpret_cast<void*>(9);
-	static const void* GDoubleTypeId = reinterpret_cast<void*>(10);
-	static const void* GBoolTypeId = reinterpret_cast<void*>(11);
+	static void* const GUInt8TypeId = reinterpret_cast<void*>(1);
+	static void* const GUInt16TypeId = reinterpret_cast<void*>(2);
+	static void* const GUInt32TypeId = reinterpret_cast<void*>(3);
+	static void* const GUInt64TypeId = reinterpret_cast<void*>(4);
+	static void* const GInt8TypeId = reinterpret_cast<void*>(5);
+	static void* const GInt16TypeId = reinterpret_cast<void*>(6);
+	static void* const GInt32TypeId = reinterpret_cast<void*>(7);
+	static void* const GInt64TypeId = reinterpret_cast<void*>(8);
+	static void* const GFloatTypeId = reinterpret_cast<void*>(9);
+	static void* const GDoubleTypeId = reinterpret_cast<void*>(10);
+	static void* const GBoolTypeId = reinterpret_cast<void*>(11);
 
-	static const void* GStringTypeId = reinterpret_cast<void*>(12);
-	static const void* GNameTypeId = reinterpret_cast<void*>(13);
-	static const void* GTextTypeId = reinterpret_cast<void*>(14);
+	static void* const GStringTypeId = reinterpret_cast<void*>(12);
+	static void* const GNameTypeId = reinterpret_cast<void*>(13);
+	static void* const GTextTypeId = reinterpret_cast<void*>(14);
 
-	static const void* GWeakObjectPtrTypeId = reinterpret_cast<void*>(15);
-	static const void* GSoftObjectPtrTypeId = reinterpret_cast<void*>(16);
-	static const void* GLazyObjectPtrTypeId = reinterpret_cast<void*>(17);
-	static const void* GSoftClassPtrTypeId = reinterpret_cast<void*>(18);
-	static const void* GScriptInterfaceTypeId = reinterpret_cast<void*>(19);
+	static void* const GWeakObjectPtrTypeId = reinterpret_cast<void*>(15);
+	static void* const GSoftObjectPtrTypeId = reinterpret_cast<void*>(16);
+	static void* const GLazyObjectPtrTypeId = reinterpret_cast<void*>(17);
+	static void* const GSoftClassPtrTypeId = reinterpret_cast<void*>(18);
+	static void* const GScriptInterfaceTypeId = reinterpret_cast<void*>(19);
 	
-	static const void* GFieldPathTypeId = reinterpret_cast<void*>(19);
+	static void* const GFieldPathTypeId = reinterpret_cast<void*>(19);
 
 	template <std::derived_from<FProperty> T>
 	T* Create(EPropertyFlags flags)
@@ -75,19 +75,24 @@ FProperty* ZSharp::FZPropertyFactory::Create(const FZPropertyDesc& desc)
 		return (*func)(desc);
 	}
 
-	UStruct* strct = static_cast<UStruct*>(desc.Descriptor);
-	if (auto cls = Cast<UClass>(strct))
+	UField* field = static_cast<UField*>(desc.Descriptor);
+	if (auto cls = Cast<UClass>(field))
 	{
 		auto prop = PropertyFactory_Private::Create<FObjectProperty>(CPF_None);
 		prop->PropertyClass = cls;
 		return prop;
 	}
-	else if (auto scriptStruct = Cast<UScriptStruct>(strct))
+	else if (auto scriptStruct = Cast<UScriptStruct>(field))
 	{
 		auto prop = PropertyFactory_Private::Create<FStructProperty>(CPF_None);
 		prop->ElementSize = scriptStruct->GetStructureSize();
 		prop->Struct = scriptStruct;
 		return prop;
+	}
+	else if (auto enm = Cast<UEnum>(field))
+	{
+		auto prop = new FEnumProperty { enm };
+		prop->SetEnum(enm);
 	}
 
 	checkNoEntry();

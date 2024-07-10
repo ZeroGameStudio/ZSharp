@@ -23,12 +23,10 @@ void ZSharp::FZLazyObjectPropertyVisitor::GetRef(const void* src, FZCallBufferSl
 
 void ZSharp::FZLazyObjectPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const
 {
-	static const FLazyObjectPtr GDefault{};
-	
 	const FLazyObjectPtr* value = TZCallBufferSlotEncoder<FLazyObjectPtr>::DecodePointer(src);
 	if (!value)
 	{
-		UnderlyingProperty->CopySingleValue(dest, &GDefault);
+		UnderlyingProperty->InitializeValue(dest);
 		return;
 	}
 	

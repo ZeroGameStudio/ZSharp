@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.Core;
 [ConjugateRegistryId(31)]
 public abstract class UnrealArray : PlainExportedObjectBase
 {
-	
+
 	protected unsafe UnrealArray(Type elementType)
 	{
 		_elementType = elementType;
@@ -16,6 +16,12 @@ public abstract class UnrealArray : PlainExportedObjectBase
 		SetupUserdata(out var userdata);
 		Userdata* pUserdata = &userdata;
 		Unmanaged = GetOwningAlc().BuildConjugate(this, (IntPtr)pUserdata);
+	}
+
+	protected UnrealArray(Type elementType, IntPtr unmanaged) : base(unmanaged)
+	{
+		_elementType = elementType;
+		ValidateElementType();
 	}
 	
 	public void InsertAt(int32 index) => this.ZCall("ex://Array.InsertAt", index);
@@ -62,9 +68,13 @@ public abstract class UnrealArray : PlainExportedObjectBase
 		{
 			userdata.ElementProperty.Descriptor = ((UnrealScriptStruct)_elementType.GetProperty(nameof(IStaticStruct.SStaticStruct))!.GetValue(null)!).Unmanaged;
 		}
+		else if (UnrealEnum.IsUnrealEnumType(_elementType))
+		{
+			userdata.ElementProperty.Descriptor = UnrealEnum.GetStaticEnum(_elementType).Unmanaged;
+		}
 	}
 
-	private Type _elementType;
+	private readonly Type _elementType;
 	
 	[StructLayout(LayoutKind.Sequential)]
 	private struct Userdata
@@ -74,17 +84,19 @@ public abstract class UnrealArray : PlainExportedObjectBase
 
 }
 
-public class UnrealArray<T> : UnrealArray
+public class UnrealArray<T> : UnrealArray, IConjugate<UnrealArray<T>>
 {
 
+	public static UnrealArray<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+
 	public UnrealArray() : base(typeof(T)){}
+	public UnrealArray(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 
 	public new T? this[int32 index]
 	{
 		get => (T?)((UnrealArray)this)[index];
 		set => ((UnrealArray)this)[index] = value!;
 	}
-	
 }
 
 

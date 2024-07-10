@@ -4,13 +4,35 @@ using System.Reflection;
 
 namespace ZeroGames.ZSharp.Core;
 
+public readonly struct RuntimeTypeLocator
+{
+	public RuntimeTypeLocator(string assemblyName, string typeName)
+	{
+		AssemblyName = assemblyName;
+		TypeName = typeName;
+	}
+	public unsafe RuntimeTypeLocator(InteropRuntimeTypeLocator* locator)
+	{
+		AssemblyName = new(locator->AssemblyName);
+		TypeName = new(locator->TypeName);
+		TypeParameters = new RuntimeTypeLocator[locator->NumTypeParameters];
+		for (int32 i = 0; i < TypeParameters.Length; ++i)
+		{
+			TypeParameters[i] = new(locator->TypeParameters + i);
+		}
+	}
+	public string AssemblyName { get; }
+	public string TypeName { get; }
+	public RuntimeTypeLocator[]? TypeParameters { get; }
+}
+
 public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 {
 	
 	public static IMasterAssemblyLoadContext? Get() => MasterAssemblyLoadContext.Get();
 
 	Assembly? LoadAssembly(string name);
-	Type? GetType(string assemblyName, string typeName);
+	Type? GetType(ref readonly RuntimeTypeLocator locator);
 
 	ZCallHandle RegisterZCall(IZCallDispatcher dispatcher);
 	void RegisterZCallResolver(IZCallResolver resolver, uint64 priority);
@@ -21,6 +43,5 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 	void ReleaseConjugate(IntPtr unmanaged);
 	void PushPendingDisposeConjugate(IConjugate conjugate);
 }
-
 
 

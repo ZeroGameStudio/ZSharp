@@ -44,15 +44,50 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         throw new NotImplementedException();
     }
 
-    public Type? GetType(string assemblyName, string typeName)
+    public Type? GetType(ref readonly RuntimeTypeLocator locator)
     {
-        Assembly? asm = Assemblies.FirstOrDefault(asm => asm.GetName().Name == assemblyName);
-        if (asm is null)
-        {
-            return null;
-        }
+        Dictionary<string, Assembly> asmLookup = Assemblies.Concat(Default.Assemblies).ToDictionary(asm => asm.GetName().Name!);
 
-        return asm.GetType(typeName);
+        Func<RuntimeTypeLocator, Type?> combine = null!;
+        combine = locator =>
+        {
+            if (!asmLookup.TryGetValue(locator.AssemblyName, out var asm))
+            {
+                return null;
+            }
+
+            Type? t = asm.GetType(locator.TypeName);
+            if (t is null)
+            {
+                return null;
+            }
+            
+            if (t.IsGenericType)
+            {
+                if (locator.TypeParameters is null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                Type[] tps = new Type[locator.TypeParameters.Length];
+                for (int32 i = 0; i < tps.Length; ++i)
+                {
+                    Type? tp = combine(locator.TypeParameters[i]);
+                    if (tp is null)
+                    {
+                        return null;
+                    }
+
+                    tps[i] = tp;
+                }
+
+                return t.MakeGenericType(tps);
+            }
+
+            return t;
+        };
+
+        return combine(locator);
     }
 
     public ZCallHandle RegisterZCall(IZCallDispatcher dispatcher)

@@ -23,12 +23,10 @@ void ZSharp::FZTextPropertyVisitor::GetRef(const void* src, FZCallBufferSlot& de
 
 void ZSharp::FZTextPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const
 {
-	static const FText GDefault{};
-	
 	const FText* value = TZCallBufferSlotEncoder<FText>::DecodePointer(src);
 	if (!value)
 	{
-		UnderlyingProperty->CopySingleValue(dest, &GDefault);
+		UnderlyingProperty->InitializeValue(dest);
 		return;
 	}
 	

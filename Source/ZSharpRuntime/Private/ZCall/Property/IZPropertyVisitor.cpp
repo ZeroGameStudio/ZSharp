@@ -6,6 +6,7 @@
 #include "UObject/PropertyOptional.h"
 #include "ZSharpRuntimeLogChannels.h"
 #include "ZFieldPathPropertyVisitor.h"
+#include "Container/ZArrayPropertyVisitor.h"
 #include "Container/ZStructPropertyVisitor.h"
 #include "Object/ZClassPropertyVisitor.h"
 #include "Object/ZLazyObjectPropertyVisitor.h"
@@ -89,7 +90,7 @@ TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FP
 	}
 	else if (const auto arrayProp = CastField<FArrayProperty>(prop))
 	{
-
+		return MakeUnique<FZArrayPropertyVisitor>(arrayProp);
 	}
 	else if (const auto setProp = CastField<FSetProperty>(prop))
 	{

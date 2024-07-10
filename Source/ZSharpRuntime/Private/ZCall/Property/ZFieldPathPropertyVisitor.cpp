@@ -23,12 +23,10 @@ void ZSharp::FZFieldPathPropertyVisitor::GetRef(const void* src, FZCallBufferSlo
 
 void ZSharp::FZFieldPathPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const
 {
-	static const FFieldPath GDefault{};
-	
 	const FFieldPath* value = TZCallBufferSlotEncoder<FFieldPath>::DecodePointer(src);
 	if (!value)
 	{
-		UnderlyingProperty->CopySingleValue(dest, &GDefault);
+		UnderlyingProperty->InitializeValue(dest);
 		return;
 	}
 	

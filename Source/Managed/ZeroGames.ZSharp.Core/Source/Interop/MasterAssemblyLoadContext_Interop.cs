@@ -48,7 +48,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     });
 
     [UnmanagedCallersOnly]
-    public static InteropRuntimeTypeHandle GetType(char* assemblyName, char* typeName) => Uncaught.ErrorIfUncaught(() =>
+    public static InteropRuntimeTypeHandle GetType(InteropRuntimeTypeLocator* locator) => Uncaught.ErrorIfUncaught(() =>
     {
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
@@ -56,7 +56,8 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
             return new InteropRuntimeTypeHandle();
         }
 
-        return new InteropRuntimeTypeHandle(alc.GetType(new string(assemblyName), new string(typeName)));
+        RuntimeTypeLocator root = new(locator);
+        return new InteropRuntimeTypeHandle(alc.GetType(ref root));
     }, default);
 
     [UnmanagedCallersOnly]

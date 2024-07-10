@@ -12,18 +12,15 @@ void ZSharp::FZStructPropertyVisitor::GetValue(const void* src, FZCallBufferSlot
 {
 	const FZSelfDescriptiveScriptStruct* sdss = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(dest.ReadConjugate());
 	const UScriptStruct* scriptStruct = UnderlyingStructProperty->Struct;
-	void* unmanaged = sdss ? sdss->GetUnderlyingInstance() : nullptr;
-	if (!unmanaged)
+	if (!sdss)
 	{
-		unmanaged = FMemory::Malloc(scriptStruct->GetStructureSize(), scriptStruct->GetMinAlignment());
-		scriptStruct->InitializeStruct(unmanaged);
-		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(scriptStruct, unmanaged, true));
+		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(scriptStruct, [src, scriptStruct](const FZSelfDescriptiveScriptStruct& sdss){ scriptStruct->CopyScriptStruct(sdss.GetUnderlyingInstance(), src); }));
 	}
 	else
 	{
 		check(sdss->GetDescriptor() == scriptStruct);
+		scriptStruct->CopyScriptStruct(sdss->GetUnderlyingInstance(), src);
 	}
-	scriptStruct->CopyScriptStruct(unmanaged, src);
 }
 
 void ZSharp::FZStructPropertyVisitor::GetRef(const void* src, FZCallBufferSlot& dest) const
@@ -37,19 +34,12 @@ void ZSharp::FZStructPropertyVisitor::SetValue(void* dest, const FZCallBufferSlo
 	const FZSelfDescriptiveScriptStruct* sdss = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(src.ReadConjugate());
 	if (!sdss)
 	{
-		const UScriptStruct* scriptStruct = UnderlyingStructProperty->Struct;
-		void* unmanaged = FMemory_Alloca_Aligned(scriptStruct->GetStructureSize(), scriptStruct->GetMinAlignment());
-		scriptStruct->InitializeStruct(unmanaged);
-		UnderlyingStructProperty->CopySingleValue(dest, unmanaged);
+		UnderlyingProperty->InitializeValue(dest);
 		return;
 	}
 	
-	const UScriptStruct* scriptStruct = sdss->GetDescriptor();
-	check(scriptStruct == UnderlyingStructProperty->Struct);
-	if (const void* unmanaged = sdss->GetUnderlyingInstance())
-	{
-		UnderlyingStructProperty->CopySingleValue(dest, unmanaged);
-	}
+	check(sdss->GetDescriptor() == UnderlyingStructProperty->Struct);
+	UnderlyingProperty->CopySingleValue(dest, sdss->GetUnderlyingInstance());
 }
 
 

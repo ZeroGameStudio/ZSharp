@@ -34,6 +34,11 @@ UObject* ZSharp::FZConjugateRegistry_UObject::Conjugate(FZConjugateHandle handle
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UObject::Conjugate(const UObjectBase* unmanaged)
 {
 	auto unmanagedObject = (UObject*)unmanaged;
+	if (!unmanagedObject)
+	{
+		return {};
+	}
+	
 	if (ConjugateMap.Find(unmanagedObject))
 	{
 		return { unmanagedObject };
@@ -97,7 +102,11 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UObject::GetManagedType(
 	const FString outerExportName = FZSharpExportHelpers::GetUFieldOuterExportName(cls);
 	const FString typeName = FString::Printf(TEXT("%s.%s"), *assemblyName, *outerExportName);
 	
-	return Alc.GetType(assemblyName, typeName);
+	FZRuntimeTypeLocatorWrapper locator;
+    locator.AssemblyName = assemblyName;
+    locator.TypeName = typeName;
+	
+	return Alc.GetType(locator);
 }
 
 void ZSharp::FZConjugateRegistry_UObject::HandleGarbageCollectComplete()

@@ -13,6 +13,23 @@ namespace ZSharp::ZConjugateRegistry_UScriptStruct_Private
 	static TZDeclareConjugateRegistry<FZConjugateRegistry_UScriptStruct> GDeclare;
 }
 
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UScriptStruct::Conjugate(const UScriptStruct* scriptStruct, TFunctionRef<void(const FZSelfDescriptiveScriptStruct& sdss)> initialize)
+{
+	const FZRuntimeTypeHandle type = GetManagedType(scriptStruct);
+	FZSelfDescriptiveScriptStruct* sdss = new FZSelfDescriptiveScriptStruct { scriptStruct };
+	initialize(*sdss);
+	void* unmanaged = sdss->GetUnderlyingInstance();
+	if (Alc.BuildConjugate(unmanaged, type))
+	{
+		ConjugateMap.Emplace(unmanaged, { TUniquePtr<FZSelfDescriptiveScriptStruct>(sdss), false });
+		CaptureConjugate(unmanaged);
+
+		return { unmanaged };
+	}
+
+	return {};
+}
+
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UScriptStruct::Conjugate(const UScriptStruct* scriptStruct, const void* unmanaged, bool owning)
 {
 	const auto mutableUnmanaged = const_cast<void*>(unmanaged);
@@ -86,8 +103,12 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UScriptStruct::GetManage
 	}
 	const FString outerExportName = FZSharpExportHelpers::GetUFieldOuterExportName(scriptStruct);
 	const FString typeName = FString::Printf(TEXT("%s.%s"), *assemblyName, *outerExportName);
+
+	FZRuntimeTypeLocatorWrapper locator;
+	locator.AssemblyName = assemblyName;
+	locator.TypeName = typeName;
 	
-	return Alc.GetType(assemblyName, typeName);
+	return Alc.GetType(locator);
 }
 
 

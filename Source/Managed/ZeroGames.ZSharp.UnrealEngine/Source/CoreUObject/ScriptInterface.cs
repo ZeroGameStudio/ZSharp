@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public class ScriptInterface<T> : ScriptInterface where T : UnrealObject
+public class ScriptInterface<T> : ScriptInterface where T : IUnrealInterface
 {
 	
 }

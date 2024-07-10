@@ -12,7 +12,10 @@
 #define IMPLEMENT_REGISTRY(Type) \
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_##Type::GetManagedType(const ConjugateType* unmanaged) const \
 { \
-	return Alc.GetType(ZSHARP_ENGINE_ASSEMBLY_NAME, FString::Printf(TEXT("%s.%s.%s"), TEXT(ZSHARP_ENGINE_ASSEMBLY_NAME), *TZExportedTypeModule<F##Type>::Get(), *TZExportedTypeName<F##Type>::Get())); \
+	FZRuntimeTypeLocatorWrapper locator; \
+	locator.AssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME; \
+	locator.TypeName = FString::Printf(TEXT("%s.%s.%s"), TEXT(ZSHARP_ENGINE_ASSEMBLY_NAME), *TZExportedTypeModule<F##Type>::Get(), *TZExportedTypeName<F##Type>::Get()); \
+	return Alc.GetType(locator); \
 } \
 namespace ZSharp::ZRegularConjugateRegistries_Private \
 { \

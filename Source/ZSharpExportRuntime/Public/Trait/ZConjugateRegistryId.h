@@ -4,7 +4,7 @@
 
 #include "SoftClassPtr.h"
 #include "StrongObjectPtr.h"
-#include "Concept/ZStaticExportableClass.h"
+#include "Concept/ZStaticallyExportableClass.h"
 
 namespace ZSharp
 {
@@ -14,10 +14,10 @@ namespace ZSharp
 	constexpr uint16 GSetConjugateRegistryId = 32;
 	constexpr uint16 GMapConjugateRegistryId = 33;
 	
-	template <CZStaticExportableClass T, typename = void>
+	template <CZStaticallyExportableClass T, typename = void>
 	struct TZConjugateRegistryId;
 
-	template <CZStaticExportableClass T>
+	template <CZStaticallyExportableClass T>
 	constexpr uint16 TZConjugateRegistryId_V = TZConjugateRegistryId<T>::Value;
 }
 

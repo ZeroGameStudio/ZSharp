@@ -5,8 +5,8 @@
 
 #include "ZSharpExportHelpers.h"
 #include "ZSharpExportRuntimeSettings.h"
-#include "Dynamic/ZDynamicExportedClass.h"
-#include "Dynamic/ZDynamicExportedEnum.h"
+#include "Dynamic/ZDynamicallyExportedClass.h"
+#include "Dynamic/ZDynamicallyExportedEnum.h"
 
 void ZSharp::FZDynamicTypeExporter::Export() const
 {
@@ -24,7 +24,7 @@ void ZSharp::FZDynamicTypeExporter::Export() const
 			continue;
 		}
 
-		FZDynamicExportedEnum::Create(enm);
+		FZDynamicallyExportedEnum::Create(enm);
 	}
 
 	for (TObjectIterator<UScriptStruct> It; It; ++It)
@@ -41,7 +41,7 @@ void ZSharp::FZDynamicTypeExporter::Export() const
 			continue;
 		}
 
-		FZDynamicExportedClass::Create(strct);
+		FZDynamicallyExportedClass::Create(strct);
 	}
 
 	for (TObjectIterator<UClass> It; It; ++It)
@@ -58,7 +58,7 @@ void ZSharp::FZDynamicTypeExporter::Export() const
 			continue;
 		}
 
-		FZDynamicExportedClass::Create(cls);
+		FZDynamicallyExportedClass::Create(cls);
 	}
 }
 

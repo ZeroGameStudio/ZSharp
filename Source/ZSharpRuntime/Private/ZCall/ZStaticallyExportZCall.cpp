@@ -1,16 +1,16 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZCall/ZStaticExportZCall.h"
+#include "ZCall/ZStaticallyExportZCall.h"
 
 #include "ZCallResolver_Export.h"
 
-ZSharp::FZStaticExportZCall::FZStaticExportZCall(const FString& name, const TFunction<int32(FZCallBuffer*)>& function)
+ZSharp::FZStaticallyExportZCall::FZStaticallyExportZCall(const FString& name, const TFunction<int32(FZCallBuffer*)>& function)
 {
 	FZCallResolver_Export::RegisterFunction(name, function);
 }
 
-FString ZSharp::ZStaticExportZCall_Private::MakeZCallName(const FString& functionName)
+FString ZSharp::ZStaticallyExportZCall_Private::MakeZCallName(const FString& functionName)
 {
 	FString left;
 	FString right;

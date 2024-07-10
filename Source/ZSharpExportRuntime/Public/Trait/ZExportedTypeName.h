@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ZIsDynamicExportableType.h"
+#include "ZIsDynamicallyExportableType.h"
 #include "StrongObjectPtr.h"
 #include "SoftClassPtr.h"
 
@@ -12,7 +12,7 @@ namespace ZSharp
 	struct TZExportedTypeName;
 
 	template <typename T>
-	struct TZExportedTypeName<T, std::enable_if_t<TZIsDynamicExportableType_V<T>>>
+	struct TZExportedTypeName<T, std::enable_if_t<TZIsDynamicallyExportableType_V<T>>>
 	{
 		static FString Get()
 		{
@@ -24,7 +24,7 @@ namespace ZSharp
 			{
 				return TBaseStructure<T>::Get()->GetName();
 			}
-			else if constexpr (TZIsDynamicExportableEnum_V<T>)
+			else if constexpr (TZIsDynamicallyExportableEnum_V<T>)
 			{
 				return T::StaticEnum()->GetName();
 			}
@@ -35,7 +35,7 @@ namespace ZSharp
 	};
 }
 
-#define ZSHARP_EXPORT_TYPE_NAME_EX(Type, Name) template<> struct ZSharp::TZExportedTypeName<Type> { static_assert(!ZSharp::TZIsDynamicExportableType_V<Type>); static FString Get() { return #Name; } };
+#define ZSHARP_EXPORT_TYPE_NAME_EX(Type, Name) template<> struct ZSharp::TZExportedTypeName<Type> { static_assert(!ZSharp::TZIsDynamicallyExportableType_V<Type>); static FString Get() { return #Name; } };
 #define ZSHARP_EXPORT_TYPE_NAME(Type) ZSHARP_EXPORT_TYPE_NAME_EX(Type, Type)
 
 ZSHARP_EXPORT_TYPE_NAME(uint8)

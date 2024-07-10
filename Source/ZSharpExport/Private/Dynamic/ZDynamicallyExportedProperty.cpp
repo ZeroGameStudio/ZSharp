@@ -1,15 +1,15 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "Dynamic/ZDynamicExportedProperty.h"
+#include "Dynamic/ZDynamicallyExportedProperty.h"
 
 #include "SoftClassPtr.h"
 #include "ZSharpExportHelpers.h"
 #include "Trait/ZExportedTypeName.h"
 
-ZSharp::FZDynamicExportedProperty* ZSharp::FZDynamicExportedProperty::Create(FProperty* property, int32 index)
+ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Create(FProperty* property, int32 index)
 {
-	auto exportedProperty = new FZDynamicExportedProperty { property, index };
+	auto exportedProperty = new FZDynamicallyExportedProperty { property, index };
 	if (!exportedProperty->IsValid())
 	{
 		delete exportedProperty;
@@ -19,7 +19,7 @@ ZSharp::FZDynamicExportedProperty* ZSharp::FZDynamicExportedProperty::Create(FPr
 	return exportedProperty;
 }
 
-FString ZSharp::FZDynamicExportedProperty::GetName() const
+FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 {
 	FString name = Property->GetName();
 	if (Property->IsA<FBoolProperty>() && name.StartsWith("b", ESearchCase::CaseSensitive))
@@ -42,12 +42,12 @@ FString ZSharp::FZDynamicExportedProperty::GetName() const
 	return name;
 }
 
-FString ZSharp::FZDynamicExportedProperty::GetZCallName() const
+FString ZSharp::FZDynamicallyExportedProperty::GetZCallName() const
 {
 	return FString::Printf(TEXT("up:/%s"), *Property->GetPathName());
 }
 
-FString ZSharp::FZDynamicExportedProperty::GetType() const
+FString ZSharp::FZDynamicallyExportedProperty::GetType() const
 {
 	if (Property->IsA<FByteProperty>())
 	{
@@ -191,17 +191,17 @@ FString ZSharp::FZDynamicExportedProperty::GetType() const
 	return {};
 }
 
-ZSharp::EZExportedPropertyFlags ZSharp::FZDynamicExportedProperty::GetFlags() const
+ZSharp::EZExportedPropertyFlags ZSharp::FZDynamicallyExportedProperty::GetFlags() const
 {
 	return Flags;
 }
 
-int32 ZSharp::FZDynamicExportedProperty::GetIndex() const
+int32 ZSharp::FZDynamicallyExportedProperty::GetIndex() const
 {
 	return Index;
 }
 
-ZSharp::FZDynamicExportedProperty::FZDynamicExportedProperty(FProperty* property, int32 index)
+ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(FProperty* property, int32 index)
 	: Property(property)
 	, Index(index)
 	, Flags(EZExportedPropertyFlags::None)
@@ -226,7 +226,7 @@ ZSharp::FZDynamicExportedProperty::FZDynamicExportedProperty(FProperty* property
 	}
 }
 
-bool ZSharp::FZDynamicExportedProperty::IsValid() const
+bool ZSharp::FZDynamicallyExportedProperty::IsValid() const
 {
 	return !!GetType().Len();
 }

@@ -1,14 +1,14 @@
 // Copyright Zero Games. All Rights Reserved.
 
 
-#include "Dynamic/ZDynamicExportedEnum.h"
+#include "Dynamic/ZDynamicallyExportedEnum.h"
 
 #include "ZExportedTypeRegistry.h"
 #include "ZSharpExportHelpers.h"
 
-ZSharp::FZDynamicExportedEnum* ZSharp::FZDynamicExportedEnum::Create(UEnum* uenum)
+ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(UEnum* uenum)
 {
-	auto enm = new FZDynamicExportedEnum { uenum };
+	auto enm = new FZDynamicallyExportedEnum { uenum };
 	if (!FZExportedTypeRegistry::Get().RegisterEnum(enm))
 	{
 		delete enm;
@@ -18,37 +18,37 @@ ZSharp::FZDynamicExportedEnum* ZSharp::FZDynamicExportedEnum::Create(UEnum* uenu
 	return enm;
 }
 
-FString ZSharp::FZDynamicExportedEnum::GetName() const
+FString ZSharp::FZDynamicallyExportedEnum::GetName() const
 {
 	return Enum->GetName();
 }
 
-FString ZSharp::FZDynamicExportedEnum::GetModule() const
+FString ZSharp::FZDynamicallyExportedEnum::GetModule() const
 {
 	return FZSharpExportHelpers::GetUFieldModuleName(Enum);
 }
 
-FString ZSharp::FZDynamicExportedEnum::GetUnrealFieldPath() const
+FString ZSharp::FZDynamicallyExportedEnum::GetUnrealFieldPath() const
 {
 	return Enum->GetPathName();
 }
 
-ZSharp::EZCallBufferSlotType ZSharp::FZDynamicExportedEnum::GetSlotType() const
+ZSharp::EZCallBufferSlotType ZSharp::FZDynamicallyExportedEnum::GetSlotType() const
 {
 	return EZCallBufferSlotType::Int64; // @FIXME: UnderlyingType
 }
 
-ZSharp::EZExportedEnumFlags ZSharp::FZDynamicExportedEnum::GetFlags() const
+ZSharp::EZExportedEnumFlags ZSharp::FZDynamicallyExportedEnum::GetFlags() const
 {
 	return Flags;
 }
 
-FString ZSharp::FZDynamicExportedEnum::GetUnderlyingType() const
+FString ZSharp::FZDynamicallyExportedEnum::GetUnderlyingType() const
 {
 	return "int64"; // @FIXME
 }
 
-void ZSharp::FZDynamicExportedEnum::ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const
+void ZSharp::FZDynamicallyExportedEnum::ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const
 {
 	for (int32 i = 0; i < Enum->NumEnums(); ++i)
 	{
@@ -58,7 +58,7 @@ void ZSharp::FZDynamicExportedEnum::ForeachEnumValue(TFunctionRef<void(const FSt
 	}
 }
 
-ZSharp::FZDynamicExportedEnum::FZDynamicExportedEnum(UEnum* uenum)
+ZSharp::FZDynamicallyExportedEnum::FZDynamicallyExportedEnum(UEnum* uenum)
 	: Enum(uenum)
 	, Flags(EZExportedEnumFlags::None)
 {

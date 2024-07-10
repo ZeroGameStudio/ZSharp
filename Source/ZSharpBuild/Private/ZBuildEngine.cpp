@@ -8,15 +8,6 @@
 #include "Glue/ZDynamicTypeExporter.h"
 #include "Glue/ZGlueManifestWriter.h"
 #include "Interfaces/IPluginManager.h"
-#include "Static/ZStaticExportedEnum.h"
-
-// @TODO: Remove
-ZSHARP_DECLARE_EXPORTED_ENUM(EForceInit, EForceInit, Core)
-
-ZSHARP_BEGIN_EXPORT_ENUM(EForceInit, false)
-	ZSHARP_EXPORT_ENUM_VALUE(ForceInit)
-	ZSHARP_EXPORT_ENUM_VALUE(ForceInitToZero)
-ZSHARP_END_EXPORT_ENUM(EForceInit)
 
 namespace ZSharp::ZBuildEngine_Private
 {

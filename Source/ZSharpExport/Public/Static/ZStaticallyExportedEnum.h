@@ -3,7 +3,7 @@
 #pragma once
 
 #include "IZExportedEnum.h"
-#include "Concept/ZStaticExportableEnum.h"
+#include "Concept/ZStaticallyExportableEnum.h"
 #include "Trait/ZExportedTypeModule.h"
 #include "Trait/ZExportedTypeName.h"
 #include "Trait/ZExportedTypeZCallBufferSlotType.h"
@@ -11,13 +11,13 @@
 
 namespace ZSharp
 {
-	namespace ZStaticExportedEnum_Private
+	namespace ZStaticallyExportedEnum_Private
 	{
 		ZSHARPEXPORT_API bool RegisterEnum(IZExportedEnum* enm);
 	}
 	
-	template <CZStaticExportableEnum T>
-	class TZStaticExportedEnum : public IZExportedEnum
+	template <CZStaticallyExportableEnum T>
+	class TZStaticallyExportedEnum : public IZExportedEnum
 	{
 
 		friend struct FZFinalizer;
@@ -42,15 +42,15 @@ namespace ZSharp
 	protected:
 		struct FZFinalizer
 		{
-			TZStaticExportedEnum* Enum;
+			TZStaticallyExportedEnum* Enum;
 			~FZFinalizer()
 			{
-				 ZStaticExportedEnum_Private::RegisterEnum(Enum);
+				 ZStaticallyExportedEnum_Private::RegisterEnum(Enum);
 			}
 		};
 
 	protected:
-		explicit TZStaticExportedEnum(bool flag, const FZFinalizer&)
+		explicit TZStaticallyExportedEnum(bool flag, const FZFinalizer&)
 			: Flags(flag ? EZExportedEnumFlags::Flags : EZExportedEnumFlags::None){}
 
 	protected:
@@ -83,17 +83,17 @@ ZSHARP_EXPORT_TYPE_MODULE(Enum, Module)
 #define ZSHARP_BEGIN_EXPORT_ENUM(Enum, bFlags) \
 namespace __ZSharpExport_Private \
 { \
-	static struct __FZStaticExportedEnum_##Enum : public ZSharp::TZStaticExportedEnum<Enum> \
+	static struct __FZStaticallyExportedEnum_##Enum : public ZSharp::TZStaticallyExportedEnum<Enum> \
 	{ \
 		using EnumClass = Enum; \
-		using ThisClass = __FZStaticExportedEnum_##Enum; \
-		explicit __FZStaticExportedEnum_##Enum(const FZFinalizer& finalizer) : ZSharp::TZStaticExportedEnum<Enum>(bFlags, finalizer) \
+		using ThisClass = __FZStaticallyExportedEnum_##Enum; \
+		explicit __FZStaticallyExportedEnum_##Enum(const FZFinalizer& finalizer) : ZSharp::TZStaticallyExportedEnum<Enum>(bFlags, finalizer) \
 		{
 
 #define ZSHARP_EXPORT_ENUM_VALUE(Value) AddEnumValue(#Value, EnumClass::Value);
 
 #define ZSHARP_END_EXPORT_ENUM(Enum) \
-			static_assert(std::is_same_v<ThisClass, __FZStaticExportedEnum_##Enum>, "Enum name doesn't match between BEGIN_EXPORT and END_EXPORT!"); \
+			static_assert(std::is_same_v<ThisClass, __FZStaticallyExportedEnum_##Enum>, "Enum name doesn't match between BEGIN_EXPORT and END_EXPORT!"); \
 		} \
 	} __GExportedEnum_##Enum { { &__GExportedEnum_##Enum } }; \
 }

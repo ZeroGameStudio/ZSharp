@@ -3,7 +3,7 @@
 #pragma once
 
 #include "ZCall/ZCallBuffer.h"
-#include "ZIsDynamicExportableType.h"
+#include "ZIsDynamicallyExportableType.h"
 
 namespace ZSharp
 {
@@ -20,13 +20,13 @@ namespace ZSharp
 	};
 
 	template <typename T>
-	struct TZExportedTypeZCallBufferSlotType<T, std::enable_if_t<TZIsDynamicExportableClass_V<T>>>
+	struct TZExportedTypeZCallBufferSlotType<T, std::enable_if_t<TZIsDynamicallyExportableClass_V<T>>>
 	{
 		static constexpr EZCallBufferSlotType Value = EZCallBufferSlotType::Conjugate;
 	};
 }
 
-#define ZSHARP_EXPORT_SLOT_TYPE(ExportedType, SlotType) template<> struct ZSharp::TZExportedTypeZCallBufferSlotType<ExportedType> { static_assert(!ZSharp::TZIsDynamicExportableType_V<ExportedType>); static constexpr EZCallBufferSlotType Value = EZCallBufferSlotType::SlotType; };
+#define ZSHARP_EXPORT_SLOT_TYPE(ExportedType, SlotType) template<> struct ZSharp::TZExportedTypeZCallBufferSlotType<ExportedType> { static_assert(!ZSharp::TZIsDynamicallyExportableType_V<ExportedType>); static constexpr EZCallBufferSlotType Value = EZCallBufferSlotType::SlotType; };
 
 ZSHARP_EXPORT_SLOT_TYPE(uint8, UInt8)
 ZSHARP_EXPORT_SLOT_TYPE(uint16, UInt16)

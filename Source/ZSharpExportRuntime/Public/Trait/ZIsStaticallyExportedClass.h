@@ -8,7 +8,7 @@
 namespace ZSharp
 {
 	template <typename T>
-	constexpr bool TZIsDynamicExportableClass_V = TZIsUClass_V<T> || TZIsUScriptStruct_V<T>;
+	constexpr bool TZIsStaticallyExportableClass_V = TIsClass<T>::Value && !TZIsUClass_V<T> && !TZIsUScriptStruct_V<T>;
 }
 
 

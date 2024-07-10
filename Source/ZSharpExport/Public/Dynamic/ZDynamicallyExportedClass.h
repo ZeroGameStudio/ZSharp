@@ -7,11 +7,11 @@
 
 namespace ZSharp
 {
-	class ZSHARPEXPORT_API FZDynamicExportedClass : public IZExportedClass, public FNoncopyable
+	class ZSHARPEXPORT_API FZDynamicallyExportedClass : public IZExportedClass, public FNoncopyable
 	{
 
 	public:
-		static FZDynamicExportedClass* Create(UStruct* ustruct);
+		static FZDynamicallyExportedClass* Create(UStruct* ustruct);
 
 	public:
 		virtual FString GetName() const override;
@@ -24,7 +24,7 @@ namespace ZSharp
 		virtual void ForeachProperty(TFunctionRef<void(const FString&, const IZExportedProperty&)> action) const override;
 
 	private:
-		explicit FZDynamicExportedClass(UStruct* ustruct);
+		explicit FZDynamicallyExportedClass(UStruct* ustruct);
 		
 	private:
 		UStruct* Struct;

@@ -1,15 +1,15 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "Dynamic/ZDynamicExportedClass.h"
+#include "Dynamic/ZDynamicallyExportedClass.h"
 
 #include "ZExportedTypeRegistry.h"
 #include "ZSharpExportHelpers.h"
-#include "Dynamic/ZDynamicExportedProperty.h"
+#include "Dynamic/ZDynamicallyExportedProperty.h"
 
-ZSharp::FZDynamicExportedClass* ZSharp::FZDynamicExportedClass::Create(UStruct* ustruct)
+ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(UStruct* ustruct)
 {
-	auto cls = new FZDynamicExportedClass { ustruct };
+	auto cls = new FZDynamicallyExportedClass { ustruct };
 	if (!FZExportedTypeRegistry::Get().RegisterClass(cls))
 	{
 		delete cls;
@@ -19,37 +19,37 @@ ZSharp::FZDynamicExportedClass* ZSharp::FZDynamicExportedClass::Create(UStruct* 
 	return cls;
 }
 
-FString ZSharp::FZDynamicExportedClass::GetName() const
+FString ZSharp::FZDynamicallyExportedClass::GetName() const
 {
 	return FZSharpExportHelpers::GetUFieldAliasedName(Struct);
 }
 
-FString ZSharp::FZDynamicExportedClass::GetModule() const
+FString ZSharp::FZDynamicallyExportedClass::GetModule() const
 {
 	return FZSharpExportHelpers::GetUFieldModuleName(Struct);
 }
 
-FString ZSharp::FZDynamicExportedClass::GetUnrealFieldPath() const
+FString ZSharp::FZDynamicallyExportedClass::GetUnrealFieldPath() const
 {
 	return Struct->GetPathName();
 }
 
-FString ZSharp::FZDynamicExportedClass::GetOuterExportName() const
+FString ZSharp::FZDynamicallyExportedClass::GetOuterExportName() const
 {
 	return FZSharpExportHelpers::GetUFieldOuterExportName(Struct);
 }
 
-uint16 ZSharp::FZDynamicExportedClass::GetConjugateRegistryId() const
+uint16 ZSharp::FZDynamicallyExportedClass::GetConjugateRegistryId() const
 {
 	return 0;
 }
 
-ZSharp::EZExportedClassFlags ZSharp::FZDynamicExportedClass::GetFlags() const
+ZSharp::EZExportedClassFlags ZSharp::FZDynamicallyExportedClass::GetFlags() const
 {
 	return Flags;
 }
 
-FString ZSharp::FZDynamicExportedClass::GetBaseType() const
+FString ZSharp::FZDynamicallyExportedClass::GetBaseType() const
 {
 	if (Struct == UInterface::StaticClass())
 	{
@@ -65,7 +65,7 @@ FString ZSharp::FZDynamicExportedClass::GetBaseType() const
 	return FZSharpExportHelpers::GetUFieldOuterExportName(super);
 }
 
-void ZSharp::FZDynamicExportedClass::ForeachProperty(TFunctionRef<void(const FString&, const IZExportedProperty&)> action) const
+void ZSharp::FZDynamicallyExportedClass::ForeachProperty(TFunctionRef<void(const FString&, const IZExportedProperty&)> action) const
 {
 	for (const auto& pair : PropertyMap)
 	{
@@ -73,7 +73,7 @@ void ZSharp::FZDynamicExportedClass::ForeachProperty(TFunctionRef<void(const FSt
 	}
 }
 
-ZSharp::FZDynamicExportedClass::FZDynamicExportedClass(UStruct* ustruct)
+ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(UStruct* ustruct)
 	: Struct(ustruct)
 	, Flags(EZExportedClassFlags::None)
 {
@@ -109,7 +109,7 @@ ZSharp::FZDynamicExportedClass::FZDynamicExportedClass(UStruct* ustruct)
 		FProperty* property = *it;
 		for (int32 i = 0; i < property->ArrayDim; ++i)
 		{
-			FZDynamicExportedProperty* exportedProperty = FZDynamicExportedProperty::Create(property, i);
+			FZDynamicallyExportedProperty* exportedProperty = FZDynamicallyExportedProperty::Create(property, i);
 			if (!exportedProperty)
 			{
 				continue;

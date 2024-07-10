@@ -3,20 +3,20 @@
 #pragma once
 
 #include "IZExportedClass.h"
-#include "Concept/ZStaticExportableClass.h"
+#include "Concept/ZStaticallyExportableClass.h"
 #include "Trait/ZConjugateRegistryId.h"
 #include "Trait/ZExportedTypeModule.h"
 #include "Trait/ZExportedTypeName.h"
 
 namespace ZSharp
 {
-	namespace ZStaticExportedClass_Private
+	namespace ZStaticallyExportedClass_Private
 	{
 		ZSHARPEXPORT_API bool RegisterClass(IZExportedClass* cls);
 	}
 	
-	template <CZStaticExportableClass T>
-	class TZStaticExportedClass : public IZExportedClass
+	template <CZStaticallyExportableClass T>
+	class TZStaticallyExportedClass : public IZExportedClass
 	{
 
 		friend struct FZFinalizer;
@@ -37,15 +37,15 @@ namespace ZSharp
 	protected:
 		struct FZFinalizer
 		{
-			TZStaticExportedClass* Class;
+			TZStaticallyExportedClass* Class;
 			~FZFinalizer()
 			{
-				ZStaticExportedClass_Private::RegisterClass(Class);
+				ZStaticallyExportedClass_Private::RegisterClass(Class);
 			}
 		};
 
 	protected:
-		TZStaticExportedClass(bool abstract, const FZFinalizer&)
+		TZStaticallyExportedClass(bool abstract, const FZFinalizer&)
 			: Flags(EZExportedClassFlags::Plain | (abstract ? EZExportedClassFlags::Abstract : EZExportedClassFlags::None)){}
 
 	private:
@@ -62,15 +62,15 @@ ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(Class, RegistryId)
 #define ZSHARP_BEGIN_EXPORT_CLASS(Class) \
 namespace __ZSharpExport_Private \
 { \
-	static struct __FZStaticExportedClass_##Class : public ZSharp::TZStaticExportedClass<Class> \
+	static struct __FZStaticallyExportedClass_##Class : public ZSharp::TZStaticallyExportedClass<Class> \
 	{ \
 		using ClassClass = Class; \
-		using ThisClass = __FZStaticExportedClass_##Class; \
-		explicit __FZStaticExportedClass_##Class(const FZFinalizer& finalizer) : ZSharp::TZStaticExportedClass<Class>(false, finalizer) \
+		using ThisClass = __FZStaticallyExportedClass_##Class; \
+		explicit __FZStaticallyExportedClass_##Class(const FZFinalizer& finalizer) : ZSharp::TZStaticallyExportedClass<Class>(false, finalizer) \
 		{
 
 #define ZSHARP_END_EXPORT_CLASS(Class) \
-			static_assert(std::is_same_v<ThisClass, __FZStaticExportedClass_##Class>, "Class name doesn't match between BEGIN_EXPORT and END_EXPORT!"); \
+			static_assert(std::is_same_v<ThisClass, __FZStaticallyExportedClass_##Class>, "Class name doesn't match between BEGIN_EXPORT and END_EXPORT!"); \
 		} \
 	} __GExportedClass_##Class { { &__GExportedClass_##Class } }; \
 }

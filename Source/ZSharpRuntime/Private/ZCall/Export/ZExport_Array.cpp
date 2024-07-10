@@ -1,8 +1,8 @@
 // Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZCall/ZStaticExportZCall.h"
-#include "ZCall/ZStaticExportZCallMacros.h"
+#include "ZCall/ZStaticallyExportZCall.h"
+#include "ZCall/ZStaticallyExportZCallMacros.h"
 #include "ZCall/Conjugate/ZConjugateRegistry_Array.h"
 
 namespace ZSharp
@@ -11,7 +11,7 @@ namespace ZSharp
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptArray::RemoveAt, _Array::RemoveAt)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptArray::Num, _Array::Num)
 
-	static FZStaticExportZCall GGet { "ex://Array.Get", [](FZCallBuffer* buffer)
+	static FZStaticallyExportZCall GGet { "ex://Array.Get", [](FZCallBuffer* buffer)
 	{
 		FZCallBuffer& buf = *buffer;
 		FZSelfDescriptiveScriptArray& sdsa = TZCallBufferSlotEncoder<FZSelfDescriptiveScriptArray>::Decode(buf[0]);
@@ -21,7 +21,7 @@ namespace ZSharp
 		return 0;
 	}};
 
-	static FZStaticExportZCall GSet { "ex://Array.Set", [](FZCallBuffer* buffer)
+	static FZStaticallyExportZCall GSet { "ex://Array.Set", [](FZCallBuffer* buffer)
 	{
 		FZCallBuffer& buf = *buffer;
 		FZSelfDescriptiveScriptArray& sdsa = TZCallBufferSlotEncoder<FZSelfDescriptiveScriptArray>::Decode(buf[0]);

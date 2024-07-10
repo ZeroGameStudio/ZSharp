@@ -5,7 +5,7 @@
 #include "ZConjugateRegistryBase.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "Trait/ZConjugateRegistryId.h"
-#include "Trait/ZIsStaticExportedClass.h"
+#include "Trait/ZIsStaticallyExportedClass.h"
 #include "ZCall/ZConjugateHandle.h"
 
 namespace ZSharp
@@ -23,7 +23,7 @@ namespace ZSharp
 		};
 
 		template <typename T>
-		requires TZIsStaticExportableClass_V<T>
+		requires TZIsStaticallyExportableClass_V<T>
 		constexpr uint16 GetConjugateId()
 		{
 			return TZConjugateRegistryId_V<T>;

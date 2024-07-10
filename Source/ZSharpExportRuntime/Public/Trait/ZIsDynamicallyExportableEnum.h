@@ -7,7 +7,7 @@
 namespace ZSharp
 {
 	template <typename T>
-	constexpr bool TZIsDynamicExportableEnum_V = TZIsUEnum_V<T>;
+	constexpr bool TZIsDynamicallyExportableEnum_V = TZIsUEnum_V<T>;
 }
 
 

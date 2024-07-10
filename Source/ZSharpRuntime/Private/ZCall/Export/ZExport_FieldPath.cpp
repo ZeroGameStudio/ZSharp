@@ -1,9 +1,9 @@
 // Copyright Zero Games. All Rights Reserved.
 
 
-#include "Static/ZStaticExportedClass.h"
-#include "ZCall/ZStaticExportZCall.h"
-#include "ZCall/ZStaticExportZCallMacros.h"
+#include "Static/ZStaticallyExportedClass.h"
+#include "ZCall/ZStaticallyExportZCall.h"
+#include "ZCall/ZStaticallyExportZCallMacros.h"
 
 // namespace ZSharp
 // {

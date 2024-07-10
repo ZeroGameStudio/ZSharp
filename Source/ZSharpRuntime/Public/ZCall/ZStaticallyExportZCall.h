@@ -8,18 +8,18 @@ namespace ZSharp
 {
 	struct FZCallBuffer;
 
-	struct ZSHARPRUNTIME_API FZStaticExportZCall
+	struct ZSHARPRUNTIME_API FZStaticallyExportZCall
 	{
-		FZStaticExportZCall(const FString& name, const TFunction<int32(FZCallBuffer*)>& function);
+		FZStaticallyExportZCall(const FString& name, const TFunction<int32(FZCallBuffer*)>& function);
 	};
 
 	template <typename T, T>
-	struct TZStaticExportZCall;
+	struct TZStaticallyExportZCall;
 
 	template <typename TRet, typename... TArgs, TRet(*Function)(TArgs...)>
-	struct TZStaticExportZCall<decltype(Function), Function>
+	struct TZStaticallyExportZCall<decltype(Function), Function>
 	{
-		TZStaticExportZCall(const FString& name)
+		TZStaticallyExportZCall(const FString& name)
 		{
 			Invoke(name, TMakeIntegerSequence<int32, sizeof...(TArgs)>{});
 		}
@@ -27,7 +27,7 @@ namespace ZSharp
 		template <int32... Indices>
 		void Invoke(const FString& name, TIntegerSequence<int32, Indices...>&&)
 		{
-			FZStaticExportZCall { name, [](FZCallBuffer* buffer)
+			FZStaticallyExportZCall { name, [](FZCallBuffer* buffer)
 			{
 				FZCallBuffer& buf = *buffer;
 
@@ -48,9 +48,9 @@ namespace ZSharp
 	};
 
 	template <typename TRet, typename TThis, typename... TArgs, TRet(TThis::*Function)(TArgs...)>
-	struct TZStaticExportZCall<decltype(Function), Function>
+	struct TZStaticallyExportZCall<decltype(Function), Function>
 	{
-		TZStaticExportZCall(const FString& name)
+		TZStaticallyExportZCall(const FString& name)
 		{
 			Invoke(name, TMakeIntegerSequence<int32, sizeof...(TArgs)>{});
 		}
@@ -58,7 +58,7 @@ namespace ZSharp
 		template <int32... Indices>
 		void Invoke(const FString& name, TIntegerSequence<int32, Indices...>&&)
 		{
-			FZStaticExportZCall { name, [](FZCallBuffer* buffer)
+			FZStaticallyExportZCall { name, [](FZCallBuffer* buffer)
 			{
 				FZCallBuffer& buf = *buffer;
 
@@ -80,9 +80,9 @@ namespace ZSharp
 	};
 
 	template <typename TRet, typename TThis, typename... TArgs, TRet(TThis::*Function)(TArgs...) const>
-	struct TZStaticExportZCall<decltype(Function), Function>
+	struct TZStaticallyExportZCall<decltype(Function), Function>
 	{
-		TZStaticExportZCall(const FString& name)
+		TZStaticallyExportZCall(const FString& name)
 		{
 			Invoke(name, TMakeIntegerSequence<int32, sizeof...(TArgs)>{});
 		}
@@ -90,7 +90,7 @@ namespace ZSharp
 		template <int32... Indices>
 		void Invoke(const FString& name, TIntegerSequence<int32, Indices...>&&)
 		{
-			FZStaticExportZCall { name, [](FZCallBuffer* buffer)
+			FZStaticallyExportZCall { name, [](FZCallBuffer* buffer)
 			{
 				FZCallBuffer& buf = *buffer;
 
@@ -111,7 +111,7 @@ namespace ZSharp
 		}
 	};
 
-	namespace ZStaticExportZCall_Private
+	namespace ZStaticallyExportZCall_Private
 	{
 		ZSHARPRUNTIME_API FString MakeZCallName(const FString& functionName);
 	}

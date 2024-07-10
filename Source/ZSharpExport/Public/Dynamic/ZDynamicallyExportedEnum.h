@@ -6,11 +6,11 @@
 
 namespace ZSharp
 {
-	class ZSHARPEXPORT_API FZDynamicExportedEnum : public IZExportedEnum
+	class ZSHARPEXPORT_API FZDynamicallyExportedEnum : public IZExportedEnum
 	{
 
 	public:
-		static FZDynamicExportedEnum* Create(UEnum* uenum);
+		static FZDynamicallyExportedEnum* Create(UEnum* uenum);
 
 	public:
 		virtual FString GetName() const override;
@@ -22,7 +22,7 @@ namespace ZSharp
 		virtual void ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const override;
 
 	private:
-		explicit FZDynamicExportedEnum(UEnum* uenum);
+		explicit FZDynamicallyExportedEnum(UEnum* uenum);
 
 	private:
 		UEnum* Enum;

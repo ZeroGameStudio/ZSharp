@@ -18,7 +18,7 @@
 // 	ZSHARP_STATIC_EXPORT_ZCALL_EX(ZCallExport_String_Private::SetData, FString::SetData)
 // }
 
-ZSHARP_BEGIN_EXPORT_CLASS(FScriptInterface)
-ZSHARP_END_EXPORT_CLASS(FScriptInterface)
+// ZSHARP_BEGIN_EXPORT_CLASS(FScriptInterface)
+// ZSHARP_END_EXPORT_CLASS(FScriptInterface)
 
 

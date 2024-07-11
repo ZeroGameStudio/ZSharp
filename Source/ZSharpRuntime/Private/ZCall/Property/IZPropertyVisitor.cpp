@@ -8,12 +8,8 @@
 #include "ZFieldPathPropertyVisitor.h"
 #include "Container/ZArrayPropertyVisitor.h"
 #include "Container/ZStructPropertyVisitor.h"
-#include "Object/ZClassPropertyVisitor.h"
-#include "Object/ZLazyObjectPropertyVisitor.h"
 #include "Object/ZObjectPropertyVisitor.h"
-#include "Object/ZSoftClassPropertyVisitor.h"
-#include "Object/ZSoftObjectPropertyVisitor.h"
-#include "Object/ZWeakObjectPropertyVisitor.h"
+#include "Object/ZObjectWrapperPropertyVisitors.h"
 #include "Primitive/ZBoolPropertyVisitor.h"
 #include "Primitive/ZEnumPropertyVisitor.h"
 #include "Primitive/ZNumericPropertyVisitor.h"
@@ -83,6 +79,10 @@ TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FP
 	else if (const auto structProp = CastField<FStructProperty>(prop))
 	{
 		return MakeUnique<FZStructPropertyVisitor>(structProp);
+	}
+	else if (const auto interfaceProp = CastField<FInterfaceProperty>(prop))
+	{
+		return MakeUnique<FZInterfacePropertyVisitor>(interfaceProp);
 	}
 	else if (const auto fieldProp = CastField<FFieldPathProperty>(prop))
 	{

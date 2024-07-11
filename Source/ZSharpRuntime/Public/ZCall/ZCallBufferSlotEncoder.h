@@ -8,6 +8,8 @@
 #include "Conjugate/ZRegularConjugateRegistries.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Conjugate/ZConjugateRegistry_UScriptStruct.h"
+#include "ZCall/Conjugate/ZObjectWrapperConjugateRegisties.h"
+#include "ZCall/Container/ZSelfDescriptiveObjectWrappers.h"
 #include "ZCall/ZCallBuffer.h"
 
 namespace ZSharp
@@ -198,16 +200,28 @@ namespace ZSharp
 	IMPLEMENT_REGULAR_ENCODER(Name)
 	IMPLEMENT_REGULAR_ENCODER(Text)
 
-	IMPLEMENT_REGULAR_ENCODER(SoftObjectPtr)
-	IMPLEMENT_REGULAR_ENCODER(WeakObjectPtr)
-	IMPLEMENT_REGULAR_ENCODER(LazyObjectPtr)
-	IMPLEMENT_REGULAR_ENCODER(StrongObjectPtr)
-	IMPLEMENT_REGULAR_ENCODER(SoftClassPtr)
-	IMPLEMENT_REGULAR_ENCODER(ScriptInterface)
-
 	IMPLEMENT_REGULAR_ENCODER(FieldPath)
 
 #undef IMPLEMENT_REGULAR_ENCODER
+
+#define IMPLEMENT_OBJECT_WRAPPER_ENCODER(Type) \
+	template <> \
+	struct TZCallBufferSlotEncoder<FZSelfDescriptive##Type> \
+	{ \
+		using DecodedType = FZSelfDescriptive##Type; \
+		static DecodedType& Decode(const FZCallBufferSlot& slot) { return *IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_##Type>().Conjugate(slot.ReadConjugate()); } \
+		static DecodedType* DecodePointer(const FZCallBufferSlot& slot) { return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_##Type>().Conjugate(slot.ReadConjugate()); } \
+	};
+
+	IMPLEMENT_OBJECT_WRAPPER_ENCODER(SubclassOf)
+	IMPLEMENT_OBJECT_WRAPPER_ENCODER(SoftClassPtr)
+	IMPLEMENT_OBJECT_WRAPPER_ENCODER(SoftObjectPtr)
+	IMPLEMENT_OBJECT_WRAPPER_ENCODER(WeakObjectPtr)
+	IMPLEMENT_OBJECT_WRAPPER_ENCODER(LazyObjectPtr)
+	IMPLEMENT_OBJECT_WRAPPER_ENCODER(ScriptInterface)
+	IMPLEMENT_OBJECT_WRAPPER_ENCODER(StrongObjectPtr)
+
+#undef IMPLEMENT_OBJECT_WRAPPER_ENCODER
 
 	template <>
 	struct TZCallBufferSlotEncoder<FZSelfDescriptiveScriptArray>

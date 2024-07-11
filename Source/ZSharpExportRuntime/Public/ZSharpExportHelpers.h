@@ -9,8 +9,11 @@ namespace ZSharp
 		static FString GetUFieldAliasedName(const UField* field);
 		static FString GetUFieldModuleName(const UField* field);
 		static bool IsUFieldModuleMapped(const UField* field);
+		static const UField* GetUFieldClosestMappedAncestor(const UField* field);
 		static FString GetUFieldOuterExportName(const UField* field);
 		static FString GetUFieldInnerExportName(const UField* field);
+		static bool GetUFieldRuntimeTypeLocatorInfo(const UField* field, FString& assemblyName, FString& typeName);
+		static bool GetFPropertyRuntimeTypeLocatorInfo(const FProperty* property, FString& assemblyName, FString& typeName);
 	};
 }
 

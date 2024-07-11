@@ -11,10 +11,10 @@ ZSharp::FZSelfDescriptiveScriptStruct::FZSelfDescriptiveScriptStruct(const UScri
 	descriptor->InitializeStruct(UnderlyingInstance);
 }
 
-ZSharp::FZSelfDescriptiveScriptStruct::FZSelfDescriptiveScriptStruct(const UScriptStruct* descriptor, void* underlyingInstance, bool owning)
+ZSharp::FZSelfDescriptiveScriptStruct::FZSelfDescriptiveScriptStruct(const UScriptStruct* descriptor, void* underlyingInstance)
 	: Descriptor(descriptor)
 	, UnderlyingInstance(underlyingInstance)
-	, bOwning(owning)
+	, bOwning(false)
 {
 }
 

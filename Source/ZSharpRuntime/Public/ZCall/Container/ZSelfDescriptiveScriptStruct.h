@@ -11,7 +11,7 @@ namespace ZSharp
 	{
 
 		FZSelfDescriptiveScriptStruct(const UScriptStruct* descriptor);
-		FZSelfDescriptiveScriptStruct(const UScriptStruct* descriptor, void* underlyingInstance, bool owning);
+		FZSelfDescriptiveScriptStruct(const UScriptStruct* descriptor, void* underlyingInstance);
 		FZSelfDescriptiveScriptStruct(const FZSelfDescriptiveScriptStruct&) = delete;
 		FZSelfDescriptiveScriptStruct(FZSelfDescriptiveScriptStruct&& other) noexcept { *this = MoveTemp(other); }
 		~FZSelfDescriptiveScriptStruct();

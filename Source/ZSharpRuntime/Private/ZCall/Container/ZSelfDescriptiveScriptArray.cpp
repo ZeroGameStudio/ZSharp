@@ -11,16 +11,13 @@ ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const FProper
 {
 }
 
-ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const FProperty* elementProperty, FScriptArray* underlyingInstance, bool owning)
+ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const FProperty* elementProperty, FScriptArray* underlyingInstance)
 	: ElementProperty(elementProperty)
 	, ElementPropertyVisitor(IZPropertyVisitor::Create(elementProperty))
 	, UnderlyingInstance(underlyingInstance)
-	, bOwning(owning)
+	, bOwning(false)
 {
-	if (!owning)
-	{
-		GCRoot = TStrongObjectPtr { elementProperty->GetOwnerStruct() };
-	}
+	GCRoot = TStrongObjectPtr { elementProperty->GetOwnerStruct() };
 }
 
 ZSharp::FZSelfDescriptiveScriptArray::~FZSelfDescriptiveScriptArray()

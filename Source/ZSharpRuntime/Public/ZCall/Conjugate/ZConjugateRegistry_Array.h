@@ -34,7 +34,7 @@ namespace ZSharp
 	public:
 		FZConjugateHandle Conjugate(const FProperty* elementPropertyProto) { return Conjugate(elementPropertyProto, [](const FZSelfDescriptiveScriptArray&){}); }
 		FZConjugateHandle Conjugate(const FProperty* elementPropertyProto, TFunctionRef<void(const FZSelfDescriptiveScriptArray&)> initialize);
-		FZConjugateHandle Conjugate(const FProperty* elementProperty, const FScriptArray* unmanaged, bool owning);
+		FZConjugateHandle Conjugate(const FProperty* elementProperty, const FScriptArray* unmanaged);
 		FZSelfDescriptiveScriptArray* Conjugate(FZConjugateHandle handle) const;
 
 	private:

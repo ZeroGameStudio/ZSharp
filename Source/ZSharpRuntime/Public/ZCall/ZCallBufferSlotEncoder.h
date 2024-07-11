@@ -48,13 +48,11 @@ namespace ZSharp
 	struct TZCallBufferSlotEncoder<T, std::enable_if_t<TZIsUScriptStruct_V<T>>>
 	{
 		using DecodedType = T;
-		static void Encode(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(&value, false)); }
+		static void Encode(const DecodedType& value, FZCallBufferSlot& slot) { slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(&value)); }
 		static void EncodeRet(const DecodedType& value, FZCallBufferSlot& slot)
 		{
 			const UScriptStruct* scriptStruct = TBaseStructure<T>::Get();
-			void* unmanaged = FMemory::Malloc(scriptStruct->GetStructureSize(), scriptStruct->GetMinAlignment());
-			scriptStruct->CopyScriptStruct(unmanaged, &value);
-			slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(scriptStruct, unmanaged, true));
+			slot.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(scriptStruct, [value, scriptStruct](FZSelfDescriptiveScriptStruct& sdss){ scriptStruct->CopyScriptStruct(sdss.GetUnderlyingInstance(), &value); }));
 		}
 		static DecodedType& Decode(const FZCallBufferSlot& slot)
 		{

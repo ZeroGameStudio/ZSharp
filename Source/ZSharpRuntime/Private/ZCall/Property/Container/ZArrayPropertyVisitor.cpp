@@ -25,7 +25,7 @@ void ZSharp::FZArrayPropertyVisitor::GetValue(const void* src, FZCallBufferSlot&
 
 void ZSharp::FZArrayPropertyVisitor::GetRef(const void* src, FZCallBufferSlot& dest) const
 {
-	dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Array>().Conjugate(UnderlyingArrayProperty->Inner, (FScriptArray*)src, false));
+	dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Array>().Conjugate(UnderlyingArrayProperty->Inner, (FScriptArray*)src));
 }
 
 void ZSharp::FZArrayPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const

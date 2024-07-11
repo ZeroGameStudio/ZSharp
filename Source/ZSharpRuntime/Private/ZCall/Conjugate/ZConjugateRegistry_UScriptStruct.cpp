@@ -30,7 +30,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UScriptStruct::Conjugate(c
 	return {};
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UScriptStruct::Conjugate(const UScriptStruct* scriptStruct, const void* unmanaged, bool owning)
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UScriptStruct::Conjugate(const UScriptStruct* scriptStruct, const void* unmanaged)
 {
 	const auto mutableUnmanaged = const_cast<void*>(unmanaged);
 	if (const FZConjugateRec* rec = ConjugateMap.Find(mutableUnmanaged))
@@ -42,7 +42,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UScriptStruct::Conjugate(c
 	const FZRuntimeTypeHandle type = GetManagedType(scriptStruct);
 	if (Alc.BuildConjugate(mutableUnmanaged, type))
 	{
-		ConjugateMap.Emplace(mutableUnmanaged, { MakeUnique<FZSelfDescriptiveScriptStruct>(scriptStruct, const_cast<void*>(unmanaged), owning), false });
+		ConjugateMap.Emplace(mutableUnmanaged, { MakeUnique<FZSelfDescriptiveScriptStruct>(scriptStruct, const_cast<void*>(unmanaged)), false });
 		CaptureConjugate(mutableUnmanaged);
 
 		return { mutableUnmanaged };

@@ -13,7 +13,7 @@ namespace ZSharp
 	{
 
 		FZSelfDescriptiveScriptArray(const FProperty* elementProperty);
-		FZSelfDescriptiveScriptArray(const FProperty* elementProperty, FScriptArray* underlyingInstance, bool owning);
+		FZSelfDescriptiveScriptArray(const FProperty* elementProperty, FScriptArray* underlyingInstance);
 		FZSelfDescriptiveScriptArray(const FZSelfDescriptiveScriptArray&) = delete;
 		FZSelfDescriptiveScriptArray(FZSelfDescriptiveScriptArray&& other) noexcept { *this = MoveTemp(other); }
 		~FZSelfDescriptiveScriptArray();

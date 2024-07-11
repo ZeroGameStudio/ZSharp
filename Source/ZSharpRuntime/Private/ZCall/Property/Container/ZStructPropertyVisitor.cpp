@@ -26,7 +26,7 @@ void ZSharp::FZStructPropertyVisitor::GetValue(const void* src, FZCallBufferSlot
 void ZSharp::FZStructPropertyVisitor::GetRef(const void* src, FZCallBufferSlot& dest) const
 {
 	const UScriptStruct* scriptStruct = UnderlyingStructProperty->Struct;
-	dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(scriptStruct, src, false));
+	dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(scriptStruct, src));
 }
 
 void ZSharp::FZStructPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const

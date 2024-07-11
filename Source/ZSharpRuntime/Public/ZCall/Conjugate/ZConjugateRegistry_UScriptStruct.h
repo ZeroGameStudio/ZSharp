@@ -32,9 +32,9 @@ namespace ZSharp
 		explicit FZConjugateRegistry_UScriptStruct(IZMasterAssemblyLoadContext& alc) : Super(alc){}
 
 	public:
-		FZConjugateHandle Conjugate(const UScriptStruct* scriptStruct) { return Conjugate(scriptStruct, [](const FZSelfDescriptiveScriptStruct&){}); }
+		FZConjugateHandle Conjugate(const UScriptStruct* scriptStruct) { return Conjugate(scriptStruct, [this](const FZSelfDescriptiveScriptStruct&){}); }
 		FZConjugateHandle Conjugate(const UScriptStruct* scriptStruct, TFunctionRef<void(const FZSelfDescriptiveScriptStruct& sdss)> initialize);
-		FZConjugateHandle Conjugate(const UScriptStruct* scriptStruct, const void* unmanaged, bool owning);
+		FZConjugateHandle Conjugate(const UScriptStruct* scriptStruct, const void* unmanaged);
 		const FZSelfDescriptiveScriptStruct* Conjugate(FZConjugateHandle handle) const;
 
 	private:

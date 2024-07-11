@@ -12,7 +12,7 @@ namespace ZSharp
 {
 	class IZMasterAssemblyLoadContext;
 	
-	class ZSHARPRUNTIME_API FZConjugateRegistry_Array : public FZConjugateRegistryBase, FNoncopyable
+	class ZSHARPRUNTIME_API FZConjugateRegistry_Array : public FZConjugateRegistryBase, public FNoncopyable
 	{
 
 		using Super = FZConjugateRegistryBase;

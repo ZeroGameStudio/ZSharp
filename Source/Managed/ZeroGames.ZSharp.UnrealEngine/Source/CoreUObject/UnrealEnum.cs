@@ -13,7 +13,7 @@ public partial class UnrealEnum
 	{
 		if (t.IsEnum && t.GetCustomAttribute<UnrealFieldPathAttribute>() is {} attr)
 		{
-			return UObjectGlobals.LowLevelFindObject<UnrealEnum>(attr.Path)!;
+			return UnrealObjectGlobals.LowLevelFindObject<UnrealEnum>(attr.Path)!;
 		}
 
 		throw new ArgumentException();

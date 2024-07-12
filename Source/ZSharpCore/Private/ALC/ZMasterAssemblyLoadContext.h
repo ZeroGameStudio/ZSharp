@@ -7,7 +7,7 @@
 #include "Interop/ZGCHandle.h"
 #include "ZCall/IZCallDispatcher.h"
 #include "ZCall/IZCallResolver.h"
-#include "ZCall/IZConjugateRegistry.h"
+#include "Conjugate/IZConjugateRegistry.h"
 
 namespace ZSharp
 {

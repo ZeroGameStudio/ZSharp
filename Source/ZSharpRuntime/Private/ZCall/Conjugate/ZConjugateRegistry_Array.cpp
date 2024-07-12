@@ -7,7 +7,7 @@
 #include "ZSharpExportRuntimeSettings.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "Trait/ZExportedTypeName.h"
-#include "ZCall/ZDeclareConjugateRegistry.h"
+#include "Conjugate/ZDeclareConjugateRegistry.h"
 #include "ZCall/Property/ZPropertyFactory.h"
 
 namespace ZSharp::ZConjugateRegistry_Array_Private

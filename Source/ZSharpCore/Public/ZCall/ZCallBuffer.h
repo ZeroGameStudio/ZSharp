@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ZConjugateHandle.h"
+#include "Conjugate/ZConjugateHandle.h"
 #include "Interop/ZGCHandle.h"
 
 #define ZSHARP_FOREACH_ZCALL_BUFFER_SLOT_TYPE() \

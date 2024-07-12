@@ -6,7 +6,7 @@
 #include "ZSharpExportHelpers.h"
 #include "ZSharpExportRuntimeSettings.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
-#include "ZCall/ZDeclareConjugateRegistry.h"
+#include "Conjugate/ZDeclareConjugateRegistry.h"
 
 namespace ZSharp::ZConjugateRegistry_UScriptStruct_Private
 {

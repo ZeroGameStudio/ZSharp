@@ -3,7 +3,7 @@
 
 #include "ZCall/Conjugate/ZObjectWrapperConjugateRegisties.h"
 
-#include "ZCall/ZDeclareConjugateRegistry.h"
+#include "Conjugate/ZDeclareConjugateRegistry.h"
 
 namespace ZSharp::ZConjugateRegistry_UObject_Private
 {

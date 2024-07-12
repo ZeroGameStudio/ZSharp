@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ZCall/IZConjugateRegistry.h"
+#include "Conjugate/IZConjugateRegistry.h"
 
 namespace ZSharp
 {

@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZCall/ZDeclareConjugateRegistry.h"
+#include "Conjugate/ZDeclareConjugateRegistry.h"
 
 #include "ZConjugateRegistryDeclarations.h"
 

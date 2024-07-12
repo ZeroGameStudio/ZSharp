@@ -6,7 +6,7 @@
 #include "ZCall/Container/ZSelfDescriptiveScriptArray.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "Trait/ZConjugateRegistryId.h"
-#include "ZCall/ZConjugateHandle.h"
+#include "Conjugate/ZConjugateHandle.h"
 
 namespace ZSharp
 {

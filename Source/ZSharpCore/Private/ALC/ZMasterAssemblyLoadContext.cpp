@@ -7,7 +7,7 @@
 #include "Interop/ZMasterAssemblyLoadContext_Interop.h"
 #include "Interop/ZRuntimeTypeLocator.h"
 #include "ZCall/IZCallDispatcher.h"
-#include "ZCall/ZConjugateRegistryDeclarations.h"
+#include "Conjugate/ZConjugateRegistryDeclarations.h"
 
 ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle handle, TUniqueFunction<void()>&& unloadCallback)
 	: Handle(handle)

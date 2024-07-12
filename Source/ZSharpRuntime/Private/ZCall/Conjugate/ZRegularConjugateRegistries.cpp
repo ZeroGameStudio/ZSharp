@@ -5,7 +5,7 @@
 
 #include "Trait/ZExportedTypeName.h"
 #include "Trait/ZExportedTypeModule.h"
-#include "ZCall/ZDeclareConjugateRegistry.h"
+#include "Conjugate/ZDeclareConjugateRegistry.h"
 
 #define COMBINE_INNER(A, B) A##B
 #define COMBINE(A, B) COMBINE_INNER(A, B)

@@ -6,7 +6,7 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "Trait/ZConjugateRegistryId.h"
 #include "Trait/ZIsStaticallyExportedClass.h"
-#include "ZCall/ZConjugateHandle.h"
+#include "Conjugate/ZConjugateHandle.h"
 
 namespace ZSharp
 {

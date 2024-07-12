@@ -5,7 +5,7 @@
 #include "IZAssemblyLoadContext.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "ZCall/ZCallHandle.h"
-#include "ZCall/CZConjugateRegistryImpl.h"
+#include "Conjugate/CZConjugateRegistryImpl.h"
 
 namespace ZSharp
 {

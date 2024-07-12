@@ -4,7 +4,7 @@
 
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "Trait/ZConjugateRegistryId.h"
-#include "ZCall/ZConjugateHandle.h"
+#include "Conjugate/ZConjugateHandle.h"
 #include "ZCall/Conjugate/ZConjugateRegistryBase.h"
 
 namespace ZSharp

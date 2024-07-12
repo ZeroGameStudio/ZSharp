@@ -3,10 +3,9 @@
 
 #include "Conjugate/ZConjugateRegistry_UScriptStruct.h"
 
-#include "ZSharpExportHelpers.h"
-#include "ZSharpExportRuntimeSettings.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"
+#include "Reflection/ZReflectionHelper.h"
 
 namespace ZSharp::ZConjugateRegistry_UScriptStruct_Private
 {
@@ -93,20 +92,11 @@ void ZSharp::FZConjugateRegistry_UScriptStruct::GetAllConjugates(TArray<void*>& 
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UScriptStruct::GetManagedType(const UScriptStruct* scriptStruct) const
 {
-	check(scriptStruct->IsNative()); // @TODO
-	
-	const FString moduleName = FZSharpExportHelpers::GetUFieldModuleName(scriptStruct);
-	FString assemblyName;
-	if (!GetDefault<UZSharpExportRuntimeSettings>()->TryGetModuleAssembly(moduleName, assemblyName))
-	{
-		assemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
-	}
-	const FString outerExportName = FZSharpExportHelpers::GetUFieldOuterExportName(scriptStruct);
-	const FString typeName = FString::Printf(TEXT("%s.%s"), *assemblyName, *outerExportName);
-
 	FZRuntimeTypeLocatorWrapper locator;
-	locator.AssemblyName = assemblyName;
-	locator.TypeName = typeName;
+	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(scriptStruct, locator))
+	{
+		return {};
+	}
 	
 	return Alc.GetType(locator);
 }

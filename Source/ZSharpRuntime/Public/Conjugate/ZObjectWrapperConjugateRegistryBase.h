@@ -3,11 +3,11 @@
 #pragma once
 
 #include "ZConjugateRegistryBase.h"
-#include "ZSharpExportHelpers.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "Trait/ZConjugateRegistryId.h"
 #include "Conjugate/ZConjugateHandle.h"
+#include "Reflection/ZReflectionHelper.h"
 
 namespace ZSharp
 {
@@ -118,7 +118,7 @@ namespace ZSharp
 			locator.AssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
 			locator.TypeName = FString::Printf(TEXT("%s.CoreUObject.%s`1"), *locator.AssemblyName, *T::GetExportTypeName());
 			FZRuntimeTypeLocatorWrapper& inner = locator.TypeParameters.Emplace_GetRef();
-			FZSharpExportHelpers::GetUFieldRuntimeTypeLocatorInfo(cls, inner.AssemblyName, inner.TypeName);
+			FZReflectionHelper::GetUFieldRuntimeTypeLocator(cls, inner);
 	
 			return Alc.GetType(locator);
 		}

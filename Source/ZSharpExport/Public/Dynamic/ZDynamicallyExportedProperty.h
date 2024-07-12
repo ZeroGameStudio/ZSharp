@@ -15,7 +15,7 @@ namespace ZSharp
 	public:
 		virtual FString GetName() const override;
 		virtual FString GetZCallName() const override;
-		virtual FString GetType() const override;
+		virtual FZFullyExportedTypeName GetType() const override;
 		virtual EZExportedPropertyFlags GetFlags() const override;
 		virtual int32 GetIndex() const override;
 

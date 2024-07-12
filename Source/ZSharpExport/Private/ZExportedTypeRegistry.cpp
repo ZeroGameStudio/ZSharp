@@ -33,7 +33,7 @@ void ZSharp::FZExportedTypeRegistry::ForeachExportedEnum(TFunctionRef<void(const
 
 bool ZSharp::FZExportedTypeRegistry::RegisterClass(IZExportedClass* cls)
 {
-	FString key = cls->GetInnerExportName();
+	FString key = cls->GetExportKey();
 	if (EnumMap.Contains(key))
 	{
 		return false;
@@ -45,7 +45,7 @@ bool ZSharp::FZExportedTypeRegistry::RegisterClass(IZExportedClass* cls)
 
 bool ZSharp::FZExportedTypeRegistry::RegisterEnum(IZExportedEnum* enm)
 {
-	FString key = enm->GetInnerExportName();
+	FString key = enm->GetExportKey();
 	if (EnumMap.Contains(key))
 	{
 		return false;

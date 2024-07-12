@@ -3,8 +3,7 @@
 
 #include "Conjugate/ZRegularConjugateRegistries.h"
 
-#include "Trait/ZExportedTypeName.h"
-#include "Trait/ZExportedTypeModule.h"
+#include "Trait/ZManagedTypeInfo.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"
 
 #define COMBINE_INNER(A, B) A##B
@@ -13,8 +12,8 @@
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_##Type::GetManagedType(const ConjugateType* unmanaged) const \
 { \
 	FZRuntimeTypeLocatorWrapper locator; \
-	locator.AssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME; \
-	locator.TypeName = FString::Printf(TEXT("%s.%s.%s"), TEXT(ZSHARP_ENGINE_ASSEMBLY_NAME), *TZExportedTypeModule<F##Type>::Get(), *TZExportedTypeName<F##Type>::Get()); \
+	locator.AssemblyName = TZManagedTypeInfo<F##Type>::GetAssemblyName(); \
+	locator.TypeName = TZManagedTypeInfo<F##Type>::GetFullName(); \
 	return Alc.GetType(locator); \
 } \
 namespace ZSharp::ZRegularConjugateRegistries_Private \

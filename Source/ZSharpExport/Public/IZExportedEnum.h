@@ -22,8 +22,6 @@ namespace ZSharp
 	public:
 		bool HasAnyFlags(EZExportedEnumFlags flags) const { return !!(GetFlags() & flags); }
 		bool HasAllFlags(EZExportedEnumFlags flags) const { return (GetFlags() & flags) == flags; }
-	private:
-		virtual FString GetOuterExportName() const override { return GetInnerExportName(); }
 	};
 }
 

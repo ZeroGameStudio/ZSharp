@@ -42,7 +42,6 @@ public class ZSharpBuild : ModuleRules
 				
 				"ZSharpCore",
 				"ZSharpExport",
-				"ZSharpExportRuntime",
 				"ZSharpRuntime",
 			}
 		);

@@ -8,7 +8,7 @@ public class SubclassOf : PlainExportedObjectBase
 	
 }
 
-public class SubclassOf<T> : SubclassOf where T : UnrealObject
+public class SubclassOf<T> : SubclassOf
 {
 	
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ZExportedTypeDto.h"
+#include "ZFullyExportedTypeNameDto.h"
 
 #include "ZExportedClassDto.generated.h"
 
@@ -11,10 +12,6 @@ struct FZExportedPropertyDto
 {
 	GENERATED_BODY()
 
-	FZExportedPropertyDto()
-		: Flags(0)
-		, Index(0){}
-
 	UPROPERTY()
 	FString Name;
 
@@ -22,13 +19,13 @@ struct FZExportedPropertyDto
 	FString ZCallName;
 
 	UPROPERTY()
-	FString Type;
+	FZFullyExportedTypeNameDto Type;
 
 	UPROPERTY()
-	uint64 Flags;
+	uint64 Flags = 0;
 
 	UPROPERTY()
-	int32 Index;
+	int32 Index = 0;
 };
 
 USTRUCT()
@@ -36,18 +33,14 @@ struct FZExportedClassDto : public FZExportedTypeDto
 {
 	GENERATED_BODY()
 
-	FZExportedClassDto()
-		: ConjugateRegistryId(0)
-		, Flags(0){}
+	UPROPERTY()
+	uint16 ConjugateRegistryId = 0;
 
 	UPROPERTY()
-	uint16 ConjugateRegistryId;
+	uint64 Flags = 0;
 
 	UPROPERTY()
-	uint64 Flags;
-
-	UPROPERTY()
-	FString BaseType;
+	FZFullyExportedTypeNameDto BaseType;
 
 	UPROPERTY()
 	TMap<FString, FZExportedPropertyDto> PropertyMap;

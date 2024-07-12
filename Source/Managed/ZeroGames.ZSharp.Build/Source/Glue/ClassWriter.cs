@@ -62,28 +62,18 @@ namespace {_exportedClass.Namespace};
 
 		return split[0];
 	}
-	
-	private string GetTypeName(string type)
-	{
-		string[] split = type.Split('.');
-		return split.Length switch
-		{
-			1 => split[0],
-			2 => split[1],
-			_ => throw new InvalidOperationException($"Wrong export type name [{type}]")
-		};
-	}
 
 	private string GetPropertyBlock(ExportedProperty property)
 	{
-		bool nullable = property.Type.EndsWith('?');
+		string name = property.Type.ToString();
+		string nunNullableName = property.Type.ToString(false);
+		bool nullable = property.Type.Nullable;
 		string nullForgivingModifier = nullable ? string.Empty : "!";
-		string nonNullableType = property.Type.Substring(0, nullable ? property.Type.Length - 1 : property.Type.Length);
 		string accessModifier = property.Public ? "public" : property.Protected ? "protected" : "private";
 		string getBlock = property.Readable ?
 @$"		get
 		{{
-			return ({property.Type})this.ZCall(""{property.ZCallName}"", false, {property.Index}, typeof({nonNullableType}))[3].Object{nullForgivingModifier};
+			return ({name})this.ZCall(""{property.ZCallName}"", false, {property.Index}, typeof({nunNullableName}))[3].Object{nullForgivingModifier};
 		}}" : string.Empty;
 		string setBlock = property.Writable ?
 @$"
@@ -162,7 +152,7 @@ namespace {_exportedClass.Namespace};
 	{
 		get
 		{
-			if (string.IsNullOrWhiteSpace(_exportedClass.BaseType))
+			if (string.IsNullOrWhiteSpace(_exportedClass.BaseType.Name))
 			{
 				if (_exportedClass.Plain)
 				{
@@ -187,7 +177,7 @@ namespace {_exportedClass.Namespace};
 				throw new InvalidOperationException($"Invalid exported class {_exportedClass.Name}");
 			}
 
-			return GetTypeName(_exportedClass.BaseType);
+			return _exportedClass.BaseType.ToString(false);
 		}
 	}
 

@@ -3,11 +3,9 @@
 
 #include "Conjugate/ZConjugateRegistry_Array.h"
 
-#include "ZSharpExportHelpers.h"
-#include "ZSharpExportRuntimeSettings.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
-#include "Trait/ZExportedTypeName.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"
+#include "Reflection/ZReflectionHelper.h"
 #include "Reflection/Property/ZPropertyFactory.h"
 
 namespace ZSharp::ZConjugateRegistry_Array_Private
@@ -100,34 +98,18 @@ void ZSharp::FZConjugateRegistry_Array::GetAllConjugates(TArray<void*>& outConju
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Array::GetManagedType(const FProperty* elementProperty) const
 {
-	const auto objectProp = CastField<FObjectProperty>(elementProperty);
-	if (!objectProp)
+	FZRuntimeTypeLocatorWrapper locator;
+	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FArrayProperty::StaticClass(), locator))
 	{
-		checkNoEntry();
 		return {};
 	}
 	
-	FZRuntimeTypeLocatorWrapper locator;
-	locator.AssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
-	locator.TypeName = "ZeroGames.ZSharp.UnrealEngine.Core.UnrealArray`1";
 	FZRuntimeTypeLocatorWrapper& inner = locator.TypeParameters.AddDefaulted_GetRef();
-
-	const UClass* cls = objectProp->PropertyClass;
-	while (!cls->IsNative())
+	if (!FZReflectionHelper::GetFPropertyRuntimeTypeLocator(elementProperty, inner))
 	{
-		cls = cls->GetSuperClass();
+		return {};
 	}
-	const FString moduleName = FZSharpExportHelpers::GetUFieldModuleName(cls);
-	FString assemblyName;
-	if (!GetDefault<UZSharpExportRuntimeSettings>()->TryGetModuleAssembly(moduleName, assemblyName))
-	{
-		assemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
-	}
-	const FString outerExportName = FZSharpExportHelpers::GetUFieldOuterExportName(cls);
-	const FString typeName = FString::Printf(TEXT("%s.%s"), *assemblyName, *outerExportName);
-	inner.AssemblyName = assemblyName;
-	inner.TypeName = typeName;
-
+	
 	return Alc.GetType(locator);
 }
 

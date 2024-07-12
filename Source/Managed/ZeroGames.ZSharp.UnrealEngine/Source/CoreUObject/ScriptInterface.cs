@@ -8,7 +8,7 @@ public class ScriptInterface : PlainExportedObjectBase
 	
 }
 
-public class ScriptInterface<T> : ScriptInterface where T : IUnrealInterface
+public class ScriptInterface<T> : ScriptInterface where T : IUnrealInterface?
 {
 	
 }

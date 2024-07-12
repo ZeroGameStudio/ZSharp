@@ -31,7 +31,6 @@ public class ZSharpRuntime : ModuleRules
 				"DeveloperSettings",
 				
 				"ZSharpCore",
-				"ZSharpExportRuntime",
 			}
 		);
 		
@@ -49,8 +48,6 @@ public class ZSharpRuntime : ModuleRules
 				new string[]
 				{
 					"UnrealEd",
-					
-					"ZSharpExport",
 				}
 			);
 		}

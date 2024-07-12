@@ -1,7 +1,6 @@
 // Copyright Zero Games. All Rights Reserved.
 
 
-#include "Static/ZStaticallyExportedClass.h"
 #include "ZCall/ZStaticallyExportZCall.h"
 #include "ZCall/ZStaticallyExportZCallMacros.h"
 
@@ -17,8 +16,5 @@ namespace ZSharp
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(ZCallExport_String_Private::GetData, FString::GetData)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(ZCallExport_String_Private::SetData, FString::SetData)
 }
-
-ZSHARP_BEGIN_EXPORT_CLASS(FString)
-ZSHARP_END_EXPORT_CLASS(FString)
 
 

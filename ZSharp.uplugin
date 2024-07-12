@@ -21,19 +21,14 @@
 			"LoadingPhase": "EarliestPossible"
 		},
 		{
-			"Name": "ZSharpExportRuntime",
+			"Name": "ZSharpRuntime",
 			"Type": "Runtime",
 			"LoadingPhase": "EarliestPossible"
 		},
 		{
 			"Name": "ZSharpExport",
 			"Type": "Editor",
-			"LoadingPhase": "EarliestPossible"
-		},
-		{
-			"Name": "ZSharpRuntime",
-			"Type": "Runtime",
-			"LoadingPhase": "EarliestPossible"
+			"LoadingPhase": "Default"
 		},
 		{
 			"Name": "ZSharpBuild",

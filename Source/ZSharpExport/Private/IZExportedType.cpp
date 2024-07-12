@@ -3,7 +3,7 @@
 
 #include "IZExportedType.h"
 
-FString ZSharp::IZExportedType::GetInnerExportName() const
+FString ZSharp::IZExportedType::GetExportKey() const
 {
 	return FString::Printf(TEXT("%s.%s"), *GetModule(), *GetName());
 }

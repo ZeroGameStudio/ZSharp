@@ -6,7 +6,7 @@
 #include "IZExportedEnum.h"
 #include "IZExportedProperty.h"
 #include "IZExportedTypeRegistry.h"
-#include "ZSharpExportRuntimeSettings.h"
+#include "ZSharpRuntimeSettings.h"
 #include "DTO/ZExportedClassDto.h"
 #include "JsonObjectConverter.h"
 
@@ -65,7 +65,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 	UE_LOG(LogTemp, Log, TEXT("Exported Class Name: [%s] Module: [%s] BaseType: [%s]"),
 		*cls.GetName(),
 		*cls.GetModule(),
-		*cls.GetBaseType());
+		*cls.GetBaseType().Name);
 }
 
 void ZSharp::FZGlueManifestWriter::WriteEnum(const IZExportedEnum& enm)
@@ -100,7 +100,7 @@ void ZSharp::FZGlueManifestWriter::WriteEnum(const IZExportedEnum& enm)
 
 TUniquePtr<FZExportedAssemblyDto>* ZSharp::FZGlueManifestWriter::GetAssemblyDto(const IZExportedType& type)
 {
-	const UZSharpExportRuntimeSettings* settings = GetDefault<UZSharpExportRuntimeSettings>();
+	const UZSharpRuntimeSettings* settings = GetDefault<UZSharpRuntimeSettings>();
 	const FString module = type.GetModule();
 	FString assembly;
 	if (!settings->TryGetModuleAssembly(module, assembly))

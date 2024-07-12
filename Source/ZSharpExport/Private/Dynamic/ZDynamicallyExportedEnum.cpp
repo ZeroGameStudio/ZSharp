@@ -4,10 +4,20 @@
 #include "Dynamic/ZDynamicallyExportedEnum.h"
 
 #include "ZExportedTypeRegistry.h"
-#include "ZSharpExportHelpers.h"
+#include "Reflection/ZReflectionHelper.h"
 
 ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(UEnum* uenum)
 {
+	if (!uenum->IsNative())
+	{
+		return nullptr;
+	}
+
+	if (!FZReflectionHelper::IsUFieldModuleMapped(uenum))
+	{
+		return nullptr;
+	}
+	
 	auto enm = new FZDynamicallyExportedEnum { uenum };
 	if (!FZExportedTypeRegistry::Get().RegisterEnum(enm))
 	{
@@ -25,7 +35,7 @@ FString ZSharp::FZDynamicallyExportedEnum::GetName() const
 
 FString ZSharp::FZDynamicallyExportedEnum::GetModule() const
 {
-	return FZSharpExportHelpers::GetUFieldModuleName(Enum);
+	return FZReflectionHelper::GetUFieldModuleName(Enum);
 }
 
 FString ZSharp::FZDynamicallyExportedEnum::GetUnrealFieldPath() const
@@ -62,8 +72,6 @@ ZSharp::FZDynamicallyExportedEnum::FZDynamicallyExportedEnum(UEnum* uenum)
 	: Enum(uenum)
 	, Flags(EZExportedEnumFlags::None)
 {
-	check(Enum->IsNative());
-
 	if (Enum->HasAnyEnumFlags(EEnumFlags::Flags))
 	{
 		Flags |= EZExportedEnumFlags::Flags;

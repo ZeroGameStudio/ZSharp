@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "ZIsUClass.h"
-#include "ZIsUScriptStruct.h"
-#include "ZIsUEnum.h"
+#include "Trait/ZIsUClass.h"
+#include "Trait/ZIsUScriptStruct.h"
+#include "Trait/ZIsUEnum.h"
 
 namespace ZSharp
 {

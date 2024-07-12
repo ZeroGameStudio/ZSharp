@@ -8,7 +8,7 @@ public class SoftClassPtr : PlainExportedObjectBase
 	
 }
 
-public class SoftClassPtr<T> : SoftClassPtr where T : UnrealObject
+public class SoftClassPtr<T> : SoftClassPtr
 {
 	
 }

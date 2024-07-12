@@ -2,11 +2,9 @@
 
 #pragma once
 
-#include "ZIsDynamicallyExportableType.h"
-#include "ZSharpExportHelpers.h"
+#include "Trait/ZIsDynamicallyExportableType.h"
+#include "Reflection/ZReflectionHelper.h"
 #include "ZUField.h"
-#include "StrongObjectPtr.h"
-#include "SoftClassPtr.h"
 
 namespace ZSharp
 {
@@ -18,7 +16,7 @@ namespace ZSharp
 	{
 		static FString Get()
 		{
-			return FZSharpExportHelpers::GetUFieldModuleName(TZUField<T>::Get());
+			return FZReflectionHelper::GetUFieldModuleName(TZUField<T>::Get());
 		}
 	};
 }
@@ -28,13 +26,6 @@ namespace ZSharp
 ZSHARP_EXPORT_TYPE_MODULE(FString, Core)
 ZSHARP_EXPORT_TYPE_MODULE(FName, Core)
 ZSHARP_EXPORT_TYPE_MODULE(FText, Core)
-
-ZSHARP_EXPORT_TYPE_MODULE(FSoftObjectPtr, CoreUObject)
-ZSHARP_EXPORT_TYPE_MODULE(FSoftClassPtr, CoreUObject)
-ZSHARP_EXPORT_TYPE_MODULE(FWeakObjectPtr, CoreUObject)
-ZSHARP_EXPORT_TYPE_MODULE(FLazyObjectPtr, CoreUObject)
-ZSHARP_EXPORT_TYPE_MODULE(FStrongObjectPtr, CoreUObject)
-ZSHARP_EXPORT_TYPE_MODULE(FScriptInterface, CoreUObject)
 
 ZSHARP_EXPORT_TYPE_MODULE(FFieldPath, CoreUObject)
 

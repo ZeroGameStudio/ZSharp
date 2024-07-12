@@ -4,11 +4,22 @@
 #include "Dynamic/ZDynamicallyExportedClass.h"
 
 #include "ZExportedTypeRegistry.h"
-#include "ZSharpExportHelpers.h"
 #include "Dynamic/ZDynamicallyExportedProperty.h"
+#include "Reflection/ZReflectionHelper.h"
+#include "Static/ZExportHelper.h"
 
 ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(UStruct* ustruct)
 {
+	if (!ustruct->IsNative())
+	{
+		return nullptr;
+	}
+
+	if (!FZReflectionHelper::IsUFieldModuleMapped(ustruct))
+	{
+		return nullptr;
+	}
+	
 	auto cls = new FZDynamicallyExportedClass { ustruct };
 	if (!FZExportedTypeRegistry::Get().RegisterClass(cls))
 	{
@@ -21,22 +32,17 @@ ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(U
 
 FString ZSharp::FZDynamicallyExportedClass::GetName() const
 {
-	return FZSharpExportHelpers::GetUFieldAliasedName(Struct);
+	return FZReflectionHelper::GetUFieldAliasedName(Struct);
 }
 
 FString ZSharp::FZDynamicallyExportedClass::GetModule() const
 {
-	return FZSharpExportHelpers::GetUFieldModuleName(Struct);
+	return FZReflectionHelper::GetUFieldModuleName(Struct);
 }
 
 FString ZSharp::FZDynamicallyExportedClass::GetUnrealFieldPath() const
 {
 	return Struct->GetPathName();
-}
-
-FString ZSharp::FZDynamicallyExportedClass::GetOuterExportName() const
-{
-	return FZSharpExportHelpers::GetUFieldOuterExportName(Struct);
 }
 
 uint16 ZSharp::FZDynamicallyExportedClass::GetConjugateRegistryId() const
@@ -49,20 +55,20 @@ ZSharp::EZExportedClassFlags ZSharp::FZDynamicallyExportedClass::GetFlags() cons
 	return Flags;
 }
 
-FString ZSharp::FZDynamicallyExportedClass::GetBaseType() const
+ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedClass::GetBaseType() const
 {
 	if (Struct == UInterface::StaticClass())
 	{
 		return {};
 	}
 	
-	const UStruct* super = Struct->GetSuperStruct();
+	const UField* super = FZReflectionHelper::GetUFieldClosestMappedAncestor(Struct->GetSuperStruct());
 	if (!super)
 	{
 		return {};
 	}
 
-	return FZSharpExportHelpers::GetUFieldOuterExportName(super);
+	return FZExportHelper::GetUFieldFullyExportedName(super);
 }
 
 void ZSharp::FZDynamicallyExportedClass::ForeachProperty(TFunctionRef<void(const FString&, const IZExportedProperty&)> action) const
@@ -77,8 +83,6 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(UStruct* ustruct)
 	: Struct(ustruct)
 	, Flags(EZExportedClassFlags::None)
 {
-	check(Struct->IsNative());
-
 	if (const auto uclass = Cast<UClass>(ustruct))
 	{
 		if (uclass->HasAnyClassFlags(CLASS_Interface))

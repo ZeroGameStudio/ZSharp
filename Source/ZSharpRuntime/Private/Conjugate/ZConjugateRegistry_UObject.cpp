@@ -3,10 +3,9 @@
 
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 
-#include "ZSharpExportHelpers.h"
-#include "ZSharpExportRuntimeSettings.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"
+#include "Reflection/ZReflectionHelper.h"
 
 namespace ZSharp::ZConjugateRegistry_UObject_Private
 {
@@ -88,23 +87,11 @@ void ZSharp::FZConjugateRegistry_UObject::GetAllConjugates(TArray<void*>& outCon
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UObject::GetManagedType(const UObject* unmanaged) const
 {
-	const UClass* cls = unmanaged->GetClass();
-	while (!cls->IsNative())
-	{
-		cls = cls->GetSuperClass();
-	}
-	const FString moduleName = FZSharpExportHelpers::GetUFieldModuleName(cls);
-	FString assemblyName;
-	if (!GetDefault<UZSharpExportRuntimeSettings>()->TryGetModuleAssembly(moduleName, assemblyName))
-	{
-		assemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
-	}
-	const FString outerExportName = FZSharpExportHelpers::GetUFieldOuterExportName(cls);
-	const FString typeName = FString::Printf(TEXT("%s.%s"), *assemblyName, *outerExportName);
-	
 	FZRuntimeTypeLocatorWrapper locator;
-    locator.AssemblyName = assemblyName;
-    locator.TypeName = typeName;
+	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(unmanaged->GetClass(), locator))
+	{
+		return {};
+	}
 	
 	return Alc.GetType(locator);
 }

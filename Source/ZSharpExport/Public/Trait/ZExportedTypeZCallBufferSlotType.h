@@ -3,7 +3,7 @@
 #pragma once
 
 #include "ZCall/ZCallBuffer.h"
-#include "ZIsDynamicallyExportableType.h"
+#include "Trait/ZIsDynamicallyExportableType.h"
 
 namespace ZSharp
 {

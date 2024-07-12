@@ -8,7 +8,7 @@ public class LazyObjectPtr : PlainExportedObjectBase
 	
 }
 
-public class LazyObjectPtr<T> : LazyObjectPtr where T : UnrealObject
+public class LazyObjectPtr<T> : LazyObjectPtr where T : UnrealObject?
 {
 	
 }

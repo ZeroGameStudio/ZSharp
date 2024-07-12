@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "ZFullyExportedTypeName.h"
+
 namespace ZSharp
 {
 	class ZSHARPEXPORT_API IZExportedVariable
@@ -10,7 +12,7 @@ namespace ZSharp
 		virtual ~IZExportedVariable(){}
 	public:
 		virtual FString GetName() const = 0;
-		virtual FString GetType() const = 0;
+		virtual FZFullyExportedTypeName GetType() const = 0;
 	};
 }
 

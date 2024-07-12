@@ -8,7 +8,7 @@ public class StrongObjectPtr : PlainExportedObjectBase
 	
 }
 
-public class StrongObjectPtr<T> : StrongObjectPtr where T : UnrealObject
+public class StrongObjectPtr<T> : StrongObjectPtr where T : UnrealObject?
 {
 	
 }

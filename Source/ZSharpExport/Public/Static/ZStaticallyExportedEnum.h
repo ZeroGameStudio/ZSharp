@@ -25,12 +25,12 @@ namespace ZSharp
 		using UnderlyingType = __underlying_type(T);
 
 	public:
-		virtual FString GetName() const override { return TZExportedTypeName<T>::Get(); }
+		virtual FString GetName() const override { return TZExportedTypeName<T>::Get().Name; }
 		virtual FString GetModule() const override { return TZExportedTypeModule<T>::Get(); }
 		virtual FString GetUnrealFieldPath() const override { return {}; }
 		virtual EZCallBufferSlotType GetSlotType() const override { return TZExportedTypeZCallBufferSlotType_V<UnderlyingType>; }
 		virtual EZExportedEnumFlags GetFlags() const override { return Flags; }
-		virtual FString GetUnderlyingType() const override { return TZExportedTypeName<UnderlyingType>::Get(); }
+		virtual FString GetUnderlyingType() const override { return TZExportedTypeName<UnderlyingType>::Get().Name; }
 		virtual void ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const override
 		{
 			for (const auto& pair : Values)

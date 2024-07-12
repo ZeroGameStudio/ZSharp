@@ -22,13 +22,12 @@ namespace ZSharp
 		friend struct FZFinalizer;
 
 	public:
-		virtual FString GetName() const override { return TZExportedTypeName<T>::Get(); }
+		virtual FString GetName() const override { return TZExportedTypeName<T>::Get().Name; }
 		virtual FString GetModule() const override { return TZExportedTypeModule<T>::Get(); }
 		virtual FString GetUnrealFieldPath() const override { return {}; }
-		virtual FString GetOuterExportName() const override { return GetInnerExportName(); }
 		virtual uint16 GetConjugateRegistryId() const override { return TZConjugateRegistryId_V<T>; }
 		virtual EZExportedClassFlags GetFlags() const override { return Flags; }
-		virtual FString GetBaseType() const override { return {}; }
+		virtual FZFullyExportedTypeName GetBaseType() const override { return {}; }
 		virtual void ForeachProperty(TFunctionRef<void(const FString&, const IZExportedProperty&)> action) const override
 		{
 			

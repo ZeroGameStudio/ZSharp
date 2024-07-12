@@ -14,12 +14,10 @@ namespace ZSharp
 	public:
 		virtual FString GetModule() const = 0;
 		virtual FString GetUnrealFieldPath() const = 0;
-		virtual FString GetOuterExportName() const = 0;
 		virtual EZCallBufferSlotType GetSlotType() const = 0;
-	public:
-		// NOTE: This will run in constructor so can't be virtual.
-		FString GetInnerExportName() const;
+		virtual FString GetExportKey() const;
 	};
 }
+
 
 

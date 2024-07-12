@@ -8,7 +8,7 @@ public class WeakObjectPtr : PlainExportedObjectBase
 	
 }
 
-public class WeakObjectPtr<T> : WeakObjectPtr where T : UnrealObject
+public class WeakObjectPtr<T> : WeakObjectPtr where T : UnrealObject?
 {
 	
 }

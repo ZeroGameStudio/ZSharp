@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZCall/Conjugate/ZRegularConjugateRegistries.h"
+#include "Conjugate/ZRegularConjugateRegistries.h"
 
 #include "Trait/ZExportedTypeName.h"
 #include "Trait/ZExportedTypeModule.h"

@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZCall/Conjugate/ZObjectWrapperConjugateRegisties.h"
+#include "Conjugate/ZObjectWrapperConjugateRegisties.h"
 
 #include "Conjugate/ZDeclareConjugateRegistry.h"
 

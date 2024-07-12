@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZCall/Conjugate/ZConjugateRegistry_Array.h"
+#include "Conjugate/ZConjugateRegistry_Array.h"
 
 #include "ZSharpExportHelpers.h"
 #include "ZSharpExportRuntimeSettings.h"

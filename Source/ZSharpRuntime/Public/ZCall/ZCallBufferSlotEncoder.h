@@ -8,7 +8,7 @@
 #include "Conjugate/ZRegularConjugateRegistries.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Conjugate/ZConjugateRegistry_UScriptStruct.h"
-#include "ZCall/Conjugate/ZObjectWrapperConjugateRegisties.h"
+#include "Conjugate/ZObjectWrapperConjugateRegisties.h"
 #include "ZCall/Container/ZSelfDescriptiveObjectWrappers.h"
 #include "ZCall/ZCallBuffer.h"
 

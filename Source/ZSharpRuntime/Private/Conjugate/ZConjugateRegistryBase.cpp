@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZCall/Conjugate/ZConjugateRegistryBase.h"
+#include "Conjugate/ZConjugateRegistryBase.h"
 
 void ZSharp::FZConjugateRegistryBase::Release()
 {

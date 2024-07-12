@@ -3,7 +3,7 @@
 
 #include "ZCall/ZStaticallyExportZCall.h"
 #include "ZCall/ZStaticallyExportZCallMacros.h"
-#include "ZCall/Conjugate/ZConjugateRegistry_Array.h"
+#include "Conjugate/ZConjugateRegistry_Array.h"
 
 namespace ZSharp
 {

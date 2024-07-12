@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Property/IZPropertyVisitor.h"
+#include "Reflection/Property/IZPropertyVisitor.h"
 #include "ZCall/IZCallDispatcher.h"
 
 namespace ZSharp

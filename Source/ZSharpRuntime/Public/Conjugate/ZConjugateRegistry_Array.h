@@ -3,7 +3,7 @@
 #pragma once
 
 #include "ZConjugateRegistryBase.h"
-#include "ZCall/Container/ZSelfDescriptiveScriptArray.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveScriptArray.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "Trait/ZConjugateRegistryId.h"
 #include "Conjugate/ZConjugateHandle.h"

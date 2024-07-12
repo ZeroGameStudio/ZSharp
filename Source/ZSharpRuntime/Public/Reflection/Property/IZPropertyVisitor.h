@@ -6,7 +6,7 @@ namespace ZSharp
 {
 	struct FZCallBufferSlot;
 	
-	class IZPropertyVisitor
+	class ZSHARPRUNTIME_API IZPropertyVisitor
 	{
 
 	public:

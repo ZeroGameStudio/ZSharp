@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ZCall/Property/ZPropertyVisitorBase.h"
+#include "Reflection/Property/ZPropertyVisitorBase.h"
 
 namespace ZSharp
 {

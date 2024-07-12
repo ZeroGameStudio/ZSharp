@@ -9,7 +9,7 @@
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Conjugate/ZConjugateRegistry_UScriptStruct.h"
 #include "Conjugate/ZObjectWrapperConjugateRegisties.h"
-#include "ZCall/Container/ZSelfDescriptiveObjectWrappers.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveObjectWrappers.h"
 #include "ZCall/ZCallBuffer.h"
 
 namespace ZSharp

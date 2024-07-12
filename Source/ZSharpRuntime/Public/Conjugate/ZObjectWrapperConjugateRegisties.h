@@ -3,7 +3,7 @@
 #pragma once
 
 #include "ZObjectWrapperConjugateRegistryBase.h"
-#include "ZCall/Container/ZSelfDescriptiveObjectWrappers.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveObjectWrappers.h"
 
 namespace ZSharp
 {

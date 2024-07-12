@@ -8,7 +8,7 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "Trait/ZExportedTypeName.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"
-#include "ZCall/Property/ZPropertyFactory.h"
+#include "Reflection/Property/ZPropertyFactory.h"
 
 namespace ZSharp::ZConjugateRegistry_Array_Private
 {

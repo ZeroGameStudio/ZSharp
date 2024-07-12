@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ZCall/Container/ZSelfDescriptiveScriptStruct.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveScriptStruct.h"
 #include "ZConjugateRegistryBase.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "Trait/ZConjugateRegistryId.h"

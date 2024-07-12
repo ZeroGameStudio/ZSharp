@@ -2,17 +2,17 @@
 
 #pragma once
 
-#include "ZCall/Property/ZPropertyVisitorBase.h"
+#include "Reflection/Property/ZPropertyVisitorBase.h"
 
 namespace ZSharp
 {
-	class FZArrayPropertyVisitor : public FZPropertyVisitorBase
+	class FZStructPropertyVisitor final : public FZPropertyVisitorBase
 	{
 
 	public:
-		explicit FZArrayPropertyVisitor(const FArrayProperty* underlyingProperty)
+		explicit FZStructPropertyVisitor(const FStructProperty* underlyingProperty)
 			: FZPropertyVisitorBase(underlyingProperty)
-			, UnderlyingArrayProperty(underlyingProperty){}
+			, UnderlyingStructProperty(underlyingProperty){}
 
 	public:
 		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override;
@@ -20,7 +20,7 @@ namespace ZSharp
 		virtual void SetValue(void* dest, const FZCallBufferSlot& src) const override;
 
 	private:
-		const FArrayProperty* UnderlyingArrayProperty;
+		const FStructProperty* UnderlyingStructProperty;
 		
 	};
 }

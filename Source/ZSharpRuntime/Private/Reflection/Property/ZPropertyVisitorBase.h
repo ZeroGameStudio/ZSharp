@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "IZPropertyVisitor.h"
+#include "Reflection/Property/IZPropertyVisitor.h"
 #include "UObject/UnrealType.h"
 
 namespace ZSharp

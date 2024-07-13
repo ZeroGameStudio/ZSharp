@@ -3,8 +3,8 @@
 
 #include "Static/ZExportHelper.h"
 
+#include "UObject/PropertyOptional.h"
 #include "Reflection/ZReflectionHelper.h"
-#include "Trait/ZExportedGenericTypeName.h"
 #include "Trait/ZExportedTypeName.h"
 
 FString ZSharp::FZExportHelper::GetUFieldExportKey(const UField* field)
@@ -56,7 +56,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 		{ FNameProperty::StaticClass(), TZExportedTypeName<FName>::Get(), },
 		{ FTextProperty::StaticClass(), TZExportedTypeName<FText>::Get(), },
 
-		{ FTextProperty::StaticClass(), TZExportedTypeName<FFieldPath>::Get(), },
+		{ FFieldPathProperty::StaticClass(), TZExportedTypeName<FFieldPath>::Get(), },
 	};
 	
 	TFunction<FZFullyExportedTypeName(const FProperty*, bool)> recurse;
@@ -74,7 +74,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 				return GetUFieldFullyExportedName(UClass::StaticClass());
 			}
 			
-			FZFullyExportedTypeName name = TZExportedGenericTypeName<FSubclassOf>::Get();
+			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveSubclassOf>::Get();
 			name.Inner = GetUFieldFullyExportedName(classProp->MetaClass).ToSimple();
 			return name;
 		}
@@ -84,7 +84,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 		}
 		else if (const auto interfaceProp = CastField<FInterfaceProperty>(property))
 		{
-			FZFullyExportedTypeName name = TZExportedGenericTypeName<FScriptInterface>::Get();
+			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptInterface>::Get();
 			name.Inner = GetUFieldFullyExportedName(interfaceProp->InterfaceClass).ToSimple();
 			return name;
 		}
@@ -98,34 +98,74 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 		}
 		else if (const auto softClassProp = CastField<FSoftClassProperty>(property))
 		{
-			FZFullyExportedTypeName name = TZExportedGenericTypeName<FSoftClassPtr>::Get();
+			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveSoftClassPtr>::Get();
 			name.Inner = GetUFieldFullyExportedName(softClassProp->MetaClass).ToSimple();
 			return name;
 		}
 		else if (const auto softObjectProp = CastField<FSoftObjectProperty>(property))
 		{
-			FZFullyExportedTypeName name = TZExportedGenericTypeName<FSoftObjectPtr>::Get();
+			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveSoftObjectPtr>::Get();
 			name.Inner = GetUFieldFullyExportedName(softObjectProp->PropertyClass).ToSimple();
 			return name;
 		}
 		else if (const auto weakObjectProp = CastField<FWeakObjectProperty>(property))
 		{
-			FZFullyExportedTypeName name = TZExportedGenericTypeName<FWeakObjectPtr>::Get();
+			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveWeakObjectPtr>::Get();
 			name.Inner = GetUFieldFullyExportedName(weakObjectProp->PropertyClass).ToSimple();
 			return name;
 		}
 		else if (const auto lazyObjectProp = CastField<FLazyObjectProperty>(property))
 		{
-			FZFullyExportedTypeName name = TZExportedGenericTypeName<FLazyObjectPtr>::Get();
+			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveLazyObjectPtr>::Get();
 			name.Inner = GetUFieldFullyExportedName(lazyObjectProp->PropertyClass).ToSimple();
+			return name;
+		}
+		else if (const auto delegateProp = CastField<FDelegateProperty>(property))
+		{
+			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptDelegate>::Get();
+			name.Inner = GetUFieldFullyExportedName(delegateProp->SignatureFunction).ToSimple();
+			return name;
+		}
+		else if (const auto multicastDelegateProp = CastField<FMulticastDelegateProperty>(property))
+		{
+			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveMulticastScriptDelegate>::Get();
+			name.Inner = GetUFieldFullyExportedName(multicastDelegateProp->SignatureFunction).ToSimple();
 			return name;
 		}
 		else if (const auto arrayProp = CastField<FArrayProperty>(property))
 		{
 			if (allowContainer)
 			{
-				FZFullyExportedTypeName name = TZExportedGenericTypeName<FZSelfDescriptiveScriptArray>::Get();
+				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptArray>::Get();
 				name.Inner = recurse(arrayProp->Inner, false).ToSimple();
+				return name;
+			}
+		}
+		else if (const auto setProp = CastField<FSetProperty>(property))
+		{
+			if (allowContainer)
+			{
+				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptArray>::Get();
+				name.Inner = recurse(setProp->ElementProp, false).ToSimple();
+				return name;
+			}
+		}
+		else if (const auto mapProp = CastField<FMapProperty>(property))
+		{
+			if (allowContainer)
+			{
+				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptArray>::Get();
+				name.Inner = recurse(mapProp->KeyProp, false).ToSimple();
+				name.Outer = recurse(mapProp->ValueProp, false).ToSimple();
+				return name;
+			}
+		}
+		else if (const auto optionalProp = CastField<FOptionalProperty>(property))
+		{
+			if (allowContainer)
+			{
+				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptArray>::Get();
+				name.Inner = recurse(optionalProp->GetValueProperty(), false).ToSimple();
 				return name;
 			}
 		}

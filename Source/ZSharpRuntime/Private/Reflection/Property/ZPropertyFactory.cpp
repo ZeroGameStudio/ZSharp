@@ -22,13 +22,14 @@ namespace ZSharp::PropertyFactory_Private
 	static void* const GNameTypeId = reinterpret_cast<void*>(13);
 	static void* const GTextTypeId = reinterpret_cast<void*>(14);
 
-	static void* const GWeakObjectPtrTypeId = reinterpret_cast<void*>(15);
-	static void* const GSoftObjectPtrTypeId = reinterpret_cast<void*>(16);
-	static void* const GLazyObjectPtrTypeId = reinterpret_cast<void*>(17);
-	static void* const GSoftClassPtrTypeId = reinterpret_cast<void*>(18);
-	static void* const GScriptInterfaceTypeId = reinterpret_cast<void*>(19);
+	static void* const GSubclassOfTypeId = reinterpret_cast<void*>(15);
+	static void* const GSoftClassPtrTypeId = reinterpret_cast<void*>(16);
+	static void* const GSoftObjectPtrTypeId = reinterpret_cast<void*>(17);
+	static void* const GWeakObjectPtrTypeId = reinterpret_cast<void*>(18);
+	static void* const GLazyObjectPtrTypeId = reinterpret_cast<void*>(19);
+	static void* const GScriptInterfaceTypeId = reinterpret_cast<void*>(20);
 	
-	static void* const GFieldPathTypeId = reinterpret_cast<void*>(19);
+	static void* const GFieldPathTypeId = reinterpret_cast<void*>(21);
 
 	template <std::derived_from<FProperty> T>
 	T* Create(EPropertyFlags flags)
@@ -58,11 +59,12 @@ namespace ZSharp::PropertyFactory_Private
 		{ GNameTypeId, [](const FZPropertyDesc&){ return Create<FNameProperty>(PrimitiveFlags); } },
 		{ GTextTypeId, [](const FZPropertyDesc&){ return Create<FTextProperty>(CPF_None); } },
 
-		{ GWeakObjectPtrTypeId, [](const FZPropertyDesc&){ return Create<FWeakObjectProperty>(PrimitiveFlags | CPF_UObjectWrapper); } },
-		{ GSoftObjectPtrTypeId, [](const FZPropertyDesc&){ return Create<FSoftObjectProperty>(CPF_UObjectWrapper | CPF_HasGetValueTypeHash); } },
-		{ GLazyObjectPtrTypeId, [](const FZPropertyDesc&){ return Create<FLazyObjectProperty>(CPF_IsPlainOldData | CPF_NoDestructor | CPF_UObjectWrapper | CPF_HasGetValueTypeHash); } },
-		{ GSoftClassPtrTypeId, [](const FZPropertyDesc&){ return Create<FSoftClassProperty>(CPF_UObjectWrapper | CPF_HasGetValueTypeHash); } },
-		{ GScriptInterfaceTypeId, [](const FZPropertyDesc&){ return Create<FInterfaceProperty>(PrimitiveFlags | CPF_UObjectWrapper); } },
+		{ GSubclassOfTypeId, [](const FZPropertyDesc& desc){ auto res = Create<FClassProperty>(CPF_UObjectWrapper | CPF_HasGetValueTypeHash); res->PropertyClass = UClass::StaticClass(); res->MetaClass = static_cast<UClass*>(desc.Metadata); return res; } },
+		{ GSoftClassPtrTypeId, [](const FZPropertyDesc& desc){ auto res = Create<FSoftClassProperty>(CPF_UObjectWrapper | CPF_HasGetValueTypeHash); res->PropertyClass = UClass::StaticClass(); res->MetaClass = static_cast<UClass*>(desc.Metadata); return res; } },
+		{ GSoftObjectPtrTypeId, [](const FZPropertyDesc& desc){ auto res = Create<FSoftObjectProperty>(CPF_UObjectWrapper | CPF_HasGetValueTypeHash); res->PropertyClass = static_cast<UClass*>(desc.Metadata); return res; } },
+		{ GWeakObjectPtrTypeId, [](const FZPropertyDesc& desc){ auto res = Create<FWeakObjectProperty>(PrimitiveFlags | CPF_UObjectWrapper); res->PropertyClass = static_cast<UClass*>(desc.Metadata); return res; } },
+		{ GLazyObjectPtrTypeId, [](const FZPropertyDesc& desc){ auto res = Create<FLazyObjectProperty>(CPF_IsPlainOldData | CPF_NoDestructor | CPF_UObjectWrapper | CPF_HasGetValueTypeHash); res->PropertyClass = static_cast<UClass*>(desc.Metadata); return res; } },
+		{ GScriptInterfaceTypeId, [](const FZPropertyDesc& desc){ auto res = Create<FInterfaceProperty>(PrimitiveFlags | CPF_UObjectWrapper); res->InterfaceClass = static_cast<UClass*>(desc.Metadata); return res; } },
 
 		{ GFieldPathTypeId, [](const FZPropertyDesc&){ return Create<FFieldPathProperty>(CPF_HasGetValueTypeHash); } },
 	};
@@ -78,9 +80,19 @@ FProperty* ZSharp::FZPropertyFactory::Create(const FZPropertyDesc& desc)
 	UField* field = static_cast<UField*>(desc.Descriptor);
 	if (auto cls = Cast<UClass>(field))
 	{
-		auto prop = PropertyFactory_Private::Create<FObjectProperty>(CPF_None);
-		prop->PropertyClass = cls;
-		return prop;
+		if (cls == UClass::StaticClass())
+		{
+			auto prop = PropertyFactory_Private::Create<FClassProperty>(CPF_None);
+			prop->PropertyClass = cls;
+			prop->MetaClass = UObject::StaticClass();
+			return prop;
+		}
+		else
+		{
+			auto prop = PropertyFactory_Private::Create<FObjectProperty>(CPF_None);
+			prop->PropertyClass = cls;
+			return prop;
+		}
 	}
 	else if (auto scriptStruct = Cast<UScriptStruct>(field))
 	{

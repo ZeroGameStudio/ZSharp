@@ -21,13 +21,14 @@ public static class IntrinsicTypeIds
 	public const IntPtr KName = 13;
 	public const IntPtr KText = 14;
 
-	public const IntPtr KWeakObjectPtr = 15;
-	public const IntPtr KSoftObjectPtr = 16;
-	public const IntPtr KLazyObjectPtr = 17;
-	public const IntPtr KSoftClassPtr = 18;
-	public const IntPtr KScriptInterface = 19;
+	public const IntPtr KSubclassOf = 15;
+	public const IntPtr KSoftClassPtr = 16;
+	public const IntPtr KSoftObjectPtr = 17;
+	public const IntPtr KWeakObjectPtr = 18;
+	public const IntPtr KLazyObjectPtr = 19;
+	public const IntPtr KScriptInterface = 20;
 
-	public const IntPtr KFieldPath = 20;
+	public const IntPtr KFieldPath = 21;
 
 	public static Dictionary<Type, IntPtr> STypeMap => new()
 	{

@@ -1,8 +1,16 @@
 // Copyright Zero Games. All Rights Reserved.
 
 #pragma once
-#include "Reflection/Wrapper/ZSelfDescriptiveObjectWrappers.h"
+
+#include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveMulticastScriptDelegate.h"
+
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptArray.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveScriptSet.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveScriptMap.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveOptional.h"
+
+#include "Reflection/Wrapper/ZSelfDescriptiveObjectWrappers.h"
 
 namespace ZSharp
 {
@@ -17,6 +25,7 @@ namespace ZSharp
 		static FString GetAssemblyName() { return "System"; } \
 		static FString GetModuleName() { return "System"; } \
 		static FString GetTypeName() { return #Name; } \
+		static FString GetTypeNameText() { return #Type; } \
 		static FString GetFullName() { return FString::Printf(TEXT("System.%s"), TEXT(#Name)); } \
 	};
 
@@ -27,7 +36,7 @@ namespace ZSharp
 		static FString GetAssemblyName() { return ZSHARP_ENGINE_ASSEMBLY_NAME; } \
 		static FString GetModuleName() { return #Module; } \
 		static FString GetTypeName() { return #Name; } \
-		static FString GetPureTypeName() { FString res; GetTypeName().Split("`", &res, nullptr); return res; } \
+		static FString GetTypeNameText() { FString res; GetTypeName().Split("`", &res, nullptr); return res; } \
 		static FString GetFullName() { return FString::Printf(TEXT("%s.%s.%s"), TEXT(ZSHARP_ENGINE_ASSEMBLY_NAME), TEXT(#Module), TEXT(#Name)); } \
 	};
 
@@ -48,12 +57,12 @@ ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(FName, Core, UnrealName)
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(FText, Core, UnrealText)
 
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptArray, Core, UnrealArray`1)
-// ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptSet, Core, UnrealSet`1)
-// ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptMap, Core, UnrealMap`2)
-// ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptOptional, Core, UnrealOptional`1)
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptSet, Core, UnrealSet`1)
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptMap, Core, UnrealMap`2)
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveOptional, Core, UnrealOptional`1)
 
-// ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FSelfDescriptiveScriptDelegate, Core, UnrealDelegate`1)
-// ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FSelfDescriptiveMulticastScriptDelegate, Core, UnrealMulticastDelegate`1)
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptDelegate, Core, UnrealDelegate`1)
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveMulticastScriptDelegate, Core, UnrealMulticastDelegate`1)
 
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveSubclassOf, CoreUObject, SubclassOf`1)
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveSoftClassPtr, CoreUObject, SoftClassPtr`1)
@@ -61,6 +70,7 @@ ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveSoftObjectPtr, 
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveWeakObjectPtr, CoreUObject, WeakObjectPtr`1)
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveLazyObjectPtr, CoreUObject, LazyObjectPtr`1)
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptInterface, CoreUObject, ScriptInterface`1)
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveStrongObjectPtr, CoreUObject, StrongObjectPtr`1)
 
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(FFieldPath, CoreUObject, FieldPath)
 

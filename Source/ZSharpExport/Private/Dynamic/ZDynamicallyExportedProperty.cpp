@@ -21,13 +21,13 @@ ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Cr
 FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 {
 	FString name = Property->GetName();
-	if (Property->IsA<FBoolProperty>() && name.StartsWith("b", ESearchCase::CaseSensitive))
+	if (Property->IsA<FBoolProperty>())
 	{
-		name.RightChopInline(1);
-		if (FChar::IsDigit(name[0]))
+		if (name.StartsWith("b", ESearchCase::CaseSensitive))
 		{
-			name.InsertAt(0, "Is");
+			name.RightChopInline(1);
 		}
+		name.InsertAt(0, "Is");
 	}
 	if (Index)
 	{

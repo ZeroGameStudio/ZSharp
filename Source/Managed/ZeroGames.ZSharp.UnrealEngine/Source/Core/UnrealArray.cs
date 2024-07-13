@@ -79,7 +79,7 @@ public abstract class UnrealArray : PlainExportedObjectBase
 	[StructLayout(LayoutKind.Sequential)]
 	private struct Userdata
 	{
-		public SimplePropertyDesc ElementProperty;
+		public PropertyDesc ElementProperty;
 	}
 
 }

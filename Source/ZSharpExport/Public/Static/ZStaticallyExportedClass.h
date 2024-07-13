@@ -5,8 +5,8 @@
 #include "IZExportedClass.h"
 #include "Concept/ZStaticallyExportableClass.h"
 #include "Trait/ZConjugateRegistryId.h"
-#include "Trait/ZExportedTypeModule.h"
 #include "Trait/ZExportedTypeName.h"
+#include "Trait/ZManagedTypeInfo.h"
 
 namespace ZSharp
 {
@@ -23,7 +23,7 @@ namespace ZSharp
 
 	public:
 		virtual FString GetName() const override { return TZExportedTypeName<T>::Get().Name; }
-		virtual FString GetModule() const override { return TZExportedTypeModule<T>::Get(); }
+		virtual FString GetModule() const override { return TZManagedTypeInfo<T>::GetModuleName(); }
 		virtual FString GetUnrealFieldPath() const override { return {}; }
 		virtual uint16 GetConjugateRegistryId() const override { return TZConjugateRegistryId_V<T>; }
 		virtual EZExportedClassFlags GetFlags() const override { return Flags; }

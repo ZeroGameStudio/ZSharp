@@ -95,7 +95,6 @@ bool ZSharp::FZCallDispatcher_UFunction::InvalidateCache() const
 	for (TFieldIterator<FProperty> it(Function.Get()); it && it->HasAllPropertyFlags(CPF_Parm); ++it)
 	{
 		FProperty* prop = *it;
-		check(prop->ArrayDim == 1);
 		TUniquePtr<IZPropertyVisitor> visitor = IZPropertyVisitor::Create(prop);
 		if (!visitor)
 		{

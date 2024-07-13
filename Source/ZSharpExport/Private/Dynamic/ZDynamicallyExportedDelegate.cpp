@@ -69,8 +69,7 @@ ZSharp::FZDynamicallyExportedDelegate::FZDynamicallyExportedDelegate(const UFunc
 
 	for (TFieldIterator<FProperty> it(Signature); it && it->HasAllPropertyFlags(CPF_Parm); ++it)
 	{
-		FProperty* property = *it;
-		FZDynamicallyExportedParameter* param = FZDynamicallyExportedParameter::Create(property);
+		FZDynamicallyExportedParameter* param = FZDynamicallyExportedParameter::Create(*it);
 		if (!param)
 		{
 			return;

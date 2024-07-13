@@ -37,12 +37,26 @@ FString ZSharp::FZReflectionHelper::GetUFieldAliasedName(const UField* field)
 	{
 		name = *alias;
 	}
+	
 	if (auto cls = Cast<UClass>(field))
 	{
-		if (cls->HasAnyClassFlags(CLASS_Interface))
+		if (cls->HasAllClassFlags(CLASS_Interface))
 		{
 			name.InsertAt(0, 'I');
 		}
+	}
+	else if (auto func = Cast<UFunction>(field))
+	{
+		static const FString GDelegatePostfix = "__DelegateSignature";
+		if (func->HasAllFunctionFlags(FUNC_Delegate) && name.EndsWith(GDelegatePostfix))
+		{
+			name.LeftChopInline(GDelegatePostfix.Len());
+		}
+	}
+
+	if (const UField* outer = field->GetTypedOuter<UField>())
+	{
+		name = GetUFieldAliasedName(outer).Append(".").Append(name);
 	}
 
 	return name;

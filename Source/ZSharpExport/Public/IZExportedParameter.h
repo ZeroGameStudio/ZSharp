@@ -6,17 +6,22 @@
 
 namespace ZSharp
 {
-	enum class EZExportedParameterDirection : uint8
+	enum class EZExportedParameterFlags : uint64
 	{
-		In,
-		Out,
-		InOut,
+		None = 0,
+		In = 1 << 0,
+		Out = 1 << 1,
+		Return = 1 << 2,
 	};
+	ENUM_CLASS_FLAGS(EZExportedParameterFlags)
 	
 	class ZSHARPEXPORT_API IZExportedParameter : public IZExportedVariable
 	{
 	public:
-		virtual EZExportedParameterDirection GetDirection() const = 0;
+		virtual EZExportedParameterFlags GetFlags() const = 0;
+	public:
+		bool HasAnyFlags(EZExportedParameterFlags flags) const { return !!(GetFlags() & flags); }
+		bool HasAllFlags(EZExportedParameterFlags flags) const { return (GetFlags() & flags) == flags; }
 	};
 }
 

@@ -26,7 +26,7 @@ FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 		name.RightChopInline(1);
 		if (FChar::IsDigit(name[0]))
 		{
-			name.InsertAt(0, "__");
+			name.InsertAt(0, "Is");
 		}
 	}
 	if (Index)

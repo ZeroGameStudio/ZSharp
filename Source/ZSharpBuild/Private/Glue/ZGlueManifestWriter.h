@@ -9,6 +9,7 @@ namespace ZSharp
 	class IZExportedType;
 	class IZExportedClass;
 	class IZExportedEnum;
+	class IZExportedDelegate;
 	
 	class FZGlueManifestWriter
 	{
@@ -19,6 +20,7 @@ namespace ZSharp
 	private:
 		void WriteClass(const IZExportedClass& cls);
 		void WriteEnum(const IZExportedEnum& enm);
+		void WriteDelegate(const IZExportedDelegate& delegate);
 
 		TUniquePtr<FZExportedAssemblyDto>* GetAssemblyDto(const IZExportedType& type);
 

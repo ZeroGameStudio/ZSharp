@@ -79,7 +79,7 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		}
 
 		assembly.Name = new DirectoryInfo(dir).Name;
-		foreach (var type in assembly.Classes.AsEnumerable<ExportedType>().Concat(assembly.Enums))
+		foreach (var type in assembly.ExportedTypes)
 		{
 			type.Assembly = assembly.Name;
 		}
@@ -113,6 +113,11 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		{
 			await using EnumWriter ew = new(exportedEnum, fs);
 			await ew.WriteAsync();
+		}
+		else if (exportedType is ExportedDelegate exportedDelegate)
+		{
+			await using DelegateWriter dw = new(exportedDelegate, fs);
+			await dw.WriteAsync();
 		}
 	}
 

@@ -31,6 +31,14 @@ void ZSharp::FZExportedTypeRegistry::ForeachExportedEnum(TFunctionRef<void(const
 	}
 }
 
+void ZSharp::FZExportedTypeRegistry::ForeachExportedDelegate(TFunctionRef<void(const IZExportedDelegate&)> action) const
+{
+	for (const auto& pair : DelegateMap)
+	{
+		action(*pair.Value);
+	}
+}
+
 bool ZSharp::FZExportedTypeRegistry::RegisterClass(IZExportedClass* cls)
 {
 	FString key = cls->GetExportKey();
@@ -52,6 +60,18 @@ bool ZSharp::FZExportedTypeRegistry::RegisterEnum(IZExportedEnum* enm)
 	}
 	
 	EnumMap.Emplace(key, enm);
+	return true;
+}
+
+bool ZSharp::FZExportedTypeRegistry::RegisterDelegate(IZExportedDelegate* delegate)
+{
+	FString key = delegate->GetExportKey();
+	if (DelegateMap.Contains(key))
+	{
+		return false;
+	}
+	
+	DelegateMap.Emplace(key, delegate);
 	return true;
 }
 

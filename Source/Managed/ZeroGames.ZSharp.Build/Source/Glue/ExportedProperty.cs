@@ -13,11 +13,9 @@ public enum EExportedPropertyFlags : uint64
 	Private = 1 << 4,
 }
 
-public class ExportedProperty
+public class ExportedProperty : ExportedVariable
 {
-	public required string Name { get; set; }
 	public required string ZCallName { get; set; }
-	public required FullyExportedTypeName Type { get; set; }
 	public required EExportedPropertyFlags Flags { get; set; }
 	public required int32 Index { get; set; }
 	

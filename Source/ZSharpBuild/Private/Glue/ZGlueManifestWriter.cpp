@@ -4,16 +4,21 @@
 #include "ZGlueManifestWriter.h"
 
 #include "IZExportedEnum.h"
+#include "IZExportedClass.h"
+#include "IZExportedDelegate.h"
 #include "IZExportedProperty.h"
+#include "IZExportedParameter.h"
 #include "IZExportedTypeRegistry.h"
 #include "ZSharpRuntimeSettings.h"
 #include "DTO/ZExportedClassDto.h"
 #include "JsonObjectConverter.h"
+#include "DTO/ZExportedDelegateDto.h"
 
 void ZSharp::FZGlueManifestWriter::Write()
 {
 	IZExportedTypeRegistry::Get().ForeachExportedEnum([this](const IZExportedEnum& enm){ WriteEnum(enm); });
 	IZExportedTypeRegistry::Get().ForeachExportedClass([this](const IZExportedClass& cls){ WriteClass(cls); });
+	IZExportedTypeRegistry::Get().ForeachExportedDelegate([this](const IZExportedDelegate& delegate){ WriteDelegate(delegate); });
 	
 	const FString glueDir = FPaths::Combine(FPaths::ProjectDir(), "Intermediate/ZSharp/Glue");
 	for (const auto& pair : AssemblyDtoMap)
@@ -96,6 +101,37 @@ void ZSharp::FZGlueManifestWriter::WriteEnum(const IZExportedEnum& enm)
 		*enm.GetModule(),
 		*ToString(enm.GetSlotType()),
 		*enm.GetUnderlyingType());
+}
+
+void ZSharp::FZGlueManifestWriter::WriteDelegate(const IZExportedDelegate& delegate)
+{
+	TUniquePtr<FZExportedAssemblyDto>* pAssemblyDto = GetAssemblyDto(delegate);
+	if (!pAssemblyDto)
+	{
+		return;
+	}
+
+	TUniquePtr<FZExportedAssemblyDto>& assemblyDto = *pAssemblyDto;
+		
+	FZExportedDelegateDto delegateDto;
+	delegateDto.Name = delegate.GetName();
+	delegateDto.Module = delegate.GetModule();
+	delegateDto.UnrealFieldPath = delegate.GetUnrealFieldPath();
+	delegateDto.Flags = static_cast<__underlying_type(EZExportedDelegateFlags)>(delegate.GetFlags());
+	delegate.ForeachParameter([&delegateDto](const IZExportedParameter& param)
+	{
+		FZExportedParameterDto paramDto;
+		paramDto.Name = param.GetName();
+		paramDto.Type = param.GetType();
+		paramDto.Flags = static_cast<__underlying_type(EZExportedParameterFlags)>(param.GetFlags());
+		delegateDto.Parameters.Emplace(MoveTemp(paramDto));
+	});
+			
+	assemblyDto->Delegates.Emplace(MoveTemp(delegateDto));
+	
+	UE_LOG(LogTemp, Log, TEXT("Exported Delegate Name: [%s] Module: [%s]"),
+		*delegate.GetName(),
+		*delegate.GetModule());
 }
 
 TUniquePtr<FZExportedAssemblyDto>* ZSharp::FZGlueManifestWriter::GetAssemblyDto(const IZExportedType& type)

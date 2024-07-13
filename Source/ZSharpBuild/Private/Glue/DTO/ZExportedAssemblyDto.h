@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ZExportedClassDto.h"
+#include "ZExportedDelegateDto.h"
 #include "ZExportedEnumDto.h"
 
 #include "ZExportedAssemblyDto.generated.h"
@@ -17,6 +18,10 @@ struct FZExportedAssemblyDto
 
 	UPROPERTY()
 	TArray<FZExportedClassDto> Classes;
+
+	UPROPERTY()
+	TArray<FZExportedDelegateDto> Delegates;
+	
 };
 
 

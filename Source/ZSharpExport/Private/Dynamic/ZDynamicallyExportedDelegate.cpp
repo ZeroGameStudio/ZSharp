@@ -9,6 +9,11 @@
 
 ZSharp::FZDynamicallyExportedDelegate* ZSharp::FZDynamicallyExportedDelegate::Create(const UFunction* signature)
 {
+	if (!signature->IsNative())
+	{
+		return nullptr;
+	}
+	
 	if (!signature->HasAnyFunctionFlags(FUNC_Delegate))
 	{
 		return nullptr;

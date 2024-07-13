@@ -17,7 +17,7 @@ public readonly struct ConjugateHandle
 
     public T? GetTarget<T>() where T : class, IConjugate
     {
-        if (!Valid)
+        if (!IsValid)
         {
             return null;
         }
@@ -31,7 +31,7 @@ public readonly struct ConjugateHandle
         return alc.Conjugate(_handle) as T;
     }
     
-    public bool Valid => _handle != IntPtr.Zero;
+    public bool IsValid => _handle != IntPtr.Zero;
 
     private readonly IntPtr _handle;
     

@@ -10,7 +10,7 @@ public class ExportedAssemblyRegistry
 
 	public void RegisterAssembly(ExportedAssembly assembly)
 	{
-		if (Volatile.Read(ref _locked))
+		if (Volatile.Read(ref _isLocked))
 		{
 			throw new InvalidOperationException("Registry has already locked.");
 		}
@@ -20,12 +20,12 @@ public class ExportedAssemblyRegistry
 
 	public void FinishRegister()
 	{
-		if (Locked)
+		if (IsLocked)
 		{
 			return;
 		}
 		
-		Volatile.Write(ref _locked, true);
+		Volatile.Write(ref _isLocked, true);
 
 		Dictionary<string, ExportedAssembly> map = new();
 		foreach (var asm in _assemblyMap.Values)
@@ -41,7 +41,7 @@ public class ExportedAssemblyRegistry
 
 	public ExportedAssembly? GetModuleAssembly(string module)
 	{
-		if (!Locked)
+		if (!IsLocked)
 		{
 			throw new InvalidOperationException("Register has not locked.");
 		}
@@ -50,10 +50,10 @@ public class ExportedAssemblyRegistry
 		return asm;
 	}
 
-	public bool Locked => Volatile.Read(ref _locked);
+	public bool IsLocked => Volatile.Read(ref _isLocked);
 	public IEnumerable<ExportedType> ExportedTypes => _assemblyMap.SelectMany(pair => pair.Value.ExportedTypes);
 
-	private bool _locked;
+	private bool _isLocked;
 	private ConcurrentDictionary<string, ExportedAssembly> _assemblyMap = new();
 	private IReadOnlyDictionary<string, ExportedAssembly>? _moduleAssemblyMap;
 

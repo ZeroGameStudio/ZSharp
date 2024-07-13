@@ -42,9 +42,9 @@ internal class ZCallResolver_Method : IZCallResolver
 				return false;
 			}
 
-			bool cond1 = attr.Name == methodName;
-			bool cond2 = string.IsNullOrWhiteSpace(attr.Name) && method.Name == methodName;
-			return cond1 || cond2;
+			bool isExplicitNameMatch = attr.Name == methodName;
+			bool isDefaultNameMatch = string.IsNullOrWhiteSpace(attr.Name) && method.Name == methodName;
+			return isExplicitNameMatch || isDefaultNameMatch;
 		}).ToArray();
 		if (methods.Length == 0)
 		{

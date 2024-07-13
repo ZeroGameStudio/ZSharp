@@ -13,10 +13,10 @@ public class ProjectDefinition
 
 	public string TargetFramework { get; init; } = "net8.0";
 	public string Language { get; init; } = "C#";
-	public bool ImplicitUsingEnabled { get; init; } = true;
-	public bool Nullable { get; init; } = true;
-	public bool StrongRestrictedNullable { get; init; } = true;
-	public bool UnsafeBlockEnabled { get; init; } = true;
+	public bool IsImplicitUsingEnabled { get; init; } = true;
+	public bool IsNullable { get; init; } = true;
+	public bool IsStrongRestrictedNullable { get; init; } = true;
+	public bool IsUnsafeBlockEnabled { get; init; } = true;
 	public bool HasGlue { get; init; } = false;
 
 	public string Authors { get; init; } = string.Empty;

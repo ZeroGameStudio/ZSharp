@@ -10,9 +10,9 @@ public readonly struct ZCallHandle
 
     public static ZCallHandle Alloc() => new(--_sCurrentHandle);
     
-    public bool Valid => _handle != 0;
-    public bool Red => _handle < 0;
-    public bool Black => _handle > 0;
+    public bool IsValid => _handle != 0;
+    public bool IsRed => _handle < 0;
+    public bool IsBlack => _handle > 0;
 
     private ZCallHandle(int64 handle) => _handle = handle;
     

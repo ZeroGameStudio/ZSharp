@@ -11,7 +11,7 @@ public enum EExportedEnumFlags : uint64
 
 public class ExportedEnum : ExportedType
 {
-	public ExportedEnum() => Static = true;
+	public ExportedEnum() => IsStatic = true;
 	public EExportedEnumFlags Flags { get; set; }
 	public required string UnderlyingType { get; set; }
 	public required Dictionary<string, string> ValueMap { get; set; }

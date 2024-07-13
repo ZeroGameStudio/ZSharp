@@ -24,7 +24,7 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 	private BuildTarget_GenerateGlue(IBuildEngine engine, [Argument("projectdir")] string projectDir) : base(engine)
 	{
 		UnrealProjectDir = projectDir;
-		if (!((IUnrealProjectDir)this).Valid)
+		if (!((IUnrealProjectDir)this).IsValid)
 		{
 			throw new ArgumentException($"Invalid argument projectdir={projectDir}.");
 		}

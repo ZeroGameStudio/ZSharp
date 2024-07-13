@@ -67,15 +67,15 @@ namespace {_exportedClass.Namespace};
 	{
 		string name = property.Type.ToString();
 		string nunNullableName = property.Type.ToString(false);
-		bool nullable = property.Type.Nullable;
-		string nullForgivingModifier = nullable ? string.Empty : "!";
-		string accessModifier = property.Public ? "public" : property.Protected ? "protected" : "private";
-		string getBlock = property.Readable ?
+		bool isNullable = property.Type.IsNullable;
+		string nullForgivingModifier = isNullable ? string.Empty : "!";
+		string accessModifier = property.IsPublic ? "public" : property.IsProtected ? "protected" : "private";
+		string getBlock = property.IsReadable ?
 @$"		get
 		{{
 			return ({name})this.ZCall(""{property.ZCallName}"", false, {property.Index}, typeof({nunNullableName}))[3].Object{nullForgivingModifier};
 		}}" : string.Empty;
-		string setBlock = property.Writable ?
+		string setBlock = property.IsWritable ?
 @$"
 		set
 		{{
@@ -130,10 +130,10 @@ namespace {_exportedClass.Namespace};
 	{
 		get
 		{
-			string? @abstract = _exportedClass.Abstract ? "abstract " : null;
-			string @class = _exportedClass.Interface ? "interface " : "class ";
+			string? @abstract = _exportedClass.IsAbstract ? "abstract " : null;
+			string @class = _exportedClass.IsInterface ? "interface " : "class ";
 			string? @base = _baseType;
-			string? conjugate = _implementsBuildConjugate ? $"IConjugate<{_exportedClass.Name}>" : null;
+			string? conjugate = _hasBuildConjugate ? $"IConjugate<{_exportedClass.Name}>" : null;
 			List<string?> bases = [ @base, conjugate ];
 			
 			string classModifiers = $"public {@abstract}partial {@class}";
@@ -146,7 +146,7 @@ namespace {_exportedClass.Namespace};
 		}
 	}
 
-	private bool _implementsBuildConjugate => !_exportedClass.Interface && !_exportedClass.Abstract;
+	private bool _hasBuildConjugate => !_exportedClass.IsInterface && !_exportedClass.IsAbstract;
 
 	private string? _baseType
 	{
@@ -154,22 +154,22 @@ namespace {_exportedClass.Namespace};
 		{
 			if (string.IsNullOrWhiteSpace(_exportedClass.BaseType.Name))
 			{
-				if (_exportedClass.Plain)
+				if (_exportedClass.IsPlain)
 				{
 					return "PlainExportedObjectBase";
 				}
 
-				if (_exportedClass.Class)
+				if (_exportedClass.IsClass)
 				{
 					return "UnrealObjectBase";
 				}
 
-				if (_exportedClass.Struct)
+				if (_exportedClass.IsStruct)
 				{
 					return "UnrealStructBase";
 				}
 
-				if (_exportedClass.Interface)
+				if (_exportedClass.IsInterface)
 				{
 					return null;
 				}
@@ -185,13 +185,13 @@ namespace {_exportedClass.Namespace};
 	{
 		get
 		{
-			if (_exportedClass.Class | _exportedClass.Interface)
+			if (_exportedClass.IsClass | _exportedClass.IsInterface)
 			{
 				return
 @"	public new static string SUnrealFieldPath => __kUnrealFieldPath;
 	public new static UnrealClass SStaticClass => UnrealObjectGlobals.LowLevelFindObject<UnrealClass>(__kUnrealFieldPath)!;";
 			}
-			if (_exportedClass.Struct)
+			if (_exportedClass.IsStruct)
 			{
 				return
 @"	public new static string SUnrealFieldPath => __kUnrealFieldPath;
@@ -206,7 +206,7 @@ namespace {_exportedClass.Namespace};
 	{
 		get
 		{
-			if (_exportedClass.Class | _exportedClass.Struct)
+			if (_exportedClass.IsClass | _exportedClass.IsStruct)
 			{
 				return "\tpublic override string UnrealFieldPath => __kUnrealFieldPath;";
 			}
@@ -236,7 +236,7 @@ namespace {_exportedClass.Namespace};
 			// Methods
 			
 			// Properties
-			foreach (var pair in _exportedClass.PropertyMap.OrderBy(pair => pair.Value.Public ? 1 : pair.Value.Protected ? 2 : 3))
+			foreach (var pair in _exportedClass.PropertyMap.OrderBy(pair => pair.Value.IsPublic ? 1 : pair.Value.IsProtected ? 2 : 3))
 			{
 				string block = GetPropertyBlock(pair.Value);
 				body.Append(block);
@@ -244,10 +244,10 @@ namespace {_exportedClass.Namespace};
 			}
 
 			// Intrinsics
-			string userdata = _exportedClass.Struct ? "SStaticStruct.Unmanaged" : "IntPtr.Zero";
-			string? constructorDefault = _exportedClass.Class || _exportedClass.Interface ? null : $"\tpublic {_exportedClass.Name}(){{ Unmanaged = GetOwningAlc().BuildConjugate(this, {userdata}); }}";
-			string? methodBuildConjugate = _implementsBuildConjugate ? $"\tpublic new static {_exportedClass.Name} BuildConjugate(IntPtr unmanaged) => new(unmanaged);" : null;
-			string? constructorRed = _exportedClass.Interface ? null : $"\tprotected {_exportedClass.Name}(IntPtr unmanaged) : base(unmanaged){{}}";
+			string userdata = _exportedClass.IsStruct ? "SStaticStruct.Unmanaged" : "IntPtr.Zero";
+			string? constructorDefault = _exportedClass.IsClass || _exportedClass.IsInterface ? null : $"\tpublic {_exportedClass.Name}(){{ Unmanaged = GetOwningAlc().BuildConjugate(this, {userdata}); }}";
+			string? methodBuildConjugate = _hasBuildConjugate ? $"\tpublic new static {_exportedClass.Name} BuildConjugate(IntPtr unmanaged) => new(unmanaged);" : null;
+			string? constructorRed = _exportedClass.IsInterface ? null : $"\tprotected {_exportedClass.Name}(IntPtr unmanaged) : base(unmanaged){{}}";
 			string? constUnrealFieldPath = string.IsNullOrWhiteSpace(_exportedClass.UnrealFieldPath) ? null : $"\tprivate const string __kUnrealFieldPath = \"{_exportedClass.UnrealFieldPath}\";";
 			
 			List<string?> intrinsicMethods = [ constructorDefault, methodBuildConjugate, _interfaceStaticField, _interfaceInstanceField, constructorRed/*, _constructorStatic*/, constUnrealFieldPath ];

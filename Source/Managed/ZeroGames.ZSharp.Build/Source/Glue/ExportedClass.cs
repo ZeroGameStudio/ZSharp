@@ -21,11 +21,11 @@ public class ExportedClass : ExportedType
 	public FullyExportedTypeName BaseType { get; set; }
 	public required Dictionary<string, ExportedProperty> PropertyMap { get; set; }
 	
-	public bool Plain => (Flags & EExportedClassFlags.Plain) != EExportedClassFlags.None;
-	public bool Class => (Flags & EExportedClassFlags.Class) != EExportedClassFlags.None;
-	public bool Struct => (Flags & EExportedClassFlags.Struct) != EExportedClassFlags.None;
-	public bool Interface => (Flags & EExportedClassFlags.Interface) != EExportedClassFlags.None;
-	public bool Abstract => (Flags & EExportedClassFlags.Abstract) != EExportedClassFlags.None;
+	public bool IsPlain => (Flags & EExportedClassFlags.Plain) != EExportedClassFlags.None;
+	public bool IsClass => (Flags & EExportedClassFlags.Class) != EExportedClassFlags.None;
+	public bool IsStruct => (Flags & EExportedClassFlags.Struct) != EExportedClassFlags.None;
+	public bool IsInterface => (Flags & EExportedClassFlags.Interface) != EExportedClassFlags.None;
+	public bool IsAbstract => (Flags & EExportedClassFlags.Abstract) != EExportedClassFlags.None;
 }
 
 

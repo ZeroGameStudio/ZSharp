@@ -30,7 +30,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
     private BuildTarget_GenerateSolution(IBuildEngine engine, [Argument("projectdir")] string projectDir, [Argument("source")] string source) : base(engine)
     {
         UnrealProjectDir = projectDir;
-        if (!((IUnrealProjectDir)this).Valid)
+        if (!((IUnrealProjectDir)this).IsValid)
         {
             throw new ArgumentException($"Invalid argument projectdir={projectDir}.");
         }

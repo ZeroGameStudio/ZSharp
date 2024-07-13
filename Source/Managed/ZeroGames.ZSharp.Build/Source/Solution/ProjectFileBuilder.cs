@@ -78,9 +78,9 @@ public class ProjectFileBuilder
 		void Append(string childName, string childInnerText) => AppendSimpleChild(doc, propertyGroupNode, childName, childInnerText);
 		Append("ProjectName", _project.Name);
 		Append("TargetFramework", "net8.0");
-		Append("ImplicitUsings", _project.ImplicitUsingEnabled ? "enable" : "disable");
-		Append("Nullable", _project.Nullable ? "enable" : "disable");
-		Append("AllowUnsafeBlocks", _project.UnsafeBlockEnabled.ToString().ToLower());
+		Append("ImplicitUsings", _project.IsImplicitUsingEnabled ? "enable" : "disable");
+		Append("Nullable", _project.IsNullable ? "enable" : "disable");
+		Append("AllowUnsafeBlocks", _project.IsUnsafeBlockEnabled.ToString().ToLower());
 		Append("Authors", _project.Authors);
 		Append("Company", _project.Company);
 		Append("AssemblyVersion", _project.AssemblyVersion);
@@ -88,7 +88,7 @@ public class ProjectFileBuilder
 		Append("NeutralLanguage", _project.NeutralLanguage);
 
 		List<string> finalWarningsToErros = [.._project.WarningsAsErrors];
-		if (_project.StrongRestrictedNullable)
+		if (_project.IsStrongRestrictedNullable)
 		{
 			finalWarningsToErros.Add("CS8600;CS8601;CS8602;CS8603;CS8604;CS8609;CS8610;CS8614;CS8616;CS8618;CS8619;CS8622;CS8625");
 		}

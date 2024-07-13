@@ -10,11 +10,11 @@ public readonly struct SimpleFullyExportedTypeName
 	
 	public required string Namespace { get; init; }
 	public required string Name { get; init; }
-	[JsonPropertyName("bNullable")] public required bool Nullable { get; init; }
+	[JsonPropertyName("bNullable")] public required bool IsNullable { get; init; }
 
-	public string ToString(bool nullable)
+	public string ToString(bool isNullable)
 	{
-		return Name + (Nullable && nullable ? "?" : string.Empty);
+		return Name + (IsNullable && isNullable ? "?" : string.Empty);
 	}
 
 	public override string ToString() => ToString(true);
@@ -26,33 +26,33 @@ public readonly struct FullyExportedTypeName
 	
 	public required string Namespace { get; init; }
 	public required string Name { get; init; }
-	[JsonPropertyName("bNullable")] public required bool Nullable { get; init; }
+	[JsonPropertyName("bNullable")] public required bool IsNullable { get; init; }
 	public SimpleFullyExportedTypeName Inner { get; init; }
 	public SimpleFullyExportedTypeName Outer { get; init; }
 
-	public string ToString(bool nullable)
+	public string ToString(bool isNullable)
 	{
 		StringBuilder res = new();
 		res.Append(Name);
-		bool generic = false;
+		bool isGeneric = false;
 		if (!string.IsNullOrWhiteSpace(Inner.Name))
 		{
-			generic = true;
-			res.Append('<').Append(Inner.ToString(nullable));
+			isGeneric = true;
+			res.Append('<').Append(Inner.ToString(isNullable));
 		}
 
 		if (!string.IsNullOrWhiteSpace(Outer.Name))
 		{
-			generic = true;
-			res.Append(", ").Append(Outer.ToString(nullable));
+			isGeneric = true;
+			res.Append(", ").Append(Outer.ToString(isNullable));
 		}
 
-		if (generic)
+		if (isGeneric)
 		{
 			res.Append('>');
 		}
 
-		if (Nullable && nullable)
+		if (IsNullable && isNullable)
 		{
 			res.Append('?');
 		}

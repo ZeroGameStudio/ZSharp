@@ -71,16 +71,16 @@ public enum {_exportedEnum.Name} : {_exportedEnum.UnderlyingType}
 		get
 		{
 			StringBuilder enumBody = new();
-			bool first = true;
+			bool isFirst = true;
 			foreach (var pair in _exportedEnum.ValueMap)
 			{
-				if (!first)
+				if (!isFirst)
 				{
 					enumBody.Append('\n');
 				}
 				else
 				{
-					first = false;
+					isFirst = false;
 				}
 
 				enumBody.Append($"\t{pair.Key} = {pair.Value},");

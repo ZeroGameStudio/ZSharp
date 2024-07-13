@@ -59,7 +59,7 @@ public abstract class ExportedObjectBase : IConjugate
 
     public void Release()
     {
-        if (_managed)
+        if (_isManaged)
         {
             Logger.Error("Dispose managed exported object from unmanaged code.");
             return;
@@ -82,43 +82,43 @@ public abstract class ExportedObjectBase : IConjugate
     private protected ExportedObjectBase()
     {
         GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
-        _managed = true;
+        _isManaged = true;
     }
 
     private protected ExportedObjectBase(IntPtr unmanaged)
     {
         GCHandle = GCHandle.Alloc(this);
         Unmanaged = unmanaged;
-        _managed = false;
+        _isManaged = false;
     }
 
     ~ExportedObjectBase() => InternalDispose(true);
 
-    private void InternalDispose(bool fromFinalizer)
+    private void InternalDispose(bool isFromFinalizer)
     {
-        if (!_managed)
+        if (!_isManaged)
         {
             Logger.Error("Finalize unmanaged export object.");
             return;
         }
         
-        if (fromFinalizer)
+        if (isFromFinalizer)
         {
             GetOwningAlc().PushPendingDisposeConjugate(this);
             return;
         }
         
-        if (Volatile.Read(ref _disposed))
+        if (Volatile.Read(ref _hasDisposed))
         {
             return;
         }
         
-        Volatile.Write(ref _disposed, true);
+        Volatile.Write(ref _hasDisposed, true);
         
         GetOwningAlc().ReleaseConjugate(Unmanaged);
         MarkAsDead();
 
-        if (!fromFinalizer)
+        if (!isFromFinalizer)
         {
             GC.SuppressFinalize(this);
         }
@@ -131,8 +131,8 @@ public abstract class ExportedObjectBase : IConjugate
         Unmanaged = IConjugate.KDead;
     }
     
-    private readonly bool _managed;
-    private bool _disposed;
+    private readonly bool _isManaged;
+    private bool _hasDisposed;
 
 }
 

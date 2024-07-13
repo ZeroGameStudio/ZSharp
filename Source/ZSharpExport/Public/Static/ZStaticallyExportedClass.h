@@ -34,17 +34,7 @@ namespace ZSharp
 		}
 
 	protected:
-		struct FZFinalizer
-		{
-			TZStaticallyExportedClass* Class;
-			~FZFinalizer()
-			{
-				ZStaticallyExportedClass_Private::RegisterClass(Class);
-			}
-		};
-
-	protected:
-		TZStaticallyExportedClass(bool abstract, const FZFinalizer&)
+		TZStaticallyExportedClass(bool abstract)
 			: Flags(EZExportedClassFlags::Plain | (abstract ? EZExportedClassFlags::Abstract : EZExportedClassFlags::None)){}
 
 	private:
@@ -65,13 +55,14 @@ namespace __ZSharpExport_Private \
 	{ \
 		using ClassClass = Class; \
 		using ThisClass = __FZStaticallyExportedClass_##Class; \
-		explicit __FZStaticallyExportedClass_##Class(const FZFinalizer& finalizer) : ZSharp::TZStaticallyExportedClass<Class>(false, finalizer) \
+		explicit __FZStaticallyExportedClass_##Class() : ZSharp::TZStaticallyExportedClass<Class>(false) \
 		{
 
 #define ZSHARP_END_EXPORT_CLASS(Class) \
 			static_assert(std::is_same_v<ThisClass, __FZStaticallyExportedClass_##Class>, "Class name doesn't match between BEGIN_EXPORT and END_EXPORT!"); \
+			ZSharp::ZStaticallyExportedClass_Private::RegisterClass(this); \
 		} \
-	} __GExportedClass_##Class { { &__GExportedClass_##Class } }; \
+	}* __GExportedClass_##Class = new std::remove_pointer_t<decltype(__GExportedClass_##Class)>; \
 }
 
 

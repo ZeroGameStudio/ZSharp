@@ -40,17 +40,7 @@ namespace ZSharp
 		}
 
 	protected:
-		struct FZFinalizer
-		{
-			TZStaticallyExportedEnum* Enum;
-			~FZFinalizer()
-			{
-				 ZStaticallyExportedEnum_Private::RegisterEnum(Enum);
-			}
-		};
-
-	protected:
-		explicit TZStaticallyExportedEnum(bool flag, const FZFinalizer&)
+		explicit TZStaticallyExportedEnum(bool flag)
 			: Flags(flag ? EZExportedEnumFlags::Flags : EZExportedEnumFlags::None){}
 
 	protected:
@@ -87,15 +77,16 @@ namespace __ZSharpExport_Private \
 	{ \
 		using EnumClass = Enum; \
 		using ThisClass = __FZStaticallyExportedEnum_##Enum; \
-		explicit __FZStaticallyExportedEnum_##Enum(const FZFinalizer& finalizer) : ZSharp::TZStaticallyExportedEnum<Enum>(bFlags, finalizer) \
+		explicit __FZStaticallyExportedEnum_##Enum() : ZSharp::TZStaticallyExportedEnum<Enum>(bFlags) \
 		{
 
 #define ZSHARP_EXPORT_ENUM_VALUE(Value) AddEnumValue(#Value, EnumClass::Value);
 
 #define ZSHARP_END_EXPORT_ENUM(Enum) \
 			static_assert(std::is_same_v<ThisClass, __FZStaticallyExportedEnum_##Enum>, "Enum name doesn't match between BEGIN_EXPORT and END_EXPORT!"); \
+			ZSharp::ZStaticallyExportedEnum_Private::RegisterEnum(this); \
 		} \
-	} __GExportedEnum_##Enum { { &__GExportedEnum_##Enum } }; \
+	}* __GExportedEnum_##Enum = new std::remove_pointer_t<decltype(__GExportedEnum_##Enum)>; \
 }
 
 

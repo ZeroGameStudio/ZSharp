@@ -91,15 +91,15 @@ ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(const FProp
 	Flags |= EZExportedPropertyFlags::Readable;
 	Flags |= EZExportedPropertyFlags::Writable;
 	
-	if (property->HasAnyPropertyFlags(CPF_NativeAccessSpecifierPublic) || property->GetBoolMetaData("AllowPrivateAccess"))
+	if (Property->HasAllPropertyFlags(CPF_NativeAccessSpecifierPublic) || Property->GetBoolMetaData("AllowPrivateAccess"))
 	{
 		Flags |= EZExportedPropertyFlags::Public;
 	}
-	else if (property->HasAnyPropertyFlags(CPF_NativeAccessSpecifierProtected))
+	else if (Property->HasAllPropertyFlags(CPF_NativeAccessSpecifierProtected))
 	{
 		Flags |= EZExportedPropertyFlags::Protected;
 	}
-	else if (property->HasAnyPropertyFlags(CPF_NativeAccessSpecifierPrivate))
+	else if (Property->HasAllPropertyFlags(CPF_NativeAccessSpecifierPrivate))
 	{
 		Flags |= EZExportedPropertyFlags::Private;
 	}

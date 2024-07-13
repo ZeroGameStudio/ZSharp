@@ -52,15 +52,15 @@ ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptArray, Co
 // ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptMap, Core, UnrealMap`2)
 // ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptOptional, Core, UnrealOptional`1)
 
-// ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FSelfDescriptiveScriptDelegate, Core, UnrealScriptDelegate`1)
-// ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FSelfDescriptiveMulticastScriptDelegate, Core, UnrealMulticastScriptDelegate`1)
+// ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FSelfDescriptiveScriptDelegate, Core, UnrealDelegate`1)
+// ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FSelfDescriptiveMulticastScriptDelegate, Core, UnrealMulticastDelegate`1)
 
-ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveSubclassOf, System, SubclassOf`1)
-ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveSoftClassPtr, System, SoftClassPtr`1)
-ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveSoftObjectPtr, System, SoftObjectPtr`1)
-ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveWeakObjectPtr, System, WeakObjectPtr`1)
-ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveLazyObjectPtr, System, LazyObjectPtr`1)
-ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptInterface, System, ScriptInterface`1)
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveSubclassOf, CoreUObject, SubclassOf`1)
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveSoftClassPtr, CoreUObject, SoftClassPtr`1)
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveSoftObjectPtr, CoreUObject, SoftObjectPtr`1)
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveWeakObjectPtr, CoreUObject, WeakObjectPtr`1)
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveLazyObjectPtr, CoreUObject, LazyObjectPtr`1)
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptInterface, CoreUObject, ScriptInterface`1)
 
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(FFieldPath, CoreUObject, FieldPath)
 

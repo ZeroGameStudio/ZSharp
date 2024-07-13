@@ -62,13 +62,12 @@ ZSharp::FZDynamicallyExportedDelegate::FZDynamicallyExportedDelegate(const UFunc
 	, Signature(signature)
 	, Flags(EZExportedDelegateFlags::None)
 {
-	check(Signature->HasAllFunctionFlags(FUNC_Delegate));
 	if (Signature->HasAllFunctionFlags(FUNC_MulticastDelegate))
 	{
 		Flags |= EZExportedDelegateFlags::Multicast;
 	}
 
-	for (TFieldIterator<FProperty> it(Signature); it; ++it)
+	for (TFieldIterator<FProperty> it(Signature); it && it->HasAllPropertyFlags(CPF_Parm); ++it)
 	{
 		FProperty* property = *it;
 		check(property->ArrayDim == 1);

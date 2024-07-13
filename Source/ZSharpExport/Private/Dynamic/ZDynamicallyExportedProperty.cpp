@@ -38,7 +38,7 @@ FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 	TArray structsToCheck { owner };
 	for (TFieldIterator<UFunction> it(owner, EFieldIteratorFlags::ExcludeSuper); it; ++it)
 	{
-		if ((*it)->HasAllFunctionFlags(FUNC_Delegate))
+		if (it->HasAllFunctionFlags(FUNC_Delegate))
 		{
 			structsToCheck.Emplace(*it);
 		}

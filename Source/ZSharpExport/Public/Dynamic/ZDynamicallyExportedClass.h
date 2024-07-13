@@ -11,7 +11,7 @@ namespace ZSharp
 	{
 
 	public:
-		static FZDynamicallyExportedClass* Create(UStruct* ustruct);
+		static FZDynamicallyExportedClass* Create(const UStruct* ustruct);
 
 	public:
 		virtual FString GetName() const override;
@@ -20,15 +20,15 @@ namespace ZSharp
 		virtual uint16 GetConjugateRegistryId() const override;
 		virtual EZExportedClassFlags GetFlags() const override;
 		virtual FZFullyExportedTypeName GetBaseType() const override;
-		virtual void ForeachProperty(TFunctionRef<void(const FString&, const IZExportedProperty&)> action) const override;
+		virtual void ForeachProperty(TFunctionRef<void(const IZExportedProperty&)> action) const override;
 
 	private:
-		explicit FZDynamicallyExportedClass(UStruct* ustruct);
+		explicit FZDynamicallyExportedClass(const UStruct* ustruct);
 		
 	private:
-		UStruct* Struct;
+		const UStruct* Struct;
 		EZExportedClassFlags Flags;
-		TMap<FString, TUniquePtr<IZExportedProperty>> PropertyMap;
+		TArray<TUniquePtr<IZExportedProperty>> Properties;
 		
 	};
 }

@@ -8,7 +8,7 @@
 #include "Reflection/ZReflectionHelper.h"
 #include "Static/ZExportHelper.h"
 
-ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(UStruct* ustruct)
+ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(const UStruct* ustruct)
 {
 	if (!ustruct->IsNative())
 	{
@@ -71,15 +71,15 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedClass::GetBaseType(
 	return FZExportHelper::GetUFieldFullyExportedName(super);
 }
 
-void ZSharp::FZDynamicallyExportedClass::ForeachProperty(TFunctionRef<void(const FString&, const IZExportedProperty&)> action) const
+void ZSharp::FZDynamicallyExportedClass::ForeachProperty(TFunctionRef<void(const IZExportedProperty&)> action) const
 {
-	for (const auto& pair : PropertyMap)
+	for (const auto& prop : Properties)
 	{
-		action(pair.Key, *pair.Value);
+		action(*prop);
 	}
 }
 
-ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(UStruct* ustruct)
+ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* ustruct)
 	: Struct(ustruct)
 	, Flags(EZExportedClassFlags::None)
 {
@@ -119,7 +119,7 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(UStruct* ustruct)
 				continue;
 			}
 
-			PropertyMap.Emplace(exportedProperty->GetName(), exportedProperty);
+			Properties.Emplace(exportedProperty);
 		}
 	}
 }

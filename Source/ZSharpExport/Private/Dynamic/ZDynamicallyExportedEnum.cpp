@@ -6,7 +6,7 @@
 #include "ZExportedTypeRegistry.h"
 #include "Reflection/ZReflectionHelper.h"
 
-ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(UEnum* uenum)
+ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(const UEnum* uenum)
 {
 	if (!uenum->IsNative())
 	{
@@ -68,7 +68,7 @@ void ZSharp::FZDynamicallyExportedEnum::ForeachEnumValue(TFunctionRef<void(const
 	}
 }
 
-ZSharp::FZDynamicallyExportedEnum::FZDynamicallyExportedEnum(UEnum* uenum)
+ZSharp::FZDynamicallyExportedEnum::FZDynamicallyExportedEnum(const UEnum* uenum)
 	: Enum(uenum)
 	, Flags(EZExportedEnumFlags::None)
 {

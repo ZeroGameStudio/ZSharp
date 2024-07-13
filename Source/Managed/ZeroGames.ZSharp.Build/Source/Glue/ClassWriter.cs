@@ -236,9 +236,9 @@ namespace {_exportedClass.Namespace};
 			// Methods
 			
 			// Properties
-			foreach (var pair in _exportedClass.PropertyMap.OrderBy(pair => pair.Value.IsPublic ? 1 : pair.Value.IsProtected ? 2 : 3))
+			foreach (var prop in _exportedClass.Properties.OrderBy(prop => prop.IsPublic ? 1 : prop.IsProtected ? 2 : 3))
 			{
-				string block = GetPropertyBlock(pair.Value);
+				string block = GetPropertyBlock(prop);
 				body.Append(block);
 				body.Append("\n\n");
 			}

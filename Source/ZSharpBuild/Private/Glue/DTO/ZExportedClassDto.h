@@ -43,7 +43,7 @@ struct FZExportedClassDto : public FZExportedTypeDto
 	FZFullyExportedTypeNameDto BaseType;
 
 	UPROPERTY()
-	TMap<FString, FZExportedPropertyDto> PropertyMap;
+	TArray<FZExportedPropertyDto> Properties;
 };
 
 

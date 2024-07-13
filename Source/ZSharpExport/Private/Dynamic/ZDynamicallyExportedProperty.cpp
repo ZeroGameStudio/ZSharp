@@ -6,7 +6,7 @@
 #include "Reflection/ZReflectionHelper.h"
 #include "Static/ZExportHelper.h"
 
-ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Create(FProperty* property, int32 index)
+ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Create(const FProperty* property, int32 index)
 {
 	auto exportedProperty = new FZDynamicallyExportedProperty { property, index };
 	if (!exportedProperty->IsValid())
@@ -61,7 +61,7 @@ int32 ZSharp::FZDynamicallyExportedProperty::GetIndex() const
 	return Index;
 }
 
-ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(FProperty* property, int32 index)
+ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(const FProperty* property, int32 index)
 	: Property(property)
 	, Index(index)
 	, Flags(EZExportedPropertyFlags::None)

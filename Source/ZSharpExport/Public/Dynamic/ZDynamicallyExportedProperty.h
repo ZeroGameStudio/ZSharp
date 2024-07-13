@@ -10,7 +10,7 @@ namespace ZSharp
 	{
 
 	public:
-		static FZDynamicallyExportedProperty* Create(FProperty* property, int32 index);
+		static FZDynamicallyExportedProperty* Create(const FProperty* property, int32 index);
 
 	public:
 		virtual FString GetName() const override;
@@ -20,13 +20,13 @@ namespace ZSharp
 		virtual int32 GetIndex() const override;
 
 	private:
-		explicit FZDynamicallyExportedProperty(FProperty* property, int32 index);
+		explicit FZDynamicallyExportedProperty(const FProperty* property, int32 index);
 
 	private:
 		bool IsValid() const;
 
 	private:
-		FProperty* Property;
+		const FProperty* Property;
 		int32 Index;
 		EZExportedPropertyFlags Flags;
 		

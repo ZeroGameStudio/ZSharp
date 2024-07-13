@@ -27,7 +27,7 @@ namespace ZSharp
 		virtual uint16 GetConjugateRegistryId() const = 0;
 		virtual EZExportedClassFlags GetFlags() const = 0;
 		virtual FZFullyExportedTypeName GetBaseType() const = 0;
-		virtual void ForeachProperty(TFunctionRef<void(const FString&, const IZExportedProperty&)> action) const = 0;
+		virtual void ForeachProperty(TFunctionRef<void(const IZExportedProperty&)> action) const = 0;
 	public:
 		bool HasAnyFlags(EZExportedClassFlags flags) const { return !!(GetFlags() & flags); }
 		bool HasAllFlags(EZExportedClassFlags flags) const { return (GetFlags() & flags) == flags; }

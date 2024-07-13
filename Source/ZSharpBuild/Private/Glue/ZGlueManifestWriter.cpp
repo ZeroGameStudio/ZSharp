@@ -45,7 +45,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 	classDto.ConjugateRegistryId = cls.GetConjugateRegistryId();
 	classDto.Flags = static_cast<__underlying_type(EZExportedClassFlags)>(cls.GetFlags());
 	classDto.BaseType = cls.GetBaseType();
-	cls.ForeachProperty([&classDto](const FString& name, const IZExportedProperty& property)
+	cls.ForeachProperty([&classDto](const IZExportedProperty& property)
 	{
 		if (!property.HasAnyFlags(EZExportedPropertyFlags::Readable | EZExportedPropertyFlags::Writable))
 		{
@@ -57,7 +57,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 		propertyDto.ZCallName = property.GetZCallName();
 		propertyDto.Type = property.GetType();
 		propertyDto.Flags = static_cast<__underlying_type(EZExportedPropertyFlags)>(property.GetFlags());
-		classDto.PropertyMap.Emplace(name, MoveTemp(propertyDto));
+		classDto.Properties.Emplace(MoveTemp(propertyDto));
 	});
 	
 	assemblyDto->Classes.Emplace(MoveTemp(classDto));

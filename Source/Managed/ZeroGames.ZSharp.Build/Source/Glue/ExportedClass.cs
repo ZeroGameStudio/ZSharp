@@ -19,7 +19,7 @@ public class ExportedClass : ExportedType
 	public uint16 ConjugateRegistryId { get; set; }
 	public required EExportedClassFlags Flags { get; set; }
 	public FullyExportedTypeName BaseType { get; set; }
-	public required Dictionary<string, ExportedProperty> PropertyMap { get; set; }
+	public required List<ExportedProperty> Properties { get; set; }
 	
 	public bool IsPlain => (Flags & EExportedClassFlags.Plain) != EExportedClassFlags.None;
 	public bool IsClass => (Flags & EExportedClassFlags.Class) != EExportedClassFlags.None;

@@ -21,19 +21,19 @@ ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Cr
 FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 {
 	FString name = Property->GetName();
-	if (Property->IsA<FBoolProperty>())
-	{
-		if (name.StartsWith("b", ESearchCase::CaseSensitive))
-		{
-			name.RightChopInline(1);
-		}
-		name.InsertAt(0, "Is");
-	}
+	// if (Property->IsA<FBoolProperty>())
+	// {
+	// 	if (name.StartsWith("b", ESearchCase::CaseSensitive))
+	// 	{
+	// 		name.RightChopInline(1);
+	// 	}
+	// 	name.InsertAt(0, "Is");
+	// }
 	if (Index)
 	{
 		name.AppendInt(Index);
 	}
-
+	
 	const UStruct* owner = Property->GetOwnerStruct();
 	TArray structsToCheck { owner };
 	for (TFieldIterator<UFunction> it(owner, EFieldIteratorFlags::ExcludeSuper); it; ++it)
@@ -43,7 +43,7 @@ FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 			structsToCheck.Emplace(*it);
 		}
 	}
-
+	
 	for (const auto structToCheck : structsToCheck)
 	{
 		FString nameToCheck;
@@ -52,10 +52,10 @@ FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 		{
 			nameToCheck = alias;
 		}
-
+	
 		if (name == nameToCheck)
 		{
-			name.InsertAt(0, "__");
+			name.AppendInt(0);
 			break;
 		}
 	}

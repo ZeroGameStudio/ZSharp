@@ -3,18 +3,29 @@
 #pragma once
 
 #include "IZExportedMember.h"
+#include "IZExportedParameter.h"
 
 namespace ZSharp
 {
-	class IZExportedParameter;
+	enum class EZExportedMethodFlags : uint64
+	{
+		None = 0,
+		Static = 1 << 0,
+		Public = 1 << 1,
+		Protected = 1 << 2,
+		Private = 1 << 3,
+	};
+	ENUM_CLASS_FLAGS(EZExportedMethodFlags)
 
 	class ZSHARPEXPORT_API IZExportedMethod : public IZExportedMember
 	{
 	public:
-		virtual const FString& GetZCallName() const = 0;
+		virtual EZExportedMethodFlags GetFlags() const = 0;
+		virtual FString GetZCallName() const = 0;
+		virtual void ForeachParameter(TFunctionRef<void(const IZExportedParameter&)> action) const = 0;
 	public:
-		virtual const IZExportedParameter* GetReturnParameter() const = 0;
-		virtual const TArray<IZExportedParameter*>& GetParameters() const = 0;
+		bool HasAnyFlags(EZExportedMethodFlags flags) const { return !!(GetFlags() & flags); }
+		bool HasAllFlags(EZExportedMethodFlags flags) const { return (GetFlags() & flags) == flags; }
 	};
 }
 

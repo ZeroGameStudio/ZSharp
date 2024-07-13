@@ -8,23 +8,23 @@
 #include "Trait/ZManagedTypeInfo.h"
 #include "UObject/PropertyOptional.h"
 
-FString ZSharp::FZReflectionHelper::GetUFieldAliasedName(const UField* field)
+FString ZSharp::FZReflectionHelper::GetUFieldAliasedName(const UField* field, bool isShortName)
 {
 	static const TMap<FString, FString> GAliasMap
 	{
-			{ "Object", "UnrealObject" },
+		{ "Object", "UnrealObject" },
 		
-			{ "Field", "UnrealField" },
-			{ "Struct", "UnrealStruct" },
-			{ "Class", "UnrealClass" },
-			{ "Interface", "UnrealInterface" },
-			{ "ScriptStruct", "UnrealScriptStruct" },
-			{ "Enum", "UnrealEnum" },
+		{ "Field", "UnrealField" },
+		{ "Struct", "UnrealStruct" },
+		{ "Class", "UnrealClass" },
+		{ "Interface", "UnrealInterface" },
+		{ "ScriptStruct", "UnrealScriptStruct" },
+		{ "Enum", "UnrealEnum" },
 		
-			{ "Function", "UnrealFunction" },
-			{ "Property", "UnrealProperty" },
+		{ "Function", "UnrealFunction" },
+		{ "Property", "UnrealProperty" },
 
-			{ "Guid", "UnrealGuid" },
+		{ "Guid", "UnrealGuid" },
 	};
 
 	if (!field)
@@ -54,9 +54,12 @@ FString ZSharp::FZReflectionHelper::GetUFieldAliasedName(const UField* field)
 		}
 	}
 
-	if (const UField* outer = field->GetTypedOuter<UField>())
+	if (!isShortName)
 	{
-		name = GetUFieldAliasedName(outer).Append(".").Append(name);
+		if (const UField* outer = field->GetTypedOuter<UField>())
+		{
+			name = GetUFieldAliasedName(outer).Append(".").Append(name);
+		}
 	}
 
 	return name;

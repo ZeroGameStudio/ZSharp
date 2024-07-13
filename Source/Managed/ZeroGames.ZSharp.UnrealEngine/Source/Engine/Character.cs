@@ -11,7 +11,7 @@ public partial class Character
 
 		return CallUnrealFunction<bool>("K2_SetActorLocation", location, sweep, sweepHitResult, isTeleport, false);
 	}
-
-	public void Jump() => CallUnrealFunction("Jump");
 	
 }
+
+

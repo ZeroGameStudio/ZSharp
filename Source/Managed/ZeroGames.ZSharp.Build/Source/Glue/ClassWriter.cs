@@ -63,6 +63,13 @@ namespace {_exportedClass.Namespace};
 		return split[0];
 	}
 
+	private string GetMethodBlock(ExportedMethod method)
+	{
+		string accessModifier = method.IsPublic ? "public" : method.IsProtected ? "protected" : "private";
+		string staticModifier = method.IsStatic ? "static " : string.Empty;
+		return $"\t{accessModifier} {staticModifier}void {method.Name}(){{}}";
+	}
+
 	private string GetPropertyBlock(ExportedProperty property)
 	{
 		string name = property.Type.ToString();
@@ -234,6 +241,12 @@ namespace {_exportedClass.Namespace};
 			StringBuilder body = new();
 			
 			// Methods
+			foreach (var method in _exportedClass.Methods.OrderBy(method => method.IsPublic ? 1 : method.IsProtected ? 2 : 3))
+			{
+				string block = GetMethodBlock(method);
+				body.Append(block);
+				body.Append("\n\n");
+			}
 			
 			// Properties
 			foreach (var prop in _exportedClass.Properties.OrderBy(prop => prop.IsPublic ? 1 : prop.IsProtected ? 2 : 3))

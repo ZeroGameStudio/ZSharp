@@ -9,7 +9,7 @@ namespace ZSharp
 	struct ZSHARPRUNTIME_API FZReflectionHelper
 	{
 
-		static FString GetUFieldAliasedName(const UField* field);
+		static FString GetUFieldAliasedName(const UField* field, bool isShortName = false);
 		static FString GetUFieldAssemblyName(const UField* field);
 		static FString GetUFieldModuleName(const UField* field);
 		static bool IsUFieldModuleMapped(const UField* field);

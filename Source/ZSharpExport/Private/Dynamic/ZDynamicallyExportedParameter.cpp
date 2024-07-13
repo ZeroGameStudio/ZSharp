@@ -19,17 +19,17 @@ ZSharp::FZDynamicallyExportedParameter* ZSharp::FZDynamicallyExportedParameter::
 
 FString ZSharp::FZDynamicallyExportedParameter::GetName() const
 {
-	FString name = Property->GetName();
-	if (Property->IsA<FBoolProperty>())
-	{
-		if (name.StartsWith("b", ESearchCase::CaseSensitive))
-		{
-			name.RightChopInline(1);
-		}
-		name.InsertAt(0, "is");
-	}
+	// FString name = Property->GetName();
+	// if (Property->IsA<FBoolProperty>())
+	// {
+	// 	if (name.StartsWith("b", ESearchCase::CaseSensitive))
+	// 	{
+	// 		name.RightChopInline(1);
+	// 	}
+	// 	name.InsertAt(0, "is");
+	// }
 
-	return name;
+	return Property->GetName();
 }
 
 ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedParameter::GetType() const

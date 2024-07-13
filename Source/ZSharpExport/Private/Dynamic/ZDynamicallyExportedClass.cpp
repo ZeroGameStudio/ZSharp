@@ -4,6 +4,7 @@
 #include "Dynamic/ZDynamicallyExportedClass.h"
 
 #include "ZExportedTypeRegistry.h"
+#include "Dynamic/ZDynamicallyExportedMethod.h"
 #include "Dynamic/ZDynamicallyExportedProperty.h"
 #include "Reflection/ZReflectionHelper.h"
 #include "Static/ZExportHelper.h"
@@ -71,6 +72,14 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedClass::GetBaseType(
 	return FZExportHelper::GetUFieldFullyExportedName(super);
 }
 
+void ZSharp::FZDynamicallyExportedClass::ForeachMethod(TFunctionRef<void(const IZExportedMethod&)> action) const
+{
+	for (const auto& method : Methods)
+	{
+		action(*method);
+	}
+}
+
 void ZSharp::FZDynamicallyExportedClass::ForeachProperty(TFunctionRef<void(const IZExportedProperty&)> action) const
 {
 	for (const auto& prop : Properties)
@@ -106,6 +115,17 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 	else
 	{
 		checkNoEntry();
+	}
+
+	for (TFieldIterator<UFunction> it(Struct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+	{
+		FZDynamicallyExportedMethod* exportedMethod = FZDynamicallyExportedMethod::Create(*it);
+		if (!exportedMethod)
+		{
+			continue;
+		}
+
+		Methods.Emplace(exportedMethod);
 	}
 
 	for (TFieldIterator<FProperty> it(Struct, EFieldIteratorFlags::ExcludeSuper); it; ++it)

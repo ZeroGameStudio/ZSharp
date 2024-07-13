@@ -6,6 +6,7 @@
 #include "IZExportedEnum.h"
 #include "IZExportedClass.h"
 #include "IZExportedDelegate.h"
+#include "IZExportedMethod.h"
 #include "IZExportedProperty.h"
 #include "IZExportedParameter.h"
 #include "IZExportedTypeRegistry.h"
@@ -50,13 +51,24 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 	classDto.ConjugateRegistryId = cls.GetConjugateRegistryId();
 	classDto.Flags = static_cast<__underlying_type(EZExportedClassFlags)>(cls.GetFlags());
 	classDto.BaseType = cls.GetBaseType();
+	cls.ForeachMethod([&classDto](const IZExportedMethod& method)
+	{
+		FZExportedMethodDto methodDto;
+		methodDto.Name = method.GetName();
+		methodDto.ZCallName = method.GetZCallName();
+		methodDto.Flags = static_cast<__underlying_type(EZExportedMethodFlags)>(method.GetFlags());
+		method.ForeachParameter([&methodDto](const IZExportedParameter& param)
+		{
+			FZExportedParameterDto paramDto;
+			paramDto.Name = param.GetName();
+			paramDto.Type = param.GetType();
+			paramDto.Flags = static_cast<__underlying_type(EZExportedParameterFlags)>(param.GetFlags());
+			methodDto.Parameters.Emplace(MoveTemp(paramDto));
+		});
+		classDto.Methods.Emplace(MoveTemp(methodDto));
+	});
 	cls.ForeachProperty([&classDto](const IZExportedProperty& property)
 	{
-		if (!property.HasAnyFlags(EZExportedPropertyFlags::Readable | EZExportedPropertyFlags::Writable))
-		{
-			return;
-		}
-		
 		FZExportedPropertyDto propertyDto;
 		propertyDto.Name = property.GetName();
 		propertyDto.ZCallName = property.GetZCallName();

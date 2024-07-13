@@ -3,6 +3,7 @@
 #pragma once
 
 #include "IZExportedClass.h"
+#include "IZExportedMethod.h"
 #include "IZExportedProperty.h"
 
 namespace ZSharp
@@ -20,6 +21,7 @@ namespace ZSharp
 		virtual uint16 GetConjugateRegistryId() const override;
 		virtual EZExportedClassFlags GetFlags() const override;
 		virtual FZFullyExportedTypeName GetBaseType() const override;
+		virtual void ForeachMethod(TFunctionRef<void(const IZExportedMethod&)> action) const override;
 		virtual void ForeachProperty(TFunctionRef<void(const IZExportedProperty&)> action) const override;
 
 	private:
@@ -28,6 +30,7 @@ namespace ZSharp
 	private:
 		const UStruct* Struct;
 		EZExportedClassFlags Flags;
+		TArray<TUniquePtr<IZExportedMethod>> Methods;
 		TArray<TUniquePtr<IZExportedProperty>> Properties;
 		
 	};

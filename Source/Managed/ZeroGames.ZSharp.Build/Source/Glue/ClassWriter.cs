@@ -94,7 +94,7 @@ namespace {_exportedClass.Namespace};
 	{
 		get
 		{
-			List<string> relevantModules = [ "Core", "CoreUObject", "Engine" ];
+			List<string> relevantModules = [ "Core", "CoreUObject", "PhysicsCore", "InputCore", "Engine" ];
 
 			if (_baseType is {} baseType)
 			{

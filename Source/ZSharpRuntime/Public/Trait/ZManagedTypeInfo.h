@@ -36,7 +36,7 @@ namespace ZSharp
 		static FString GetAssemblyName() { return ZSHARP_ENGINE_ASSEMBLY_NAME; } \
 		static FString GetModuleName() { return #Module; } \
 		static FString GetTypeName() { return #Name; } \
-		static FString GetTypeNameText() { FString res; GetTypeName().Split("`", &res, nullptr); return res; } \
+		static FString GetTypeNameText() { FString res; return GetTypeName().Split("`", &res, nullptr) ? res : GetTypeName(); } \
 		static FString GetFullName() { return FString::Printf(TEXT("%s.%s.%s"), TEXT(ZSHARP_ENGINE_ASSEMBLY_NAME), TEXT(#Module), TEXT(#Name)); } \
 	};
 

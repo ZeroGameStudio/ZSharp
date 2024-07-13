@@ -7,8 +7,9 @@ namespace ZeroGames.ZSharp.Build.Glue;
 public class DelegateWriter : IDisposable, IAsyncDisposable
 {
 
-	public DelegateWriter(ExportedDelegate exportedDelegate, Stream stream)
+	public DelegateWriter(ExportedAssemblyRegistry registry, ExportedDelegate exportedDelegate, Stream stream)
 	{
+		_registry = registry;
 		_exportedDelegate = exportedDelegate;
 		_sw = new(stream, Encoding.UTF8);
 	}
@@ -49,6 +50,10 @@ $@"public partial class {outerClassName}
 
 #nullable enable
 
+using ZeroGames.ZSharp.Core;
+using ZeroGames.ZSharp.UnrealEngine;
+{_extraUsingBlock}
+
 namespace {_exportedDelegate.Namespace};
 
 {delegateDeclaration}
@@ -58,7 +63,20 @@ namespace {_exportedDelegate.Namespace};
 
 ");
 	});
+	
+	private string _extraUsingBlock
+	{
+		get
+		{
+			List<string> relevantModules = [ "Core", "CoreUObject", "PhysicsCore", "InputCore", "Engine" ];
+			
+			relevantModules.RemoveAll(module => string.IsNullOrWhiteSpace(module) || module == _exportedDelegate.Module);
 
+			return string.Join('\n', relevantModules.Distinct().Select(module => $"using {_registry.GetModuleAssembly(module)?.Name ?? throw new InvalidOperationException($"Unmapped module {module}")}.{module};"));
+		}
+	}
+
+	private ExportedAssemblyRegistry _registry;
 	private ExportedDelegate _exportedDelegate;
 	private StreamWriter _sw;
 	

@@ -9,6 +9,8 @@ namespace ZSharp
 		FString Namespace;
 		FString Name;
 		bool bNullable = false;
+		
+		bool IsValid() const { return !!Name.Len(); }
 	};
 	
 	struct FZFullyExportedTypeName

@@ -33,11 +33,33 @@ FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 	{
 		name.AppendInt(Index);
 	}
-	if (name == FZReflectionHelper::GetUFieldAliasedName(Property->GetOwnerStruct()))
+
+	const UStruct* owner = Property->GetOwnerStruct();
+	TArray structsToCheck { owner };
+	for (TFieldIterator<UFunction> it(owner, EFieldIteratorFlags::ExcludeSuper); it; ++it)
 	{
-		name.InsertAt(0, "__");
+		if ((*it)->HasAllFunctionFlags(FUNC_Delegate))
+		{
+			structsToCheck.Emplace(*it);
+		}
 	}
 
+	for (const auto structToCheck : structsToCheck)
+	{
+		FString nameToCheck;
+		FString alias = FZReflectionHelper::GetUFieldAliasedName(structToCheck);
+		if (!alias.Split(".", nullptr, &nameToCheck, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
+		{
+			nameToCheck = alias;
+		}
+
+		if (name == nameToCheck)
+		{
+			name.InsertAt(0, "__");
+			break;
+		}
+	}
+	
 	return name;
 }
 

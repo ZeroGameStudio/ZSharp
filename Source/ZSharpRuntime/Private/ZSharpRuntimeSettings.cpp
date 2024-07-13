@@ -7,7 +7,12 @@ UZSharpRuntimeSettings::UZSharpRuntimeSettings()
 {
 	IntrinsicModuleAssemblyMapping.Emplace("Core", EngineAssemblyName);
 	IntrinsicModuleAssemblyMapping.Emplace("CoreUObject", EngineAssemblyName);
+	
+	IntrinsicModuleAssemblyMapping.Emplace("PhysicsCore", EngineAssemblyName);
+	IntrinsicModuleAssemblyMapping.Emplace("InputCore", EngineAssemblyName);
+	
 	IntrinsicModuleAssemblyMapping.Emplace("Engine", EngineAssemblyName);
+	
 	IntrinsicModuleAssemblyMapping.Emplace("ZSharpRuntime", EngineAssemblyName);
 }
 

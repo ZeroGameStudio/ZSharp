@@ -116,7 +116,7 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		}
 		else if (exportedType is ExportedDelegate exportedDelegate)
 		{
-			await using DelegateWriter dw = new(exportedDelegate, fs);
+			await using DelegateWriter dw = new(_registry, exportedDelegate, fs);
 			await dw.WriteAsync();
 		}
 	}

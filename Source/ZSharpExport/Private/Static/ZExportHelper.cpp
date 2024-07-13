@@ -138,6 +138,10 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 			{
 				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptArray>::Get();
 				name.Inner = recurse(arrayProp->Inner, false).ToSimple();
+				if (!name.Inner.IsValid())
+				{
+					return {};
+				}
 				return name;
 			}
 		}
@@ -145,8 +149,12 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 		{
 			if (allowContainer)
 			{
-				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptArray>::Get();
+				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptSet>::Get();
 				name.Inner = recurse(setProp->ElementProp, false).ToSimple();
+				if (!name.Inner.IsValid())
+				{
+					return {};
+				}
 				return name;
 			}
 		}
@@ -154,9 +162,13 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 		{
 			if (allowContainer)
 			{
-				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptArray>::Get();
+				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptMap>::Get();
 				name.Inner = recurse(mapProp->KeyProp, false).ToSimple();
 				name.Outer = recurse(mapProp->ValueProp, false).ToSimple();
+				if (!name.Inner.IsValid() || !name.Outer.IsValid())
+				{
+					return {};
+				}
 				return name;
 			}
 		}
@@ -164,8 +176,12 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 		{
 			if (allowContainer)
 			{
-				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptArray>::Get();
+				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveOptional>::Get();
 				name.Inner = recurse(optionalProp->GetValueProperty(), false).ToSimple();
+				if (!name.Inner.IsValid())
+				{
+					return {};
+				}
 				return name;
 			}
 		}

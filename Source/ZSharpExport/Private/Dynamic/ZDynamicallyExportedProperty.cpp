@@ -89,10 +89,7 @@ ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(const FProp
 	, Flags(EZExportedPropertyFlags::None)
 {
 	Flags |= EZExportedPropertyFlags::Readable;
-	if (!property->HasAnyPropertyFlags(CPF_BlueprintReadOnly))
-	{
-		Flags |= EZExportedPropertyFlags::Writable;
-	}
+	Flags |= EZExportedPropertyFlags::Writable;
 	
 	if (property->HasAnyPropertyFlags(CPF_NativeAccessSpecifierPublic) || property->GetBoolMetaData("AllowPrivateAccess"))
 	{

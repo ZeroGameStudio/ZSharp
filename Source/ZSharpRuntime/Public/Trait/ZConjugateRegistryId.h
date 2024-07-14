@@ -3,8 +3,13 @@
 #pragma once
 
 #include "Concept/ZStaticallyExportableClass.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveMulticastScriptDelegate.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptArray.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveObjectWrappers.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveOptional.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveScriptMap.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveScriptSet.h"
 
 namespace ZSharp
 {
@@ -34,5 +39,11 @@ ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveScriptInterface, 26
 ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveStrongObjectPtr, 27)
 
 ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveScriptArray, 31)
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveScriptSet, 32)
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveScriptMap, 33)
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveOptional, 34)
+
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveScriptDelegate, 41)
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveMulticastScriptDelegate, 42)
 
 

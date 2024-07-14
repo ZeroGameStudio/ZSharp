@@ -3,7 +3,7 @@
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(26)]
-public class ScriptInterface : PlainExportedObjectBase
+public abstract class ScriptInterface : PlainExportedObjectBase
 {
 	
 }

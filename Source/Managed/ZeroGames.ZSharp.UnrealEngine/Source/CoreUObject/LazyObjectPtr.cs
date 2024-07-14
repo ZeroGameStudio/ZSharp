@@ -3,7 +3,7 @@
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(25)]
-public class LazyObjectPtr : PlainExportedObjectBase
+public abstract class LazyObjectPtr : PlainExportedObjectBase
 {
 	
 }

@@ -3,7 +3,7 @@
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(22)]
-public class SoftClassPtr : PlainExportedObjectBase
+public abstract class SoftClassPtr : PlainExportedObjectBase
 {
 	
 }

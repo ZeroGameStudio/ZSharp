@@ -3,7 +3,7 @@
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(24)]
-public class WeakObjectPtr : PlainExportedObjectBase
+public abstract class WeakObjectPtr : PlainExportedObjectBase
 {
 	
 }

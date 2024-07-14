@@ -2,7 +2,8 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class UnrealOptional
+[ConjugateRegistryId(34)]
+public abstract class UnrealOptional
 {
 	
 }

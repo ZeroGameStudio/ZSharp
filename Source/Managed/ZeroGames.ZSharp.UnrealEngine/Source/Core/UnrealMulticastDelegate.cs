@@ -2,7 +2,8 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class UnrealMulticastDelegate
+[ConjugateRegistryId(42)]
+public abstract class UnrealMulticastDelegate
 {
 	
 }

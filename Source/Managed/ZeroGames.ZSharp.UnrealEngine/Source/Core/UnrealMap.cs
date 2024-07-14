@@ -2,7 +2,8 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class UnrealMap
+[ConjugateRegistryId(33)]
+public abstract class UnrealMap
 {
 	
 }

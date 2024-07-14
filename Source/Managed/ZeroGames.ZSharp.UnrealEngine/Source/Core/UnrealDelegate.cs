@@ -2,7 +2,8 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class UnrealDelegate
+[ConjugateRegistryId(41)]
+public abstract class UnrealDelegate
 {
 	
 }

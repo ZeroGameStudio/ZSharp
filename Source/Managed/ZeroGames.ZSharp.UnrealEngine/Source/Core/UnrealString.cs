@@ -13,7 +13,7 @@ public partial class UnrealString
 
     public unsafe string Data
     {
-        get => new((char*)this.ZCall("ex://String.GetData", IntPtr.Zero)[1].Pointer);
+        get => new((char*)this.ZCall("ex://String.GetData", IntPtr.Zero)[-1].Pointer);
         set
         {
             fixed (char* data = value.ToCharArray())

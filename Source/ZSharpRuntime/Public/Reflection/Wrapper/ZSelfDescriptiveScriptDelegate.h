@@ -2,10 +2,26 @@
 
 #pragma once
 
+#include "ZSelfDescriptiveBase.h"
+
 namespace ZSharp
 {
-	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptDelegate
+	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptDelegate : TZSelfDescriptiveBase<FZSelfDescriptiveScriptDelegate, UFunction, FScriptDelegate>
 	{
+		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_AUTO_CTOR(FZSelfDescriptiveScriptDelegate)
+
+		void Bind(UObject* object, FName name);
+		void Unbind();
+
+		void Execute(void* params);
+
+		UObject* GetObject() const;
+		FName GetFunctionName() const;
+		const UFunction* GetFunction() const;
+		FString GetZCallName() const;
+
+		bool IsBound() const;
+		bool IsBoundToObject(const UObject* object) const;
 		
 	};
 }

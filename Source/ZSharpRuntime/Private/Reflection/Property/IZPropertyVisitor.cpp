@@ -8,6 +8,7 @@
 #include "ZFieldPathPropertyVisitor.h"
 #include "Container/ZArrayPropertyVisitor.h"
 #include "Container/ZStructPropertyVisitor.h"
+#include "Delegate/ZDelegatePropertyVisitor.h"
 #include "Object/ZObjectPropertyVisitor.h"
 #include "Object/ZObjectWrapperPropertyVisitors.h"
 #include "Primitive/ZBoolPropertyVisitor.h"
@@ -106,7 +107,7 @@ TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FP
 	}
 	else if (const auto delegateProp = CastField<FDelegateProperty>(prop))
 	{
-		
+		return MakeUnique<FZDelegatePropertyVisitor>(delegateProp);
 	}
 	else if (const auto multicastInlineDelegateProp = CastField<FMulticastInlineDelegateProperty>(prop))
 	{

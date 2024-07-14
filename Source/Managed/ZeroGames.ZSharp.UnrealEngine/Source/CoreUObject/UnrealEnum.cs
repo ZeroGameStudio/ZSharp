@@ -9,7 +9,7 @@ public partial class UnrealEnum
 
 	public static bool IsUnrealEnumType(Type t) => t.IsEnum && t.GetCustomAttribute<UnrealFieldPathAttribute>() is not null;
 
-	public static UnrealEnum GetStaticEnum(Type t)
+	public static UnrealEnum GetUnrealEnum(Type t)
 	{
 		if (t.IsEnum && t.GetCustomAttribute<UnrealFieldPathAttribute>() is {} attr)
 		{
@@ -20,3 +20,5 @@ public partial class UnrealEnum
 	}
 
 }
+
+

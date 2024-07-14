@@ -7,6 +7,10 @@ namespace ZeroGames.ZSharp.UnrealEngine.Core;
 [ConjugateRegistryId(31)]
 public abstract class UnrealArray : PlainExportedObjectBase
 {
+	
+	public void InsertAt(int32 index) => this.ZCall("ex://Array.InsertAt", index);
+	
+	public int32 Count => this.ZCall("ex://Array.Num", 0)[-1].Int32;
 
 	protected unsafe UnrealArray(Type elementType)
 	{
@@ -24,15 +28,8 @@ public abstract class UnrealArray : PlainExportedObjectBase
 		ValidateElementType();
 	}
 	
-	public void InsertAt(int32 index) => this.ZCall("ex://Array.InsertAt", index);
-
-	public int32 Count => this.ZCall("ex://Array.Num", 0)[1].Int32;
-	
-	public object? this[int32 index]
-	{
-		get => this.ZCall("ex://Array.Get", index, _elementType)[2].Object;
-		set => this.ZCall("ex://Array.Set", index, value);
-	}
+	protected object? Get(int32 index) => this.ZCall("ex://Array.Get", index, _elementType)[-1].Object;
+	protected void Set(int32 index, object? value) => this.ZCall("ex://Array.Set", index, value);
 	
 	private void ValidateElementType()
 	{
@@ -70,7 +67,7 @@ public abstract class UnrealArray : PlainExportedObjectBase
 		}
 		else if (UnrealEnum.IsUnrealEnumType(_elementType))
 		{
-			userdata.ElementProperty.Descriptor = UnrealEnum.GetStaticEnum(_elementType).Unmanaged;
+			userdata.ElementProperty.Descriptor = UnrealEnum.GetUnrealEnum(_elementType).Unmanaged;
 		}
 	}
 
@@ -92,11 +89,12 @@ public class UnrealArray<T> : UnrealArray, IConjugate<UnrealArray<T>>
 	public UnrealArray() : base(typeof(T)){}
 	public UnrealArray(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 
-	public new T? this[int32 index]
+	public T? this[int32 index]
 	{
-		get => (T?)((UnrealArray)this)[index];
-		set => ((UnrealArray)this)[index] = value!;
+		get => (T?)Get(index);
+		set => Set(index, value);
 	}
+	
 }
 
 

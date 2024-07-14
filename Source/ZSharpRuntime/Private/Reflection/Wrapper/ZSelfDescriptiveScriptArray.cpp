@@ -5,9 +5,9 @@
 
 ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const DescriptorType* descriptor)
 	: Super(descriptor)
-	, ElementPropertyVisitor(IZPropertyVisitor::Create(GetDescriptor()))
+	, ElementPropertyVisitor(IZPropertyVisitor::Create(descriptor))
 {
-	GCRoot = TStrongObjectPtr { Descriptor->GetOwnerStruct() };
+
 }
 
 ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance)

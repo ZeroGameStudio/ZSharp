@@ -36,7 +36,7 @@ namespace ZSharp
 		{
 			if constexpr (IsUObjectDescriptor)
 			{
-				GCRoot = TStrongObjectPtr<UObject> { Descriptor };
+				GCRoot = TStrongObjectPtr<const UObject> { Descriptor };
 			}
 		}
 		
@@ -47,7 +47,7 @@ namespace ZSharp
 		{
 			if constexpr (IsUObjectDescriptor)
 			{
-				GCRoot = TStrongObjectPtr<UObject> { Descriptor };
+				GCRoot = TStrongObjectPtr<const UObject> { Descriptor };
 			}
 		}
 		
@@ -122,5 +122,17 @@ namespace ZSharp
 		
 	};
 }
+
+#define ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY(ThisClass) \
+using Super = TZSelfDescriptiveBase; \
+friend struct TZSelfDescriptiveBase; \
+ThisClass(const DescriptorType* descriptor); \
+ThisClass(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance);
+
+#define ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_AUTO_CTOR(ThisClass) \
+	using Super = TZSelfDescriptiveBase; \
+	friend struct TZSelfDescriptiveBase; \
+	ThisClass(const DescriptorType* descriptor) : Super(descriptor){} \
+	ThisClass(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance) : Super(descriptor, underlyingInstance){}
 
 

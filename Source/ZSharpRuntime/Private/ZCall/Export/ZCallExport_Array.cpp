@@ -6,9 +6,9 @@
 
 namespace ZSharp
 {
-	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptArray::InsertAt, _Array::InsertAt)
-	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptArray::RemoveAt, _Array::RemoveAt)
-	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptArray::Num, _Array::Num)
+	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptArray::InsertAt, FArray::InsertAt)
+	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptArray::RemoveAt, FArray::RemoveAt)
+	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptArray::Num, FArray::Num)
 
 	static FZStaticallyExportZCall GGet { "ex://Array.Get", [](FZCallBuffer* buffer)
 	{

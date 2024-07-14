@@ -17,12 +17,8 @@ namespace ZSharp
 	
 	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptArray : TZSelfDescriptiveBase<FZSelfDescriptiveScriptArray, FProperty, FScriptArray>
 	{
-
-		using Super = TZSelfDescriptiveBase;
-		friend struct TZSelfDescriptiveBase;
-
-		FZSelfDescriptiveScriptArray(const DescriptorType* descriptor);
-		FZSelfDescriptiveScriptArray(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance);
+		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY(FZSelfDescriptiveScriptArray)
+		
 		FZSelfDescriptiveScriptArray(FZSelfDescriptiveScriptArray&& other) noexcept;
 
 		void InsertAt(int32 index);

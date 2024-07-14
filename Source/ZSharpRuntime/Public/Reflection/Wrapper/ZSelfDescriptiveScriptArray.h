@@ -2,23 +2,28 @@
 
 #pragma once
 
+#include "ZSelfDescriptiveBase.h"
 #include "Reflection/Property/IZPropertyVisitor.h"
 
 namespace ZSharp
 {
 	struct FZCallBufferSlot;
+
+	template <>
+	struct TZSelfDescriptiveTraits<struct FZSelfDescriptiveScriptArray> : FZSelfDescriptiveTraitsBase
+	{
+		static constexpr bool HasCustomDeleteUnderlyingInstance = true;
+	};
 	
-	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptArray
+	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptArray : TZSelfDescriptiveBase<FZSelfDescriptiveScriptArray, FProperty, FScriptArray>
 	{
 
-		FZSelfDescriptiveScriptArray(const FProperty* elementProperty);
-		FZSelfDescriptiveScriptArray(const FProperty* elementProperty, FScriptArray* underlyingInstance);
-		FZSelfDescriptiveScriptArray(const FZSelfDescriptiveScriptArray&) = delete;
-		FZSelfDescriptiveScriptArray(FZSelfDescriptiveScriptArray&& other) noexcept { *this = MoveTemp(other); }
-		~FZSelfDescriptiveScriptArray();
+		using Super = TZSelfDescriptiveBase;
+		friend struct TZSelfDescriptiveBase;
 
-		const FProperty* GetElementProperty() const { return ElementProperty; }
-		FScriptArray* GetUnderlyingInstance() const { return UnderlyingInstance; }
+		FZSelfDescriptiveScriptArray(const DescriptorType* descriptor);
+		FZSelfDescriptiveScriptArray(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance);
+		FZSelfDescriptiveScriptArray(FZSelfDescriptiveScriptArray&& other) noexcept;
 
 		void InsertAt(int32 index);
 		void RemoveAt(int32 index);
@@ -27,22 +32,20 @@ namespace ZSharp
 
 		int32 Num() const;
 
-		FZSelfDescriptiveScriptArray& operator=(const FZSelfDescriptiveScriptArray&) = delete;
 		FZSelfDescriptiveScriptArray& operator=(FZSelfDescriptiveScriptArray&& other) noexcept;
 
 	private:
 		FScriptArrayHelper GetHelper() const
 		{
-			return FScriptArrayHelper::CreateHelperFormInnerProperty(ElementProperty, UnderlyingInstance);
+			return FScriptArrayHelper::CreateHelperFormInnerProperty(Descriptor, UnderlyingInstance);
 		}
 
 	private:
-		TStrongObjectPtr<UStruct> GCRoot;
-		const FProperty* ElementProperty;
+		void DeleteUnderlyingInstance();
+
+	private:
 		TUniquePtr<IZPropertyVisitor> ElementPropertyVisitor;
-		FScriptArray* UnderlyingInstance;
-		bool bOwning;
-		
+
 	};
 }
 

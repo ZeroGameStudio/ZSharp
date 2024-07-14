@@ -36,7 +36,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FPr
 	const auto mutableUnmanaged = const_cast<FScriptArray*>(unmanaged);
 	if (const FZConjugateRec* rec = ConjugateMap.Find(mutableUnmanaged))
 	{
-		check(rec->Array->GetElementProperty()->GetClass() == elementProperty->GetClass());
+		check(rec->Array->GetDescriptor()->GetClass() == elementProperty->GetClass());
 		return { mutableUnmanaged };
 	}
 

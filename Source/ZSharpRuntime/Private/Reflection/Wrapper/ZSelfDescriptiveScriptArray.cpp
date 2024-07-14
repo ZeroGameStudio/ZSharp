@@ -3,41 +3,23 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptArray.h"
 
-ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const FProperty* elementProperty)
-	: ElementProperty(elementProperty)
-	, ElementPropertyVisitor(IZPropertyVisitor::Create(elementProperty))
-	, UnderlyingInstance(new FScriptArray)
-	, bOwning(true)
+ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const DescriptorType* descriptor)
+	: Super(descriptor)
+	, ElementPropertyVisitor(IZPropertyVisitor::Create(GetDescriptor()))
 {
+	GCRoot = TStrongObjectPtr { Descriptor->GetOwnerStruct() };
 }
 
-ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const FProperty* elementProperty, FScriptArray* underlyingInstance)
-	: ElementProperty(elementProperty)
-	, ElementPropertyVisitor(IZPropertyVisitor::Create(elementProperty))
-	, UnderlyingInstance(underlyingInstance)
-	, bOwning(false)
+ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance)
+	: Super(descriptor, underlyingInstance)
 {
-	GCRoot = TStrongObjectPtr { elementProperty->GetOwnerStruct() };
+	GCRoot = TStrongObjectPtr { Descriptor->GetOwnerStruct() };
 }
 
-ZSharp::FZSelfDescriptiveScriptArray::~FZSelfDescriptiveScriptArray()
+ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(FZSelfDescriptiveScriptArray&& other) noexcept
+	: Super(MoveTemp(other))
 {
-	if (bOwning)
-	{
-		// If ElementType is not trivially destructible, we need to destroy them manually.
-		if (!ElementProperty->HasAnyPropertyFlags(CPF_IsPlainOldData | CPF_NoDestructor))
-		{
-			FScriptArrayHelper helper = GetHelper();
-			const int32 num = helper.Num();
-			for (int32 i = 0; i < num; ++i)
-			{
-				ElementProperty->DestroyValue(helper.GetElementPtr(i));
-			}
-		}
-		
-		delete UnderlyingInstance;
-		delete ElementProperty;
-	}
+	ElementPropertyVisitor = MoveTemp(other.ElementPropertyVisitor);
 }
 
 void ZSharp::FZSelfDescriptiveScriptArray::InsertAt(int32 index)
@@ -74,12 +56,29 @@ int32 ZSharp::FZSelfDescriptiveScriptArray::Num() const
 
 ZSharp::FZSelfDescriptiveScriptArray& ZSharp::FZSelfDescriptiveScriptArray::operator=(FZSelfDescriptiveScriptArray&& other) noexcept
 {
-	ElementProperty = other.ElementProperty;
-	UnderlyingInstance = other.UnderlyingInstance;
-	bOwning = other.bOwning;
-	other.bOwning = false;
+	Super::operator=(MoveTemp(other));
+	
+	GCRoot = other.GCRoot;
+	other.GCRoot.Reset();
+	ElementPropertyVisitor = MoveTemp(other.ElementPropertyVisitor);
 
 	return *this;
+}
+
+void ZSharp::FZSelfDescriptiveScriptArray::DeleteUnderlyingInstance()
+{
+	// If ElementType is not trivially destructible, we need to destroy them manually.
+	if (!Descriptor->HasAnyPropertyFlags(CPF_IsPlainOldData | CPF_NoDestructor))
+	{
+		FScriptArrayHelper helper = GetHelper();
+		const int32 num = helper.Num();
+		for (int32 i = 0; i < num; ++i)
+		{
+			Descriptor->DestroyValue(helper.GetElementPtr(i));
+		}
+	}
+		
+	delete UnderlyingInstance;
 }
 
 

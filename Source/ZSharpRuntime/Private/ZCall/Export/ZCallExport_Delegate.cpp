@@ -6,7 +6,8 @@
 
 namespace ZSharp
 {
-	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptDelegate::Bind, FDelegate::Bind)
+	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptDelegate::BindUFunction, FDelegate::BindUFunction)
+	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptDelegate::BindManaged, FDelegate::BindManaged)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptDelegate::Unbind, FDelegate::Unbind)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptDelegate::GetObject, FDelegate::GetObject)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptDelegate::GetZCallName, FDelegate::GetZCallName)

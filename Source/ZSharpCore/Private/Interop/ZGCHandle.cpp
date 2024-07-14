@@ -6,6 +6,11 @@
 
 void ZSharp::FZGCHandle::Free()
 {
+	if (!Handle)
+	{
+		return;
+	}
+	
 	FZGCHandle_Interop::GFree(*this);
 	Handle = nullptr;
 }

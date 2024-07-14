@@ -3,7 +3,9 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
 
-void ZSharp::FZSelfDescriptiveScriptDelegate::Bind(UObject* object, FName name)
+#include "ZCall/ManagedDelegateProxy.h"
+
+void ZSharp::FZSelfDescriptiveScriptDelegate::BindUFunction(UObject* object, FName name)
 {
 	if (!object)
 	{
@@ -22,6 +24,21 @@ void ZSharp::FZSelfDescriptiveScriptDelegate::Bind(UObject* object, FName name)
 	}
 	
 	UnderlyingInstance->BindUFunction(object, name);
+}
+
+UObject* ZSharp::FZSelfDescriptiveScriptDelegate::BindManaged(FZGCHandle delegate)
+{
+	if (!delegate)
+	{
+		return nullptr;
+	}
+
+	auto proxy = NewObject<UManagedDelegateProxy>();
+	proxy->Signature = TStrongObjectPtr { Descriptor };
+	proxy->Delegate = delegate;
+	UnderlyingInstance->BindUFunction(proxy, GET_FUNCTION_NAME_CHECKED(UManagedDelegateProxy, __ZStub));
+
+	return proxy;
 }
 
 void ZSharp::FZSelfDescriptiveScriptDelegate::Unbind()

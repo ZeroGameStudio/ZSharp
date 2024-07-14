@@ -3,14 +3,16 @@
 #pragma once
 
 #include "ZSelfDescriptiveBase.h"
+#include "Interop/ZGCHandle.h"
 
 namespace ZSharp
 {
 	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptDelegate : TZSelfDescriptiveBase<FZSelfDescriptiveScriptDelegate, UFunction, FScriptDelegate>
 	{
 		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_AUTO_CTOR(FZSelfDescriptiveScriptDelegate)
-
-		void Bind(UObject* object, FName name);
+		
+		void BindUFunction(UObject* object, FName name);
+		UObject* BindManaged(FZGCHandle delegate);
 		void Unbind();
 
 		void Execute(void* params);

@@ -1,6 +1,8 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Reflection;
+using System.Runtime.InteropServices;
+using ZeroGames.ZSharp.UnrealEngine.ZSharpRuntime;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
@@ -20,7 +22,7 @@ public abstract class UnrealDelegate : PlainExportedObjectBase
 		throw new ArgumentException();
 	}
 
-	public void Bind(UnrealObject obj, string name) => this.ZCall("ex://Delegate.Bind", obj, new UnrealName(name));
+	public void Bind(UnrealObject obj, string name) => this.ZCall("ex://Delegate.BindUFunction", obj, new UnrealName(name));
 	public void Unbind() => this.ZCall("ex://Delegate.Unbind");
 	public bool IsBoundToObject(UnrealObject obj) => this.ZCall("ex://Delegate.IsBoundToObject", obj)[-1].Bool;
 
@@ -52,6 +54,17 @@ public abstract class UnrealDelegate : PlainExportedObjectBase
 		_delegateType = delegateType;
 		ValidateDelegateType();
 	}
+
+	protected UnrealObject? Bind(Delegate @delegate)
+	{
+		if (@delegate.GetType() != _delegateType)
+		{
+			throw new InvalidOperationException();
+		}
+
+		GCHandle handle = GCHandle.Alloc(@delegate);
+		return this.ZCall("ex://Delegate.BindManaged", handle, null)[-1].ReadConjugate<UnrealObject>();
+	}
 	
 	private void ValidateDelegateType()
 	{
@@ -72,7 +85,9 @@ public class UnrealDelegate<T> : UnrealDelegate, IConjugate<UnrealDelegate<T>> w
 
 	public UnrealDelegate() : base(typeof(T)){}
 	public UnrealDelegate(IntPtr unmanaged) : base(typeof(T), unmanaged){}
-	
+
+	public UnrealObject? Bind(T @delegate) => base.Bind(@delegate);
+
 }
 
 

@@ -9,7 +9,14 @@ internal class ZCallDispatcher_Delegate : IZCallDispatcher
 	
 	public unsafe int32 Dispatch(ZCallBuffer* buffer)
 	{
-		throw new NotImplementedException();
+		Delegate? @delegate = (*buffer)[0].GCHandle.Target as Delegate;
+		if (@delegate is null)
+		{
+			return 1;
+		}
+
+		@delegate.DynamicInvoke();
+		return 0;
 	}
 
 	public string Name => KName;

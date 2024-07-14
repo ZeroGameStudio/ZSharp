@@ -185,6 +185,15 @@ namespace ZSharp
 		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
 		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadBool(); }
 	};
+	
+	template <>
+	struct TZCallBufferSlotEncoder<FZGCHandle>
+	{
+		using DecodedType = FZGCHandle;
+		static void Encode(DecodedType value, FZCallBufferSlot& slot) { slot.WriteGCHandle(value); }
+		static void EncodeRet(DecodedType value, FZCallBufferSlot& slot) { Encode(value, slot); }
+		static DecodedType Decode(const FZCallBufferSlot& slot) { return slot.ReadGCHandle(); }
+	};
 
 #define IMPLEMENT_REGULAR_ENCODER(Type) \
 	template <> \

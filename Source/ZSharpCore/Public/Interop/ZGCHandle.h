@@ -7,7 +7,7 @@ namespace ZSharp
 	struct FZGCHandle
 	{
 
-		void Free();
+		ZSHARPCORE_API void Free();
 		
 		operator bool() const
 		{

@@ -14,6 +14,8 @@ public class ExportedDelegate : ExportedType
 	public required EExportedDelegateFlags Flags { get; set; }
 	public required List<ExportedParameter> Parameters { get; set; }
 
+	public bool IsMulticast => (Flags & EExportedDelegateFlags.Multicast) != EExportedDelegateFlags.None;
+	
 	public ExportedParameter? ReturnParameter => Parameters.Count > 0 ? Parameters[^1] : null;
 }
 

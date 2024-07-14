@@ -28,15 +28,28 @@ public class DelegateWriter : IDisposable, IAsyncDisposable
 	{
 		string returnType = _exportedDelegate.ReturnParameter?.Type.ToString() ?? "void";
 		string delegateName = _exportedDelegate.Name.Split('.')[^1];
-		string parameterList = "";
+		List<string> parameters = [];
+		for (int32 i = 0; i < _exportedDelegate.Parameters.Count - 1; ++i)
+		{
+			ExportedParameter param = _exportedDelegate.Parameters[i];
+			string modifier = param.IsInOut ? "ref " : param.IsOut ? "out " : string.Empty;
+			parameters.Add($"{modifier}{param.Type} {param.Name}");
+		}
+		string parameterList = string.Join(", ", parameters);
+		string delegateAttr = $"[UnrealFieldPath(\"{_exportedDelegate.UnrealFieldPath}\")]\n";
+		if (_exportedDelegate.IsMulticast)
+		{
+			delegateAttr = delegateAttr.Insert(0, "[Multicast]\n");
+		}
 		string delegateDeclaration = $"public delegate {returnType} {delegateName}({parameterList});";
+		delegateDeclaration = delegateAttr + delegateDeclaration;
 		if (_exportedDelegate.Name.Contains('.'))
 		{
 			string outerClassName = _exportedDelegate.Name.Split('.')[0];
 			delegateDeclaration =
 $@"public partial class {outerClassName}
 {{
-	{delegateDeclaration}
+{delegateDeclaration.Indent()}
 }}";
 		}
 		

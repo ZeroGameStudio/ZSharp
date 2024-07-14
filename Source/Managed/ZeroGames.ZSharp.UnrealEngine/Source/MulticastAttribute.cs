@@ -2,9 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
-public unsafe interface IBlackConjugateUserdata
-{
-	static abstract void* Userdata { get; }
-}
+[AttributeUsage(AttributeTargets.Delegate)]
+public class MulticastAttribute : Attribute;
 
 

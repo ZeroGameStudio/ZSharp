@@ -14,6 +14,11 @@ public enum EExportedParameterFlags : uint64
 public class ExportedParameter : ExportedVariable
 {
 	public required EExportedParameterFlags Flags { get; set; }
+	
+	public bool IsIn => (Flags & EExportedParameterFlags.In) != EExportedParameterFlags.None;
+	public bool IsOut => (Flags & EExportedParameterFlags.Out) != EExportedParameterFlags.None;
+	public bool IsInOut => IsIn && IsOut;
+	public bool IsReturn => (Flags & EExportedParameterFlags.Return) != EExportedParameterFlags.None;
 }
 
 

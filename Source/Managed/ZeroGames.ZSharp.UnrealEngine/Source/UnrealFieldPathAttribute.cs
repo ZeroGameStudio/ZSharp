@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Enum, Inherited = false)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Enum | AttributeTargets.Delegate, Inherited = false)]
 public class UnrealFieldPathAttribute : Attribute
 {
 	public UnrealFieldPathAttribute(string path) => Path = path;

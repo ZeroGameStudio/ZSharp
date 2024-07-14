@@ -261,6 +261,10 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         {
             _conjugateMap[unmanaged] = new(registryId, new(managed));
         }
+        else
+        {
+            throw new InvalidOperationException();
+        }
 
         return unmanaged;
     }

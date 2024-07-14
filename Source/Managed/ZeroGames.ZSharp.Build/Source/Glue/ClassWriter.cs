@@ -67,7 +67,59 @@ namespace {_exportedClass.Namespace};
 	{
 		string accessModifier = method.IsPublic ? "public" : method.IsProtected ? "protected" : "private";
 		string staticModifier = method.IsStatic ? "static " : string.Empty;
-		return $"\t{accessModifier} {staticModifier}void {method.Name}(){{}}";
+		string returnType = method.ReturnParameter?.Type.ToString() ?? "void";
+		List<string> parameters = [];
+		List<string> zcallParameters = [ $"\"{method.ZCallName}\"" ];
+		List<string> copybackStats = [];
+		for (int32 i = 0; i < method.Parameters.Count - 1; ++i)
+		{
+			ExportedParameter param = method.Parameters[i];
+			string modifier = param.IsInOut ? "ref " : param.IsOut ? "out " : string.Empty;
+			parameters.Add($"{modifier}{param.Type} {param.Name}");
+
+			if (param is { IsOut: true, IsIn: false })
+			{
+				string @default = param.Type.IsNullable ? "null" : $"new {param.Type}()";
+				zcallParameters.Add(@default);
+			}
+			else
+			{
+				zcallParameters.Add(param.Name);
+			}
+
+			if (param.IsOut)
+			{
+				int32 index = method.IsStatic ? i : i + 1;
+				string nullForgivingModifier = param.Type.IsNullable ? string.Empty : "!";
+				string left = param.Name;
+				string right = $"({param.Type.ToString()})res[{index}].Object{nullForgivingModifier}";
+				copybackStats.Add($"{left} = {right};");
+			}
+		}
+		string parameterList = string.Join(", ", parameters);
+		string context = method.IsStatic ? "ZCallEx" : "this";
+		string copybacks = string.Join("\n", copybackStats);
+		if (copybacks.Length > 0)
+		{
+			copybacks = copybacks.Insert(0, "\n") + '\n';
+		}
+		
+		string returnNullForgivingModifier = method.ReturnParameter?.Type.IsNullable ?? default ? string.Empty : "!";
+		string returnBody = method.ReturnParameter is not null ? $" ({returnType})res[-1].Object{returnNullForgivingModifier}" : string.Empty;
+		string returnStat = $"return{returnBody};";
+
+		
+		string zcallParameterList = string.Join(", ", zcallParameters);
+		
+		string methodBody =
+@$"DynamicZCallResult res = {context}.ZCall({zcallParameterList});
+{copybacks}
+{returnStat}".Indent(2);
+		return
+@$"	{accessModifier} {staticModifier}{returnType} {method.Name}({parameterList})
+	{{
+{methodBody}
+	}}";
 	}
 
 	private string GetPropertyBlock(ExportedProperty property)
@@ -239,21 +291,25 @@ namespace {_exportedClass.Namespace};
 		get
 		{
 			StringBuilder body = new();
-			
-			// Methods
-			foreach (var method in _exportedClass.Methods.OrderBy(method => method.IsPublic ? 1 : method.IsProtected ? 2 : 3))
+
+			// @TODO: Interface needs special support.
+			if (!_exportedClass.IsInterface)
 			{
-				string block = GetMethodBlock(method);
-				body.Append(block);
-				body.Append("\n\n");
-			}
+				// Methods
+				foreach (var method in _exportedClass.Methods.OrderBy(method => method.IsPublic ? 1 : method.IsProtected ? 2 : 3))
+				{
+					string block = GetMethodBlock(method);
+					body.Append(block);
+					body.Append("\n\n");
+				}
 			
-			// Properties
-			foreach (var prop in _exportedClass.Properties.OrderBy(prop => prop.IsPublic ? 1 : prop.IsProtected ? 2 : 3))
-			{
-				string block = GetPropertyBlock(prop);
-				body.Append(block);
-				body.Append("\n\n");
+				// Properties
+				foreach (var prop in _exportedClass.Properties.OrderBy(prop => prop.IsPublic ? 1 : prop.IsProtected ? 2 : 3))
+				{
+					string block = GetPropertyBlock(prop);
+					body.Append(block);
+					body.Append("\n\n");
+				}
 			}
 
 			// Intrinsics

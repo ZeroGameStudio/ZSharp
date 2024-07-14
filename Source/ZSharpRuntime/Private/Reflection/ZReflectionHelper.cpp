@@ -25,6 +25,7 @@ FString ZSharp::FZReflectionHelper::GetUFieldAliasedName(const UField* field, bo
 		{ "Property", "UnrealProperty" },
 
 		{ "Guid", "UnrealGuid" },
+		{ "DateTime", "UnrealDateTime" },
 	};
 
 	if (!field)

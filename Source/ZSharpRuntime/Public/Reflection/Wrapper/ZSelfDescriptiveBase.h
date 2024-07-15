@@ -124,14 +124,14 @@ namespace ZSharp
 }
 
 #define ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY(ThisClass) \
-using Super = TZSelfDescriptiveBase; \
-friend struct TZSelfDescriptiveBase; \
-ThisClass(const DescriptorType* descriptor); \
-ThisClass(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance);
+	using Super = TZSelfDescriptiveBase; \
+	friend Super; \
+	ThisClass(const DescriptorType* descriptor); \
+	ThisClass(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance);
 
 #define ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_AUTO_CTOR(ThisClass) \
 	using Super = TZSelfDescriptiveBase; \
-	friend struct TZSelfDescriptiveBase; \
+	friend Super; \
 	ThisClass(const DescriptorType* descriptor) : Super(descriptor){} \
 	ThisClass(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance) : Super(descriptor, underlyingInstance){}
 

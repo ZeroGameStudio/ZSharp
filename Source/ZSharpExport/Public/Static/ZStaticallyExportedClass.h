@@ -19,8 +19,6 @@ namespace ZSharp
 	class TZStaticallyExportedClass : public IZExportedClass
 	{
 
-		friend struct FZFinalizer;
-
 	public:
 		virtual FString GetName() const override { return TZExportedTypeName<T>::Get().Name; }
 		virtual FString GetModule() const override { return TZManagedTypeInfo<T>::GetModuleName(); }

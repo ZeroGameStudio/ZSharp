@@ -19,8 +19,6 @@ namespace ZSharp
 	class TZStaticallyExportedEnum : public IZExportedEnum
 	{
 
-		friend struct FZFinalizer;
-
 		using UnderlyingType = __underlying_type(T);
 
 	public:

@@ -9,7 +9,7 @@ namespace ZSharp
 #define DECLARE_REGISTRY(Type) \
 	class ZSHARPRUNTIME_API FZConjugateRegistry_##Type : public TZRegularConjugateRegistryBase<FZConjugateRegistry_##Type, F##Type> \
 	{ \
-		friend class Super; \
+		friend Super; \
 	public: \
 		explicit FZConjugateRegistry_##Type(IZMasterAssemblyLoadContext& alc) : Super(alc){} \
 	private: \

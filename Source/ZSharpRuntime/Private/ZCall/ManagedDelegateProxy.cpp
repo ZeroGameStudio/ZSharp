@@ -6,7 +6,6 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
-#include "ZCall/ZCallBuffer.h"
 
 void UManagedDelegateProxy::BeginDestroy()
 {

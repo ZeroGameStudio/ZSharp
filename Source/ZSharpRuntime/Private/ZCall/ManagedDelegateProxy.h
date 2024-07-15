@@ -5,6 +5,7 @@
 #include "ZManagedDelegateProxyInterface.h"
 #include "Interop/ZGCHandle.h"
 #include "Reflection/Function/ZFunctionVisitorHandle.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveMulticastScriptDelegate.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
 #include "ZCall/ZCallHandle.h"
 
@@ -16,6 +17,7 @@ class ZSHARPRUNTIME_API UManagedDelegateProxy final : public UObject, public IZM
 	GENERATED_BODY()
 
 	friend ZSharp::FZSelfDescriptiveScriptDelegate;
+	friend ZSharp::FZSelfDescriptiveMulticastScriptDelegate;
 
 public:
 	virtual ZSharp::FZGCHandle ManagedDelegateProxy_GetDelegate() const override { return Delegate; }

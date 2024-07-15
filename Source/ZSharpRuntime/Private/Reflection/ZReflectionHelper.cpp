@@ -169,8 +169,7 @@ bool ZSharp::FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(const FFieldCl
 		{ FOptionalProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveOptional>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveOptional>::GetFullName() } },
 
 		{ FDelegateProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveScriptDelegate>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveScriptDelegate>::GetFullName() } },
-		{ FMulticastInlineDelegateProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveMulticastScriptDelegate>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveMulticastScriptDelegate>::GetFullName() } },
-		{ FMulticastSparseDelegateProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveMulticastScriptDelegate>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveMulticastScriptDelegate>::GetFullName() } },
+		{ FMulticastDelegateProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveMulticastScriptDelegate>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveMulticastScriptDelegate>::GetFullName() } },
 
 		{ FClassProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveSubclassOf>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveSubclassOf>::GetFullName() } },
 		{ FSoftClassProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveSoftClassPtr>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveSoftClassPtr>::GetFullName() } },

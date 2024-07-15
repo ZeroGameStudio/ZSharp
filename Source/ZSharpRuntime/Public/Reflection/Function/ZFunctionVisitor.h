@@ -33,6 +33,7 @@ namespace ZSharp
 
 		bool bIsStatic;
 		bool bIsDelegate;
+		bool bIsMulticastDelegate;
 		bool bIsRpc;
 		TArray<TUniquePtr<IZPropertyVisitor>> ParameterProperties;
 		TUniquePtr<IZPropertyVisitor> ReturnProperty;

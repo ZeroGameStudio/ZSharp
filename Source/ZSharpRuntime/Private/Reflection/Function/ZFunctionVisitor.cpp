@@ -70,6 +70,7 @@ int32 ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBuffer* buffer) cons
 {
 	check(bAvailable);
 	check(bIsDelegate);
+	check(!bIsMulticastDelegate);
 	check(!bIsStatic);
 
 	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
@@ -93,7 +94,6 @@ int32 ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBuffer* buffer) cons
 		ReturnProperty->InitializeValue_InContainer(params);
 	}
 
-	check(self.GetUnderlyingInstance()->IsBound());
 	self.GetUnderlyingInstance()->ProcessDelegate<UObject>(params);
 
 	for (const auto index : OutParamIndices)
@@ -112,7 +112,36 @@ int32 ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBuffer* buffer) cons
 
 int32 ZSharp::FZFunctionVisitor::InvokeMulticastScriptDelegate(FZCallBuffer* buffer) const
 {
-	checkNoEntry();
+	check(bAvailable);
+	check(bIsDelegate);
+	check(bIsMulticastDelegate);
+	check(!ReturnProperty);
+	check(!bIsStatic);
+
+	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
+
+	FZCallBuffer& buf = *buffer;
+	UFunction* func = Function.Get();
+	FZSelfDescriptiveMulticastScriptDelegate& self = TZCallBufferSlotEncoder<FZSelfDescriptiveMulticastScriptDelegate>::Decode(buf[0]);
+	check(self.GetDescriptor() == func);
+	
+	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
+
+	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
+	{
+		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+		visitor->InitializeValue_InContainer(params);
+		visitor->SetValue_InContainer(params, buf[i + 1], 0);
+	}
+
+	self.GetUnderlyingInstance()->ProcessMulticastDelegate<UObject>(params);
+
+	for (const auto index : OutParamIndices)
+	{
+		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
+		visitor->GetValue_InContainer(params, buf[index + 1], 0);
+	}
+	
 	return 0;
 }
 
@@ -207,6 +236,7 @@ ZSharp::FZFunctionVisitor::FZFunctionVisitor(UFunction* function)
 	: bAvailable(false)
 	, bIsStatic(false)
 	, bIsDelegate(false)
+	, bIsMulticastDelegate(false)
 	, bIsRpc(false)
 {
 	Function = function;
@@ -219,6 +249,7 @@ ZSharp::FZFunctionVisitor::FZFunctionVisitor(UFunction* function)
 
 	bIsStatic = function->HasAllFunctionFlags(FUNC_Static);
 	bIsDelegate = function->HasAllFunctionFlags(FUNC_Delegate);
+	bIsMulticastDelegate = function->HasAllFunctionFlags(FUNC_MulticastDelegate);
 	bIsRpc = function->HasAnyFunctionFlags(FUNC_NetServer | FUNC_NetClient | FUNC_NetMulticast);
 	
 	ParameterProperties.Empty();

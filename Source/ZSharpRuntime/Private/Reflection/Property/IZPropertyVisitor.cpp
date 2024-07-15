@@ -9,7 +9,7 @@
 #include "Container/ZArrayPropertyVisitor.h"
 #include "Container/ZStructPropertyVisitor.h"
 #include "Delegate/ZDelegatePropertyVisitor.h"
-#include "Delegate/ZMulticastDelegatePropertyVisitor.h"
+#include "Delegate/ZMulticastInlineDelegatePropertyVisitor.h"
 #include "Object/ZObjectPropertyVisitor.h"
 #include "Object/ZObjectWrapperPropertyVisitors.h"
 #include "Primitive/ZBoolPropertyVisitor.h"

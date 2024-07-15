@@ -5,7 +5,7 @@
 #include "ZManagedDelegateProxyInterface.h"
 #include "Interop/ZGCHandle.h"
 #include "Reflection/Function/ZFunctionVisitorHandle.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveMulticastScriptDelegate.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveMulticastInlineScriptDelegate.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
 #include "ZCall/ZCallHandle.h"
 

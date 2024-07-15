@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Concept/ZStaticallyExportableClass.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveMulticastScriptDelegate.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveMulticastInlineScriptDelegate.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptArray.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveObjectWrappers.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveOptional.h"

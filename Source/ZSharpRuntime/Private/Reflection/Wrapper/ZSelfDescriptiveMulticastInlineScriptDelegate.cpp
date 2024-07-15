@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "Reflection/Wrapper/ZSelfDescriptiveMulticastScriptDelegate.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveMulticastInlineScriptDelegate.h"
 
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
 #include "ZCall/ManagedDelegateProxy.h"

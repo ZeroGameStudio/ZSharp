@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "Conjugate/ZConjugateRegistry_MulticastDelegate.h"
+#include "Conjugate/ZConjugateRegistry_MulticastInlineDelegate.h"
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"

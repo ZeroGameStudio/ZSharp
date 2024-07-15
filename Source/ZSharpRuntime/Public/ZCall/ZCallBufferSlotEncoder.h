@@ -6,7 +6,7 @@
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_Array.h"
 #include "Conjugate/ZConjugateRegistry_Delegate.h"
-#include "Conjugate/ZConjugateRegistry_MulticastDelegate.h"
+#include "Conjugate/ZConjugateRegistry_MulticastInlineDelegate.h"
 #include "Conjugate/ZRegularConjugateRegistries.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Conjugate/ZConjugateRegistry_UScriptStruct.h"

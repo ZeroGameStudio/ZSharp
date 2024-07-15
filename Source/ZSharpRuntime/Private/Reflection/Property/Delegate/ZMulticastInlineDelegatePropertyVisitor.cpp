@@ -1,13 +1,13 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZMulticastDelegatePropertyVisitor.h"
+#include "ZMulticastInlineDelegatePropertyVisitor.h"
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "ZCall/ZCallBuffer.h"
-#include "Conjugate/ZConjugateRegistry_MulticastDelegate.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveMulticastScriptDelegate.h"
+#include "Conjugate/ZConjugateRegistry_MulticastInlineDelegate.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveMulticastInlineScriptDelegate.h"
 
 void ZSharp::FZMulticastDelegatePropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const
 {

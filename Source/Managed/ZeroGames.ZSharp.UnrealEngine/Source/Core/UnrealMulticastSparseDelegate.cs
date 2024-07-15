@@ -20,7 +20,6 @@ public abstract class UnrealMulticastSparseDelegate : PlainExportedObjectBase
 	protected UnrealMulticastSparseDelegate(Type delegateType)
 	{
 		_delegateType = delegateType;
-		ValidateDelegateType();
 		
 		Unmanaged = GetOwningAlc().BuildConjugate(this, UnrealDelegate.GetUnrealDelegateSignature(_delegateType).Unmanaged);
 	}
@@ -28,7 +27,6 @@ public abstract class UnrealMulticastSparseDelegate : PlainExportedObjectBase
 	protected UnrealMulticastSparseDelegate(Type delegateType, IntPtr unmanaged) : base(unmanaged)
 	{
 		_delegateType = delegateType;
-		ValidateDelegateType();
 	}
 	
 	protected UnrealObject? Add(Delegate @delegate)
@@ -42,27 +40,7 @@ public abstract class UnrealMulticastSparseDelegate : PlainExportedObjectBase
 		return this.ZCall("ex://MulticastSparseDelegate.AddManaged", handle, null)[-1].ReadConjugate<UnrealObject>();
 	}
 	
-	private void ValidateDelegateType()
-	{
-		if (!UnrealDelegate.IsUnrealDelegateType(_delegateType))
-		{
-			throw new NotSupportedException();
-		}
-	}
-	
 	private readonly Type _delegateType;
-	
-}
-
-public class UnrealMulticastSparseDelegate<T> : UnrealMulticastSparseDelegate, IConjugate<UnrealMulticastSparseDelegate<T>> where T : Delegate
-{
-	
-	public static UnrealMulticastSparseDelegate<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
-
-	public UnrealMulticastSparseDelegate() : base(typeof(T)){}
-	public UnrealMulticastSparseDelegate(IntPtr unmanaged) : base(typeof(T), unmanaged){}
-	
-	public UnrealObject? Add(T @delegate) => base.Add(@delegate);
 	
 }
 

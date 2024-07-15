@@ -12,6 +12,7 @@ namespace ZSharp
 	{
 		None = 0,
 		Multicast = 1 << 0,
+		Sparse = 1 << 1,
 	};
 	ENUM_CLASS_FLAGS(EZExportedDelegateFlags)
 	

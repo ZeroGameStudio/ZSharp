@@ -94,13 +94,7 @@ void ZSharp::FZConjugateRegistry_Delegate::GetAllConjugates(TArray<void*>& outCo
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Delegate::GetManagedType(const UFunction* signature) const
 {
 	FZRuntimeTypeLocatorWrapper locator;
-	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FDelegateProperty::StaticClass(), locator))
-	{
-		return {};
-	}
-	
-	FZRuntimeTypeLocatorWrapper& inner = locator.TypeParameters.AddDefaulted_GetRef();
-	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(signature, inner))
+	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(signature, locator))
 	{
 		return {};
 	}

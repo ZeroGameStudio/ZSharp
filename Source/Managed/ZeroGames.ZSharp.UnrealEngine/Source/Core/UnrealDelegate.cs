@@ -8,12 +8,10 @@ namespace ZeroGames.ZSharp.UnrealEngine.Core;
 [ConjugateRegistryId(41)]
 public abstract class UnrealDelegate : PlainExportedObjectBase
 {
-	
-	public static bool IsUnrealDelegateType(Type t) => t.IsSubclassOf(typeof(Delegate)) && t.GetCustomAttribute<UnrealFieldPathAttribute>() is not null;
 
 	public static UnrealFunction GetUnrealDelegateSignature(Type t)
 	{
-		if (t.IsSubclassOf(typeof(Delegate)) && t.GetCustomAttribute<UnrealFieldPathAttribute>() is {} attr)
+		if (t.GetCustomAttribute<UnrealFieldPathAttribute>() is {} attr)
 		{
 			return UnrealObjectGlobals.LowLevelFindObject<UnrealFunction>(attr.Path)!;
 		}
@@ -33,7 +31,6 @@ public abstract class UnrealDelegate : PlainExportedObjectBase
 	protected UnrealDelegate(Type delegateType)
 	{
 		_delegateType = delegateType;
-		ValidateDelegateType();
 		
 		Unmanaged = GetOwningAlc().BuildConjugate(this, GetUnrealDelegateSignature(_delegateType).Unmanaged);
 	}
@@ -41,7 +38,6 @@ public abstract class UnrealDelegate : PlainExportedObjectBase
 	protected UnrealDelegate(Type delegateType, IntPtr unmanaged) : base(unmanaged)
 	{
 		_delegateType = delegateType;
-		ValidateDelegateType();
 	}
 
 	protected UnrealObject? Bind(Delegate @delegate)
@@ -55,27 +51,7 @@ public abstract class UnrealDelegate : PlainExportedObjectBase
 		return this.ZCall("ex://Delegate.BindManaged", handle, null)[-1].ReadConjugate<UnrealObject>();
 	}
 	
-	private void ValidateDelegateType()
-	{
-		if (!IsUnrealDelegateType(_delegateType))
-		{
-			throw new NotSupportedException();
-		}
-	}
-	
 	private readonly Type _delegateType;
-
-}
-
-public class UnrealDelegate<T> : UnrealDelegate, IConjugate<UnrealDelegate<T>> where T : Delegate
-{
-	
-	public static UnrealDelegate<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
-
-	public UnrealDelegate() : base(typeof(T)){}
-	public UnrealDelegate(IntPtr unmanaged) : base(typeof(T), unmanaged){}
-
-	public UnrealObject? Bind(T @delegate) => base.Bind(@delegate);
 
 }
 

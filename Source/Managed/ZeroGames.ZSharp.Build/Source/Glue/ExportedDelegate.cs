@@ -7,6 +7,7 @@ public enum EExportedDelegateFlags : uint64
 {
 	None = 0,
 	Multicast = 1 << 0,
+	Sparse = 1 << 1,
 }
 
 public class ExportedDelegate : ExportedType
@@ -15,6 +16,7 @@ public class ExportedDelegate : ExportedType
 	public required List<ExportedParameter> Parameters { get; set; }
 
 	public bool IsMulticast => (Flags & EExportedDelegateFlags.Multicast) != EExportedDelegateFlags.None;
+	public bool IsSparse => (Flags & EExportedDelegateFlags.Sparse) != EExportedDelegateFlags.None;
 	
 	public ExportedParameter? ReturnParameter => Parameters.Count > 0 ? Parameters[^1] : null;
 }

@@ -37,11 +37,20 @@ public class DelegateWriter : IDisposable, IAsyncDisposable
 		}
 		string parameterList = string.Join(", ", parameters);
 		string delegateAttr = $"[UnrealFieldPath(\"{_exportedDelegate.UnrealFieldPath}\")]\n";
-		if (_exportedDelegate.IsMulticast)
-		{
-			delegateAttr = delegateAttr.Insert(0, "[Multicast]\n");
-		}
-		string delegateDeclaration = $"public delegate {returnType} {delegateName}({parameterList});";
+		string baseType = _exportedDelegate.IsSparse ? "UnrealMulticastSparseDelegate" : _exportedDelegate.IsMulticast ? "UnrealMulticastInlineDelegate" : "UnrealDelegate";
+		string signatureDeclaration = $"public delegate {returnType} Signature({parameterList});";
+		string bindMethodName = _exportedDelegate.IsMulticast ? "Add" : "Bind";
+		
+		string delegateDeclaration =
+@$"public class {delegateName} : {baseType}, IConjugate<{delegateName}>
+{{
+	{signatureDeclaration}
+	public static {delegateName} BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+	public {delegateName}() : base(typeof(Signature)){{}}
+	public {delegateName}(IntPtr unmanaged) : base(typeof(Signature), unmanaged){{}}
+	public UnrealObject? {bindMethodName}(Signature @delegate) => base.{bindMethodName}(@delegate);
+}}";
+
 		delegateDeclaration = delegateAttr + delegateDeclaration;
 		if (_exportedDelegate.Name.Contains('.'))
 		{

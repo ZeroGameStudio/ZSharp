@@ -169,10 +169,6 @@ bool ZSharp::FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(const FFieldCl
 		{ FMapProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveScriptMap>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveScriptMap>::GetFullName() } },
 		{ FOptionalProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveOptional>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveOptional>::GetFullName() } },
 
-		{ FDelegateProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveScriptDelegate>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveScriptDelegate>::GetFullName() } },
-		{ FMulticastInlineDelegateProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveMulticastInlineScriptDelegate>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveMulticastInlineScriptDelegate>::GetFullName() } },
-		{ FMulticastSparseDelegateProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveMulticastSparseScriptDelegate>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveMulticastSparseScriptDelegate>::GetFullName() } },
-		
 		{ FClassProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveSubclassOf>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveSubclassOf>::GetFullName() } },
 		{ FSoftClassProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveSoftClassPtr>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveSoftClassPtr>::GetFullName() } },
 		{ FSoftObjectProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveSoftObjectPtr>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveSoftObjectPtr>::GetFullName() } },
@@ -215,6 +211,18 @@ bool ZSharp::FZReflectionHelper::GetFPropertyRuntimeTypeLocator(const FProperty*
 	{
 		return GetUFieldRuntimeTypeLocator(enumProp->GetEnum(), outLocator);
 	}
+	else if (const auto delegateProp = CastField<FDelegateProperty>(property))
+	{
+		return GetUFieldRuntimeTypeLocator(delegateProp->SignatureFunction, outLocator);
+	}
+	else if (const auto multicastInlineDelegateProp = CastField<FMulticastInlineDelegateProperty>(property))
+	{
+		return GetUFieldRuntimeTypeLocator(multicastInlineDelegateProp->SignatureFunction, outLocator);
+	}
+	else if (const auto multicastSparseDelegateProp = CastField<FMulticastSparseDelegateProperty>(property))
+	{
+		return GetUFieldRuntimeTypeLocator(multicastSparseDelegateProp->SignatureFunction, outLocator);
+	}
 	
 	if (!GetFFieldClassRuntimeTypeLocator(property->GetClass(), outLocator))
 	{
@@ -232,6 +240,7 @@ bool ZSharp::FZReflectionHelper::GetFPropertyRuntimeTypeLocator(const FProperty*
 		{
 			return GetUFieldRuntimeTypeLocator(objectProp->PropertyClass, inner);
 		}
+		// @TODO
 	}
 	
 	checkNoEntry();

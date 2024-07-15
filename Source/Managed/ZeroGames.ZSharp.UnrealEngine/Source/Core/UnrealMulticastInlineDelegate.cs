@@ -20,7 +20,6 @@ public abstract class UnrealMulticastInlineDelegate : PlainExportedObjectBase
 	protected UnrealMulticastInlineDelegate(Type delegateType)
 	{
 		_delegateType = delegateType;
-		ValidateDelegateType();
 		
 		Unmanaged = GetOwningAlc().BuildConjugate(this, UnrealDelegate.GetUnrealDelegateSignature(_delegateType).Unmanaged);
 	}
@@ -28,7 +27,6 @@ public abstract class UnrealMulticastInlineDelegate : PlainExportedObjectBase
 	protected UnrealMulticastInlineDelegate(Type delegateType, IntPtr unmanaged) : base(unmanaged)
 	{
 		_delegateType = delegateType;
-		ValidateDelegateType();
 	}
 	
 	protected UnrealObject? Add(Delegate @delegate)
@@ -42,27 +40,7 @@ public abstract class UnrealMulticastInlineDelegate : PlainExportedObjectBase
 		return this.ZCall("ex://MulticastInlineDelegate.AddManaged", handle, null)[-1].ReadConjugate<UnrealObject>();
 	}
 	
-	private void ValidateDelegateType()
-	{
-		if (!UnrealDelegate.IsUnrealDelegateType(_delegateType))
-		{
-			throw new NotSupportedException();
-		}
-	}
-	
 	private readonly Type _delegateType;
-	
-}
-
-public class UnrealMulticastInlineDelegate<T> : UnrealMulticastInlineDelegate, IConjugate<UnrealMulticastInlineDelegate<T>> where T : Delegate
-{
-	
-	public static UnrealMulticastInlineDelegate<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
-
-	public UnrealMulticastInlineDelegate() : base(typeof(T)){}
-	public UnrealMulticastInlineDelegate(IntPtr unmanaged) : base(typeof(T), unmanaged){}
-	
-	public UnrealObject? Add(T @delegate) => base.Add(@delegate);
 	
 }
 

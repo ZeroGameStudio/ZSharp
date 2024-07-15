@@ -67,6 +67,12 @@ ZSharp::FZDynamicallyExportedDelegate::FZDynamicallyExportedDelegate(const UFunc
 		Flags |= EZExportedDelegateFlags::Multicast;
 	}
 
+	if (Signature->IsA<USparseDelegateFunction>())
+	{
+		check(HasAllFlags(EZExportedDelegateFlags::Multicast));
+		Flags |= EZExportedDelegateFlags::Sparse;
+	}
+
 	for (TFieldIterator<FProperty> it(Signature); it && it->HasAllPropertyFlags(CPF_Parm); ++it)
 	{
 		FZDynamicallyExportedParameter* param = FZDynamicallyExportedParameter::Create(*it);

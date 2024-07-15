@@ -69,13 +69,7 @@ void ZSharp::FZConjugateRegistry_MulticastSparseDelegate::GetAllConjugates(TArra
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_MulticastSparseDelegate::GetManagedType(const USparseDelegateFunction* signature) const
 {
 	FZRuntimeTypeLocatorWrapper locator;
-	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FMulticastSparseDelegateProperty::StaticClass(), locator))
-	{
-		return {};
-	}
-	
-	FZRuntimeTypeLocatorWrapper& inner = locator.TypeParameters.AddDefaulted_GetRef();
-	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(signature, inner))
+	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(signature, locator))
 	{
 		return {};
 	}

@@ -61,10 +61,6 @@ ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptSet, Core
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptMap, Core, UnrealMap`2)
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveOptional, Core, UnrealOptional`1)
 
-ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveScriptDelegate, Core, UnrealDelegate`1)
-ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate, Core, UnrealMulticastInlineDelegate`1)
-ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate, Core, UnrealMulticastSparseDelegate`1)
-
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveSubclassOf, CoreUObject, SubclassOf`1)
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveSoftClassPtr, CoreUObject, SoftClassPtr`1)
 ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(ZSharp::FZSelfDescriptiveSoftObjectPtr, CoreUObject, SoftObjectPtr`1)

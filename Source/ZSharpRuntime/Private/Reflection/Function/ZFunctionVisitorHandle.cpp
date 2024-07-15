@@ -1,9 +1,9 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZFunctionVisitorHandle.h"
+#include "Reflection/Function/ZFunctionVisitorHandle.h"
 
-#include "ZFunctionVisitorRegistry.h"
+#include "Reflection/Function/ZFunctionVisitorRegistry.h"
 
 const ZSharp::FZFunctionVisitor* ZSharp::FZFunctionVisitorHandle::Get() const
 {

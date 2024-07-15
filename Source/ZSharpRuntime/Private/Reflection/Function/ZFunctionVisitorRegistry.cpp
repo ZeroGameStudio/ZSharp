@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZFunctionVisitorRegistry.h"
+#include "Reflection/Function/ZFunctionVisitorRegistry.h"
 
 const ZSharp::FZFunctionVisitorRegistry& ZSharp::FZFunctionVisitorRegistry::Get()
 {

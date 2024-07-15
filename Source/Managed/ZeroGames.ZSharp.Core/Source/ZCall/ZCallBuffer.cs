@@ -583,8 +583,10 @@ public struct ZCallBufferSlot
 		{
 			Conjugate = (ConjugateHandle)value;
 		}
-
-		throw new InvalidOperationException();
+		else
+		{
+			throw new InvalidOperationException();
+		}
 	}
 
 	public EZCallBufferSlotType Type => _type;

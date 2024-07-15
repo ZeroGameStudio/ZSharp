@@ -14,7 +14,7 @@ int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 		return 1;
 	}
 
-	const int32 res = Function->Invoke_Black(buffer);
+	const int32 res = Function->InvokeUFunction(buffer);
 	return res ? res + 1 : 0;
 }
 

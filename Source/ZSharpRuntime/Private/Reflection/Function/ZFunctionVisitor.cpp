@@ -1,13 +1,17 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZFunctionVisitor.h"
+#include "Reflection/Function/ZFunctionVisitor.h"
 
 #include "ZCall/ZCallBufferSlotEncoder.h"
+#include "ZCall/ZManagedDelegateProxyInterface.h"
 
-int32 ZSharp::FZFunctionVisitor::Invoke_Black(FZCallBuffer* buffer) const
+int32 ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer* buffer) const
 {
 	check(bAvailable);
+	check(!bIsDelegate);
+
+	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
 
 	FZCallBuffer& buf = *buffer;
 	UFunction* func = Function.Get();
@@ -20,7 +24,7 @@ int32 ZSharp::FZFunctionVisitor::Invoke_Black(FZCallBuffer* buffer) const
 			return 1;
 		}
 		const UFunction* proto = func;
-		func = self->GetClass()->FindFunctionByName(func->GetFName()); // Instance function may be polymorphism
+		func = self->FindFunctionChecked(func->GetFName()); // Instance function may be polymorphism
 		check(func->IsChildOf(proto));
 		check(func->IsSignatureCompatibleWith(proto));
 	}
@@ -32,14 +36,18 @@ int32 ZSharp::FZFunctionVisitor::Invoke_Black(FZCallBuffer* buffer) const
 	check(self);
 	check(self->IsA(func->GetOuterUClass()));
 	
-	void* params = FMemory::Malloc(func->ParmsSize, func->MinAlignment);
-	ON_SCOPE_EXIT { FMemory::Free(params); };
+	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
 
 	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 	{
 		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
 		visitor->InitializeValue_InContainer(params);
 		visitor->SetValue_InContainer(params, buf[bIsStatic ? i : i + 1], 0);
+	}
+
+	if (ReturnProperty)
+	{
+		ReturnProperty->InitializeValue_InContainer(params);
 	}
 
 	self->ProcessEvent(func, params);
@@ -58,17 +66,147 @@ int32 ZSharp::FZFunctionVisitor::Invoke_Black(FZCallBuffer* buffer) const
 	return 0;
 }
 
-int32 ZSharp::FZFunctionVisitor::Invoke_Red(void* param) const
+int32 ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBuffer* buffer) const
+{
+	check(bAvailable);
+	check(bIsDelegate);
+	check(!bIsStatic);
+
+	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
+
+	FZCallBuffer& buf = *buffer;
+	UFunction* func = Function.Get();
+	FZSelfDescriptiveScriptDelegate& self = TZCallBufferSlotEncoder<FZSelfDescriptiveScriptDelegate>::Decode(buf[0]);
+	check(self.GetDescriptor() == func);
+	
+	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
+
+	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
+	{
+		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+		visitor->InitializeValue_InContainer(params);
+		visitor->SetValue_InContainer(params, buf[i + 1], 0);
+	}
+	
+	if (ReturnProperty)
+	{
+		ReturnProperty->InitializeValue_InContainer(params);
+	}
+
+	self.GetUnderlyingInstance()->ProcessDelegate<UObject>(params);
+
+	for (const auto index : OutParamIndices)
+	{
+		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
+		visitor->GetValue_InContainer(params, buf[index + 1], 0);
+	}
+
+	if (ReturnProperty)
+	{
+		ReturnProperty->GetValue_InContainer(params, buf[-1], 0);
+	}
+
+	return 0;
+}
+
+int32 ZSharp::FZFunctionVisitor::InvokeMulticastScriptDelegate(FZCallBuffer* buffer) const
+{
+	checkNoEntry();
+	return 0;
+}
+
+int32 ZSharp::FZFunctionVisitor::InvokeZCall(FZCallHandle handle, UObject* object, void* params) const
 {
 	check(bAvailable);
 
-	checkNoEntry();
-	return 1;
+	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
+
+	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
+	if (!alc)
+	{
+		return 1;
+	}
+
+	int32 numSlots = ParameterProperties.Num() + (ReturnProperty ? 1 : 0);
+	UObject* self;
+	if (bIsDelegate)
+	{
+		checkSlow(handle == alc->GetZCallHandle("d://"));
+		check(!bIsStatic);
+		check(object);
+		check(object->Implements<UZManagedDelegateProxyInterface>());
+	}
+	else if (bIsStatic)
+	{
+		checkNoEntry(); // @TODO: Dynamic Class
+	}
+	else
+	{
+		checkNoEntry(); // @TODO: Dynamic Class
+	}
+	
+	if (self = object; self)
+	{
+		++numSlots;
+	}
+
+	check(self || bIsStatic);
+	
+	int32 res;
+	alc->PrepareForZCall();
+	{
+		FZCallBuffer buffer;
+		buffer.Slots = (FZCallBufferSlot*)FMemory_Alloca(numSlots * sizeof(FZCallBufferSlot));
+		buffer.NumSlots = numSlots;
+
+		FMemory::Memzero(buffer.Slots, numSlots * sizeof(FZCallBufferSlot));
+		for (int32 i = 0; i < numSlots; ++i)
+		{
+			buffer.Slots[i].Type = EZCallBufferSlotType::Uninitialized;
+		}
+
+		if (bIsDelegate)
+		{
+			TZCallBufferSlotEncoder<FZGCHandle>::Encode(CastChecked<IZManagedDelegateProxyInterface>(self)->ManagedDelegateProxy_GetDelegate(), buffer[0]);
+		}
+		else if (!bIsStatic)
+		{
+			TZCallBufferSlotEncoder<UObject*>::Encode(self, buffer[0]);
+		}
+
+		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
+		{
+			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+			visitor->GetValue_InContainer(params, buffer[bIsStatic ? i : i + 1], 0);
+		}
+
+		if (ReturnProperty)
+		{
+			ReturnProperty->GetValue_InContainer(params, buffer[-1], 0);
+		}
+		
+		res = alc->ZCall(handle, &buffer);
+		
+		for (const auto index : OutParamIndices)
+		{
+			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
+			visitor->SetValue_InContainer(params, buffer[bIsStatic ? index : index + 1], 0);
+		}
+
+		if (ReturnProperty)
+		{
+			ReturnProperty->SetValue_InContainer(params, buffer[-1], 0);
+		}
+	}
+
+	return res ? res + 1 : 0;
 }
 
 ZSharp::FZFunctionVisitor::FZFunctionVisitor(UFunction* function)
 	: bAvailable(false)
 	, bIsStatic(false)
+	, bIsDelegate(false)
+	, bIsRpc(false)
 {
 	Function = function;
 	if (!Function.IsValid(true))
@@ -79,6 +217,8 @@ ZSharp::FZFunctionVisitor::FZFunctionVisitor(UFunction* function)
 	check(!function->GetSuperFunction());
 
 	bIsStatic = function->HasAllFunctionFlags(FUNC_Static);
+	bIsDelegate = function->HasAllFunctionFlags(FUNC_Delegate);
+	bIsRpc = function->HasAnyFunctionFlags(FUNC_NetServer | FUNC_NetClient | FUNC_NetMulticast);
 	
 	ParameterProperties.Empty();
 	ReturnProperty.Reset();

@@ -3,6 +3,7 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
 
+#include "Reflection/Function/ZFunctionVisitorRegistry.h"
 #include "ZCall/ManagedDelegateProxy.h"
 
 void ZSharp::FZSelfDescriptiveScriptDelegate::BindUFunction(UObject* object, FName name)
@@ -46,9 +47,17 @@ void ZSharp::FZSelfDescriptiveScriptDelegate::Unbind()
 	UnderlyingInstance->Unbind();
 }
 
-void ZSharp::FZSelfDescriptiveScriptDelegate::Execute(void* params)
+int32 ZSharp::FZSelfDescriptiveScriptDelegate::Execute(FZCallBuffer* buffer)
 {
-	UnderlyingInstance->ProcessDelegate<UObject>(params);
+	if (!Visitor)
+	{
+		if (Visitor = FZFunctionVisitorRegistry::Get().Get(Descriptor); !Visitor)
+		{
+			return 1;
+		}
+	}
+	
+	return Visitor->InvokeScriptDelegate(buffer);
 }
 
 UObject* ZSharp::FZSelfDescriptiveScriptDelegate::GetObject() const

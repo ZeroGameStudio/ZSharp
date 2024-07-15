@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Reflection/Property/IZPropertyVisitor.h"
+#include "ZCall/ZCallHandle.h"
 
 namespace ZSharp
 {
@@ -14,8 +15,10 @@ namespace ZSharp
 		friend class FZFunctionVisitorRegistry;
 	
 	public:
-		int32 Invoke_Black(FZCallBuffer* buffer) const;
-		int32 Invoke_Red(void* param) const;
+		int32 InvokeUFunction(FZCallBuffer* buffer) const;
+		int32 InvokeScriptDelegate(FZCallBuffer* buffer) const;
+		int32 InvokeMulticastScriptDelegate(FZCallBuffer* buffer) const;
+		int32 InvokeZCall(FZCallHandle handle, UObject* object, void* params) const;
 
 	private:
 		explicit FZFunctionVisitor(UFunction* function);
@@ -29,6 +32,8 @@ namespace ZSharp
 		bool bAvailable;
 
 		bool bIsStatic;
+		bool bIsDelegate;
+		bool bIsRpc;
 		TArray<TUniquePtr<IZPropertyVisitor>> ParameterProperties;
 		TUniquePtr<IZPropertyVisitor> ReturnProperty;
 		TArray<int32> OutParamIndices;

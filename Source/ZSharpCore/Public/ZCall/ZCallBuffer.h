@@ -28,6 +28,8 @@ namespace ZSharp
 #define Op(Type) Type,
 		ZSHARP_FOREACH_ZCALL_BUFFER_SLOT_TYPE()
 #undef Op
+
+		Uninitialized = 0xFF,
 	};
 
 	ZSHARPCORE_API FString ToString(EZCallBufferSlotType type);

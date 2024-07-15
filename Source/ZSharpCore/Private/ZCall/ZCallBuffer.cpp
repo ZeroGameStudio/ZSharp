@@ -88,169 +88,197 @@ ZSharp::FZCallBufferSlot ZSharp::FZCallBufferSlot::FromConjugate(FZConjugateHand
 
 uint8 ZSharp::FZCallBufferSlot::ReadUInt8() const
 {
-	check(Type == EZCallBufferSlotType::UInt8);
+	check(Type == EZCallBufferSlotType::UInt8 || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.UInt8 || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.UInt8;
 }
 
 uint16 ZSharp::FZCallBufferSlot::ReadUInt16() const
 {
-	check(Type == EZCallBufferSlotType::UInt16);
+	check(Type == EZCallBufferSlotType::UInt16 || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.UInt16 || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.UInt16;
 }
 
 uint32 ZSharp::FZCallBufferSlot::ReadUInt32() const
 {
-	check(Type == EZCallBufferSlotType::UInt32);
+	check(Type == EZCallBufferSlotType::UInt32 || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.UInt32 || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.UInt32;
 }
 
 uint64 ZSharp::FZCallBufferSlot::ReadUInt64() const
 {
-	check(Type == EZCallBufferSlotType::UInt64);
+	check(Type == EZCallBufferSlotType::UInt64 || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.UInt64 || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.UInt64;
 }
 
 int8 ZSharp::FZCallBufferSlot::ReadInt8() const
 {
-	check(Type == EZCallBufferSlotType::Int8);
+	check(Type == EZCallBufferSlotType::Int8 || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.Int8 || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.Int8;
 }
 
 int16 ZSharp::FZCallBufferSlot::ReadInt16() const
 {
-	check(Type == EZCallBufferSlotType::Int16);
+	check(Type == EZCallBufferSlotType::Int16 || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.Int16 || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.Int16;
 }
 
 int32 ZSharp::FZCallBufferSlot::ReadInt32() const
 {
-	check(Type == EZCallBufferSlotType::Int32);
+	check(Type == EZCallBufferSlotType::Int32 || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.Int32 || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.Int32;
 }
 
 int64 ZSharp::FZCallBufferSlot::ReadInt64() const
 {
-	check(Type == EZCallBufferSlotType::Int64);
+	check(Type == EZCallBufferSlotType::Int64 || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.Int64 || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.Int64;
 }
 
 float ZSharp::FZCallBufferSlot::ReadFloat() const
 {
-	check(Type == EZCallBufferSlotType::Float);
+	check(Type == EZCallBufferSlotType::Float || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.Float || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.Float;
 }
 
 double ZSharp::FZCallBufferSlot::ReadDouble() const
 {
-	check(Type == EZCallBufferSlotType::Double);
+	check(Type == EZCallBufferSlotType::Double || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.Double || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.Double;
 }
 
 bool ZSharp::FZCallBufferSlot::ReadBool() const
 {
-	check(Type == EZCallBufferSlotType::Bool);
+	check(Type == EZCallBufferSlotType::Bool || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.Bool || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.Bool > 0;
 }
 
 void* ZSharp::FZCallBufferSlot::ReadPointer() const
 {
-	check(Type == EZCallBufferSlotType::Pointer);
+	check(Type == EZCallBufferSlotType::Pointer || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.Pointer || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.Pointer;
 }
 
 ZSharp::FZGCHandle ZSharp::FZCallBufferSlot::ReadGCHandle() const
 {
-	check(Type == EZCallBufferSlotType::GCHandle);
+	check(Type == EZCallBufferSlotType::GCHandle || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.GCHandle || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.GCHandle;
 }
 
 ZSharp::FZConjugateHandle ZSharp::FZCallBufferSlot::ReadConjugate() const
 {
-	check(Type == EZCallBufferSlotType::Conjugate);
+	check(Type == EZCallBufferSlotType::Conjugate || Type == EZCallBufferSlotType::Uninitialized);
+	check(!Value.Conjugate || Type != EZCallBufferSlotType::Uninitialized);
 	return Value.Conjugate;
 }
 
 void ZSharp::FZCallBufferSlot::WriteUInt8(uint8 value)
 {
-	check(Type == EZCallBufferSlotType::UInt8);
+	check(Type == EZCallBufferSlotType::UInt8 || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::UInt8;
 	Value.UInt8 = value;
 }
 
 void ZSharp::FZCallBufferSlot::WriteUInt16(uint16 value)
 {
-	check(Type == EZCallBufferSlotType::UInt16);
+	check(Type == EZCallBufferSlotType::UInt16 || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::UInt16;
 	Value.UInt16 = value;
 }
 
 void ZSharp::FZCallBufferSlot::WriteUInt32(uint32 value)
 {
-	check(Type == EZCallBufferSlotType::UInt32);
+	check(Type == EZCallBufferSlotType::UInt32 || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::UInt32;
 	Value.UInt32 = value;
 }
 
 void ZSharp::FZCallBufferSlot::WriteUInt64(uint64 value)
 {
-	check(Type == EZCallBufferSlotType::UInt64);
+	check(Type == EZCallBufferSlotType::UInt64 || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::UInt64;
 	Value.UInt64 = value;
 }
 
 void ZSharp::FZCallBufferSlot::WriteInt8(int8 value)
 {
-	check(Type == EZCallBufferSlotType::Int8);
+	check(Type == EZCallBufferSlotType::Int8 || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::Int8;
 	Value.Int8 = value;
 }
 
 void ZSharp::FZCallBufferSlot::WriteInt16(int16 value)
 {
-	check(Type == EZCallBufferSlotType::Int16);
+	check(Type == EZCallBufferSlotType::Int16 || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::Int16;
 	Value.Int16 = value;
 }
 
 void ZSharp::FZCallBufferSlot::WriteInt32(int32 value)
 {
-	check(Type == EZCallBufferSlotType::Int32);
+	check(Type == EZCallBufferSlotType::Int32 || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::Int32;
 	Value.Int32 = value;
 }
 
 void ZSharp::FZCallBufferSlot::WriteInt64(int64 value)
 {
-	check(Type == EZCallBufferSlotType::Int64);
+	check(Type == EZCallBufferSlotType::Int64 || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::Int64;
 	Value.Int64 = value;
 }
 
 void ZSharp::FZCallBufferSlot::WriteFloat(float value)
 {
-	check(Type == EZCallBufferSlotType::Float);
+	check(Type == EZCallBufferSlotType::Float || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::Float;
 	Value.Float = value;
 }
 
 void ZSharp::FZCallBufferSlot::WriteDouble(double value)
 {
-	check(Type == EZCallBufferSlotType::Double);
+	check(Type == EZCallBufferSlotType::Double || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::Double;
 	Value.Double = value;
 }
 
 void ZSharp::FZCallBufferSlot::WriteBool(bool value)
 {
-	check(Type == EZCallBufferSlotType::Bool);
+	check(Type == EZCallBufferSlotType::Bool || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::Bool;
 	Value.Bool = value;
 }
 
 void ZSharp::FZCallBufferSlot::WritePointer(const void* value)
 {
-	check(Type == EZCallBufferSlotType::Pointer);
+	check(Type == EZCallBufferSlotType::Pointer || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::Pointer;
 	Value.Pointer = const_cast<void*>(value);
 }
 
 void ZSharp::FZCallBufferSlot::WriteGCHandle(FZGCHandle value)
 {
-	check(Type == EZCallBufferSlotType::GCHandle);
+	check(Type == EZCallBufferSlotType::GCHandle || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::GCHandle;
 	Value.GCHandle = value;
 }
 
 void ZSharp::FZCallBufferSlot::WriteConjugate(FZConjugateHandle value)
 {
-	check(Type == EZCallBufferSlotType::Conjugate);
+	check(Type == EZCallBufferSlotType::Conjugate || Type == EZCallBufferSlotType::Uninitialized);
+	Type = EZCallBufferSlotType::Conjugate;
 	Value.Conjugate = value;
 }
 

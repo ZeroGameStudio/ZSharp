@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Reflection;
+
 namespace ZeroGames.ZSharp.Core;
 
 internal class ZCallDispatcher_Delegate : IZCallDispatcher
@@ -15,7 +17,31 @@ internal class ZCallDispatcher_Delegate : IZCallDispatcher
 			return 1;
 		}
 
-		@delegate.DynamicInvoke();
+		int32 pos = 1;
+		MethodInfo method = @delegate.Method;
+		ParameterInfo[] parameterInfos = method.GetParameters();
+		List<object?> parameters = new();
+		for (int32 i = 0; i < parameterInfos.Length; ++i)
+		{
+			parameters.Add((*buffer)[pos++].Object);
+		}
+
+		object? returnValue = @delegate.DynamicInvoke(parameters.ToArray());
+
+		for (int32 i = 0; i < parameterInfos.Length; ++i)
+		{
+			var parameter = parameterInfos[i];
+			if (parameter.IsOut)
+			{
+				(*buffer)[i + 1].Object = parameters[i];
+			}
+		}
+
+		if (method.ReturnType != typeof(void))
+		{
+			(*buffer)[pos].Object = returnValue;
+		}
+		
 		return 0;
 	}
 

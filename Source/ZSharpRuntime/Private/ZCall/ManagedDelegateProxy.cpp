@@ -5,6 +5,7 @@
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
+#include "Reflection/Function/ZFunctionVisitorRegistry.h"
 #include "ZCall/ZCallBuffer.h"
 
 void UManagedDelegateProxy::BeginDestroy()
@@ -20,18 +21,31 @@ void UManagedDelegateProxy::ProcessEvent(UFunction* function, void* parms)
 	{
 		return Super::ProcessEvent(function, parms);
 	}
-	
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
-	if (alc)
+
+	if (!DelegateZCallHandle)
 	{
-		alc->PrepareForZCall();
-		ZSharp::FZCallBuffer buffer;
-		buffer.Slots = new ZSharp::FZCallBufferSlot[1];
-		buffer.NumSlots = 1;
-		buffer[0] = ZSharp::FZCallBufferSlot::FromGCHandle(Delegate);
-		ZSharp::FZCallHandle handle = alc->GetZCallHandle("d://");
-		alc->ZCall(handle, &buffer);
+		if (ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc())
+		{
+			if (DelegateZCallHandle = alc->GetZCallHandle("d://"); !DelegateZCallHandle)
+			{
+				return;
+			}
+		}
+		else
+		{
+			return;
+		}
 	}
+	
+	if (!SignatureFunctionVisitor)
+	{
+		if (SignatureFunctionVisitor = ZSharp::FZFunctionVisitorRegistry::Get().Get(Signature.Get()); !SignatureFunctionVisitor)
+		{
+			return;
+		}
+	}
+
+	SignatureFunctionVisitor->InvokeZCall(DelegateZCallHandle, this, parms);
 }
 
 

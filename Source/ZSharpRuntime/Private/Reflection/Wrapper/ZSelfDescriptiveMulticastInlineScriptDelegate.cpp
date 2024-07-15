@@ -6,7 +6,7 @@
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
 #include "ZCall/ManagedDelegateProxy.h"
 
-void ZSharp::FZSelfDescriptiveMulticastScriptDelegate::AddUFunction(UObject* object, FName name)
+void ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::AddUFunction(UObject* object, FName name)
 {
 	if (!object)
 	{
@@ -29,7 +29,7 @@ void ZSharp::FZSelfDescriptiveMulticastScriptDelegate::AddUFunction(UObject* obj
 	UnderlyingInstance->Add(unicast);
 }
 
-UObject* ZSharp::FZSelfDescriptiveMulticastScriptDelegate::AddManaged(FZGCHandle delegate)
+UObject* ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::AddManaged(FZGCHandle delegate)
 {
 	if (!delegate)
 	{
@@ -46,22 +46,22 @@ UObject* ZSharp::FZSelfDescriptiveMulticastScriptDelegate::AddManaged(FZGCHandle
 	return proxy;
 }
 
-void ZSharp::FZSelfDescriptiveMulticastScriptDelegate::RemoveUFunction(const UObject* object, FName name)
+void ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::RemoveUFunction(const UObject* object, FName name)
 {
 	UnderlyingInstance->Remove(object, name);
 }
 
-void ZSharp::FZSelfDescriptiveMulticastScriptDelegate::RemoveAll(const UObject* object)
+void ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::RemoveAll(const UObject* object)
 {
 	UnderlyingInstance->RemoveAll(object);
 }
 
-void ZSharp::FZSelfDescriptiveMulticastScriptDelegate::Clear()
+void ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::Clear()
 {
 	UnderlyingInstance->Clear();
 }
 
-int32 ZSharp::FZSelfDescriptiveMulticastScriptDelegate::Broadcast(FZCallBuffer* buffer)
+int32 ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::Broadcast(FZCallBuffer* buffer)
 {
 	if (!IsBound())
 	{
@@ -79,7 +79,7 @@ int32 ZSharp::FZSelfDescriptiveMulticastScriptDelegate::Broadcast(FZCallBuffer* 
 	return Visitor->InvokeMulticastScriptDelegate(buffer);
 }
 
-bool ZSharp::FZSelfDescriptiveMulticastScriptDelegate::IsBound() const
+bool ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::IsBound() const
 {
 	return UnderlyingInstance->IsBound();
 }

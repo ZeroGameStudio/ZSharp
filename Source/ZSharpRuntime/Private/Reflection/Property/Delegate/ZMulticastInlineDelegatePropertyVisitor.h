@@ -6,11 +6,11 @@
 
 namespace ZSharp
 {
-	class FZMulticastDelegatePropertyVisitor : public FZPropertyVisitorBase
+	class FZMulticastInlineDelegatePropertyVisitor : public FZPropertyVisitorBase
 	{
 
 	public:
-		explicit FZMulticastDelegatePropertyVisitor(const FMulticastDelegateProperty* underlyingProperty)
+		explicit FZMulticastInlineDelegatePropertyVisitor(const FMulticastDelegateProperty* underlyingProperty)
 			: FZPropertyVisitorBase(underlyingProperty)
 			, UnderlyingDelegateProperty(underlyingProperty){}
 

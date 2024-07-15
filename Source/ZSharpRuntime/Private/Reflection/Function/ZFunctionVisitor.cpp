@@ -122,7 +122,7 @@ int32 ZSharp::FZFunctionVisitor::InvokeMulticastScriptDelegate(FZCallBuffer* buf
 
 	FZCallBuffer& buf = *buffer;
 	UFunction* func = Function.Get();
-	FZSelfDescriptiveMulticastScriptDelegate& self = TZCallBufferSlotEncoder<FZSelfDescriptiveMulticastScriptDelegate>::Decode(buf[0]);
+	FZSelfDescriptiveMulticastInlineScriptDelegate& self = TZCallBufferSlotEncoder<FZSelfDescriptiveMulticastInlineScriptDelegate>::Decode(buf[0]);
 	check(self.GetDescriptor() == func);
 	
 	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);

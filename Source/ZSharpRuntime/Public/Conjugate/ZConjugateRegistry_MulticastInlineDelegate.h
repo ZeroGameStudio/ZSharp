@@ -12,30 +12,30 @@ namespace ZSharp
 {
 	class IZMasterAssemblyLoadContext;
 	
-	class ZSHARPRUNTIME_API FZConjugateRegistry_MulticastDelegate : public FZConjugateRegistryBase, public FNoncopyable
+	class ZSHARPRUNTIME_API FZConjugateRegistry_MulticastInlineDelegate : public FZConjugateRegistryBase, public FNoncopyable
 	{
 
 		using Super = FZConjugateRegistryBase;
-		using ThisClass = FZConjugateRegistry_MulticastDelegate;
+		using ThisClass = FZConjugateRegistry_MulticastInlineDelegate;
 
 	public:
-		static constexpr uint16 RegistryId = TZConjugateRegistryId_V<FZSelfDescriptiveMulticastScriptDelegate>;
+		static constexpr uint16 RegistryId = TZConjugateRegistryId_V<FZSelfDescriptiveMulticastInlineScriptDelegate>;
 
 	private:
 		struct FZConjugateRec
 		{
-			TUniquePtr<FZSelfDescriptiveMulticastScriptDelegate> Delegate;
+			TUniquePtr<FZSelfDescriptiveMulticastInlineScriptDelegate> Delegate;
 			bool bBlack;
 		};
 
 	public:
-		explicit FZConjugateRegistry_MulticastDelegate(IZMasterAssemblyLoadContext& alc) : Super(alc){}
+		explicit FZConjugateRegistry_MulticastInlineDelegate(IZMasterAssemblyLoadContext& alc) : Super(alc){}
 
 	public:
-		FZConjugateHandle Conjugate(const UFunction* signature) { return Conjugate(signature, [](const FZSelfDescriptiveMulticastScriptDelegate&){}); }
-		FZConjugateHandle Conjugate(const UFunction* signature, TFunctionRef<void(const FZSelfDescriptiveMulticastScriptDelegate&)> initialize);
+		FZConjugateHandle Conjugate(const UFunction* signature) { return Conjugate(signature, [](const FZSelfDescriptiveMulticastInlineScriptDelegate&){}); }
+		FZConjugateHandle Conjugate(const UFunction* signature, TFunctionRef<void(const FZSelfDescriptiveMulticastInlineScriptDelegate&)> initialize);
 		FZConjugateHandle Conjugate(const UFunction* signature, const FMulticastScriptDelegate* unmanaged);
-		FZSelfDescriptiveMulticastScriptDelegate* Conjugate(FZConjugateHandle handle) const;
+		FZSelfDescriptiveMulticastInlineScriptDelegate* Conjugate(FZConjugateHandle handle) const;
 
 	private:
 		virtual void* BuildConjugate(void* userdata) override;

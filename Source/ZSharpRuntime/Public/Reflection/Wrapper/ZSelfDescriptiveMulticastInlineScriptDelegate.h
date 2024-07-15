@@ -10,9 +10,9 @@ namespace ZSharp
 {
 	struct FZCallBuffer;
 
-	struct ZSHARPRUNTIME_API FZSelfDescriptiveMulticastScriptDelegate : TZSelfDescriptiveBase<FZSelfDescriptiveMulticastScriptDelegate, UFunction, FMulticastScriptDelegate>
+	struct ZSHARPRUNTIME_API FZSelfDescriptiveMulticastInlineScriptDelegate : TZSelfDescriptiveBase<FZSelfDescriptiveMulticastInlineScriptDelegate, UFunction, FMulticastScriptDelegate>
 	{
-		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_AUTO_CTOR(FZSelfDescriptiveMulticastScriptDelegate)
+		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_AUTO_CTOR(FZSelfDescriptiveMulticastInlineScriptDelegate)
 		
 		void AddUFunction(UObject* object, FName name);
 		UObject* AddManaged(FZGCHandle delegate);

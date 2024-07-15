@@ -9,12 +9,12 @@
 #include "Conjugate/ZConjugateRegistry_MulticastInlineDelegate.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveMulticastInlineScriptDelegate.h"
 
-void ZSharp::FZMulticastDelegatePropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const
+void ZSharp::FZMulticastInlineDelegatePropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const
 {
-	const FZSelfDescriptiveMulticastScriptDelegate* sdsd = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_MulticastDelegate>().Conjugate(dest.ReadConjugate());
+	const FZSelfDescriptiveMulticastInlineScriptDelegate* sdsd = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_MulticastInlineDelegate>().Conjugate(dest.ReadConjugate());
 	if (!sdsd)
 	{
-		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_MulticastDelegate>().Conjugate(UnderlyingDelegateProperty->SignatureFunction, [src, this](const FZSelfDescriptiveMulticastScriptDelegate& sdsd){ UnderlyingProperty->CopySingleValue(sdsd.GetUnderlyingInstance(), src); }));
+		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_MulticastInlineDelegate>().Conjugate(UnderlyingDelegateProperty->SignatureFunction, [src, this](const FZSelfDescriptiveMulticastInlineScriptDelegate& sdsd){ UnderlyingProperty->CopySingleValue(sdsd.GetUnderlyingInstance(), src); }));
 	}
 	else
 	{
@@ -23,14 +23,14 @@ void ZSharp::FZMulticastDelegatePropertyVisitor::GetValue(const void* src, FZCal
 	}
 }
 
-void ZSharp::FZMulticastDelegatePropertyVisitor::GetRef(const void* src, FZCallBufferSlot& dest) const
+void ZSharp::FZMulticastInlineDelegatePropertyVisitor::GetRef(const void* src, FZCallBufferSlot& dest) const
 {
-	dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_MulticastDelegate>().Conjugate(UnderlyingDelegateProperty->SignatureFunction, (FMulticastScriptDelegate*)src));
+	dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_MulticastInlineDelegate>().Conjugate(UnderlyingDelegateProperty->SignatureFunction, (FMulticastScriptDelegate*)src));
 }
 
-void ZSharp::FZMulticastDelegatePropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const
+void ZSharp::FZMulticastInlineDelegatePropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const
 {
-	const FZSelfDescriptiveMulticastScriptDelegate* sdsd = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_MulticastDelegate>().Conjugate(src.ReadConjugate());
+	const FZSelfDescriptiveMulticastInlineScriptDelegate* sdsd = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_MulticastInlineDelegate>().Conjugate(src.ReadConjugate());
 	if (!sdsd)
 	{
 		UnderlyingProperty->InitializeValue(dest);

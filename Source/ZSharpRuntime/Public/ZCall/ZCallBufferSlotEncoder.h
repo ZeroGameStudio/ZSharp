@@ -239,7 +239,7 @@ namespace ZSharp
 	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(ScriptArray, Array)
 
 	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(ScriptDelegate, Delegate)
-	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(MulticastScriptDelegate, MulticastDelegate)
+	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(MulticastInlineScriptDelegate, MulticastInlineDelegate)
 
 #undef IMPLEMENT_SELF_DESCRIPTIVE_ENCODER
 	

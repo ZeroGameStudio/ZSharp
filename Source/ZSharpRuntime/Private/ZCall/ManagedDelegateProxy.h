@@ -17,7 +17,7 @@ class ZSHARPRUNTIME_API UManagedDelegateProxy final : public UObject, public IZM
 	GENERATED_BODY()
 
 	friend ZSharp::FZSelfDescriptiveScriptDelegate;
-	friend ZSharp::FZSelfDescriptiveMulticastScriptDelegate;
+	friend ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate;
 
 public:
 	virtual ZSharp::FZGCHandle ManagedDelegateProxy_GetDelegate() const override { return Delegate; }

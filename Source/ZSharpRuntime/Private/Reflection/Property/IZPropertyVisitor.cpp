@@ -112,7 +112,7 @@ TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FP
 	}
 	else if (const auto multicastDelegateProp = CastField<FMulticastDelegateProperty>(prop))
 	{
-		return MakeUnique<FZMulticastDelegatePropertyVisitor>(multicastDelegateProp);
+		return MakeUnique<FZMulticastInlineDelegatePropertyVisitor>(multicastDelegateProp);
 	}
 
 	UE_LOG(LogZSharpRuntime, Fatal, TEXT("Property type [%s] is not supported!!!"), *prop->GetClass()->GetName());

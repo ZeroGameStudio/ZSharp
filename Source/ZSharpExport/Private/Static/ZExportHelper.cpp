@@ -128,7 +128,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 		}
 		else if (const auto multicastDelegateProp = CastField<FMulticastDelegateProperty>(property))
 		{
-			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveMulticastScriptDelegate>::Get();
+			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveMulticastInlineScriptDelegate>::Get();
 			name.Inner = GetUFieldFullyExportedName(multicastDelegateProp->SignatureFunction).ToSimple();
 			return name;
 		}

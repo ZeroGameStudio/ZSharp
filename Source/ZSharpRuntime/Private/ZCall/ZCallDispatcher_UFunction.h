@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Reflection/Property/IZPropertyVisitor.h"
+#include "Reflection/Function/ZFunctionVisitorHandle.h"
 #include "ZCall/IZCallDispatcher.h"
 
 namespace ZSharp
@@ -13,8 +13,7 @@ namespace ZSharp
 	public:
 		explicit FZCallDispatcher_UFunction(const FString& name)
 			: Name(name)
-			, Path(name.RightChop(4))
-			, bAvailable(false){}
+			, Path(name.RightChop(4)){}
 		
 	public:
 		virtual const FString& GetName() const override { return Name; }
@@ -26,12 +25,7 @@ namespace ZSharp
 	private:
 		FString Name;
 		FString Path;
-		mutable TWeakObjectPtr<UFunction> Function;
-
-		mutable bool bAvailable;
-		mutable TArray<TUniquePtr<IZPropertyVisitor>> ParameterProperties;
-		mutable TUniquePtr<IZPropertyVisitor> ReturnProperty;
-		mutable TArray<int32> OutParamIndices;
+		mutable FZFunctionVisitorHandle Function;
 		
 	};
 }

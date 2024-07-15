@@ -9,11 +9,12 @@ namespace ZSharp
 	enum class EZExportedPropertyFlags : uint64
 	{
 		None = 0,
-		Readable = 1 << 0,
-		Writable = 1 << 1,
-		Public = 1 << 2,
-		Protected = 1 << 3,
-		Private = 1 << 4,
+		Public = 1 << 0,
+		Protected = 1 << 1,
+		Private = 1 << 2,
+		Readable = 1 << 3,
+		Writable = 1 << 4,
+		Event = 1 << 5,
 	};
 	ENUM_CLASS_FLAGS(EZExportedPropertyFlags)
 	

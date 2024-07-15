@@ -129,21 +129,15 @@ namespace {_exportedClass.Namespace};
 		bool isNullable = property.Type.IsNullable;
 		string nullForgivingModifier = isNullable ? string.Empty : "!";
 		string accessModifier = property.IsPublic ? "public" : property.IsProtected ? "protected" : "private";
-		string getBlock = property.IsReadable ?
-@$"		get
-		{{
-			return ({name})this.ZCall(""{property.ZCallName}"", false, {property.Index}, typeof({nunNullableName}))[3].Object{nullForgivingModifier};
-		}}" : string.Empty;
-		string setBlock = property.IsWritable ?
-@$"
-		set
-		{{
-			this.ZCall(""{property.ZCallName}"", true, {property.Index}, value);
-		}}" : string.Empty;
+		
+		string getBlock = property.IsReadable ? @$"get => ({name})this.ZCall(""{property.ZCallName}"", false, {property.Index}, typeof({nunNullableName}))[3].Object{nullForgivingModifier};" : string.Empty;
+		string setBlock = property.IsWritable ? @$"set => this.ZCall(""{property.ZCallName}"", true, {property.Index}, value);" : string.Empty;
+		string lf = string.IsNullOrWhiteSpace(setBlock) ? string.Empty : "\n";
+		
 		string block =
 @$"	{accessModifier} {property.Type} {property.Name}
 	{{
-{getBlock}{setBlock}
+{getBlock.Indent(2)}{lf}{setBlock.Indent(2)}
 	}}";
 
 		return block;

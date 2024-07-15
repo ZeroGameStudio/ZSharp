@@ -63,23 +63,23 @@ ZSharp::FZDynamicallyExportedMethod::FZDynamicallyExportedMethod(const UFunction
 	, Function(function)
 	, Flags(EZExportedMethodFlags::None)
 {
+	if (Function->HasAllFunctionFlags(FUNC_Public) || Function->GetBoolMetaData("AllowPrivateAccess"))
+	{
+		Flags |= EZExportedMethodFlags::Public;
+	}
+	else if (Function->HasAllFunctionFlags(FUNC_Protected))
+	{
+		Flags |= EZExportedMethodFlags::Protected;
+	}
+	else if (Function->HasAllFunctionFlags(FUNC_Private))
+	{
+		Flags |= EZExportedMethodFlags::Private;
+	}
+	
 	if (Function->HasAllFunctionFlags(FUNC_Static))
 	{
 		Flags |= EZExportedMethodFlags::Static;
 	}
-	
-	if (Function->HasAllFunctionFlags(FUNC_Public) || Function->GetBoolMetaData("AllowPrivateAccess"))
-    {
-    	Flags |= EZExportedMethodFlags::Public;
-    }
-    else if (Function->HasAllFunctionFlags(FUNC_Protected))
-    {
-    	Flags |= EZExportedMethodFlags::Protected;
-    }
-    else if (Function->HasAllFunctionFlags(FUNC_Private))
-    {
-    	Flags |= EZExportedMethodFlags::Private;
-    }
 
 	for (TFieldIterator<FProperty> it(Function); it && it->HasAllPropertyFlags(CPF_Parm); ++it)
 	{

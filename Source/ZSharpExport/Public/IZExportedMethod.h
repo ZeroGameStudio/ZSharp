@@ -10,10 +10,10 @@ namespace ZSharp
 	enum class EZExportedMethodFlags : uint64
 	{
 		None = 0,
-		Static = 1 << 0,
-		Public = 1 << 1,
-		Protected = 1 << 2,
-		Private = 1 << 3,
+		Public = 1 << 0,
+		Protected = 1 << 1,
+		Private = 1 << 2,
+		Static = 1 << 3,
 	};
 	ENUM_CLASS_FLAGS(EZExportedMethodFlags)
 

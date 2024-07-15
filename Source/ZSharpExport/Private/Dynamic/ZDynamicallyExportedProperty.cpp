@@ -21,14 +21,6 @@ ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Cr
 FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 {
 	FString name = Property->GetName();
-	// if (Property->IsA<FBoolProperty>())
-	// {
-	// 	if (name.StartsWith("b", ESearchCase::CaseSensitive))
-	// 	{
-	// 		name.RightChopInline(1);
-	// 	}
-	// 	name.InsertAt(0, "Is");
-	// }
 	if (Index)
 	{
 		name.AppendInt(Index);
@@ -88,9 +80,6 @@ ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(const FProp
 	, Index(index)
 	, Flags(EZExportedPropertyFlags::None)
 {
-	Flags |= EZExportedPropertyFlags::Readable;
-	Flags |= EZExportedPropertyFlags::Writable;
-	
 	if (Property->HasAllPropertyFlags(CPF_NativeAccessSpecifierPublic) || Property->GetBoolMetaData("AllowPrivateAccess"))
 	{
 		Flags |= EZExportedPropertyFlags::Public;
@@ -102,6 +91,17 @@ ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(const FProp
 	else if (Property->HasAllPropertyFlags(CPF_NativeAccessSpecifierPrivate))
 	{
 		Flags |= EZExportedPropertyFlags::Private;
+	}
+
+	Flags |= EZExportedPropertyFlags::Readable;
+
+	if (property->IsA<FMulticastDelegateProperty>())
+	{
+		Flags |= EZExportedPropertyFlags::Event;
+	}
+	else
+	{
+		Flags |= EZExportedPropertyFlags::Writable;
 	}
 }
 

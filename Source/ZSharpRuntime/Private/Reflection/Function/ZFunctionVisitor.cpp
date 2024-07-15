@@ -93,6 +93,7 @@ int32 ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBuffer* buffer) cons
 		ReturnProperty->InitializeValue_InContainer(params);
 	}
 
+	check(self.GetUnderlyingInstance()->IsBound());
 	self.GetUnderlyingInstance()->ProcessDelegate<UObject>(params);
 
 	for (const auto index : OutParamIndices)

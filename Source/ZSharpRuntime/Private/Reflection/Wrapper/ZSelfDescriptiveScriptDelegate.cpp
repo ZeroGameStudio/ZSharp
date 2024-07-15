@@ -49,11 +49,16 @@ void ZSharp::FZSelfDescriptiveScriptDelegate::Unbind()
 
 int32 ZSharp::FZSelfDescriptiveScriptDelegate::Execute(FZCallBuffer* buffer)
 {
+	if (!IsBound())
+	{
+		return 1;
+	}
+	
 	if (!Visitor)
 	{
 		if (Visitor = FZFunctionVisitorRegistry::Get().Get(Descriptor); !Visitor)
 		{
-			return 1;
+			return 2;
 		}
 	}
 	

@@ -9,9 +9,11 @@ public partial class UnrealName
 
 	public override string ToString() => Data;
 
+	public UnrealString ToUnrealString() => this.ZCall("ex://Name.ToString", [ null ])[-1].ReadConjugate<UnrealString>()!;
+
 	public unsafe string Data
 	{
-		get => new((char*)this.ZCall("ex://Name.GetData", IntPtr.Zero)[-1].Pointer);
+		get => ToUnrealString().Data;
 		set
 		{
 			fixed (char* data = value.ToCharArray())

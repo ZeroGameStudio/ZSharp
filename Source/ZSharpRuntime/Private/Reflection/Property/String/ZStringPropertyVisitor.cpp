@@ -30,7 +30,7 @@ void ZSharp::FZStringPropertyVisitor::SetValue(void* dest, const FZCallBufferSlo
 		return;
 	}
 	
-	UnderlyingProperty->CopySingleValue(dest, &value);
+	UnderlyingProperty->CopySingleValue(dest, value);
 }
 
 

@@ -48,7 +48,7 @@ namespace ZSharp
 			}
 
 			ValidateValue(*value);
-			UnderlyingProperty->CopySingleValue(dest, &value);
+			UnderlyingProperty->CopySingleValue(dest, value->GetUnderlyingInstance());
 		}
 
 	private:

@@ -24,5 +24,5 @@ public class ExportedMethod
 	public bool IsPrivate => (Flags & EExportedMethodFlags.Private) != EExportedMethodFlags.None;
 	public bool IsStatic => (Flags & EExportedMethodFlags.Static) != EExportedMethodFlags.None;
 
-	public ExportedParameter? ReturnParameter => Parameters.Count > 0 ? Parameters[^1] : null;
+	public ExportedParameter? ReturnParameter => Parameters.Count > 0 && Parameters[^1].IsReturn ? Parameters[^1] : null;
 }

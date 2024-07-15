@@ -71,7 +71,8 @@ namespace {_exportedClass.Namespace};
 		List<string> parameters = [];
 		List<string> zcallParameters = [ $"\"{method.ZCallName}\"" ];
 		List<string> copybackStats = [];
-		for (int32 i = 0; i < method.Parameters.Count - 1; ++i)
+		bool hasReturn = method.ReturnParameter is not null;
+		for (int32 i = 0; i < method.Parameters.Count - (hasReturn ? 1 : 0); ++i)
 		{
 			ExportedParameter param = method.Parameters[i];
 			string modifier = param.IsInOut ? "ref " : param.IsOut ? "out " : string.Empty;
@@ -105,7 +106,7 @@ namespace {_exportedClass.Namespace};
 		}
 		
 		string returnNullForgivingModifier = method.ReturnParameter?.Type.IsNullable ?? default ? string.Empty : "!";
-		string returnBody = method.ReturnParameter is not null ? $" ({returnType})res[-1].Object{returnNullForgivingModifier}" : string.Empty;
+		string returnBody = hasReturn ? $" ({returnType})res[-1].Object{returnNullForgivingModifier}" : string.Empty;
 		string returnStat = $"return{returnBody};";
 
 		
@@ -147,7 +148,7 @@ namespace {_exportedClass.Namespace};
 	{
 		get
 		{
-			List<string> relevantModules = [ "Core", "CoreUObject", "PhysicsCore", "InputCore", "Engine" ];
+			List<string> relevantModules = [ "Core", "CoreUObject", "PhysicsCore", "InputCore", "Engine", "UMG", "SlateCore", "Slate" ];
 
 			if (_baseType is {} baseType)
 			{
@@ -183,13 +184,12 @@ namespace {_exportedClass.Namespace};
 	{
 		get
 		{
-			string? @abstract = _exportedClass.IsAbstract ? "abstract " : null;
 			string @class = _exportedClass.IsInterface ? "interface " : "class ";
 			string? @base = _baseType;
 			string? conjugate = _hasBuildConjugate ? $"IConjugate<{_exportedClass.Name}>" : null;
 			List<string?> bases = [ @base, conjugate ];
 			
-			string classModifiers = $"public {@abstract}partial {@class}";
+			string classModifiers = $"public partial {@class}";
 			string baseTypes = string.Join(", ", bases.Where(b => b is not null));
 			if (!string.IsNullOrWhiteSpace(baseTypes))
 			{
@@ -199,7 +199,7 @@ namespace {_exportedClass.Namespace};
 		}
 	}
 
-	private bool _hasBuildConjugate => !_exportedClass.IsInterface && !_exportedClass.IsAbstract;
+	private bool _hasBuildConjugate => !_exportedClass.IsInterface;
 
 	private string? _baseType
 	{

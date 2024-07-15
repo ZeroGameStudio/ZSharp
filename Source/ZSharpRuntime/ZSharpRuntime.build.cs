@@ -31,6 +31,8 @@ public class ZSharpRuntime : ModuleRules
 				"DeveloperSettings",
 				
 				"ZSharpCore",
+				
+				"SlateCore", "UMG", // @FIXME: Move to addons.
 			}
 		);
 		

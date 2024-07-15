@@ -29,7 +29,8 @@ public class DelegateWriter : IDisposable, IAsyncDisposable
 		string returnType = _exportedDelegate.ReturnParameter?.Type.ToString() ?? "void";
 		string delegateName = _exportedDelegate.Name.Split('.')[^1];
 		List<string> parameters = [];
-		for (int32 i = 0; i < _exportedDelegate.Parameters.Count - 1; ++i)
+		bool hasReturn = _exportedDelegate.ReturnParameter is not null;
+		for (int32 i = 0; i < _exportedDelegate.Parameters.Count - (hasReturn ? 1 : 0); ++i)
 		{
 			ExportedParameter param = _exportedDelegate.Parameters[i];
 			string modifier = param.IsInOut ? "ref " : param.IsOut ? "out " : string.Empty;
@@ -90,7 +91,7 @@ namespace {_exportedDelegate.Namespace};
 	{
 		get
 		{
-			List<string> relevantModules = [ "Core", "CoreUObject", "PhysicsCore", "InputCore", "Engine" ];
+			List<string> relevantModules = [ "Core", "CoreUObject", "PhysicsCore", "InputCore", "Engine", "UMG", "SlateCore", "Slate" ];
 			
 			relevantModules.RemoveAll(module => string.IsNullOrWhiteSpace(module) || module == _exportedDelegate.Module);
 

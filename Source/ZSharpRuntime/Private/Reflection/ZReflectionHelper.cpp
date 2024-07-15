@@ -5,6 +5,7 @@
 
 #include "ZSharpRuntimeSettings.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveMulticastSparseScriptDelegate.h"
 #include "Trait/ZManagedTypeInfo.h"
 #include "UObject/PropertyOptional.h"
 
@@ -169,8 +170,9 @@ bool ZSharp::FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(const FFieldCl
 		{ FOptionalProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveOptional>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveOptional>::GetFullName() } },
 
 		{ FDelegateProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveScriptDelegate>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveScriptDelegate>::GetFullName() } },
-		{ FMulticastDelegateProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveMulticastInlineScriptDelegate>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveMulticastInlineScriptDelegate>::GetFullName() } },
-
+		{ FMulticastInlineDelegateProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveMulticastInlineScriptDelegate>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveMulticastInlineScriptDelegate>::GetFullName() } },
+		{ FMulticastSparseDelegateProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveMulticastSparseScriptDelegate>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveMulticastSparseScriptDelegate>::GetFullName() } },
+		
 		{ FClassProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveSubclassOf>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveSubclassOf>::GetFullName() } },
 		{ FSoftClassProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveSoftClassPtr>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveSoftClassPtr>::GetFullName() } },
 		{ FSoftObjectProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveSoftObjectPtr>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveSoftObjectPtr>::GetFullName() } },

@@ -63,6 +63,11 @@ void* ZSharp::FZConjugateRegistry_UObject::BuildConjugate(void* userdata)
 
 void ZSharp::FZConjugateRegistry_UObject::ReleaseConjugate(void* unmanaged)
 {
+	if (!ConjugateMap.Contains(unmanaged))
+	{
+		return;
+	}
+	
 	Alc.ReleaseConjugate(unmanaged);
 	ConjugateMap.Remove(unmanaged);
 }

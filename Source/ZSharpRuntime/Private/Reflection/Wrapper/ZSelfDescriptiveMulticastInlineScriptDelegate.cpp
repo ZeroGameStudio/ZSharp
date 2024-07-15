@@ -76,7 +76,7 @@ int32 ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::Broadcast(FZCallBu
 		}
 	}
 	
-	return Visitor->InvokeMulticastScriptDelegate(buffer);
+	return Visitor->InvokeMulticastInlineScriptDelegate(buffer);
 }
 
 bool ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::IsBound() const

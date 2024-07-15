@@ -4,6 +4,7 @@
 
 #include "Concept/ZStaticallyExportableClass.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveMulticastInlineScriptDelegate.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveMulticastSparseScriptDelegate.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptArray.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveObjectWrappers.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveOptional.h"
@@ -45,5 +46,6 @@ ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveOptional, 34)
 
 ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveScriptDelegate, 41)
 ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate, 42)
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate, 43)
 
 

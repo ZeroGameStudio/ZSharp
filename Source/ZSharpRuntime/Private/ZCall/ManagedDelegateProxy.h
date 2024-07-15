@@ -6,6 +6,7 @@
 #include "Interop/ZGCHandle.h"
 #include "Reflection/Function/ZFunctionVisitorHandle.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveMulticastInlineScriptDelegate.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveMulticastSparseScriptDelegate.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
 #include "ZCall/ZCallHandle.h"
 
@@ -18,6 +19,7 @@ class ZSHARPRUNTIME_API UManagedDelegateProxy final : public UObject, public IZM
 
 	friend ZSharp::FZSelfDescriptiveScriptDelegate;
 	friend ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate;
+	friend ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate;
 
 public:
 	virtual ZSharp::FZGCHandle ManagedDelegateProxy_GetDelegate() const override { return Delegate; }

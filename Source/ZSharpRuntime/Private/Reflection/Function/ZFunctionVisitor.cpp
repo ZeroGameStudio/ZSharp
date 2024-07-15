@@ -110,7 +110,7 @@ int32 ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBuffer* buffer) cons
 	return 0;
 }
 
-int32 ZSharp::FZFunctionVisitor::InvokeMulticastScriptDelegate(FZCallBuffer* buffer) const
+int32 ZSharp::FZFunctionVisitor::InvokeMulticastInlineScriptDelegate(FZCallBuffer* buffer) const
 {
 	check(bAvailable);
 	check(bIsDelegate);
@@ -135,6 +135,41 @@ int32 ZSharp::FZFunctionVisitor::InvokeMulticastScriptDelegate(FZCallBuffer* buf
 	}
 
 	self.GetUnderlyingInstance()->ProcessMulticastDelegate<UObject>(params);
+
+	for (const auto index : OutParamIndices)
+	{
+		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
+		visitor->GetValue_InContainer(params, buf[index + 1], 0);
+	}
+	
+	return 0;
+}
+
+int32 ZSharp::FZFunctionVisitor::InvokeMulticastSparseScriptDelegate(FZCallBuffer* buffer) const
+{
+	check(bAvailable);
+	check(bIsDelegate);
+	check(bIsMulticastDelegate);
+	check(!ReturnProperty);
+	check(!bIsStatic);
+
+	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
+
+	FZCallBuffer& buf = *buffer;
+	UFunction* func = Function.Get();
+	FZSelfDescriptiveMulticastSparseScriptDelegate& self = TZCallBufferSlotEncoder<FZSelfDescriptiveMulticastSparseScriptDelegate>::Decode(buf[0]);
+	check(self.GetDescriptor() == func);
+	
+	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
+
+	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
+	{
+		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+		visitor->InitializeValue_InContainer(params);
+		visitor->SetValue_InContainer(params, buf[i + 1], 0);
+	}
+
+	self.GetDelegatePtr()->ProcessMulticastDelegate<UObject>(params);
 
 	for (const auto index : OutParamIndices)
 	{

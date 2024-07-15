@@ -7,7 +7,7 @@
 #include "Conjugate/ZDeclareConjugateRegistry.h"
 #include "Reflection/ZReflectionHelper.h"
 
-namespace ZSharp::ZConjugateRegistry_MulticastDelegate_Private
+namespace ZSharp::ZConjugateRegistry_MulticastInlineDelegate_Private
 {
 	static TZDeclareConjugateRegistry<FZConjugateRegistry_MulticastInlineDelegate> GDeclare;
 }
@@ -94,7 +94,7 @@ void ZSharp::FZConjugateRegistry_MulticastInlineDelegate::GetAllConjugates(TArra
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_MulticastInlineDelegate::GetManagedType(const UFunction* signature) const
 {
 	FZRuntimeTypeLocatorWrapper locator;
-	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FMulticastDelegateProperty::StaticClass(), locator))
+	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FMulticastInlineDelegateProperty::StaticClass(), locator))
 	{
 		return {};
 	}

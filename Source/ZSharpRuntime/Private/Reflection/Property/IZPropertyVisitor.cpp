@@ -10,6 +10,7 @@
 #include "Container/ZStructPropertyVisitor.h"
 #include "Delegate/ZDelegatePropertyVisitor.h"
 #include "Delegate/ZMulticastInlineDelegatePropertyVisitor.h"
+#include "Delegate/ZMulticastSparseDelegatePropertyVisitor.h"
 #include "Object/ZObjectPropertyVisitor.h"
 #include "Object/ZObjectWrapperPropertyVisitors.h"
 #include "Primitive/ZBoolPropertyVisitor.h"
@@ -110,9 +111,13 @@ TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FP
 	{
 		return MakeUnique<FZDelegatePropertyVisitor>(delegateProp);
 	}
-	else if (const auto multicastDelegateProp = CastField<FMulticastDelegateProperty>(prop))
+	else if (const auto multicastInlineDelegateProp = CastField<FMulticastInlineDelegateProperty>(prop))
 	{
-		return MakeUnique<FZMulticastInlineDelegatePropertyVisitor>(multicastDelegateProp);
+		return MakeUnique<FZMulticastInlineDelegatePropertyVisitor>(multicastInlineDelegateProp);
+	}
+	else if (const auto multicastSparseDelegateProp = CastField<FMulticastSparseDelegateProperty>(prop))
+	{
+		return MakeUnique<FZMulticastSparseDelegatePropertyVisitor>(multicastSparseDelegateProp);
 	}
 
 	UE_LOG(LogZSharpRuntime, Fatal, TEXT("Property type [%s] is not supported!!!"), *prop->GetClass()->GetName());

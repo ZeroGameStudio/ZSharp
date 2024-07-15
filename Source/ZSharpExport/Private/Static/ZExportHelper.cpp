@@ -126,10 +126,16 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 			name.Inner = GetUFieldFullyExportedName(delegateProp->SignatureFunction).ToSimple();
 			return name;
 		}
-		else if (const auto multicastDelegateProp = CastField<FMulticastDelegateProperty>(property))
+		else if (const auto multicastInlineDelegateProp = CastField<FMulticastInlineDelegateProperty>(property))
 		{
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveMulticastInlineScriptDelegate>::Get();
-			name.Inner = GetUFieldFullyExportedName(multicastDelegateProp->SignatureFunction).ToSimple();
+			name.Inner = GetUFieldFullyExportedName(multicastInlineDelegateProp->SignatureFunction).ToSimple();
+			return name;
+		}
+		else if (const auto multicastSparseDelegateProp = CastField<FMulticastSparseDelegateProperty>(property))
+		{
+			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveMulticastSparseScriptDelegate>::Get();
+			name.Inner = GetUFieldFullyExportedName(multicastSparseDelegateProp->SignatureFunction).ToSimple();
 			return name;
 		}
 		else if (const auto arrayProp = CastField<FArrayProperty>(property))

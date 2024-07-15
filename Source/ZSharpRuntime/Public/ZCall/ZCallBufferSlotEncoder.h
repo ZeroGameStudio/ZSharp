@@ -7,6 +7,7 @@
 #include "Conjugate/ZConjugateRegistry_Array.h"
 #include "Conjugate/ZConjugateRegistry_Delegate.h"
 #include "Conjugate/ZConjugateRegistry_MulticastInlineDelegate.h"
+#include "Conjugate/ZConjugateRegistry_MulticastSparseDelegate.h"
 #include "Conjugate/ZRegularConjugateRegistries.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Conjugate/ZConjugateRegistry_UScriptStruct.h"
@@ -240,6 +241,7 @@ namespace ZSharp
 
 	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(ScriptDelegate, Delegate)
 	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(MulticastInlineScriptDelegate, MulticastInlineDelegate)
+	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(MulticastSparseScriptDelegate, MulticastSparseDelegate)
 
 #undef IMPLEMENT_SELF_DESCRIPTIVE_ENCODER
 	

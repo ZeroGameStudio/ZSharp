@@ -25,11 +25,11 @@ public abstract class UnrealDelegate : PlainExportedObjectBase
 	public void Bind(UnrealObject obj, string name) => this.ZCall("ex://Delegate.BindUFunction", obj, new UnrealName(name));
 	public void Unbind() => this.ZCall("ex://Delegate.Unbind");
 	public DynamicZCallResult Execute(params object?[] parameters) => this.ZCall("ex://Delegate.Execute", parameters);
-	public bool IsBoundToObject(UnrealObject obj) => this.ZCall("ex://Delegate.IsBoundToObject", obj)[-1].Bool;
+	public bool IsBoundToObject(UnrealObject obj) => this.ZCall("ex://Delegate.IsBoundToObject", obj, false)[-1].Bool;
 	
-	public UnrealObject? Object => this.ZCall("ex://Delegate.GetObject")[-1].ReadConjugate<UnrealObject>();
-	public string ZCallName => this.ZCall("ex://Delegate.GetZCallName")[-1].ReadConjugate<UnrealString>()!.ToString()!;
-	public bool IsBound => this.ZCall("ex://Delegate.IsBound")[-1].Bool;
+	public UnrealObject? Object => this.ZCall("ex://Delegate.GetObject", [ null ])[-1].ReadConjugate<UnrealObject>();
+	public string FunctionName => this.ZCall("ex://Delegate.GetFunctionName", [null])[-1].ReadConjugate<UnrealName>()!.ToString();
+	public bool IsBound => this.ZCall("ex://Delegate.IsBound", false)[-1].Bool;
 	
 	protected UnrealDelegate(Type delegateType)
 	{

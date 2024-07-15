@@ -22,8 +22,6 @@ namespace ZSharp
 
 		UObject* GetObject() const;
 		FName GetFunctionName() const;
-		const UFunction* GetFunction() const;
-		FString GetZCallName() const;
 
 		bool IsBound() const;
 		bool IsBoundToObject(const UObject* object) const;

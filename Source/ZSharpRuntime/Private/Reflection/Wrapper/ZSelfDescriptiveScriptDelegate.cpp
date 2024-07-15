@@ -75,33 +75,6 @@ FName ZSharp::FZSelfDescriptiveScriptDelegate::GetFunctionName() const
 	return UnderlyingInstance->GetFunctionName();
 }
 
-const UFunction* ZSharp::FZSelfDescriptiveScriptDelegate::GetFunction() const
-{
-	const UObject* object = GetObject();
-	if (!object)
-	{
-		return nullptr;
-	}
-	
-	return object->FindFunctionChecked(GetFunctionName());
-}
-
-FString ZSharp::FZSelfDescriptiveScriptDelegate::GetZCallName() const
-{
-	const UFunction* func = GetFunction();
-	if (!func)
-	{
-		return {};
-	}
-	
-	while (const UFunction* super = func->GetSuperFunction())
-	{
-		func = super;
-	}
-
-	return FString::Printf(TEXT("uf:/%s"), *func->GetPathName());
-}
-
 bool ZSharp::FZSelfDescriptiveScriptDelegate::IsBound() const
 {
 	return UnderlyingInstance->IsBound();

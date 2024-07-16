@@ -84,7 +84,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 			
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveSubclassOf>::Get();
 			name.Inner = GetUFieldFullyExportedName(classProp->MetaClass).ToSimple();
-			return name;
+			return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 		}
 		else if (const auto objectProp = CastField<FObjectProperty>(property))
 		{
@@ -94,7 +94,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 		{
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptInterface>::Get();
 			name.Inner = GetUFieldFullyExportedName(interfaceProp->InterfaceClass).ToSimple();
-			return name;
+			return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 		}
 		else if (const auto structProp = CastField<FStructProperty>(property))
 		{
@@ -108,25 +108,25 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 		{
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveSoftClassPtr>::Get();
 			name.Inner = GetUFieldFullyExportedName(softClassProp->MetaClass).ToSimple();
-			return name;
+			return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 		}
 		else if (const auto softObjectProp = CastField<FSoftObjectProperty>(property))
 		{
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveSoftObjectPtr>::Get();
 			name.Inner = GetUFieldFullyExportedName(softObjectProp->PropertyClass).ToSimple();
-			return name;
+			return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 		}
 		else if (const auto weakObjectProp = CastField<FWeakObjectProperty>(property))
 		{
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveWeakObjectPtr>::Get();
 			name.Inner = GetUFieldFullyExportedName(weakObjectProp->PropertyClass).ToSimple();
-			return name;
+			return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 		}
 		else if (const auto lazyObjectProp = CastField<FLazyObjectProperty>(property))
 		{
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveLazyObjectPtr>::Get();
 			name.Inner = GetUFieldFullyExportedName(lazyObjectProp->PropertyClass).ToSimple();
-			return name;
+			return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 		}
 		else if (const auto delegateProp = CastField<FDelegateProperty>(property))
 		{
@@ -146,11 +146,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 			{
 				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptArray>::Get();
 				name.Inner = recurse(arrayProp->Inner, false).ToSimple();
-				if (!name.Inner.IsValid())
-				{
-					return {};
-				}
-				return name;
+				return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 			}
 		}
 		else if (const auto setProp = CastField<FSetProperty>(property))
@@ -159,11 +155,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 			{
 				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptSet>::Get();
 				name.Inner = recurse(setProp->ElementProp, false).ToSimple();
-				if (!name.Inner.IsValid())
-				{
-					return {};
-				}
-				return name;
+				return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 			}
 		}
 		else if (const auto mapProp = CastField<FMapProperty>(property))
@@ -173,11 +165,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptMap>::Get();
 				name.Inner = recurse(mapProp->KeyProp, false).ToSimple();
 				name.Outer = recurse(mapProp->ValueProp, false).ToSimple();
-				if (!name.Inner.IsValid() || !name.Outer.IsValid())
-				{
-					return {};
-				}
-				return name;
+				return name.Inner.IsValid() && name.Outer.IsValid() ? name : FZFullyExportedTypeName{};
 			}
 		}
 		else if (const auto optionalProp = CastField<FOptionalProperty>(property))
@@ -186,11 +174,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 			{
 				FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveOptional>::Get();
 				name.Inner = recurse(optionalProp->GetValueProperty(), false).ToSimple();
-				if (!name.Inner.IsValid())
-				{
-					return {};
-				}
-				return name;
+				return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 			}
 		}
 

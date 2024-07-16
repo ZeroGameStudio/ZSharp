@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
 [ConjugateRegistryId(42)]
-public abstract class UnrealMulticastInlineDelegate : PlainExportedObjectBase
+public abstract class UnrealMulticastInlineDelegateBase : PlainExportedObjectBase
 {
 	
 	public void Add(UnrealObject obj, string name) => this.ZCall("ex://MulticastInlineDelegate.AddUFunction", obj, new UnrealName(name));
@@ -17,14 +17,14 @@ public abstract class UnrealMulticastInlineDelegate : PlainExportedObjectBase
 	
 	public bool IsBound => this.ZCall("ex://MulticastInlineDelegate.IsBound", false)[-1].Bool;
 	
-	protected UnrealMulticastInlineDelegate(Type delegateType)
+	protected UnrealMulticastInlineDelegateBase(Type delegateType)
 	{
 		_delegateType = delegateType;
 		
-		Unmanaged = GetOwningAlc().BuildConjugate(this, UnrealDelegate.GetUnrealDelegateSignature(_delegateType).Unmanaged);
+		Unmanaged = GetOwningAlc().BuildConjugate(this, UnrealDelegateBase.GetUnrealDelegateSignature(_delegateType).Unmanaged);
 	}
 
-	protected UnrealMulticastInlineDelegate(Type delegateType, IntPtr unmanaged) : base(unmanaged)
+	protected UnrealMulticastInlineDelegateBase(Type delegateType, IntPtr unmanaged) : base(unmanaged)
 	{
 		_delegateType = delegateType;
 	}

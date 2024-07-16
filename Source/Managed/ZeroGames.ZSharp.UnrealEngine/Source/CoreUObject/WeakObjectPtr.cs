@@ -2,14 +2,13 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-[ConjugateRegistryId(24)]
-public abstract class WeakObjectPtr : PlainExportedObjectBase
+public class WeakObjectPtr<T> : WeakObjectPtrBase, IConjugate<WeakObjectPtr<T>> where T : UnrealObject?
 {
 	
-}
+	public static WeakObjectPtr<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-public class WeakObjectPtr<T> : WeakObjectPtr where T : UnrealObject?
-{
+	public WeakObjectPtr() : base(typeof(T)){}
+	public WeakObjectPtr(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 	
 }
 

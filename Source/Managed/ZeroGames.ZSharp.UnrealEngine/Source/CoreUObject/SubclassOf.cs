@@ -2,14 +2,13 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-[ConjugateRegistryId(21)]
-public abstract class SubclassOf : PlainExportedObjectBase
+public class SubclassOf<T> : SubclassOfBase, IConjugate<SubclassOf<T>> /*where T : IStaticClass?*/
 {
 	
-}
+	public static SubclassOf<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-public class SubclassOf<T> : SubclassOf
-{
+	public SubclassOf() : base(typeof(T)){}
+	public SubclassOf(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 	
 }
 

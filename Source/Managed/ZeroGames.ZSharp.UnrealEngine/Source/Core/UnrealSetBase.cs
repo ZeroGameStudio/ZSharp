@@ -2,7 +2,8 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class UnrealSet<T> : UnrealSetBase
+[ConjugateRegistryId(32)]
+public abstract class UnrealSetBase
 {
 	
 }

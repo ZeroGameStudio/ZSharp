@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
 [ConjugateRegistryId(41)]
-public abstract class UnrealDelegate : PlainExportedObjectBase
+public abstract class UnrealDelegateBase : PlainExportedObjectBase
 {
 
 	public static UnrealFunction GetUnrealDelegateSignature(Type t)
@@ -28,14 +28,14 @@ public abstract class UnrealDelegate : PlainExportedObjectBase
 	public string FunctionName => this.ZCall("ex://Delegate.GetFunctionName", [null])[-1].ReadConjugate<UnrealName>()!.ToString();
 	public bool IsBound => this.ZCall("ex://Delegate.IsBound", false)[-1].Bool;
 	
-	protected UnrealDelegate(Type delegateType)
+	protected UnrealDelegateBase(Type delegateType)
 	{
 		_delegateType = delegateType;
 		
 		Unmanaged = GetOwningAlc().BuildConjugate(this, GetUnrealDelegateSignature(_delegateType).Unmanaged);
 	}
 
-	protected UnrealDelegate(Type delegateType, IntPtr unmanaged) : base(unmanaged)
+	protected UnrealDelegateBase(Type delegateType, IntPtr unmanaged) : base(unmanaged)
 	{
 		_delegateType = delegateType;
 	}

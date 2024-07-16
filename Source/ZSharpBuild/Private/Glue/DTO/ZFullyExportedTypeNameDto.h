@@ -7,6 +7,31 @@
 #include "ZFullyExportedTypeNameDto.generated.h"
 
 USTRUCT()
+struct FZSingleFullyExportedTypeNameDto
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString Namespace;
+
+	UPROPERTY()
+	FString Name;
+
+	UPROPERTY()
+	bool bNullable = false;
+
+	FZSingleFullyExportedTypeNameDto& operator=(const ZSharp::FZSingleFullyExportedTypeName& other)
+	{
+		Namespace = other.Namespace;
+		Name = other.Name;
+		bNullable = other.bNullable;
+
+		return *this;
+	}
+	
+};
+
+USTRUCT()
 struct FZSimpleFullyExportedTypeNameDto
 {
 	GENERATED_BODY()
@@ -20,11 +45,15 @@ struct FZSimpleFullyExportedTypeNameDto
 	UPROPERTY()
 	bool bNullable = false;
 
+	UPROPERTY()
+	FZSingleFullyExportedTypeNameDto Inner;
+
 	FZSimpleFullyExportedTypeNameDto& operator=(const ZSharp::FZSimpleFullyExportedTypeName& other)
 	{
 		Namespace = other.Namespace;
 		Name = other.Name;
 		bNullable = other.bNullable;
+		Inner = other.Inner;
 
 		return *this;
 	}

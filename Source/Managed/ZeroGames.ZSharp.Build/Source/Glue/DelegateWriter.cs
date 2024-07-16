@@ -38,7 +38,7 @@ public class DelegateWriter : IDisposable, IAsyncDisposable
 		}
 		string parameterList = string.Join(", ", parameters);
 		string delegateAttr = $"[UnrealFieldPath(\"{_exportedDelegate.UnrealFieldPath}\")]\n";
-		string baseType = _exportedDelegate.IsSparse ? "UnrealMulticastSparseDelegate" : _exportedDelegate.IsMulticast ? "UnrealMulticastInlineDelegate" : "UnrealDelegate";
+		string baseType = _exportedDelegate.IsSparse ? "UnrealMulticastSparseDelegateBase" : _exportedDelegate.IsMulticast ? "UnrealMulticastInlineDelegateBase" : "UnrealDelegateBase";
 		string signatureDeclaration = $"public delegate {returnType} Signature({parameterList});";
 		string bindMethodName = _exportedDelegate.IsMulticast ? "Add" : "Bind";
 		

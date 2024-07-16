@@ -2,14 +2,13 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-[ConjugateRegistryId(27)]
-public abstract class StrongObjectPtr : PlainExportedObjectBase
+public class StrongObjectPtr<T> : StrongObjectPtrBase, IConjugate<StrongObjectPtr<T>> where T : UnrealObject?
 {
 	
-}
+	public static StrongObjectPtr<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-public class StrongObjectPtr<T> : StrongObjectPtr where T : UnrealObject?
-{
+	public StrongObjectPtr() : base(typeof(T)){}
+	public StrongObjectPtr(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 	
 }
 

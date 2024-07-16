@@ -4,12 +4,23 @@
 
 namespace ZSharp
 {
-	struct FZSimpleFullyExportedTypeName
+	struct FZSingleFullyExportedTypeName
 	{
 		FString Namespace;
 		FString Name;
 		bool bNullable = false;
 		
+		bool IsValid() const { return !!Name.Len(); }
+	};
+	
+	struct FZSimpleFullyExportedTypeName
+	{
+		FString Namespace;
+		FString Name;
+		bool bNullable = false;
+		FZSingleFullyExportedTypeName Inner;
+
+		FZSingleFullyExportedTypeName ToSingle() const { return { Namespace, Name, bNullable }; }
 		bool IsValid() const { return !!Name.Len(); }
 	};
 	
@@ -21,7 +32,7 @@ namespace ZSharp
 		FZSimpleFullyExportedTypeName Inner;
 		FZSimpleFullyExportedTypeName Outer;
 
-		FZSimpleFullyExportedTypeName ToSimple() const { return { Namespace, Name, bNullable }; }
+		FZSimpleFullyExportedTypeName ToSimple() const { return { Namespace, Name, bNullable, Inner.ToSingle() }; }
 		bool IsValid() const { return !!Name.Len(); }
 	};
 }

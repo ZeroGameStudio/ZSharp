@@ -2,14 +2,13 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-[ConjugateRegistryId(22)]
-public abstract class SoftClassPtr : PlainExportedObjectBase
+public class SoftClassPtr<T> : SoftClassPtrBase, IConjugate<SoftClassPtr<T>> /* where T : IStaticClass? */
 {
 	
-}
+	public static SoftClassPtr<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-public class SoftClassPtr<T> : SoftClassPtr
-{
+	public SoftClassPtr() : base(typeof(T)){}
+	public SoftClassPtr(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 	
 }
 

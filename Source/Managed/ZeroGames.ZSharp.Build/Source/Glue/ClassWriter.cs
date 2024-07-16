@@ -69,7 +69,7 @@ namespace {_exportedClass.Namespace};
 		string staticModifier = method.IsStatic ? "static " : string.Empty;
 		string returnType = method.ReturnParameter?.Type.ToString() ?? "void";
 		List<string> parameters = [];
-		List<string> zcallParameters = [ $"\"{method.ZCallName}\"" ];
+		List<string> zcallParameters = [];
 		List<string> copybackStats = [];
 		bool hasReturn = method.ReturnParameter is not null;
 		for (int32 i = 0; i < method.Parameters.Count - (hasReturn ? 1 : 0); ++i)
@@ -108,12 +108,15 @@ namespace {_exportedClass.Namespace};
 		string returnNullForgivingModifier = method.ReturnParameter?.Type.IsNullable ?? default ? string.Empty : "!";
 		string returnBody = hasReturn ? $" ({returnType})res[-1].Object{returnNullForgivingModifier}" : string.Empty;
 		string returnStat = $"return{returnBody};";
-
 		
 		string zcallParameterList = string.Join(", ", zcallParameters);
+		string @return = (method.ReturnParameter?.Type.IsNullable ?? false) ? "null" : $"new {returnType}()";
+		string returnSeparator = string.IsNullOrWhiteSpace(zcallParameterList) ? string.Empty : ", ";
+		string returnParam = hasReturn ? $"{returnSeparator}{@return}" : string.Empty;
+		string zcallparam = $"\"{method.ZCallName}\"";
 		
-		string methodBody =
-@$"DynamicZCallResult res = {context}.ZCall({zcallParameterList});
+		string methodBody = 
+@$"DynamicZCallResult res = {context}.ZCall({zcallparam}, [ {zcallParameterList}{returnParam} ]);
 {copybacks}
 {returnStat}".Indent(2);
 		return

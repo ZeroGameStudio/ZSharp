@@ -138,8 +138,10 @@ bool ZSharp::FZReflectionHelper::GetUFieldRuntimeTypeLocator(const UField* field
 	{
 		return false;
 	}
-	
-	outLocator.TypeName = FString::Printf(TEXT("%s.%s.%s"), *outLocator.AssemblyName, *moduleName, *GetUFieldAliasedName(ancestor));
+
+	FString alias = GetUFieldAliasedName(ancestor);
+	alias.ReplaceCharInline('.', '+');
+	outLocator.TypeName = FString::Printf(TEXT("%s.%s.%s"), *outLocator.AssemblyName, *moduleName, *alias);
 
 	return true;
 }

@@ -68,6 +68,11 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
 
         void GetProjectDefinition(string subpath, bool searchFile = true)
         {
+            if (!Directory.Exists(subpath))
+            {
+                return;
+            }
+            
             if (searchFile)
             {
                 string fileName = $"{new DirectoryInfo(subpath).Name}.zsproj";

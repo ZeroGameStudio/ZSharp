@@ -62,6 +62,14 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 	TFunction<FZFullyExportedTypeName(const FProperty*, bool)> recurse;
 	recurse = [&recurse](const FProperty* property, bool allowContainer)->FZFullyExportedTypeName
 	{
+		if (const auto numericProp = CastField<FNumericProperty>(property))
+		{
+			if (const UEnum* underlyingEnum = numericProp->GetIntPropertyEnum())
+			{
+				return GetUFieldFullyExportedName(underlyingEnum);
+			}
+		}
+		
 		if (const FZFullyExportedTypeName* name = GProtoMap.Find(property->GetClass()))
 		{
 			return *name;

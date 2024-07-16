@@ -6,11 +6,19 @@
 #include "ZSharpRuntimeLogChannels.h"
 #include "ZCall/ZCallBuffer.h"
 
+ZSharp::FZNumericPropertyVisitor::FZNumericPropertyVisitor(const FNumericProperty* underlyingProperty)
+	: FZPrimitivePropertyVisitorBase(underlyingProperty)
+	, Enum(underlyingProperty->GetIntPropertyEnum())
+{
+	check(!Enum || UnderlyingProperty->IsA<FByteProperty>());
+}
+
 void ZSharp::FZNumericPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const
 {
 	if (const auto uint8Prop = CastField<FByteProperty>(UnderlyingProperty))
 	{
-		dest.WriteUInt8(uint8Prop->GetPropertyValue(src));
+		const uint8 value = uint8Prop->GetPropertyValue(src);
+		Enum ? dest.WriteInt64(value) : dest.WriteUInt8(uint8Prop->GetPropertyValue(src));
 	}
 	else if (const auto uint16Prop = CastField<FUInt16Property>(UnderlyingProperty))
 	{
@@ -59,7 +67,7 @@ void ZSharp::FZNumericPropertyVisitor::SetValue(void* dest, const FZCallBufferSl
 {
 	if (UnderlyingProperty->IsA<FByteProperty>())
 	{
-		const uint8 value = src.ReadUInt8();
+		const uint8 value = Enum ? static_cast<uint8>(src.ReadInt64()) : src.ReadUInt8();
 		UnderlyingProperty->CopySingleValue(dest, &value);
 	}
 	else if (UnderlyingProperty->IsA<FUInt16Property>())

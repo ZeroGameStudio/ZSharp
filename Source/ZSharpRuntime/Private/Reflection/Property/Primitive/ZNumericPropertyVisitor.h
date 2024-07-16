@@ -10,12 +10,14 @@ namespace ZSharp
 	{
 
 	public:
-		explicit FZNumericPropertyVisitor(const FNumericProperty* underlyingProperty)
-			: FZPrimitivePropertyVisitorBase(underlyingProperty){}
+		explicit FZNumericPropertyVisitor(const FNumericProperty* underlyingProperty);
 
 	public:
 		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override;
 		virtual void SetValue(void* dest, const FZCallBufferSlot& src) const override;
+
+	private:
+		const UEnum* Enum;
 		
 	};
 }

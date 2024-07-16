@@ -125,6 +125,10 @@ public struct ZCallBufferSlot
 		{
 			return FromConjugate();
 		}
+		else if (t.IsEnum)
+		{
+			return FromType(t.GetEnumUnderlyingType());
+		}
 
 		throw new InvalidOperationException();
 	}
@@ -141,7 +145,7 @@ public struct ZCallBufferSlot
 		{
 			return (ZCallBufferSlot)value;
 		}
-		if (t.IsAssignableTo(typeof(Type)))
+		if (t.IsSubclassOf(typeof(Type)))
 		{
 			return FromType((Type)value);
 		}
@@ -204,6 +208,10 @@ public struct ZCallBufferSlot
 		else if (t == typeof(ConjugateHandle))
 		{
 			return FromConjugate((ConjugateHandle)value);
+		}
+		else if (t.IsEnum)
+		{
+			return FromObject(Convert.ChangeType(value, t.GetEnumUnderlyingType()));
 		}
 
 		throw new InvalidOperationException();
@@ -582,6 +590,10 @@ public struct ZCallBufferSlot
 		else if (t == typeof(ConjugateHandle))
 		{
 			Conjugate = (ConjugateHandle)value;
+		}
+		else if (t.IsEnum)
+		{
+			Object = Convert.ChangeType(value, t.GetEnumUnderlyingType());
 		}
 		else
 		{

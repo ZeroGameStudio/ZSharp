@@ -225,6 +225,13 @@ bool ZSharp::FZReflectionHelper::GetFPropertyRuntimeTypeLocator(const FProperty*
 	{
 		return GetUFieldRuntimeTypeLocator(multicastSparseDelegateProp->SignatureFunction, outLocator);
 	}
+	else if (const auto numericProp = CastField<FNumericProperty>(property))
+	{
+		if (const UEnum* underlyingEnum = numericProp->GetIntPropertyEnum())
+		{
+			return GetUFieldRuntimeTypeLocator(underlyingEnum, outLocator);
+		}
+	}
 	
 	if (!GetFFieldClassRuntimeTypeLocator(property->GetClass(), outLocator))
 	{

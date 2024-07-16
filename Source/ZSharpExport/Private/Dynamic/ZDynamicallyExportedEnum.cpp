@@ -45,7 +45,7 @@ FString ZSharp::FZDynamicallyExportedEnum::GetUnrealFieldPath() const
 
 ZSharp::EZCallBufferSlotType ZSharp::FZDynamicallyExportedEnum::GetSlotType() const
 {
-	return EZCallBufferSlotType::Int64; // @FIXME: UnderlyingType
+	return EZCallBufferSlotType::Int64;
 }
 
 ZSharp::EZExportedEnumFlags ZSharp::FZDynamicallyExportedEnum::GetFlags() const
@@ -55,7 +55,7 @@ ZSharp::EZExportedEnumFlags ZSharp::FZDynamicallyExportedEnum::GetFlags() const
 
 FString ZSharp::FZDynamicallyExportedEnum::GetUnderlyingType() const
 {
-	return "int64"; // @FIXME
+	return "int64";
 }
 
 void ZSharp::FZDynamicallyExportedEnum::ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const

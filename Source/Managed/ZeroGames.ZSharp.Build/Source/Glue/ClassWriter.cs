@@ -80,8 +80,7 @@ namespace {_exportedClass.Namespace};
 
 			if (param is { IsOut: true, IsIn: false })
 			{
-				string @default = param.Type.IsNullable ? "null" : $"new {param.Type}()";
-				zcallParameters.Add(@default);
+				zcallParameters.Add($"typeof({param.Type.ToString(false)})");
 			}
 			else
 			{
@@ -110,8 +109,8 @@ namespace {_exportedClass.Namespace};
 		string returnStat = $"return{returnBody};";
 		
 		string zcallParameterList = string.Join(", ", zcallParameters);
-		string @return = (method.ReturnParameter?.Type.IsNullable ?? false) ? "null" : $"new {returnType}()";
 		string returnSeparator = string.IsNullOrWhiteSpace(zcallParameterList) ? string.Empty : ", ";
+		string @return = hasReturn ? $"typeof({method.ReturnParameter!.Type.ToString(false)})" : string.Empty;
 		string returnParam = hasReturn ? $"{returnSeparator}{@return}" : string.Empty;
 		string zcallparam = $"\"{method.ZCallName}\"";
 		
@@ -129,12 +128,11 @@ namespace {_exportedClass.Namespace};
 	private string GetPropertyBlock(ExportedProperty property)
 	{
 		string name = property.Type.ToString();
-		string nunNullableName = property.Type.ToString(false);
 		bool isNullable = property.Type.IsNullable;
 		string nullForgivingModifier = isNullable ? string.Empty : "!";
 		string accessModifier = property.IsPublic ? "public" : property.IsProtected ? "protected" : "private";
 		
-		string getBlock = property.IsReadable ? @$"get => ({name})this.ZCall(""{property.ZCallName}"", false, {property.Index}, typeof({nunNullableName}))[3].Object{nullForgivingModifier};" : string.Empty;
+		string getBlock = property.IsReadable ? @$"get => ({name})this.ZCall(""{property.ZCallName}"", false, {property.Index}, typeof({property.Type.ToString(false)}))[3].Object{nullForgivingModifier};" : string.Empty;
 		string setBlock = property.IsWritable ? @$"set => this.ZCall(""{property.ZCallName}"", true, {property.Index}, value);" : string.Empty;
 		string lf = string.IsNullOrWhiteSpace(setBlock) ? string.Empty : "\n";
 		

@@ -273,7 +273,7 @@ namespace ZSharp
 		{
 			using TArg = decltype(args.template Get<Index>());
 
-			if constexpr (std::is_lvalue_reference_v<TArg> && !std::is_const_v<TArg>)
+			if constexpr (std::is_lvalue_reference_v<TArg> && !std::is_const_v<std::remove_reference_t<TArg>>)
 			{
 				TZCallBufferSlotEncoder<std::decay_t<TArg>>::template Encode(args.template Get<Index>(), buf[Index + indexOffset]);
 			}

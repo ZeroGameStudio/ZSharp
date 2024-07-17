@@ -25,8 +25,8 @@ public abstract class UnrealObjectWrapperBase : PlainExportedObjectBase
 	
 	private void ValidateElementType()
 	{
-		bool objectMatch = _objectType.IsSubclassOf(typeof(UnrealObjectBase)) && _allowObject;
-		bool interfaceMatch = _objectType.IsSubclassOf(typeof(IUnrealInterface)) && _allowInterface;
+		bool objectMatch = _objectType.IsAssignableTo(typeof(UnrealObjectBase)) && _allowObject;
+		bool interfaceMatch = _objectType.IsAssignableTo(typeof(IUnrealInterface)) && _allowInterface;
 		if (!objectMatch && !interfaceMatch)
 		{
 			throw new NotSupportedException();

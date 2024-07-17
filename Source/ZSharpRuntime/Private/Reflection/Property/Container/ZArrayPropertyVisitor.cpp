@@ -18,7 +18,7 @@ void ZSharp::FZArrayPropertyVisitor::GetValue(const void* src, FZCallBufferSlot&
 	}
 	else
 	{
-		check(sdsa->GetDescriptor()->GetClass() == UnderlyingArrayProperty->GetClass());
+		check(sdsa->GetDescriptor()->GetClass() == UnderlyingArrayProperty->Inner->GetClass());
 		UnderlyingProperty->CopySingleValue(sdsa->GetUnderlyingInstance(), src);
 	}
 }

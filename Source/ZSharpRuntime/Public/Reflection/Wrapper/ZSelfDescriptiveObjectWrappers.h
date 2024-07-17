@@ -35,16 +35,26 @@ namespace ZSharp
 
 		const UClass* GetDescriptor() const { return Descriptor.Get(); }
 		T* GetUnderlyingInstance() const { return UnderlyingInstance; }
-		UObject* Get() const { return UnderlyingInstance->Get(); }
-		void Set(ObjectType* obj)
+		UObject* Get() const
 		{
-			if constexpr (std::is_same_v<T, FScriptInterface>)
+			if constexpr (std::is_same_v<WrapperType, FScriptInterface>)
 			{
-				*UnderlyingInstance = T { obj, obj->GetInterfaceAddress(const_cast<UClass*>(Descriptor.Get())) };
+				return UnderlyingInstance->GetObject();
 			}
 			else
 			{
-				*UnderlyingInstance = T { obj };
+				return UnderlyingInstance->Get();
+			}
+		}
+		void Set(ObjectType* obj)
+		{
+			if constexpr (std::is_same_v<WrapperType, FScriptInterface>)
+			{
+				*UnderlyingInstance = WrapperType { obj, obj->GetInterfaceAddress(const_cast<UClass*>(Descriptor.Get())) };
+			}
+			else
+			{
+				*UnderlyingInstance = WrapperType { obj };
 			}
 		}
 

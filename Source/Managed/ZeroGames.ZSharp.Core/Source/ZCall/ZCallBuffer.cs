@@ -145,7 +145,7 @@ public struct ZCallBufferSlot
 		{
 			return (ZCallBufferSlot)value;
 		}
-		if (t.IsSubclassOf(typeof(Type)))
+		if (t.IsAssignableTo(typeof(Type)))
 		{
 			return FromType((Type)value);
 		}

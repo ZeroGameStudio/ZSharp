@@ -33,7 +33,7 @@ public abstract class UnrealArrayBase : PlainExportedObjectBase
 	
 	private void ValidateElementType()
 	{
-		if (_elementType.IsSubclassOf(typeof(UnrealObjectBase)) || _elementType.IsSubclassOf(typeof(UnrealStructBase)) || UnrealEnum.IsUnrealEnumType(_elementType))
+		if (_elementType.IsAssignableTo(typeof(UnrealObjectBase)) || _elementType.IsAssignableTo(typeof(UnrealStructBase)) || UnrealEnum.IsUnrealEnumType(_elementType))
 		{
 			return;
 		}
@@ -53,11 +53,11 @@ public abstract class UnrealArrayBase : PlainExportedObjectBase
 		{
 			userdata.ElementProperty.Descriptor = id;
 		}
-		else if (_elementType.IsSubclassOf(typeof(UnrealObjectBase)))
+		else if (_elementType.IsAssignableTo(typeof(UnrealObjectBase)))
 		{
 			userdata.ElementProperty.Descriptor = ((UnrealClass)_elementType.GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!).Unmanaged;
 		}
-		else if (_elementType.IsSubclassOf(typeof(UnrealStructBase)))
+		else if (_elementType.IsAssignableTo(typeof(UnrealStructBase)))
 		{
 			userdata.ElementProperty.Descriptor = ((UnrealScriptStruct)_elementType.GetProperty(nameof(IStaticStruct.SStaticStruct))!.GetValue(null)!).Unmanaged;
 		}

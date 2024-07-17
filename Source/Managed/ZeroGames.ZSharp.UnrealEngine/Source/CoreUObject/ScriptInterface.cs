@@ -9,6 +9,21 @@ public class ScriptInterface<T> : ScriptInterfaceBase, IConjugate<ScriptInterfac
 
 	public ScriptInterface() : base(typeof(T)){}
 	public ScriptInterface(IntPtr unmanaged) : base(typeof(T), unmanaged){}
+
+	public ScriptInterface(UnrealObject? obj) : this()
+	{
+		if (obj is null)
+		{
+			return;
+		}
+
+		if (!obj.Implements<T>())
+		{
+			throw new NotSupportedException();
+		}
+
+		Object = obj;
+	}
 	
 }
 

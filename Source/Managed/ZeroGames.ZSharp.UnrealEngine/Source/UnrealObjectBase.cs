@@ -3,7 +3,7 @@
 namespace ZeroGames.ZSharp.UnrealEngine;
 
 [ConjugateRegistryId(1)]
-public abstract class UnrealObjectBase : UnrealExportedObjectBase, IStaticClass
+public abstract class UnrealObjectBase : UnrealExportedObjectBase, IStaticClass, IUnrealObject
 {
 
     public static UnrealClass SStaticClass => throw new NotSupportedException();

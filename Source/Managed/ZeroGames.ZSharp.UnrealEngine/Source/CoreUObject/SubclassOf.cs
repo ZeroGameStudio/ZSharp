@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public class SubclassOf<T> : SubclassOfBase, IConjugate<SubclassOf<T>> /*where T : IStaticClass?*/
+public class SubclassOf<T> : SubclassOfBase, IConjugate<SubclassOf<T>> where T : IUnrealObject?
 {
 	
 	public static SubclassOf<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);

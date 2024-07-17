@@ -14,9 +14,9 @@ namespace ZSharp
 	constexpr EZCallBufferSlotType TZExportedTypeZCallBufferSlotType_V = TZExportedTypeZCallBufferSlotType<T>::Value;
 
 	template <typename T>
-	struct TZExportedTypeZCallBufferSlotType<T, std::enable_if_t<TIsEnum<T>::Value>>
+	struct TZExportedTypeZCallBufferSlotType<T, std::enable_if_t<TZIsDynamicallyExportableEnum_V<T>>>
 	{
-		static constexpr EZCallBufferSlotType Value = TZExportedTypeZCallBufferSlotType_V<T>;
+		static constexpr EZCallBufferSlotType Value = EZCallBufferSlotType::Int64;
 	};
 
 	template <typename T>

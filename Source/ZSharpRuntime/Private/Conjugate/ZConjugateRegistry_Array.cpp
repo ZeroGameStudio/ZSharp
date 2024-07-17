@@ -105,7 +105,7 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Array::GetManagedType(co
 	}
 	
 	FZRuntimeTypeLocatorWrapper& inner = locator.TypeParameters.AddDefaulted_GetRef();
-	if (!FZReflectionHelper::GetFPropertyRuntimeTypeLocator(elementProperty, inner))
+	if (!FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(elementProperty, inner))
 	{
 		return {};
 	}

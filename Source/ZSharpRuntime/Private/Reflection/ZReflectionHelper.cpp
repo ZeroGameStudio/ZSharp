@@ -192,8 +192,13 @@ bool ZSharp::FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(const FFieldCl
 	return true;
 }
 
-bool ZSharp::FZReflectionHelper::GetFPropertyRuntimeTypeLocator(const FProperty* property, FZRuntimeTypeLocatorWrapper& outLocator)
+bool ZSharp::FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(const FProperty* property, FZRuntimeTypeLocatorWrapper& outLocator)
 {
+	if (!ensure(!property->IsA<FArrayProperty>() && !property->IsA<FSetProperty>() && !property->IsA<FMapProperty>() && !property->IsA<FOptionalProperty>()))
+	{
+		return false;
+	}
+	
 	if (const auto classProp = CastField<FClassProperty>(property))
 	{
 		if (classProp->MetaClass == UObject::StaticClass())
@@ -240,16 +245,38 @@ bool ZSharp::FZReflectionHelper::GetFPropertyRuntimeTypeLocator(const FProperty*
 
 	if (outLocator.TypeName.Contains("`"))
 	{
+		ensure(outLocator.TypeName.EndsWith("1"));
+		ensure(property->IsA<FObjectPropertyBase>() && !property->IsA<FObjectProperty>());
+		
 		FZRuntimeTypeLocatorWrapper& inner = outLocator.TypeParameters.Emplace_GetRef();
 		if (const auto classProp = CastField<FClassProperty>(property))
 		{
 			return GetUFieldRuntimeTypeLocator(classProp->MetaClass, inner);
 		}
-		else if (const auto objectProp = CastField<FObjectProperty>(property))
+		else if (const auto softClassProp = CastField<FSoftClassProperty>(property))
 		{
-			return GetUFieldRuntimeTypeLocator(objectProp->PropertyClass, inner);
+			return GetUFieldRuntimeTypeLocator(softClassProp->MetaClass, inner);
 		}
-		// @TODO
+		else if (const auto softObjectProperty = CastField<FSoftObjectProperty>(property))
+		{
+			return GetUFieldRuntimeTypeLocator(softObjectProperty->PropertyClass, inner);
+		}
+		else if (const auto weakObjectProperty = CastField<FWeakObjectProperty>(property))
+		{
+			return GetUFieldRuntimeTypeLocator(weakObjectProperty->PropertyClass, inner);
+		}
+		else if (const auto lazyObjectProperty = CastField<FLazyObjectProperty>(property))
+		{
+			return GetUFieldRuntimeTypeLocator(lazyObjectProperty->PropertyClass, inner);
+		}
+		else if (const auto interfaceProperty = CastField<FInterfaceProperty>(property))
+		{
+			return GetUFieldRuntimeTypeLocator(interfaceProperty->InterfaceClass, inner);
+		}
+		else
+		{
+			checkNoEntry();
+		}
 	}
 	
 	checkNoEntry();

@@ -16,7 +16,7 @@ namespace ZSharp
 		static const UField* GetUFieldClosestMappedAncestor(const UField* field);
 		static bool GetUFieldRuntimeTypeLocator(const UField* field, FZRuntimeTypeLocatorWrapper& outLocator);
 		static bool GetFFieldClassRuntimeTypeLocator(const FFieldClass* cls, FZRuntimeTypeLocatorWrapper& outLocator);
-		static bool GetFPropertyRuntimeTypeLocator(const FProperty* property, FZRuntimeTypeLocatorWrapper& outLocator);
+		static bool GetNonContainerFPropertyRuntimeTypeLocator(const FProperty* property, FZRuntimeTypeLocatorWrapper& outLocator);
 		
 	};
 }

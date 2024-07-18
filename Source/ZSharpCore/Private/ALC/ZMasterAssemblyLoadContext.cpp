@@ -126,6 +126,26 @@ void ZSharp::FZMasterAssemblyLoadContext::RegisterZCallResolver(IZCallResolver* 
 	ZCallResolverLink.StableSort([](auto& lhs, auto& rhs){ return lhs.template Get<0>() < rhs.template Get<0>(); });
 }
 
+void ZSharp::FZMasterAssemblyLoadContext::PushRedFrame()
+{
+	++RedZCallDepth;
+	
+	for (const auto& registry : ConjugateRegistries)
+	{
+		registry->PushRedFrame();
+	}
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::PopRedFrame()
+{
+	for (const auto& registry : ConjugateRegistries)
+	{
+		registry->PopRedFrame();
+	}
+
+	--RedZCallDepth;
+}
+
 void ZSharp::FZMasterAssemblyLoadContext::PrepareForZCall()
 {
 	check(IsInGameThread());
@@ -255,26 +275,6 @@ void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate_Red(void* unmanaged, F
 void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate_Red(void* unmanaged)
 {
 	FZMasterAssemblyLoadContext_Interop::GReleaseConjugate_Red(unmanaged);
-}
-
-void ZSharp::FZMasterAssemblyLoadContext::PushRedFrame()
-{
-	++RedZCallDepth;
-	
-	for (const auto& registry : ConjugateRegistries)
-	{
-		registry->PushRedFrame();
-	}
-}
-
-void ZSharp::FZMasterAssemblyLoadContext::PopRedFrame()
-{
-	for (const auto& registry : ConjugateRegistries)
-	{
-		registry->PopRedFrame();
-	}
-
-	--RedZCallDepth;
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::HandleGarbageCollectComplete()

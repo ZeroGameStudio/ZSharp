@@ -34,6 +34,8 @@ namespace ZSharp
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) override;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) override;
 
+		virtual void PushRedFrame() override;
+		virtual void PopRedFrame() override;
 		virtual void PrepareForZCall() override;
 		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) override;
 		virtual FZCallHandle GetZCallHandle(const FString& name) override;
@@ -55,9 +57,6 @@ namespace ZSharp
 		FZCallHandle GetZCallHandle_Red(const FString& name);
 		void* BuildConjugate_Red(void* unmanaged, FZRuntimeTypeHandle type);
 		void ReleaseConjugate_Red(void* unmanaged);
-
-		void PushRedFrame();
-		void PopRedFrame();
 
 		bool IsInsideOfRedZCall() const { return !!RedZCallDepth; }
 		

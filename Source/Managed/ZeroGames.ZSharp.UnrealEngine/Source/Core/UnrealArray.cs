@@ -10,9 +10,9 @@ public class UnrealArray<T> : UnrealArrayBase, IConjugate<UnrealArray<T>>
 	public UnrealArray() : base(typeof(T)){}
 	public UnrealArray(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 
-	public T? this[int32 index]
+	public T this[int32 index]
 	{
-		get => (T?)Get(index);
+		get => (T)Get(index)!;
 		set => Set(index, value);
 	}
 	

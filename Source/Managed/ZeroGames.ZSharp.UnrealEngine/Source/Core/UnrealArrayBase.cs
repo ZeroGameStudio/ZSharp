@@ -38,6 +38,11 @@ public abstract class UnrealArrayBase : PlainExportedObjectBase
 		{
 			return;
 		}
+
+		if (_elementType.GetGenericTypeDefinition() == typeof(Nullable<>))
+		{
+			throw new NotSupportedException("Nullable value type is not supported.");
+		}
 		
 		if (!IntrinsicTypeIds.STypeMap.ContainsKey(_elementType) && (_elementType.BaseType is null || !IntrinsicTypeIds.STypeMap.ContainsKey(_elementType.BaseType)))
 		{

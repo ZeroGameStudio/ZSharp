@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public class ScriptInterface<T> : ScriptInterfaceBase, IConjugate<ScriptInterface<T>> where T : IUnrealInterface?
+public class ScriptInterface<T> : ScriptInterfaceBase, IConjugate<ScriptInterface<T>> where T : IUnrealInterface
 {
 	
 	public static ScriptInterface<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);

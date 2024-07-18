@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public class LazyObjectPtr<T> : LazyObjectPtrBase, IConjugate<LazyObjectPtr<T>> where T : UnrealObject?
+public class LazyObjectPtr<T> : LazyObjectPtrBase, IConjugate<LazyObjectPtr<T>> where T : UnrealObject
 {
 	
 	public static LazyObjectPtr<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);

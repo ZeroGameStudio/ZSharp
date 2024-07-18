@@ -5,33 +5,10 @@
 #include "Blueprint/UserWidget.h"
 #include "ZSharpUserWidget.generated.h"
 
-USTRUCT()
-struct FZSharpUserWidgetZCallName
-{
-	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere)
-	FString AssemblyName;
-
-	UPROPERTY(EditAnywhere)
-	FString ClassName;
-
-	UPROPERTY(EditAnywhere)
-	FString MethodName;
-
-	FString operator*() const
-	{
-		return FString::Printf(TEXT("m://%s:%s:%s"), *AssemblyName, *ClassName, *MethodName);
-	}
-};
-
 UCLASS(Abstract)
 class ZSHARPRUNTIME_API UZSharpUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
-public:
-	UZSharpUserWidget(const FObjectInitializer& objectInitializer);
 
 public:
 	virtual void NativeOnInitialized() override;
@@ -40,17 +17,20 @@ public:
 	virtual void NativeTick(const FGeometry& geometry, float deltaTime) override;
 
 private:
+	FString MakeZCallName(const FString& MethodName) const
+	{
+		return FString::Printf(TEXT("m://%s:%s:%s"), *AssemblyName, *ClassName, *MethodName);
+	}
+
+private:
 	UPROPERTY(EditDefaultsOnly)
-	FZSharpUserWidgetZCallName OnInitializedZCall;
+	FString AssemblyName;
+
+	UPROPERTY(EditDefaultsOnly)
+	FString ClassName;
 	
 	UPROPERTY(EditDefaultsOnly)
-	FZSharpUserWidgetZCallName ConstructZCall;
-
-	UPROPERTY(EditDefaultsOnly)
-	FZSharpUserWidgetZCallName DestructZCall;
-
-	UPROPERTY(EditDefaultsOnly)
-	FZSharpUserWidgetZCallName TickZCall;
+	bool bShouldCallManagedTick;
 	
 };
 

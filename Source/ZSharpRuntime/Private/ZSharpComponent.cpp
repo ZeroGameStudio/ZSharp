@@ -11,10 +11,6 @@
 UZSharpComponent::UZSharpComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
-	BeginPlayZCall.MethodName = "BeginPlay";
-	EndPlayZCall.MethodName = "EndPlay";
-	TickZCall.MethodName = "Tick";
 }
 
 void UZSharpComponent::BeginPlay()
@@ -27,7 +23,7 @@ void UZSharpComponent::BeginPlay()
 		alc->PrepareForZCall();
 		ZSHARP_STACK_ALLOC_ZCALL_BUFFER(ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UObject>().Conjugate(this)));
 
-		ZSharp::FZCallHandle handle = alc->GetZCallHandle(*BeginPlayZCall);
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle(MakeZCallName("BeginPlay"));
 		alc->ZCall(handle, &buffer);
 	}
 }
@@ -40,7 +36,7 @@ void UZSharpComponent::EndPlay(const EEndPlayReason::Type endPlayReason)
 		alc->PrepareForZCall();
 		ZSHARP_STACK_ALLOC_ZCALL_BUFFER(ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UObject>().Conjugate(this)));
 
-		ZSharp::FZCallHandle handle = alc->GetZCallHandle(*EndPlayZCall);
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle(MakeZCallName("EndPlay"));
 		alc->ZCall(handle, &buffer);
 	}
 	
@@ -51,6 +47,11 @@ void UZSharpComponent::TickComponent(float deltaTime, ELevelTick tickType, FActo
 {
 	Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
+	if (!bShouldCallManagedTick)
+	{
+		return;
+	}
+
 	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
 	if (alc)
 	{
@@ -59,7 +60,7 @@ void UZSharpComponent::TickComponent(float deltaTime, ELevelTick tickType, FActo
 			ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UObject>().Conjugate(this)),
 			ZSharp::FZCallBufferSlot::FromFloat(deltaTime));
 
-		ZSharp::FZCallHandle handle = alc->GetZCallHandle(*TickZCall);
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle(MakeZCallName("Tick"));
 		alc->ZCall(handle, &buffer);
 	}
 }

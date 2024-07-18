@@ -4,26 +4,6 @@
 
 #include "ZSharpComponent.generated.h"
 
-USTRUCT()
-struct FZSharpComponentZCallName
-{
-	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere)
-	FString AssemblyName;
-
-	UPROPERTY(EditAnywhere)
-	FString ClassName;
-
-	UPROPERTY(EditAnywhere)
-	FString MethodName;
-
-	FString operator*() const
-	{
-		return FString::Printf(TEXT("m://%s:%s:%s"), *AssemblyName, *ClassName, *MethodName);
-	}
-};
-
 UCLASS(meta = (BlueprintSpawnableComponent))
 class ZSHARPRUNTIME_API UZSharpComponent : public UActorComponent
 {
@@ -38,13 +18,19 @@ private:
 	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 
 private:
+	FString MakeZCallName(const FString& MethodName) const
+	{
+		return FString::Printf(TEXT("m://%s:%s:%s"), *AssemblyName, *ClassName, *MethodName);
+	}
+	
+private:
 	UPROPERTY(EditDefaultsOnly)
-	FZSharpComponentZCallName BeginPlayZCall;
+	FString AssemblyName;
 
 	UPROPERTY(EditDefaultsOnly)
-	FZSharpComponentZCallName EndPlayZCall;
-
+	FString ClassName;
+	
 	UPROPERTY(EditDefaultsOnly)
-	FZSharpComponentZCallName TickZCall;
+	bool bShouldCallManagedTick;
 	
 };

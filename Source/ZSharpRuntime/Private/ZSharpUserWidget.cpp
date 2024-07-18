@@ -9,15 +9,6 @@
 #include "Conjugate/ZConjugateRegistry_UScriptStruct.h"
 #include "ZCall/ZCallBuffer.h"
 
-UZSharpUserWidget::UZSharpUserWidget(const FObjectInitializer& objectInitializer)
-	: Super(objectInitializer)
-{
-	OnInitializedZCall.MethodName = "OnInitialized";
-    ConstructZCall.MethodName = "Construct";
-    DestructZCall.MethodName = "Destruct";
-    TickZCall.MethodName = "Tick";
-}
-
 void UZSharpUserWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -28,7 +19,7 @@ void UZSharpUserWidget::NativeOnInitialized()
 		alc->PrepareForZCall();
 		ZSHARP_STACK_ALLOC_ZCALL_BUFFER(ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UObject>().Conjugate(this)));
 
-		ZSharp::FZCallHandle handle = alc->GetZCallHandle(*OnInitializedZCall);
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle(MakeZCallName("OnInitialized"));
 		alc->ZCall(handle, &buffer);
 	}
 }
@@ -43,7 +34,7 @@ void UZSharpUserWidget::NativeConstruct()
 		alc->PrepareForZCall();
 		ZSHARP_STACK_ALLOC_ZCALL_BUFFER(ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UObject>().Conjugate(this)));
 
-		ZSharp::FZCallHandle handle = alc->GetZCallHandle(*ConstructZCall);
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle(MakeZCallName("Construct"));
 		alc->ZCall(handle, &buffer);
 	}
 }
@@ -56,7 +47,7 @@ void UZSharpUserWidget::NativeDestruct()
 		alc->PrepareForZCall();
 		ZSHARP_STACK_ALLOC_ZCALL_BUFFER(ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UObject>().Conjugate(this)));
 
-		ZSharp::FZCallHandle handle = alc->GetZCallHandle(*DestructZCall);
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle(MakeZCallName("Destruct"));
 		alc->ZCall(handle, &buffer);
 	}
 	
@@ -67,6 +58,11 @@ void UZSharpUserWidget::NativeTick(const FGeometry& geometry, float deltaTime)
 {
 	Super::NativeTick(geometry, deltaTime);
 
+	if (!bShouldCallManagedTick)
+	{
+		return;
+	}
+
 	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
 	if (alc)
 	{
@@ -76,7 +72,7 @@ void UZSharpUserWidget::NativeTick(const FGeometry& geometry, float deltaTime)
 			ZSharp::FZCallBufferSlot::FromConjugate(alc->GetConjugateRegistry<ZSharp::FZConjugateRegistry_UScriptStruct>().Conjugate(FGeometry::StaticStruct(), &geometry)),
 			ZSharp::FZCallBufferSlot::FromFloat(deltaTime));
 
-		ZSharp::FZCallHandle handle = alc->GetZCallHandle(*TickZCall);
+		ZSharp::FZCallHandle handle = alc->GetZCallHandle(MakeZCallName("Tick"));
 		alc->ZCall(handle, &buffer);
 	}
 }

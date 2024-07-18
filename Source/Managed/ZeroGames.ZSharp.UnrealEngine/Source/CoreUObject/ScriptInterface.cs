@@ -22,7 +22,13 @@ public class ScriptInterface<T> : ScriptInterfaceBase, IConjugate<ScriptInterfac
 			throw new NotSupportedException();
 		}
 
-		Object = obj;
+		_Object = obj;
+	}
+
+	public UnrealObject? Object
+	{
+		get => _Object;
+		set => _Object = value;
 	}
 	
 }

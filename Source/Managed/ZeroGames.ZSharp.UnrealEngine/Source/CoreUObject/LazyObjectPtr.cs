@@ -10,6 +10,29 @@ public class LazyObjectPtr<T> : LazyObjectPtrBase, IConjugate<LazyObjectPtr<T>> 
 	public LazyObjectPtr() : base(typeof(T)){}
 	public LazyObjectPtr(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 	
+	public LazyObjectPtr(UnrealObject? obj) : this()
+	{
+		if (obj is null)
+		{
+			return;
+		}
+
+		if (!obj.IsA<T>())
+		{
+			throw new NotSupportedException();
+		}
+
+		_Object = obj;
+	}
+	
+	public T? Object
+	{
+		get => (T?)_Object;
+		set => _Object = value;
+	}
+	
+	public bool IsNull => this.ZCall("ex://LazyObject.IsNull", false)[-1].Bool;
+	
 }
 
 

@@ -7,6 +7,7 @@ public abstract class SoftObjectPtrBase : UnrealObjectWrapperBase
 {
 	protected SoftObjectPtrBase(Type objectType) : base(objectType, true, false){}
 	protected SoftObjectPtrBase(Type objectType, IntPtr unmanaged) : base(objectType, true, false, unmanaged){}
+	protected override string _ZCallClassName => "SoftObject";
 }
 
 

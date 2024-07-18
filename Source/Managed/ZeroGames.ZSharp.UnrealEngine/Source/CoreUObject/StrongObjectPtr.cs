@@ -10,6 +10,27 @@ public class StrongObjectPtr<T> : StrongObjectPtrBase, IConjugate<StrongObjectPt
 	public StrongObjectPtr() : base(typeof(T)){}
 	public StrongObjectPtr(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 	
+	public StrongObjectPtr(UnrealObject? obj) : this()
+	{
+		if (obj is null)
+		{
+			return;
+		}
+
+		if (!obj.IsA<T>())
+		{
+			throw new NotSupportedException();
+		}
+
+		_Object = obj;
+	}
+	
+	public T? Object
+	{
+		get => (T?)_Object;
+		set => _Object = value;
+	}
+	
 }
 
 

@@ -4,6 +4,8 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 public abstract class UnrealObjectWrapperBase : PlainExportedObjectBase
 {
+
+	public bool IsValid => _Object is not null;
 	
 	protected UnrealObjectWrapperBase(Type objectType, bool allowObject, bool allowInterface)
 	{
@@ -21,6 +23,14 @@ public abstract class UnrealObjectWrapperBase : PlainExportedObjectBase
 		_allowObject = allowObject;
 		_allowInterface = allowInterface;
 		ValidateElementType();
+	}
+	
+	protected abstract string _ZCallClassName { get; }
+	
+	protected UnrealObject? _Object
+	{
+		get => this.ZCall($"ex://{_ZCallClassName}.Get", [ null ])[-1].ReadConjugate<UnrealObject>();
+		set => this.ZCall($"ex://{_ZCallClassName}.Set", value);
 	}
 	
 	private void ValidateElementType()

@@ -8,9 +8,9 @@ namespace ZSharp
 {
 	namespace ZCallExport_Interface_Private
 	{
-		UObject* Get(const FZSelfDescriptiveScriptInterface& interface) { return interface.Get(); }
+		UObject* Get(const FZSelfDescriptiveScriptInterface& wrapper) { return wrapper.Get(); }
 		// Here it must be const ref, otherwise it will try to copy out after function call.
-		void Set(const FZSelfDescriptiveScriptInterface& interface, UObject* obj) { const_cast<FZSelfDescriptiveScriptInterface&>(interface).Set(obj); }
+		void Set(const FZSelfDescriptiveScriptInterface& wrapper, UObject* obj) { const_cast<FZSelfDescriptiveScriptInterface&>(wrapper).Set(obj); }
 	}
 	
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(ZCallExport_Interface_Private::Get, FInterface::Get)

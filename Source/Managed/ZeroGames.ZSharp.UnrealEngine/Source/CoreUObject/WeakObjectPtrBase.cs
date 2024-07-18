@@ -7,6 +7,7 @@ public abstract class WeakObjectPtrBase : UnrealObjectWrapperBase
 {
 	protected WeakObjectPtrBase(Type objectType) : base(objectType, true, false){}
 	protected WeakObjectPtrBase(Type objectType, IntPtr unmanaged) : base(objectType, true, false, unmanaged){}
+	protected override string _ZCallClassName => "WeakObject";
 }
 
 

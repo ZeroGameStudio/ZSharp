@@ -10,6 +10,27 @@ public class SubclassOf<T> : SubclassOfBase, IConjugate<SubclassOf<T>> where T :
 	public SubclassOf() : base(typeof(T)){}
 	public SubclassOf(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 	
+	public SubclassOf(UnrealClass? cls) : this()
+	{
+		if (cls is null)
+		{
+			return;
+		}
+		
+		if (!cls.IsChildOf((UnrealClass)typeof(T).GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!))
+		{
+			throw new NotSupportedException();
+		}
+
+		_Object = cls;
+	}
+	
+	public UnrealClass? Class
+	{
+		get => (UnrealClass?)_Object;
+		set => _Object = value;
+	}
+	
 }
 
 

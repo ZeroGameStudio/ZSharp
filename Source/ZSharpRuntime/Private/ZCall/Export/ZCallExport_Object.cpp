@@ -8,6 +8,7 @@ namespace ZSharp
 {
 	namespace ZCallExport_Object_Private
 	{
+		bool IsA(const UObject* obj, const UClass* cls) { return obj->IsA(cls); }
 		bool Implements(const UObject* obj, const UClass* interface) { return obj->GetClass()->ImplementsInterface(interface); }
 		FString GetName(const UObject* obj) { return GetNameSafe(obj); }
 		FString GetPathName(const UObject* obj) { return obj->GetPathName(); }
@@ -18,6 +19,7 @@ namespace ZSharp
 
 	ZSHARP_STATIC_EXPORT_ZCALL(UObject::GetClass)
 	ZSHARP_STATIC_EXPORT_ZCALL(UObject::GetOuter)
+	ZSHARP_STATIC_EXPORT_ZCALL_EX(ZCallExport_Object_Private::IsA, UObject::IsA)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(ZCallExport_Object_Private::Implements, UObject::Implements)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(ZCallExport_Object_Private::GetPathName, UObject::GetPathName)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(ZCallExport_Object_Private::GetName, UObject::GetName)

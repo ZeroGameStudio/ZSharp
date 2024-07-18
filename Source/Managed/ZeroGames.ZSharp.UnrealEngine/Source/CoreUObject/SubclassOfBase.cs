@@ -7,6 +7,7 @@ public abstract class SubclassOfBase : UnrealObjectWrapperBase
 {
 	protected SubclassOfBase(Type objectType) : base(objectType, true, true){}
 	protected SubclassOfBase(Type objectType, IntPtr unmanaged) : base(objectType, true, true, unmanaged){}
+	protected override string _ZCallClassName => "SubclassOf";
 }
 
 

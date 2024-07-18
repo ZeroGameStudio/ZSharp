@@ -5,6 +5,8 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public partial class UnrealObject
 {
 
+    public bool IsA(UnrealClass @class) => this.ZCall("ex://Object.IsA", @class, false)[-1].Bool;
+    public bool IsA<T>() where T : UnrealObject => IsA((UnrealClass)typeof(T).GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!);
     public bool Implements(UnrealClass @interface) => this.ZCall("ex://Object.Implements", @interface, false)[-1].Bool;
     public bool Implements<T>() where T : IUnrealInterface => Implements((UnrealClass)typeof(T).GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!);
 

@@ -13,7 +13,7 @@ ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle hand
 	: Handle(handle)
 	, UnloadCallback(MoveTemp(unloadCallback))
 	, bUnloaded(false)
-	, RedZCallDepth(0)
+	, RedStackDepth(0)
 	, bZCallPrepared(false)
 {
 	FZConjugateRegistryDeclarations::ForeachDeclaration([this](uint16 id, const TUniqueFunction<IZConjugateRegistry*(IZMasterAssemblyLoadContext&)>& factory)
@@ -38,7 +38,7 @@ ZSharp::FZMasterAssemblyLoadContext::~FZMasterAssemblyLoadContext()
 void ZSharp::FZMasterAssemblyLoadContext::Unload()
 {
 	check(IsInGameThread());
-	check(!IsInsideOfRedZCall());
+	check(!IsInRedStack());
 
 	if (bUnloaded)
 	{
@@ -128,7 +128,9 @@ void ZSharp::FZMasterAssemblyLoadContext::RegisterZCallResolver(IZCallResolver* 
 
 void ZSharp::FZMasterAssemblyLoadContext::PushRedFrame()
 {
-	++RedZCallDepth;
+	check(IsInGameThread());
+	
+	++RedStackDepth;
 	
 	for (const auto& registry : ConjugateRegistries)
 	{
@@ -138,12 +140,15 @@ void ZSharp::FZMasterAssemblyLoadContext::PushRedFrame()
 
 void ZSharp::FZMasterAssemblyLoadContext::PopRedFrame()
 {
+	check(IsInGameThread());
+	check(IsInRedStack());
+	
 	for (const auto& registry : ConjugateRegistries)
 	{
 		registry->PopRedFrame();
 	}
 
-	--RedZCallDepth;
+	--RedStackDepth;
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::PrepareForZCall()
@@ -196,7 +201,7 @@ ZSharp::IZConjugateRegistry& ZSharp::FZMasterAssemblyLoadContext::GetConjugateRe
 int32 ZSharp::FZMasterAssemblyLoadContext::ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const
 {
 	check(IsInGameThread());
-	check(IsInsideOfRedZCall());
+	check(IsInRedStack());
 	
 	if (!handle.IsBlack())
 	{
@@ -279,7 +284,7 @@ void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate_Red(void* unmanaged)
 
 void ZSharp::FZMasterAssemblyLoadContext::HandleGarbageCollectComplete()
 {
-	UE_CLOG(IsInsideOfRedZCall(), LogZSharpCore, Fatal, TEXT("Collect Garbage inside of Red ZCall!!!"));
+	UE_CLOG(IsInRedStack(), LogZSharpCore, Fatal, TEXT("Collect Garbage inside of Red ZCall!!!"));
 }
 
 

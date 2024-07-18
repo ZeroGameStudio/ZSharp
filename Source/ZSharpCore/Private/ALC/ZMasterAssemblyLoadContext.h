@@ -58,7 +58,7 @@ namespace ZSharp
 		void* BuildConjugate_Red(void* unmanaged, FZRuntimeTypeHandle type);
 		void ReleaseConjugate_Red(void* unmanaged);
 
-		bool IsInsideOfRedZCall() const { return !!RedZCallDepth; }
+		bool IsInRedStack() const { return !!RedStackDepth; }
 		
 	private:
 		void HandleGarbageCollectComplete();
@@ -74,7 +74,7 @@ namespace ZSharp
 		TArray<TTuple<uint64, TUniquePtr<IZCallResolver>>> ZCallResolverLink;
 
 		TSparseArray<TUniquePtr<IZConjugateRegistry>> ConjugateRegistries;
-		int32 RedZCallDepth;
+		int32 RedStackDepth;
 		bool bZCallPrepared;
 
 		FTSTicker::FDelegateHandle TickDelegate;

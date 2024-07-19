@@ -8,6 +8,10 @@ namespace ZSharp
 	class IZSlimAssemblyLoadContext;
 
 	DECLARE_MULTICAST_DELEGATE_OneParam(FZOnMasterAlcLoaded, IZMasterAssemblyLoadContext*)
+	DECLARE_MULTICAST_DELEGATE_OneParam(FZOnMasterAlcLoadFrameworks, IZMasterAssemblyLoadContext*)
+	DECLARE_MULTICAST_DELEGATE_OneParam(FZOnMasterAlcLoadApplications, IZMasterAssemblyLoadContext*)
+	DECLARE_MULTICAST_DELEGATE_OneParam(FZOnMasterAlcLoadPlugins, IZMasterAssemblyLoadContext*)
+	DECLARE_MULTICAST_DELEGATE_OneParam(FZOnMasterAlcFullyLoaded, IZMasterAssemblyLoadContext*)
 	DECLARE_MULTICAST_DELEGATE(FZOnMasterAlcUnloaded)
 	
 	class ZSHARPCORE_API IZSharpClr
@@ -27,6 +31,18 @@ namespace ZSharp
 		virtual FDelegateHandle RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate, bool notifyIfLoaded = true) = 0;
 		virtual void UnregisterMasterAlcLoaded(FDelegateHandle delegate) = 0;
 		virtual void UnregisterMasterAlcLoaded(const void* userObject) = 0;
+		virtual FDelegateHandle RegisterMasterAlcLoadFrameworks(FZOnMasterAlcLoadFrameworks::FDelegate delegate, bool notifyIfLoaded = true) = 0;
+		virtual void UnregisterMasterAlcLoadFrameworks(FDelegateHandle delegate) = 0;
+		virtual void UnregisterMasterAlcLoadFrameworks(const void* userObject) = 0;
+		virtual FDelegateHandle RegisterMasterAlcLoadApplications(FZOnMasterAlcLoadApplications::FDelegate delegate, bool notifyIfLoaded = true) = 0;
+		virtual void UnregisterMasterAlcLoadApplications(FDelegateHandle delegate) = 0;
+		virtual void UnregisterMasterAlcLoadApplications(const void* userObject) = 0;
+		virtual FDelegateHandle RegisterMasterAlcLoadPlugins(FZOnMasterAlcLoadPlugins::FDelegate delegate, bool notifyIfLoaded = true) = 0;
+		virtual void UnregisterMasterAlcLoadPlugins(FDelegateHandle delegate) = 0;
+		virtual void UnregisterMasterAlcLoadPlugins(const void* userObject) = 0;
+		virtual FDelegateHandle RegisterMasterAlcFullyLoaded(FZOnMasterAlcFullyLoaded::FDelegate delegate, bool notifyIfLoaded = true) = 0;
+		virtual void UnregisterMasterAlcFullyLoaded(FDelegateHandle delegate) = 0;
+		virtual void UnregisterMasterAlcFullyLoaded(const void* userObject) = 0;
 		virtual FDelegateHandle RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate delegate) = 0;
 		virtual void UnregisterMasterAlcUnloaded(FDelegateHandle delegate) = 0;
 		virtual void UnregisterMasterAlcUnloaded(const void* userObject) = 0;

@@ -35,6 +35,18 @@ namespace ZSharp
 		virtual FDelegateHandle RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate, bool notifyIfLoaded = true) override;
 		virtual void UnregisterMasterAlcLoaded(FDelegateHandle delegate) override;
 		virtual void UnregisterMasterAlcLoaded(const void* userObject) override;
+		virtual FDelegateHandle RegisterMasterAlcLoadFrameworks(FZOnMasterAlcLoadFrameworks::FDelegate delegate, bool notifyIfLoaded = true) override;
+		virtual void UnregisterMasterAlcLoadFrameworks(FDelegateHandle delegate) override;
+		virtual void UnregisterMasterAlcLoadFrameworks(const void* userObject) override;
+		virtual FDelegateHandle RegisterMasterAlcLoadApplications(FZOnMasterAlcLoadApplications::FDelegate delegate, bool notifyIfLoaded = true) override;
+		virtual void UnregisterMasterAlcLoadApplications(FDelegateHandle delegate) override;
+		virtual void UnregisterMasterAlcLoadApplications(const void* userObject) override;
+		virtual FDelegateHandle RegisterMasterAlcLoadPlugins(FZOnMasterAlcLoadPlugins::FDelegate delegate, bool notifyIfLoaded = true) override;
+		virtual void UnregisterMasterAlcLoadPlugins(FDelegateHandle delegate) override;
+		virtual void UnregisterMasterAlcLoadPlugins(const void* userObject) override;
+		virtual FDelegateHandle RegisterMasterAlcFullyLoaded(FZOnMasterAlcFullyLoaded::FDelegate delegate, bool notifyIfLoaded = true) override;
+		virtual void UnregisterMasterAlcFullyLoaded(FDelegateHandle delegate) override;
+		virtual void UnregisterMasterAlcFullyLoaded(const void* userObject) override;
 		virtual FDelegateHandle RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate delegate) override;
 		virtual void UnregisterMasterAlcUnloaded(FDelegateHandle delegate) override;
 		virtual void UnregisterMasterAlcUnloaded(const void* userObject) override;
@@ -52,6 +64,10 @@ namespace ZSharp
 
 	private:
 		FZOnMasterAlcLoaded OnMasterAlcLoaded;
+		FZOnMasterAlcLoadFrameworks OnMasterAlcLoadFrameworks;
+		FZOnMasterAlcLoadApplications OnMasterAlcLoadApplications;
+		FZOnMasterAlcLoadPlugins OnMasterAlcLoadPlugins;
+		FZOnMasterAlcFullyLoaded OnMasterAlcFullyLoaded;
 		FZOnMasterAlcUnloaded OnMasterAlcUnloaded;
 		
 	};

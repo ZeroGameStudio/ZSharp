@@ -72,7 +72,6 @@ void FZSharpRuntimeModule::CreateMasterAlc()
 		void*** ManagedFunctions = managedFunctions;
 	} args{};
 	alc->LoadAssembly(FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "ZeroGames.ZSharp.UnrealEngine.dll"), &args);
-	alc->LoadAssembly(FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Game.dll"));
 }
 
 void FZSharpRuntimeModule::UnloadMasterAlc()

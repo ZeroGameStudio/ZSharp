@@ -65,7 +65,7 @@ public abstract class ExportedObjectBase : IConjugate
             return;
         }
         
-        if (!this.IsValid())
+        if (!IsAlive)
         {
             Logger.Error("Dispose exported object twice.");
             return;
@@ -78,6 +78,7 @@ public abstract class ExportedObjectBase : IConjugate
 
     public GCHandle GCHandle { get; }
     public IntPtr Unmanaged { get; protected set; }
+    public bool IsAlive => Unmanaged != IConjugate.KDead;
 
     private protected ExportedObjectBase()
     {

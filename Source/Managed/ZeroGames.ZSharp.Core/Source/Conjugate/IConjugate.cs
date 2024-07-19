@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-public interface IConjugate : IGCHandle, IDisposable
+public interface IConjugate : IGCHandle, IExplicitLifecycle, IDisposable
 {
     public const IntPtr KDead = 0xDEAD;
     protected internal void Release();

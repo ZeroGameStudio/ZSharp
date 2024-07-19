@@ -4,6 +4,7 @@
 
 #include "CLR/IZSharpClr.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "Interop/ZSharpEventLoop_Interop.h"
 #include "ZCall/ZCallResolver_Export.h"
 #include "ZCall/ZCallResolver_UFunction.h"
 #include "ZCall/ZCallResolver_UProperty.h"
@@ -56,7 +57,21 @@ void FZSharpRuntimeModule::CreateMasterAlc()
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_Export{}, 0);
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UFunction{}, 1);
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UProperty{}, 2);
-	alc->LoadAssembly(FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "ZeroGames.ZSharp.UnrealEngine.dll"));
+
+	void** managedFunctions[] =
+	{
+#define ADDRESS_OF(Pointer) reinterpret_cast<void**>(&Pointer)
+
+		ADDRESS_OF(ZSharp::FZSharpEventLoop_Interop::GNotifyEvent),
+				
+#undef ADDRESS_OF
+	};
+		
+	struct
+	{
+		void*** ManagedFunctions = managedFunctions;
+	} args{};
+	alc->LoadAssembly(FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "ZeroGames.ZSharp.UnrealEngine.dll"), &args);
 	alc->LoadAssembly(FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Game.dll"));
 }
 

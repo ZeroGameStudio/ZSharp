@@ -48,7 +48,7 @@ public static class Uncaught
         }
     }
 
-    internal static void FatalIfUncaught(Action action)
+    public static void FatalIfUncaught(Action action)
     {
         try
         {

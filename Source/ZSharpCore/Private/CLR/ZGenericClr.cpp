@@ -65,9 +65,9 @@ namespace ZSharp::ZGenericClr_Private
 		{
 #define ADDRESS_OF(Pointer) reinterpret_cast<void**>(&Pointer)
 
-			ADDRESS_OF(ZClr_Interop::GCollectGarbage),
-			ADDRESS_OF(ZClr_Interop::GCreateMasterAlc),
-			ADDRESS_OF(ZClr_Interop::GCreateSlimAlc),
+			ADDRESS_OF(FZClr_Interop::GCollectGarbage),
+			ADDRESS_OF(FZClr_Interop::GCreateMasterAlc),
+			ADDRESS_OF(FZClr_Interop::GCreateSlimAlc),
 
 			ADDRESS_OF(FZGCHandle_Interop::GFree),
 
@@ -230,7 +230,7 @@ void ZSharp::FZGenericClr::Shutdown()
 
 void ZSharp::FZGenericClr::CollectGarbage(int32 generation, bool aggressive, bool blocking, bool compacting)
 {
-	ZClr_Interop::GCollectGarbage(generation, aggressive, blocking, compacting);
+	FZClr_Interop::GCollectGarbage(generation, aggressive, blocking, compacting);
 }
 
 ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
@@ -242,7 +242,7 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
 		UE_LOG(LogZSharpCore, Fatal, TEXT("Master ALC already exists!"));
 	}
 
-	FZGCHandle handle = ZClr_Interop::GCreateMasterAlc();
+	FZGCHandle handle = FZClr_Interop::GCreateMasterAlc();
 	if (!handle)
 	{
 		return nullptr;
@@ -271,7 +271,7 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericClr::CreateSlimAlc(const FSt
 		UE_LOG(LogZSharpCore, Fatal, TEXT("Slim ALC [%s] already exists!"), *name);
 	}
 
-	FZGCHandle handle = ZClr_Interop::GCreateSlimAlc(*name);
+	FZGCHandle handle = FZClr_Interop::GCreateSlimAlc(*name);
 	if (!handle)
 	{
 		return nullptr;

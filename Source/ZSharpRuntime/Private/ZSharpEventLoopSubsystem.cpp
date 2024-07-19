@@ -3,6 +3,8 @@
 
 #include "ZSharpEventLoopSubsystem.h"
 
+#include "ALC/IZMasterAssemblyLoadContext.h"
+#include "CLR/IZSharpClr.h"
 #include "Interop/ZSharpEventLoop_Interop.h"
 
 void FZSharpEventLoopTickFunction::Run() const
@@ -73,6 +75,15 @@ void UZSharpEventLoopSubsystem::HandleWorldDelegate(UWorld* world, ELevelTick ti
 
 void UZSharpEventLoopSubsystem::NotifyEvent(ZSharp::EZSharpEventLoopEventType eventType)
 {
+	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
+	if (!alc)
+	{
+		return;
+	}
+
+	alc->PushRedFrame();
+	ON_SCOPE_EXIT { alc->PopRedFrame(); };
+	
 	const FGameTime time = GetWorldRef().GetTime();
 	ZSharp::FZSharpEventLoop_Interop::GNotifyEvent(eventType, time.GetDeltaWorldTimeSeconds(), time.GetDeltaRealTimeSeconds(), time.GetWorldTimeSeconds(), time.GetRealTimeSeconds());
 }

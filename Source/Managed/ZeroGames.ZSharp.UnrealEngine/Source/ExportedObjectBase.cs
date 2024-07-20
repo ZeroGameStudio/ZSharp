@@ -78,7 +78,7 @@ public abstract class ExportedObjectBase : IConjugate
 
     public GCHandle GCHandle { get; }
     public IntPtr Unmanaged { get; protected set; }
-    public bool IsAlive => Unmanaged != IConjugate.KDead;
+    public virtual bool IsAlive => Unmanaged != IConjugate.KDead;
 
     private protected ExportedObjectBase()
     {

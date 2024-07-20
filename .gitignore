@@ -9,7 +9,3 @@ Binaries/
 DerivedDataCache/
 Intermediate/
 Saved/
-
-# ZSharp generated files
-bin/
-obj/

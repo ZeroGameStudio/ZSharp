@@ -3,6 +3,7 @@
 
 #include "ZBuildEngine.h"
 
+#include "ZSharpBuildSettings.h"
 #include "ALC/ZCommonDllMainArgs.h"
 #include "CLR/IZSharpClr.h"
 #include "Glue/ZDynamicTypeExporter.h"
@@ -31,7 +32,7 @@ namespace ZSharp::ZBuildEngine_Private
 	
 	static FString LocateBuildAssembly()
 	{
-		const FString pluginDir = IPluginManager::Get().GetModuleOwnerPlugin(UE_MODULE_NAME)->GetBaseDir();
+		const FString pluginDir = IPluginManager::Get().FindEnabledPlugin("ZSharp")->GetBaseDir();
 	
 		FString dllPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed/ZeroGames.ZSharp.Build.dll");
 		if (!FPaths::FileExists(dllPath))
@@ -49,9 +50,15 @@ namespace ZSharp::ZBuildEngine_Private
 		return FPaths::ConvertRelativePathToFull(FPaths::ProjectDir());
 	}
 
-	static FString GetPluginDir()
+	static FString GetPluginDir(const FString& pluginName)
 	{
-		return FPaths::ConvertRelativePathToFull(IPluginManager::Get().GetModuleOwnerPlugin(UE_MODULE_NAME)->GetBaseDir());
+		TSharedPtr<IPlugin> plugin = IPluginManager::Get().FindEnabledPlugin(*pluginName);
+		if (!plugin)
+		{
+			return {};
+		}
+		
+		return FPaths::ConvertRelativePathToFull(plugin->GetBaseDir());
 	}
 
 	static FString BuildArgument(const FString& key, const FString& value)
@@ -71,13 +78,23 @@ void ZSharp::FZBuildEngine::GenerateSolution() const
 {
 	const FString assemblyDir = ZBuildEngine_Private::LocateBuildAssembly();
 	const FString projectDir = ZBuildEngine_Private::GetProjectDir();
-	const FString pluginDir = ZBuildEngine_Private::GetPluginDir();
+	const FString pluginDir = ZBuildEngine_Private::GetPluginDir("ZSharp");
 
 	const FString targetArg = ZBuildEngine_Private::BuildArgument("target", "solution");
 	const FString projectDirArg = ZBuildEngine_Private::BuildArgument("projectdir", projectDir);
 	const FString projectManagedSourceDir = FPaths::Combine(projectDir, "Source/Managed");
 	const FString pluginManagedSourceDir = FPaths::Combine(pluginDir, "Source/Managed");
-	const FString sourceArg = ZBuildEngine_Private::BuildArgument("source", FString::Printf(TEXT("%s;%s"), *projectManagedSourceDir, *pluginManagedSourceDir));
+	FString dirsToScan = FString::Printf(TEXT("%s;%s"), *projectManagedSourceDir, *pluginManagedSourceDir);
+	for (const auto& pluginName : GetDefault<UZSharpBuildSettings>()->GetPluginsToScanZsproj())
+	{
+		FString dir = ZBuildEngine_Private::GetPluginDir(pluginName);
+		dir = FPaths::Combine(dir, "Source/Managed");
+		if (dir.Len())
+		{
+			dirsToScan.Append(";").Append(dir);
+		}
+	}
+	const FString sourceArg = ZBuildEngine_Private::BuildArgument("source", dirsToScan);
 
 	const TCHAR* argv[] =
 	{

@@ -166,7 +166,7 @@ void ZSharp::FZGenericClr::Startup()
 
 	bInitialized = true;
 
-	const FString pluginDir = IPluginManager::Get().GetModuleOwnerPlugin(UE_MODULE_NAME)->GetBaseDir();
+	const FString pluginDir = IPluginManager::Get().FindEnabledPlugin("ZSharp")->GetBaseDir();
 	const FString pluginBinariesDir = FPaths::Combine(pluginDir, "Binaries");
 	const FString pluginContentDir = FPaths::Combine(pluginDir, "Content");
 	

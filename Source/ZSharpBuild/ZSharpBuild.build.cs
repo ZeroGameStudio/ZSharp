@@ -27,6 +27,8 @@ public class ZSharpBuild : ModuleRules
 			new string[]
 			{
 				"Core",
+				
+				"DeveloperSettings",
 			}
 		);
 		

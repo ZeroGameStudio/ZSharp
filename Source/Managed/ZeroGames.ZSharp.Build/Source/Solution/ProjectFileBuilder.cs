@@ -78,7 +78,7 @@ public class ProjectFileBuilder
 		void Append(string childName, string childInnerText) => AppendSimpleChild(doc, propertyGroupNode, childName, childInnerText);
 		Append("ProjectName", _project.Name);
 		Append("TargetFramework", "net8.0");
-		Append("ImplicitUsings", _project.IsImplicitUsingEnabled ? "enable" : "disable");
+		Append("ImplicitUsings", "disable");
 		Append("Nullable", _project.IsNullable ? "enable" : "disable");
 		Append("AllowUnsafeBlocks", _project.IsUnsafeBlockEnabled.ToString().ToLower());
 		Append("Authors", _project.Authors);
@@ -139,7 +139,9 @@ public class ProjectFileBuilder
 	{
 		XmlElement itemGroupNode = doc.CreateElement("ItemGroup");
 
-		foreach (var us in _project.Usings)
+		List<string> intrinsicUsings = [ "System", "System.Collections.Generic", "System.Linq" ];
+
+		foreach (var us in intrinsicUsings.Concat(_project.Usings))
 		{
 			XmlElement usingNode = doc.CreateElement("Using");
 			usingNode.SetAttribute("Include", us);

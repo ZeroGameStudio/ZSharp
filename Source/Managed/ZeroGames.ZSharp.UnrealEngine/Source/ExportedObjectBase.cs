@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
+using System.Threading;
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 

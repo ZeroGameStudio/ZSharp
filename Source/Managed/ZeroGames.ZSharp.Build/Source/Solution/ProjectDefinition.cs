@@ -13,7 +13,6 @@ public class ProjectDefinition
 
 	public string TargetFramework { get; init; } = "net8.0";
 	public string Language { get; init; } = "C#";
-	public bool IsImplicitUsingEnabled { get; init; } = true;
 	public bool IsNullable { get; init; } = true;
 	public bool IsStrongRestrictedNullable { get; init; } = true;
 	public bool IsUnsafeBlockEnabled { get; init; } = true;

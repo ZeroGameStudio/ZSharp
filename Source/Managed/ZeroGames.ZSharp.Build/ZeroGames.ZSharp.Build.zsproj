@@ -12,6 +12,9 @@
 	],
 	"Usings":
 	[
+		"System.IO",
+		"System.Threading",
+		"System.Threading.Tasks",
 		"ZeroGames.ZSharp.Core",
 		"ZeroGames.ZSharp.Core.UnrealEngine"
 	]

@@ -66,7 +66,7 @@ public abstract class ExportedObjectBase : IConjugate
             return;
         }
         
-        if (!IsAlive)
+        if (Unmanaged == IConjugate.KDead)
         {
             Logger.Error("Dispose exported object twice.");
             return;

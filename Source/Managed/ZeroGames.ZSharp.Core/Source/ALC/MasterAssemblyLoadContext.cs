@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Security;
+using System.Threading;
 
 namespace ZeroGames.ZSharp.Core;
 
@@ -139,6 +140,8 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         {
             conjugate.Dispose();
         }
+        
+        _curSyncContext.Tick(deltaTime);
     }
     
     internal int32 ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
@@ -210,14 +213,21 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
 
     protected override void HandleUnload()
     {
-        base.HandleUnload();
-        
         if (_sSingleton != this)
         {
             throw new InvalidOperationException("Master ALC mismatch.");
         }
 
+        if (!ReferenceEquals(SynchronizationContext.Current, _curSyncContext))
+        {
+            throw new InvalidOperationException("SynchronizationContext mismatch.");
+        }
+        
+        SynchronizationContext.SetSynchronizationContext(_prevSyncContext);
+
         _sSingleton = null;
+        
+        base.HandleUnload();
     }
 
     private const int32 _kDefaultConjugateMapCapacity = 65536;
@@ -229,6 +239,10 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         _sSingleton = this;
 
         Resolving += (_, fullName) => LoadAssembly(fullName.Name!);
+        
+        _prevSyncContext = SynchronizationContext.Current;
+        _curSyncContext = new();
+        SynchronizationContext.SetSynchronizationContext(_curSyncContext);
 
         RegisterZCall(new ZCallDispatcher_Delegate());
         RegisterZCallResolver(new ZCallResolver_Method(), 1);
@@ -301,6 +315,9 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
 
         return 0;
     }
+
+    private SynchronizationContext? _prevSyncContext;
+    private ZSharpSynchronizationContext _curSyncContext;
     
     private Dictionary<ZCallHandle, IZCallDispatcher> _zcallMap = new();
     private Dictionary<string, ZCallHandle> _zcallName2Handle = new();

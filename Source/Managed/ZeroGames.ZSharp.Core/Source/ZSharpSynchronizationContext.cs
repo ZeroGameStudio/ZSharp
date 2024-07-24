@@ -12,14 +12,7 @@ internal class ZSharpSynchronizationContext : SynchronizationContext
 	{
 		if (Thread.CurrentThread.ManagedThreadId == _threadId)
 		{
-			try
-			{
-				d(state);
-			}
-			catch (Exception ex)
-			{
-				Logger.Error($"Unhandled Exception Detected.\n{ex}");
-			}
+			ProtectedCall(d, state);
 		}
 		else
 		{
@@ -33,14 +26,19 @@ internal class ZSharpSynchronizationContext : SynchronizationContext
 	{
 		while (_recs.TryDequeue(out var rec))
 		{
-			try
-			{
-				rec.Callback(rec.State);
-			}
-			catch (Exception ex)
-			{
-				Logger.Error($"Unhandled Exception Detected.\n{ex}");
-			}
+			ProtectedCall(rec.Callback, rec.State);
+		}
+	}
+
+	private void ProtectedCall(SendOrPostCallback d, object? state)
+	{
+		try
+		{
+			d(state);
+		}
+		catch (Exception ex)
+		{
+			Logger.Error($"Unhandled Exception Detected.\n{ex}");
 		}
 	}
 	

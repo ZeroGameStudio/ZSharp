@@ -79,7 +79,25 @@ public abstract class ExportedObjectBase : IConjugate
 
     public GCHandle GCHandle { get; }
     public IntPtr Unmanaged { get; protected set; }
-    public virtual bool IsAlive => Unmanaged != IConjugate.KDead;
+    public virtual bool IsExpired => Unmanaged != IConjugate.KDead;
+
+    public event Action<IExplicitLifecycle>? OnExpired;
+
+    protected void TryBroadcastOnExpired()
+    {
+        if (_hasBoradcastOnExpired)
+        {
+            return;
+        }
+
+        if (!IsExpired)
+        {
+            throw new InvalidOperationException();
+        }
+
+        _hasBoradcastOnExpired = true;
+        OnExpired?.Invoke(this);
+    }
 
     private protected ExportedObjectBase()
     {
@@ -131,10 +149,12 @@ public abstract class ExportedObjectBase : IConjugate
     {
         GCHandle.Free();
         Unmanaged = IConjugate.KDead;
+        TryBroadcastOnExpired();
     }
     
     private readonly bool _isManaged;
     private bool _hasDisposed;
+    private bool _hasBoradcastOnExpired;
 
 }
 

@@ -12,7 +12,6 @@ public partial class UnrealObject
 
     public void MarkAsGarbage() => this.ZCall("ex://Object.MarkAsGarbage", [ null ]);
     
-    public override bool IsAlive => __IsGarbage;
     public bool __IsGarbage => this.ZCall("ex://Object.IsGarbage", [ null ])[-1].Bool;
     public override UnrealClass __Class => this.ZCall("ex://Object.GetClass", [ null ])[-1].ReadConjugate<UnrealClass>() ?? throw new InvalidOperationException();
     public UnrealObject? __Outer => this.ZCall("ex://Object.GetOuter", [ null ])[-1].ReadConjugate<UnrealObject>();

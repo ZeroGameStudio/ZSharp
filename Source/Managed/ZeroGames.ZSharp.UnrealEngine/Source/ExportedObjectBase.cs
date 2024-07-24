@@ -79,7 +79,7 @@ public abstract class ExportedObjectBase : IConjugate
 
     public GCHandle GCHandle { get; }
     public IntPtr Unmanaged { get; protected set; }
-    public virtual bool IsExpired => Unmanaged != IConjugate.KDead;
+    public virtual bool IsExpired => Unmanaged == IConjugate.KDead;
 
     public event Action<IExplicitLifecycle>? OnExpired;
 

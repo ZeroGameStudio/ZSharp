@@ -3,6 +3,8 @@
 
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 
+#include "ZUObjectConjugateController_Actor.h"
+#include "ZUObjectConjugateController_GC.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"
 #include "Reflection/ZReflectionHelper.h"
@@ -15,12 +17,8 @@ namespace ZSharp::ZConjugateRegistry_UObject_Private
 ZSharp::FZConjugateRegistry_UObject::FZConjugateRegistry_UObject(IZMasterAssemblyLoadContext& alc)
 	: Super(alc)
 {
-	GCDelegate = FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);
-}
-
-ZSharp::FZConjugateRegistry_UObject::~FZConjugateRegistry_UObject()
-{
-	FCoreUObjectDelegates::GarbageCollectComplete.Remove(GCDelegate);
+	RegisterController(new FZUObjectConjugateController_GC);
+	RegisterController(new FZUObjectConjugateController_Actor);
 }
 
 UObject* ZSharp::FZConjugateRegistry_UObject::Conjugate(FZConjugateHandle handle) const
@@ -43,15 +41,35 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UObject::Conjugate(const U
 		return { unmanagedObject };
 	}
 
+	if (!CanBuildConjugate(unmanagedObject))
+	{
+		return {};
+	}
+
 	const FZRuntimeTypeHandle type = GetManagedType(unmanagedObject);
 	if (Alc.BuildConjugate(unmanagedObject, type))
 	{
 		ConjugateMap.Emplace(unmanagedObject, unmanagedObject);
+		NotifyConjugated(unmanagedObject);
 	
 		return { unmanagedObject };
 	}
 
 	return {};
+}
+
+void ZSharp::FZConjugateRegistry_UObject::RegisterController(IZUObjectConjugateController* controller)
+{
+	Controllers.Emplace(controller);
+
+	controller->SetLifecycleExpiredCallback([this](UObject* unmanaged){ NotifyLifecycleExpired(unmanaged); });
+	for (const auto& pair : ConjugateMap)
+	{
+		if (UObject* unmanaged = pair.Value.ResolveObjectPtrEvenIfGarbage())
+		{
+			controller->NotifyConjugated(unmanaged);
+		}
+	}
 }
 
 void* ZSharp::FZConjugateRegistry_UObject::BuildConjugate(void* userdata)
@@ -90,6 +108,32 @@ void ZSharp::FZConjugateRegistry_UObject::GetAllConjugates(TArray<void*>& outCon
 	}
 }
 
+bool ZSharp::FZConjugateRegistry_UObject::CanBuildConjugate(UObject* unmanaged) const
+{
+	for (const auto& controller : Controllers)
+	{
+		if (!controller->CanBuildConjugate(unmanaged))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void ZSharp::FZConjugateRegistry_UObject::NotifyConjugated(UObject* unmanaged)
+{
+	for (const auto& controller : Controllers)
+	{
+		controller->NotifyConjugated(unmanaged);
+	}
+}
+
+void ZSharp::FZConjugateRegistry_UObject::NotifyLifecycleExpired(UObject* unmanaged)
+{
+	ReleaseConjugate(unmanaged);
+}
+
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UObject::GetManagedType(const UObject* unmanaged) const
 {
 	FZRuntimeTypeLocatorWrapper locator;
@@ -99,23 +143,6 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UObject::GetManagedType(
 	}
 	
 	return Alc.GetType(locator);
-}
-
-void ZSharp::FZConjugateRegistry_UObject::HandleGarbageCollectComplete()
-{
-	TArray<void*> pendingRemoves;
-	for (const auto& pair : ConjugateMap)
-	{
-		if (!pair.Value.ResolveObjectPtrEvenIfGarbage())
-		{
-			pendingRemoves.Emplace(pair.Key);
-		}
-	}
-	
-	for (const auto& key : pendingRemoves)
-	{
-		ReleaseConjugate(key);
-	}
 }
 
 

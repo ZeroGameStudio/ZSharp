@@ -76,27 +76,69 @@ public abstract class ExportedObjectBase : IConjugate
         
         GC.SuppressFinalize(this);
     }
+    
+    public ExplicitLifecycleExpiredRegistration RegisterOnExpired(Action<IExplicitLifecycle, object?> callback, object? state)
+    {
+        lock (this)
+        {
+            if (IsExpired)
+            {
+                if (UnrealEngineStatics.IsInGameThread())
+                {
+                    callback(this, state);
+                }
+                else
+                {
+                    SynchronizationContext.Current?.Send(s => callback(this, s), state);
+                }
+                
+                return default;
+            }
+            else
+            {
+                _onExpiredRegistry ??= new();
+                ExplicitLifecycleExpiredRegistration reg = new(this, ++_onExpiredRegistrationHandle);
+                _onExpiredRegistry[reg] = new(callback, state);
+
+                return reg;
+            }
+        }
+    }
+
+    public void UnregisterOnExpired(ExplicitLifecycleExpiredRegistration registration)
+    {
+        lock (this)
+        {
+            if (!IsExpired)
+            {
+                _onExpiredRegistry?.Remove(registration);
+            }
+        }
+    }
 
     public GCHandle GCHandle { get; }
-    public IntPtr Unmanaged { get; protected set; }
-    public virtual bool IsExpired => Unmanaged == IConjugate.KDead;
 
-    public event Action<IExplicitLifecycle>? OnExpired;
-
-    protected void TryBroadcastOnExpired()
+    public IntPtr Unmanaged
     {
-        if (_hasBoradcastOnExpired)
+        get => _unmanaged;
+        protected set
         {
-            return;
+            lock (this)
+            {
+                _unmanaged = value;
+            }
         }
+    }
 
-        if (!IsExpired)
+    public bool IsExpired
+    {
+        get
         {
-            throw new InvalidOperationException();
+            lock (this)
+            {
+                return Unmanaged == IConjugate.KDead;
+            }
         }
-
-        _hasBoradcastOnExpired = true;
-        OnExpired?.Invoke(this);
     }
 
     private protected ExportedObjectBase()
@@ -113,6 +155,29 @@ public abstract class ExportedObjectBase : IConjugate
     }
 
     ~ExportedObjectBase() => InternalDispose(true);
+    
+    private void TryBroadcastOnExpired()
+    {
+        if (_hasBroadcastOnExpired)
+        {
+            return;
+        }
+
+        if (!IsExpired)
+        {
+            throw new InvalidOperationException();
+        }
+
+        _hasBroadcastOnExpired = true;
+        if (_onExpiredRegistry is not null)
+        {
+            foreach (var pair in _onExpiredRegistry)
+            {
+                OnExpiredCallbackRec rec = pair.Value;
+                rec.Callback(this, rec.State);
+            }
+        }
+    }
 
     private void InternalDispose(bool isFromFinalizer)
     {
@@ -151,10 +216,17 @@ public abstract class ExportedObjectBase : IConjugate
         Unmanaged = IConjugate.KDead;
         TryBroadcastOnExpired();
     }
+
+    private readonly record struct OnExpiredCallbackRec(Action<IExplicitLifecycle, object?> Callback, object? State);
+
+    private IntPtr _unmanaged;
     
     private readonly bool _isManaged;
     private bool _hasDisposed;
-    private bool _hasBoradcastOnExpired;
+    
+    private uint64 _onExpiredRegistrationHandle;
+    private bool _hasBroadcastOnExpired;
+    private Dictionary<ExplicitLifecycleExpiredRegistration, OnExpiredCallbackRec>? _onExpiredRegistry;
 
 }
 

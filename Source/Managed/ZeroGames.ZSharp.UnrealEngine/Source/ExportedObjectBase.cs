@@ -79,67 +79,38 @@ public abstract class ExportedObjectBase : IConjugate
     
     public ExplicitLifecycleExpiredRegistration RegisterOnExpired(Action<IExplicitLifecycle, object?> callback, object? state)
     {
-        lock (this)
+        if (IsExpired)
         {
-            if (IsExpired)
-            {
-                if (UnrealEngineStatics.IsInGameThread)
-                {
-                    callback(this, state);
-                }
-                else
-                {
-                    GetOwningAlc().SynchronizationContext.Send(s => callback(this, s), state);
-                }
-                
-                return default;
-            }
-            else
-            {
-                _onExpiredRegistry ??= new();
-                ExplicitLifecycleExpiredRegistration reg = new(this, ++_onExpiredRegistrationHandle);
-                _onExpiredRegistry[reg] = new(callback, state);
+            callback(this, state);
 
-                return reg;
-            }
+            return default;
+        }
+        else
+        {
+            _onExpiredRegistry ??= new();
+            ExplicitLifecycleExpiredRegistration reg = new(this, ++_onExpiredRegistrationHandle);
+            _onExpiredRegistry[reg] = new(callback, state);
+
+            return reg;
         }
     }
 
     public void UnregisterOnExpired(ExplicitLifecycleExpiredRegistration registration)
     {
-        lock (this)
+        if (!IsExpired)
         {
-            if (!IsExpired)
-            {
-                _onExpiredRegistry?.Remove(registration);
-            }
+            _onExpiredRegistry?.Remove(registration);
         }
     }
 
     public GCHandle GCHandle { get; }
 
-    public IntPtr Unmanaged
-    {
-        get => _unmanaged;
-        protected set
-        {
-            lock (this)
-            {
-                _unmanaged = value;
-            }
-        }
-    }
+    public IntPtr Unmanaged { get; protected set; }
 
-    public bool IsExpired
-    {
-        get
-        {
-            lock (this)
-            {
-                return Unmanaged == IConjugate.KDead;
-            }
-        }
-    }
+    public bool IsExpired => Unmanaged == IConjugate.KDead;
+
+    public bool IsGameThreadOnly => true;
+    public object SyncRoot => this;
 
     private protected ExportedObjectBase()
     {
@@ -218,8 +189,6 @@ public abstract class ExportedObjectBase : IConjugate
     }
 
     private readonly record struct OnExpiredCallbackRec(Action<IExplicitLifecycle, object?> Callback, object? State);
-
-    private IntPtr _unmanaged;
     
     private readonly bool _isManaged;
     private bool _hasDisposed;

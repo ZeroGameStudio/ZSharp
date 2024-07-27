@@ -83,13 +83,13 @@ public abstract class ExportedObjectBase : IConjugate
         {
             if (IsExpired)
             {
-                if (UnrealEngineStatics.IsInGameThread())
+                if (UnrealEngineStatics.IsInGameThread)
                 {
                     callback(this, state);
                 }
                 else
                 {
-                    SynchronizationContext.Current?.Send(s => callback(this, s), state);
+                    GetOwningAlc().SynchronizationContext.Send(s => callback(this, s), state);
                 }
                 
                 return default;

@@ -1,6 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Reflection;
+using System.Threading;
 
 namespace ZeroGames.ZSharp.Core;
 
@@ -42,6 +43,8 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 	IntPtr BuildConjugate(IConjugate managed, IntPtr userdata);
 	void ReleaseConjugate(IntPtr unmanaged);
 	void PushPendingDisposeConjugate(IConjugate conjugate);
+
+	SynchronizationContext SynchronizationContext { get; }
 }
 
 

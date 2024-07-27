@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.Core;
 
 internal class ZSharpSynchronizationContext : SynchronizationContext
 {
-	
+
 	public override void Send(SendOrPostCallback d, object? state)
 	{
 		if (Thread.CurrentThread.ManagedThreadId == _threadId)

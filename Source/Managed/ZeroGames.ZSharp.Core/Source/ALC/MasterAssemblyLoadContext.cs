@@ -124,6 +124,11 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         _pendingDisposeConjugates.Enqueue(conjugate);
     }
 
+    public SynchronizationContext SynchronizationContext
+    {
+        get => _curSyncContext;
+    }
+
     internal static MasterAssemblyLoadContext Create()
     {
         if (_sSingleton is not null)
@@ -218,12 +223,12 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
             throw new InvalidOperationException("Master ALC mismatch.");
         }
 
-        if (!ReferenceEquals(SynchronizationContext.Current, _curSyncContext))
+        if (SynchronizationContext.Current != SynchronizationContext)
         {
             throw new InvalidOperationException("SynchronizationContext mismatch.");
         }
         
-        SynchronizationContext.SetSynchronizationContext(_prevSyncContext);
+        System.Threading.SynchronizationContext.SetSynchronizationContext(_prevSyncContext);
 
         _sSingleton = null;
         
@@ -242,7 +247,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         
         _prevSyncContext = SynchronizationContext.Current;
         _curSyncContext = new();
-        SynchronizationContext.SetSynchronizationContext(_curSyncContext);
+        SynchronizationContext.SetSynchronizationContext(SynchronizationContext);
 
         RegisterZCall(new ZCallDispatcher_Delegate());
         RegisterZCallResolver(new ZCallResolver_Method(), 1);

@@ -13,6 +13,8 @@ public readonly struct ExplicitLifecycleExpiredRegistration(IExplicitLifecycle l
 
 	public void Unregister() => _lifecycle.UnregisterOnExpired(this);
 
+	public bool IsValid => _lifecycle.IsValidRegistration(this);
+
 	private readonly IExplicitLifecycle _lifecycle = lifecycle;
 	private readonly uint64 _handle = handle;
 	

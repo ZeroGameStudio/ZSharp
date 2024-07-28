@@ -6,6 +6,7 @@ public interface IExplicitLifecycle
 {
 	ExplicitLifecycleExpiredRegistration RegisterOnExpired(Action<IExplicitLifecycle, object?> callback, object? state);
 	void UnregisterOnExpired(ExplicitLifecycleExpiredRegistration registration);
+	bool IsValidRegistration(ExplicitLifecycleExpiredRegistration registration);
 	
 	bool IsExpired { get; }
 	

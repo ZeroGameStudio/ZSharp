@@ -103,6 +103,16 @@ public abstract class ExportedObjectBase : IConjugate
         }
     }
 
+    public bool IsValidRegistration(ExplicitLifecycleExpiredRegistration registration)
+    {
+        if (IsExpired)
+        {
+            return false;
+        }
+
+        return _onExpiredRegistry?.ContainsKey(registration) ?? false;
+    }
+
     public GCHandle GCHandle { get; }
 
     public IntPtr Unmanaged { get; protected set; }

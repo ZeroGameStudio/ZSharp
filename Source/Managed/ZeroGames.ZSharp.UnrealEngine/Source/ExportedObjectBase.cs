@@ -60,7 +60,7 @@ public abstract class ExportedObjectBase : IConjugate
 
     public void Release()
     {
-        if (_isManaged)
+        if (_managed)
         {
             Logger.Error("Dispose managed exported object from unmanaged code.");
             return;
@@ -125,14 +125,14 @@ public abstract class ExportedObjectBase : IConjugate
     private protected ExportedObjectBase()
     {
         GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
-        _isManaged = true;
+        _managed = true;
     }
 
     private protected ExportedObjectBase(IntPtr unmanaged)
     {
         GCHandle = GCHandle.Alloc(this);
         Unmanaged = unmanaged;
-        _isManaged = false;
+        _managed = false;
     }
 
     ~ExportedObjectBase() => InternalDispose(true);
@@ -160,15 +160,15 @@ public abstract class ExportedObjectBase : IConjugate
         }
     }
 
-    private void InternalDispose(bool isFromFinalizer)
+    private void InternalDispose(bool fromFinalizer)
     {
-        if (!_isManaged)
+        if (!_managed)
         {
             Logger.Error("Finalize unmanaged export object.");
             return;
         }
         
-        if (isFromFinalizer)
+        if (fromFinalizer)
         {
             GetOwningAlc().PushPendingDisposeConjugate(this);
             return;
@@ -184,7 +184,7 @@ public abstract class ExportedObjectBase : IConjugate
         GetOwningAlc().ReleaseConjugate(Unmanaged);
         MarkAsDead();
 
-        if (!isFromFinalizer)
+        if (!fromFinalizer)
         {
             GC.SuppressFinalize(this);
         }
@@ -200,7 +200,7 @@ public abstract class ExportedObjectBase : IConjugate
 
     private readonly record struct OnExpiredCallbackRec(Action<IExplicitLifecycle, object?> Callback, object? State);
     
-    private readonly bool _isManaged;
+    private readonly bool _managed;
     private bool _hasDisposed;
     
     private uint64 _onExpiredRegistrationHandle;

@@ -128,8 +128,8 @@ namespace {_exportedClass.Namespace};
 	private string GetPropertyBlock(ExportedProperty property)
 	{
 		string name = property.Type.ToString();
-		bool isNullable = property.Type.IsNullable;
-		string nullForgivingModifier = isNullable ? string.Empty : "!";
+		bool nullable = property.Type.IsNullable;
+		string nullForgivingModifier = nullable ? string.Empty : "!";
 		string accessModifier = property.IsPublic ? "public" : property.IsProtected ? "protected" : "private";
 		
 		string getBlock = property.IsReadable ? @$"get => ({name})this.ZCall(""{property.ZCallName}"", false, {property.Index}, typeof({property.Type.ToString(false)}))[3].Object{nullForgivingModifier};" : string.Empty;

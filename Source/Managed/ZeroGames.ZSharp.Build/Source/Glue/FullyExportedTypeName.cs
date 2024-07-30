@@ -12,9 +12,9 @@ public readonly struct SingleFullyExportedTypeName
 	public required string Name { get; init; }
 	[JsonPropertyName("bNullable")] public required bool IsNullable { get; init; }
 
-	public string ToString(bool isNullable)
+	public string ToString(bool nullable)
 	{
-		return Name + (IsNullable && isNullable ? "?" : string.Empty);
+		return Name + (IsNullable && nullable ? "?" : string.Empty);
 	}
 
 	public override string ToString() => ToString(true);
@@ -29,23 +29,23 @@ public readonly struct SimpleFullyExportedTypeName
 	[JsonPropertyName("bNullable")] public required bool IsNullable { get; init; }
 	public SingleFullyExportedTypeName Inner { get; init; }
 
-	public string ToString(bool isNullable)
+	public string ToString(bool nullable)
 	{
 		StringBuilder res = new();
 		res.Append(Name);
-		bool isGeneric = false;
+		bool generic = false;
 		if (!string.IsNullOrWhiteSpace(Inner.Name))
 		{
-			isGeneric = true;
-			res.Append('<').Append(Inner.ToString(isNullable));
+			generic = true;
+			res.Append('<').Append(Inner.ToString(nullable));
 		}
 
-		if (isGeneric)
+		if (generic)
 		{
 			res.Append('>');
 		}
 
-		if (IsNullable && isNullable)
+		if (IsNullable && nullable)
 		{
 			res.Append('?');
 		}
@@ -66,29 +66,29 @@ public readonly struct FullyExportedTypeName
 	public SimpleFullyExportedTypeName Inner { get; init; }
 	public SimpleFullyExportedTypeName Outer { get; init; }
 
-	public string ToString(bool isNullable)
+	public string ToString(bool nullable)
 	{
 		StringBuilder res = new();
 		res.Append(Name);
-		bool isGeneric = false;
+		bool generic = false;
 		if (!string.IsNullOrWhiteSpace(Inner.Name))
 		{
-			isGeneric = true;
-			res.Append('<').Append(Inner.ToString(isNullable));
+			generic = true;
+			res.Append('<').Append(Inner.ToString(nullable));
 		}
 
 		if (!string.IsNullOrWhiteSpace(Outer.Name))
 		{
-			isGeneric = true;
-			res.Append(", ").Append(Outer.ToString(isNullable));
+			generic = true;
+			res.Append(", ").Append(Outer.ToString(nullable));
 		}
 
-		if (isGeneric)
+		if (generic)
 		{
 			res.Append('>');
 		}
 
-		if (IsNullable && isNullable)
+		if (IsNullable && nullable)
 		{
 			res.Append('?');
 		}

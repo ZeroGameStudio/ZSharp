@@ -18,13 +18,13 @@ public readonly struct InteropString : IDisposable
 
     public InteropString(IntPtr address)
     {
-        _isUnmanaged = true;
+        _unmanaged = true;
         _address = address;
     }
 
     public void Dispose()
     {
-        if (!_isUnmanaged)
+        if (!_unmanaged)
         {
             unsafe
             {
@@ -45,7 +45,7 @@ public readonly struct InteropString : IDisposable
         }
     }
 
-    private readonly bool _isUnmanaged;
+    private readonly bool _unmanaged;
     private readonly IntPtr _address;
 
 }

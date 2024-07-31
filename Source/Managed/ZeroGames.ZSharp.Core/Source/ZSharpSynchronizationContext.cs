@@ -22,7 +22,7 @@ internal class ZSharpSynchronizationContext : SynchronizationContext
 
 	public override void Post(SendOrPostCallback d, object? state) => _recs.Enqueue(new(d, state));
 
-	public void Tick(TimeSpan deltaTime)
+	public void Tick(float deltaTime)
 	{
 		while (_recs.TryDequeue(out var rec))
 		{

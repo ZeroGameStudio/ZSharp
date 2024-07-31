@@ -10,7 +10,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
 {
     
     [UnmanagedCallersOnly]
-    public static uint8 Tick(float deltaTime) => Uncaught.ErrorIfUncaught<uint8>(() =>
+    public static uint8 Tick(float deltaSeconds) => Uncaught.ErrorIfUncaught<uint8>(() =>
     {
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
@@ -18,7 +18,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
             return 0;
         }
         
-        alc.Tick(deltaTime);
+        alc.Tick(TimeSpan.FromSeconds(deltaSeconds));
         return 1;
     }, default);
 

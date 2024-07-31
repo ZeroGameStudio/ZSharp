@@ -139,7 +139,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         return new();
     }
 
-    internal void Tick(float deltaTime)
+    internal void Tick(TimeSpan deltaTime)
     {
         while (_pendingDisposeConjugates.TryDequeue(out var conjugate))
         {

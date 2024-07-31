@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.Core.UnrealEngine;
 public static class Logger
 {
 
-    internal static void Fatal(params object?[]? objects) => Log(1, objects);
+    public static void Fatal(params object?[]? objects) => Log(1, objects);
     public static void Error(params object?[]? objects) => Log(2, objects);
     public static void Warning(params object?[]? objects) => Log(3, objects);
     public static void Display(params object?[]? objects) => Log(4, objects);

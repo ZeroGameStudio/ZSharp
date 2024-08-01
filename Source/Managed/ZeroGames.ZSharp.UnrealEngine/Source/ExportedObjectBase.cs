@@ -155,7 +155,14 @@ public abstract class ExportedObjectBase : IConjugate
             foreach (var pair in _onExpiredRegistry)
             {
                 OnExpiredCallbackRec rec = pair.Value;
-                rec.Callback(this, rec.State);
+                try
+                {
+                    rec.Callback(this, rec.State);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Unhandled Exception Detected.\n{ex}");
+                }
             }
         }
     }

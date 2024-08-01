@@ -163,6 +163,8 @@ public abstract class ExportedObjectBase : IConjugate
                 {
                     Logger.Error($"Unhandled Exception Detected.\n{ex}");
                 }
+
+                _onExpiredRegistry = null;
             }
         }
     }

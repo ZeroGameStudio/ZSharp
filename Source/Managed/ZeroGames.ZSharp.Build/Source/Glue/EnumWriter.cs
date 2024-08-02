@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Reflection;
 using System.Text;
 
 namespace ZeroGames.ZSharp.Build.Glue;
@@ -51,7 +52,7 @@ public enum {_exportedEnum.Name} : {_exportedEnum.UnderlyingType}
 	{
 		get
 		{
-			List<string> attrs = [ "[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"0.0.4\")]" ];
+			List<string> attrs = [ $"[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"{Assembly.GetExecutingAssembly().GetName().Version!}\")]" ];
 			if ((_exportedEnum.Flags & EExportedEnumFlags.Flags) != EExportedEnumFlags.None)
 			{
 				attrs.Add("[Flags]");

@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Reflection;
 using System.Text;
 
 namespace ZeroGames.ZSharp.Build.Glue;
@@ -166,7 +167,7 @@ namespace {_exportedClass.Namespace};
 	{
 		get
 		{
-			List<string> attrs = [ "[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"0.0.4\")]" ];
+			List<string> attrs = [ $"[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"{Assembly.GetExecutingAssembly().GetName().Version!}\")]" ];
 			if (_exportedClass.ConjugateRegistryId > 0)
 			{
 				attrs.Add($"[ConjugateRegistryId({_exportedClass.ConjugateRegistryId})]");

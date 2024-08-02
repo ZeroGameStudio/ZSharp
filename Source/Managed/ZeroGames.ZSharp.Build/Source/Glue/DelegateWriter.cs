@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Reflection;
 using System.Text;
 
 namespace ZeroGames.ZSharp.Build.Glue;
@@ -37,7 +38,7 @@ public class DelegateWriter : IDisposable, IAsyncDisposable
 			parameters.Add($"{modifier}{param.Type} {param.Name}");
 		}
 		string parameterList = string.Join(", ", parameters);
-		string delegateAttr = $"[UnrealFieldPath(\"{_exportedDelegate.UnrealFieldPath}\")]\n";
+		string delegateAttr = $"[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"{Assembly.GetExecutingAssembly().GetName().Version!}\")]\n[UnrealFieldPath(\"{_exportedDelegate.UnrealFieldPath}\")]\n";
 		string baseType = _exportedDelegate.IsSparse ? "UnrealMulticastSparseDelegateBase" : _exportedDelegate.IsMulticast ? "UnrealMulticastInlineDelegateBase" : "UnrealDelegateBase";
 		string signatureDeclaration = $"public delegate {returnType} Signature({parameterList});";
 		string bindMethodName = _exportedDelegate.IsMulticast ? "Add" : "Bind";

@@ -145,7 +145,9 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
     private async Task<string> GenerateSolutionFile()
     {
         // @FIXME: Solution file name
-        string path = $"{UnrealProjectDir}/ZLabScript.sln";
+        string projectFile = Directory.GetFiles(UnrealProjectDir, "*.*", SearchOption.TopDirectoryOnly).FirstOrDefault(file => Path.GetExtension(file) == ".uproject") ?? throw new InvalidOperationException();
+        string projectFileShortName = Path.GetFileNameWithoutExtension(projectFile);
+        string path = $"{UnrealProjectDir}/{projectFileShortName}Script.sln";
         await using FileStream fs = File.Create(path);
         await using StreamWriter sw = new(fs, Encoding.UTF8);
 

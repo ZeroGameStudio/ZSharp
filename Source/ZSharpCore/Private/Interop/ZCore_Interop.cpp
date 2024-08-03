@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "Core_Interop.h"
+#include "ZCore_Interop.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptCore, Log, All)
 

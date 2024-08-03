@@ -3,6 +3,7 @@
 
 #include "ZMasterAssemblyLoadContext_Interop.h"
 
+#include "ZSehHelper.h"
 #include "CLR/IZSharpClr.h"
 #include "ALC/ZMasterAssemblyLoadContext.h"
 
@@ -14,7 +15,7 @@ int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCall_Black(FZCallHandle hand
 		return -1;
 	}
 
-	return alc->ZCall_Black(handle, buffer);
+	GUARDED_INVOKE(alc->ZCall_Black(handle, buffer), -2);
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext_Interop::GetZCallHandle_Black(const TCHAR* name)

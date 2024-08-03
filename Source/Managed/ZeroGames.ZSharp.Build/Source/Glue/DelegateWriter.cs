@@ -74,9 +74,7 @@ $@"public partial class {outerClassName}
 
 #nullable enable
 
-using ZeroGames.ZSharp.Core;
-using ZeroGames.ZSharp.UnrealEngine;
-{_extraUsingBlock}
+{string.Join('\n', NamespaceHelper.LootNamespace(_exportedDelegate).Where(ns => ns != _exportedDelegate.Namespace).Select(ns => $"using {ns};"))}
 
 namespace {_exportedDelegate.Namespace};
 
@@ -87,18 +85,6 @@ namespace {_exportedDelegate.Namespace};
 
 ");
 	});
-	
-	private string _extraUsingBlock
-	{
-		get
-		{
-			List<string> relevantModules = [ "Core", "CoreUObject", "PhysicsCore", "InputCore", "Engine", "UMG", "SlateCore", "Slate" ];
-			
-			relevantModules.RemoveAll(module => string.IsNullOrWhiteSpace(module) || module == _exportedDelegate.Module);
-
-			return string.Join('\n', relevantModules.Distinct().Select(module => $"using {_registry.GetModuleAssembly(module)?.Name ?? throw new InvalidOperationException($"Unmapped module {module}")}.{module};"));
-		}
-	}
 
 	private ExportedAssemblyRegistry _registry;
 	private ExportedDelegate _exportedDelegate;

@@ -23,10 +23,11 @@ namespace ZSharp
 	struct ZSharp::TZManagedTypeInfo<Type> \
 	{ \
 		static FString GetAssemblyName() { return "System"; } \
-		static FString GetModuleName() { return "System"; } \
+		static FString GetModuleName() { return GetAssemblyName(); } \
+		static FString GetNamespace() { return GetAssemblyName(); } \
 		static FString GetTypeName() { return #Name; } \
 		static FString GetTypeNameText() { return #Type; } \
-		static FString GetFullName() { return FString::Printf(TEXT("System.%s"), TEXT(#Name)); } \
+		static FString GetFullName() { return FString::Printf(TEXT("%s.%s"), *GetNamespace(), *GetTypeName()); } \
 	};
 
 #define ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(Type, Module, Name) \
@@ -35,9 +36,10 @@ namespace ZSharp
 	{ \
 		static FString GetAssemblyName() { return ZSHARP_ENGINE_ASSEMBLY_NAME; } \
 		static FString GetModuleName() { return #Module; } \
+		static FString GetNamespace() { return FString::Printf(TEXT("%s.%s"), *GetAssemblyName(), *GetModuleName()); } \
 		static FString GetTypeName() { return #Name; } \
 		static FString GetTypeNameText() { FString res; return GetTypeName().Split("`", &res, nullptr) ? res : GetTypeName(); } \
-		static FString GetFullName() { return FString::Printf(TEXT("%s.%s.%s"), TEXT(ZSHARP_ENGINE_ASSEMBLY_NAME), TEXT(#Module), TEXT(#Name)); } \
+		static FString GetFullName() { return FString::Printf(TEXT("%s.%s"), *GetNamespace(), *GetTypeName()); } \
 	};
 
 ZSHARP_DECLARE_SYSTEM_MANAGED_TYPE_INFO(uint8, Byte)

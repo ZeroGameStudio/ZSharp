@@ -12,7 +12,7 @@ namespace ZSharp
 	{
 		static FZFullyExportedTypeName Get()
 		{
-			return { FString::Printf(TEXT("%s.%s"), *TZManagedTypeInfo<T>::GetAssemblyName(), *TZManagedTypeInfo<T>::GetModuleName()), TZManagedTypeInfo<T>::GetTypeNameText() };
+			return { TZManagedTypeInfo<T>::GetNamespace(), TZManagedTypeInfo<T>::GetTypeNameText() };
 		}
 	};
 }

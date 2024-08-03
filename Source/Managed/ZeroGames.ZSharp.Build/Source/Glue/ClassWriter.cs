@@ -38,9 +38,7 @@ public class ClassWriter : IDisposable, IAsyncDisposable
 #nullable enable
 #pragma warning disable CS0109 // Member does not hide an inherited member; new keyword is not required
 
-using ZeroGames.ZSharp.Core;
-using ZeroGames.ZSharp.UnrealEngine;
-{_extraUsingBlock}
+{string.Join('\n', NamespaceHelper.LootNamespace(_exportedClass).Where(ns => ns != _exportedClass.Namespace).Select(ns => $"using {ns};"))}
 
 namespace {_exportedClass.Namespace};
 
@@ -144,23 +142,6 @@ namespace {_exportedClass.Namespace};
 	}}";
 
 		return block;
-	}
-
-	private string _extraUsingBlock
-	{
-		get
-		{
-			List<string> relevantModules = [ "Core", "CoreUObject", "PhysicsCore", "InputCore", "Engine", "UMG", "SlateCore", "Slate" ];
-
-			if (_baseType is {} baseType)
-			{
-				relevantModules.Add(GetTypeModule(baseType));
-			}
-			
-			relevantModules.RemoveAll(module => string.IsNullOrWhiteSpace(module) || module == _exportedClass.Module);
-
-			return string.Join('\n', relevantModules.Distinct().Select(module => $"using {_registry.GetModuleAssembly(module)?.Name ?? throw new InvalidOperationException($"Unmapped module {module}")}.{module};"));
-		}
 	}
 
 	private string _classAttributes

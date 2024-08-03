@@ -218,14 +218,30 @@ public class ProjectFileBuilder
 		targetNode.SetAttribute("Name", "PostBuild");
 		targetNode.SetAttribute("AfterTargets", "PostBuildEvent");
 
-		XmlElement mkdirNode = doc.CreateElement("Exec");
-		string outputDir = "$(UnrealProjectDir)/Binaries/Managed";
-		mkdirNode.SetAttribute("Command", $"if not exist \"{outputDir}\" mkdir \"{outputDir}\"");
-		targetNode.AppendChild(mkdirNode);
+		{
+			// Copy output to project binaries dir.
+			XmlElement mkdirNode = doc.CreateElement("Exec");
+			string projectBinariesDir = "$(UnrealProjectDir)/Binaries/Managed";
+			mkdirNode.SetAttribute("Command", $"if not exist \"{projectBinariesDir}\" mkdir \"{projectBinariesDir}\"");
+			targetNode.AppendChild(mkdirNode);
 
-		XmlElement copyNode = doc.CreateElement("Exec");
-		copyNode.SetAttribute("Command", $"copy \"$(TargetPath)\" \"{outputDir}/$(TargetFileName)\"");
-		targetNode.AppendChild(copyNode);
+			XmlElement copyNode = doc.CreateElement("Exec");
+			copyNode.SetAttribute("Command", $"copy \"$(TargetPath)\" \"{projectBinariesDir}/$(TargetFileName)\"");
+			targetNode.AppendChild(copyNode);
+		}
+
+		if (_project.IsPrecompiled)
+		{
+			// Copy precompiled output to plugin content dir.
+			XmlElement mkdirNode = doc.CreateElement("Exec");
+			string pluginContentDir = "$(ZSharpDir)/Content";
+			mkdirNode.SetAttribute("Command", $"if not exist \"{pluginContentDir}\" mkdir \"{pluginContentDir}\"");
+			targetNode.AppendChild(mkdirNode);
+
+			XmlElement copyNode = doc.CreateElement("Exec");
+			copyNode.SetAttribute("Command", $"copy \"$(TargetPath)\" \"{pluginContentDir}/$(TargetFileName)\"");
+			targetNode.AppendChild(copyNode);
+		}
 
 		projectNode.AppendChild(targetNode);
 		return targetNode;

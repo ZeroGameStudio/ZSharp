@@ -65,6 +65,7 @@ void FZSharpRuntimeModule::UnloadMasterAlc()
 	ZSharp::IZSharpClr::Get().GetMasterAlc()->Unload();
 }
 
+#if WITH_EDITOR
 void FZSharpRuntimeModule::HandleBeginPIE(const bool simulating)
 {
 	CreateMasterAlc();
@@ -74,5 +75,6 @@ void FZSharpRuntimeModule::HandleEndPIE(const bool simulating)
 {
 	UnloadMasterAlc();
 }
+#endif
 
 

@@ -103,8 +103,10 @@ FProperty* ZSharp::FZPropertyFactory::Create(const FZPropertyDesc& desc)
 	}
 	else if (auto enm = Cast<UEnum>(field))
 	{
-		auto prop = new FEnumProperty { enm };
+		auto prop = PropertyFactory_Private::Create<FEnumProperty>(PropertyFactory_Private::PrimitiveFlags);
 		prop->SetEnum(enm);
+		prop->AddCppProperty(PropertyFactory_Private::Create<FInt64Property>(PropertyFactory_Private::PrimitiveFlags));
+		prop->ElementSize = prop->GetUnderlyingProperty()->ElementSize;
 	}
 
 	checkNoEntry();

@@ -42,6 +42,17 @@ public class Dotnet : ModuleRules
 
 			RuntimeDependencies.Add(Path.Combine(frameworkDir, relativePath), file);
 		}
+
+		if (!Target.bBuildEditor)
+		{
+			RuntimeDependencies.Add(Path.Combine(PluginDirectory, "Content/ZSharp.runtimeconfig.json"));
+			IEnumerable<string> managedAssemblies = GetFiles(Path.Combine(PluginDirectory, "Binaries/Managed"));
+			foreach (var file in managedAssemblies)
+			{
+				string fileName = Path.GetFileName(file);
+				RuntimeDependencies.Add(Path.Combine("$(TargetOutputDir)/../Managed", fileName), file);
+			}
+		}
 	}
 
 	private static IEnumerable<string> GetFiles(string directory, string pattern = "*.*")

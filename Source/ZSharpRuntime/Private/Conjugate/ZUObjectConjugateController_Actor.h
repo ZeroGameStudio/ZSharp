@@ -26,10 +26,11 @@ namespace ZSharp
 		virtual void SetLifecycleExpiredCallback(const TFunction<void(UObject*)>& callback) override;
 
 	private:
+		UZUObjectConjugateController_Actor_Proxy* GetProxy() const;
 		void HandleActorDestroyed(AActor* actor);
 
 	private:
-		TStrongObjectPtr<UZUObjectConjugateController_Actor_Proxy> Proxy;
+		mutable TStrongObjectPtr<UZUObjectConjugateController_Actor_Proxy> Proxy;
 		TSet<TObjectKey<AActor>> Actors;
 		TFunction<void(UObject*)> OnExpired;
 		

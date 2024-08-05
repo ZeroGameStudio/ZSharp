@@ -167,10 +167,16 @@ void ZSharp::FZGenericClr::Startup()
 	bInitialized = true;
 
 	const FString pluginDir = IPluginManager::Get().FindEnabledPlugin("ZSharp")->GetBaseDir();
-	const FString pluginBinariesDir = FPaths::Combine(pluginDir, "Binaries");
 	const FString pluginContentDir = FPaths::Combine(pluginDir, "Content");
-	
+
+#if WITH_EDITOR
+	const FString pluginBinariesDir = FPaths::Combine(pluginDir, "Binaries");
 	const FString dotnetRoot = FPaths::Combine(pluginBinariesDir, ZSHARP_DOTNET_PATH);
+#else
+	const FString projectDir = FPaths::ProjectDir();
+	const FString projectBinariesDir = FPaths::Combine(projectDir, "Binaries");
+	const FString dotnetRoot = FPaths::Combine(projectBinariesDir, ZSHARP_DOTNET_PATH);
+#endif
 	const FString hostFXRPath = FPaths::Combine(dotnetRoot, ZSHARP_HOSTFXR_PATH);
 	void* hostFXR = FPlatformProcess::GetDllHandle(*hostFXRPath);
 	check(hostFXR);

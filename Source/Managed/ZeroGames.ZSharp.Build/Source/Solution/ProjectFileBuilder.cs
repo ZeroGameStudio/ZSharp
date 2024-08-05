@@ -229,6 +229,18 @@ public class ProjectFileBuilder
 			copyNode.SetAttribute("Command", $"copy \"$(TargetPath)\" \"{projectBinariesDir}/$(TargetFileName)\"");
 			targetNode.AppendChild(copyNode);
 		}
+		
+		{
+			// Copy output to plugin binaries dir for packaging.
+			XmlElement mkdirNode = doc.CreateElement("Exec");
+			string projectBinariesDir = "$(ZSharpDir)/Binaries/Managed";
+			mkdirNode.SetAttribute("Command", $"if not exist \"{projectBinariesDir}\" mkdir \"{projectBinariesDir}\"");
+			targetNode.AppendChild(mkdirNode);
+
+			XmlElement copyNode = doc.CreateElement("Exec");
+			copyNode.SetAttribute("Command", $"copy \"$(TargetPath)\" \"{projectBinariesDir}/$(TargetFileName)\"");
+			targetNode.AppendChild(copyNode);
+		}
 
 		if (_project.IsPrecompiled)
 		{

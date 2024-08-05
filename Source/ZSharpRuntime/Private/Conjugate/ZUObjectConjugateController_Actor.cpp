@@ -5,17 +5,22 @@
 
 ZSharp::FZUObjectConjugateController_Actor::FZUObjectConjugateController_Actor()
 {
-	Proxy = TStrongObjectPtr { NewObject<UZUObjectConjugateController_Actor_Proxy>() };
-	Proxy->Owner = this;
+
 }
 
 ZSharp::FZUObjectConjugateController_Actor::~FZUObjectConjugateController_Actor()
 {
+	if (!Proxy)
+	{
+		return;
+	}
+
+	UZUObjectConjugateController_Actor_Proxy* proxy = Proxy.Get();
 	for (const auto& key : Actors)
 	{
 		if (AActor* actor = key.ResolveObjectPtrEvenIfGarbage())
 		{
-			actor->OnDestroyed.RemoveAll(Proxy.Get());
+			actor->OnDestroyed.RemoveAll(proxy);
 		}
 	}
 }
@@ -39,7 +44,7 @@ void ZSharp::FZUObjectConjugateController_Actor::NotifyConjugated(UObject* unman
 	if (AActor* actor = Cast<AActor>(unmanaged))
 	{
 		Actors.Emplace(actor);
-		actor->OnDestroyed.AddDynamic(Proxy.Get(), &UZUObjectConjugateController_Actor_Proxy::HandleActorDestroyed);
+		actor->OnDestroyed.AddDynamic(GetProxy(), &UZUObjectConjugateController_Actor_Proxy::HandleActorDestroyed);
 	}
 }
 
@@ -54,6 +59,19 @@ void ZSharp::FZUObjectConjugateController_Actor::NotifyConjugateReleased(UObject
 void ZSharp::FZUObjectConjugateController_Actor::SetLifecycleExpiredCallback(const TFunction<void(UObject*)>& callback)
 {
 	OnExpired = callback;
+}
+
+UZUObjectConjugateController_Actor_Proxy* ZSharp::FZUObjectConjugateController_Actor::GetProxy() const
+{
+	UZUObjectConjugateController_Actor_Proxy* proxy = Proxy.Get();
+	if (!proxy)
+	{
+		proxy = NewObject<UZUObjectConjugateController_Actor_Proxy>();
+		proxy->Owner = const_cast<FZUObjectConjugateController_Actor*>(this);
+		Proxy = TStrongObjectPtr { proxy };
+	}
+
+	return proxy;
 }
 
 void ZSharp::FZUObjectConjugateController_Actor::HandleActorDestroyed(AActor* actor)

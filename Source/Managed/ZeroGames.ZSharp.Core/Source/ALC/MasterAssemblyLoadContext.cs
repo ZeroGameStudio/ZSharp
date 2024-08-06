@@ -2,6 +2,7 @@
 
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Security;
@@ -13,6 +14,16 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
 {
 
     public const string KName = "Master";
+    
+    public static MasterAssemblyLoadContext Create()
+    {
+        if (_sSingleton is not null)
+        {
+            throw new InvalidOperationException("Master ALC already exists.");
+        }
+
+        return new();
+    }
     
     public static MasterAssemblyLoadContext? Get()
     {
@@ -124,22 +135,18 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         _pendingDisposeConjugates.Enqueue(conjugate);
     }
 
-    public SynchronizationContext SynchronizationContext
+    public ELoadAssemblyErrorCode LoadAssembly(Stream stream, void* args)
     {
-        get => _curSyncContext;
-    }
-
-    internal static MasterAssemblyLoadContext Create()
-    {
-        if (_sSingleton is not null)
+        Assembly asm = LoadFromStream(stream);
+        if (DllMainStatics.TryInvokeDllMain(asm, args, out var res) && res is not null)
         {
-            throw new InvalidOperationException("Master ALC already exists.");
+            return ELoadAssemblyErrorCode.Succeed;
         }
 
-        return new();
+        return ELoadAssemblyErrorCode.Succeed;
     }
 
-    internal void Tick(float deltaTime)
+    public void Tick(float deltaTime)
     {
         while (_pendingDisposeConjugates.TryDequeue(out var conjugate))
         {
@@ -149,7 +156,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         _curSyncContext.Tick(deltaTime);
     }
     
-    internal int32 ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
+    public int32 ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
     {
         if (!_zcallMap.TryGetValue(handle, out var dispatcher))
         {
@@ -159,7 +166,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         return dispatcher.Dispatch(buffer);
     }
 
-    internal ZCallHandle GetZCallHandle_Red(string name)
+    public ZCallHandle GetZCallHandle_Red(string name)
     {
         if (!_zcallName2Handle.TryGetValue(name, out var handle))
         {
@@ -177,7 +184,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         return handle;
     }
 
-    internal IntPtr BuildConjugate_Red(IntPtr unmanaged, Type type)
+    public IntPtr BuildConjugate_Red(IntPtr unmanaged, Type type)
     {
         Type conjugateType = typeof(IConjugate<>).MakeGenericType(type);
         if (type.IsAssignableTo(conjugateType))
@@ -190,7 +197,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         return new();
     }
 
-    internal void ReleaseConjugate_Red(IntPtr unmanaged)
+    public void ReleaseConjugate_Red(IntPtr unmanaged)
     {
         if (!_conjugateMap.Remove(unmanaged, out var rec))
         {
@@ -205,7 +212,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         conjugate.Release();
     }
 
-    internal IConjugate? Conjugate(IntPtr unmanaged)
+    public IConjugate? Conjugate(IntPtr unmanaged)
     {
         if (!_conjugateMap.TryGetValue(unmanaged, out var rec))
         {
@@ -214,6 +221,11 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
 
         rec.Wref.TryGetTarget(out var conjugate);
         return conjugate;
+    }
+    
+    public SynchronizationContext SynchronizationContext
+    {
+        get => _curSyncContext;
     }
 
     protected override void HandleUnload()

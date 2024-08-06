@@ -24,7 +24,7 @@ namespace ZSharp
 	class ZSHARPCORE_API IZMasterAssemblyLoadContext : public IZAssemblyLoadContext
 	{
 	public:
-		virtual void LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) = 0;
+		virtual EZLoadAssemblyErrorCode LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) = 0;
 		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeLocatorWrapper& locator) = 0;
 	public:
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) = 0;

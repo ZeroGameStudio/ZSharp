@@ -57,11 +57,11 @@ void ZSharp::FZMasterAssemblyLoadContext::Unload()
 	UnloadCallback();
 }
 
-void ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const TArray<uint8>& buffer, void* args)
+ZSharp::EZLoadAssemblyErrorCode ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const TArray<uint8>& buffer, void* args)
 {
 	check(IsInGameThread());
 	
-	FZMasterAssemblyLoadContext_Interop::GLoadAssembly(buffer.GetData(), buffer.Num(), args);
+	return static_cast<EZLoadAssemblyErrorCode>(FZMasterAssemblyLoadContext_Interop::GLoadAssembly(buffer.GetData(), buffer.Num(), args));
 }
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const FZRuntimeTypeLocatorWrapper& locator)

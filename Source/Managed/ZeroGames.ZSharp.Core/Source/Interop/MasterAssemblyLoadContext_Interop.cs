@@ -36,17 +36,16 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     }, -1);
 
     [UnmanagedCallersOnly]
-    public static void LoadAssembly(uint8* buffer, int32 size, void* args) => Uncaught.ErrorIfUncaught(() =>
+    public static int32 LoadAssembly(uint8* buffer, int32 size, void* args) => Uncaught.ErrorIfUncaught(() =>
     {
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
         {
-            return;
+            return -1;
         }
 
-        Assembly asm = alc.LoadFromStream(new UnmanagedMemoryStream(buffer, size));
-        DllMainStatics.TryInvokeDllMain(asm, args, out var res);
-    });
+        return (int32)alc.LoadAssembly(new UnmanagedMemoryStream(buffer, size), args);
+    }, default);
 
     [UnmanagedCallersOnly]
     public static InteropRuntimeTypeHandle GetType(InteropRuntimeTypeLocator* locator) => Uncaught.ErrorIfUncaught(() =>

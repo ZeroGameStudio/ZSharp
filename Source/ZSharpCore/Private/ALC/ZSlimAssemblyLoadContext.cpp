@@ -31,7 +31,7 @@ ZSharp::EZLoadAssemblyErrorCode ZSharp::FZSlimAssemblyLoadContext::LoadAssembly(
 	return static_cast<EZLoadAssemblyErrorCode>(FZSlimAssemblyLoadContext_Interop::GLoadAssembly(Handle, buffer.GetData(), buffer.Num(), args));
 }
 
-ZSharp::EZCallMethodErrorCode ZSharp::FZSlimAssemblyLoadContext::CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args) const
+ZSharp::EZCallMethodErrorCode ZSharp::FZSlimAssemblyLoadContext::CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args)
 {
 	if (bUnloading)
 	{

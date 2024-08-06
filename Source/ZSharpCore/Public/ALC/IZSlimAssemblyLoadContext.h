@@ -13,7 +13,7 @@ namespace ZSharp
 	public:
 		virtual EZLoadAssemblyErrorCode LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) = 0;
 	public:
-		virtual EZCallMethodErrorCode CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args = nullptr) const = 0;
+		virtual EZCallMethodErrorCode CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args = nullptr) = 0;
 		// Helpers
 	public:
 		EZLoadAssemblyErrorCode LoadAssembly(const FString& path, void* args = nullptr);

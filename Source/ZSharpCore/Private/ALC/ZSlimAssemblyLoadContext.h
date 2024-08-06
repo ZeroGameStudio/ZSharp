@@ -31,7 +31,7 @@ namespace ZSharp
 		
 		virtual EZLoadAssemblyErrorCode LoadAssembly(const TArray<uint8>& buffer, void* args) override;
 
-		virtual EZCallMethodErrorCode CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args) const override;
+		virtual EZCallMethodErrorCode CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args) override;
 
 	private:
 		FZGCHandle Handle;

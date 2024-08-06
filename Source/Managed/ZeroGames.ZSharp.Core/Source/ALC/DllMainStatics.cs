@@ -38,7 +38,7 @@ internal static class DllMainStatics
 
         object?[]? parameters = null;
         ParameterInfo[] parameterInfos = dllMain.GetParameters();
-        if (parameterInfos.Length > 0 && args is not null)
+        if (parameterInfos.Length > 0)
         {
             if (parameterInfos.Length != 1)
             {
@@ -48,7 +48,7 @@ internal static class DllMainStatics
             Type parameterType = parameterInfos[0].ParameterType;
             if (parameterType == typeof(string[]) && args is not null)
             {
-                parameters = new object[] { ((CommonDllMainArgs*)args)->Parse() };
+                parameters = [ ((CommonMethodArgs*)args)->Parse() ];
             }
             else
             {
@@ -57,7 +57,7 @@ internal static class DllMainStatics
                     throw new Exception("DllMain has non-pointer parameter but not string[].");
                 }
                         
-                parameters = new object[] { new IntPtr(args) };
+                parameters = [ new IntPtr(args) ];
             }
         }
                 

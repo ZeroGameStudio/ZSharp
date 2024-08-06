@@ -17,30 +17,30 @@ void ZSharp::FZSlimAssemblyLoadContext::Unload()
 	FZSlimAssemblyLoadContext_Interop::GUnload(Handle);
 }
 
-int32 ZSharp::FZSlimAssemblyLoadContext::LoadAssembly(const TArray<uint8>& buffer, void* args)
+ZSharp::EZLoadAssemblyErrorCode ZSharp::FZSlimAssemblyLoadContext::LoadAssembly(const TArray<uint8>& buffer, void* args)
 {
 	if (bUnloading)
 	{
-		return -1;
+		return EZLoadAssemblyErrorCode::AlcUnavailable;
 	}
 	
 	++RunningCount;
 
 	ON_SCOPE_EXIT { --RunningCount; };
 	
-	return FZSlimAssemblyLoadContext_Interop::GLoadAssembly(Handle, buffer.GetData(), buffer.Num(), args);
+	return static_cast<EZLoadAssemblyErrorCode>(FZSlimAssemblyLoadContext_Interop::GLoadAssembly(Handle, buffer.GetData(), buffer.Num(), args));
 }
 
-int32 ZSharp::FZSlimAssemblyLoadContext::CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args) const
+ZSharp::EZCallMethodErrorCode ZSharp::FZSlimAssemblyLoadContext::CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args) const
 {
 	if (bUnloading)
 	{
-		return -1;
+		return EZCallMethodErrorCode::AlcUnavailable;
 	}
 	
 	++RunningCount;
 
 	ON_SCOPE_EXIT { --RunningCount; };
 	
-	return FZSlimAssemblyLoadContext_Interop::GCallMethod(Handle, *assemblyName, *typeName, *methodName, args);
+	return static_cast<EZCallMethodErrorCode>(FZSlimAssemblyLoadContext_Interop::GCallMethod(Handle, *assemblyName, *typeName, *methodName, args));
 }

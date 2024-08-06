@@ -4,7 +4,7 @@
 #include "ZBuildEngine.h"
 
 #include "ZSharpBuildSettings.h"
-#include "ALC/ZCommonDllMainArgs.h"
+#include "ALC/ZCommonMethodArgs.h"
 #include "CLR/IZSharpClr.h"
 #include "Glue/ZDynamicTypeExporter.h"
 #include "Glue/ZGlueManifestWriter.h"
@@ -102,7 +102,7 @@ void ZSharp::FZBuildEngine::GenerateSolution() const
 		*projectDirArg,
 		*sourceArg,
 	};
-	FZCommonDllMainArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
+	FZCommonMethodArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
 	IZSharpClr::Get().Run(assemblyDir, &commonArgs);
 }
 
@@ -122,7 +122,7 @@ void ZSharp::FZBuildEngine::GenerateGlue() const
 		*targetArg,
 		*projectDirArg,
 	};
-	FZCommonDllMainArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
+	FZCommonMethodArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
 	IZSharpClr::Get().Run(assemblyDir, &commonArgs);
 }
 

@@ -4,7 +4,7 @@
 
 #include "CLR/ZSharpClr.h"
 #include "CLR/IZSharpClr.h"
-#include "ALC/ZCommonDllMainArgs.h"
+#include "ALC/ZCommonMethodArgs.h"
 
 namespace ZSharp::ZSharpCoreModule_Private
 {
@@ -25,7 +25,7 @@ namespace ZSharp::ZSharpCoreModule_Private
 			argv.Emplace(*args[i]);
 		}
 		
-		FZCommonDllMainArgs commonArgs { argv.Num(), argv.GetData() };
+		FZCommonMethodArgs commonArgs { argv.Num(), argv.GetData() };
 		IZSharpClr::Get().Run(path, &commonArgs);
 	}),
 	ECVF_Default);
@@ -47,7 +47,7 @@ namespace ZSharp::ZSharpCoreModule_Private
 				argv.Emplace(*args[i]);
 			}
 		
-			FZCommonDllMainArgs commonArgs { argv.Num(), argv.GetData() };
+			FZCommonMethodArgs commonArgs { argv.Num(), argv.GetData() };
 			IZSharpClr::Get().RunAsync(path, &commonArgs);
 		}),
 		ECVF_Default);

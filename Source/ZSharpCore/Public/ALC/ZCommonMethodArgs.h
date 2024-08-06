@@ -4,7 +4,7 @@
 
 namespace ZSharp
 {
-	struct FZCommonDllMainArgs
+	struct FZCommonMethodArgs
 	{
 		int32 Argc;
 		const TCHAR** Argv;

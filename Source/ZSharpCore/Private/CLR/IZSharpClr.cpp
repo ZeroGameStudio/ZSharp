@@ -28,7 +28,7 @@ int32 ZSharp::IZSharpClr::Run(const FString& path, void* args, const FString& al
 
 	ON_SCOPE_EXIT { alc->Unload(); };
 
-	return alc->LoadAssembly(path, args);
+	return (int32)alc->LoadAssembly(path, args);
 }
 
 int32 ZSharp::IZSharpClr::RunAsync(const FString& path, void* args, const FString& alcName)
@@ -40,7 +40,7 @@ int32 ZSharp::IZSharpClr::RunAsync(const FString& path, void* args, const FStrin
 		return -1;
 	}
 
-	return alc->LoadAssembly(path, args);
+	return (int32)alc->LoadAssembly(path, args);
 }
 
 

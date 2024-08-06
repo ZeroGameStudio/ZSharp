@@ -27,11 +27,11 @@ namespace ZSharp
 		virtual void Unload() override;
 
 		// IZSlimAssemblyLoadContext
-		virtual const FString& GetName() const override { return Name; }
+		virtual FString GetName() const override { return Name; }
 		
-		virtual int32 LoadAssembly(const TArray<uint8>& buffer, void* args) override;
+		virtual EZLoadAssemblyErrorCode LoadAssembly(const TArray<uint8>& buffer, void* args) override;
 
-		virtual int32 CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args) const override;
+		virtual EZCallMethodErrorCode CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args) const override;
 
 	private:
 		FZGCHandle Handle;

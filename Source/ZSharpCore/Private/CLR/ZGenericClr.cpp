@@ -242,7 +242,7 @@ void ZSharp::FZGenericClr::CollectGarbage(int32 generation, bool aggressive, boo
 ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
 {
 	check(IsInGameThread());
-
+	
 	if (MasterAlc)
 	{
 		UE_LOG(LogZSharpCore, Fatal, TEXT("Master ALC already exists!"));

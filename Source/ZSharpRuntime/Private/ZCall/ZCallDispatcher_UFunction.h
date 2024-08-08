@@ -17,7 +17,7 @@ namespace ZSharp
 		
 	public:
 		virtual const FString& GetName() const override { return Name; }
-		virtual int32 Dispatch(FZCallBuffer* buffer) const override;
+		virtual EZCallErrorCode Dispatch(FZCallBuffer* buffer) const override;
 
 	private:
 		bool InvalidateCache() const;

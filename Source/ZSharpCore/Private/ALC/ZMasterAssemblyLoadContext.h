@@ -37,7 +37,7 @@ namespace ZSharp
 		virtual void PushRedFrame() override;
 		virtual void PopRedFrame() override;
 		virtual void PrepareForZCall() override;
-		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) override;
+		virtual EZCallErrorCode ZCall(FZCallHandle handle, FZCallBuffer* buffer) override;
 		virtual FZCallHandle GetZCallHandle(const FString& name) override;
 		virtual void* BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type) override;
 		virtual void ReleaseConjugate(void* unmanaged) override;
@@ -45,7 +45,7 @@ namespace ZSharp
 		virtual IZConjugateRegistry& GetConjugateRegistry(uint16 id) override;
 		
 	public:
-		int32 ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const;
+		EZCallErrorCode ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const;
 		FZCallHandle GetZCallHandle_Black(const FString& name);
 		void* BuildConjugate_Black(uint16 registryId, void* userdata);
 		void ReleaseConjugate_Black(uint16 registryId, void* unmanaged);
@@ -53,7 +53,7 @@ namespace ZSharp
 	private:
 		bool Tick(float deltaTime);
 		
-		int32 ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer);
+		EZCallErrorCode ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer);
 		FZCallHandle GetZCallHandle_Red(const FString& name);
 		void* BuildConjugate_Red(void* unmanaged, FZRuntimeTypeHandle type);
 		void ReleaseConjugate_Red(void* unmanaged);

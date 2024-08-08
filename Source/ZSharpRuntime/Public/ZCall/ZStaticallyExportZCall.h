@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "ZSharpErrorCodes.h"
 #include "ZCallBufferSlotEncoder.h"
 
 namespace ZSharp
@@ -10,7 +11,7 @@ namespace ZSharp
 
 	struct ZSHARPRUNTIME_API FZStaticallyExportZCall
 	{
-		FZStaticallyExportZCall(const FString& name, const TFunction<int32(FZCallBuffer*)>& function);
+		FZStaticallyExportZCall(const FString& name, const TFunction<EZCallErrorCode(FZCallBuffer*)>& function);
 	};
 
 	template <typename T, T>
@@ -42,7 +43,7 @@ namespace ZSharp
 				}
 				TZTryDecodeZCallBufferSlot<TArgs...>::template EncodeStatic(args, buf);
 				
-				return 0;
+				return EZCallErrorCode::Succeed;
 			}};
 		}
 	};
@@ -74,7 +75,7 @@ namespace ZSharp
 				}
 				TZTryDecodeZCallBufferSlot<TArgs...>::template EncodeInstance(args, buf);
 				
-				return 0;
+				return EZCallErrorCode::Succeed;
 			}};
 		}
 	};
@@ -106,7 +107,7 @@ namespace ZSharp
 				}
 				TZTryDecodeZCallBufferSlot<TArgs...>::template EncodeInstance(args, buf);
 					
-				return 0;
+				return EZCallErrorCode::Succeed;
 			}};
 		}
 	};

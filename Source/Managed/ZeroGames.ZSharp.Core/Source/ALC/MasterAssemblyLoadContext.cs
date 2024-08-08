@@ -125,7 +125,7 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         });
     }
 
-    public int32 ZCall(ZCallHandle handle, ZCallBuffer* buffer) => ZCall_Black(handle, buffer);
+    public EZCallErrorCode ZCall(ZCallHandle handle, ZCallBuffer* buffer) => ZCall_Black(handle, buffer);
     public ZCallHandle GetZCallHandle(string name) => GetZCallHandle_Black(name);
     public IntPtr BuildConjugate(IConjugate managed, IntPtr userdata) => BuildConjugate_Black(managed, userdata);
     public void ReleaseConjugate(IntPtr unmanaged) => ReleaseConjugate_Black(unmanaged);
@@ -156,11 +156,11 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         _curSyncContext.Tick(deltaTime);
     }
     
-    public int32 ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
+    public EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
     {
         if (!_zcallMap.TryGetValue(handle, out var dispatcher))
         {
-            return -1;
+            return EZCallErrorCode.DispatcherNotFound;
         }
 
         return dispatcher.Dispatch(buffer);
@@ -266,9 +266,9 @@ internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase,
         RegisterZCallResolver(new ZCallResolver_Property(), 2);
     }
     
-    private int32 ZCall_Black(ZCallHandle handle, ZCallBuffer* buffer)
+    private EZCallErrorCode ZCall_Black(ZCallHandle handle, ZCallBuffer* buffer)
     {
-        return MasterAssemblyLoadContext_Interop.SZCall_Black(handle, buffer);
+        return (EZCallErrorCode)MasterAssemblyLoadContext_Interop.SZCall_Black(handle, buffer);
     }
 
     private ZCallHandle GetZCallHandle_Black(string name)

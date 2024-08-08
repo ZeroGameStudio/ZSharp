@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ZSelfDescriptiveBase.h"
+#include "ZSharpErrorCodes.h"
 #include "Interop/ZGCHandle.h"
 #include "Reflection/Function/ZFunctionVisitorHandle.h"
 
@@ -18,7 +19,7 @@ namespace ZSharp
 		UObject* BindManaged(FZGCHandle delegate);
 		void Unbind();
 
-		int32 Execute(FZCallBuffer* buffer);
+		EZCallErrorCode Execute(FZCallBuffer* buffer);
 
 		UObject* GetObject() const;
 		FName GetFunctionName() const;

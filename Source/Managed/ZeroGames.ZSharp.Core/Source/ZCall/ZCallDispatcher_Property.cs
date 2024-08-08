@@ -5,7 +5,7 @@ namespace ZeroGames.ZSharp.Core;
 public class ZCallDispatcher_Property : IZCallDispatcher
 {
 	
-	public unsafe int32 Dispatch(ZCallBuffer* buffer)
+	public unsafe EZCallErrorCode Dispatch(ZCallBuffer* buffer)
 	{
 		throw new NotImplementedException();
 	}

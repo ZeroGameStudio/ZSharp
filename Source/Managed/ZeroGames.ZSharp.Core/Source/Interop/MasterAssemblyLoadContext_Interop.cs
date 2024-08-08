@@ -41,11 +41,11 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
         {
-            return -1;
+            return (int32)ELoadAssemblyErrorCode.AlcUnavailable;
         }
 
         return (int32)alc.LoadAssembly(new UnmanagedMemoryStream(buffer, size), args);
-    }, default);
+    }, (int32)ELoadAssemblyErrorCode.UnknownError);
 
     [UnmanagedCallersOnly]
     public static InteropRuntimeTypeHandle GetType(InteropRuntimeTypeLocator* locator) => Uncaught.ErrorIfUncaught(() =>
@@ -66,11 +66,11 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
         {
-            return 1;
+            return (int32)EZCallErrorCode.AlcUnavailable;
         }
 
-        return alc.ZCall_Red(handle, buffer);
-    }, -1);
+        return (int32)alc.ZCall_Red(handle, buffer);
+    }, (int32)EZCallErrorCode.UnknownError);
     
     [UnmanagedCallersOnly]
     public static ZCallHandle GetZCallHandle_Red(char* name) => Uncaught.ErrorIfUncaught(() =>

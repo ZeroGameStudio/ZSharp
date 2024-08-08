@@ -4,6 +4,7 @@
 
 #include "Reflection/Property/IZPropertyVisitor.h"
 #include "ZCall/ZCallHandle.h"
+#include "ZSharpErrorCodes.h"
 
 namespace ZSharp
 {
@@ -15,11 +16,11 @@ namespace ZSharp
 		friend class FZFunctionVisitorRegistry;
 	
 	public:
-		int32 InvokeUFunction(FZCallBuffer* buffer) const;
-		int32 InvokeScriptDelegate(FZCallBuffer* buffer) const;
-		int32 InvokeMulticastInlineScriptDelegate(FZCallBuffer* buffer) const;
-		int32 InvokeMulticastSparseScriptDelegate(FZCallBuffer* buffer) const;
-		int32 InvokeZCall(FZCallHandle handle, UObject* object, void* params) const;
+		EZCallErrorCode InvokeUFunction(FZCallBuffer* buffer) const;
+		EZCallErrorCode InvokeScriptDelegate(FZCallBuffer* buffer) const;
+		EZCallErrorCode InvokeMulticastInlineScriptDelegate(FZCallBuffer* buffer) const;
+		EZCallErrorCode InvokeMulticastSparseScriptDelegate(FZCallBuffer* buffer) const;
+		EZCallErrorCode InvokeZCall(FZCallHandle handle, UObject* object, void* params) const;
 
 	private:
 		explicit FZFunctionVisitor(UFunction* function);

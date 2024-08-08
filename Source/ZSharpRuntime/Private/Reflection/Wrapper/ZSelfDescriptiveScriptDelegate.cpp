@@ -47,18 +47,19 @@ void ZSharp::FZSelfDescriptiveScriptDelegate::Unbind()
 	UnderlyingInstance->Unbind();
 }
 
-int32 ZSharp::FZSelfDescriptiveScriptDelegate::Execute(FZCallBuffer* buffer)
+ZSharp::EZCallErrorCode ZSharp::FZSelfDescriptiveScriptDelegate::Execute(FZCallBuffer* buffer)
 {
 	if (!IsBound())
 	{
-		return 1;
+		checkNoEntry();
+		return EZCallErrorCode::ExternalError;
 	}
 	
 	if (!Visitor)
 	{
 		if (Visitor = FZFunctionVisitorRegistry::Get().Get(Descriptor); !Visitor)
 		{
-			return 2;
+			return EZCallErrorCode::DispatcherNotFound;
 		}
 	}
 	

@@ -9,12 +9,12 @@ internal class ZCallDispatcher_Delegate : IZCallDispatcher
 
 	public const string KName = "d://";
 	
-	public unsafe int32 Dispatch(ZCallBuffer* buffer)
+	public unsafe EZCallErrorCode Dispatch(ZCallBuffer* buffer)
 	{
 		Delegate? @delegate = (*buffer)[0].GCHandle.Target as Delegate;
 		if (@delegate is null)
 		{
-			return 1;
+			return EZCallErrorCode.BufferError;
 		}
 
 		int32 pos = 1;
@@ -42,7 +42,7 @@ internal class ZCallDispatcher_Delegate : IZCallDispatcher
 			(*buffer)[pos].Object = returnValue;
 		}
 		
-		return 0;
+		return EZCallErrorCode.Succeed;
 	}
 
 	public string Name => KName;

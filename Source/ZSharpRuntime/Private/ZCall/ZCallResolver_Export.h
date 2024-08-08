@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "ZSharpErrorCodes.h"
 #include "ZCall/IZCallResolver.h"
 
 namespace ZSharp
@@ -12,7 +13,7 @@ namespace ZSharp
 	{
 
 	public:
-		static void RegisterFunction(const FString& name, const TFunction<int32(FZCallBuffer*)>& function);
+		static void RegisterFunction(const FString& name, const TFunction<EZCallErrorCode(FZCallBuffer*)>& function);
 
 	public:
 		virtual IZCallDispatcher* Resolve(const FString& name) const override;

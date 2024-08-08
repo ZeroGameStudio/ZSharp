@@ -17,7 +17,7 @@ namespace ZSharp
 		int32 index = buf[1].ReadInt32();
 		sdsa.Get(index, buf[2]);
 		
-		return 0;
+		return EZCallErrorCode::Succeed;
 	}};
 
 	static FZStaticallyExportZCall GSet { "ex://Array.Set", [](FZCallBuffer* buffer)
@@ -27,7 +27,7 @@ namespace ZSharp
 		int32 index = buf[1].ReadInt32();
 		sdsa.Set(index, buf[2]);
 		
-		return 0;
+		return EZCallErrorCode::Succeed;
 	}};
 }
 

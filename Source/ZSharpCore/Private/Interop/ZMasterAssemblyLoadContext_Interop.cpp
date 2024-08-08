@@ -15,7 +15,7 @@ int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCall_Black(FZCallHandle hand
 		return -1;
 	}
 
-	GUARDED_INVOKE(alc->ZCall_Black(handle, buffer), -2);
+	GUARDED_INVOKE(static_cast<int32>(alc->ZCall_Black(handle, buffer)), -2);
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext_Interop::GetZCallHandle_Black(const TCHAR* name)

@@ -7,15 +7,14 @@
 #include "ZCall/ZCallBuffer.h"
 #include "ZCall/ZCallBufferSlotEncoder.h"
 
-int32 ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
+ZSharp::EZCallErrorCode ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
 {
 	if (!Function && !InvalidateCache())
 	{
-		return 1;
+		return EZCallErrorCode::DispatcherError;
 	}
 
-	const int32 res = Function->InvokeUFunction(buffer);
-	return res ? res + 1 : 0;
+	return Function->InvokeUFunction(buffer);
 }
 
 bool ZSharp::FZCallDispatcher_UFunction::InvalidateCache() const

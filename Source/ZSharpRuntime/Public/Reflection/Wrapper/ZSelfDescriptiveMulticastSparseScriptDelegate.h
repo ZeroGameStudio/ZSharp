@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ZSelfDescriptiveBase.h"
+#include "ZSharpErrorCodes.h"
 #include "Interop/ZGCHandle.h"
 #include "Reflection/Function/ZFunctionVisitorHandle.h"
 
@@ -24,7 +25,7 @@ namespace ZSharp
 		void RemoveAll(const UObject* object);
 		void Clear();
 
-		int32 Broadcast(FZCallBuffer* buffer);
+		EZCallErrorCode Broadcast(FZCallBuffer* buffer);
 
 		bool IsBound() const;
 

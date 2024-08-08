@@ -38,7 +38,7 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 	ZCallHandle RegisterZCall(IZCallDispatcher dispatcher);
 	void RegisterZCallResolver(IZCallResolver resolver, uint64 priority);
 	
-	int32 ZCall(ZCallHandle handle, ZCallBuffer* buffer);
+	EZCallErrorCode ZCall(ZCallHandle handle, ZCallBuffer* buffer);
 	ZCallHandle GetZCallHandle(string name);
 	IntPtr BuildConjugate(IConjugate managed, IntPtr userdata);
 	void ReleaseConjugate(IntPtr unmanaged);

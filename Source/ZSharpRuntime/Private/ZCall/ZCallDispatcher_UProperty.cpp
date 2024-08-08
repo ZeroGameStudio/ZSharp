@@ -14,19 +14,19 @@ ZSharp::FZCallDispatcher_UProperty::FZCallDispatcher_UProperty(const FString& na
 	Name.RightChop(4).Split(TEXT(":"), &StructPath, &PropertyName, ESearchCase::CaseSensitive, ESearchDir::FromEnd);
 }
 
-int32 ZSharp::FZCallDispatcher_UProperty::Dispatch(FZCallBuffer* buffer) const
+ZSharp::EZCallErrorCode ZSharp::FZCallDispatcher_UProperty::Dispatch(FZCallBuffer* buffer) const
 {
 	if (!GCRoot.IsValid(true))
 	{
 		if (bAvailable = InvalidateCache(); !bAvailable)
 		{
-			return 1;
+			return EZCallErrorCode::DispatcherError;
 		}
 	}
 
 	if (!bAvailable)
 	{
-		return 2;
+		return EZCallErrorCode::DispatcherError;
 	}
 
 	FZCallBuffer& buf = *buffer;
@@ -55,7 +55,7 @@ int32 ZSharp::FZCallDispatcher_UProperty::Dispatch(FZCallBuffer* buffer) const
 		Property->GetRef_InContainer(self, buf[3], index);
 	}
 	
-	return 0;
+	return EZCallErrorCode::Succeed;
 }
 
 bool ZSharp::FZCallDispatcher_UProperty::InvalidateCache() const

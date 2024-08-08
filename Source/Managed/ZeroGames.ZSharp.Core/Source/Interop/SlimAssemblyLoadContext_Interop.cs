@@ -26,13 +26,13 @@ internal static class SlimAssemblyLoadContext_Interop
     public static unsafe int32 LoadAssembly(GCHandle handle, uint8* buffer, int32 size, void* args) => Uncaught.ErrorIfUncaught(() =>
     {
         return (int32)Unsafe.As<SlimAssemblyLoadContext>(handle.Target)!.LoadAssembly(new UnmanagedMemoryStream(buffer, size), args);
-    }, -1);
+    }, (int32)ELoadAssemblyErrorCode.UnknownError);
 
     [UnmanagedCallersOnly]
     public static unsafe int32 CallMethod(GCHandle handle, char* assemblyName, char* typeName, char* methodName, void* args) => Uncaught.ErrorIfUncaught(() =>
     {
         return (int32)Unsafe.As<SlimAssemblyLoadContext>(handle.Target)!.CallMethod(new(assemblyName), new(typeName), new(methodName), args);
-    }, -1);
+    }, (int32)ECallMethodErrorCode.UnknownError);
 
 }
 

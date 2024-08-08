@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "ZSharpErrorCodes.h"
+
 namespace ZSharp
 {
 	struct FZCallBuffer;
@@ -12,7 +14,7 @@ namespace ZSharp
 		virtual ~IZCallDispatcher(){}
 	public:
 		virtual const FString& GetName() const = 0;
-		virtual int32 Dispatch(FZCallBuffer* buffer) const = 0;
+		virtual EZCallErrorCode Dispatch(FZCallBuffer* buffer) const = 0;
 	};
 }
 

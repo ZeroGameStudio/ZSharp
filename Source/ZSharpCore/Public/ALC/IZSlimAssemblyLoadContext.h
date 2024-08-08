@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "ZSharpErrorCodes.h"
 #include "IZAssemblyLoadContext.h"
 
 namespace ZSharp

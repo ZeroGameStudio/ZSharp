@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.Core;
 
 public unsafe interface IZCallDispatcher
 {
-	int32 Dispatch(ZCallBuffer* buffer);
+	EZCallErrorCode Dispatch(ZCallBuffer* buffer);
 	string Name { get; }
 }
 

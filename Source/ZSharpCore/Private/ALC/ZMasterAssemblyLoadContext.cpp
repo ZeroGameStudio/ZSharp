@@ -160,7 +160,7 @@ void ZSharp::FZMasterAssemblyLoadContext::PrepareForZCall()
 	bZCallPrepared = true;
 }
 
-int32 ZSharp::FZMasterAssemblyLoadContext::ZCall(FZCallHandle handle, FZCallBuffer* buffer)
+ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall(FZCallHandle handle, FZCallBuffer* buffer)
 {
 	check(IsInGameThread());
 	check(bZCallPrepared);
@@ -198,20 +198,20 @@ ZSharp::IZConjugateRegistry& ZSharp::FZMasterAssemblyLoadContext::GetConjugateRe
 	return *ConjugateRegistries[id];
 }
 
-int32 ZSharp::FZMasterAssemblyLoadContext::ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const
+ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const
 {
 	check(IsInGameThread());
 	check(IsInRedStack());
 	
 	if (!handle.IsBlack())
 	{
-		return -1;
+		return EZCallErrorCode::InvalidHandle;
 	}
 	
 	const TUniquePtr<IZCallDispatcher>* pDispatcher = ZCallMap.Find(handle);
 	if (!pDispatcher)
 	{
-		return -1;
+		return EZCallErrorCode::DispatcherNotFound;
 	}
 
 	return (*pDispatcher)->Dispatch(buffer);
@@ -260,11 +260,11 @@ bool ZSharp::FZMasterAssemblyLoadContext::Tick(float deltaTime)
 	return FZMasterAssemblyLoadContext_Interop::GTick(deltaTime) > 0;
 }
 
-int32 ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer)
+ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer)
 {
 	ON_SCOPE_EXIT { PopRedFrame(); };
 
-	return FZMasterAssemblyLoadContext_Interop::GZCall_Red(handle, buffer);
+	return static_cast<EZCallErrorCode>(FZMasterAssemblyLoadContext_Interop::GZCall_Red(handle, buffer));
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle_Red(const FString& name)

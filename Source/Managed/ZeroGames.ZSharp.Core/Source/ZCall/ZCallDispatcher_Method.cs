@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.Core;
 internal class ZCallDispatcher_Method : IZCallDispatcher
 {
 	
-	public unsafe int32 Dispatch(ZCallBuffer* buffer)
+	public unsafe EZCallErrorCode Dispatch(ZCallBuffer* buffer)
 	{
         int32 pos = 0;
         
@@ -18,7 +18,7 @@ internal class ZCallDispatcher_Method : IZCallDispatcher
             obj = (*buffer)[pos++].ReadConjugate<IConjugate>();
             if (obj is null || !obj.GetType().IsAssignableTo(thisType))
             {
-                return 1;
+                return EZCallErrorCode.BufferError;
             }
         }
 
@@ -45,7 +45,7 @@ internal class ZCallDispatcher_Method : IZCallDispatcher
             (*buffer)[pos].Object = returnValue;
         }
 
-        return 0;
+        return EZCallErrorCode.Succeed;
 	}
 
 	public required string Name { get; init; }

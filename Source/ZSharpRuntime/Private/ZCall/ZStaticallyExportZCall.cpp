@@ -5,7 +5,7 @@
 
 #include "ZCallResolver_Export.h"
 
-ZSharp::FZStaticallyExportZCall::FZStaticallyExportZCall(const FString& name, const TFunction<int32(FZCallBuffer*)>& function)
+ZSharp::FZStaticallyExportZCall::FZStaticallyExportZCall(const FString& name, const TFunction<EZCallErrorCode(FZCallBuffer*)>& function)
 {
 	FZCallResolver_Export::RegisterFunction(name, function);
 }

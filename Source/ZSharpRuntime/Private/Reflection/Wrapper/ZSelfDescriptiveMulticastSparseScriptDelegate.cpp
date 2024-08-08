@@ -67,18 +67,18 @@ void ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::Clear()
 	UnderlyingInstance->__Internal_Clear(GetOwner(), Descriptor->DelegateName);
 }
 
-int32 ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::Broadcast(FZCallBuffer* buffer)
+ZSharp::EZCallErrorCode ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::Broadcast(FZCallBuffer* buffer)
 {
 	if (!IsBound())
 	{
-		return 1;
+		return EZCallErrorCode::ExternalError;
 	}
 	
 	if (!Visitor)
 	{
 		if (Visitor = FZFunctionVisitorRegistry::Get().Get(Descriptor); !Visitor)
 		{
-			return 2;
+			return EZCallErrorCode::DispatcherNotFound;
 		}
 	}
 	

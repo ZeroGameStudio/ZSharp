@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "ZSharpErrorCodes.h"
 #include "IZAssemblyLoadContext.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "ZCall/ZCallHandle.h"
@@ -33,7 +34,7 @@ namespace ZSharp
 		virtual void PushRedFrame() = 0;
 		virtual void PopRedFrame() = 0;
 		virtual void PrepareForZCall() = 0;
-		virtual int32 ZCall(FZCallHandle handle, FZCallBuffer* buffer) = 0;
+		virtual EZCallErrorCode ZCall(FZCallHandle handle, FZCallBuffer* buffer) = 0;
 		virtual FZCallHandle GetZCallHandle(const FString& name) = 0;
 		virtual void* BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type) = 0;
 		virtual void ReleaseConjugate(void* unmanaged) = 0;

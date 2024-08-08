@@ -6,7 +6,7 @@
 #include "ZCall/ZCallBufferSlotEncoder.h"
 #include "ZCall/ZManagedDelegateProxyInterface.h"
 
-int32 ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer* buffer) const
+ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer* buffer) const
 {
 	check(bAvailable);
 	check(!bIsDelegate);
@@ -21,7 +21,7 @@ int32 ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer* buffer) const
 		self = TZCallBufferSlotEncoder<UObject*>::Decode(buf[0]);
 		if (!self)
 		{
-			return 1;
+			return EZCallErrorCode::BufferError;
 		}
 		const UFunction* proto = func;
 		func = self->FindFunctionChecked(func->GetFName()); // Instance function may be polymorphism
@@ -63,10 +63,10 @@ int32 ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer* buffer) const
 		ReturnProperty->GetValue_InContainer(params, buf[-1], 0);
 	}
 
-	return 0;
+	return EZCallErrorCode::Succeed;
 }
 
-int32 ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBuffer* buffer) const
+ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBuffer* buffer) const
 {
 	check(bAvailable);
 	check(bIsDelegate);
@@ -107,10 +107,10 @@ int32 ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBuffer* buffer) cons
 		ReturnProperty->GetValue_InContainer(params, buf[-1], 0);
 	}
 
-	return 0;
+	return EZCallErrorCode::Succeed;
 }
 
-int32 ZSharp::FZFunctionVisitor::InvokeMulticastInlineScriptDelegate(FZCallBuffer* buffer) const
+ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastInlineScriptDelegate(FZCallBuffer* buffer) const
 {
 	check(bAvailable);
 	check(bIsDelegate);
@@ -142,10 +142,10 @@ int32 ZSharp::FZFunctionVisitor::InvokeMulticastInlineScriptDelegate(FZCallBuffe
 		visitor->GetValue_InContainer(params, buf[index + 1], 0);
 	}
 	
-	return 0;
+	return EZCallErrorCode::Succeed;
 }
 
-int32 ZSharp::FZFunctionVisitor::InvokeMulticastSparseScriptDelegate(FZCallBuffer* buffer) const
+ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastSparseScriptDelegate(FZCallBuffer* buffer) const
 {
 	check(bAvailable);
 	check(bIsDelegate);
@@ -177,10 +177,10 @@ int32 ZSharp::FZFunctionVisitor::InvokeMulticastSparseScriptDelegate(FZCallBuffe
 		visitor->GetValue_InContainer(params, buf[index + 1], 0);
 	}
 	
-	return 0;
+	return EZCallErrorCode::Succeed;
 }
 
-int32 ZSharp::FZFunctionVisitor::InvokeZCall(FZCallHandle handle, UObject* object, void* params) const
+ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(FZCallHandle handle, UObject* object, void* params) const
 {
 	check(bAvailable);
 
@@ -189,7 +189,7 @@ int32 ZSharp::FZFunctionVisitor::InvokeZCall(FZCallHandle handle, UObject* objec
 	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
 	if (!alc)
 	{
-		return 1;
+		return EZCallErrorCode::AlcUnavailable;
 	}
 
 	int32 numSlots = ParameterProperties.Num() + (ReturnProperty ? 1 : 0);
@@ -217,7 +217,7 @@ int32 ZSharp::FZFunctionVisitor::InvokeZCall(FZCallHandle handle, UObject* objec
 
 	check(self || bIsStatic);
 	
-	int32 res;
+	EZCallErrorCode res;
 	alc->PrepareForZCall();
 	{
 		FZCallBuffer buffer;
@@ -264,7 +264,7 @@ int32 ZSharp::FZFunctionVisitor::InvokeZCall(FZCallHandle handle, UObject* objec
 		}
 	}
 
-	return res ? res + 1 : 0;
+	return res;
 }
 
 ZSharp::FZFunctionVisitor::FZFunctionVisitor(UFunction* function)

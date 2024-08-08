@@ -28,7 +28,7 @@ ZSharp::EZLoadAssemblyErrorCode ZSharp::FZSlimAssemblyLoadContext::LoadAssembly(
 
 	ON_SCOPE_EXIT { --RunningCount; };
 	
-	return static_cast<EZLoadAssemblyErrorCode>(FZSlimAssemblyLoadContext_Interop::GLoadAssembly(Handle, buffer.GetData(), buffer.Num(), args));
+	return FZSlimAssemblyLoadContext_Interop::GLoadAssembly(Handle, buffer.GetData(), buffer.Num(), args);
 }
 
 ZSharp::EZCallMethodErrorCode ZSharp::FZSlimAssemblyLoadContext::CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args)
@@ -42,5 +42,5 @@ ZSharp::EZCallMethodErrorCode ZSharp::FZSlimAssemblyLoadContext::CallMethod(cons
 
 	ON_SCOPE_EXIT { --RunningCount; };
 	
-	return static_cast<EZCallMethodErrorCode>(FZSlimAssemblyLoadContext_Interop::GCallMethod(Handle, *assemblyName, *typeName, *methodName, args));
+	return FZSlimAssemblyLoadContext_Interop::GCallMethod(Handle, *assemblyName, *typeName, *methodName, args);
 }

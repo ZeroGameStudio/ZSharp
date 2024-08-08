@@ -7,15 +7,15 @@
 #include "CLR/IZSharpClr.h"
 #include "ALC/ZMasterAssemblyLoadContext.h"
 
-int32 ZSharp::FZMasterAssemblyLoadContext_Interop::ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer)
+ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext_Interop::ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer)
 {
 	auto alc = static_cast<FZMasterAssemblyLoadContext*>(IZSharpClr::Get().GetMasterAlc());
 	if (!alc)
 	{
-		return -1;
+		return EZCallErrorCode::AlcUnavailable;
 	}
 
-	GUARDED_INVOKE(static_cast<int32>(alc->ZCall_Black(handle, buffer)), -2);
+	GUARDED_INVOKE(alc->ZCall_Black(handle, buffer), EZCallErrorCode::UnknownError);
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext_Interop::GetZCallHandle_Black(const TCHAR* name)

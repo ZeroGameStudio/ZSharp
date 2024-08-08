@@ -61,7 +61,7 @@ ZSharp::EZLoadAssemblyErrorCode ZSharp::FZMasterAssemblyLoadContext::LoadAssembl
 {
 	check(IsInGameThread());
 	
-	return static_cast<EZLoadAssemblyErrorCode>(FZMasterAssemblyLoadContext_Interop::GLoadAssembly(buffer.GetData(), buffer.Num(), args));
+	return FZMasterAssemblyLoadContext_Interop::GLoadAssembly(buffer.GetData(), buffer.Num(), args);
 }
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const FZRuntimeTypeLocatorWrapper& locator)
@@ -264,7 +264,7 @@ ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHan
 {
 	ON_SCOPE_EXIT { PopRedFrame(); };
 
-	return static_cast<EZCallErrorCode>(FZMasterAssemblyLoadContext_Interop::GZCall_Red(handle, buffer));
+	return FZMasterAssemblyLoadContext_Interop::GZCall_Red(handle, buffer);
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle_Red(const FString& name)

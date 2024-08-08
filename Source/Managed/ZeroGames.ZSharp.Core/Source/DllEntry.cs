@@ -76,17 +76,17 @@ internal static class DllEntry
         // MasterAssemblyLoadContext interop functions
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<float, uint8>)&MasterAssemblyLoadContext_Interop.Tick;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<int32>)&MasterAssemblyLoadContext_Interop.Unload;
-        *args->ManagedFunctions[offset++] = (delegate* unmanaged<uint8*, int32, void*, int32>)&MasterAssemblyLoadContext_Interop.LoadAssembly;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<uint8*, int32, void*, ELoadAssemblyErrorCode>)&MasterAssemblyLoadContext_Interop.LoadAssembly;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<InteropRuntimeTypeLocator*, InteropRuntimeTypeHandle>)&MasterAssemblyLoadContext_Interop.GetType;
-        *args->ManagedFunctions[offset++] = (delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32>)&MasterAssemblyLoadContext_Interop.ZCall_Red;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<ZCallHandle, ZCallBuffer*, EZCallErrorCode>)&MasterAssemblyLoadContext_Interop.ZCall_Red;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, ZCallHandle>)&MasterAssemblyLoadContext_Interop.GetZCallHandle_Red;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, InteropRuntimeTypeHandle, IntPtr>)&MasterAssemblyLoadContext_Interop.BuildConjugate_Red;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, void>)&MasterAssemblyLoadContext_Interop.ReleaseConjugate_Red;
         
         // SlimAssemblyLoadContext interop functions
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, int32>)&SlimAssemblyLoadContext_Interop.Unload;
-        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, uint8*, int32, void*, int32>)&SlimAssemblyLoadContext_Interop.LoadAssembly;
-        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, char*, char*, void*, int32>)&SlimAssemblyLoadContext_Interop.CallMethod;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, uint8*, int32, void*, ELoadAssemblyErrorCode>)&SlimAssemblyLoadContext_Interop.LoadAssembly;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, char*, char*, void*, ECallMethodErrorCode>)&SlimAssemblyLoadContext_Interop.CallMethod;
 
         Logger.Log("===================== ZSharp Startup =====================");
 

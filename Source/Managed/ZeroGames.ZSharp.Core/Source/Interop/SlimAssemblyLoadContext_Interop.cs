@@ -23,16 +23,16 @@ internal static class SlimAssemblyLoadContext_Interop
     }, -1);
 
     [UnmanagedCallersOnly]
-    public static unsafe int32 LoadAssembly(GCHandle handle, uint8* buffer, int32 size, void* args) => Uncaught.ErrorIfUncaught(() =>
+    public static unsafe ELoadAssemblyErrorCode LoadAssembly(GCHandle handle, uint8* buffer, int32 size, void* args) => Uncaught.ErrorIfUncaught(() =>
     {
-        return (int32)Unsafe.As<SlimAssemblyLoadContext>(handle.Target)!.LoadAssembly(new UnmanagedMemoryStream(buffer, size), args);
-    }, (int32)ELoadAssemblyErrorCode.UnknownError);
+        return Unsafe.As<SlimAssemblyLoadContext>(handle.Target)!.LoadAssembly(new UnmanagedMemoryStream(buffer, size), args);
+    }, ELoadAssemblyErrorCode.UnknownError);
 
     [UnmanagedCallersOnly]
-    public static unsafe int32 CallMethod(GCHandle handle, char* assemblyName, char* typeName, char* methodName, void* args) => Uncaught.ErrorIfUncaught(() =>
+    public static unsafe ECallMethodErrorCode CallMethod(GCHandle handle, char* assemblyName, char* typeName, char* methodName, void* args) => Uncaught.ErrorIfUncaught(() =>
     {
-        return (int32)Unsafe.As<SlimAssemblyLoadContext>(handle.Target)!.CallMethod(new(assemblyName), new(typeName), new(methodName), args);
-    }, (int32)ECallMethodErrorCode.UnknownError);
+        return Unsafe.As<SlimAssemblyLoadContext>(handle.Target)!.CallMethod(new(assemblyName), new(typeName), new(methodName), args);
+    }, ECallMethodErrorCode.UnknownError);
 
 }
 

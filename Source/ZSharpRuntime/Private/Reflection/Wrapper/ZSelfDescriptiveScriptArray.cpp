@@ -12,6 +12,7 @@ ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const Descrip
 
 ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance)
 	: Super(descriptor, underlyingInstance)
+	, ElementPropertyVisitor(IZPropertyVisitor::Create(descriptor))
 {
 	GCRoot = TStrongObjectPtr { Descriptor->GetOwnerStruct() };
 }
@@ -58,8 +59,6 @@ ZSharp::FZSelfDescriptiveScriptArray& ZSharp::FZSelfDescriptiveScriptArray::oper
 {
 	Super::operator=(MoveTemp(other));
 	
-	GCRoot = other.GCRoot;
-	other.GCRoot.Reset();
 	ElementPropertyVisitor = MoveTemp(other.ElementPropertyVisitor);
 
 	return *this;

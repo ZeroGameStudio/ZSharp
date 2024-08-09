@@ -85,3 +85,14 @@ bool ZSharp::FZSelfDescriptiveScriptDelegate::IsBoundToObject(const UObject* obj
 {
 	return UnderlyingInstance->IsBoundToObject(object);
 }
+
+ZSharp::FZSelfDescriptiveScriptDelegate& ZSharp::FZSelfDescriptiveScriptDelegate::operator=(FZSelfDescriptiveScriptDelegate&& other) noexcept
+{
+	Super::operator=(MoveTemp(other));
+	
+	Visitor = other.Visitor;
+
+	return *this;
+}
+
+

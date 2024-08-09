@@ -100,6 +100,15 @@ FMulticastScriptDelegate* ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate
 	return nullptr;
 }
 
+ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate& ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::operator=(FZSelfDescriptiveMulticastSparseScriptDelegate&& other) noexcept
+{
+	Super::operator=(MoveTemp(other));
+	
+	Visitor = other.Visitor;
+
+	return *this;
+}
+
 void ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::Add(const FScriptDelegate& unicast)
 {
 	UnderlyingInstance->__Internal_AddUnique(GetOwner(), Descriptor->DelegateName, unicast);

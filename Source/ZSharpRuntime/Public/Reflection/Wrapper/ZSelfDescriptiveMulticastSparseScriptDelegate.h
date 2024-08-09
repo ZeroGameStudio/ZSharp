@@ -30,6 +30,8 @@ namespace ZSharp
 		bool IsBound() const;
 
 		FMulticastScriptDelegate* GetDelegatePtr();
+		
+		FZSelfDescriptiveMulticastSparseScriptDelegate& operator=(FZSelfDescriptiveMulticastSparseScriptDelegate&& other) noexcept;
 
 	private:
 		void Add(const FScriptDelegate& unicast);

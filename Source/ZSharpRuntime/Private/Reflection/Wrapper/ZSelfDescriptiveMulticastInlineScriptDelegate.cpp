@@ -84,4 +84,13 @@ bool ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::IsBound() const
 	return UnderlyingInstance->IsBound();
 }
 
+ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate& ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::operator=(FZSelfDescriptiveMulticastInlineScriptDelegate&& other) noexcept
+{
+	Super::operator=(MoveTemp(other));
+	
+	Visitor = other.Visitor;
+
+	return *this;
+}
+
 

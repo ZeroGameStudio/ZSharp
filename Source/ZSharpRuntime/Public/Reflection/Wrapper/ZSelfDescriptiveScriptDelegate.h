@@ -27,6 +27,8 @@ namespace ZSharp
 		bool IsBound() const;
 		bool IsBoundToObject(const UObject* object) const;
 
+		FZSelfDescriptiveScriptDelegate& operator=(FZSelfDescriptiveScriptDelegate&& other) noexcept;
+
 	private:
 		 FZFunctionVisitorHandle Visitor;
 		

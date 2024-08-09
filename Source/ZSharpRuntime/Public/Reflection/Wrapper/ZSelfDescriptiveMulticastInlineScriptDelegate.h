@@ -25,6 +25,8 @@ namespace ZSharp
 
 		bool IsBound() const;
 
+		FZSelfDescriptiveMulticastInlineScriptDelegate& operator=(FZSelfDescriptiveMulticastInlineScriptDelegate&& other) noexcept;
+
 	private:
 		FZFunctionVisitorHandle Visitor;
 		

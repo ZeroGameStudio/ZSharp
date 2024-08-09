@@ -18,8 +18,8 @@ void ZSharp::FZStructPropertyVisitor::GetValue(const void* src, FZCallBufferSlot
 	}
 	else
 	{
-		check(sdss->GetDescriptor() == scriptStruct);
-		scriptStruct->CopyScriptStruct(sdss->GetUnderlyingInstance(), src);
+		check(UnderlyingStructProperty->Struct->IsChildOf(sdss->GetDescriptor()));
+		UnderlyingProperty->CopySingleValue(sdss->GetUnderlyingInstance(), src);
 	}
 }
 
@@ -38,7 +38,7 @@ void ZSharp::FZStructPropertyVisitor::SetValue(void* dest, const FZCallBufferSlo
 		return;
 	}
 	
-	check(sdss->GetDescriptor() == UnderlyingStructProperty->Struct);
+	check(sdss->GetDescriptor()->IsChildOf(UnderlyingStructProperty->Struct));
 	UnderlyingProperty->CopySingleValue(dest, sdss->GetUnderlyingInstance());
 }
 

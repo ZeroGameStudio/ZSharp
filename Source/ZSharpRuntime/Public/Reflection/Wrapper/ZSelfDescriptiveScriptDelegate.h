@@ -14,6 +14,8 @@ namespace ZSharp
 	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptDelegate : TZSelfDescriptiveBase<FZSelfDescriptiveScriptDelegate, UFunction, FScriptDelegate>
 	{
 		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_AUTO_CTOR(FZSelfDescriptiveScriptDelegate)
+
+		FZSelfDescriptiveScriptDelegate(FZSelfDescriptiveScriptDelegate&& other) noexcept;
 		
 		void BindUFunction(UObject* object, FName name);
 		UObject* BindManaged(FZGCHandle delegate);

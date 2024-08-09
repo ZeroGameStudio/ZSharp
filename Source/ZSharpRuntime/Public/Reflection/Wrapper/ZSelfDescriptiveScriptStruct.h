@@ -2,38 +2,34 @@
 
 #pragma once
 
+#include "ZSelfDescriptiveBase.h"
 #include "Trait/ZIsUScriptStruct.h"
 #include "UObject/StrongObjectPtr.h"
 
 namespace ZSharp
 {
-	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptStruct
+	template <>
+	struct TZSelfDescriptiveTraits<struct FZSelfDescriptiveOptional> : FZSelfDescriptiveTraitsBase
 	{
-
-		FZSelfDescriptiveScriptStruct(const UScriptStruct* descriptor);
-		FZSelfDescriptiveScriptStruct(const UScriptStruct* descriptor, void* underlyingInstance);
-		FZSelfDescriptiveScriptStruct(const FZSelfDescriptiveScriptStruct&) = delete;
-		FZSelfDescriptiveScriptStruct(FZSelfDescriptiveScriptStruct&& other) noexcept { *this = MoveTemp(other); }
-		~FZSelfDescriptiveScriptStruct();
-
-		const UScriptStruct* GetDescriptor() const { return Descriptor.Get(); }
-		void* GetUnderlyingInstance() const { return UnderlyingInstance; }
+		static constexpr bool HasCustomNewUnderlyingInstance = true;
+		static constexpr bool HasCustomDeleteUnderlyingInstance = true;
+	};
+	
+	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptStruct : TZSelfDescriptiveBase<FZSelfDescriptiveScriptStruct, UScriptStruct, void>
+	{
+		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_AUTO_CTOR(FZSelfDescriptiveScriptStruct)
 
 		template <typename T>
 		requires TZIsUScriptStruct_V<T>
 		T* GetUnderlyingInstance() const
 		{
-			check(TBaseStructure<T>::Get() == Descriptor.Get());
+			check(TBaseStructure<T>::Get() == Descriptor);
 			return static_cast<T*>(UnderlyingInstance);
 		}
 
-		FZSelfDescriptiveScriptStruct& operator=(const FZSelfDescriptiveScriptStruct&) = delete;
-		FZSelfDescriptiveScriptStruct& operator=(FZSelfDescriptiveScriptStruct&& other) noexcept;
-
 	private:
-		TStrongObjectPtr<const UScriptStruct> Descriptor;
-		void* UnderlyingInstance;
-		bool bOwning;
+		static UnderlyingInstanceType* NewUnderlyingInstance(const DescriptorType* descriptor);
+		void DeleteUnderlyingInstance();
 		
 	};
 }

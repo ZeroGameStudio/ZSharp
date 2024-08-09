@@ -6,6 +6,12 @@
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
 #include "ZCall/ManagedDelegateProxy.h"
 
+ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::FZSelfDescriptiveMulticastSparseScriptDelegate(FZSelfDescriptiveMulticastSparseScriptDelegate&& other) noexcept
+	: Super(MoveTemp(other))
+{
+	Visitor = other.Visitor;
+}
+
 void ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::AddUFunction(UObject* object, FName name)
 {
 	if (!object)

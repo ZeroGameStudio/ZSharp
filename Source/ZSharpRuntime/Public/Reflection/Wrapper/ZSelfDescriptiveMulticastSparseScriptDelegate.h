@@ -13,11 +13,9 @@ namespace ZSharp
 
 	struct ZSHARPRUNTIME_API FZSelfDescriptiveMulticastSparseScriptDelegate : TZSelfDescriptiveBase<FZSelfDescriptiveMulticastSparseScriptDelegate, USparseDelegateFunction, FSparseDelegate>
 	{
+		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_AUTO_CTOR(FZSelfDescriptiveMulticastSparseScriptDelegate)
 
-		using Super = TZSelfDescriptiveBase;
-		friend Super;
-
-		FZSelfDescriptiveMulticastSparseScriptDelegate(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance) : Super(descriptor, underlyingInstance){}
+		FZSelfDescriptiveMulticastSparseScriptDelegate(FZSelfDescriptiveMulticastSparseScriptDelegate&& other) noexcept;
 		
 		void AddUFunction(UObject* object, FName name);
 		UObject* AddManaged(FZGCHandle delegate);

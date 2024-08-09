@@ -31,6 +31,7 @@ ZSharp::FZSelfDescriptiveOptional::FZSelfDescriptiveOptional(FZSelfDescriptiveOp
 ZSharp::FZSelfDescriptiveOptional::~FZSelfDescriptiveOptional()
 {
 	Helper->DestroyValue(UnderlyingInstance);
+	FMemory::Free(UnderlyingInstance);
 }
 
 bool ZSharp::FZSelfDescriptiveOptional::Get(FZCallBufferSlot& dest) const
@@ -73,8 +74,7 @@ ZSharp::FZSelfDescriptiveOptional::UnderlyingInstanceType* ZSharp::FZSelfDescrip
 {
 	// Here the helper is not available so we only allocate memory for the underlying instance.
 	// Let our constructor to initialize it.
-	void* instance = FMemory::Malloc(descriptor->GetSize(), descriptor->GetMinAlignment());
-	return instance;
+	return FMemory::Malloc(descriptor->GetSize(), descriptor->GetMinAlignment());
 }
 
 

@@ -71,7 +71,7 @@ namespace ZSharp
 		
 		FZConjugateHandle Conjugate(const TConjugate* unmanaged, bool owning)
 		{
-			const auto mutableUnmanaged = const_cast<TConjugate*>(unmanaged);
+			auto mutableUnmanaged = const_cast<TConjugate*>(unmanaged);
 			if (const RecordType* rec = ConjugateMap.Find(mutableUnmanaged))
 			{
 				// This branch means conjugating an unmanaged object that doesn't owned by the caller.

@@ -32,7 +32,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_MulticastInlineDelegate::C
 
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_MulticastInlineDelegate::Conjugate(const UFunction* signature, const FMulticastScriptDelegate* unmanaged)
 {
-	const auto mutableUnmanaged = const_cast<FMulticastScriptDelegate*>(unmanaged);
+	auto mutableUnmanaged = const_cast<FMulticastScriptDelegate*>(unmanaged);
 	if (const FZConjugateRec* rec = ConjugateMap.Find(mutableUnmanaged))
 	{
 		check(rec->Delegate->GetDescriptor() == signature);

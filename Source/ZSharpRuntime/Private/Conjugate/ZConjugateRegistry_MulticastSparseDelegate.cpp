@@ -14,7 +14,7 @@ namespace ZSharp::ZConjugateRegistry_MulticastSparseDelegate_Private
 
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_MulticastSparseDelegate::Conjugate(const USparseDelegateFunction* signature, const FSparseDelegate* unmanaged)
 {
-	const auto mutableUnmanaged = const_cast<FSparseDelegate*>(unmanaged);
+	auto mutableUnmanaged = const_cast<FSparseDelegate*>(unmanaged);
 	if (const TUniquePtr<FZSelfDescriptiveMulticastSparseScriptDelegate>* pSdsd = ConjugateMap.Find(mutableUnmanaged))
 	{
 		check((*pSdsd)->GetDescriptor() == signature);

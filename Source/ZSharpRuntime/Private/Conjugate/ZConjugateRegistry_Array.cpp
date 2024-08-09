@@ -15,7 +15,7 @@ namespace ZSharp::ZConjugateRegistry_Array_Private
 
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FProperty* elementPropertyProto, TFunctionRef<void(const FZSelfDescriptiveScriptArray&)> initialize)
 {
-	FProperty* elementProperty = CastField<FProperty>(FField::Duplicate(elementPropertyProto, nullptr));
+	auto elementProperty = CastField<FProperty>(FField::Duplicate(elementPropertyProto, nullptr));
 	auto sdsa = new FZSelfDescriptiveScriptArray { elementProperty };
 	initialize(*sdsa);
 	
@@ -34,7 +34,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FPr
 
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FProperty* elementProperty, const FScriptArray* unmanaged)
 {
-	const auto mutableUnmanaged = const_cast<FScriptArray*>(unmanaged);
+	auto mutableUnmanaged = const_cast<FScriptArray*>(unmanaged);
 	if (const FZConjugateRec* rec = ConjugateMap.Find(mutableUnmanaged))
 	{
 		check(rec->Array->GetDescriptor()->GetClass() == elementProperty->GetClass());

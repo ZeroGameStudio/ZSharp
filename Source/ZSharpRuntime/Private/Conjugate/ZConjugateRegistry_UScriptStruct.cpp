@@ -31,7 +31,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UScriptStruct::Conjugate(c
 
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UScriptStruct::Conjugate(const UScriptStruct* scriptStruct, const void* unmanaged)
 {
-	const auto mutableUnmanaged = const_cast<void*>(unmanaged);
+	auto mutableUnmanaged = const_cast<void*>(unmanaged);
 	if (const FZConjugateRec* rec = ConjugateMap.Find(mutableUnmanaged))
 	{
 		check(rec->ScriptStruct->GetDescriptor() == scriptStruct);

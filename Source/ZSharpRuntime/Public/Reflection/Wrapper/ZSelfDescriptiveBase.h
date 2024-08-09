@@ -13,7 +13,8 @@ namespace ZSharp
 
 	template <typename>
 	struct TZSelfDescriptiveTraits : FZSelfDescriptiveTraitsBase{};
-	
+
+	// IMPORTANT: Destructor is non-virtual and never use this type as pointer!
 	template <typename TImpl, typename TDescriptor, typename TUnderlyingInstance>
 	struct TZSelfDescriptiveBase
 	{

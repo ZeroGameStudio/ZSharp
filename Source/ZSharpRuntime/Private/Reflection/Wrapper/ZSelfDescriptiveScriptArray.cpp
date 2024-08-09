@@ -39,7 +39,7 @@ void ZSharp::FZSelfDescriptiveScriptArray::Get(int32 index, FZCallBufferSlot& de
 {
 	FScriptArrayHelper helper = GetHelper();
 	const void* src = helper.GetElementPtr(index);
-	ElementPropertyVisitor->GetValue(src, dest);
+	ElementPropertyVisitor->GetValue(src, dest); // Always get copy instead of reference for memory safety.
 }
 
 void ZSharp::FZSelfDescriptiveScriptArray::Set(int32 index, const FZCallBufferSlot& src)

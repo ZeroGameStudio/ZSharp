@@ -14,10 +14,11 @@ namespace ZSharp::ZConjugateRegistry_MulticastInlineDelegate_Private
 
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_MulticastInlineDelegate::Conjugate(const UFunction* signature, TFunctionRef<void(const FZSelfDescriptiveMulticastInlineScriptDelegate&)> initialize)
 {
-	const FZRuntimeTypeHandle type = GetManagedType(signature);
 	auto sdsd = new FZSelfDescriptiveMulticastInlineScriptDelegate { signature };
 	initialize(*sdsd);
+	
 	void* unmanaged = sdsd->GetUnderlyingInstance();
+	const FZRuntimeTypeHandle type = GetManagedType(signature);
 	if (Alc.BuildConjugate(unmanaged, type))
 	{
 		ConjugateMap.Emplace(unmanaged, { TUniquePtr<FZSelfDescriptiveMulticastInlineScriptDelegate>(sdsd), false });

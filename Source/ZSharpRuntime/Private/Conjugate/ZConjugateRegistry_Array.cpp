@@ -15,11 +15,12 @@ namespace ZSharp::ZConjugateRegistry_Array_Private
 
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FProperty* elementPropertyProto, TFunctionRef<void(const FZSelfDescriptiveScriptArray&)> initialize)
 {
-	const FZRuntimeTypeHandle type = GetManagedType(elementPropertyProto);
 	FProperty* elementProperty = CastField<FProperty>(FField::Duplicate(elementPropertyProto, nullptr));
 	auto sdsa = new FZSelfDescriptiveScriptArray { elementProperty };
 	initialize(*sdsa);
+	
 	void* unmanaged = sdsa->GetUnderlyingInstance();
+	const FZRuntimeTypeHandle type = GetManagedType(elementProperty);
 	if (Alc.BuildConjugate(unmanaged, type))
 	{
 		ConjugateMap.Emplace(unmanaged, { TUniquePtr<FZSelfDescriptiveScriptArray>(sdsa), false });

@@ -32,7 +32,7 @@ namespace ZSharp
 	protected:
 		TZSelfDescriptiveBase(const TDescriptor* descriptor)
 			: Descriptor(descriptor)
-			, UnderlyingInstance(NewUnderlyingInstance())
+			, UnderlyingInstance(NewUnderlyingInstance(descriptor))
 			, bOwning(true)
 		{
 			if constexpr (IsUObjectDescriptor)
@@ -99,11 +99,11 @@ namespace ZSharp
 		}
 
 	private:
-		static TUnderlyingInstance* NewUnderlyingInstance()
+		static TUnderlyingInstance* NewUnderlyingInstance(const TDescriptor* descriptor)
 		{
 			if constexpr (TZSelfDescriptiveTraits<TImpl>::HasCustomNewUnderlyingInstance)
 			{
-				return TImpl::NewUnderlyingInstance();
+				return TImpl::NewUnderlyingInstance(descriptor);
 			}
 			else
 			{

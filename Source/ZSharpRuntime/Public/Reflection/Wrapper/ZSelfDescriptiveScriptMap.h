@@ -2,11 +2,48 @@
 
 #pragma once
 
+#include "ZSelfDescriptiveBase.h"
+#include "Reflection/Property/IZPropertyVisitor.h"
+
 namespace ZSharp
 {
-	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptMap
+	struct FZCallBufferSlot;
+
+	template <>
+	struct TZSelfDescriptiveTraits<struct FZSelfDescriptiveScriptMap> : FZSelfDescriptiveTraitsBase
 	{
+		static constexpr bool HasCustomDeleteUnderlyingInstance = true;
+		static constexpr bool HasCustomDeleteDescriptor = true;
+	};
+	
+	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptMap : TZSelfDescriptiveBase<FZSelfDescriptiveScriptMap, TPair<const FProperty*, const FProperty*>, FScriptMap>
+	{
+		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY(FZSelfDescriptiveScriptMap)
 		
+		FZSelfDescriptiveScriptMap(FZSelfDescriptiveScriptMap&& other) noexcept;
+		
+		void Add(const FZCallBufferSlot& src);
+		void Remove(const FZCallBufferSlot& src);
+		bool Find(const FZCallBufferSlot& src, FZCallBufferSlot& dest) const;
+
+		int32 Num() const;
+
+		FZSelfDescriptiveScriptMap& operator=(FZSelfDescriptiveScriptMap&& other) noexcept;
+
+	private:
+		FScriptMapHelper GetHelper() const
+		{
+			return FScriptMapHelper::CreateHelperFormInnerProperties(const_cast<FProperty*>(Descriptor->Key), const_cast<FProperty*>(Descriptor->Value), UnderlyingInstance);
+		}
+
+	private:
+		void DeleteUnderlyingInstance();
+		void DeleteDescriptor();
+
+	private:
+		TUniquePtr<IZPropertyVisitor> KeyPropertyVisitor;
+		TUniquePtr<IZPropertyVisitor> ValuePropertyVisitor;
+
 	};
 }
 

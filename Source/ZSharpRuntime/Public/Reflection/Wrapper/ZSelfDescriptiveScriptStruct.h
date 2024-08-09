@@ -9,7 +9,7 @@
 namespace ZSharp
 {
 	template <>
-	struct TZSelfDescriptiveTraits<struct FZSelfDescriptiveOptional> : FZSelfDescriptiveTraitsBase
+	struct TZSelfDescriptiveTraits<struct FZSelfDescriptiveScriptStruct> : FZSelfDescriptiveTraitsBase
 	{
 		static constexpr bool HasCustomNewUnderlyingInstance = true;
 		static constexpr bool HasCustomDeleteUnderlyingInstance = true;

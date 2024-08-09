@@ -7,6 +7,9 @@
 #include "ZSharpRuntimeLogChannels.h"
 #include "ZFieldPathPropertyVisitor.h"
 #include "Container/ZArrayPropertyVisitor.h"
+#include "Container/ZMapPropertyVisitor.h"
+#include "Container/ZOptionalPropertyVisitor.h"
+#include "Container/ZSetPropertyVisitor.h"
 #include "Container/ZStructPropertyVisitor.h"
 #include "Delegate/ZDelegatePropertyVisitor.h"
 #include "Delegate/ZMulticastInlineDelegatePropertyVisitor.h"
@@ -97,15 +100,15 @@ TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FP
 	}
 	else if (const auto setProp = CastField<FSetProperty>(prop))
 	{
-
+		return MakeUnique<FZSetPropertyVisitor>(setProp);
 	}
 	else if (const auto mapProp = CastField<FMapProperty>(prop))
 	{
-
+		return MakeUnique<FZMapPropertyVisitor>(mapProp);
 	}
 	else if (const auto optionalProp = CastField<FOptionalProperty>(prop))
 	{
-		
+		return MakeUnique<FZOptionalPropertyVisitor>(optionalProp);
 	}
 	else if (const auto delegateProp = CastField<FDelegateProperty>(prop))
 	{

@@ -48,13 +48,6 @@ public static class IntrinsicTypeIds
 		{ typeof(UnrealName), KName },
 		{ typeof(UnrealText), KText },
 		
-		{ typeof(SubclassOfBase), KSubclassOf },
-		{ typeof(SoftClassPtrBase), KSoftClassPtr },
-		{ typeof(SoftObjectPtrBase), KSoftObjectPtr },
-		{ typeof(WeakObjectPtrBase), KWeakObjectPtr },
-		{ typeof(LazyObjectPtrBase), KLazyObjectPtr },
-		{ typeof(ScriptInterfaceBase), KScriptInterface },
-		
 		{ typeof(FieldPath), KFieldPath },
 	};
 }

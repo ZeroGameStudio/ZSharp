@@ -34,42 +34,18 @@ public abstract class UnrealArrayBase : PlainExportedObjectBase
 	
 	private void ValidateElementType()
 	{
-		if (_elementType.IsAssignableTo(typeof(UnrealObjectBase)) || _elementType.IsAssignableTo(typeof(UnrealStructBase)) || UnrealEnum.IsUnrealEnumType(_elementType))
+		if (!ContainerHelper.CanBeValue(_elementType))
 		{
-			return;
-		}
-
-		if (_elementType.GetGenericTypeDefinition() == typeof(Nullable<>))
-		{
-			throw new NotSupportedException("Nullable value type is not supported.");
-		}
-		
-		if (!IntrinsicTypeIds.STypeMap.ContainsKey(_elementType) && (_elementType.BaseType is null || !IntrinsicTypeIds.STypeMap.ContainsKey(_elementType.BaseType)))
-		{
-			throw new NotSupportedException();
+			throw new ArgumentOutOfRangeException();
 		}
 	}
 	
 	private void SetupUserdata(out Userdata userdata)
 	{
-		userdata = new();
-
-		IntPtr id;
-		if (IntrinsicTypeIds.STypeMap.TryGetValue(_elementType, out id) || (_elementType.BaseType is not null && IntrinsicTypeIds.STypeMap.TryGetValue(_elementType.BaseType, out id)))
+		userdata = default;
+		if (!ContainerHelper.TryGetPropertyDesc(_elementType, out userdata.ElementProperty))
 		{
-			userdata.ElementProperty.Descriptor = id;
-		}
-		else if (_elementType.IsAssignableTo(typeof(UnrealObjectBase)))
-		{
-			userdata.ElementProperty.Descriptor = ((UnrealClass)_elementType.GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!).Unmanaged;
-		}
-		else if (_elementType.IsAssignableTo(typeof(UnrealStructBase)))
-		{
-			userdata.ElementProperty.Descriptor = ((UnrealScriptStruct)_elementType.GetProperty(nameof(IStaticStruct.SStaticStruct))!.GetValue(null)!).Unmanaged;
-		}
-		else if (UnrealEnum.IsUnrealEnumType(_elementType))
-		{
-			userdata.ElementProperty.Descriptor = UnrealEnum.GetUnrealEnum(_elementType).Unmanaged;
+			throw new ArgumentOutOfRangeException();
 		}
 	}
 

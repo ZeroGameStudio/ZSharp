@@ -15,7 +15,7 @@ namespace ZSharp::ZConjugateRegistry_UScriptStruct_Private
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UScriptStruct::Conjugate(const UScriptStruct* scriptStruct, TFunctionRef<void(const FZSelfDescriptiveScriptStruct& sdss)> initialize)
 {
 	const FZRuntimeTypeHandle type = GetManagedType(scriptStruct);
-	FZSelfDescriptiveScriptStruct* sdss = new FZSelfDescriptiveScriptStruct { scriptStruct };
+	auto sdss = new FZSelfDescriptiveScriptStruct { scriptStruct };
 	initialize(*sdss);
 	void* unmanaged = sdss->GetUnderlyingInstance();
 	if (Alc.BuildConjugate(unmanaged, type))

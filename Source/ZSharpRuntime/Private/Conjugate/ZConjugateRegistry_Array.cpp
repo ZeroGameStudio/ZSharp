@@ -17,7 +17,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FPr
 {
 	const FZRuntimeTypeHandle type = GetManagedType(elementPropertyProto);
 	FProperty* elementProperty = CastField<FProperty>(FField::Duplicate(elementPropertyProto, nullptr));
-	FZSelfDescriptiveScriptArray* sdsa = new FZSelfDescriptiveScriptArray { elementProperty };
+	auto sdsa = new FZSelfDescriptiveScriptArray { elementProperty };
 	initialize(*sdsa);
 	void* unmanaged = sdsa->GetUnderlyingInstance();
 	if (Alc.BuildConjugate(unmanaged, type))

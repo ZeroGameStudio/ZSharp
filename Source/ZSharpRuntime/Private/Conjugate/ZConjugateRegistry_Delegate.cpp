@@ -15,7 +15,7 @@ namespace ZSharp::ZConjugateRegistry_Delegate_Private
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Delegate::Conjugate(const UFunction* signature, TFunctionRef<void(const FZSelfDescriptiveScriptDelegate&)> initialize)
 {
 	const FZRuntimeTypeHandle type = GetManagedType(signature);
-	FZSelfDescriptiveScriptDelegate* sdsd = new FZSelfDescriptiveScriptDelegate { signature };
+	auto sdsd = new FZSelfDescriptiveScriptDelegate { signature };
 	initialize(*sdsd);
 	void* unmanaged = sdsd->GetUnderlyingInstance();
 	if (Alc.BuildConjugate(unmanaged, type))

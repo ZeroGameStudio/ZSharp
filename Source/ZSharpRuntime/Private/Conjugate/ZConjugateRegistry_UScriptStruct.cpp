@@ -41,7 +41,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UScriptStruct::Conjugate(c
 	const FZRuntimeTypeHandle type = GetManagedType(scriptStruct);
 	if (Alc.BuildConjugate(mutableUnmanaged, type))
 	{
-		ConjugateMap.Emplace(mutableUnmanaged, { MakeUnique<FZSelfDescriptiveScriptStruct>(scriptStruct, const_cast<void*>(unmanaged)), false });
+		ConjugateMap.Emplace(mutableUnmanaged, { MakeUnique<FZSelfDescriptiveScriptStruct>(scriptStruct, mutableUnmanaged), false });
 		CaptureConjugate(mutableUnmanaged);
 
 		return { mutableUnmanaged };

@@ -19,6 +19,9 @@ namespace ZSharp
 	{
 		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_AUTO_CTOR(FZSelfDescriptiveScriptStruct)
 
+		const UScriptStruct* GetScriptStruct() const { return Descriptor; }
+		void* GetUnderlyingInstance() const { return UnderlyingInstance; }
+
 		template <typename T>
 		requires TZIsUScriptStruct_V<T>
 		T* GetUnderlyingInstance() const

@@ -14,6 +14,7 @@ namespace ZSharp
 	{
 		static constexpr bool HasCustomDeleteUnderlyingInstance = true;
 		static constexpr bool HasCustomDeleteDescriptor = true;
+		static constexpr bool HasFinalize = true;
 	};
 	
 	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptMap : TZSelfDescriptiveBase<FZSelfDescriptiveScriptMap, TPair<const FProperty*, const FProperty*>, FScriptMap>
@@ -39,6 +40,7 @@ namespace ZSharp
 	private:
 		void DeleteUnderlyingInstance();
 		void DeleteDescriptor();
+		void Finalize();
 
 	private:
 		TUniquePtr<IZPropertyVisitor> KeyPropertyVisitor;

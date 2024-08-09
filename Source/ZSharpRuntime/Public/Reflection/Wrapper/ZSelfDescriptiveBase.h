@@ -9,6 +9,7 @@ namespace ZSharp
 		static constexpr bool HasCustomNewUnderlyingInstance = false;
 		static constexpr bool HasCustomDeleteUnderlyingInstance = false;
 		static constexpr bool HasCustomDeleteDescriptor = false;
+		static constexpr bool HasFinalize = false;
 	};
 
 	template <typename>
@@ -82,6 +83,11 @@ namespace ZSharp
 				{
 					delete Descriptor;
 				}
+			}
+
+			if constexpr (TZSelfDescriptiveTraits<TImpl>::HasFinalize)
+			{
+				AsImpl().Finalize();
 			}
 		}
 

@@ -94,6 +94,10 @@ void ZSharp::FZSelfDescriptiveScriptMap::DeleteDescriptor()
 {
 	delete Descriptor->Key;
 	delete Descriptor->Value;
+}
+
+void ZSharp::FZSelfDescriptiveScriptMap::Finalize()
+{
 	delete Descriptor;
 }
 

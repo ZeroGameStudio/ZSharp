@@ -18,6 +18,7 @@ namespace ZSharp
 		Struct = 1 << 2,
 		Interface = 1 << 3,
 		Abstract = 1 << 4,
+		Hashable = 1 << 5,
 	};
 	ENUM_CLASS_FLAGS(EZExportedClassFlags)
 	

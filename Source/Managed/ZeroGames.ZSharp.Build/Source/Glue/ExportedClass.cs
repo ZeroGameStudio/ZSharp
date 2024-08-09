@@ -11,6 +11,7 @@ public enum EExportedClassFlags : uint64
 	Struct = 1 << 2,
 	Interface = 1 << 3,
 	Abstract = 1 << 4,
+	Hashable = 1 << 5,
 }
 
 public class ExportedClass : ExportedType
@@ -27,6 +28,7 @@ public class ExportedClass : ExportedType
 	public bool IsStruct => (Flags & EExportedClassFlags.Struct) != EExportedClassFlags.None;
 	public bool IsInterface => (Flags & EExportedClassFlags.Interface) != EExportedClassFlags.None;
 	public bool IsAbstract => (Flags & EExportedClassFlags.Abstract) != EExportedClassFlags.None;
+	public bool IsHashableStruct => IsStruct && (Flags & EExportedClassFlags.Hashable) != EExportedClassFlags.None;
 }
 
 

@@ -158,6 +158,11 @@ namespace {_exportedClass.Namespace};
 			{
 				attrs.Add($"[UnrealFieldPath(__kUnrealFieldPath)]");
 			}
+
+			if (_exportedClass.IsHashableStruct)
+			{
+				attrs.Add("[HashableUnrealStruct]");
+			}
 			
 			return string.Join('\n', attrs);
 		}

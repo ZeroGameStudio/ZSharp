@@ -111,6 +111,11 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 	else if (const auto ustrct = Cast<UScriptStruct>(ustruct))
 	{
 		Flags |= EZExportedClassFlags::Struct;
+		UScriptStruct::ICppStructOps* ops = ustrct->GetCppStructOps();
+		if (ops && ops->HasGetTypeHash())
+		{
+			Flags |= EZExportedClassFlags::Hashable;
+		}
 	}
 	else
 	{

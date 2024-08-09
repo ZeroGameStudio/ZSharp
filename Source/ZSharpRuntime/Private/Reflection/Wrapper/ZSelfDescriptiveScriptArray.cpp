@@ -66,14 +66,21 @@ ZSharp::FZSelfDescriptiveScriptArray& ZSharp::FZSelfDescriptiveScriptArray::oper
 
 void ZSharp::FZSelfDescriptiveScriptArray::DeleteUnderlyingInstance()
 {
+	if (!Num())
+	{
+		return;
+	}
+	
 	// If ElementType is not trivially destructible, we need to destroy them manually.
 	if (!Descriptor->HasAnyPropertyFlags(CPF_IsPlainOldData | CPF_NoDestructor))
 	{
 		FScriptArrayHelper helper = GetHelper();
+		const uint32 stride = Descriptor->GetSize();
+		uint8* ptr = helper.GetElementPtr(0);
 		const int32 num = helper.Num();
-		for (int32 i = 0; i < num; ++i)
+		for (int32 i = 0; i < num; ++i, ptr += stride)
 		{
-			Descriptor->DestroyValue(helper.GetElementPtr(i));
+			Descriptor->DestroyValue_InContainer(ptr);
 		}
 	}
 		

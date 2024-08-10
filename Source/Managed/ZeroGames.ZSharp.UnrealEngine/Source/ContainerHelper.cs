@@ -154,6 +154,11 @@ internal static class ContainerHelper
 		}
 		
 		// 2 delegates.
+		if (type.IsAssignableTo(typeof(UnrealDelegateBase)) || type.IsAssignableTo(typeof(UnrealMulticastInlineDelegateBase)))
+		{
+			desc.Descriptor = UnrealDelegateBase.GetUnrealDelegateSignature(type).Unmanaged;
+		}
+		
 		return false;
 	}
 

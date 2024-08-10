@@ -25,6 +25,7 @@ namespace ZSharp
 		void RemoveAt(int32 index);
 		void Get(int32 index, FZCallBufferSlot& dest) const;
 		void Set(int32 index, const FZCallBufferSlot& src);
+		void Clear();
 
 		int32 Num() const;
 

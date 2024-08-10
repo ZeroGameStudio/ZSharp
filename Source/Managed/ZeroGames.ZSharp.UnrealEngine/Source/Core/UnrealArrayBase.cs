@@ -10,6 +10,7 @@ public abstract class UnrealArrayBase : PlainExportedObjectBase
 	
 	public void InsertAt(int32 index) => this.ZCall("ex://Array.InsertAt", index);
 	public void RemoveAt(int32 index) => this.ZCall("ex://Array.RemoveAt", index);
+	public void Clear() => this.ZCall("ex://Array.Clear");
 	
 	public int32 Count => this.ZCall("ex://Array.Num", 0)[-1].Int32;
 

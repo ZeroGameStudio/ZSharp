@@ -9,7 +9,11 @@ public class UnrealSet<T> : UnrealSetBase, IConjugate<UnrealSet<T>>
 
 	public UnrealSet() : base(typeof(T)){}
 	public UnrealSet(IntPtr unmanaged) : base(typeof(T), unmanaged){}
-	
+
+	public void Add(T value) => base.Add(value);
+	public void Remove(T value) => base.Remove(value);
+	public bool Contains(T value) => base.Contains(value);
+
 }
 
 

@@ -108,6 +108,21 @@ FProperty* ZSharp::FZPropertyFactory::Create(const FZPropertyDesc& desc)
 		prop->AddCppProperty(PropertyFactory_Private::Create<FInt64Property>(PropertyFactory_Private::PrimitiveFlags));
 		prop->ElementSize = prop->GetUnderlyingProperty()->ElementSize;
 	}
+	else if (auto sign = Cast<UDelegateFunction>(field); sign && !sign->IsA<USparseDelegateFunction>())
+	{
+		if (!sign->HasAnyFunctionFlags(FUNC_MulticastDelegate))
+		{
+			auto prop = PropertyFactory_Private::Create<FDelegateProperty>(CPF_None);
+			prop->SignatureFunction = sign;
+			return prop;
+		}
+		else
+		{
+			auto prop = PropertyFactory_Private::Create<FMulticastInlineDelegateProperty>(CPF_None);
+			prop->SignatureFunction = sign;
+			return prop;
+		}
+	}
 
 	checkNoEntry();
 	return nullptr;

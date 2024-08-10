@@ -49,6 +49,12 @@ void ZSharp::FZSelfDescriptiveScriptArray::Set(int32 index, const FZCallBufferSl
 	ElementPropertyVisitor->SetValue(dest, src);
 }
 
+void ZSharp::FZSelfDescriptiveScriptArray::Clear()
+{
+	FScriptArrayHelper helper = GetHelper();
+	helper.EmptyValues();
+}
+
 int32 ZSharp::FZSelfDescriptiveScriptArray::Num() const
 {
 	FScriptArrayHelper helper = GetHelper();

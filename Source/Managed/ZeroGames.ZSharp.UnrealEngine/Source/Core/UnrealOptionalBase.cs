@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
@@ -7,6 +8,10 @@ namespace ZeroGames.ZSharp.UnrealEngine.Core;
 [ConjugateRegistryId(34)]
 public abstract class UnrealOptionalBase : PlainExportedObjectBase
 {
+	
+	public void Reset() => this.ZCall("ex://Optional.Reset");
+
+	public bool IsSet => this.ZCall("ex://Optional.IsSet", false)[-1].Bool;
 	
 	protected unsafe UnrealOptionalBase(Type elementType)
 	{
@@ -23,6 +28,15 @@ public abstract class UnrealOptionalBase : PlainExportedObjectBase
 		_elementType = elementType;
 		ValidateElementType();
 	}
+
+	protected bool Get([NotNullWhen(true)] out object? value)
+	{
+		DynamicZCallResult res = this.ZCall("ex://Optional.Get", _elementType);
+		value = res[1].Object;
+
+		return res[-1].Bool;
+	}
+	protected void Set(object? value) => this.ZCall("ex://Optional.Set", value);
 	
 	private void ValidateElementType()
 	{

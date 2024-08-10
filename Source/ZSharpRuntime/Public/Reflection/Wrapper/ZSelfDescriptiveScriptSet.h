@@ -24,6 +24,7 @@ namespace ZSharp
 		void Add(const FZCallBufferSlot& src);
 		void Remove(const FZCallBufferSlot& src);
 		bool Contains(const FZCallBufferSlot& src) const;
+		void Clear();
 
 		int32 Num() const;
 

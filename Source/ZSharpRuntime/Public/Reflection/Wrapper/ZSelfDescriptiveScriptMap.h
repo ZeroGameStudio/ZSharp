@@ -23,9 +23,10 @@ namespace ZSharp
 		
 		FZSelfDescriptiveScriptMap(FZSelfDescriptiveScriptMap&& other) noexcept;
 		
-		void Add(const FZCallBufferSlot& src);
-		void Remove(const FZCallBufferSlot& src);
-		bool Find(const FZCallBufferSlot& src, FZCallBufferSlot& dest) const;
+		void Add(const FZCallBufferSlot& key, const FZCallBufferSlot& value);
+		void Remove(const FZCallBufferSlot& key);
+		bool Find(const FZCallBufferSlot& key, FZCallBufferSlot& value) const;
+		void Clear();
 
 		int32 Num() const;
 

@@ -47,6 +47,12 @@ bool ZSharp::FZSelfDescriptiveScriptSet::Contains(const FZCallBufferSlot& src) c
 	return helper.FindElementIndexFromHash(data) != INDEX_NONE;
 }
 
+void ZSharp::FZSelfDescriptiveScriptSet::Clear()
+{
+	FScriptSetHelper helper = GetHelper();
+	helper.EmptyElements();
+}
+
 int32 ZSharp::FZSelfDescriptiveScriptSet::Num() const
 {
 	FScriptSetHelper helper = GetHelper();

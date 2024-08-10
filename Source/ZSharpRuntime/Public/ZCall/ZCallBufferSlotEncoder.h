@@ -5,6 +5,9 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_Array.h"
+#include "Conjugate/ZConjugateRegistry_Set.h"
+#include "Conjugate/ZConjugateRegistry_Map.h"
+#include "Conjugate/ZConjugateRegistry_Optional.h"
 #include "Conjugate/ZConjugateRegistry_Delegate.h"
 #include "Conjugate/ZConjugateRegistry_MulticastInlineDelegate.h"
 #include "Conjugate/ZConjugateRegistry_MulticastSparseDelegate.h"
@@ -238,6 +241,9 @@ namespace ZSharp
 #undef IMPLEMENT_OBJECT_WRAPPER_ENCODER
 
 	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(ScriptArray, Array)
+	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(ScriptSet, Set)
+	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(ScriptMap, Map)
+	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(Optional, Optional)
 
 	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(ScriptDelegate, Delegate)
 	IMPLEMENT_SELF_DESCRIPTIVE_ENCODER(MulticastInlineScriptDelegate, MulticastInlineDelegate)

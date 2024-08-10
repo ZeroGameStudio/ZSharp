@@ -25,22 +25,53 @@ ZSharp::FZSelfDescriptiveScriptMap::FZSelfDescriptiveScriptMap(FZSelfDescriptive
 	ValuePropertyVisitor = MoveTemp(other.ValuePropertyVisitor);
 }
 
-void ZSharp::FZSelfDescriptiveScriptMap::Add(const FZCallBufferSlot& src)
+void ZSharp::FZSelfDescriptiveScriptMap::Add(const FZCallBufferSlot& key, const FZCallBufferSlot& value)
 {
+	FScriptMapHelper helper = GetHelper();
+	void* keyData = FMemory_Alloca_Aligned(Descriptor->Key->GetSize(), Descriptor->Key->GetMinAlignment());
+	KeyPropertyVisitor->SetValue(keyData, key);
+	void* valueData = FMemory_Alloca_Aligned(Descriptor->Value->GetSize(), Descriptor->Value->GetMinAlignment());
+	KeyPropertyVisitor->SetValue(valueData, value);
+	
+	helper.AddPair(keyData, valueData);
 }
 
-void ZSharp::FZSelfDescriptiveScriptMap::Remove(const FZCallBufferSlot& src)
+void ZSharp::FZSelfDescriptiveScriptMap::Remove(const FZCallBufferSlot& key)
 {
+	FScriptMapHelper helper = GetHelper();
+	void* keyData = FMemory_Alloca_Aligned(Descriptor->Key->GetSize(), Descriptor->Key->GetMinAlignment());
+	KeyPropertyVisitor->SetValue(keyData, key);
+	
+	helper.RemovePair(keyData);
 }
 
-bool ZSharp::FZSelfDescriptiveScriptMap::Find(const FZCallBufferSlot& src, FZCallBufferSlot& dest) const
+bool ZSharp::FZSelfDescriptiveScriptMap::Find(const FZCallBufferSlot& key, FZCallBufferSlot& value) const
 {
-	return true;
+	FScriptMapHelper helper = GetHelper();
+	void* keyData = FMemory_Alloca_Aligned(Descriptor->Key->GetSize(), Descriptor->Key->GetMinAlignment());
+	KeyPropertyVisitor->SetValue(keyData, key);
+	
+	if (void* valueData = helper.FindValueFromHash(keyData))
+	{
+		ValuePropertyVisitor->GetValue(valueData, value);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void ZSharp::FZSelfDescriptiveScriptMap::Clear()
+{
+	FScriptMapHelper helper = GetHelper();
+	helper.EmptyValues();
 }
 
 int32 ZSharp::FZSelfDescriptiveScriptMap::Num() const
 {
-	return 0;
+	FScriptMapHelper helper = GetHelper();
+	return helper.Num();
 }
 
 ZSharp::FZSelfDescriptiveScriptMap& ZSharp::FZSelfDescriptiveScriptMap::operator=(FZSelfDescriptiveScriptMap&& other) noexcept

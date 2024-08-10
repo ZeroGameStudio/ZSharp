@@ -52,7 +52,7 @@ public enum {_exportedEnum.Name} : {_exportedEnum.UnderlyingType}
 	{
 		get
 		{
-			List<string> attrs = [ $"[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"{Assembly.GetExecutingAssembly().GetName().Version!}\")]" ];
+			List<string> attrs = [ $"[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"{Assembly.GetExecutingAssembly().GetName().Version!.ToString(3)}\")]" ];
 			if ((_exportedEnum.Flags & EExportedEnumFlags.Flags) != EExportedEnumFlags.None)
 			{
 				attrs.Add("[Flags]");

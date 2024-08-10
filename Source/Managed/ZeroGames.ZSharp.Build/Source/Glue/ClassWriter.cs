@@ -148,7 +148,7 @@ namespace {_exportedClass.Namespace};
 	{
 		get
 		{
-			List<string> attrs = [ $"[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"{Assembly.GetExecutingAssembly().GetName().Version!}\")]" ];
+			List<string> attrs = [ $"[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"{Assembly.GetExecutingAssembly().GetName().Version!.ToString(3)}\")]" ];
 			if (_exportedClass.ConjugateRegistryId > 0)
 			{
 				attrs.Add($"[ConjugateRegistryId({_exportedClass.ConjugateRegistryId})]");

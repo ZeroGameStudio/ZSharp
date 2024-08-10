@@ -8,7 +8,9 @@ ZSharp::FZSelfDescriptiveOptional::FZSelfDescriptiveOptional(const DescriptorTyp
 	, Helper(new FOptionalProperty(nullptr, {}, RF_Public | RF_MarkAsNative | RF_Transient))
 	, UnderlyingPropertyVisitor(IZPropertyVisitor::Create(descriptor))
 {
-	Helper->SetValueProperty(const_cast<FProperty*>(descriptor));
+	// FOptionalProperty owns it's ValueProperty, so we have to make a copy.
+	auto duplicatedValueProperty = CastField<FProperty>(FField::Duplicate(descriptor, nullptr));
+	Helper->SetValueProperty(duplicatedValueProperty);
 	Helper->InitializeValue(UnderlyingInstance);
 }
 
@@ -17,7 +19,9 @@ ZSharp::FZSelfDescriptiveOptional::FZSelfDescriptiveOptional(const DescriptorTyp
 	, Helper(new FOptionalProperty(nullptr, {}, RF_Public | RF_MarkAsNative | RF_Transient))
 	, UnderlyingPropertyVisitor(IZPropertyVisitor::Create(descriptor))
 {
-	Helper->SetValueProperty(const_cast<FProperty*>(descriptor));
+	// FOptionalProperty owns it's ValueProperty, so we have to make a copy.
+	auto duplicatedValueProperty = CastField<FProperty>(FField::Duplicate(descriptor, nullptr));
+	Helper->SetValueProperty(duplicatedValueProperty);
 	GCRoot = TStrongObjectPtr { Descriptor->GetOwnerStruct() };
 }
 
@@ -30,8 +34,11 @@ ZSharp::FZSelfDescriptiveOptional::FZSelfDescriptiveOptional(FZSelfDescriptiveOp
 
 ZSharp::FZSelfDescriptiveOptional::~FZSelfDescriptiveOptional()
 {
-	Helper->DestroyValue(UnderlyingInstance);
-	FMemory::Free(UnderlyingInstance);
+	if (bOwning)
+	{
+		Helper->DestroyValue(UnderlyingInstance);
+		FMemory::Free(UnderlyingInstance);
+	}
 }
 
 bool ZSharp::FZSelfDescriptiveOptional::Get(FZCallBufferSlot& dest) const

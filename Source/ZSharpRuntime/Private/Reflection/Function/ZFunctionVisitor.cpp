@@ -14,7 +14,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
 
 	FZCallBuffer& buf = *buffer;
-	UFunction* func = Function.Get();
+	UFunction* func = Function.Get(); // @FIXME: Dynamic function may get GCed.
 	UObject* self;
 	if (!bIsStatic)
 	{

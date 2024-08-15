@@ -2,9 +2,6 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-public interface IZSharpAssemblyLoadContext : IGCHandle
-{
-	
-}
+public interface IZSharpAssemblyLoadContext : IGCHandle;
 
 

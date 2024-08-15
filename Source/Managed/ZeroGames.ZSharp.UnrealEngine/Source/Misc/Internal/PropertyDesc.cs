@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace ZeroGames.ZSharp.UnrealEngine;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct PropertyDesc
+internal struct PropertyDesc
 {
 	public IntPtr Descriptor;
 	public IntPtr Metadata;

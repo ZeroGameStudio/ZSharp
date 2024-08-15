@@ -2,9 +2,6 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-public interface ISlimAssemblyLoadContext : IZSharpAssemblyLoadContext
-{
-	
-}
+public interface ISlimAssemblyLoadContext : IZSharpAssemblyLoadContext;
 
 

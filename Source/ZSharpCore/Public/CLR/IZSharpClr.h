@@ -13,14 +13,23 @@ namespace ZSharp
 	DECLARE_MULTICAST_DELEGATE_OneParam(FZOnMasterAlcLoadPlugins, IZMasterAssemblyLoadContext*)
 	DECLARE_MULTICAST_DELEGATE_OneParam(FZOnMasterAlcFullyLoaded, IZMasterAssemblyLoadContext*)
 	DECLARE_MULTICAST_DELEGATE(FZOnMasterAlcUnloaded)
-	
+
+	/**
+ 	 * Represents a running CLR.
+ 	 * A CLR object is automatically created when the module is loaded based on the configuration.
+ 	 * The lifecycle of the CLR object accompanies the entire process, and there is one and only one CLR object per process.
+ 	 * The CLR object internally maintains multiple AssemblyLoadContexts to achieve environment isolation.
+ 	 *
+ 	 * @see IZAssemblyLoadContext
+ 	 */
 	class ZSHARPCORE_API IZSharpClr
 	{
 	public:
+		/** Get the unique CLR object for the current process. */
 		static IZSharpClr& Get();
+		
 	public:
-		virtual ~IZSharpClr(){}
-	public:
+		/** Call managed GC. */
 		virtual void CollectGarbage(int32 generation = -1, bool aggressive = true, bool blocking = false, bool compacting = true) = 0;
 	public:
 		virtual IZMasterAssemblyLoadContext* CreateMasterAlc() = 0;
@@ -50,6 +59,9 @@ namespace ZSharp
 	public:
 		int32 Run(const FString& path, void* args = nullptr, const FString& alcName = "");
 		int32 RunAsync(const FString& path, void* args = nullptr, const FString& alcName = "");
+
+	public:
+		virtual ~IZSharpClr(){}
 	};
 }
 

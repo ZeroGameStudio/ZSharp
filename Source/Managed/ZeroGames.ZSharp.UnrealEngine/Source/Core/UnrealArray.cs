@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class UnrealArray<T> : UnrealArrayBase, IConjugate<UnrealArray<T>>
+public sealed class UnrealArray<T> : UnrealArrayBase, IConjugate<UnrealArray<T>>
 {
 
 	public static UnrealArray<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);

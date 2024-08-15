@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public partial class UnrealText
+public sealed partial class UnrealText
 {
 	
 	public UnrealText(string content) : this() => Data = content;

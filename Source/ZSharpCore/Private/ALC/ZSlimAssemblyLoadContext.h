@@ -6,7 +6,7 @@
 
 namespace ZSharp
 {
-	class FZSlimAssemblyLoadContext : public IZSlimAssemblyLoadContext
+	class FZSlimAssemblyLoadContext final : public IZSlimAssemblyLoadContext
 	{
 
 	public:

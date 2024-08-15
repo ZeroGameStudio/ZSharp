@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-public class ZCallDispatcher_Property : IZCallDispatcher
+internal class ZCallDispatcher_Property : IZCallDispatcher
 {
 	
 	public unsafe EZCallErrorCode Dispatch(ZCallBuffer* buffer)

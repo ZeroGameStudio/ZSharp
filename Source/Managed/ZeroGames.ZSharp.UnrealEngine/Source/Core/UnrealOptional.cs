@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class UnrealOptional<T> : UnrealOptionalBase, IConjugate<UnrealOptional<T>>
+public sealed class UnrealOptional<T> : UnrealOptionalBase, IConjugate<UnrealOptional<T>>
 {
 	
 	public static UnrealOptional<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);

@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace ZeroGames.ZSharp.Core;
 
-internal class ZSharpSynchronizationContext : SynchronizationContext
+internal sealed class ZSharpSynchronizationContext : SynchronizationContext
 {
 
 	public override void Send(SendOrPostCallback d, object? state)

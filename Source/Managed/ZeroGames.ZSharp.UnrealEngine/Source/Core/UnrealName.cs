@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public partial class UnrealName
+public sealed partial class UnrealName
 {
 	
 	public UnrealName(string content) : this() => Data = content;

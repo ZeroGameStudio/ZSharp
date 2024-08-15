@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class UnrealSet<T> : UnrealSetBase, IConjugate<UnrealSet<T>>
+public sealed class UnrealSet<T> : UnrealSetBase, IConjugate<UnrealSet<T>>
 {
 	
 	public static UnrealSet<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);

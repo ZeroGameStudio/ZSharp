@@ -11,7 +11,7 @@
 
 namespace ZSharp
 {
-	class FZMasterAssemblyLoadContext : public IZMasterAssemblyLoadContext
+	class FZMasterAssemblyLoadContext final : public IZMasterAssemblyLoadContext
 	{
 
 		using ThisClass = FZMasterAssemblyLoadContext;

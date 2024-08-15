@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CLR/IZSharpClr.h"
-#include "ALC/IZMasterAssemblyLoadContext.h"
-#include "ALC/IZSlimAssemblyLoadContext.h"
+#include "ALC/ZMasterAssemblyLoadContext.h"
+#include "ALC/ZSlimAssemblyLoadContext.h"
 
 namespace ZSharp
 {
 	class IZAssemblyLoadContext;
 	
-	class FZGenericClr : public IZSharpClr
+	class FZGenericClr final : public IZSharpClr
 	{
 
 		using ThisClass = FZGenericClr;
@@ -58,9 +58,9 @@ namespace ZSharp
 
 	private:
 		bool bInitialized = false;
-		TUniquePtr<IZMasterAssemblyLoadContext> MasterAlc;
+		TUniquePtr<FZMasterAssemblyLoadContext> MasterAlc;
 		FRWLock SlimAlcMapLock;
-		TMap<FString, TUniquePtr<IZSlimAssemblyLoadContext>> SlimAlcMap;
+		TMap<FString, TUniquePtr<FZSlimAssemblyLoadContext>> SlimAlcMap;
 
 	private:
 		FZOnMasterAlcLoaded OnMasterAlcLoaded;

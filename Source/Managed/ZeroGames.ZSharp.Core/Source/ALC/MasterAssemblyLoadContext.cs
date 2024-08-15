@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace ZeroGames.ZSharp.Core;
 
-internal unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMasterAssemblyLoadContext
+internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMasterAssemblyLoadContext
 {
 
     public const string KName = "Master";

@@ -6,7 +6,7 @@ using System.Runtime.Loader;
 
 namespace ZeroGames.ZSharp.Core;
 
-internal class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, ISlimAssemblyLoadContext
+internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, ISlimAssemblyLoadContext
 {
     
     public static SlimAssemblyLoadContext Create(string name)

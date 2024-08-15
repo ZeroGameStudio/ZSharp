@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
-public class UnrealMap<TKey, TValue> : UnrealMapBase, IConjugate<UnrealMap<TKey, TValue>>
+public sealed class UnrealMap<TKey, TValue> : UnrealMapBase, IConjugate<UnrealMap<TKey, TValue>>
 {
 	
 	public static UnrealMap<TKey, TValue> BuildConjugate(IntPtr unmanaged) => new(unmanaged);

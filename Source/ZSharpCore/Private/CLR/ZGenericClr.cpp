@@ -298,8 +298,9 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericClr::CreateSlimAlc(const FSt
 ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericClr::GetSlimAlc(const FString& name)
 {
 	FReadScopeLock _(SlimAlcMapLock);
+
 	
-	const TUniquePtr<IZSlimAssemblyLoadContext>* pAlc = SlimAlcMap.Find(name);
+	const TUniquePtr<FZSlimAssemblyLoadContext>* pAlc = SlimAlcMap.Find(name);
 	return pAlc ? pAlc->Get() : nullptr;
 }
 

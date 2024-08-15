@@ -4,12 +4,12 @@
 #include "ZMasterAssemblyLoadContext_Interop.h"
 
 #include "ZSehHelper.h"
-#include "CLR/IZSharpClr.h"
 #include "ALC/ZMasterAssemblyLoadContext.h"
+#include "CLR/ZGenericClr.h"
 
 ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext_Interop::ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer)
 {
-	auto alc = static_cast<FZMasterAssemblyLoadContext*>(IZSharpClr::Get().GetMasterAlc());
+	auto alc = static_cast<FZMasterAssemblyLoadContext*>(FZGenericClr::Get().GetMasterAlc());
 	if (!alc)
 	{
 		return EZCallErrorCode::AlcUnavailable;
@@ -20,7 +20,7 @@ ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext_Interop::ZCall_Black
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext_Interop::GetZCallHandle_Black(const TCHAR* name)
 {
-	auto alc = static_cast<FZMasterAssemblyLoadContext*>(IZSharpClr::Get().GetMasterAlc());
+	auto alc = static_cast<FZMasterAssemblyLoadContext*>(FZGenericClr::Get().GetMasterAlc());
 	if (!alc)
 	{
 		return FZCallHandle{};
@@ -31,7 +31,7 @@ ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext_Interop::GetZCallHandle
 
 void* ZSharp::FZMasterAssemblyLoadContext_Interop::BuildConjugate_Black(uint16 registryId, void* userdata)
 {
-	auto alc = static_cast<FZMasterAssemblyLoadContext*>(IZSharpClr::Get().GetMasterAlc());
+	auto alc = static_cast<FZMasterAssemblyLoadContext*>(FZGenericClr::Get().GetMasterAlc());
 	if (!alc)
 	{
 		return nullptr;
@@ -42,7 +42,7 @@ void* ZSharp::FZMasterAssemblyLoadContext_Interop::BuildConjugate_Black(uint16 r
 
 void ZSharp::FZMasterAssemblyLoadContext_Interop::ReleaseConjugate_Black(uint16 registryId, void* unmanaged)
 {
-	auto alc = static_cast<FZMasterAssemblyLoadContext*>(IZSharpClr::Get().GetMasterAlc());
+	auto alc = static_cast<FZMasterAssemblyLoadContext*>(FZGenericClr::Get().GetMasterAlc());
 	if (!alc)
 	{
 		return;

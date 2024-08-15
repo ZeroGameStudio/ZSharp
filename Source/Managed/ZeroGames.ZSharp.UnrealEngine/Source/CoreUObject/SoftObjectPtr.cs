@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public class SoftObjectPtr<T> : SoftObjectPtrBase, IConjugate<SoftObjectPtr<T>> where T : UnrealObject
+public sealed class SoftObjectPtr<T> : SoftObjectPtrBase, IConjugate<SoftObjectPtr<T>> where T : UnrealObject
 {
 	
 	public static SoftObjectPtr<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);

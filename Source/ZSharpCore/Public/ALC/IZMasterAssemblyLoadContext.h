@@ -25,7 +25,6 @@ namespace ZSharp
 	class ZSHARPCORE_API IZMasterAssemblyLoadContext : public IZAssemblyLoadContext
 	{
 	public:
-		virtual EZLoadAssemblyErrorCode LoadAssembly(const TArray<uint8>& buffer, void* args = nullptr) = 0;
 		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeLocatorWrapper& locator) = 0;
 	public:
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) = 0;
@@ -43,8 +42,6 @@ namespace ZSharp
 		
 		// Helpers
 	public:
-		void LoadAssembly(const FString& path, void* args = nullptr);
-
 		template <CZConjugateRegistryImpl T>
 		T& GetConjugateRegistry()
 		{

@@ -21,10 +21,6 @@ public class AssemblyResolver : IAssemblyResolver
 			{
 				using FileStream fs = File.OpenRead(file);
 				assembly = alc.LoadFromStream(fs);
-				if (assembly.GetCustomAttribute<DllEntryAttribute>() is not null)
-				{
-					Logger.Fatal($"Assembly {assembly.GetName().Name} has DllEntry and cannot be loaded implicitly!!!");
-				}
 				return ELoadAssemblyErrorCode.Succeed;
 			}
 		}

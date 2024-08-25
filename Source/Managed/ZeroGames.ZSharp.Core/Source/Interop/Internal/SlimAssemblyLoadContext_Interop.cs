@@ -23,9 +23,9 @@ internal static class SlimAssemblyLoadContext_Interop
     }, -1);
 
     [UnmanagedCallersOnly]
-    public static unsafe ELoadAssemblyErrorCode LoadAssembly(GCHandle handle, uint8* buffer, int32 size, void* args) => Uncaught.ErrorIfUncaught(() =>
+    public static unsafe ELoadAssemblyErrorCode LoadAssembly(GCHandle handle, char* assemblyName, void* args) => Uncaught.ErrorIfUncaught(() =>
     {
-        return Unsafe.As<SlimAssemblyLoadContext>(handle.Target)!.LoadAssembly(new UnmanagedMemoryStream(buffer, size), args);
+        return Unsafe.As<SlimAssemblyLoadContext>(handle.Target)!.LoadAssembly(new(assemblyName), args, out _);
     }, ELoadAssemblyErrorCode.UnknownError);
 
     [UnmanagedCallersOnly]

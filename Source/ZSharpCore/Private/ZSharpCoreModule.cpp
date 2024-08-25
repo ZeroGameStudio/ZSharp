@@ -18,7 +18,7 @@ namespace ZSharp::ZSharpCoreModule_Private
 			return;
 		}
 
-		const FString& path = args[0];
+		const FString& name = args[0];
 		TArray<const TCHAR*> argv;
 		for (int32 i = 1; i < args.Num(); ++i)
 		{
@@ -26,7 +26,7 @@ namespace ZSharp::ZSharpCoreModule_Private
 		}
 		
 		FZCommonMethodArgs commonArgs { argv.Num(), argv.GetData() };
-		IZSharpClr::Get().Run(path, &commonArgs);
+		IZSharpClr::Get().Run(name, &commonArgs);
 	}),
 	ECVF_Default);
 
@@ -40,7 +40,7 @@ namespace ZSharp::ZSharpCoreModule_Private
 				return;
 			}
 
-			const FString& path = args[0];
+			const FString& name = args[0];
 			TArray<const TCHAR*> argv;
 			for (int32 i = 1; i < args.Num(); ++i)
 			{
@@ -48,7 +48,7 @@ namespace ZSharp::ZSharpCoreModule_Private
 			}
 		
 			FZCommonMethodArgs commonArgs { argv.Num(), argv.GetData() };
-			IZSharpClr::Get().RunAsync(path, &commonArgs);
+			IZSharpClr::Get().RunAsync(name, &commonArgs);
 		}),
 		ECVF_Default);
 }

@@ -26,13 +26,29 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
         Resolving += HandleResolve;
         Unloading += _ => HandleUnload();
     }
+
+    public unsafe ELoadAssemblyErrorCode LoadAssembly(string name, void* args, out Assembly? assembly) => InternalLoadAssembly(name, args, out assembly, false);
+
+    public unsafe ECallMethodErrorCode CallMethod(string assemblyName, string typeName, string methodName, void* args)
+    {
+        throw new NotImplementedException();
+    }
     
-    public unsafe ELoadAssemblyErrorCode LoadAssembly(string name, void* args, out Assembly? assembly)
+    public GCHandle GCHandle { get; }
+
+    protected virtual void HandleUnload(){}
+    
+    private unsafe ELoadAssemblyErrorCode InternalLoadAssembly(string name, void* args, out Assembly? assembly, bool implicitly)
     {
         ELoadAssemblyErrorCode res = _resolver.Resolve(this, name, out assembly);
         if (assembly is null)
         {
             return res;
+        }
+        
+        if (implicitly && assembly.GetCustomAttribute<DllEntryAttribute>() is not null)
+        {
+            Logger.Fatal($"Assembly {assembly.GetName().Name} has DllEntry and cannot be loaded implicitly!!!");
         }
 
         try
@@ -48,18 +64,9 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
         return res;
     }
 
-    public unsafe ECallMethodErrorCode CallMethod(string assemblyName, string typeName, string methodName, void* args)
-    {
-        throw new NotImplementedException();
-    }
-    
-    public GCHandle GCHandle { get; }
-
-    protected virtual void HandleUnload(){}
-
     private unsafe Assembly? HandleResolve(AssemblyLoadContext alc, AssemblyName name)
     {
-        LoadAssembly(name.Name!, null, out var assembly);
+        InternalLoadAssembly(name.Name!, null, out var assembly, true);
         return assembly;
     }
 

@@ -130,12 +130,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         _pendingDisposeConjugates.Enqueue(conjugate);
     }
 
-    public ELoadAssemblyErrorCode LoadAssembly(Stream stream, void* args)
-    {
-        Assembly asm = LoadFromStream(stream);
-        return DllMainStatics.TryInvokeDllMain(asm, args);
-    }
-
     public void Tick(float deltaTime)
     {
         while (_pendingDisposeConjugates.TryDequeue(out var conjugate))

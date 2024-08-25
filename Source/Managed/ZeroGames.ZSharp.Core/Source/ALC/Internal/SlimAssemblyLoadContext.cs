@@ -19,12 +19,6 @@ internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, I
         return new(name);
     }
 
-    public unsafe ELoadAssemblyErrorCode LoadAssembly(Stream stream, void* args)
-    {
-        Assembly asm = LoadFromStream(stream);
-        return DllMainStatics.TryInvokeDllMain(asm, args);
-    }
-
     protected override void HandleUnload()
     {
         base.HandleUnload();

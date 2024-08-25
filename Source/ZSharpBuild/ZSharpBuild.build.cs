@@ -54,5 +54,7 @@ public class ZSharpBuild : ModuleRules
 			{
 			}
 		);
+		
+		PublicDefinitions.Add($"ZSHARP_BUILD_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Build\"");
 	}
 }

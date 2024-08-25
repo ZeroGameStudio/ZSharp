@@ -57,7 +57,8 @@ void FZSharpRuntimeModule::CreateMasterAlc()
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UFunction{}, 1);
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UProperty{}, 2);
 
-	alc->LoadAssembly(FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "ZeroGames.ZSharp.UnrealEngine.dll"));
+	// ZeroGames.ZSharp.UnrealEngine can be accessed via reflection, so we must load it as early as possible.
+	alc->LoadAssembly(ZSHARP_ENGINE_ASSEMBLY_NAME);
 }
 
 void FZSharpRuntimeModule::UnloadMasterAlc()

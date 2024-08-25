@@ -29,21 +29,6 @@ namespace ZSharp::ZBuildEngine_Private
 			FZBuildEngine::Get().GenerateGlue();
 		}),
 		ECVF_Default);
-	
-	static FString LocateBuildAssembly()
-	{
-		const FString pluginDir = IPluginManager::Get().FindEnabledPlugin("ZSharp")->GetBaseDir();
-	
-		FString dllPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed/ZeroGames.ZSharp.Build.dll");
-		if (!FPaths::FileExists(dllPath))
-		{
-			dllPath = FPaths::Combine(pluginDir, "Content/ZeroGames.ZSharp.Build.dll");
-		}
-
-		check(FPaths::FileExists(dllPath));
-
-		return dllPath;
-	}
 
 	static FString GetProjectDir()
 	{
@@ -76,7 +61,6 @@ ZSharp::FZBuildEngine& ZSharp::FZBuildEngine::Get()
 
 void ZSharp::FZBuildEngine::GenerateSolution() const
 {
-	const FString assemblyDir = ZBuildEngine_Private::LocateBuildAssembly();
 	const FString projectDir = ZBuildEngine_Private::GetProjectDir();
 	const FString pluginDir = ZBuildEngine_Private::GetPluginDir("ZSharp");
 
@@ -103,7 +87,7 @@ void ZSharp::FZBuildEngine::GenerateSolution() const
 		*sourceArg,
 	};
 	FZCommonMethodArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
-	IZSharpClr::Get().Run(assemblyDir, &commonArgs);
+	IZSharpClr::Get().Run(ZSHARP_BUILD_ASSEMBLY_NAME, &commonArgs);
 }
 
 void ZSharp::FZBuildEngine::GenerateGlue() const
@@ -111,7 +95,6 @@ void ZSharp::FZBuildEngine::GenerateGlue() const
 	FZDynamicTypeExporter{}.Export();
 	FZGlueManifestWriter{}.Write();
 
-	const FString assemblyDir = ZBuildEngine_Private::LocateBuildAssembly();
 	const FString projectDir = ZBuildEngine_Private::GetProjectDir();
 
 	const FString targetArg = ZBuildEngine_Private::BuildArgument("target", "glue");
@@ -123,7 +106,7 @@ void ZSharp::FZBuildEngine::GenerateGlue() const
 		*projectDirArg,
 	};
 	FZCommonMethodArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
-	IZSharpClr::Get().Run(assemblyDir, &commonArgs);
+	IZSharpClr::Get().Run(ZSHARP_BUILD_ASSEMBLY_NAME, &commonArgs);
 }
 
 void ZSharp::FZBuildEngine::BuildSolution() const

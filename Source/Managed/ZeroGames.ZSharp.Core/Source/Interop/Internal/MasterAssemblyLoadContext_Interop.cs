@@ -36,7 +36,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     }, -1);
 
     [UnmanagedCallersOnly]
-    public static ELoadAssemblyErrorCode LoadAssembly(uint8* buffer, int32 size, void* args) => Uncaught.ErrorIfUncaught(() =>
+    public static ELoadAssemblyErrorCode LoadAssembly(char* assemblyName, void* args) => Uncaught.ErrorIfUncaught(() =>
     {
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
@@ -44,8 +44,20 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
             return ELoadAssemblyErrorCode.AlcUnavailable;
         }
 
-        return alc.LoadAssembly(new UnmanagedMemoryStream(buffer, size), args);
+        return alc.LoadAssembly(new(assemblyName), args, out _);
     }, ELoadAssemblyErrorCode.UnknownError);
+    
+    [UnmanagedCallersOnly]
+    public static ECallMethodErrorCode CallMethod(char* assemblyName, char* typeName, char* methodName, void* args) => Uncaught.ErrorIfUncaught(() =>
+    {
+        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
+        if (alc is null)
+        {
+            return ECallMethodErrorCode.AlcUnavailable;
+        }
+
+        return alc.CallMethod(new(assemblyName), new(typeName), new(methodName), args);
+    }, ECallMethodErrorCode.UnknownError);
 
     [UnmanagedCallersOnly]
     public static InteropRuntimeTypeHandle GetType(InteropRuntimeTypeLocator* locator) => Uncaught.ErrorIfUncaught(() =>

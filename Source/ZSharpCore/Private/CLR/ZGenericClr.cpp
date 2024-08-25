@@ -36,14 +36,14 @@ namespace ZSharp::ZGenericClr_Private
 	
 	static void LoadCoreAssembly(const FString& pluginContentDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
-		const TCHAR* Core_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Core_Interop");
-		const TCHAR* InteropString_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropString_Interop");
-		const TCHAR* MasterAssemblyLoadContext_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.MasterAssemblyLoadContext_Interop");
+		static const TCHAR* GCore_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Core_Interop");
+		static const TCHAR* GInteropString_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropString_Interop");
+		static const TCHAR* GMasterAssemblyLoadContext_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.MasterAssemblyLoadContext_Interop");
 		
-		FZUnmanagedFunction unmanagedFunctions[] =
+		static FZUnmanagedFunction GUnmanagedFunctions[] =
         {
 #define TO_STRING(FieldName) TEXT(#FieldName)
-#define BUILD_UNMANAGED_FUNCTION(ShortTypeName, FieldName) { ShortTypeName##TypeName, TO_STRING(S##FieldName), FZ##ShortTypeName::FieldName }
+#define BUILD_UNMANAGED_FUNCTION(ShortTypeName, FieldName) { G##ShortTypeName##TypeName, TO_STRING(S##FieldName), FZ##ShortTypeName::FieldName }
 
 			BUILD_UNMANAGED_FUNCTION(Core_Interop, CoreLog),
 			
@@ -61,7 +61,7 @@ namespace ZSharp::ZGenericClr_Private
 #undef TO_STRING
         };
 
-		void** managedFunctions[] =
+		static void** GManagedFunctions[] =
 		{
 #define ADDRESS_OF(Pointer) reinterpret_cast<void**>(&Pointer)
 
@@ -87,13 +87,13 @@ namespace ZSharp::ZGenericClr_Private
 #undef ADDRESS_OF
 		};
 		
-		struct
+		static const struct
 		{
-			FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(unmanagedFunctions), unmanagedFunctions };
-			void*** ManagedFunctions = managedFunctions;
-		} args{};
+			FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(GUnmanagedFunctions), GUnmanagedFunctions };
+			void*** ManagedFunctions = GManagedFunctions;
+		} GArgs{};
 
-		int32(*dllMain)(const decltype(args)&) = nullptr;
+		void(*dllMain)(const decltype(GArgs)&) = nullptr;
 
 		const FString assemblyName = ZSHARP_CORE_ASSEMBLY_NAME;
 		FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed", assemblyName + ".dll");
@@ -113,25 +113,57 @@ namespace ZSharp::ZGenericClr_Private
 		getFunctionPointer(*entryTypeName, *entryMethodName, UNMANAGEDCALLERSONLY_METHOD, nullptr, nullptr, reinterpret_cast<void**>(&dllMain));
 		
 		check(dllMain);
-		dllMain(args);
+		dllMain(GArgs);
+	}
+
+	static void LoadResolverAssembly(const FString& pluginContentDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
+	{
+		static const FString GProjectDir = FPaths::ProjectDir();
+		
+		static const struct
+		{
+			const TCHAR* ProjectDir = *GProjectDir;
+		} GArgs{};
+
+		void(*dllMain)(const decltype(GArgs)&) = nullptr;
+
+		const FString assemblyName = ZSHARP_RESOLVER_ASSEMBLY_NAME;
+		FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed", assemblyName + ".dll");
+		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
+		const FString entryMethodName = TEXT("DllMain");
+
+		TArray<uint8> content;
+		if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
+		{
+			assemblyPath = FPaths::Combine(pluginContentDir, assemblyName + ".dll");
+			if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
+			{
+				checkNoEntry();
+			}
+		}
+		loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
+		getFunctionPointer(*entryTypeName, *entryMethodName, UNMANAGEDCALLERSONLY_METHOD, nullptr, nullptr, reinterpret_cast<void**>(&dllMain));
+
+		check(dllMain);
+		dllMain(GArgs);
 	}
 
 	static void LoadEngineCoreAssembly(const FString& pluginContentDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
-		FString typeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("UnrealEngine_Interop"));
+		static const FString GTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("UnrealEngine_Interop"));
 
-		FZUnmanagedFunction unmanagedFunctions[] =
+		static FZUnmanagedFunction GUnmanagedFunctions[] =
 		{
-			{ *typeName, TEXT("SLog"), FZUnrealEngine_Interop::Log },
-			{ *typeName, TEXT("SIsInGameThread"), FZUnrealEngine_Interop::IsInGameThread },
+			{ *GTypeName, TEXT("SLog"), FZUnrealEngine_Interop::Log },
+			{ *GTypeName, TEXT("SIsInGameThread"), FZUnrealEngine_Interop::IsInGameThread },
 		};
 		
-		struct
+		static const struct
         {
-        	FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(unmanagedFunctions), unmanagedFunctions };
-        } args{};
+        	FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(GUnmanagedFunctions), GUnmanagedFunctions };
+        } GArgs{};
 
-		int32(*dllMain)(const decltype(args)&) = nullptr;
+		void(*dllMain)(const decltype(GArgs)&) = nullptr;
 
 		const FString assemblyName = ZSHARP_CORE_ENGINE_ASSEMBLY_NAME;
 		FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed", assemblyName + ".dll");
@@ -151,7 +183,7 @@ namespace ZSharp::ZGenericClr_Private
 		getFunctionPointer(*entryTypeName, *entryMethodName, UNMANAGEDCALLERSONLY_METHOD, nullptr, nullptr, reinterpret_cast<void**>(&dllMain));
 
 		check(dllMain);
-		dllMain(args);
+		dllMain(GArgs);
 	}
 }
 
@@ -205,6 +237,7 @@ void ZSharp::FZGenericClr::Startup()
 	closeHostFXR(handle);
 
 	ZGenericClr_Private::LoadCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
+	ZGenericClr_Private::LoadResolverAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
 	ZGenericClr_Private::LoadEngineCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
 	
 	FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);

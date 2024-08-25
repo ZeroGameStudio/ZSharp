@@ -30,7 +30,7 @@ internal class DllEntry
     }
 
     [UnmanagedCallersOnly]
-    private static unsafe int32 DllMain(Args* args) => Uncaught.FatalIfUncaught(() =>
+    private static unsafe void DllMain(Args* args) => Uncaught.FatalIfUncaught(() =>
     {
         for (int32 i = 0; i < args->UnmanagedFunctions.Count; ++i)
         {
@@ -61,9 +61,7 @@ internal class DllEntry
             
             field.SetValue(null, (IntPtr)function->Address);
         }
-
-        return 0;
-    }, -1);
+    });
 
 }
 

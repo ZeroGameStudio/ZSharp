@@ -26,14 +26,12 @@ internal static class DllMainStatics
         return dllMain;
     }
 
-    public static unsafe bool TryInvokeDllMain(Assembly assembly, void* args, out int32? result)
+    public static unsafe ELoadAssemblyErrorCode TryInvokeDllMain(Assembly assembly, void* args)
     {
-        result = null;
-        
         MethodInfo? dllMain = GetDllMainMethodInfo(assembly);
         if (dllMain is null)
         {
-            return false;
+            return ELoadAssemblyErrorCode.Succeed;
         }
 
         object?[]? parameters = null;
@@ -42,7 +40,7 @@ internal static class DllMainStatics
         {
             if (parameterInfos.Length != 1)
             {
-                throw new Exception("DllMain has more than 1 parameters.");
+                return ELoadAssemblyErrorCode.InvalidDllMainSignature;
             }
                     
             Type parameterType = parameterInfos[0].ParameterType;
@@ -54,20 +52,16 @@ internal static class DllMainStatics
             {
                 if (!parameterType.IsPointer)
                 {
-                    throw new Exception("DllMain has non-pointer parameter but not string[].");
+                    return ELoadAssemblyErrorCode.InvalidDllMainSignature;
                 }
                         
                 parameters = [ new IntPtr(args) ];
             }
         }
-                
-        object? res = dllMain.Invoke(null, parameters);
-        if (res is int32 intRes)
-        {
-            result = intRes;
-        }
         
-        return true;
+        dllMain.Invoke(null, parameters);
+        
+        return ELoadAssemblyErrorCode.Succeed;
     }
     
 }

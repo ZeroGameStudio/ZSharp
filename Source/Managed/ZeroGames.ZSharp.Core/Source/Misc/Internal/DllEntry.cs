@@ -31,7 +31,7 @@ internal static class DllEntry
     }
 
     [UnmanagedCallersOnly]
-    private static unsafe int32 DllMain(Args* args) => Uncaught.FatalIfUncaught(() =>
+    private static unsafe void DllMain(Args* args) => Uncaught.FatalIfUncaught(() =>
     {
         for (int32 i = 0; i < args->UnmanagedFunctions.Count; ++i)
         {
@@ -89,9 +89,7 @@ internal static class DllEntry
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, char*, char*, void*, ECallMethodErrorCode>)&SlimAssemblyLoadContext_Interop.CallMethod;
 
         Logger.Log("===================== ZSharp Startup =====================");
-
-        return 0;
-    }, -1);
+    });
     
 }
 

@@ -51,11 +51,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         return _sSingleton;
     }
 
-    public Assembly? LoadAssembly(string name)
-    {
-        throw new NotImplementedException();
-    }
-
     public Type? GetType(ref readonly RuntimeTypeLocator locator)
     {
         Dictionary<string, Assembly> asmLookup = Assemblies.Concat(Default.Assemblies).ToDictionary(asm => asm.GetName().Name!);
@@ -138,12 +133,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     public ELoadAssemblyErrorCode LoadAssembly(Stream stream, void* args)
     {
         Assembly asm = LoadFromStream(stream);
-        if (DllMainStatics.TryInvokeDllMain(asm, args, out var res) && res is not null)
-        {
-            return ELoadAssemblyErrorCode.Succeed;
-        }
-
-        return ELoadAssemblyErrorCode.Succeed;
+        return DllMainStatics.TryInvokeDllMain(asm, args);
     }
 
     public void Tick(float deltaTime)
@@ -254,8 +244,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private MasterAssemblyLoadContext() : base(KName)
     {
         _sSingleton = this;
-
-        Resolving += (_, fullName) => LoadAssembly(fullName.Name!);
         
         _prevSyncContext = SynchronizationContext.Current;
         _curSyncContext = new();

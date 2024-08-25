@@ -31,8 +31,7 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 {
 	
 	public static IMasterAssemblyLoadContext? Get() => MasterAssemblyLoadContext.Get();
-
-	Assembly? LoadAssembly(string name);
+	
 	Type? GetType(ref readonly RuntimeTypeLocator locator);
 
 	ZCallHandle RegisterZCall(IZCallDispatcher dispatcher);

@@ -22,17 +22,7 @@ internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, I
     public unsafe ELoadAssemblyErrorCode LoadAssembly(Stream stream, void* args)
     {
         Assembly asm = LoadFromStream(stream);
-        if (DllMainStatics.TryInvokeDllMain(asm, args, out var res) && res is not null)
-        {
-            return ELoadAssemblyErrorCode.Succeed;
-        }
-
-        return ELoadAssemblyErrorCode.Succeed;
-    }
-
-    public unsafe ECallMethodErrorCode CallMethod(string assemblyName, string typeName, string methodName, void* args)
-    {
-        throw new NotImplementedException();
+        return DllMainStatics.TryInvokeDllMain(asm, args);
     }
 
     protected override void HandleUnload()

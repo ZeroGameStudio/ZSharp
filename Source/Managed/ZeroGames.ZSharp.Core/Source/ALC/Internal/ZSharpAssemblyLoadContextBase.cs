@@ -29,7 +29,7 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
     
     public unsafe ELoadAssemblyErrorCode LoadAssembly(string name, void* args, out Assembly? assembly)
     {
-        ELoadAssemblyErrorCode res = _resolver.Resolve(name, out assembly);
+        ELoadAssemblyErrorCode res = _resolver.Resolve(this, name, out assembly);
         if (assembly is null)
         {
             return res;

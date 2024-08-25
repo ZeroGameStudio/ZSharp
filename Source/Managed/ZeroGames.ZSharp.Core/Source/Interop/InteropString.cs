@@ -4,6 +4,8 @@ namespace ZeroGames.ZSharp.Core;
 
 public readonly struct InteropString : IDisposable
 {
+
+    public InteropString() : this(string.Empty){}
     
     public InteropString(string str)
     {
@@ -33,6 +35,8 @@ public readonly struct InteropString : IDisposable
         }
     }
 
+    public override string ToString() => Data;
+
     public unsafe string Data
     {
         get => new(InteropString_Interop.SGetData(_address));
@@ -44,6 +48,8 @@ public readonly struct InteropString : IDisposable
             }
         }
     }
+
+    public IntPtr Address => _address;
 
     private readonly bool _unmanaged;
     private readonly IntPtr _address;

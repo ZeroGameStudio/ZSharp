@@ -11,7 +11,8 @@ namespace ZSharp
 
 		AlcUnavailable = 101,
 		
-		BadImage = 201,
+		FileNotFound = 201,
+		BadImage = 202,
 
 		InvalidDllMainSignature = 301,
 		UnhandledDllMainException = 302,

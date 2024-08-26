@@ -1,8 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.IO;
-using System.Reflection;
-using System.Runtime.Loader;
 
 [assembly: AssemblyResolver(typeof(ZeroGames.ZSharp.AssemblyResolver.AssemblyResolver))]
 
@@ -11,7 +9,7 @@ namespace ZeroGames.ZSharp.AssemblyResolver;
 public class AssemblyResolver : IAssemblyResolver
 {
 	
-	public ELoadAssemblyErrorCode Resolve(AssemblyLoadContext alc, string name, out Assembly? assembly)
+	public string? Resolve(string name)
 	{
 		_cachedManagedDllDir ??= $"{UnrealPaths.ProjectDir}Binaries/Managed";
 
@@ -19,18 +17,15 @@ public class AssemblyResolver : IAssemblyResolver
 		{
 			if (Path.GetFileNameWithoutExtension(file) == name)
 			{
-				using FileStream fs = File.OpenRead(file);
-				assembly = alc.LoadFromStream(fs);
-				return ELoadAssemblyErrorCode.Succeed;
+				return file;
 			}
 		}
 
-		assembly = null;
-		return ELoadAssemblyErrorCode.FileNotFound;
+		return null;
 	}
 
 	private string? _cachedManagedDllDir;
-
+	
 }
 
 

@@ -1,9 +1,11 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
+using Mono.Cecil;
 
 namespace ZeroGames.ZSharp.Core;
 
@@ -40,28 +42,54 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
     
     private unsafe ELoadAssemblyErrorCode InternalLoadAssembly(string name, void* args, out Assembly? assembly, bool implicitly)
     {
-        ELoadAssemblyErrorCode res = _resolver.Resolve(this, name, out assembly);
-        if (assembly is null)
-        {
-            return res;
-        }
+        assembly = null;
         
-        if (implicitly && assembly.GetCustomAttribute<DllEntryAttribute>() is not null)
+        string? dllPath = _resolver.Resolve(name);
+        if (dllPath is null)
         {
-            Logger.Fatal($"Assembly {assembly.GetName().Name} has DllEntry and cannot be loaded implicitly!!!");
+            return ELoadAssemblyErrorCode.FileNotFound;
+        }
+
+        if (implicitly)
+        {
+            try
+            {
+                AssemblyDefinition assemblyDef = AssemblyDefinition.ReadAssembly(dllPath);
+                foreach (var attr in assemblyDef.CustomAttributes)
+                {
+                    if (attr.AttributeType.FullName == typeof(DllEntryAttribute).FullName)
+                    {
+                        Logger.Fatal($"Assembly {assemblyDef.Name.Name} has DllEntry and cannot be loaded implicitly!!!");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return ELoadAssemblyErrorCode.BadImage;
+            }
+        }
+
+        using (FileStream fs = File.OpenRead(dllPath))
+        {
+            try
+            {
+                assembly = LoadFromStream(fs);
+            }
+            catch (Exception)
+            {
+                return ELoadAssemblyErrorCode.BadImage;
+            }
         }
 
         try
         {
-            res = DllMainStatics.TryInvokeDllMain(assembly, args);
+            return DllMainStatics.TryInvokeDllMain(assembly, args);
         }
         catch (Exception ex)
         {
             Logger.Error($"Unhandled DllMain Exception:\n{ex}");
             return ELoadAssemblyErrorCode.UnhandledDllMainException;
         }
-
-        return res;
     }
 
     private unsafe Assembly? HandleResolve(AssemblyLoadContext alc, AssemblyName name)

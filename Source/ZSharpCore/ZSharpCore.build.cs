@@ -38,6 +38,7 @@ public class ZSharpCore : ModuleRules
 				"Projects",
 				
 				"Dotnet",
+				"MonoCecil",
 			}
 		);
 		

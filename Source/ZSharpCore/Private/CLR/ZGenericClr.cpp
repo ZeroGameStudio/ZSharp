@@ -34,6 +34,28 @@ namespace ZSharp::ZGenericClr_Private
 		int32 Count;
 		FZUnmanagedFunction* Functions;
 	};
+
+	static void LoadSharedAssemblies(const FString& pluginDir, load_assembly_bytes_fn loadAssembly)
+	{
+#if WITH_EDITOR
+		const FString sharedDllRoot = FPaths::Combine(pluginDir, "Binaries/Managed/Shared");
+#else
+		const FString sharedDllRoot = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed/Shared");
+#endif
+		
+		TArray<FString> sharedDllFiles;
+		IFileManager::Get().FindFilesRecursive(sharedDllFiles, *sharedDllRoot, TEXT("*.dll"), true, false);
+
+		TArray<uint8> content;
+		for (const auto& dll : sharedDllFiles)
+		{
+			content.Empty();
+			if (FFileHelper::LoadFileToArray(content, *dll, FILEREAD_Silent))
+			{
+				loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
+			}
+		}
+	}
 	
 	static void LoadCoreAssembly(const FString& pluginContentDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
@@ -228,6 +250,7 @@ void ZSharp::FZGenericClr::Startup()
 
 	closeHostFXR(handle);
 
+	ZGenericClr_Private::LoadSharedAssemblies(pluginDir, loadAssembly);
 	ZGenericClr_Private::LoadCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
 	ZGenericClr_Private::LoadEngineCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
 	ZGenericClr_Private::LoadResolverAssembly(pluginContentDir, loadAssembly);

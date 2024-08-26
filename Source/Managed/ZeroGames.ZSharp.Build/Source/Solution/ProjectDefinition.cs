@@ -28,7 +28,7 @@ public class ProjectDefinition
 	public List<string> WarningsAsErrors { get; init; } = new();
 
 	public List<string> ProjectReferences { get; init; } = new();
-	public List<string> References { get; init; } = new();
+	public List<string> ExternalReferences { get; init; } = new();
 	public List<string> Usings { get; init; } = new();
 	public Dictionary<string, string> Aliases { get; init; } = new();
 

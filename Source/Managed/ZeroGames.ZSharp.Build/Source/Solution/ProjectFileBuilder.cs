@@ -184,10 +184,19 @@ public class ProjectFileBuilder
 			itemGroupNode.AppendChild(referenceNode);
 		}
 
-		List<string> finalReferences = [.._project.References];
-		foreach (var reference in finalReferences)
+		List<string> finalExternalReferences = [.._project.ExternalReferences];
+		foreach (var reference in finalExternalReferences)
 		{
-			throw new NotImplementedException();
+			string postfix = reference.EndsWith(".dll") ? string.Empty : ".dll";
+			string dllPath = $"$(SourceDir)/{reference}{postfix}";
+			string dllName = Path.GetFileNameWithoutExtension(dllPath);
+
+			XmlElement referenceNode = doc.CreateElement("Reference");
+			referenceNode.SetAttribute("Include", dllName);
+			XmlElement hintPathNode = doc.CreateElement("HintPath");
+			hintPathNode.InnerText = dllPath;
+			referenceNode.AppendChild(hintPathNode);
+			itemGroupNode.AppendChild(referenceNode);
 		}
 		
 		XmlElement compileNode = doc.CreateElement("Compile");

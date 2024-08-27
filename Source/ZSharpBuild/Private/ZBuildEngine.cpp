@@ -17,7 +17,7 @@ namespace ZSharp::ZBuildEngine_Private
 		TEXT("Generate ZSharp solution and project files."),
 		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& args)
 		{
-			FZBuildEngine::Get().GenerateSolution();
+			FZBuildEngine::Get().GenerateSolution(args);
 		}),
 		ECVF_Default);
 
@@ -26,7 +26,7 @@ namespace ZSharp::ZBuildEngine_Private
 		TEXT("Generate ZSharp glue code."),
 		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& args)
 		{
-			FZBuildEngine::Get().GenerateGlue();
+			FZBuildEngine::Get().GenerateGlue(args);
 		}),
 		ECVF_Default);
 
@@ -59,7 +59,7 @@ ZSharp::FZBuildEngine& ZSharp::FZBuildEngine::Get()
 	return GSingleton;
 }
 
-void ZSharp::FZBuildEngine::GenerateSolution() const
+void ZSharp::FZBuildEngine::GenerateSolution(const TArray<FString>& args) const
 {
 	const FString projectDir = ZBuildEngine_Private::GetProjectDir();
 	const FString pluginDir = ZBuildEngine_Private::GetPluginDir("ZSharp");
@@ -90,26 +90,55 @@ void ZSharp::FZBuildEngine::GenerateSolution() const
 	IZSharpClr::Get().Run(ZSHARP_BUILD_ASSEMBLY_NAME, &commonArgs);
 }
 
-void ZSharp::FZBuildEngine::GenerateGlue() const
+void ZSharp::FZBuildEngine::GenerateGlue(const TArray<FString>& args) const
 {
-	FZDynamicTypeExporter{}.Export();
-	FZGlueManifestWriter{}.Write();
+	{ // Step I: Export types and generate manifest.json file.
+		TArray<FString> assemblies;
+		FRegexPattern pattern { "^assemblies=.+$" };
+		for (const auto& arg : args)
+		{
+			FRegexMatcher matcher { pattern, arg };
+			if (matcher.FindNext())
+			{
+				FString value;
+				arg.Split("=", nullptr, &value);
+				value.ParseIntoArray(assemblies, TEXT(","));
+			}
+		}
+	
+		FZDynamicTypeExporter{}.Export(assemblies);
+		FZGlueManifestWriter{}.Write(assemblies);
+	}
+	
+	{ // Step II: Call ZeroGames.ZSharp.Build to generate glue code.
+		const FString projectDir = ZBuildEngine_Private::GetProjectDir();
 
-	const FString projectDir = ZBuildEngine_Private::GetProjectDir();
+		TArray<FString> stringArgs;
+		stringArgs.Emplace(ZBuildEngine_Private::BuildArgument("target", "glue"));
+		stringArgs.Emplace(ZBuildEngine_Private::BuildArgument("projectdir", projectDir));
 
-	const FString targetArg = ZBuildEngine_Private::BuildArgument("target", "glue");
-	const FString projectDirArg = ZBuildEngine_Private::BuildArgument("projectdir", projectDir);
+		FRegexPattern pattern { "^.+=.+$" };
+		for (const auto& arg : args)
+		{
+			FRegexMatcher matcher { pattern, arg };
+			if (matcher.FindNext())
+			{
+				stringArgs.Emplace(arg);
+			}
+		}
 
-	const TCHAR* argv[] =
-	{
-		*targetArg,
-		*projectDirArg,
-	};
-	FZCommonMethodArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
-	IZSharpClr::Get().Run(ZSHARP_BUILD_ASSEMBLY_NAME, &commonArgs);
+		TArray<const TCHAR*> rawArgs;
+		for (const auto& arg : stringArgs)
+		{
+			rawArgs.Emplace(*arg);
+		}
+	
+		FZCommonMethodArgs commonArgs { rawArgs.Num(), rawArgs.GetData() };
+		IZSharpClr::Get().Run(ZSHARP_BUILD_ASSEMBLY_NAME, &commonArgs);
+	}
 }
 
-void ZSharp::FZBuildEngine::BuildSolution() const
+void ZSharp::FZBuildEngine::BuildSolution(const TArray<FString>& args) const
 {
 
 }

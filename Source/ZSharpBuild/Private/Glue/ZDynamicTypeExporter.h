@@ -8,7 +8,7 @@ namespace ZSharp
 	{
 
 	public:
-		void Export() const;
+		void Export(const TArray<FString>& assemblies) const;
 		
 	};
 }

@@ -15,7 +15,7 @@ namespace ZSharp
 	{
 
 	public:
-		void Write();
+		void Write(const TArray<FString>& assemblies);
 
 	private:
 		void WriteClass(const IZExportedClass& cls);
@@ -26,6 +26,7 @@ namespace ZSharp
 
 	private:
 		TMap<FString, TUniquePtr<FZExportedAssemblyDto>> AssemblyDtoMap; // DTO can be extreme large so we save pointer to map.
+		TArray<FString> ExplicitAssemblies;
 		
 	};
 }

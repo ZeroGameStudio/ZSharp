@@ -10,8 +10,6 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 
 	public override async Task<string> BuildAsync()
 	{
-		// SetupTestData();
-		
 		await SetupRegistry();
 		await Parallel.ForEachAsync(_registry.ExportedTypes, (type, _) => GenerateType(type));
 
@@ -21,19 +19,17 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 	public string UnrealProjectDir { get; }
 	
 	[FactoryConstructor]
-	private BuildTarget_GenerateGlue(IBuildEngine engine, [Argument("projectdir")] string projectDir) : base(engine)
+	private BuildTarget_GenerateGlue(IBuildEngine engine, [Argument("projectdir")] string projectDir, [Argument("assemblies")] string? assemblies = null) : base(engine)
 	{
 		UnrealProjectDir = projectDir;
 		if (!((IUnrealProjectDir)this).IsValid)
 		{
 			throw new ArgumentException($"Invalid argument projectdir={projectDir}.");
 		}
+
+		_assemblies = assemblies?.Split(',');
+		
 		_glueDir = $"{projectDir}/Intermediate/ZSharp/Glue";
-	}
-	
-	private void SetupTestData()
-	{
-		File.Copy($"{_glueDir}/../../../Content/Manifest.json", $"{_glueDir}/Game/Manifest.json", true);
 	}
 
 	private async Task SetupRegistry()
@@ -54,7 +50,7 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 				continue;
 			}
 			
-			if (File.Exists($"{dir}/.timestamp"))
+			if (!(_assemblies?.Contains(new DirectoryInfo(dir).Name) ?? true))
 			{
 				continue;
 			}
@@ -131,6 +127,8 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 			}
 		}
 	}
+
+	private string[]? _assemblies;
 	
 	private ExportedAssemblyRegistry _registry = new();
 	private string _glueDir;

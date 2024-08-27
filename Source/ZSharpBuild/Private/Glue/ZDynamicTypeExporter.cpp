@@ -6,26 +6,47 @@
 #include "Dynamic/ZDynamicallyExportedClass.h"
 #include "Dynamic/ZDynamicallyExportedDelegate.h"
 #include "Dynamic/ZDynamicallyExportedEnum.h"
+#include "Reflection/ZReflectionHelper.h"
 
-void ZSharp::FZDynamicTypeExporter::Export() const
+void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies) const
 {
 	for (TObjectIterator<UEnum> it; it; ++it)
 	{
+		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetUFieldAssemblyName(*it)))
+		{
+			continue;
+		}
+		
 		FZDynamicallyExportedEnum::Create(*it);
 	}
 
 	for (TObjectIterator<UScriptStruct> it; it; ++it)
 	{
+		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetUFieldAssemblyName(*it)))
+		{
+			continue;
+		}
+		
 		FZDynamicallyExportedClass::Create(*it);
 	}
 
 	for (TObjectIterator<UClass> it; it; ++it)
 	{
+		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetUFieldAssemblyName(*it)))
+		{
+			continue;
+		}
+		
 		FZDynamicallyExportedClass::Create(*it);
 	}
 
-	for (TObjectIterator<UFunction> it; it; ++it)
+	for (TObjectIterator<UDelegateFunction> it; it; ++it)
 	{
+		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetUFieldAssemblyName(*it)))
+		{
+			continue;
+		}
+		
 		FZDynamicallyExportedDelegate::Create(*it);
 	}
 }

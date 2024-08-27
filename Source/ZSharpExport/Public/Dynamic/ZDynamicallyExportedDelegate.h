@@ -11,7 +11,7 @@ namespace ZSharp
 	{
 
 	public:
-		static FZDynamicallyExportedDelegate* Create(const UFunction* signature);
+		static FZDynamicallyExportedDelegate* Create(const UDelegateFunction* signature);
 
 	public:
 		virtual FString GetName() const override;
@@ -21,14 +21,14 @@ namespace ZSharp
 		virtual void ForeachParameter(TFunctionRef<void(const IZExportedParameter&)> action) const override;
 
 	private:
-		explicit FZDynamicallyExportedDelegate(const UFunction* signature);
+		explicit FZDynamicallyExportedDelegate(const UDelegateFunction* signature);
 
 	private:
 		bool IsValid() const { return bValid; }
 
 	private:
 		bool bValid;
-		const UFunction* Signature;
+		const UDelegateFunction* Signature;
 		EZExportedDelegateFlags Flags;
 		TArray<TUniquePtr<IZExportedParameter>> Parameters;
 		

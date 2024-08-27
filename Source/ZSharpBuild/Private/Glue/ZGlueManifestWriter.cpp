@@ -15,8 +15,10 @@
 #include "JsonObjectConverter.h"
 #include "DTO/ZExportedDelegateDto.h"
 
-void ZSharp::FZGlueManifestWriter::Write()
+void ZSharp::FZGlueManifestWriter::Write(const TArray<FString>& assemblies)
 {
+	ExplicitAssemblies = assemblies;
+	
 	IZExportedTypeRegistry::Get().ForeachExportedEnum([this](const IZExportedEnum& enm){ WriteEnum(enm); });
 	IZExportedTypeRegistry::Get().ForeachExportedClass([this](const IZExportedClass& cls){ WriteClass(cls); });
 	IZExportedTypeRegistry::Get().ForeachExportedDelegate([this](const IZExportedDelegate& delegate){ WriteDelegate(delegate); });
@@ -152,6 +154,11 @@ TUniquePtr<FZExportedAssemblyDto>* ZSharp::FZGlueManifestWriter::GetAssemblyDto(
 	const FString module = type.GetModule();
 	FString assembly;
 	if (!settings->TryGetModuleAssembly(module, assembly))
+	{
+		return nullptr;
+	}
+
+	if (!ExplicitAssemblies.IsEmpty() && !ExplicitAssemblies.Contains(assembly))
 	{
 		return nullptr;
 	}

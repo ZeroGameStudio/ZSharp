@@ -13,9 +13,9 @@ namespace ZSharp
 		static FZBuildEngine& Get();
 
 	public:
-		virtual void GenerateSolution() const override;
-		virtual void GenerateGlue() const override;
-		virtual void BuildSolution() const override;
+		virtual void GenerateSolution(const TArray<FString>& args) const override;
+		virtual void GenerateGlue(const TArray<FString>& args) const override;
+		virtual void BuildSolution(const TArray<FString>& args) const override;
 		
 	};
 }

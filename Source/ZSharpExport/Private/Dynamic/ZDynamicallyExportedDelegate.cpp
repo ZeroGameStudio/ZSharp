@@ -7,7 +7,7 @@
 #include "Dynamic/ZDynamicallyExportedParameter.h"
 #include "Reflection/ZReflectionHelper.h"
 
-ZSharp::FZDynamicallyExportedDelegate* ZSharp::FZDynamicallyExportedDelegate::Create(const UFunction* signature)
+ZSharp::FZDynamicallyExportedDelegate* ZSharp::FZDynamicallyExportedDelegate::Create(const UDelegateFunction* signature)
 {
 	if (!signature->IsNative())
 	{
@@ -57,7 +57,7 @@ void ZSharp::FZDynamicallyExportedDelegate::ForeachParameter(TFunctionRef<void(c
 	}
 }
 
-ZSharp::FZDynamicallyExportedDelegate::FZDynamicallyExportedDelegate(const UFunction* signature)
+ZSharp::FZDynamicallyExportedDelegate::FZDynamicallyExportedDelegate(const UDelegateFunction* signature)
 	: bValid(false)
 	, Signature(signature)
 	, Flags(EZExportedDelegateFlags::None)

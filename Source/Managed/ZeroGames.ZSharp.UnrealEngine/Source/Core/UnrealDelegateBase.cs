@@ -40,7 +40,7 @@ public abstract class UnrealDelegateBase : PlainExportedObjectBase
 		_delegateType = delegateType;
 	}
 
-	protected UnrealObject? Bind(Delegate @delegate)
+	protected UnrealObject Bind(Delegate @delegate)
 	{
 		if (@delegate.GetType() != _delegateType)
 		{
@@ -48,7 +48,7 @@ public abstract class UnrealDelegateBase : PlainExportedObjectBase
 		}
 
 		GCHandle handle = GCHandle.Alloc(@delegate);
-		return this.ZCall("ex://Delegate.BindManaged", handle, null)[-1].ReadConjugate<UnrealObject>();
+		return this.ZCall("ex://Delegate.BindManaged", handle, null)[-1].ReadConjugate<UnrealObject>()!;
 	}
 	
 	private readonly Type _delegateType;

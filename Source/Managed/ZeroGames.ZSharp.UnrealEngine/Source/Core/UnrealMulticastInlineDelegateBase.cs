@@ -29,7 +29,7 @@ public abstract class UnrealMulticastInlineDelegateBase : PlainExportedObjectBas
 		_delegateType = delegateType;
 	}
 	
-	protected UnrealObject? Add(Delegate @delegate)
+	protected UnrealObject Add(Delegate @delegate)
 	{
 		if (@delegate.GetType() != _delegateType)
 		{
@@ -37,7 +37,7 @@ public abstract class UnrealMulticastInlineDelegateBase : PlainExportedObjectBas
 		}
 
 		GCHandle handle = GCHandle.Alloc(@delegate);
-		return this.ZCall("ex://MulticastInlineDelegate.AddManaged", handle, null)[-1].ReadConjugate<UnrealObject>();
+		return this.ZCall("ex://MulticastInlineDelegate.AddManaged", handle, null)[-1].ReadConjugate<UnrealObject>()!;
 	}
 	
 	private readonly Type _delegateType;

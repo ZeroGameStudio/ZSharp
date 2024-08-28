@@ -50,7 +50,7 @@ public class DelegateWriter : IDisposable, IAsyncDisposable
 	public static {delegateName} BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 	public {delegateName}() : base(typeof(Signature)){{}}
 	public {delegateName}(IntPtr unmanaged) : base(typeof(Signature), unmanaged){{}}
-	public UnrealObject? {bindMethodName}(Signature @delegate) => base.{bindMethodName}(@delegate);
+	public UnrealObject {bindMethodName}(Signature @delegate) => base.{bindMethodName}(@delegate);
 }}";
 
 		delegateDeclaration = delegateAttr + delegateDeclaration;

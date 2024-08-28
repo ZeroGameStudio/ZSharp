@@ -127,4 +127,55 @@ TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FP
 	return nullptr;
 }
 
+void ZSharp::IZPropertyVisitor::InitializeValue_InContainer(void* dest) const
+{
+	InitializeValue(ContainerPtrToValuePtr(dest, 0));
+}
+
+void ZSharp::IZPropertyVisitor::GetValue_InContainer(const void* src, FZCallBufferSlot& dest, int32 index) const
+{
+	if (const FProperty* underlyingProperty = GetUnderlyingProperty(); underlyingProperty->HasGetter())
+	{
+		check(underlyingProperty->ArrayDim == 1);
+		void* value = FMemory_Alloca(underlyingProperty->GetSize());
+		underlyingProperty->CallGetter(src, value);
+		GetValue(value, dest);
+	}
+	else
+	{
+		GetValue(ContainerPtrToValuePtr(src, index), dest);
+	}
+}
+
+void ZSharp::IZPropertyVisitor::GetRef_InContainer(const void* src, FZCallBufferSlot& dest, int32 index) const
+{
+	if (const FProperty* underlyingProperty = GetUnderlyingProperty(); underlyingProperty->HasGetter())
+	{
+		// We have no way but fallback to get a copy when get ref on a property with getter.
+		check(underlyingProperty->ArrayDim == 1);
+		void* value = FMemory_Alloca(underlyingProperty->GetSize());
+		underlyingProperty->CallGetter(src, value);
+		GetValue(ContainerPtrToValuePtr(src, index), dest);
+	}
+	else
+	{
+		GetRef(ContainerPtrToValuePtr(src, index), dest);
+	}
+}
+
+void ZSharp::IZPropertyVisitor::SetValue_InContainer(void* dest, const FZCallBufferSlot& src, int32 index) const
+{
+	if (const FProperty* underlyingProperty = GetUnderlyingProperty(); underlyingProperty->HasSetter())
+	{
+		check(underlyingProperty->ArrayDim == 1);
+		void* value = FMemory_Alloca(underlyingProperty->GetSize());
+		SetValue(value, src);
+		underlyingProperty->CallSetter(dest, value);
+	}
+	else
+	{
+		SetValue(ContainerPtrToValuePtr(dest, index), src);
+	}
+}
+
 

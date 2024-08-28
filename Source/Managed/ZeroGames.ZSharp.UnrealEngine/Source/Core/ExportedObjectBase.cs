@@ -60,9 +60,9 @@ public abstract class ExportedObjectBase : IConjugate
 
     public void Release()
     {
-        if (_managed)
+        if (IsBlack)
         {
-            Logger.Error("Dispose managed exported object from unmanaged code.");
+            Logger.Error("Dispose black conjugate from unmanaged code.");
             return;
         }
         
@@ -116,6 +116,7 @@ public abstract class ExportedObjectBase : IConjugate
     public GCHandle GCHandle { get; }
 
     public IntPtr Unmanaged { get; protected set; }
+    public bool IsBlack { get; }
 
     public bool IsExpired => Unmanaged == IConjugate.KDead;
 
@@ -125,14 +126,14 @@ public abstract class ExportedObjectBase : IConjugate
     private protected ExportedObjectBase()
     {
         GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
-        _managed = true;
+        IsBlack = true;
     }
 
     private protected ExportedObjectBase(IntPtr unmanaged)
     {
         GCHandle = GCHandle.Alloc(this);
         Unmanaged = unmanaged;
-        _managed = false;
+        IsBlack = false;
     }
 
     ~ExportedObjectBase() => InternalDispose(true);
@@ -171,7 +172,7 @@ public abstract class ExportedObjectBase : IConjugate
 
     private void InternalDispose(bool fromFinalizer)
     {
-        if (!_managed)
+        if (!IsBlack)
         {
             Logger.Error("Finalize unmanaged export object.");
             return;
@@ -209,7 +210,6 @@ public abstract class ExportedObjectBase : IConjugate
 
     private readonly record struct OnExpiredCallbackRec(Action<IExplicitLifecycle, object?> Callback, object? State);
     
-    private readonly bool _managed;
     private bool _hasDisposed;
     
     private uint64 _onExpiredRegistrationHandle;

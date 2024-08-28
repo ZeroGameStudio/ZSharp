@@ -7,6 +7,7 @@ public interface IConjugate : IGCHandle, IExplicitLifecycle, IDisposable
     public const IntPtr KDead = 0xDEAD;
     protected internal void Release();
     IntPtr Unmanaged { get; }
+    bool IsBlack { get; }
 }
 
 public interface IConjugate<out T> : IConjugate where T : class, IConjugate<T>

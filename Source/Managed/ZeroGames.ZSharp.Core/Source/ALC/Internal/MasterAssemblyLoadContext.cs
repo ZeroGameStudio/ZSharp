@@ -223,8 +223,16 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         {
             throw new InvalidOperationException("SynchronizationContext mismatch.");
         }
+
+        foreach (var pair in _conjugateMap)
+        {
+            if (pair.Value.Wref.TryGetTarget(out var conjugate) && conjugate.IsBlack)
+            {
+                conjugate.Dispose();
+            }
+        }
         
-        System.Threading.SynchronizationContext.SetSynchronizationContext(_prevSyncContext);
+        SynchronizationContext.SetSynchronizationContext(_prevSyncContext);
 
         _sSingleton = null;
         

@@ -17,7 +17,7 @@ public sealed class SubclassOf<T> : SubclassOfBase, IConjugate<SubclassOf<T>> wh
 			return;
 		}
 		
-		if (!cls.IsChildOf((UnrealClass)typeof(T).GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!))
+		if (!cls.IsChildOf(UnrealObjectGlobals.GetClass<T>()))
 		{
 			throw new NotSupportedException();
 		}

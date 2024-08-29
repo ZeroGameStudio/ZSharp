@@ -25,6 +25,8 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase, IConjugate<SoftObjectP
 		_Object = obj;
 	}
 	
+	public T? Load() => (T?)this.ZCall("ex://SoftObject.Load", [null])[-1].Object;
+	
 	public T? Object
 	{
 		get => (T?)_Object;
@@ -32,7 +34,6 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase, IConjugate<SoftObjectP
 	}
 	
 	public bool IsNull => this.ZCall("ex://SoftObject.IsNull", false)[-1].Bool;
-	public T? Load => (T?)this.ZCall("ex://SoftObject.Load", [null])[-1].Object;
 	
 }
 

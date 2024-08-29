@@ -97,7 +97,7 @@ internal static class ContainerHelper
 		// UClasses
 		if (type.IsAssignableTo(typeof(UnrealObjectBase)))
 		{
-			desc.Descriptor = ((UnrealClass)type.GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!).Unmanaged;
+			desc.Descriptor = UnrealObjectGlobals.GetClass(type).Unmanaged;
 			return true;
 		}
 		
@@ -119,37 +119,37 @@ internal static class ContainerHelper
 		if (type.IsAssignableTo(typeof(SubclassOfBase)))
 		{
 			desc.Descriptor = IntrinsicTypeIds.KSubclassOf;
-			desc.Metadata = ((UnrealClass)type.GetGenericArguments()[0].GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!).Unmanaged;
+			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(SubclassOfBase)))
 		{
 			desc.Descriptor = IntrinsicTypeIds.KSubclassOf;
-			desc.Metadata = ((UnrealClass)type.GetGenericArguments()[0].GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!).Unmanaged;
+			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(SubclassOfBase)))
 		{
 			desc.Descriptor = IntrinsicTypeIds.KSubclassOf;
-			desc.Metadata = ((UnrealClass)type.GetGenericArguments()[0].GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!).Unmanaged;
+			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(SubclassOfBase)))
 		{
 			desc.Descriptor = IntrinsicTypeIds.KSubclassOf;
-			desc.Metadata = ((UnrealClass)type.GetGenericArguments()[0].GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!).Unmanaged;
+			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(SubclassOfBase)))
 		{
 			desc.Descriptor = IntrinsicTypeIds.KSubclassOf;
-			desc.Metadata = ((UnrealClass)type.GetGenericArguments()[0].GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!).Unmanaged;
+			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(SubclassOfBase)))
 		{
 			desc.Descriptor = IntrinsicTypeIds.KSubclassOf;
-			desc.Metadata = ((UnrealClass)type.GetGenericArguments()[0].GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!).Unmanaged;
+			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		

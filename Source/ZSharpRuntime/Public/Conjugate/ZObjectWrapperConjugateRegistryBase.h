@@ -31,11 +31,12 @@ namespace ZSharp
 		explicit TZObjectWrapperConjugateRegistryBase(IZMasterAssemblyLoadContext& alc) : FZConjugateRegistryBase(alc){}
 
 	public:
-		FZConjugateHandle Conjugate(const UClass* descriptor, typename T::ObjectType* obj = nullptr)
+		FZConjugateHandle Conjugate(const UClass* descriptor) { return Conjugate(descriptor, [](const T&){}); }
+		FZConjugateHandle Conjugate(const UClass* descriptor, TFunctionRef<void(const T&)> initialize)
 		{
 			const FZRuntimeTypeHandle type = GetManagedType(descriptor);
 			auto sdow = new T { descriptor };
-			sdow->Set(obj);
+			initialize(*sdow);
 			void* unmanaged = sdow->GetUnderlyingInstance();
 			if (Alc.BuildConjugate(unmanaged, type))
 			{

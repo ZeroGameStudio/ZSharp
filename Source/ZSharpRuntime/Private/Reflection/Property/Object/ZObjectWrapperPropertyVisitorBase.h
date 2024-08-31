@@ -24,7 +24,7 @@ namespace ZSharp
 			TSelfDescriptiveObjectWrapper* sdow = TZCallBufferSlotEncoder<TSelfDescriptiveObjectWrapper>::DecodePointer(dest);
 			if (!sdow)
 			{
-				dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<TConjugateRegistry>().Conjugate(GetDescriptor()));
+				dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<TConjugateRegistry>().Conjugate(GetDescriptor(), [this, src](const TSelfDescriptiveObjectWrapper& sdow){ UnderlyingProperty->CopySingleValue(sdow.GetUnderlyingInstance(), src); }));
 			}
 			else
 			{

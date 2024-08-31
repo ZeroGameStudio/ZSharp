@@ -32,7 +32,7 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase, IConjugate<SoftClassPtr<
 	}
 
 	public bool IsNull => this.ZCall("ex://SoftClass.IsNull", false)[-1].Bool;
-	public T? Load => (T?)this.ZCall("ex://SoftClass.Load", [null])[-1].Object;
+	public SubclassOf<T> Load => new((UnrealClass?)this.ZCall("ex://SoftClass.Load", [null])[-1].Object);
 
 }
 

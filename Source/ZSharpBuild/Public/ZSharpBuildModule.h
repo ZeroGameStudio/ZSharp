@@ -11,8 +11,8 @@ class IZSharpBuildModule : public IModuleInterface
 public:
 	static FORCEINLINE IZSharpBuildModule& Get()
 	{
-		static IZSharpBuildModule& Singleton = FModuleManager::LoadModuleChecked<IZSharpBuildModule>("ZSharpBuild");
-		return Singleton;
+		static IZSharpBuildModule& GSingleton = FModuleManager::LoadModuleChecked<IZSharpBuildModule>("ZSharpBuild");
+		return GSingleton;
 	}
 
 	static FORCEINLINE bool IsAvailable()

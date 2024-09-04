@@ -11,8 +11,8 @@ class IZSharpEditorModule : public IModuleInterface
 public:
 	static FORCEINLINE IZSharpEditorModule& Get()
 	{
-		static IZSharpEditorModule& Singleton = FModuleManager::LoadModuleChecked<IZSharpEditorModule>("ZSharpEditor");
-		return Singleton;
+		static IZSharpEditorModule& GSingleton = FModuleManager::LoadModuleChecked<IZSharpEditorModule>("ZSharpEditor");
+		return GSingleton;
 	}
 
 	static FORCEINLINE bool IsAvailable()

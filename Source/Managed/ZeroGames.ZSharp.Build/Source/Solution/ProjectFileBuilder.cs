@@ -255,12 +255,12 @@ public class ProjectFileBuilder
 		{
 			// Copy precompiled output to plugin content dir.
 			XmlElement mkdirNode = doc.CreateElement("Exec");
-			string pluginContentDir = "$(ZSharpDir)/Content";
-			mkdirNode.SetAttribute("Command", $"if not exist \"{pluginContentDir}\" mkdir \"{pluginContentDir}\"");
+			string precompiledDir = "$(ZSharpDir)/Precompiled";
+			mkdirNode.SetAttribute("Command", $"if not exist \"{precompiledDir}\" mkdir \"{precompiledDir}\"");
 			targetNode.AppendChild(mkdirNode);
 
 			XmlElement copyNode = doc.CreateElement("Exec");
-			copyNode.SetAttribute("Command", $"copy \"$(TargetPath)\" \"{pluginContentDir}/$(TargetFileName)\"");
+			copyNode.SetAttribute("Command", $"copy \"$(TargetPath)\" \"{precompiledDir}/$(TargetFileName)\"");
 			targetNode.AppendChild(copyNode);
 		}
 

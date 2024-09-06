@@ -8,7 +8,7 @@
 	"NeutralLanguage": "zh",
 	"ExternalReferences":
 	[
-		"../../ThirdParty/MonoCecil/Mono.Cecil.dll"
+		"../../ThirdParty/Dotnet/shared/Mono.Cecil.dll"
 	]
 }
 

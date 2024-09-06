@@ -57,7 +57,7 @@ namespace ZSharp::ZGenericClr_Private
 		}
 	}
 	
-	static void LoadCoreAssembly(const FString& pluginContentDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
+	static void LoadCoreAssembly(const FString& precompiledDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
 		static const TCHAR* GCore_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Core_Interop");
 		static const TCHAR* GInteropString_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropString_Interop");
@@ -127,7 +127,7 @@ namespace ZSharp::ZGenericClr_Private
 		TArray<uint8> content;
 		if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
 		{
-			assemblyPath = FPaths::Combine(pluginContentDir, assemblyName + ".dll");
+			assemblyPath = FPaths::Combine(precompiledDir, assemblyName + ".dll");
 			if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
 			{
 				checkNoEntry();
@@ -140,7 +140,7 @@ namespace ZSharp::ZGenericClr_Private
 		dllMain(GArgs);
 	}
 
-	static void LoadEngineCoreAssembly(const FString& pluginContentDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
+	static void LoadEngineCoreAssembly(const FString& precompiledDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
 		static const FString GUnrealEngineInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("UnrealEngine_Interop"));
 		static const FString GPathInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("Path_Interop"));;
@@ -168,7 +168,7 @@ namespace ZSharp::ZGenericClr_Private
 		TArray<uint8> content;
 		if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
 		{
-			assemblyPath = FPaths::Combine(pluginContentDir, assemblyName + ".dll");
+			assemblyPath = FPaths::Combine(precompiledDir, assemblyName + ".dll");
 			if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
 			{
 				checkNoEntry();
@@ -181,7 +181,7 @@ namespace ZSharp::ZGenericClr_Private
 		dllMain(GArgs);
 	}
 
-	static void LoadResolverAssembly(const FString& pluginContentDir, load_assembly_bytes_fn loadAssembly)
+	static void LoadResolverAssembly(const FString& precompiledDir, load_assembly_bytes_fn loadAssembly)
 	{
 		const FString assemblyName = ZSHARP_RESOLVER_ASSEMBLY_NAME;
 		FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed", assemblyName + ".dll");
@@ -191,7 +191,7 @@ namespace ZSharp::ZGenericClr_Private
 		TArray<uint8> content;
 		if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
 		{
-			assemblyPath = FPaths::Combine(pluginContentDir, assemblyName + ".dll");
+			assemblyPath = FPaths::Combine(precompiledDir, assemblyName + ".dll");
 			if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
 			{
 				checkNoEntry();
@@ -213,7 +213,6 @@ void ZSharp::FZGenericClr::Startup()
 	bInitialized = true;
 
 	const FString pluginDir = IPluginManager::Get().FindEnabledPlugin("ZSharp")->GetBaseDir();
-	const FString pluginContentDir = FPaths::Combine(pluginDir, "Content");
 
 #if WITH_EDITOR
 	const FString pluginBinariesDir = FPaths::Combine(pluginDir, "Binaries");
@@ -237,7 +236,8 @@ void ZSharp::FZGenericClr::Startup()
 	check(closeHostFXR);
 
 	hostfxr_handle handle = nullptr;
-	const FString runtimeConfigPath = FPaths::Combine(pluginContentDir, ZSHARP_RUNTIME_CONFIG_FILE_NAME);
+	const FString pluginConfigDir = FPaths::Combine(pluginDir, "Config");
+	const FString runtimeConfigPath = FPaths::Combine(pluginConfigDir, ZSHARP_RUNTIME_CONFIG_FILE_NAME);
 	initializeHostFxr(*runtimeConfigPath, nullptr, &handle);
 	check(handle);
 
@@ -250,10 +250,11 @@ void ZSharp::FZGenericClr::Startup()
 
 	closeHostFXR(handle);
 
+	const FString precompiledDir = FPaths::Combine(pluginDir, "Precompiled");
 	ZGenericClr_Private::LoadSharedAssemblies(pluginDir, loadAssembly);
-	ZGenericClr_Private::LoadCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
-	ZGenericClr_Private::LoadEngineCoreAssembly(pluginContentDir, loadAssembly, getFunctionPointer);
-	ZGenericClr_Private::LoadResolverAssembly(pluginContentDir, loadAssembly);
+	ZGenericClr_Private::LoadCoreAssembly(precompiledDir, loadAssembly, getFunctionPointer);
+	ZGenericClr_Private::LoadEngineCoreAssembly(precompiledDir, loadAssembly, getFunctionPointer);
+	ZGenericClr_Private::LoadResolverAssembly(precompiledDir, loadAssembly);
 	
 	FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);
 }

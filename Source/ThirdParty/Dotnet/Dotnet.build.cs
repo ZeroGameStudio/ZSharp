@@ -17,41 +17,67 @@ public class Dotnet : ModuleRules
 		string dotnetVersion = "8.0.3";
 
 		string dotnetRoot = Path.Combine("$(BinaryOutputDir)", "dotnet");
-		string hostDir = Path.Combine(dotnetRoot, "host", "fxr", dotnetVersion);
+
+		{ // Copy hostfxr.
+			string hostDir = Path.Combine(dotnetRoot, "host", "fxr", dotnetVersion);
+			
+			string hostfxrSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "host", "hostfxr.dll");
+			string hostfxrDstPath = Path.Combine(hostDir, "hostfxr.dll");
+			RuntimeDependencies.Add(hostfxrDstPath, hostfxrSrcPath);
+		}
+		
 		string frameworkDir = Path.Combine(dotnetRoot, "shared", "Microsoft.NETCore.App", dotnetVersion);
-
-		string hostfxrSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "host", "hostfxr.dll");
-		string hostfxrDstPath = Path.Combine(hostDir, "hostfxr.dll");
-		RuntimeDependencies.Add(hostfxrDstPath, hostfxrSrcPath);
 		
-		string runtimeName = "coreclr";
-		
-		string runtimeSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "runtime", runtimeName, "coreclr.dll");
-		string runtimeDstPath = Path.Combine(frameworkDir, "coreclr.dll");
-		RuntimeDependencies.Add(runtimeDstPath, runtimeSrcPath);
-		
-		string coreLibSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "runtime", runtimeName, "System.Private.CoreLib.dll");
-		string coreLibDstPath = Path.Combine(frameworkDir, "System.Private.CoreLib.dll");
-		RuntimeDependencies.Add(coreLibDstPath, coreLibSrcPath);
-
-		string frameworkSrcDir = Path.Combine(ModuleDirectory, "framework");
-		IEnumerable<string> frameworkFiles = GetFiles(frameworkSrcDir);
-		foreach (var file in frameworkFiles)
-		{
-			string relativePath = file.Substring(frameworkSrcDir.Length + 1, file.Length - frameworkSrcDir.Length - 1);
-
-			RuntimeDependencies.Add(Path.Combine(frameworkDir, relativePath), file);
+		{ // Copy coreclr & CoreLib
+			string runtimeName = "coreclr";
+			
+			string coreLibSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "runtime", runtimeName, "System.Private.CoreLib.dll");
+			string coreLibDstPath = Path.Combine(frameworkDir, "System.Private.CoreLib.dll");
+			RuntimeDependencies.Add(coreLibDstPath, coreLibSrcPath);
+			
+			string runtimeSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "runtime", runtimeName, "coreclr.dll");
+			string runtimeDstPath = Path.Combine(frameworkDir, "coreclr.dll");
+			RuntimeDependencies.Add(runtimeDstPath, runtimeSrcPath);
 		}
 
+		{ // Copy BCL
+			string frameworkSrcDir = Path.Combine(ModuleDirectory, "framework");
+            IEnumerable<string> frameworkFiles = GetFiles(frameworkSrcDir);
+            foreach (var file in frameworkFiles)
+            {
+            	string relativePath = file.Substring(frameworkSrcDir.Length + 1, file.Length - frameworkSrcDir.Length - 1);
+            
+            	RuntimeDependencies.Add(Path.Combine(frameworkDir, relativePath), file);
+            }
+		}
+
+		{ // Copy shared libs
+			string sharedSrcDir = Path.Combine(ModuleDirectory, "shared");
+			string sharedDstDir = Path.Combine("$(BinaryOutputDir)", "..", "Managed", "Shared");
+			IEnumerable<string> sharedFiles = GetFiles(sharedSrcDir);
+			foreach (var file in sharedFiles)
+			{
+				string relativePath = file.Substring(sharedSrcDir.Length + 1, file.Length - sharedSrcDir.Length - 1);
+            
+				RuntimeDependencies.Add(Path.Combine(sharedDstDir, relativePath), file);
+			}
+		}
+
+		/*
+		 * On staged builds:
+		 * 1. Copy all managed libs to project binaries dir.
+		 * 2. Mark runtimeconfig.json as runtime dependency.
+		 */
 		if (!Target.bBuildEditor)
 		{
-			RuntimeDependencies.Add(Path.Combine(PluginDirectory, "Content/ZSharp.runtimeconfig.json"));
 			IEnumerable<string> managedAssemblies = GetFiles(Path.Combine(PluginDirectory, "Binaries/Managed"));
 			foreach (var file in managedAssemblies)
 			{
 				string fileName = Path.GetFileName(file);
 				RuntimeDependencies.Add(Path.Combine("$(TargetOutputDir)/../Managed", fileName), file);
 			}
+			
+			RuntimeDependencies.Add(Path.Combine(PluginDirectory, "Config/ZSharp.runtimeconfig.json"));
 		}
 	}
 

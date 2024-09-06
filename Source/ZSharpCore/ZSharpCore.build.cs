@@ -38,7 +38,6 @@ public class ZSharpCore : ModuleRules
 				"Projects",
 				
 				"Dotnet",
-				"MonoCecil",
 			}
 		);
 		
@@ -49,10 +48,9 @@ public class ZSharpCore : ModuleRules
 			}
 		);
 		
-		if (!Target.bBuildEditor 
-		    && (Target.Platform == UnrealTargetPlatform.Win64
+		if (Target.Platform == UnrealTargetPlatform.Win64
 		    || Target.Platform == UnrealTargetPlatform.Linux
-		    || Target.Platform == UnrealTargetPlatform.Mac) || true)
+		    || Target.Platform == UnrealTargetPlatform.Mac)
 		{
 			PrivateDefinitions.Add("ZSHARP_WITH_CORECLR=1");
 			PrivateDefinitions.Add("ZSHARP_WITH_MONO=0");

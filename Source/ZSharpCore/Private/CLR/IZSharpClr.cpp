@@ -12,9 +12,7 @@ namespace ZSharp::ZSharpClr_Private
 
 ZSharp::IZSharpClr& ZSharp::IZSharpClr::Get()
 {
-	static FZSharpClr GSingleton;
-
-	return GSingleton;
+	return FZSharpClr::Get();
 }
 
 int32 ZSharp::IZSharpClr::Run(const FString& name, void* args, const FString& alcName)

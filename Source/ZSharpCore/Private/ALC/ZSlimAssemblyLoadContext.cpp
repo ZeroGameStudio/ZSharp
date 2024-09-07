@@ -31,16 +31,16 @@ ZSharp::EZLoadAssemblyErrorCode ZSharp::FZSlimAssemblyLoadContext::LoadAssembly(
 	return FZSlimAssemblyLoadContext_Interop::GLoadAssembly(Handle, *assemblyName, args);
 }
 
-ZSharp::EZCallMethodErrorCode ZSharp::FZSlimAssemblyLoadContext::CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args)
+ZSharp::EZInvokeMethodErrorCode ZSharp::FZSlimAssemblyLoadContext::InvokeMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args)
 {
 	if (bUnloading)
 	{
-		return EZCallMethodErrorCode::AlcUnavailable;
+		return EZInvokeMethodErrorCode::AlcUnavailable;
 	}
 	
 	++RunningCount;
 
 	ON_SCOPE_EXIT { --RunningCount; };
 	
-	return FZSlimAssemblyLoadContext_Interop::GCallMethod(Handle, *assemblyName, *typeName, *methodName, args);
+	return FZSlimAssemblyLoadContext_Interop::GInvokeMethod(Handle, *assemblyName, *typeName, *methodName, args);
 }

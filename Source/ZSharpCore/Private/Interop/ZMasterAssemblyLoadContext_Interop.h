@@ -22,7 +22,7 @@ namespace ZSharp
 		inline static uint8(*GTick)(float) = nullptr;
 		inline static int32(*GUnload)() = nullptr;
 		inline static EZLoadAssemblyErrorCode(*GLoadAssembly)(const TCHAR*, void*) = nullptr;
-		inline static EZCallMethodErrorCode(*GCallMethod)(const TCHAR*, const TCHAR*, const TCHAR*, void*) = nullptr;
+		inline static EZInvokeMethodErrorCode(*GInvokeMethod)(const TCHAR*, const TCHAR*, const TCHAR*, void*) = nullptr;
 		inline static FZRuntimeTypeHandle(*GGetType)(const FZRuntimeTypeLocator&) = nullptr;
 
 		inline static EZCallErrorCode(*GZCall_Red)(FZCallHandle handle, FZCallBuffer* buffer);

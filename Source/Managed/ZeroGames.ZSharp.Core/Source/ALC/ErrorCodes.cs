@@ -16,7 +16,7 @@ public enum ELoadAssemblyErrorCode : int32
 	UnhandledDllMainException = 302,
 }
 
-public enum ECallMethodErrorCode : int32
+public enum EInvokeMethodErrorCode : int32
 {
 	Succeed = 0,
 	UnknownError = -1,

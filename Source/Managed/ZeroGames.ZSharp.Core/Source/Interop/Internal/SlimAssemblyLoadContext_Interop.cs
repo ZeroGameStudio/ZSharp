@@ -29,10 +29,10 @@ internal static class SlimAssemblyLoadContext_Interop
     }, ELoadAssemblyErrorCode.UnknownError);
 
     [UnmanagedCallersOnly]
-    public static unsafe ECallMethodErrorCode CallMethod(GCHandle handle, char* assemblyName, char* typeName, char* methodName, void* args) => Uncaught.ErrorIfUncaught(() =>
+    public static unsafe EInvokeMethodErrorCode InvokeMethod(GCHandle handle, char* assemblyName, char* typeName, char* methodName, void* args) => Uncaught.ErrorIfUncaught(() =>
     {
-        return Unsafe.As<SlimAssemblyLoadContext>(handle.Target)!.CallMethod(new(assemblyName), new(typeName), new(methodName), args);
-    }, ECallMethodErrorCode.UnknownError);
+        return Unsafe.As<SlimAssemblyLoadContext>(handle.Target)!.InvokeMethod(new(assemblyName), new(typeName), new(methodName), args);
+    }, EInvokeMethodErrorCode.UnknownError);
 
 }
 

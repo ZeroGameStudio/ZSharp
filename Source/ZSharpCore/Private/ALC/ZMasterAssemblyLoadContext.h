@@ -28,7 +28,7 @@ namespace ZSharp
 		virtual void Unload() override;
 
 		virtual EZLoadAssemblyErrorCode LoadAssembly(const FString& assemblyName, void* args) override;
-		virtual EZCallMethodErrorCode CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args) override;
+		virtual EZInvokeMethodErrorCode InvokeMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args) override;
 
 		// IZMasterAssemblyLoadContext
 		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeLocatorWrapper& locator) override;

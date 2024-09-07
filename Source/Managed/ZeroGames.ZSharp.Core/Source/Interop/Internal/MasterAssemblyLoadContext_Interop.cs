@@ -48,16 +48,16 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     }, ELoadAssemblyErrorCode.UnknownError);
     
     [UnmanagedCallersOnly]
-    public static ECallMethodErrorCode CallMethod(char* assemblyName, char* typeName, char* methodName, void* args) => Uncaught.ErrorIfUncaught(() =>
+    public static EInvokeMethodErrorCode InvokeMethod(char* assemblyName, char* typeName, char* methodName, void* args) => Uncaught.ErrorIfUncaught(() =>
     {
         MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
         if (alc is null)
         {
-            return ECallMethodErrorCode.AlcUnavailable;
+            return EInvokeMethodErrorCode.AlcUnavailable;
         }
 
-        return alc.CallMethod(new(assemblyName), new(typeName), new(methodName), args);
-    }, ECallMethodErrorCode.UnknownError);
+        return alc.InvokeMethod(new(assemblyName), new(typeName), new(methodName), args);
+    }, EInvokeMethodErrorCode.UnknownError);
 
     [UnmanagedCallersOnly]
     public static InteropRuntimeTypeHandle GetType(InteropRuntimeTypeLocator* locator) => Uncaught.ErrorIfUncaught(() =>

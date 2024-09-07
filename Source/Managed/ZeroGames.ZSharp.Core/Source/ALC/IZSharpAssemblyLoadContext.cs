@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.Core;
 public interface IZSharpAssemblyLoadContext : IGCHandle
 {
 	unsafe ELoadAssemblyErrorCode LoadAssembly(string name, void* args, out Assembly? assembly);
-	unsafe ECallMethodErrorCode CallMethod(string assemblyName, string typeName, string methodName, void* args);
+	unsafe EInvokeMethodErrorCode InvokeMethod(string assemblyName, string typeName, string methodName, void* args);
 }
 
 

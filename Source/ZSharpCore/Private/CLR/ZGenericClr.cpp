@@ -97,7 +97,7 @@ namespace ZSharp::ZGenericClr_Private
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GTick),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GUnload),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GLoadAssembly),
-			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GCallMethod),
+			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GInvokeMethod),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GGetType),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GZCall_Red),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GGetZCallHandle_Red),
@@ -106,7 +106,7 @@ namespace ZSharp::ZGenericClr_Private
 
 			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GUnload),
 			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GLoadAssembly),
-			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GCallMethod),
+			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GInvokeMethod),
 				
 #undef ADDRESS_OF
 		};

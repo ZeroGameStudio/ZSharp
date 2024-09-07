@@ -77,7 +77,7 @@ internal static class DllEntry
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<float, uint8>)&MasterAssemblyLoadContext_Interop.Tick;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<int32>)&MasterAssemblyLoadContext_Interop.Unload;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, void*, ELoadAssemblyErrorCode>)&MasterAssemblyLoadContext_Interop.LoadAssembly;
-        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, char*, char*, void*, ECallMethodErrorCode>)&MasterAssemblyLoadContext_Interop.CallMethod;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, char*, char*, void*, EInvokeMethodErrorCode>)&MasterAssemblyLoadContext_Interop.InvokeMethod;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<InteropRuntimeTypeLocator*, InteropRuntimeTypeHandle>)&MasterAssemblyLoadContext_Interop.GetType;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<ZCallHandle, ZCallBuffer*, EZCallErrorCode>)&MasterAssemblyLoadContext_Interop.ZCall_Red;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, ZCallHandle>)&MasterAssemblyLoadContext_Interop.GetZCallHandle_Red;
@@ -87,7 +87,7 @@ internal static class DllEntry
         // SlimAssemblyLoadContext interop functions
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, int32>)&SlimAssemblyLoadContext_Interop.Unload;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, void*, ELoadAssemblyErrorCode>)&SlimAssemblyLoadContext_Interop.LoadAssembly;
-        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, char*, char*, void*, ECallMethodErrorCode>)&SlimAssemblyLoadContext_Interop.CallMethod;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, char*, char*, void*, EInvokeMethodErrorCode>)&SlimAssemblyLoadContext_Interop.InvokeMethod;
 
         Logger.Log("===================== ZSharp Startup =====================");
     });

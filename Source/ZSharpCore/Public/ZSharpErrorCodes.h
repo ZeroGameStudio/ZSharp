@@ -18,7 +18,7 @@ namespace ZSharp
 		UnhandledDllMainException = 302,
 	};
 
-	enum class EZCallMethodErrorCode : int32
+	enum class EZInvokeMethodErrorCode : int32
 	{
 		Succeed = 0,
 		UnknownError = -1,

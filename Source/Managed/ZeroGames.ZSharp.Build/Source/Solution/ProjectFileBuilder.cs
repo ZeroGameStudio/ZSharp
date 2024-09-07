@@ -253,7 +253,7 @@ public class ProjectFileBuilder
 
 		if (_project.IsPrecompiled)
 		{
-			// Copy precompiled output to plugin content dir.
+			// Copy precompiled output to precompiled dir.
 			XmlElement mkdirNode = doc.CreateElement("Exec");
 			string precompiledDir = "$(ZSharpDir)/Precompiled";
 			mkdirNode.SetAttribute("Command", $"if not exist \"{precompiledDir}\" mkdir \"{precompiledDir}\"");

@@ -64,11 +64,11 @@ ZSharp::EZLoadAssemblyErrorCode ZSharp::FZMasterAssemblyLoadContext::LoadAssembl
     return FZMasterAssemblyLoadContext_Interop::GLoadAssembly(*assemblyName, args);
 }
 
-ZSharp::EZCallMethodErrorCode ZSharp::FZMasterAssemblyLoadContext::CallMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args)
+ZSharp::EZInvokeMethodErrorCode ZSharp::FZMasterAssemblyLoadContext::InvokeMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args)
 {
 	check(IsInGameThread());
 	
-	return FZMasterAssemblyLoadContext_Interop::GCallMethod(*assemblyName, *typeName, *methodName, args);
+	return FZMasterAssemblyLoadContext_Interop::GInvokeMethod(*assemblyName, *typeName, *methodName, args);
 }
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const FZRuntimeTypeLocatorWrapper& locator)

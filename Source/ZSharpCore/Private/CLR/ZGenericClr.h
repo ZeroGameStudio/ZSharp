@@ -52,6 +52,9 @@ namespace ZSharp
 		virtual void UnregisterMasterAlcUnloaded(const void* userObject) override;
 
 	private:
+		FZGenericClr() = default;
+
+	private:
 		void HandleGarbageCollectComplete();
 		void HandleMasterAlcUnloaded();
 		void HandleSlimAlcUnloaded(const FString& name);

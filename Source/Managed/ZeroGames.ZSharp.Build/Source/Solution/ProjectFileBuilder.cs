@@ -224,44 +224,33 @@ public class ProjectFileBuilder
 	private XmlElement BuildTargetNode(XmlDocument doc, XmlElement projectNode)
 	{
 		XmlElement targetNode = doc.CreateElement("Target");
-		targetNode.SetAttribute("Name", "PostBuild");
-		targetNode.SetAttribute("AfterTargets", "PostBuildEvent");
-
+		
+		void AddCopyTarget(string targetDir)
 		{
-			// Copy output to project binaries dir.
 			XmlElement mkdirNode = doc.CreateElement("Exec");
-			string projectBinariesDir = "$(UnrealProjectDir)/Binaries/Managed";
-			mkdirNode.SetAttribute("Command", $"if not exist \"{projectBinariesDir}\" mkdir \"{projectBinariesDir}\"");
+			mkdirNode.SetAttribute("Command", $"if not exist \"{targetDir}\" mkdir \"{targetDir}\"");
 			targetNode.AppendChild(mkdirNode);
 
 			XmlElement copyNode = doc.CreateElement("Exec");
-			copyNode.SetAttribute("Command", $"copy \"$(TargetPath)\" \"{projectBinariesDir}/$(TargetFileName)\"");
+			copyNode.SetAttribute("Command", $"copy \"$(TargetPath)\" \"{targetDir}/$(TargetFileName)\"");
 			targetNode.AppendChild(copyNode);
 		}
 		
-		{
-			// Copy output to plugin binaries dir for packaging.
-			XmlElement mkdirNode = doc.CreateElement("Exec");
-			string projectBinariesDir = "$(ZSharpDir)/Binaries/Managed";
-			mkdirNode.SetAttribute("Command", $"if not exist \"{projectBinariesDir}\" mkdir \"{projectBinariesDir}\"");
-			targetNode.AppendChild(mkdirNode);
+		targetNode.SetAttribute("Name", "PostBuild");
+		targetNode.SetAttribute("AfterTargets", "PostBuildEvent");
 
-			XmlElement copyNode = doc.CreateElement("Exec");
-			copyNode.SetAttribute("Command", $"copy \"$(TargetPath)\" \"{projectBinariesDir}/$(TargetFileName)\"");
-			targetNode.AppendChild(copyNode);
+		if (_project.IsShared)
+		{
+			AddCopyTarget("$(ZSharpDir)/Binaries/Managed/Shared");
 		}
-
-		if (_project.IsPrecompiled)
+		else
 		{
-			// Copy precompiled output to precompiled dir.
-			XmlElement mkdirNode = doc.CreateElement("Exec");
-			string precompiledDir = "$(ZSharpDir)/Precompiled";
-			mkdirNode.SetAttribute("Command", $"if not exist \"{precompiledDir}\" mkdir \"{precompiledDir}\"");
-			targetNode.AppendChild(mkdirNode);
-
-			XmlElement copyNode = doc.CreateElement("Exec");
-			copyNode.SetAttribute("Command", $"copy \"$(TargetPath)\" \"{precompiledDir}/$(TargetFileName)\"");
-			targetNode.AppendChild(copyNode);
+			AddCopyTarget("$(UnrealProjectDir)/Binaries/Managed");
+			AddCopyTarget("$(ZSharpDir)/Binaries/Managed");
+			if (_project.IsPrecompiled)
+			{
+				AddCopyTarget("$(ZSharpDir)/Precompiled");
+			}
 		}
 
 		projectNode.AppendChild(targetNode);

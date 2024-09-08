@@ -2,6 +2,8 @@
 
 #include "ZSharpEmitModule.h"
 
+#include "ZUnrealFieldScanner.h"
+
 class FZSharpEmitModule : public IZSharpEmitModule
 {
 	// Begin IModuleInterface
@@ -14,8 +16,12 @@ IMPLEMENT_MODULE(FZSharpEmitModule, ZSharpEmit)
 
 void FZSharpEmitModule::StartupModule()
 {
+	ZSharp::FZUnrealFieldScanner::Get().Startup();
 }
 
 void FZSharpEmitModule::ShutdownModule()
 {
+	ZSharp::FZUnrealFieldScanner::Get().Shutdown();
 }
+
+

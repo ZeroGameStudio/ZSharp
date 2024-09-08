@@ -27,6 +27,7 @@ public class ZSharpEmit : ModuleRules
 			new string[]
 			{
 				"Core",
+				"DeveloperSettings",
 			}
 		);
 		
@@ -35,7 +36,7 @@ public class ZSharpEmit : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Engine",
+				"ZSharpCore",
 			}
 		);
 		
@@ -45,5 +46,7 @@ public class ZSharpEmit : ModuleRules
 			{
 			}
 		);
+		
+		PublicDefinitions.Add($"ZSHARP_SCANNER_ASSEMBLY_NAME=\"ZeroGames.ZSharp.UnrealFieldScanner\"");
 	}
 }

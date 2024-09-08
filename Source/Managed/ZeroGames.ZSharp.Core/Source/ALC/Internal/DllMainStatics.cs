@@ -34,6 +34,7 @@ internal static class DllMainStatics
             return ELoadAssemblyErrorCode.Succeed;
         }
 
+        // @FIXME: Integrate with InvokeMethod().
         object?[]? parameters = null;
         ParameterInfo[] parameterInfos = dllMain.GetParameters();
         if (parameterInfos.Length > 0)
@@ -54,7 +55,7 @@ internal static class DllMainStatics
                 {
                     return ELoadAssemblyErrorCode.InvalidDllMainSignature;
                 }
-                        
+                
                 parameters = [ new IntPtr(args) ];
             }
         }

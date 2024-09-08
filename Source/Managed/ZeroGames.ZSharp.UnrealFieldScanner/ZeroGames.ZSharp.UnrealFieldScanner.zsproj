@@ -1,0 +1,26 @@
+{
+	"ParentFolder": "ZSharp",
+	"Authors": "Lin7Han",
+	"Company": "ZeroGames",
+	"AssemblyVersion": "0.1.0",
+	"FileVersion": "0.1.0",
+	"NeutralLanguage": "zh",
+	"ProjectReferences":
+	[
+		"ZeroGames.ZSharp.Core",
+		"ZeroGames.ZSharp.Core.UnrealEngine",
+		"ZeroGames.ZSharp.Emit"
+	],
+	"ExternalReferences":
+	[
+		"../../ThirdParty/Dotnet/shared/Mono.Cecil.dll"
+	],
+	"Usings":
+	[
+		"ZeroGames.ZSharp.Core",
+		"ZeroGames.ZSharp.Core.UnrealEngine",
+		"ZeroGames.ZSharp.Emit.Specifier"
+	]
+}
+
+

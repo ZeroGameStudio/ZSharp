@@ -30,7 +30,7 @@ public enum EInvokeMethodErrorCode : int32
 
 	MethodNotFound = 401,
 	AmbiguousMethodName = 402,
-	AmbiguousMethodSignature = 403,
+	InvalidMethodSignature = 403,
 	UnhandledException = 404,
 }
 

@@ -33,7 +33,61 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
 
     public unsafe EInvokeMethodErrorCode InvokeMethod(string assemblyName, string typeName, string methodName, void* args)
     {
-        throw new NotImplementedException();
+        Assembly? assembly;
+        try
+        {
+            assembly = Assemblies.Concat(Default.Assemblies).SingleOrDefault(asm => asm.GetName().Name == assemblyName);
+        }
+        catch (InvalidOperationException)
+        {
+            return EInvokeMethodErrorCode.AmbiguousAssemblyName;
+        }
+
+        if (assembly is null)
+        {
+            return EInvokeMethodErrorCode.AssemblyNotFound;
+        }
+
+        Type? type = assembly.GetType(typeName);
+        if (type is null)
+        {
+            return EInvokeMethodErrorCode.TypeNotFound;
+        }
+
+        MethodInfo? method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static);
+        if (method is null)
+        {
+            return EInvokeMethodErrorCode.MethodNotFound;
+        }
+        
+        object?[]? parameters = null;
+        ParameterInfo[] parameterInfos = method.GetParameters();
+        if (parameterInfos.Length > 0)
+        {
+            if (parameterInfos.Length != 1)
+            {
+                return EInvokeMethodErrorCode.InvalidMethodSignature;
+            }
+                    
+            Type parameterType = parameterInfos[0].ParameterType;
+            if (parameterType == typeof(string[]) && args is not null)
+            {
+                parameters = [ ((CommonMethodArgs*)args)->Parse() ];
+            }
+            else
+            {
+                if (!parameterType.IsPointer)
+                {
+                    return EInvokeMethodErrorCode.InvalidMethodSignature;
+                }
+                
+                parameters = [ new IntPtr(args) ];
+            }
+        }
+        
+        method.Invoke(null, parameters);
+
+        return EInvokeMethodErrorCode.Succeed;
     }
     
     public GCHandle GCHandle { get; }
@@ -54,7 +108,7 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
         {
             try
             {
-                AssemblyDefinition assemblyDef = AssemblyDefinition.ReadAssembly(dllPath);
+                using AssemblyDefinition assemblyDef = AssemblyDefinition.ReadAssembly(dllPath);
                 foreach (var attr in assemblyDef.CustomAttributes)
                 {
                     if (attr.AttributeType.FullName == typeof(DllEntryAttribute).FullName)

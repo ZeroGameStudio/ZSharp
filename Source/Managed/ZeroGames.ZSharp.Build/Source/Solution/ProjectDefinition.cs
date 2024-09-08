@@ -18,6 +18,7 @@ public class ProjectDefinition
 	public bool IsUnsafeBlockEnabled { get; init; } = true;
 	public bool HasGlue { get; init; } = false;
 	public bool IsPrecompiled { get; init; } = false;
+	public bool IsShared { get; init; } = false;
 
 	public string Authors { get; init; } = string.Empty;
 	public string Company { get; init; } = string.Empty;

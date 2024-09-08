@@ -20,6 +20,16 @@ void ZSharp::FZUnrealFieldScanner::Startup()
 	ScannerAlc = IZSharpClr::Get().CreateSlimAlc("__UnrealFieldScanner");
 	if (ScannerAlc->LoadAssembly(ZSHARP_SCANNER_ASSEMBLY_NAME) == EZLoadAssemblyErrorCode::Succeed)
 	{
+		TArray<FModuleStatus> moduleStatuses;
+		FModuleManager::Get().QueryModules(moduleStatuses);
+		for (const auto& status : moduleStatuses)
+		{
+			if (status.bIsLoaded)
+			{
+				ScanUnrealFieldsForModule(FName(status.Name), false);
+			}
+		}
+		
 		/*
 		 * This is for making sure that ScanUnrealFieldsForModule() is executed after ProcessNewlyLoadedUObjects():
 		 * 1. if USE_PER_MODULE_UOBJECT_BOOTSTRAP || IS_MONOLITHIC, ProcessNewlyLoadedUObjects() only needs to execute once and has already done before.

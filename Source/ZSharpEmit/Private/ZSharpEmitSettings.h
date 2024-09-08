@@ -18,7 +18,7 @@ struct FZAssembliesToScan
  * 
  */
 UCLASS(Config = ZSharp, DefaultConfig)
-class ZSHARPEMIT_API UZSharpEmitSettings : public UDeveloperSettings
+class UZSharpEmitSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 

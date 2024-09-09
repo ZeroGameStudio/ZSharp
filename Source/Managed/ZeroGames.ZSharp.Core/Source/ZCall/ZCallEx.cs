@@ -29,22 +29,22 @@ public struct DynamicZCallResult
 public static class ZCallEx
 {
 
-	public static DynamicZCallResult ZCall(ZCallHandle handle, params object?[] parameters) => InternalZCall(IMasterAssemblyLoadContext.Get()!, handle, parameters);
+	public static DynamicZCallResult ZCall(ZCallHandle handle, params object?[] parameters) => InternalZCall(IMasterAssemblyLoadContext.Instance!, handle, parameters);
 	
 	public static DynamicZCallResult ZCall(string name, out ZCallHandle outHandle, params object?[] parameters)
 	{
-		IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
+		IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Instance!;
 		outHandle = alc.GetZCallHandle(name);
 		return InternalZCall(alc, outHandle, parameters);
 	}
 
 	public static DynamicZCallResult ZCall(string name, params object?[] parameters) => ZCall(name, out _, parameters);
 	
-	public static DynamicZCallResult ZCall(this IConjugate @this, ZCallHandle handle, params object?[] parameters) => InternalZCall(@this, IMasterAssemblyLoadContext.Get()!, handle, parameters);
+	public static DynamicZCallResult ZCall(this IConjugate @this, ZCallHandle handle, params object?[] parameters) => InternalZCall(@this, IMasterAssemblyLoadContext.Instance!, handle, parameters);
 	
 	public static DynamicZCallResult ZCall(this IConjugate @this, string name, out ZCallHandle outHandle, params object?[] parameters)
 	{
-		IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Get()!;
+		IMasterAssemblyLoadContext alc = IMasterAssemblyLoadContext.Instance!;
 		outHandle = alc.GetZCallHandle(name);
 		return InternalZCall(@this, alc, outHandle, parameters);
 	}

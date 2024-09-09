@@ -30,7 +30,7 @@ public readonly struct RuntimeTypeLocator
 public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 {
 	
-	public static IMasterAssemblyLoadContext? Get() => MasterAssemblyLoadContext.Get();
+	public static IMasterAssemblyLoadContext? Instance => MasterAssemblyLoadContext.Instance;
 	
 	Type? GetType(ref readonly RuntimeTypeLocator locator);
 

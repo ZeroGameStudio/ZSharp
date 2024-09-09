@@ -7,7 +7,7 @@ internal class ZCallResolver_Property : IZCallResolver
 	
 	public IZCallDispatcher? Resolve(string name)
 	{
-		IMasterAssemblyLoadContext? alc = IMasterAssemblyLoadContext.Get();
+		IMasterAssemblyLoadContext? alc = IMasterAssemblyLoadContext.Instance;
 		if (alc is null)
 		{
 			return null;

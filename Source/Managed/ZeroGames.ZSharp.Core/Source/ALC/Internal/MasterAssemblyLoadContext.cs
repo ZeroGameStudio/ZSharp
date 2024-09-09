@@ -24,31 +24,34 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
         return new();
     }
-    
-    public static MasterAssemblyLoadContext? Get()
+
+    public static MasterAssemblyLoadContext? Instance
     {
-        Action @throw = () => throw new SecurityException("Code has no permission to access Master ALC.");
+        get
+        {
+            Action @throw = () => throw new SecurityException("Code has no permission to access Master ALC.");
         
-        StackFrame stack = new(1);
-        MethodBase? method = stack.GetMethod();
-        if (method is null)
-        {
-            @throw();
-        }
+            StackFrame stack = new(1);
+            MethodBase? method = stack.GetMethod();
+            if (method is null)
+            {
+                @throw();
+            }
 
-        Type? type = method!.DeclaringType;
-        if (type is null)
-        {
-            @throw();
-        }
+            Type? type = method!.DeclaringType;
+            if (type is null)
+            {
+                @throw();
+            }
 
-        AssemblyLoadContext? callerAlc = GetLoadContext(type!.Assembly);
-        if (callerAlc != _sSingleton && callerAlc != Default)
-        {
-            @throw();
-        }
+            AssemblyLoadContext? callerAlc = GetLoadContext(type!.Assembly);
+            if (callerAlc != _sSingleton && callerAlc != Default)
+            {
+                @throw();
+            }
         
-        return _sSingleton;
+            return _sSingleton;
+        }
     }
 
     public Type? GetType(ref readonly RuntimeTypeLocator locator)

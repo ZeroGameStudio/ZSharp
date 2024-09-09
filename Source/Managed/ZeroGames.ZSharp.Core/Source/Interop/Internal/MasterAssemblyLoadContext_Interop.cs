@@ -12,7 +12,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     [UnmanagedCallersOnly]
     public static uint8 Tick(float deltaTime) => Uncaught.ErrorIfUncaught<uint8>(() =>
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
+        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
         if (alc is null)
         {
             return 0;
@@ -25,7 +25,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     [UnmanagedCallersOnly]
     public static int32 Unload() => Uncaught.ErrorIfUncaught(() =>
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
+        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
         if (alc is null)
         {
             return -1;
@@ -38,7 +38,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     [UnmanagedCallersOnly]
     public static ELoadAssemblyErrorCode LoadAssembly(char* assemblyName, void* args) => Uncaught.ErrorIfUncaught(() =>
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
+        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
         if (alc is null)
         {
             return ELoadAssemblyErrorCode.AlcUnavailable;
@@ -50,7 +50,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     [UnmanagedCallersOnly]
     public static EInvokeMethodErrorCode InvokeMethod(char* assemblyName, char* typeName, char* methodName, void* args) => Uncaught.ErrorIfUncaught(() =>
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
+        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
         if (alc is null)
         {
             return EInvokeMethodErrorCode.AlcUnavailable;
@@ -62,7 +62,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     [UnmanagedCallersOnly]
     public static InteropRuntimeTypeHandle GetType(InteropRuntimeTypeLocator* locator) => Uncaught.ErrorIfUncaught(() =>
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
+        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
         if (alc is null)
         {
             return new InteropRuntimeTypeHandle();
@@ -75,7 +75,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     [UnmanagedCallersOnly]
     public static EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer) => Uncaught.ErrorIfUncaught(() =>
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
+        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
         if (alc is null)
         {
             return EZCallErrorCode.AlcUnavailable;
@@ -87,7 +87,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     [UnmanagedCallersOnly]
     public static ZCallHandle GetZCallHandle_Red(char* name) => Uncaught.ErrorIfUncaught(() =>
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
+        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
         if (alc is null)
         {
             return new ZCallHandle();
@@ -99,7 +99,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     [UnmanagedCallersOnly]
     public static IntPtr BuildConjugate_Red(IntPtr unmanaged, InteropRuntimeTypeHandle type) => Uncaught.ErrorIfUncaught(() =>
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
+        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
         if (alc is null)
         {
             return default;
@@ -117,7 +117,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     [UnmanagedCallersOnly]
     public static void ReleaseConjugate_Red(IntPtr unmanaged) => Uncaught.ErrorIfUncaught(() =>
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
+        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
         if (alc is null)
         {
             return;

@@ -22,7 +22,7 @@ public readonly struct ConjugateHandle
             return null;
         }
         
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Get();
+        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
         if (alc is null)
         {
             return null;

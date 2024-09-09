@@ -7,6 +7,7 @@
 #include "ZSharpEmitSettings.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
+#include "Emit/ZUnrealFieldEmitter.h"
 
 ZSharp::FZUnrealFieldScanner& ZSharp::FZUnrealFieldScanner::Get()
 {
@@ -109,6 +110,21 @@ void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, b
 		} args { *assembly, &outManifest };
 		ScannerAlc->InvokeMethod(ZSHARP_SCANNER_ASSEMBLY_NAME, "ZeroGames.ZSharp.UnrealFieldScanner.UnrealFieldScanner_Interop", "Scan", &args);
 		UE_LOG(LogZSharpEmit, Log, TEXT("%s"), *outManifest);
+
+		// @TEST
+		if (assembly == "Game")
+		{
+			FZPackageDefinition packageDef;
+			packageDef.Path = "/Script/ZSharpEmitter/Game";
+			FZClassDefinition& classDef = packageDef.Classes.Emplace_GetRef();
+			classDef.Name = "TestActorComponent";
+			classDef.SuperPath = "/Script/Engine.ActorComponent";
+			classDef.WithinPath = "/Script/Engine.PlayerController";
+			classDef.Metadata.Emplace("BlueprintSpawnableComponent", "true");
+			
+			FZUnrealFieldEmitter::Get().Emit(packageDef);
+			UE_LOG(LogZSharpEmit, Log, TEXT("%s"), *classDef.Name);
+		}
 	}
 }
 

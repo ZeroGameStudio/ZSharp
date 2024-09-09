@@ -2,7 +2,7 @@
 
 #include "ZSharpEmitModule.h"
 
-#include "ZUnrealFieldScanner.h"
+#include "Scan/ZUnrealFieldScanner.h"
 
 class FZSharpEmitModule : public IZSharpEmitModule
 {

@@ -26,7 +26,9 @@ namespace ZSharp
 	private:
 		IZSlimAssemblyLoadContext* ScannerAlc = nullptr;
 		FDelegateHandle ProcessLoadedObjectsDelegate;
+		
 		TOptional<TArray<FName>> DeferredModules;
+		TSet<FString> ScannedAssemblies;
 		
 	};
 }

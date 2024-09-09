@@ -95,6 +95,12 @@ void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, b
 	TArray<FString> assemblies = GetDefault<UZSharpEmitSettings>()->GetModuleAssembliesToScan(moduleName);
 	for (const auto& assembly : assemblies)
 	{
+		if (ScannedAssemblies.Contains(assembly))
+		{
+			continue;
+		}
+		ScannedAssemblies.Emplace(assembly);
+		
 		FString outManifest;
 		struct
 		{

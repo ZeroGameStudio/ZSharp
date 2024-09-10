@@ -3,11 +3,111 @@
 
 #include "ZUnrealFieldScanner.h"
 
+#include "JsonObjectConverter.h"
 #include "ZSharpEmitLogChannels.h"
 #include "ZSharpEmitSettings.h"
+#include "ZUnrealFieldDefinitionDtos.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "Emit/ZUnrealFieldEmitter.h"
+
+namespace ZSharp::ZUnrealFieldScanner_Private
+{
+	static TMap<FName, FZPropertyDefinition> PropertyDtoMap2DefMap(TMap<FName, FZPropertyDefinitionDto>&& dtoMap)
+	{
+		TMap<FName, FZPropertyDefinition> defMap;
+		defMap.Reserve(dtoMap.Num());
+		
+		for (auto& pair : dtoMap)
+		{
+			FZPropertyDefinitionDto& dto = pair.Value;
+			FZPropertyDefinition& def = defMap.Emplace(dto.Name);
+			def.Name = dto.Name;
+			def.Flags = static_cast<EObjectFlags>(dto.Flags);
+			def.MetadataMap = MoveTemp(dto.MetadataMap);
+		}
+
+		return defMap;
+	}
+
+	static TMap<FName, FZFunctionDefinition> FunctionDtoMap2DefMap(TMap<FName, FZFunctionDefinitionDto>&& dtoMap)
+	{
+		TMap<FName, FZFunctionDefinition> defMap;
+		defMap.Reserve(dtoMap.Num());
+		
+		for (auto& pair : dtoMap)
+		{
+			FZFunctionDefinitionDto& dto = pair.Value;
+			FZFunctionDefinition& def = defMap.Emplace(dto.Name);
+			def.Name = dto.Name;
+			def.Flags = static_cast<EObjectFlags>(dto.Flags);
+			def.MetadataMap = MoveTemp(dto.MetadataMap);
+			def.SuperPath = dto.SuperPath;
+			def.PropertyMap = PropertyDtoMap2DefMap(MoveTemp(dto.PropertyMap));
+			def.FunctionFlags = static_cast<EFunctionFlags>(dto.FunctionFlags);
+			def.RpcId = dto.RpcId;
+			def.RpcResponseId = dto.RpcResponseId;
+		}
+
+		return defMap;
+	}
+	
+	static FZPackageDefinition PackageDto2Def(FZPackageDefinitionDto&& dto)
+	{
+		FZPackageDefinition def;
+		def.Path = dto.Path;
+
+		{ // @TODO Enums
+			
+		}
+
+		{ // @TODO Structs
+			
+		}
+
+		{ // Classes
+			for (auto& pair : dto.ClassMap)
+			{
+				FZClassDefinitionDto& classDto = pair.Value;
+				FZClassDefinition& classDef = def.ClassMap.Emplace(classDto.Name);
+				classDef.Name = classDto.Name;
+				classDef.Flags = static_cast<EObjectFlags>(classDto.Flags);
+				classDef.MetadataMap = MoveTemp(classDto.MetadataMap);
+				classDef.SuperPath = classDto.SuperPath;
+				classDef.PropertyMap = PropertyDtoMap2DefMap(MoveTemp(classDto.PropertyMap));
+				classDef.ConfigName = classDto.ConfigName;
+				classDef.WithinPath = classDto.WithinPath;
+				classDef.ClassFlags = static_cast<EClassFlags>(classDto.ClassFlags);
+				classDef.CastFlags = static_cast<EClassCastFlags>(classDto.CastFlags);
+				classDef.ImplementedInterfacePaths = MoveTemp(classDto.ImplementedInterfacePaths);
+				classDef.FunctionMap = FunctionDtoMap2DefMap(MoveTemp(classDto.FunctionMap));
+			}
+		}
+
+		{ // @TODO Interfaces
+			
+		}
+
+		{ // @TODO Delegates
+			
+		}
+
+		return def;
+	}
+	
+	static void EmitUnrealFieldsForAssembly(const FString& assemblyName, const FString& manifest)
+	{
+		FZPackageDefinitionDto pakDto;
+		if (!FJsonObjectConverter::JsonObjectStringToUStruct<FZPackageDefinitionDto>(manifest, &pakDto))
+		{
+			UE_LOG(LogZSharpEmit, Fatal, TEXT("Fail to emit unreal field for assembly [%s]!!! Manifest: [%s]"), *assemblyName, *manifest);
+			return;
+		}
+
+		FZPackageDefinition pakDef = PackageDto2Def(MoveTemp(pakDto));
+		FZUnrealFieldEmitter::Get().Emit(pakDef);
+	}
+}
 
 ZSharp::FZUnrealFieldScanner& ZSharp::FZUnrealFieldScanner::Get()
 {
@@ -105,26 +205,18 @@ void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, b
 		FString outManifest;
 		struct
 		{
-			const TCHAR* assemblyName;
-			FString* outManifest;
-		} args { *assembly, &outManifest };
+			const TCHAR* AssemblyName;
+			FString* OutManifest;
+			uint8 bWithMetadata;
+		} args { *assembly, &outManifest, WITH_METADATA };
 		ScannerAlc->InvokeMethod(ZSHARP_SCANNER_ASSEMBLY_NAME, "ZeroGames.ZSharp.UnrealFieldScanner.UnrealFieldScanner_Interop", "Scan", &args);
-		UE_LOG(LogZSharpEmit, Log, TEXT("%s"), *outManifest);
 
-		// @TEST
-		if (assembly == "Game")
+		if (outManifest.IsEmpty())
 		{
-			FZPackageDefinition packageDef;
-			packageDef.Path = "/Script/ZSharpEmitter/Game";
-			FZClassDefinition& classDef = packageDef.Classes.Emplace_GetRef();
-			classDef.Name = "TestActorComponent";
-			classDef.SuperPath = "/Script/Engine.ActorComponent";
-			classDef.WithinPath = "/Script/Engine.PlayerController";
-			classDef.Metadata.Emplace("BlueprintSpawnableComponent", "true");
-			
-			FZUnrealFieldEmitter::Get().Emit(packageDef);
-			UE_LOG(LogZSharpEmit, Log, TEXT("%s"), *classDef.Name);
+			continue;
 		}
+
+		ZUnrealFieldScanner_Private::EmitUnrealFieldsForAssembly(assembly, outManifest);
 	}
 }
 

@@ -12,6 +12,7 @@ internal static class UnrealFieldScanner_Interop
 	{
 		public char* AssemblyName;
 		public IntPtr OutManifest;
+		public uint8 WithMetadata;
 	}
 
 	public static unsafe void Scan(ScanArgs* args)
@@ -20,7 +21,10 @@ internal static class UnrealFieldScanner_Interop
 		{
 			string assemblyName = new(args->AssemblyName);
 			InteropString outManifest = new(args->OutManifest);
-			outManifest.Data = UnrealFieldScanner.Instance.Scan(assemblyName);
+			bool withMetadata = args->WithMetadata > 0;
+			
+			using UnrealFieldScanner scanner = new(assemblyName, withMetadata);
+			outManifest.Data = scanner.Scan();
 		}
 		catch (Exception ex)
 		{

@@ -1,0 +1,144 @@
+﻿// Copyright Zero Games. All Rights Reserved.
+
+#pragma once
+
+#include "ZUnrealFieldDefinitionDtos.generated.h"
+
+static_assert(std::is_same_v<__underlying_type(EObjectFlags), int32>);
+static_assert(std::is_same_v<__underlying_type(EPropertyFlags), uint64>);
+static_assert(std::is_same_v<__underlying_type(EFunctionFlags), uint32>);
+static_assert(std::is_same_v<__underlying_type(EClassFlags), int32>);
+static_assert(std::is_same_v<__underlying_type(EClassCastFlags), uint64>);
+static_assert(std::is_same_v<__underlying_type(EStructFlags), int32>);
+
+USTRUCT()
+struct FZFieldDefinitionDto
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName Name;
+
+	UPROPERTY()
+	int32 Flags = 0;
+	
+	UPROPERTY()
+	TMap<FName, FString> MetadataMap;
+};
+
+USTRUCT()
+struct FZPropertyDefinitionDto : public FZFieldDefinitionDto
+{
+	GENERATED_BODY()
+	
+	// @TODO
+};
+
+USTRUCT()
+struct FZStructDefinitionDto : public FZFieldDefinitionDto
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName SuperPath;
+
+	UPROPERTY()
+	TMap<FName, FZPropertyDefinitionDto> PropertyMap;
+};
+
+USTRUCT()
+struct FZFunctionDefinitionDto : public FZStructDefinitionDto
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	uint32 FunctionFlags = 0;
+
+	UPROPERTY()
+	uint16 RpcId = 0;
+
+	UPROPERTY()
+	uint16 RpcResponseId = 0;
+};
+
+USTRUCT()
+struct FZEnumDefinitionDto : public FZFieldDefinitionDto
+{
+	GENERATED_BODY()
+	
+	// @TODO
+};
+
+USTRUCT()
+struct FZScriptStructDefinitionDto : public FZStructDefinitionDto
+{
+	GENERATED_BODY()
+	
+	// @TODO
+};
+
+USTRUCT()
+struct FZClassDefinitionDto : public FZStructDefinitionDto
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName ConfigName;
+
+	UPROPERTY()
+	FName WithinPath;
+
+	UPROPERTY()
+	int32 ClassFlags = 0;
+
+	UPROPERTY()
+	uint64 CastFlags = 0;
+
+	UPROPERTY()
+	TArray<FName> ImplementedInterfacePaths;
+
+	UPROPERTY()
+	TMap<FName, FZFunctionDefinitionDto> FunctionMap;
+};
+
+USTRUCT()
+struct FZInterfaceDefinitionDto : public FZStructDefinitionDto
+{
+	GENERATED_BODY()
+	
+	// @TODO
+};
+
+USTRUCT()
+struct FZDelegateDefinitionDto : public FZStructDefinitionDto
+{
+	GENERATED_BODY()
+	
+	// @TODO
+};
+
+USTRUCT()
+struct FZPackageDefinitionDto
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName Path;
+
+	UPROPERTY()
+	TMap<FName, FZEnumDefinitionDto> EnumMap;
+	
+	UPROPERTY()
+	TMap<FName, FZScriptStructDefinitionDto> StructMap;
+
+	UPROPERTY()
+	TMap<FName, FZClassDefinitionDto> ClassMap;
+
+	UPROPERTY()
+	TMap<FName, FZInterfaceDefinitionDto> InterfaceMap;
+
+	UPROPERTY()
+	TMap<FName, FZDelegateDefinitionDto> DelegateMap;
+};
+
+

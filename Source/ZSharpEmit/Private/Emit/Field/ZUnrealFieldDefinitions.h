@@ -8,69 +8,65 @@ class UZSharpFunction;
 // IMPORTANT: These types are designed to use on stack only and use UObject raw pointer, NEVER store them on heap!
 namespace ZSharp
 {
-	struct FZPropertyDefinition
+	struct FZFieldDefinition
+	{
+		FName Name;
+		EObjectFlags Flags = RF_NoFlags;
+		TMap<FName, FString> MetadataMap;
+	};
+	
+	struct FZPropertyDefinition : public FZFieldDefinition
 	{
 		// @TODO
 	};
 
-	struct FZFunctionDefinition
+	struct FZStructDefinition : public FZFieldDefinition
+	{
+		FName SuperPath;
+		TMap<FName, FZPropertyDefinition> PropertyMap;
+	};
+
+	struct FZFunctionDefinition : public FZStructDefinition
 	{
 		UZSharpFunction* Function = nullptr;
 		
-		FString Name;
-		
-		FString OuterPath;
-		FString SuperPath;
-
-		EObjectFlags Flags = RF_NoFlags;
 		EFunctionFlags FunctionFlags = FUNC_None;
 
 		uint16 RpcId = 0;
 		uint16 RpcResponseId = 0;
-		
-		TArray<FZPropertyDefinition> Parameters;
-
-		TMap<FName, FString> Metadata;
 	};
 	
-	struct FZEnumDefinition
+	struct FZEnumDefinition : public FZFieldDefinition
 	{
 		// @TODO
 	};
 	
-	struct FZStructDefinition
+	struct FZScriptStructDefinition : public FZStructDefinition
 	{
 		// @TODO
 	};
 
-	struct FZClassDefinition
+	struct FZClassDefinition : public FZStructDefinition
 	{
 		UZSharpClass* Class = nullptr;
 		
-		FString Name;
-
 		FName ConfigName;
-		FString SuperPath;
-		FString WithinPath;
+		FName WithinPath;
 
-		EObjectFlags Flags = RF_NoFlags;
 		EClassFlags ClassFlags = CLASS_None;
 		EClassCastFlags CastFlags = CASTCLASS_None;
 
-		TArray<FString> ImplementedInterfacePaths;
+		TArray<FName> ImplementedInterfacePaths;
 		
-		TArray<FZFunctionDefinition> Functions;
-		TArray<FZPropertyDefinition> Properties;
-
-		TMap<FName, FString> Metadata;
+		TMap<FName, FZFunctionDefinition> FunctionMap;
 	};
 	
-	struct FZInterfaceDefinition
+	struct FZInterfaceDefinition : public FZStructDefinition
 	{
 		// @TODO
 	};
 	
-	struct FZDelegateDefinition
+	struct FZDelegateDefinition : public FZStructDefinition
 	{
 		// @TODO
 	};
@@ -79,15 +75,13 @@ namespace ZSharp
 	{
 		UPackage* Package = nullptr;
 		
-		FString Path;
+		FName Path;
 		
-		TArray<FZEnumDefinition> Enums;
-		TArray<FZStructDefinition> Structs;
-		TArray<FZClassDefinition> Classes;
-		TArray<FZInterfaceDefinition> Interfaces;
-		TArray<FZDelegateDefinition> Delegates;
-
-		TMap<FName, FString> Metadata;
+		TMap<FName, FZEnumDefinition> EnumMap;
+		TMap<FName, FZScriptStructDefinition> StructMap;
+		TMap<FName, FZClassDefinition> ClassMap;
+		TMap<FName, FZInterfaceDefinition> InterfaceMap;
+		TMap<FName, FZDelegateDefinition> DelegateMap;
 	};
 }
 

@@ -36,6 +36,10 @@ public class ZSharpEmit : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
+				
+				"Json",
+				"JsonUtilities",
+				
 				"ZSharpCore",
 			}
 		);

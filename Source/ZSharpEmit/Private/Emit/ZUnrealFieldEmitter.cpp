@@ -26,8 +26,8 @@ UPackage* ZSharp::FZUnrealFieldEmitter::Emit(FZPackageDefinition& def)
 
 void ZSharp::FZUnrealFieldEmitter::EmitPackage(FZPackageDefinition& def) const
 {
-	UE_CLOG(!!FindPackage(nullptr, *def.Path), LogZSharpEmit, Fatal, TEXT("Package [%s] already exists!!!"), *def.Path);
-	UPackage* pak = CreatePackage(*def.Path);
+	UE_CLOG(!!FindPackage(nullptr, *def.Path.ToString()), LogZSharpEmit, Fatal, TEXT("Package [%s] already exists!!!"), *def.Path.ToString());
+	UPackage* pak = CreatePackage(*def.Path.ToString());
 	def.Package = pak;
 
 	// Engine code only marks script packages as compiled-in but not root.
@@ -36,36 +36,36 @@ void ZSharp::FZUnrealFieldEmitter::EmitPackage(FZPackageDefinition& def) const
 	pak->SetPackageFlags(PKG_CompiledIn);
 
 	// Enums have no dependency so we can emit them just one step.
-	for (auto& enumDef : def.Enums)
+	for (auto& pair : def.EnumMap)
 	{
-		EmitEnum(pak, enumDef);
+		EmitEnum(pak, pair.Value);
 	}
 	
 	// Other fields have dependency so we emit skeleton (placeholder) first.
-	for (auto& structDef : def.Structs)
+	for (auto& pair : def.StructMap)
 	{
-		EmitStructSkeleton(pak, structDef);
+		EmitStructSkeleton(pak, pair.Value);
 	}
 
-	for (auto& classDef : def.Classes)
+	for (auto& pair : def.ClassMap)
 	{
-		EmitClassSkeleton(pak, classDef);
+		EmitClassSkeleton(pak, pair.Value);
 	}
 
-	for (auto& interfaceDef : def.Interfaces)
+	for (auto& pair : def.InterfaceMap)
 	{
-		EmitInterfaceSkeleton(pak, interfaceDef);
+		EmitInterfaceSkeleton(pak, pair.Value);
 	}
 
-	for (auto& delegateDef : def.Delegates)
+	for (auto& pair : def.DelegateMap)
 	{
-		EmitDelegateSkeleton(pak, delegateDef);
+		EmitDelegateSkeleton(pak, pair.Value);
 	}
 
 	// Now that all fields are in memory (but not fully initialized) and we can setup dependency.
-	for (const auto& structDef : def.Structs)
+	for (const auto& pair : def.StructMap)
 	{
-		FinishEmitStruct(pak, structDef);
+		FinishEmitStruct(pak, pair.Value);
 	}
 
 	// Subclass may depend on super/within class's data i.e. ClassConfigName, SparseClassDataStruct.
@@ -74,10 +74,10 @@ void ZSharp::FZUnrealFieldEmitter::EmitPackage(FZPackageDefinition& def) const
 	{
 		TArray<const UZSharpClass*> classes;
 		TMap<const UZSharpClass*, const FZClassDefinition*> map;
-		for (const auto& classDef : def.Classes)
+		for (const auto& pair : def.ClassMap)
 		{
-			classes.Emplace(classDef.Class);
-			map.Emplace(classDef.Class, &classDef);
+			classes.Emplace(pair.Value.Class);
+			map.Emplace(pair.Value.Class, &pair.Value);
 		}
 		
 		Algo::TopologicalSort(classes, [&map](const UZSharpClass* cls)
@@ -85,14 +85,14 @@ void ZSharp::FZUnrealFieldEmitter::EmitPackage(FZPackageDefinition& def) const
 			const FZClassDefinition* classDef = map.FindChecked(cls);
 			TArray<UZSharpClass*, TInlineAllocator<2>> dependencies;
 			
-			if (const auto superClass = FindObjectChecked<UClass>(nullptr, *classDef->SuperPath); superClass->UObject::IsA<UZSharpClass>())
+			if (const auto superClass = FindObjectChecked<UClass>(nullptr, *classDef->SuperPath.ToString()); superClass->UObject::IsA<UZSharpClass>())
 			{
 				dependencies.Emplace(static_cast<UZSharpClass*>(superClass));
 			}
 			
-			if (!classDef->WithinPath.IsEmpty())
+			if (!classDef->WithinPath.IsNone())
 			{
-				if (const auto withinClass = FindObjectChecked<UClass>(nullptr, *classDef->WithinPath); withinClass->UObject::IsA<UZSharpClass>())
+				if (const auto withinClass = FindObjectChecked<UClass>(nullptr, *classDef->WithinPath.ToString()); withinClass->UObject::IsA<UZSharpClass>())
 				{
 					dependencies.Emplace(static_cast<UZSharpClass*>(withinClass));
 				}
@@ -108,20 +108,20 @@ void ZSharp::FZUnrealFieldEmitter::EmitPackage(FZPackageDefinition& def) const
 		}
 	}
 
-	for (const auto& interfaceDef : def.Interfaces)
+	for (const auto& pair : def.InterfaceMap)
 	{
-		FinishEmitInterface(pak, interfaceDef);
+		FinishEmitInterface(pak, pair.Value);
 	}
 
-	for (const auto& delegateDef : def.Delegates)
+	for (const auto& pair : def.DelegateMap)
 	{
-		FinishEmitDelegate(pak, delegateDef);
+		FinishEmitDelegate(pak, pair.Value);
 	}
 
 	// Finally, create CDO for all classes.
-	for (const auto& classDef : def.Classes)
+	for (const auto& pair : def.ClassMap)
 	{
-		(void)classDef.Class->GetDefaultObject();
+		(void)pair.Value.Class->GetDefaultObject();
 	}
 }
 
@@ -130,7 +130,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitEnum(UPackage* pak, FZEnumDefinition& def
 	// @TODO
 }
 
-void ZSharp::FZUnrealFieldEmitter::EmitStructSkeleton(UPackage* pak, FZStructDefinition& def) const
+void ZSharp::FZUnrealFieldEmitter::EmitStructSkeleton(UPackage* pak, FZScriptStructDefinition& def) const
 {
 	// @TODO
 }
@@ -144,7 +144,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 	
 	FStaticConstructObjectParameters params { UZSharpClass::StaticClass() };
 	params.Outer = pak;
-	params.Name = *def.Name;
+	params.Name = *def.Name.ToString();
 	params.SetFlags = def.Flags | GCompiledInFlags;
 	
 	const auto cls = static_cast<UZSharpClass*>(StaticConstructObject_Internal(params));
@@ -183,7 +183,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitDelegateSkeleton(UPackage* pak, FZDelegat
 	// @TODO
 }
 
-void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, const FZStructDefinition& def) const
+void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, const FZScriptStructDefinition& def) const
 {
 	// @TODO
 }
@@ -194,14 +194,14 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, const FZClassD
 
 	// Migrate from InitializePrivateStaticClass().
 	// UZSharpClass must have super class.
-	check(!def.SuperPath.IsEmpty());
-	const auto superClass = FindObjectChecked<UClass>(nullptr, *def.SuperPath);
+	check(!def.SuperPath.IsNone());
+	const auto superClass = FindObjectChecked<UClass>(nullptr, *def.SuperPath.ToString());
 	cls->SetSuperStruct(superClass);
 	cls->ClassFlags |= superClass->ClassFlags & CLASS_Inherit;
 
-	if (!def.WithinPath.IsEmpty())
+	if (!def.WithinPath.IsNone())
 	{
-		const auto withinClass = FindObjectChecked<UClass>(nullptr, *def.WithinPath);
+		const auto withinClass = FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString());
 		cls->ClassWithin = withinClass;
 	}
 
@@ -250,7 +250,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, const FZClassD
 		cls->Interfaces.Reserve(def.ImplementedInterfacePaths.Num());
 		for (const auto& implementedInterfacePath : def.ImplementedInterfacePaths)
 		{
-			UClass* interfaceClass = FindObjectChecked<UClass>(nullptr, *implementedInterfacePath);
+			UClass* interfaceClass = FindObjectChecked<UClass>(nullptr, *implementedInterfacePath.ToString());
 			check(interfaceClass->HasAllClassFlags(CLASS_Interface));
 			// Interfaces implemented by UZSharpClass is always regarded as implemented in blueprint.
 			FImplementedInterface implementedInterface { interfaceClass, 0, true };
@@ -258,7 +258,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, const FZClassD
 		}
 	}
 
-	AddMetadata(cls, def.Metadata);
+	AddMetadata(cls, def.MetadataMap);
 
 	cls->Bind();
 	cls->StaticLink(true);

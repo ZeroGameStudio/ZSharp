@@ -3,30 +3,30 @@
 
 #include "Emit/Field/ZSharpClass.h"
 
-namespace ZSharpClass_Private
+namespace ZSharp::ZSharpClass_Private
 {
 	static void ConstructObject(const FObjectInitializer& objectInitializer, UClass* cls)
 	{
 		UObject* obj = objectInitializer.GetObj();
-		
-		// Construct super first.
-		// Only call constructor of the most derived C++ class because C++ constructor will continue to call super.
-		if (cls->UObject::IsA<UZSharpClass>())
-		{
-			ConstructObject(objectInitializer, cls->GetSuperClass());
-		}
 
-		// Then construct self.
-		if (const auto zscls = Cast<UZSharpClass>(cls))
+		if (cls->GetClass() != UClass::StaticClass())
 		{
-			for (TFieldIterator<FProperty> it(zscls, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+			// If we are not C++ class (Z# or BPGC) then call super constructor first.
+			ConstructObject(objectInitializer, cls->GetSuperClass());
+
+			// Setup Z# properties if we are Z# class.
+			if (const auto zscls = Cast<UZSharpClass>(cls))
 			{
-				// @TODO: Default value.
-				it->InitializeValue_InContainer(obj);
+				for (TFieldIterator<FProperty> it(zscls, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+				{
+					// @TODO: Default value.
+					it->InitializeValue_InContainer(obj);
+				}
 			}
 		}
 		else
 		{
+			// Only call self constructor and stop call up because C++ itself will handle the rest.
 			cls->ClassConstructor(objectInitializer);
 		}
 	}
@@ -39,7 +39,7 @@ namespace ZSharpClass_Private
 
 UZSharpClass::UZSharpClass()
 {
-	ClassConstructor = ZSharpClass_Private::ClassConstructor;
+	ClassConstructor = ZSharp::ZSharpClass_Private::ClassConstructor;
 }
 
 

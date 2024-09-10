@@ -20,9 +20,9 @@ namespace ZSharp
 		FZUnrealFieldScanner() = default;
 
 	private:
-		void ScanUnrealFieldsForModule(FName moduleName, bool canProcessNewlyLoadedObject);
 		void FlushDeferredModules();
-
+		void ScanUnrealFieldsForModule(FName moduleName, bool canProcessNewlyLoadedObject);
+		
 	private:
 		IZSlimAssemblyLoadContext* ScannerAlc = nullptr;
 		FDelegateHandle ProcessLoadedObjectsDelegate;

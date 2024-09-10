@@ -45,7 +45,7 @@ public abstract class ExportedObjectBase : IConjugate
 
         if (alc is IMasterAssemblyLoadContext masterAlc)
         {
-            if (alc != IMasterAssemblyLoadContext.Get())
+            if (alc != IMasterAssemblyLoadContext.Instance)
             {
                 throw new Exception("Owning ALC is MasterAssemblyLoadContext but not the live one.");
             }

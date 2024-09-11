@@ -82,8 +82,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		FProperty* property = def.Property;
 		property->PropertyFlags |= def.PropertyFlags;
 		property->RepNotifyFunc = def.RepNotifyName;
-		property->ArrayDim = 1;
-		
+
 		// Migrate from FProperty::Init().
 		if (property->GetOwner<UObject>())
 		{

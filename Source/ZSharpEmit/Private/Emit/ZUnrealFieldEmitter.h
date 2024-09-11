@@ -2,10 +2,15 @@
 
 #pragma once
 
-#include "Field/ZUnrealFieldDefinitions.h"
-
 namespace ZSharp
 {
+	struct FZEnumDefinition;
+	struct FZScriptStructDefinition;
+	struct FZClassDefinition;
+	struct FZInterfaceDefinition;
+	struct FZDelegateDefinition;
+	struct FZPackageDefinition;
+	
 	class FZUnrealFieldEmitter
 	{
 		

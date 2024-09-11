@@ -7,7 +7,7 @@
 #include "Algo/TopologicalSort.h"
 #include "Emit/Field/ZSharpClass.h"
 #include "Emit/Field/ZSharpFunction.h"
-#include "Field/ZUnrealFieldDefinitions.h"
+#include "ZUnrealFieldDefinitions.h"
 #include "UObject/PropertyOptional.h"
 
 namespace ZSharp::ZUnrealFieldEmitter_Private

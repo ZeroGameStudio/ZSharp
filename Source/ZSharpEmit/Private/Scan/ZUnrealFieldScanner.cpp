@@ -9,6 +9,7 @@
 #include "ZUnrealFieldDefinitionDtos.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
+#include "Emit/ZUnrealFieldDefinitions.h"
 #include "Emit/ZUnrealFieldEmitter.h"
 
 namespace ZSharp::ZUnrealFieldScanner_Private

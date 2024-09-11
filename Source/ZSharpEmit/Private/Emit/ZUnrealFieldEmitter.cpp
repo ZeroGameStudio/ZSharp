@@ -4,11 +4,52 @@
 #include "ZUnrealFieldEmitter.h"
 
 #include "ZSharpEmitLogChannels.h"
+#include "ZSharpFieldRegistry.h"
 #include "Algo/TopologicalSort.h"
-#include "Emit/Field/ZSharpClass.h"
-#include "Emit/Field/ZSharpFunction.h"
 #include "ZUnrealFieldDefinitions.h"
 #include "UObject/PropertyOptional.h"
+
+namespace ZSharp::ZSharpClass_Private
+{
+	static void ConstructObject(const FObjectInitializer& objectInitializer, UClass* cls)
+	{
+		UObject* obj = objectInitializer.GetObj();
+
+		const bool zscls = FZSharpFieldRegistry::Get().IsZSharpClass(cls);
+		const bool native = cls->IsNative();
+		// If we are dynamic class (Z# class or BPGC) then call super constructor first.
+		if (zscls || !native)
+		{
+			ConstructObject(objectInitializer, cls->GetSuperClass());
+		}
+
+		// BPGC doesn't need to do anything else.
+		if (!native)
+		{
+			return;
+		}
+		
+		// Setup Z# properties for Z# class.
+		if (zscls)
+		{
+			for (TFieldIterator<FProperty> it(cls, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+			{
+				// @TODO: Default value.
+				it->InitializeValue_InContainer(obj);
+			}
+		}
+		// Only call self constructor and stop call up because C++ itself will handle the rest.
+		else
+		{
+			cls->ClassConstructor(objectInitializer);
+		}
+	}
+	
+	static void ClassConstructor(const FObjectInitializer& objectInitializer)
+	{
+		ConstructObject(objectInitializer, objectInitializer.GetClass());
+	}
+}
 
 namespace ZSharp::ZUnrealFieldEmitter_Private
 {
@@ -318,12 +359,13 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		// Migrate from UECodeGen_Private::ConstructUFunction().
 		constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Transient | RF_MarkAsNative;
 
-		FStaticConstructObjectParameters params { UZSharpFunction::StaticClass() };
+		FStaticConstructObjectParameters params { UFunction::StaticClass() };
 		params.Outer = outer;
 		params.Name = *def.Name.ToString();
 		params.SetFlags = def.Flags | GCompiledInFlags;
 	
-		const auto function = static_cast<UZSharpFunction*>(StaticConstructObject_Internal(params));
+		const auto function = static_cast<UFunction*>(StaticConstructObject_Internal(params));
+		FZSharpFieldRegistry::Get().RegisterFunction(function);
 		def.Function = function;
 
 		function->FunctionFlags |= def.FunctionFlags;
@@ -417,29 +459,29 @@ void ZSharp::FZUnrealFieldEmitter::EmitPackage(FZPackageDefinition& def) const
 	// So we sort classes to ensure super/within class get constructed before subclass.
 	// Algo::TopologicalSort doesn't support projection or custom hash, so we manually make a projection.
 	{
-		TArray<const UZSharpClass*> classes;
-		TMap<const UZSharpClass*, FZClassDefinition*> map;
+		TArray<const UClass*> classes;
+		TMap<const UClass*, FZClassDefinition*> map;
 		for (auto& pair : def.ClassMap)
 		{
 			classes.Emplace(pair.Value.Class);
 			map.Emplace(pair.Value.Class, &pair.Value);
 		}
 		
-		Algo::TopologicalSort(classes, [&map](const UZSharpClass* cls)
+		Algo::TopologicalSort(classes, [&map](const UClass* cls)
 		{
 			const FZClassDefinition* classDef = map.FindChecked(cls);
-			TArray<UZSharpClass*, TInlineAllocator<2>> dependencies;
+			TArray<UClass*, TInlineAllocator<2>> dependencies;
 			
-			if (const auto superClass = FindObjectChecked<UClass>(nullptr, *classDef->SuperPath.ToString()); superClass->UObject::IsA<UZSharpClass>())
+			if (const auto superClass = FindObjectChecked<UClass>(nullptr, *classDef->SuperPath.ToString()); FZSharpFieldRegistry::Get().IsZSharpClass(superClass))
 			{
-				dependencies.Emplace(static_cast<UZSharpClass*>(superClass));
+				dependencies.Emplace(superClass);
 			}
 			
 			if (!classDef->WithinPath.IsNone())
 			{
-				if (const auto withinClass = FindObjectChecked<UClass>(nullptr, *classDef->WithinPath.ToString()); withinClass->UObject::IsA<UZSharpClass>())
+				if (const auto withinClass = FindObjectChecked<UClass>(nullptr, *classDef->WithinPath.ToString()); FZSharpFieldRegistry::Get().IsZSharpClass(withinClass))
 				{
-					dependencies.Emplace(static_cast<UZSharpClass*>(withinClass));
+					dependencies.Emplace(withinClass);
 				}
 			}
 			
@@ -487,17 +529,18 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 	// Migrate from static constructor of UClass.
 	constexpr EClassFlags GCompiledInClassFlags = CLASS_Native;
 	
-	FStaticConstructObjectParameters params { UZSharpClass::StaticClass() };
+	FStaticConstructObjectParameters params { UClass::StaticClass() };
 	params.Outer = pak;
 	params.Name = *def.Name.ToString();
 	params.SetFlags = def.Flags | GCompiledInFlags;
 	
-	const auto cls = static_cast<UZSharpClass*>(StaticConstructObject_Internal(params));
+	const auto cls = static_cast<UClass*>(StaticConstructObject_Internal(params));
+	FZSharpFieldRegistry::Get().RegisterClass(cls);
 	def.Class = cls;
 
 	// Migrate from UClass(EStaticConstructor).
-	// UZSharpClass::ClassConstructor is a compile-time constant and set by UZSharpClass itself so we don't care it here.
 	// UZSharpClass has no ClassVTableHelperCtorCaller and CppClassStaticFunctions so will directly copy from super in Bind().
+	cls->ClassConstructor = ZSharpClass_Private::ClassConstructor;
 	cls->ClassUnique = 0;
 	cls->bCooked = false;
 	cls->bLayoutChanging = false;
@@ -535,7 +578,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 
 void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinition& def) const
 {
-	UZSharpClass* cls = def.Class;
+	UClass* cls = def.Class;
 
 	// Migrate from InitializePrivateStaticClass().
 	// UZSharpClass must have super class.

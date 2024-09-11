@@ -60,7 +60,7 @@ namespace ZSharp
 
 	struct FZFunctionDefinition : public FZStructDefinition
 	{
-		UZSharpFunction* Function = nullptr;
+		UFunction* Function = nullptr;
 		
 		EFunctionFlags FunctionFlags = FUNC_None;
 
@@ -80,7 +80,7 @@ namespace ZSharp
 
 	struct FZClassDefinition : public FZStructDefinition
 	{
-		UZSharpClass* Class = nullptr;
+		UClass* Class = nullptr;
 		
 		FName ConfigName;
 		FName WithinPath;

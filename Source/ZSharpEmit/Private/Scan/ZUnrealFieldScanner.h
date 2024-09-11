@@ -8,6 +8,8 @@ namespace ZSharp
 	
 	class FZUnrealFieldScanner
 	{
+
+		using ThisClass = FZUnrealFieldScanner;
 		
 	public:
 		static FZUnrealFieldScanner& Get();

@@ -25,13 +25,11 @@ namespace ZSharp
 		void EmitInterfaceSkeleton(UPackage* pak, FZInterfaceDefinition& def) const;
 		void EmitDelegateSkeleton(UPackage* pak, FZDelegateDefinition& def) const;
 		
-		void FinishEmitStruct(UPackage* pak, const FZScriptStructDefinition& def) const;
-		void FinishEmitClass(UPackage* pak, const FZClassDefinition& def) const;
-		void FinishEmitInterface(UPackage* pak, const FZInterfaceDefinition& def) const;
-		void FinishEmitDelegate(UPackage* pak, const FZDelegateDefinition& def) const;
+		void FinishEmitStruct(UPackage* pak, FZScriptStructDefinition& def) const;
+		void FinishEmitClass(UPackage* pak, FZClassDefinition& def) const;
+		void FinishEmitInterface(UPackage* pak, FZInterfaceDefinition& def) const;
+		void FinishEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const;
 
-		void AddMetadata(UObject* object, const TMap<FName, FString>& metadata) const;
-		
 	private:
 		FZUnrealFieldEmitter() = default;
 

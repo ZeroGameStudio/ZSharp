@@ -6,7 +6,350 @@
 #include "ZSharpEmitLogChannels.h"
 #include "Algo/TopologicalSort.h"
 #include "Emit/Field/ZSharpClass.h"
+#include "Emit/Field/ZSharpFunction.h"
 #include "Field/ZUnrealFieldDefinitions.h"
+#include "UObject/PropertyOptional.h"
+
+namespace ZSharp::ZUnrealFieldEmitter_Private
+{
+	static void AddMetadata(UField* field, const TMap<FName, FString>& metadata)
+	{
+#if WITH_METADATA
+		if (!metadata.IsEmpty())
+		{
+			UMetaData* target = field->GetOutermost()->GetMetaData();
+			for (const auto& pair : metadata)
+			{
+				target->SetValue(field, pair.Key, *pair.Value);
+			}
+		}
+#endif
+	}
+
+	static void AddMetadata(FField* field, const TMap<FName, FString>& metadata)
+	{
+#if WITH_METADATA
+		for (const auto& pair : metadata)
+		{
+			field->SetMetaData(pair.Key, *pair.Value);
+		}
+#endif
+	}
+
+	static void FinishEmitProperty(FZSimplePropertyDefinition& def)
+	{
+		FProperty* property = def.Property;
+		property->PropertyFlags |= def.PropertyFlags;
+		property->RepNotifyFunc = def.RepNotifyName;
+		property->ArrayDim = 1;
+		
+		// Migrate from FProperty::Init().
+		if (property->GetOwner<UObject>())
+		{
+			const auto owner = property->GetOwnerChecked<UField>();
+			owner->AddCppProperty(property);
+		}
+		else
+		{
+			const auto owner = property->GetOwnerChecked<FField>();
+			owner->AddCppProperty(property);
+		}
+	}
+
+	static constexpr EObjectFlags GCompiledInPropertyObjectFlags = RF_Public | RF_Transient;
+	static constexpr EPropertyFlags PrimitiveFlags = CPF_ZeroConstructor | CPF_IsPlainOldData | CPF_NoDestructor | CPF_HasGetValueTypeHash;
+
+#define NEW_PROPERTY(PropertyTypeName, CompiledInPropertyFlags) \
+	auto property = new F##PropertyTypeName##Property(owner, def.Name, def.Flags | GCompiledInPropertyObjectFlags); \
+	property->PropertyFlags |= CompiledInPropertyFlags; \
+	def.Property = property;
+	
+	static void EmitSimpleProperty(FFieldVariant owner, FZSimplePropertyDefinition& def)
+	{
+		switch (def.Type)
+		{
+			// Primitives
+		case EZPropertyType::UInt8:
+			{
+				NEW_PROPERTY(Byte, PrimitiveFlags);
+				break;
+			}
+		case EZPropertyType::UInt16:
+			{
+				NEW_PROPERTY(UInt16, PrimitiveFlags);
+				break;
+			}
+		case EZPropertyType::UInt32:
+			{
+				NEW_PROPERTY(UInt32, PrimitiveFlags);
+				break;
+			}
+		case EZPropertyType::UInt64:
+			{
+				NEW_PROPERTY(UInt64, PrimitiveFlags);
+				break;
+			}
+		case EZPropertyType::Int8:
+			{
+				NEW_PROPERTY(Int8, PrimitiveFlags);
+				break;
+			}
+		case EZPropertyType::Int16:
+			{
+				NEW_PROPERTY(Int16, PrimitiveFlags);
+				break;
+			}
+		case EZPropertyType::Int32:
+			{
+				NEW_PROPERTY(Int, PrimitiveFlags);
+				break;
+			}
+		case EZPropertyType::Int64:
+			{
+				NEW_PROPERTY(Int64, PrimitiveFlags);
+				break;
+			}
+		case EZPropertyType::Float:
+			{
+				NEW_PROPERTY(Float, PrimitiveFlags);
+				break;
+			}
+		case EZPropertyType::Double:
+			{
+				NEW_PROPERTY(Double, PrimitiveFlags);
+				break;
+			}
+		case EZPropertyType::Enum:
+			{
+				NEW_PROPERTY(Enum, PrimitiveFlags);
+
+				const auto underlyingProperty = new FInt64Property(property, NAME_None, GCompiledInPropertyObjectFlags);
+				property->ElementSize = underlyingProperty->ElementSize;
+				property->SetEnum(FindObjectChecked<UEnum>(nullptr, *def.DescriptorFieldPath.ToString()));
+				property->AddCppProperty(underlyingProperty);
+				
+				break;
+			}
+			// Strings
+		case EZPropertyType::String:
+			{
+				NEW_PROPERTY(Str, CPF_ZeroConstructor | CPF_HasGetValueTypeHash);
+				break;
+			}
+		case EZPropertyType::Name:
+			{
+				NEW_PROPERTY(Name, PrimitiveFlags);
+				break;
+			}
+		case EZPropertyType::Text:
+			{
+				NEW_PROPERTY(Text, CPF_None);
+				break;
+			}
+			// Object wrappers
+		case EZPropertyType::Object:
+			{
+				NEW_PROPERTY(Object, PrimitiveFlags | CPF_TObjectPtrWrapper);
+
+				property->PropertyClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				
+				break;
+			}
+		case EZPropertyType::Class:
+			{
+				NEW_PROPERTY(Class, CPF_UObjectWrapper | CPF_HasGetValueTypeHash);
+
+				property->PropertyClass = UClass::StaticClass();
+				property->MetaClass = FindObjectChecked<UClass>(nullptr, *def.MetaDescriptorFieldPath.ToString());
+				
+				break;
+			}
+		case EZPropertyType::SoftClass:
+			{
+				NEW_PROPERTY(SoftClass, CPF_UObjectWrapper | CPF_HasGetValueTypeHash);
+
+				property->MetaClass = FindObjectChecked<UClass>(nullptr, *def.MetaDescriptorFieldPath.ToString());
+				
+				break;
+			}
+		case EZPropertyType::SoftObject:
+			{
+				NEW_PROPERTY(SoftObject, CPF_UObjectWrapper | CPF_HasGetValueTypeHash);
+
+				property->PropertyClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				
+				break;
+			}
+		case EZPropertyType::WeakObject:
+			{
+				NEW_PROPERTY(WeakObject, PrimitiveFlags | CPF_UObjectWrapper);
+
+				property->PropertyClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				
+				break;
+			}
+		case EZPropertyType::LazyObject:
+			{
+				NEW_PROPERTY(LazyObject, CPF_IsPlainOldData | CPF_NoDestructor | CPF_UObjectWrapper | CPF_HasGetValueTypeHash);
+
+				property->PropertyClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				
+				break;
+			}
+		case EZPropertyType::Interface:
+			{
+				NEW_PROPERTY(Interface, PrimitiveFlags | CPF_UObjectWrapper);
+
+				property->InterfaceClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				
+				break;
+			}
+			// Containers (Struct)
+		case EZPropertyType::Struct:
+			{
+				NEW_PROPERTY(Struct, CPF_None);
+
+				property->Struct = FindObjectChecked<UScriptStruct>(nullptr, *def.DescriptorFieldPath.ToString());
+				property->ElementSize = property->Struct->GetStructureSize();
+				
+				break;
+			}
+			// Delegates
+		case EZPropertyType::Delegate:
+			{
+				NEW_PROPERTY(Delegate, CPF_None);
+
+				property->SignatureFunction = FindObjectChecked<UDelegateFunction>(nullptr, *def.DescriptorFieldPath.ToString());
+				
+				break;
+			}
+		case EZPropertyType::MulticastInlineDelegate:
+			{
+				NEW_PROPERTY(MulticastInlineDelegate, CPF_None);
+				
+				property->SignatureFunction = FindObjectChecked<UDelegateFunction>(nullptr, *def.DescriptorFieldPath.ToString());
+				
+				break;
+			}
+			// Special types
+		case EZPropertyType::FieldPath:
+			{
+				NEW_PROPERTY(FieldPath, CPF_HasGetValueTypeHash);
+
+				property->PropertyClass = FProperty::StaticClass();
+				
+				break;
+			}
+		default:
+			{
+				UE_LOG(LogZSharpEmit, Fatal, TEXT("Unknown property type [%d]!!!"), def.Type);
+				break;
+			}
+		}
+
+		FinishEmitProperty(def);
+	}
+
+	static void EmitProperty(FFieldVariant owner, FZPropertyDefinition& def)
+	{
+		bool needsFinish = true;
+		switch (def.Type)
+		{
+			// Containers (except Struct)
+		case EZPropertyType::Array:
+			{
+				NEW_PROPERTY(Array, CPF_None);
+
+				EmitSimpleProperty(property, def.InnerProperty);
+
+				break;
+			}
+		case EZPropertyType::Set:
+			{
+				NEW_PROPERTY(Set, CPF_None);
+
+				EmitSimpleProperty(property, def.InnerProperty);
+
+				break;
+			}
+		case EZPropertyType::Map:
+			{
+				NEW_PROPERTY(Map, CPF_None);
+
+				EmitSimpleProperty(property, def.InnerProperty);
+				EmitSimpleProperty(property, def.OuterProperty);
+
+				break;
+			}
+		case EZPropertyType::Optional:
+			{
+				NEW_PROPERTY(Optional, CPF_None);
+
+				EmitSimpleProperty(property, def.InnerProperty);
+
+				break;
+			}
+		default:
+			{
+				EmitSimpleProperty(owner, def);
+				needsFinish = false;
+				break;
+			}
+		}
+
+		if (needsFinish)
+		{
+			FinishEmitProperty(def);
+		}
+	}
+
+#undef NEW_PROPERTY
+
+	static void EmitProperties(UStruct* outer, TMap<FName, FZPropertyDefinition>& def)
+	{
+		for (auto& pair : def)
+		{
+			EmitProperty(outer, pair.Value);
+		}
+	}
+
+	static void EmitFunction(UClass* outer, FZFunctionDefinition& def)
+	{
+		// Migrate from UECodeGen_Private::ConstructUFunction().
+		constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Transient | RF_MarkAsNative;
+
+		FStaticConstructObjectParameters params { UZSharpFunction::StaticClass() };
+		params.Outer = outer;
+		params.Name = *def.Name.ToString();
+		params.SetFlags = def.Flags | GCompiledInFlags;
+	
+		const auto function = static_cast<UZSharpFunction*>(StaticConstructObject_Internal(params));
+		def.Function = function;
+
+		function->FunctionFlags |= def.FunctionFlags;
+		function->RPCId = def.RpcId;
+		function->RPCResponseId = def.RpcResponseId;
+
+		EmitProperties(function, def.PropertyMap);
+		AddMetadata(function, def.MetadataMap);
+
+		function->Bind();
+		function->StaticLink(true);
+
+		// Migrate from UClass::CreateLinkAndAddChildFunctionsToMap().
+		function->Next = outer->Children;
+		outer->Children = function;
+		outer->AddFunctionToFunctionMap(function, function->GetFName());
+	}
+
+	static void EmitFunctions(UClass* outer, TMap<FName, FZFunctionDefinition>& def)
+	{
+		for (auto& pair : def)
+		{
+			EmitFunction(outer, pair.Value);
+		}
+	}
+}
 
 ZSharp::FZUnrealFieldEmitter& ZSharp::FZUnrealFieldEmitter::Get()
 {
@@ -63,7 +406,9 @@ void ZSharp::FZUnrealFieldEmitter::EmitPackage(FZPackageDefinition& def) const
 	}
 
 	// Now that all fields are in memory (but not fully initialized) and we can setup dependency.
-	for (const auto& pair : def.StructMap)
+	// IMPORTANT: Structs must finish before others because properties depend on structs need to calculate size.
+	// @TODO: Sort structs by reference.
+	for (auto& pair : def.StructMap)
 	{
 		FinishEmitStruct(pak, pair.Value);
 	}
@@ -73,8 +418,8 @@ void ZSharp::FZUnrealFieldEmitter::EmitPackage(FZPackageDefinition& def) const
 	// Algo::TopologicalSort doesn't support projection or custom hash, so we manually make a projection.
 	{
 		TArray<const UZSharpClass*> classes;
-		TMap<const UZSharpClass*, const FZClassDefinition*> map;
-		for (const auto& pair : def.ClassMap)
+		TMap<const UZSharpClass*, FZClassDefinition*> map;
+		for (auto& pair : def.ClassMap)
 		{
 			classes.Emplace(pair.Value.Class);
 			map.Emplace(pair.Value.Class, &pair.Value);
@@ -101,19 +446,19 @@ void ZSharp::FZUnrealFieldEmitter::EmitPackage(FZPackageDefinition& def) const
 			return dependencies;
 		});
 		
-		for (const auto cls : classes)
+		for (auto cls : classes)
 		{
-			const FZClassDefinition* classDef = map.FindChecked(cls);
+			FZClassDefinition* classDef = map.FindChecked(cls);
 			FinishEmitClass(pak, *classDef);
 		}
 	}
 
-	for (const auto& pair : def.InterfaceMap)
+	for (auto& pair : def.InterfaceMap)
 	{
 		FinishEmitInterface(pak, pair.Value);
 	}
 
-	for (const auto& pair : def.DelegateMap)
+	for (auto& pair : def.DelegateMap)
 	{
 		FinishEmitDelegate(pak, pair.Value);
 	}
@@ -138,9 +483,9 @@ void ZSharp::FZUnrealFieldEmitter::EmitStructSkeleton(UPackage* pak, FZScriptStr
 void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefinition& def) const
 {
 	// Migrate from GetPrivateStaticClassBody().
-	static EObjectFlags GCompiledInFlags = RF_Public | RF_Standalone | RF_Transient | RF_MarkAsNative | RF_MarkAsRootSet;
+	constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Standalone | RF_Transient | RF_MarkAsNative | RF_MarkAsRootSet;
 	// Migrate from static constructor of UClass.
-	static EClassFlags GCompiledInClassFlags = CLASS_Native;
+	constexpr EClassFlags GCompiledInClassFlags = CLASS_Native;
 	
 	FStaticConstructObjectParameters params { UZSharpClass::StaticClass() };
 	params.Outer = pak;
@@ -183,12 +528,12 @@ void ZSharp::FZUnrealFieldEmitter::EmitDelegateSkeleton(UPackage* pak, FZDelegat
 	// @TODO
 }
 
-void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, const FZScriptStructDefinition& def) const
+void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStructDefinition& def) const
 {
 	// @TODO
 }
 
-void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, const FZClassDefinition& def) const
+void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinition& def) const
 {
 	UZSharpClass* cls = def.Class;
 
@@ -196,12 +541,14 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, const FZClassD
 	// UZSharpClass must have super class.
 	check(!def.SuperPath.IsNone());
 	const auto superClass = FindObjectChecked<UClass>(nullptr, *def.SuperPath.ToString());
+	check(superClass->IsNative());
 	cls->SetSuperStruct(superClass);
 	cls->ClassFlags |= superClass->ClassFlags & CLASS_Inherit;
 
 	if (!def.WithinPath.IsNone())
 	{
 		const auto withinClass = FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString());
+		check(withinClass->IsNative());
 		cls->ClassWithin = withinClass;
 	}
 
@@ -220,8 +567,10 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, const FZClassD
 		cls->ReferenceSchema.Reset();
 	}
 
-	// @TODO: Emit class functions.
-	// @TODO: Emit class properties.
+	// Engine code construct functions first and this can make side effects to class instance
+	// so we keep sync with engine code.
+	ZUnrealFieldEmitter_Private::EmitFunctions(cls, def.FunctionMap);
+	ZUnrealFieldEmitter_Private::EmitProperties(cls, def.PropertyMap);
 
 	// We have already set CppTypeInfo before so we don't need to do here.
 	// But it is still necessary to match ClassConfigName with super.
@@ -258,36 +607,23 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, const FZClassD
 		}
 	}
 
-	AddMetadata(cls, def.MetadataMap);
+	ZUnrealFieldEmitter_Private::AddMetadata(cls, def.MetadataMap);
 
 	cls->Bind();
 	cls->StaticLink(true);
-	cls->AssembleReferenceTokenStream();
 	cls->SetSparseClassDataStruct(cls->GetSparseClassDataArchetypeStruct());
+	
+	cls->AssembleReferenceTokenStream(true);
 }
 
-void ZSharp::FZUnrealFieldEmitter::FinishEmitInterface(UPackage* pak, const FZInterfaceDefinition& def) const
+void ZSharp::FZUnrealFieldEmitter::FinishEmitInterface(UPackage* pak, FZInterfaceDefinition& def) const
 {
 	// @TODO
 }
 
-void ZSharp::FZUnrealFieldEmitter::FinishEmitDelegate(UPackage* pak, const FZDelegateDefinition& def) const
+void ZSharp::FZUnrealFieldEmitter::FinishEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const
 {
 	// @TODO
-}
-
-void ZSharp::FZUnrealFieldEmitter::AddMetadata(UObject* object, const TMap<FName, FString>& metadata) const
-{
-#if WITH_METADATA
-	if (!metadata.IsEmpty())
-	{
-		UMetaData* target = object->GetOutermost()->GetMetaData();
-		for (const auto& pair : metadata)
-		{
-			target->SetValue(object, pair.Key, *pair.Value);
-		}
-	}
-#endif
 }
 
 

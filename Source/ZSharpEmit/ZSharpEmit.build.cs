@@ -41,6 +41,7 @@ public class ZSharpEmit : ModuleRules
 				"JsonUtilities",
 				
 				"ZSharpCore",
+				"ZSharpRuntime",
 			}
 		);
 		

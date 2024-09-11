@@ -14,10 +14,42 @@ namespace ZSharp
 		EObjectFlags Flags = RF_NoFlags;
 		TMap<FName, FString> MetadataMap;
 	};
-	
-	struct FZPropertyDefinition : public FZFieldDefinition
+
+	enum class EZPropertyType : uint8
 	{
-		// @TODO
+		None,
+		// Primitives
+		UInt8, UInt16, UInt32, UInt64, Int8, Int16, Int32, Int64, Float, Double, Bool, Enum,
+		// Strings
+		String, Name, Text,
+		// Object wrappers
+		Object, Class, SoftClass, SoftObject, WeakObject, LazyObject, Interface,
+		// Containers
+		Struct, Array, Set, Map, Optional,
+		// Delegates
+		Delegate, MulticastInlineDelegate, // MulticastSparseDelegate is not supported.
+		// Special types
+		FieldPath, // VerseValue is not supported.
+	};
+
+	struct FZSimplePropertyDefinition : public FZFieldDefinition
+	{
+		FProperty* Property = nullptr;
+		
+		EZPropertyType Type = EZPropertyType::None;
+
+		EPropertyFlags PropertyFlags = CPF_None;
+
+		FName RepNotifyName;
+
+		FName DescriptorFieldPath; // UField metadata.
+		FName MetaDescriptorFieldPath; // UClass metadata.
+	};
+	
+	struct FZPropertyDefinition : public FZSimplePropertyDefinition
+	{
+		FZSimplePropertyDefinition InnerProperty;
+		FZSimplePropertyDefinition OuterProperty;
 	};
 
 	struct FZStructDefinition : public FZFieldDefinition

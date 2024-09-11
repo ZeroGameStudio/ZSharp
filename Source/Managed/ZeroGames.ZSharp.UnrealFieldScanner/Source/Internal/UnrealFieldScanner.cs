@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using Mono.Cecil;
 using IAssemblyResolver = ZeroGames.ZSharp.Core.IAssemblyResolver;
@@ -125,7 +124,6 @@ internal class UnrealFieldScanner : IDisposable
 
 		if (_withMetadata)
 		{
-			cls.MetadataMap = new();
 			cls.MetadataMap["IsBlueprintBase"] = "true";
 			cls.MetadataMap["BlueprintType"] = "true";
 		}

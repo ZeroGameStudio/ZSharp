@@ -34,7 +34,7 @@ namespace ZSharp::PropertyFactory_Private
 	template <std::derived_from<FProperty> T>
 	T* Create(EPropertyFlags flags)
 	{
-		auto prop = new T(nullptr, "", RF_Public | RF_MarkAsNative | RF_Transient);
+		auto prop = new T(nullptr, NAME_None, RF_Public | RF_MarkAsNative | RF_Transient);
 		prop->SetPropertyFlags(flags);
 		return prop;
 	}

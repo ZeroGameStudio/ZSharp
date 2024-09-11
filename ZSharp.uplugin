@@ -21,12 +21,12 @@
 			"LoadingPhase": "EarliestPossible"
 		},
 		{
-			"Name": "ZSharpEmit",
+			"Name": "ZSharpRuntime",
 			"Type": "Runtime",
 			"LoadingPhase": "EarliestPossible"
 		},
 		{
-			"Name": "ZSharpRuntime",
+			"Name": "ZSharpEmit",
 			"Type": "Runtime",
 			"LoadingPhase": "EarliestPossible"
 		},

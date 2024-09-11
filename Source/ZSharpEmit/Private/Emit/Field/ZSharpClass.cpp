@@ -11,7 +11,7 @@ namespace ZSharp::ZSharpClass_Private
 
 		if (cls->GetClass() != UClass::StaticClass())
 		{
-			// If we are not C++ class (Z# or BPGC) then call super constructor first.
+			// If we are not C++ class (Z# class or BPGC) then call super constructor first.
 			ConstructObject(objectInitializer, cls->GetSuperClass());
 
 			// Setup Z# properties if we are Z# class.

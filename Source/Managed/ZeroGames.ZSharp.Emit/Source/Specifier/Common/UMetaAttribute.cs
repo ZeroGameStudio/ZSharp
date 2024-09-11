@@ -2,11 +2,11 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = true)]
-public class UMetaAttribute(string key, string value) : Attribute
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property)]
+public class UMetaAttribute(params string[] pairs) : Attribute
 {
-	public string Key => key;
-	public string Value => value;
+	public string[] Pairs => pairs;
 }
 
-
+[UMeta()]
+class A;

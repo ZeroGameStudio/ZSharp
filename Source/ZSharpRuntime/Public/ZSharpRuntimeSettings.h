@@ -5,6 +5,19 @@
 #include "Engine/DeveloperSettings.h"
 #include "ZSharpRuntimeSettings.generated.h"
 
+USTRUCT()
+struct FZModuleMappingContext
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FString AssemblyName;
+
+	UPROPERTY(EditAnywhere)
+	bool bHasDynamicFields;
+	
+};
+
 /**
  * 
  */
@@ -20,9 +33,8 @@ public:
 	virtual FName GetCategoryName() const override { return TEXT("ZSharp"); }
 	
 public:
-	bool IsModuleMapped(const FString& module) const;
-	bool TryGetModuleAssembly(const FString& module, FString& outAssembly) const;
-	void ForeachMappedModule(TFunctionRef<void(const FString&, const FString&)> action) const;
+	const FZModuleMappingContext* GetModuleMappingContext(const FString& module) const;
+	void ForeachMappedModule(TFunctionRef<void(const FString&, const FZModuleMappingContext&)> action) const;
 
 private:
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Assembly")
@@ -34,11 +46,11 @@ private:
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Assembly")
 	FString EngineAssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
 	
-	UPROPERTY(Config, EditAnywhere, Category = "Export")
-	TMap<FString, FString> ModuleAssemblyMapping;
+	UPROPERTY(Config, EditAnywhere, Category = "Mapping")
+	TMap<FString, FZModuleMappingContext> ModuleAssemblyMapping;
 
-	UPROPERTY(Transient, VisibleAnywhere, Category = "Export")
-	TMap<FString, FString> IntrinsicModuleAssemblyMapping;
+	UPROPERTY(Transient, VisibleAnywhere, Category = "Mapping")
+	TMap<FString, FZModuleMappingContext> IntrinsicModuleAssemblyMapping;
 	
 };
 

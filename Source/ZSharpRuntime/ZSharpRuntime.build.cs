@@ -41,6 +41,11 @@ public class ZSharpRuntime : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
+				
+				"Json",
+				"JsonUtilities",
+				
+				"ZSharpRuntime",
 			}
 		);
 		
@@ -62,5 +67,6 @@ public class ZSharpRuntime : ModuleRules
 		);
 		
 		PublicDefinitions.Add($"ZSHARP_ENGINE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.UnrealEngine\"");
+		PublicDefinitions.Add($"ZSHARP_SCANNER_ASSEMBLY_NAME=\"ZeroGames.ZSharp.UnrealFieldScanner\"");
 	}
 }

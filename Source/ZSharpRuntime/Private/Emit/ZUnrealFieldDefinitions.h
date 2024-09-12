@@ -103,11 +103,11 @@ namespace ZSharp
 		// @TODO
 	};
 	
-	struct FZPackageDefinition
+	struct FZUnrealFieldManifest
 	{
 		UPackage* Package = nullptr;
 		
-		FName Path;
+		FName ModuleName;
 		
 		TMap<FName, FZEnumDefinition> EnumMap;
 		TMap<FName, FZScriptStructDefinition> StructMap;

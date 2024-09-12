@@ -4,6 +4,7 @@
 
 #include "CLR/IZSharpClr.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "Emit/ZUnrealFieldScanner.h"
 #include "ZCall/ZCallResolver_Export.h"
 #include "ZCall/ZCallResolver_UFunction.h"
 #include "ZCall/ZCallResolver_UProperty.h"
@@ -32,6 +33,8 @@ IMPLEMENT_MODULE(FZSharpRuntimeModule, ZSharpRuntime)
 
 void FZSharpRuntimeModule::StartupModule()
 {
+	ZSharp::FZUnrealFieldScanner::Get().Startup();
+	
 #if WITH_EDITOR
 	FEditorDelegates::PreBeginPIE.AddRaw(this, &ThisClass::HandleBeginPIE);
 	FEditorDelegates::ShutdownPIE.AddRaw(this, &ThisClass::HandleEndPIE);
@@ -42,6 +45,8 @@ void FZSharpRuntimeModule::StartupModule()
 
 void FZSharpRuntimeModule::ShutdownModule()
 {
+	ZSharp::FZUnrealFieldScanner::Get().Shutdown();
+	
 #if WITH_EDITOR
 	FEditorDelegates::PreBeginPIE.RemoveAll(this);
 	FEditorDelegates::ShutdownPIE.RemoveAll(this);

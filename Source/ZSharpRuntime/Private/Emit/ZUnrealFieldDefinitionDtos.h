@@ -118,12 +118,12 @@ struct FZDelegateDefinitionDto : public FZStructDefinitionDto
 };
 
 USTRUCT()
-struct FZPackageDefinitionDto
+struct FZUnrealFieldManifestDto
 {
 	GENERATED_BODY()
 
 	UPROPERTY()
-	FName Path;
+	FName ModuleName;
 
 	UPROPERTY()
 	TMap<FName, FZEnumDefinitionDto> EnumMap;

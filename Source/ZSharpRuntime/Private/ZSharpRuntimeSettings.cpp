@@ -5,35 +5,27 @@
 
 UZSharpRuntimeSettings::UZSharpRuntimeSettings()
 {
-	IntrinsicModuleAssemblyMapping.Emplace("Core", EngineAssemblyName);
-	IntrinsicModuleAssemblyMapping.Emplace("CoreUObject", EngineAssemblyName);
+	IntrinsicModuleAssemblyMapping.Emplace("Core", { EngineAssemblyName, false });
+	IntrinsicModuleAssemblyMapping.Emplace("CoreUObject", { EngineAssemblyName, false });
 	
-	IntrinsicModuleAssemblyMapping.Emplace("PhysicsCore", EngineAssemblyName);
-	IntrinsicModuleAssemblyMapping.Emplace("InputCore", EngineAssemblyName);
+	IntrinsicModuleAssemblyMapping.Emplace("PhysicsCore", { EngineAssemblyName, false });
+	IntrinsicModuleAssemblyMapping.Emplace("InputCore", { EngineAssemblyName, false });
 	
-	IntrinsicModuleAssemblyMapping.Emplace("Engine", EngineAssemblyName);
-	
-	IntrinsicModuleAssemblyMapping.Emplace("ZSharpRuntime", EngineAssemblyName);
+	IntrinsicModuleAssemblyMapping.Emplace("Engine", { EngineAssemblyName, false });
 }
 
-bool UZSharpRuntimeSettings::IsModuleMapped(const FString& module) const
+const FZModuleMappingContext* UZSharpRuntimeSettings::GetModuleMappingContext(const FString& module) const
 {
-	return IntrinsicModuleAssemblyMapping.Contains(module) || ModuleAssemblyMapping.Contains(module);
-}
-
-bool UZSharpRuntimeSettings::TryGetModuleAssembly(const FString& module, FString& outAssembly) const
-{
-	const FString* assembly = IntrinsicModuleAssemblyMapping.Find(module);
-	if (!assembly)
+	const FZModuleMappingContext* ctx = IntrinsicModuleAssemblyMapping.Find(module);
+	if (!ctx)
 	{
-		assembly = ModuleAssemblyMapping.Find(module);
+		ctx = ModuleAssemblyMapping.Find(module);
 	}
 
-	outAssembly = assembly ? *assembly : "";
-	return !!assembly;
+	return ctx;
 }
 
-void UZSharpRuntimeSettings::ForeachMappedModule(TFunctionRef<void(const FString&, const FString&)> action) const
+void UZSharpRuntimeSettings::ForeachMappedModule(TFunctionRef<void(const FString&, const FZModuleMappingContext&)> action) const
 {
 	for (const auto& pair : IntrinsicModuleAssemblyMapping)
 	{

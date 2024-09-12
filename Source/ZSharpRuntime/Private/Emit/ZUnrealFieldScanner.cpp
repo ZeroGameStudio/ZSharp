@@ -4,8 +4,8 @@
 #include "ZUnrealFieldScanner.h"
 
 #include "JsonObjectConverter.h"
-#include "ZSharpEmitLogChannels.h"
-#include "ZSharpEmitSettings.h"
+#include "ZSharpRuntimeLogChannels.h"
+#include "ZSharpRuntimeSettings.h"
 #include "ZUnrealFieldDefinitionDtos.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
@@ -53,10 +53,10 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 		return defMap;
 	}
 	
-	static FZPackageDefinition PackageDto2Def(FZPackageDefinitionDto&& dto)
+	static FZUnrealFieldManifest ManifestDto2Def(FZUnrealFieldManifestDto&& dto)
 	{
-		FZPackageDefinition def;
-		def.Path = dto.Path;
+		FZUnrealFieldManifest def;
+		def.ModuleName = dto.ModuleName;
 
 		{ // @TODO Enums
 			
@@ -96,17 +96,17 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 		return def;
 	}
 	
-	static void EmitUnrealFieldsForAssembly(const FString& assemblyName, const FString& manifest)
+	static void EmitUnrealFieldsForModule(const FString& moduleName, const FString& manifestJson)
 	{
-		FZPackageDefinitionDto pakDto;
-		if (!FJsonObjectConverter::JsonObjectStringToUStruct<FZPackageDefinitionDto>(manifest, &pakDto))
+		FZUnrealFieldManifestDto dto;
+		if (!FJsonObjectConverter::JsonObjectStringToUStruct<FZUnrealFieldManifestDto>(manifestJson, &dto))
 		{
-			UE_LOG(LogZSharpEmit, Fatal, TEXT("Fail to emit unreal field for assembly [%s]!!! Manifest: [%s]"), *assemblyName, *manifest);
+			UE_LOG(LogZSharpEmit, Fatal, TEXT("Fail to emit unreal field for module [%s]!!! Manifest: [%s]"), *moduleName, *manifestJson);
 			return;
 		}
 
-		FZPackageDefinition pakDef = PackageDto2Def(MoveTemp(pakDto));
-		FZUnrealFieldEmitter::Get().Emit(pakDef);
+		FZUnrealFieldManifest manifest = ManifestDto2Def(MoveTemp(dto));
+		FZUnrealFieldEmitter::Get().Emit(manifest);
 	}
 }
 
@@ -181,6 +181,12 @@ void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, b
 	{
 		return;
 	}
+
+	if (ScannedModules.Contains(moduleName))
+	{
+		return;
+	}
+	ScannedModules.Emplace(moduleName);
 	
 	if (!canProcessNewlyLoadedObject)
 	{
@@ -193,32 +199,36 @@ void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, b
 	}
 
 	FlushDeferredModules();
-	
-	TArray<FString> assemblies = GetDefault<UZSharpEmitSettings>()->GetModuleAssembliesToScan(moduleName);
-	for (const auto& assembly : assemblies)
+
+	const FZModuleMappingContext* ctx = GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(moduleName.ToString());
+	if (!ctx)
 	{
-		if (ScannedAssemblies.Contains(assembly))
-		{
-			continue;
-		}
-		ScannedAssemblies.Emplace(assembly);
-		
-		FString outManifest;
-		struct
-		{
-			const TCHAR* AssemblyName;
-			FString* OutManifest;
-			uint8 bWithMetadata;
-		} args { *assembly, &outManifest, WITH_METADATA };
-		ScannerAlc->InvokeMethod(ZSHARP_SCANNER_ASSEMBLY_NAME, "ZeroGames.ZSharp.UnrealFieldScanner.UnrealFieldScanner_Interop", "Scan", &args);
-
-		if (outManifest.IsEmpty())
-		{
-			continue;
-		}
-
-		ZUnrealFieldScanner_Private::EmitUnrealFieldsForAssembly(assembly, outManifest);
+		return;
 	}
+
+	if (!ctx->bHasDynamicFields)
+	{
+		return;
+	}
+	
+	const FString assembly = ctx->AssemblyName;
+	const FString moduleNameStr = moduleName.ToString();
+	FString outManifest;
+	struct
+	{
+		const TCHAR* AssemblyName;
+		const TCHAR* ModuleName;
+		FString* OutManifest;
+		uint8 bWithMetadata;
+	} args { *assembly, *moduleNameStr, &outManifest, WITH_METADATA };
+	ScannerAlc->InvokeMethod(ZSHARP_SCANNER_ASSEMBLY_NAME, "ZeroGames.ZSharp.UnrealFieldScanner.UnrealFieldScanner_Interop", "Scan", &args);
+
+	if (outManifest.IsEmpty())
+	{
+		return;
+	}
+
+	ZUnrealFieldScanner_Private::EmitUnrealFieldsForModule(moduleNameStr, outManifest);
 }
 
 

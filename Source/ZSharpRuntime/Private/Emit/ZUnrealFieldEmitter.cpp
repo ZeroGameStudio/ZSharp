@@ -3,7 +3,7 @@
 
 #include "ZUnrealFieldEmitter.h"
 
-#include "ZSharpEmitLogChannels.h"
+#include "ZSharpRuntimeLogChannels.h"
 #include "ZSharpFieldRegistry.h"
 #include "Algo/TopologicalSort.h"
 #include "ZUnrealFieldDefinitions.h"
@@ -53,6 +53,11 @@ namespace ZSharp::ZSharpClass_Private
 
 namespace ZSharp::ZUnrealFieldEmitter_Private
 {
+	static void FatalIfObjectExists(UObject* outer, FName name)
+	{
+		UE_CLOG(!!FindObject<UObject>(outer, *name.ToString()), LogZSharpEmit, Fatal, TEXT("Object [%s].[%s] already exists!!!"), *outer->GetPathName(), *name.ToString());
+	}
+	
 	static void AddMetadata(UField* field, const TMap<FName, FString>& metadata)
 	{
 #if WITH_METADATA
@@ -399,25 +404,28 @@ ZSharp::FZUnrealFieldEmitter& ZSharp::FZUnrealFieldEmitter::Get()
 	return GSingleton;
 }
 
-UPackage* ZSharp::FZUnrealFieldEmitter::Emit(FZPackageDefinition& def)
+void ZSharp::FZUnrealFieldEmitter::Emit(FZUnrealFieldManifest& def)
 {
 	UE_CLOG(bEmitting, LogZSharpEmit, Fatal, TEXT("Emit is a package-wide atomic operation so can't invoke recursively!!!"));
 	TGuardValue recursionGuard { bEmitting, true };
+
+	if (EmittedModules.Contains(def.ModuleName))
+	{
+		return;
+	}
+	EmittedModules.Emplace(def.ModuleName);
 	
-	EmitPackage(def);
-	return def.Package;
+	InternalEmit(def);
 }
 
-void ZSharp::FZUnrealFieldEmitter::EmitPackage(FZPackageDefinition& def) const
+void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& def) const
 {
-	UE_CLOG(!!FindPackage(nullptr, *def.Path.ToString()), LogZSharpEmit, Fatal, TEXT("Package [%s] already exists!!!"), *def.Path.ToString());
-	UPackage* pak = CreatePackage(*def.Path.ToString());
+	// Here the module static initializer should have been executed and the package should be in memory.
+	const FString packageName = FString::Printf(TEXT("/Script/%s"), *def.ModuleName.ToString());
+	UPackage* pak = FindPackage(nullptr, *packageName);
+	UE_CLOG(!pak, LogZSharpEmit, Fatal, TEXT("Package [%s] not found!!!"), *def.ModuleName.ToString());
+	UE_CLOG(!pak->HasAllPackagesFlags(PKG_CompiledIn), LogZSharpEmit, Fatal, TEXT("Package [%s] is not compiled-in!!!"), *def.ModuleName.ToString());
 	def.Package = pak;
-
-	// Engine code only marks script packages as compiled-in but not root.
-	// This is because compiled-in packages are always referenced by compiled-in fields which is mark as root.
-	// So compiled-in packages never get GCed and we keep sync with engine code.
-	pak->SetPackageFlags(PKG_CompiledIn);
 
 	// Enums have no dependency so we can emit them just one step.
 	for (auto& pair : def.EnumMap)
@@ -513,11 +521,13 @@ void ZSharp::FZUnrealFieldEmitter::EmitPackage(FZPackageDefinition& def) const
 
 void ZSharp::FZUnrealFieldEmitter::EmitEnum(UPackage* pak, FZEnumDefinition& def) const
 {
+	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
 	// @TODO
 }
 
 void ZSharp::FZUnrealFieldEmitter::EmitStructSkeleton(UPackage* pak, FZScriptStructDefinition& def) const
 {
+	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
 	// @TODO
 }
 
@@ -527,6 +537,8 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 	constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Standalone | RF_Transient | RF_MarkAsNative | RF_MarkAsRootSet;
 	// Migrate from static constructor of UClass.
 	constexpr EClassFlags GCompiledInClassFlags = CLASS_Native;
+
+	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
 	
 	FStaticConstructObjectParameters params { UClass::StaticClass() };
 	params.Outer = pak;
@@ -562,11 +574,13 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 
 void ZSharp::FZUnrealFieldEmitter::EmitInterfaceSkeleton(UPackage* pak, FZInterfaceDefinition& def) const
 {
+	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
 	// @TODO
 }
 
 void ZSharp::FZUnrealFieldEmitter::EmitDelegateSkeleton(UPackage* pak, FZDelegateDefinition& def) const
 {
+	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
 	// @TODO
 }
 

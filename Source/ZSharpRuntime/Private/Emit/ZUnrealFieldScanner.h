@@ -30,7 +30,7 @@ namespace ZSharp
 		FDelegateHandle ProcessLoadedObjectsDelegate;
 		
 		TOptional<TArray<FName>> DeferredModules;
-		TSet<FString> ScannedAssemblies;
+		TSet<FName> ScannedModules;
 		
 	};
 }

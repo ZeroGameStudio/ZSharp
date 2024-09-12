@@ -4,5 +4,6 @@
 #include "ZSharpRuntimeLogChannels.h"
 
 DEFINE_LOG_CATEGORY(LogZSharpRuntime);
+DEFINE_LOG_CATEGORY(LogZSharpEmit);
 
 

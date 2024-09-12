@@ -152,12 +152,13 @@ TUniquePtr<FZExportedAssemblyDto>* ZSharp::FZGlueManifestWriter::GetAssemblyDto(
 {
 	const UZSharpRuntimeSettings* settings = GetDefault<UZSharpRuntimeSettings>();
 	const FString module = type.GetModule();
-	FString assembly;
-	if (!settings->TryGetModuleAssembly(module, assembly))
+	const FZModuleMappingContext* ctx = settings->GetModuleMappingContext(module);
+	if (!ctx)
 	{
 		return nullptr;
 	}
 
+	const FString assembly = ctx->AssemblyName;
 	if (!ExplicitAssemblies.IsEmpty() && !ExplicitAssemblies.Contains(assembly))
 	{
 		return nullptr;

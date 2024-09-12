@@ -14,7 +14,7 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 internal class UnrealFieldScanner : IDisposable
 {
 	
-	public UnrealFieldScanner(string assemblyName, bool withMetadata)
+	public UnrealFieldScanner(string assemblyName, string moduleName, bool withMetadata)
 	{
 		Assembly resolverAssembly = AssemblyLoadContext.Default.Assemblies.Single(asm => asm.GetCustomAttribute<AssemblyResolverAttribute>() is not null);
 		Type resolverType = resolverAssembly.GetCustomAttribute<AssemblyResolverAttribute>()!.ResolverType;
@@ -23,14 +23,17 @@ internal class UnrealFieldScanner : IDisposable
 			throw new InvalidOperationException();
 		}
 
+		_assemblyName = assemblyName;
+		_moduleName = moduleName;
 		_withMetadata = withMetadata;
+		
 		_resolver = Unsafe.As<IAssemblyResolver>(Activator.CreateInstance(resolverType)!);
 		if (_resolver.Resolve(assemblyName) is { } dllPath)
 		{
 			_assembly = LoadAssemblyDefinition(dllPath);
 		}
 
-		_def = new() { Path = ResolvePackagePath(assemblyName) };
+		_manifest = new() { ModuleName = _moduleName };
 	}
 
 	~UnrealFieldScanner()
@@ -65,9 +68,9 @@ internal class UnrealFieldScanner : IDisposable
 
 		Parallel.ForEachAsync(_assembly.Modules.SelectMany(module => module.Types), (type, _) => ScanTypeDefinition(type)).GetAwaiter().GetResult();
 
-		lock (_def)
+		lock (_manifest)
 		{
-			_result = _def.IsEmpty ? string.Empty : JsonSerializer.Serialize(_def);
+			_result = _manifest.IsEmpty ? string.Empty : JsonSerializer.Serialize(_manifest);
 		}
 		return _result;
 	}
@@ -81,6 +84,28 @@ internal class UnrealFieldScanner : IDisposable
 
 	private ValueTask ScanTypeDefinition(TypeDefinition type)
 	{
+		string typeFullName = type.FullName;
+		string[] names = typeFullName.Split('.');
+		// Valid class path name of unreal field requires AssemblyName.ModuleName.FieldName
+		// so name with less than 3 segments must be invalid.
+		if (names.Length < 3)
+		{
+			return ValueTask.CompletedTask;
+		}
+
+		// ModuleName mismatch.
+		if (names[^2] != _moduleName)
+		{
+			return ValueTask.CompletedTask;
+		}
+		
+		// AssemblyName mismatch.
+		string assemblyNameToTest = string.Join('.', names.Take(names.Length - 2));
+		if (assemblyNameToTest != _assemblyName)
+		{
+			return ValueTask.CompletedTask;
+		}
+		
 		string uclassAttributeFullName = typeof(UClassAttribute).FullName!;
 		foreach (var attr in type.CustomAttributes)
 		{
@@ -128,9 +153,9 @@ internal class UnrealFieldScanner : IDisposable
 			cls.MetadataMap["BlueprintType"] = "true";
 		}
 		
-		lock (_def.ClassMap)
+		lock (_manifest.ClassMap)
 		{
-			_def.ClassMap[cls.Name] = cls;
+			_manifest.ClassMap[cls.Name] = cls;
 		}
 	}
 
@@ -159,12 +184,6 @@ internal class UnrealFieldScanner : IDisposable
 	}
 
 	private AssemblyDefinition LoadAssemblyDefinition(string dllPath) => AssemblyDefinition.ReadAssembly(dllPath, new() { AssemblyResolver = new PoisonedAssemblyResolver() });
-
-	private string ResolvePackagePath(string assemblyName)
-	{
-		string subpath = assemblyName.Replace('.', '/');
-		return $"/Script/ZSharpEmit/{subpath}";
-	}
 	
 	private void InternalDispose()
 	{
@@ -185,6 +204,8 @@ internal class UnrealFieldScanner : IDisposable
 
 	private const string UNREAL_FIELD_PATH_ATTRIBUTE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.UnrealFieldPathAttribute";
 
+	private readonly string _assemblyName;
+	private readonly string _moduleName;
 	private readonly bool _withMetadata;
 	
 	private IAssemblyResolver _resolver;
@@ -192,7 +213,7 @@ internal class UnrealFieldScanner : IDisposable
 	private AssemblyDefinition? _assembly;
 	private Dictionary<string, AssemblyDefinition> _externalAssemblyMap = new();
 
-	private UnrealPackageDefinition _def;
+	private UnrealFieldManifest _manifest;
 	private string? _result;
 
 	private bool _disposed;

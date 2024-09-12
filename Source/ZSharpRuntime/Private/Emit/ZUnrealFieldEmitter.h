@@ -9,7 +9,7 @@ namespace ZSharp
 	struct FZClassDefinition;
 	struct FZInterfaceDefinition;
 	struct FZDelegateDefinition;
-	struct FZPackageDefinition;
+	struct FZUnrealFieldManifest;
 	
 	class FZUnrealFieldEmitter
 	{
@@ -18,10 +18,10 @@ namespace ZSharp
 		static FZUnrealFieldEmitter& Get();
 
 	public:
-		UPackage* Emit(FZPackageDefinition& def);
+		void Emit(FZUnrealFieldManifest& def);
 
 	private:
-		void EmitPackage(FZPackageDefinition& def) const;
+		void InternalEmit(FZUnrealFieldManifest& def) const;
 		
 		void EmitEnum(UPackage* pak, FZEnumDefinition& def) const;
 		
@@ -40,6 +40,7 @@ namespace ZSharp
 
 	private:
 		bool bEmitting = false;
+		TSet<FName> EmittedModules;
 		
 	};
 }

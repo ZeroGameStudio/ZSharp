@@ -59,9 +59,9 @@ public class UnrealDelegateDefinition : UnrealStructDefinition
 	// @TODO
 }
 
-public class UnrealPackageDefinition
+public class UnrealFieldManifest
 {
-	public required string Path { get; set; }
+	public required string ModuleName { get; set; }
 	public Dictionary<string, UnrealEnumDefinition> EnumMap { get; set; } = new();
 	public Dictionary<string, UnrealScriptStructDefinition> StructMap { get; set; } = new();
 	public Dictionary<string, UnrealClassDefinition> ClassMap { get; set; } = new();

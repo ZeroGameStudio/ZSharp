@@ -26,11 +26,6 @@
 			"LoadingPhase": "EarliestPossible"
 		},
 		{
-			"Name": "ZSharpEmit",
-			"Type": "Runtime",
-			"LoadingPhase": "EarliestPossible"
-		},
-		{
 			"Name": "ZSharpExport",
 			"Type": "Editor",
 			"LoadingPhase": "Default"

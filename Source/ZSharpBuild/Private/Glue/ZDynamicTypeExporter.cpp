@@ -6,10 +6,13 @@
 #include "Dynamic/ZDynamicallyExportedClass.h"
 #include "Dynamic/ZDynamicallyExportedDelegate.h"
 #include "Dynamic/ZDynamicallyExportedEnum.h"
+#include "Emit/IZSharpFieldRegistry.h"
 #include "Reflection/ZReflectionHelper.h"
 
 void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies) const
 {
+	IZSharpFieldRegistry& registry = IZSharpFieldRegistry::Get();
+	
 	for (TObjectIterator<UEnum> it; it; ++it)
 	{
 		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetUFieldAssemblyName(*it)))
@@ -32,6 +35,11 @@ void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies) co
 
 	for (TObjectIterator<UClass> it; it; ++it)
 	{
+		if (registry.IsZSharpClass(*it))
+		{
+			continue;
+		}
+		
 		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetUFieldAssemblyName(*it)))
 		{
 			continue;

@@ -18,7 +18,7 @@ namespace ZSharp
 	 * There are too many places violate the fucking LSP in engine code, i.e. Assuming that native class is exact UClass but not subclass...
 	 * So we have no way to make a subclass like UZSharpClass inherits from UClass and have to use proxy...
 	 */
-	class ZSHARPEMIT_API IZSharpFieldRegistry
+	class ZSHARPRUNTIME_API IZSharpFieldRegistry
 	{
 	public:
 		static IZSharpFieldRegistry& Get();

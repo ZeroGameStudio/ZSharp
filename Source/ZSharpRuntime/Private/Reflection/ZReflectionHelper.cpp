@@ -70,13 +70,8 @@ FString ZSharp::FZReflectionHelper::GetUFieldAliasedName(const UField* field, bo
 FString ZSharp::FZReflectionHelper::GetUFieldAssemblyName(const UField* field)
 {
 	const FString moduleName = GetUFieldModuleName(field);
-	FString res;
-	if (!GetDefault<UZSharpRuntimeSettings>()->TryGetModuleAssembly(moduleName, res))
-	{
-		return {};
-	}
-
-	return res;
+	const FZModuleMappingContext* ctx = GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(moduleName);
+	return ctx ? ctx->AssemblyName : "";
 }
 
 FString ZSharp::FZReflectionHelper::GetUFieldModuleName(const UField* field)
@@ -94,7 +89,7 @@ FString ZSharp::FZReflectionHelper::GetUFieldModuleName(const UField* field)
 
 bool ZSharp::FZReflectionHelper::IsUFieldModuleMapped(const UField* field)
 {
-	return GetDefault<UZSharpRuntimeSettings>()->IsModuleMapped(GetUFieldModuleName(field));
+	return !!GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(GetUFieldModuleName(field));
 }
 
 const UField* ZSharp::FZReflectionHelper::GetUFieldClosestMappedAncestor(const UField* field)

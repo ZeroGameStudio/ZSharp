@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-namespace ZeroGames.ZSharp.UnrealEngine;
+namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(1)]
 public abstract class UnrealObjectBase : UnrealExportedObjectBase, IStaticClass, IUnrealObject

@@ -25,7 +25,7 @@ namespace ZeroGames.ZSharp.UnrealEngine;
  *     AllocManagedObject (request by managed user code)
  *     -> AllocUnmanagedResource & BuildConjugate (request by managed code)
  *     -> ...
- *     -> Finalize
+ *     -> Dispose or Finalize
  *     -> ReleaseUnmanagedResource
  *     -> MarkAsDead (request directly by finalizer)
  *     -> ...

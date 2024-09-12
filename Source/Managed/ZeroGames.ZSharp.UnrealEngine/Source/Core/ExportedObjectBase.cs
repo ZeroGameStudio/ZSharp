@@ -9,7 +9,7 @@ using System.Threading;
 namespace ZeroGames.ZSharp.UnrealEngine;
 
 /**
- * Unmanaged Lifecycle:
+ * Red Lifecycle:
  *     AllocUnmanagedResource (done by unmanaged code)
  *     -> ...
  *     -> ZCall
@@ -21,7 +21,7 @@ namespace ZeroGames.ZSharp.UnrealEngine;
  *     -> ...
  *     -> ReleaseManagedObject (done by GC)
  *
- * Managed Lifecycle:
+ * Black Lifecycle:
  *     AllocManagedObject (request by managed user code)
  *     -> AllocUnmanagedResource & BuildConjugate (request by managed code)
  *     -> ...

@@ -420,12 +420,17 @@ void ZSharp::FZUnrealFieldEmitter::Emit(FZUnrealFieldManifest& def)
 
 void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& def) const
 {
-	// Here the module static initializer should have been executed and the package should be in memory.
+	if (def.EnumMap.IsEmpty() && def.StructMap.IsEmpty() && def.ClassMap.IsEmpty() && def.InterfaceMap.IsEmpty() && def.DelegateMap.IsEmpty())
+	{
+		return;
+	}
+	
+	// Migrate from UObjectBase::DeferredRegister().
 	const FString packageName = FString::Printf(TEXT("/Script/%s"), *def.ModuleName.ToString());
-	UPackage* pak = FindPackage(nullptr, *packageName);
-	UE_CLOG(!pak, LogZSharpEmit, Fatal, TEXT("Package [%s] not found!!!"), *def.ModuleName.ToString());
-	UE_CLOG(!pak->HasAllPackagesFlags(PKG_CompiledIn), LogZSharpEmit, Fatal, TEXT("Package [%s] is not compiled-in!!!"), *def.ModuleName.ToString());
+	UPackage* pak = CreatePackage(*packageName);
 	def.Package = pak;
+
+	pak->SetPackageFlags(PKG_CompiledIn);
 
 	// Enums have no dependency so we can emit them just one step.
 	for (auto& pair : def.EnumMap)
@@ -601,12 +606,9 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 	cls->SetSuperStruct(superClass);
 	cls->ClassFlags |= superClass->ClassFlags & CLASS_Inherit;
 
-	if (!def.WithinPath.IsNone())
-	{
-		const auto withinClass = FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString());
-		check(withinClass->IsNative());
-		cls->ClassWithin = withinClass;
-	}
+	const auto withinClass = !def.WithinPath.IsNone() ? FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString()) : UObject::StaticClass();
+	check(withinClass->IsNative());
+	cls->ClassWithin = withinClass;
 
 	cls->RegisterDependencies();
 
@@ -616,38 +618,18 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 
 	cls->ClassFlags |= CLASS_Constructed;
 
-	// Actually UZSharpClass can never been intrinsic but we want to keep sync with engine code.
-	if (!cls->HasAnyClassFlags(CLASS_Intrinsic))
-	{
-		check(!cls->HasAnyClassFlags(CLASS_TokenStreamAssembled));
-		cls->ReferenceSchema.Reset();
-	}
+	check(!cls->HasAnyClassFlags(CLASS_Intrinsic | CLASS_TokenStreamAssembled));
+	cls->ReferenceSchema.Reset();
 
 	// Engine code construct functions first and this can make side effects to class instance
 	// so we keep sync with engine code.
 	ZUnrealFieldEmitter_Private::EmitFunctions(cls, def.FunctionMap);
 	ZUnrealFieldEmitter_Private::EmitProperties(cls, def.PropertyMap);
 
-	// We have already set CppTypeInfo before so we don't need to do here.
-	// But it is still necessary to match ClassConfigName with super.
-	while (UClass* super = cls->GetSuperClass())
+	// If we have no ClassConfigName then inherit from super.
+	if  (cls->ClassConfigName.IsNone())
 	{
-		if (!super->ClassConfigName.IsNone())
-		{
-			if (cls->ClassConfigName.IsNone())
-			{
-				cls->ClassConfigName = super->ClassConfigName;
-			}
-			else
-			{
-				UE_CLOG(cls->ClassConfigName != super->ClassConfigName, LogZSharpEmit, Fatal, TEXT("Class [%s] has different ClassConfigName [%s] with super [%s].[%s]!!!"),
-					*GetNameSafe(cls),
-					*cls->ClassConfigName.ToString(),
-					*GetNameSafe(super),
-					*super->ClassConfigName.ToString());
-			}
-			break;
-		}
+		cls->ClassConfigName = superClass->ClassConfigName;
 	}
 
 	if (!def.ImplementedInterfacePaths.IsEmpty())

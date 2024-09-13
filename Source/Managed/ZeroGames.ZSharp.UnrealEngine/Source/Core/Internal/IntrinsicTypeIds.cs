@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 
 internal static class IntrinsicTypeIds
 {
-	// NOTE: KEEP SYNC WITH ZPropertyFactory.cpp
+	// IMPORTANT: KEEP SYNC WITH ZPropertyFactory.cpp
 	public const IntPtr KUInt8 = 1;
 	public const IntPtr KUInt16 = 2;
 	public const IntPtr KUInt32 = 3;

@@ -27,11 +27,47 @@ struct FZFieldDefinitionDto
 };
 
 USTRUCT()
+struct FZSimplePropertyDefinitionDto
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	uint8 Type = 0;
+
+	UPROPERTY()
+	uint64 PropertyFlags = 0;
+
+	UPROPERTY()
+	FName RepNotifyName;
+
+	UPROPERTY()
+	FName DescriptorFieldPath;
+};
+
+USTRUCT()
 struct FZPropertyDefinitionDto : public FZFieldDefinitionDto
 {
 	GENERATED_BODY()
+
+	// USTRUCT forbids multiple inheritance so we copy fields from FZSimplePropertyDefinitionDto.
+	UPROPERTY()
+	uint8 Type = 0;
+
+	UPROPERTY()
+	uint64 PropertyFlags = 0;
+
+	UPROPERTY()
+	FName RepNotifyName;
+
+	UPROPERTY()
+	FName DescriptorFieldPath;
 	
-	// @TODO
+	UPROPERTY()
+	FZSimplePropertyDefinitionDto InnerProperty;
+
+	UPROPERTY()
+	FZSimplePropertyDefinitionDto OuterProperty;
+	
 };
 
 USTRUCT()

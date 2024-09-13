@@ -7,13 +7,37 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 public class UnrealFieldDefinition
 {
 	public required string Name { get; set; }
-	public required EObjectFlags Flags { get; set; }
+	public EObjectFlags Flags { get; set; }
 	public Dictionary<string, string> MetadataMap { get; set; } = new();
 }
 
+// IMPORTANT: KEEP SYNC WITH ZUnrealFieldDefinitions.h
+public enum EPropertyType : uint8
+{
+	None,
+	// Primitives
+	UInt8, UInt16, UInt32, UInt64, Int8, Int16, Int32, Int64, Float, Double, Bool, Enum,
+	// Strings
+	String, Name, Text,
+	// Object wrappers
+	Object, Class, SoftClass, SoftObject, WeakObject, LazyObject, Interface,
+	// Containers
+	Struct, Array, Set, Map, Optional,
+	// Delegates
+	Delegate, MulticastInlineDelegate, // MulticastSparseDelegate is not supported.
+	// Special types
+	FieldPath, // VerseValue is not supported.
+};
+
 public class UnrealPropertyDefinition : UnrealFieldDefinition
 {
-	// @TODO
+	public required EPropertyType Type { get; set; }
+	public EPropertyFlags PropertyFlags { get; set; }
+	public string? RepNotifyName { get; set; }
+	public string? DescriptorFieldPath { get; set; }
+
+	public UnrealPropertyDefinition? InnerProperty { get; set; }
+	public UnrealPropertyDefinition? OuterProperty { get; set; }
 }
 
 public class UnrealStructDefinition : UnrealFieldDefinition
@@ -24,7 +48,7 @@ public class UnrealStructDefinition : UnrealFieldDefinition
 
 public class UnrealFunctionDefinition : UnrealStructDefinition
 {
-	public required EFunctionFlags FunctionFlags { get; set; }
+	public EFunctionFlags FunctionFlags { get; set; }
 	public uint16 RpcId { get; set; }
 	public uint16 RpcResponseId { get; set; }
 }
@@ -43,8 +67,8 @@ public class UnrealClassDefinition : UnrealStructDefinition
 {
 	public string? ConfigName { get; set; }
 	public string? WithinPath { get; set; }
-	public required EClassFlags ClassFlags { get; set; }
-	public required EClassCastFlags CastFlags { get; set; }
+	public EClassFlags ClassFlags { get; set; }
+	public EClassCastFlags CastFlags { get; set; }
 	public List<string> ImplementedInterfacePaths { get; set; } = new();
 	public Dictionary<string, UnrealFunctionDefinition> FunctionMap { get; set; } = new();
 }

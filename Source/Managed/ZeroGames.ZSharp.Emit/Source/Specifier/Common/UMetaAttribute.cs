@@ -8,5 +8,4 @@ public class UMetaAttribute(params string[] pairs) : Attribute
 	public string[] Pairs => pairs;
 }
 
-[UMeta()]
-class A;
+

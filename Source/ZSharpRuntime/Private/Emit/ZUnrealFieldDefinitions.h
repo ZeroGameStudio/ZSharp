@@ -32,7 +32,7 @@ namespace ZSharp
 		FieldPath, // VerseValue is not supported.
 	};
 
-	struct FZSimplePropertyDefinition : public FZFieldDefinition
+	struct FZSimplePropertyDefinition
 	{
 		FProperty* Property = nullptr;
 		
@@ -42,11 +42,10 @@ namespace ZSharp
 
 		FName RepNotifyName;
 
-		FName DescriptorFieldPath; // UField metadata.
-		FName MetaDescriptorFieldPath; // UClass metadata.
+		FName DescriptorFieldPath;
 	};
 	
-	struct FZPropertyDefinition : public FZSimplePropertyDefinition
+	struct FZPropertyDefinition : public FZFieldDefinition, public FZSimplePropertyDefinition
 	{
 		FZSimplePropertyDefinition InnerProperty;
 		FZSimplePropertyDefinition OuterProperty;

@@ -14,7 +14,7 @@ struct FZModuleMappingContext
 	FString AssemblyName;
 
 	UPROPERTY(EditAnywhere)
-	bool bHasDynamicFields;
+	bool bHasDynamicFields = false;
 	
 };
 

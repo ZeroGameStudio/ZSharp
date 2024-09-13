@@ -26,6 +26,18 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 			def.Name = dto.Name;
 			def.Flags = static_cast<EObjectFlags>(dto.Flags);
 			def.MetadataMap = MoveTemp(dto.MetadataMap);
+
+#define COPY_SIMPLE_PROPERTY(DefName, DtoName) \
+			DefName.Type = static_cast<EZPropertyType>(DtoName.Type); \
+			DefName.PropertyFlags = static_cast<EPropertyFlags>(DtoName.PropertyFlags); \
+			DefName.RepNotifyName = DtoName.RepNotifyName; \
+			DefName.DescriptorFieldPath = DtoName.DescriptorFieldPath;
+
+			COPY_SIMPLE_PROPERTY(def, dto);
+			COPY_SIMPLE_PROPERTY(def.InnerProperty, dto.InnerProperty);
+			COPY_SIMPLE_PROPERTY(def.OuterProperty, dto.OuterProperty);
+
+#undef COPY_SIMPLE_PROPERTY
 		}
 
 		return defMap;

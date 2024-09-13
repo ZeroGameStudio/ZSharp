@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
@@ -11,7 +10,7 @@ using IAssemblyResolver = ZeroGames.ZSharp.Core.IAssemblyResolver;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
-internal class UnrealFieldScanner : IDisposable
+internal partial class UnrealFieldScanner : IDisposable
 {
 	
 	public UnrealFieldScanner(string assemblyName, string moduleName, bool withMetadata)
@@ -49,12 +48,7 @@ internal class UnrealFieldScanner : IDisposable
 
 	public string Scan()
 	{
-		// while (!Debugger.IsAttached)
-		// {
-		// 	Thread.Sleep(1000);
-		// 	Logger.Warning("Waiting for debugger...");
-		// }
-		// Debugger.Break();
+		//BlockUntilDebuggerAttached();
 		
 		if (_assembly is null)
 		{
@@ -81,7 +75,7 @@ internal class UnrealFieldScanner : IDisposable
 		public AssemblyDefinition Resolve(AssemblyNameReference name) => throw new NotSupportedException();
 		public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters) => throw new NotSupportedException();
 	}
-
+	
 	private ValueTask ScanTypeDefinition(TypeDefinition type)
 	{
 		string typeFullName = type.FullName;
@@ -106,57 +100,12 @@ internal class UnrealFieldScanner : IDisposable
 			return ValueTask.CompletedTask;
 		}
 		
-		string uclassAttributeFullName = typeof(UClassAttribute).FullName!;
-		foreach (var attr in type.CustomAttributes)
+		if (GetCustomAttributeOrDefault(type, typeof(UClassAttribute).FullName!) is not null)
 		{
-			if (attr.AttributeType.FullName == uclassAttributeFullName)
-			{
-				ScanUClass(type);
-				break;
-			}
+			ScanUClass(type);
 		}
 
 		return ValueTask.CompletedTask;
-	}
-
-	private void ScanUClass(TypeDefinition type)
-	{
-		string name = type.Name;
-		EObjectFlags flags = EObjectFlags.RF_NoFlags;
-		EClassFlags classFlags = EClassFlags.CLASS_None;
-		EClassCastFlags castFlags = EClassCastFlags.CASTCLASS_None;
-		UnrealClassDefinition cls = new()
-		{
-			Name = name,
-			Flags = flags,
-			ClassFlags = classFlags,
-			CastFlags = castFlags
-		};
-
-		string baseName = type.BaseType.Name;
-		IMetadataScope scope = type.BaseType.Scope;
-		string baseAssemblyName = scope.MetadataScopeType == MetadataScopeType.AssemblyNameReference ? scope.Name : throw new InvalidOperationException();
-		AssemblyDefinition baseAssembly = GetAssemblyDefinition(baseAssemblyName) ?? throw new InvalidOperationException();
-		TypeDefinition baseType = baseAssembly.Modules.SelectMany(module => module.Types).Single(t => t.Name == baseName);
-		foreach (var attr in baseType.CustomAttributes)
-		{
-			if (attr.AttributeType.FullName == UNREAL_FIELD_PATH_ATTRIBUTE_FULL_NAME)
-			{
-				cls.SuperPath = (string)attr.ConstructorArguments[0].Value;
-				break;
-			}
-		}
-
-		if (_withMetadata)
-		{
-			cls.MetadataMap["IsBlueprintBase"] = "true";
-			cls.MetadataMap["BlueprintType"] = "true";
-		}
-		
-		lock (_manifest.ClassMap)
-		{
-			_manifest.ClassMap[cls.Name] = cls;
-		}
 	}
 
 	// We don't use Mono.Cecil's built-in assembly resolving mechanism
@@ -201,8 +150,6 @@ internal class UnrealFieldScanner : IDisposable
 			pair.Value.Dispose();
 		}
 	}
-
-	private const string UNREAL_FIELD_PATH_ATTRIBUTE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.UnrealFieldPathAttribute";
 
 	private readonly string _assemblyName;
 	private readonly string _moduleName;

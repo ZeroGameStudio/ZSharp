@@ -105,11 +105,11 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 	static constexpr EPropertyFlags PrimitiveFlags = CPF_ZeroConstructor | CPF_IsPlainOldData | CPF_NoDestructor | CPF_HasGetValueTypeHash;
 
 #define NEW_PROPERTY(PropertyTypeName, CompiledInPropertyFlags) \
-	auto property = new F##PropertyTypeName##Property(owner, def.Name, def.Flags | GCompiledInPropertyObjectFlags); \
+	auto property = new F##PropertyTypeName##Property(owner, name, flags | GCompiledInPropertyObjectFlags); \
 	property->PropertyFlags |= CompiledInPropertyFlags; \
 	def.Property = property;
 	
-	static void EmitSimpleProperty(FFieldVariant owner, FZSimplePropertyDefinition& def)
+	static void EmitSimpleProperty(FFieldVariant owner, FZSimplePropertyDefinition& def, FName name, EObjectFlags flags)
 	{
 		switch (def.Type)
 		{
@@ -205,7 +205,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				NEW_PROPERTY(Class, CPF_UObjectWrapper | CPF_HasGetValueTypeHash);
 
 				property->PropertyClass = UClass::StaticClass();
-				property->MetaClass = FindObjectChecked<UClass>(nullptr, *def.MetaDescriptorFieldPath.ToString());
+				property->MetaClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
@@ -213,7 +213,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(SoftClass, CPF_UObjectWrapper | CPF_HasGetValueTypeHash);
 
-				property->MetaClass = FindObjectChecked<UClass>(nullptr, *def.MetaDescriptorFieldPath.ToString());
+				property->MetaClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
@@ -297,6 +297,9 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 	static void EmitProperty(FFieldVariant owner, FZPropertyDefinition& def)
 	{
+		const FName name = def.Name;
+		const EObjectFlags flags = def.Flags;
+		
 		bool needsFinish = true;
 		switch (def.Type)
 		{
@@ -305,7 +308,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(Array, CPF_None);
 
-				EmitSimpleProperty(property, def.InnerProperty);
+				EmitSimpleProperty(property, def.InnerProperty, {}, RF_NoFlags);
 
 				break;
 			}
@@ -313,7 +316,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(Set, CPF_None);
 
-				EmitSimpleProperty(property, def.InnerProperty);
+				EmitSimpleProperty(property, def.InnerProperty, {}, RF_NoFlags);
 
 				break;
 			}
@@ -321,8 +324,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(Map, CPF_None);
 
-				EmitSimpleProperty(property, def.InnerProperty);
-				EmitSimpleProperty(property, def.OuterProperty);
+				EmitSimpleProperty(property, def.InnerProperty, {}, RF_NoFlags);
+				EmitSimpleProperty(property, def.OuterProperty, {}, RF_NoFlags);
 
 				break;
 			}
@@ -330,13 +333,13 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(Optional, CPF_None);
 
-				EmitSimpleProperty(property, def.InnerProperty);
+				EmitSimpleProperty(property, def.InnerProperty, {}, RF_NoFlags);
 
 				break;
 			}
 		default:
 			{
-				EmitSimpleProperty(owner, def);
+				EmitSimpleProperty(owner, def, name, flags);
 				needsFinish = false;
 				break;
 			}

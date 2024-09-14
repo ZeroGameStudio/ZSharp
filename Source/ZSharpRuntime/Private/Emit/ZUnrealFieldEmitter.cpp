@@ -51,6 +51,14 @@ namespace ZSharp::ZSharpClass_Private
 	}
 }
 
+namespace ZSharp::ZSharpFunction_Private
+{
+	static DEFINE_FUNCTION(execZCall)
+	{
+		
+	}
+}
+
 namespace ZSharp::ZUnrealFieldEmitter_Private
 {
 	static void FatalIfObjectExists(UObject* outer, FName name)
@@ -378,6 +386,11 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		function->FunctionFlags |= def.FunctionFlags;
 		function->RPCId = def.RpcId;
 		function->RPCResponseId = def.RpcResponseId;
+
+		if (function->HasAllFunctionFlags(FUNC_Native))
+		{
+			outer->AddNativeFunction(*function->GetName(), ZSharpFunction_Private::execZCall);
+		}
 
 		EmitProperties(function, def.PropertyMap);
 		AddMetadata(function, def.MetadataMap);

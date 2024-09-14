@@ -3,6 +3,8 @@
 
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
 
+#include "CLR/IZSharpClr.h"
+
 const ZSharp::FZFunctionVisitorRegistry& ZSharp::FZFunctionVisitorRegistry::Get()
 {
 	static const FZFunctionVisitorRegistry GSingleton;
@@ -24,6 +26,16 @@ ZSharp::FZFunctionVisitorHandle ZSharp::FZFunctionVisitorRegistry::Get(const UFu
 	}
 
 	return { ancestor };
+}
+
+ZSharp::FZFunctionVisitorRegistry::FZFunctionVisitorRegistry()
+{
+	MasterAlcUnloadedDelegate = IZSharpClr::Get().RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate::CreateRaw(this, &ThisClass::ClearAlcSensitiveStates));
+}
+
+ZSharp::FZFunctionVisitorRegistry::~FZFunctionVisitorRegistry()
+{
+	IZSharpClr::Get().UnregisterMasterAlcUnloaded(MasterAlcUnloadedDelegate);
 }
 
 const ZSharp::FZFunctionVisitor* ZSharp::FZFunctionVisitorRegistry::Get(FZFunctionVisitorHandle handle) const
@@ -53,6 +65,11 @@ const ZSharp::FZFunctionVisitor* ZSharp::FZFunctionVisitorRegistry::Get(FZFuncti
 	}
 
 	return pVisitor->Get();
+}
+
+void ZSharp::FZFunctionVisitorRegistry::ClearAlcSensitiveStates()
+{
+	FZFunctionVisitor::StaticClearAlcSensitiveStates();
 }
 
 

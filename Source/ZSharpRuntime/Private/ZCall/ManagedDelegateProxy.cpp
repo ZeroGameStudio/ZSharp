@@ -3,8 +3,6 @@
 
 #include "ManagedDelegateProxy.h"
 
-#include "ALC/IZMasterAssemblyLoadContext.h"
-#include "CLR/IZSharpClr.h"
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
 
 void UManagedDelegateProxy::BeginDestroy()
@@ -20,21 +18,6 @@ void UManagedDelegateProxy::ProcessEvent(UFunction* function, void* parms)
 	{
 		return Super::ProcessEvent(function, parms);
 	}
-
-	if (!DelegateZCallHandle)
-	{
-		if (ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc())
-		{
-			if (DelegateZCallHandle = alc->GetZCallHandle("d://"); !DelegateZCallHandle)
-			{
-				return;
-			}
-		}
-		else
-		{
-			return;
-		}
-	}
 	
 	if (!SignatureFunctionVisitor)
 	{
@@ -44,7 +27,7 @@ void UManagedDelegateProxy::ProcessEvent(UFunction* function, void* parms)
 		}
 	}
 
-	SignatureFunctionVisitor->InvokeZCall(DelegateZCallHandle, this, parms);
+	SignatureFunctionVisitor->InvokeZCall(this, parms);
 }
 
 

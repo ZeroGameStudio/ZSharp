@@ -8,7 +8,6 @@
 #include "Reflection/Wrapper/ZSelfDescriptiveMulticastInlineScriptDelegate.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveMulticastSparseScriptDelegate.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
-#include "ZCall/ZCallHandle.h"
 
 #include "ManagedDelegateProxy.generated.h"
 
@@ -36,7 +35,6 @@ private:
 	TStrongObjectPtr<const UFunction> Signature;
 	ZSharp::FZGCHandle Delegate;
 	
-	ZSharp::FZCallHandle DelegateZCallHandle;
 	ZSharp::FZFunctionVisitorHandle SignatureFunctionVisitor;
 	
 };

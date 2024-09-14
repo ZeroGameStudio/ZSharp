@@ -7,10 +7,12 @@
 
 namespace ZSharp
 {
-	class FZFunctionVisitorRegistry: public FNoncopyable
+	class FZFunctionVisitorRegistry : public FNoncopyable
 	{
 
 		friend FZFunctionVisitorHandle;
+
+		using ThisClass = FZFunctionVisitorRegistry;
 
 	public:
 		static const FZFunctionVisitorRegistry& Get();
@@ -19,9 +21,18 @@ namespace ZSharp
 		FZFunctionVisitorHandle Get(const UFunction* function) const;
 
 	private:
+		FZFunctionVisitorRegistry();
+		~FZFunctionVisitorRegistry();
+
+	private:
 		const FZFunctionVisitor* Get(FZFunctionVisitorHandle handle) const;
 
 	private:
+		void ClearAlcSensitiveStates();
+
+	private:
+		FDelegateHandle MasterAlcUnloadedDelegate;
+		
 		mutable TMap<FZFunctionVisitorHandle, TUniquePtr<FZFunctionVisitor>> FunctionMap;
 		
 	};

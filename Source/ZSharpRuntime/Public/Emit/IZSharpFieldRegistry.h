@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "ZCall/ZCallHandle.h"
+
 namespace ZSharp
 {
 	struct FZSharpClass
@@ -11,7 +13,18 @@ namespace ZSharp
 
 	struct FZSharpFunction
 	{
-	
+
+		friend class FZSharpFieldRegistry;
+
+	public:
+		FZCallHandle GetZCallHandle() const;
+
+	public:
+		FString ZCallName;
+		
+	private:
+		mutable FZCallHandle ZCallHandle{};
+		
 	};
 
 	/**

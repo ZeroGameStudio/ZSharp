@@ -26,9 +26,15 @@ namespace ZSharp
 		FZSharpFunction* GetMutableFunction(const UFunction* function) { return const_cast<FZSharpFunction*>(GetFunction(function)); }
 
 	private:
-		FZSharpFieldRegistry() = default;
+		FZSharpFieldRegistry();
+		virtual ~FZSharpFieldRegistry() override;
 
 	private:
+		void ClearAlcSensitiveStates();
+
+	private:
+		FDelegateHandle MasterAlcUnloadedDelegate;
+		
 		TMap<const UClass*, TUniquePtr<FZSharpClass>> ClassRegistry;
 		TMap<const UFunction*, TUniquePtr<FZSharpFunction>> FunctionRegistry;
 		

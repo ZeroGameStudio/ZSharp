@@ -3,6 +3,8 @@
 
 #include "ZSharpFieldRegistry.h"
 
+#include "CLR/IZSharpClr.h"
+
 ZSharp::FZSharpFieldRegistry& ZSharp::FZSharpFieldRegistry::Get()
 {
 	static FZSharpFieldRegistry GSingleton;
@@ -32,6 +34,24 @@ ZSharp::FZSharpFunction* ZSharp::FZSharpFieldRegistry::RegisterFunction(const UF
 {
 	FZSharpFunction* zsfunction = new FZSharpFunction;
 	return FunctionRegistry.Emplace(function, zsfunction).Get();
+}
+
+ZSharp::FZSharpFieldRegistry::FZSharpFieldRegistry()
+{
+	MasterAlcUnloadedDelegate = IZSharpClr::Get().RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate::CreateRaw(this, &ThisClass::ClearAlcSensitiveStates));
+}
+
+ZSharp::FZSharpFieldRegistry::~FZSharpFieldRegistry()
+{
+	IZSharpClr::Get().UnregisterMasterAlcUnloaded(MasterAlcUnloadedDelegate);
+}
+
+void ZSharp::FZSharpFieldRegistry::ClearAlcSensitiveStates()
+{
+	for (const auto& pair : FunctionRegistry)
+	{
+		pair.Value->ZCallHandle = {};
+	}
 }
 
 

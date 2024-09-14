@@ -15,7 +15,7 @@ internal static class UnrealFieldScanner_Interop
 		public IntPtr OutManifest;
 		public uint8 WithMetadata;
 	}
-
+	
 	public static unsafe void Scan(ScanArgs* args)
 	{
 		try
@@ -30,7 +30,7 @@ internal static class UnrealFieldScanner_Interop
 		}
 		catch (Exception ex)
 		{
-			Logger.Error(ex);
+			Logger.Fatal(ex);
 		}
 	}
 

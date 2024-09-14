@@ -2,10 +2,10 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-public class ZCallAttribute : Attribute
+[AttributeUsage(AttributeTargets.Method)]
+public class ZCallAttribute() : Attribute
 {
-	public ZCallAttribute(){}
-	public ZCallAttribute(string name) => Name = name;
+	public ZCallAttribute(string name) : this() => Name = name;
 	public string? Name { get; }
 }
 

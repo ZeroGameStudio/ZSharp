@@ -91,6 +91,9 @@ struct FZFunctionDefinitionDto : public FZStructDefinitionDto
 	uint32 FunctionFlags = 0;
 
 	UPROPERTY()
+	FString ZCallName;
+
+	UPROPERTY()
 	uint16 RpcId = 0;
 
 	UPROPERTY()

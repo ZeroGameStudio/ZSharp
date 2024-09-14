@@ -63,6 +63,8 @@ namespace ZSharp
 		
 		EFunctionFlags FunctionFlags = FUNC_None;
 
+		FString ZCallName;
+
 		uint16 RpcId = 0;
 		uint16 RpcResponseId = 0;
 	};

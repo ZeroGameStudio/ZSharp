@@ -58,6 +58,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 			def.SuperPath = dto.SuperPath;
 			def.PropertyMap = PropertyDtoMap2DefMap(MoveTemp(dto.PropertyMap));
 			def.FunctionFlags = static_cast<EFunctionFlags>(dto.FunctionFlags);
+			def.ZCallName = MoveTemp(dto.ZCallName);
 			def.RpcId = dto.RpcId;
 			def.RpcResponseId = dto.RpcResponseId;
 		}

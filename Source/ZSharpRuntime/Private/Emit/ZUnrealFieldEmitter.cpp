@@ -380,14 +380,17 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		params.SetFlags = def.Flags | GCompiledInFlags;
 	
 		const auto function = static_cast<UFunction*>(StaticConstructObject_Internal(params));
-		FZSharpFieldRegistry::Get().RegisterFunction(function);
+		FZSharpFunction* zsfunction = FZSharpFieldRegistry::Get().RegisterFunction(function);
 		def.Function = function;
 
 		function->FunctionFlags |= def.FunctionFlags;
+		zsfunction->ZCallName = def.ZCallName;
 		function->RPCId = def.RpcId;
 		function->RPCResponseId = def.RpcResponseId;
 
-		if (function->HasAllFunctionFlags(FUNC_Native))
+		const bool isNative = function->HasAllFunctionFlags(FUNC_Native);
+		check(!zsfunction->ZCallName.IsEmpty() || !isNative);
+		if (isNative)
 		{
 			outer->AddNativeFunction(*function->GetName(), ZSharpFunction_Private::execZCall);
 		}

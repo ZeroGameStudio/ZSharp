@@ -110,6 +110,7 @@ namespace ZSharp
 	{
 		
 		FZCallBufferSlot& operator[](int32 index);
+		const FZCallBufferSlot& operator[](int32 index) const { return (*const_cast<FZCallBuffer*>(this))[index]; }
 		
 		FZCallBufferSlot* Slots;
 		int32 NumSlots;

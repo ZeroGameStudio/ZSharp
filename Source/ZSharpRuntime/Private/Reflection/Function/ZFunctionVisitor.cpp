@@ -19,7 +19,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
 
 	FZCallBuffer& buf = *buffer;
-	UFunction* func = Function.Get(); // @FIXME: Dynamic function may get GCed.
+	UFunction* func = Function.Get();
 	UObject* self;
 	if (!bIsStatic)
 	{
@@ -43,25 +43,13 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 	
 	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
 
-	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
-	{
-		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
-		visitor->InitializeValue_InContainer(params);
-		visitor->SetValue_InContainer(params, buf[bIsStatic ? i : i + 1], 0);
-	}
+	FillParams(params, buf);
 
 	self->ProcessEvent(func, params);
 
-	for (const auto index : OutParamIndices)
-	{
-		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
-		visitor->GetValue_InContainer(params, buf[bIsStatic ? index : index + 1], 0);
-	}
-
-	if (ReturnProperty)
-	{
-		ReturnProperty->GetValue_InContainer(params, buf[-1], 0);
-	}
+	CopyOut(buf, params);
+	
+	params = nullptr;
 
 	return EZCallErrorCode::Succeed;
 }
@@ -83,25 +71,13 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBu
 	
 	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
 
-	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
-	{
-		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
-		visitor->InitializeValue_InContainer(params);
-		visitor->SetValue_InContainer(params, buf[i + 1], 0);
-	}
+	FillParams(params, buf);
 
 	self.GetUnderlyingInstance()->ProcessDelegate<UObject>(params);
 
-	for (const auto index : OutParamIndices)
-	{
-		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
-		visitor->GetValue_InContainer(params, buf[index + 1], 0);
-	}
-
-	if (ReturnProperty)
-	{
-		ReturnProperty->GetValue_InContainer(params, buf[-1], 0);
-	}
+	CopyOut(buf, params);
+	
+	params = nullptr;
 
 	return EZCallErrorCode::Succeed;
 }
@@ -124,20 +100,13 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastInlineScriptDe
 	
 	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
 
-	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
-	{
-		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
-		visitor->InitializeValue_InContainer(params);
-		visitor->SetValue_InContainer(params, buf[i + 1], 0);
-	}
+	FillParams(params, buf);
 
 	self.GetUnderlyingInstance()->ProcessMulticastDelegate<UObject>(params);
 
-	for (const auto index : OutParamIndices)
-	{
-		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
-		visitor->GetValue_InContainer(params, buf[index + 1], 0);
-	}
+	CopyOut(buf, params);
+
+	params = nullptr;
 	
 	return EZCallErrorCode::Succeed;
 }
@@ -160,25 +129,18 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastSparseScriptDe
 	
 	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
 
-	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
-	{
-		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
-		visitor->InitializeValue_InContainer(params);
-		visitor->SetValue_InContainer(params, buf[i + 1], 0);
-	}
+	FillParams(params, buf);
 
 	self.GetDelegatePtr()->ProcessMulticastDelegate<UObject>(params);
 
-	for (const auto index : OutParamIndices)
-	{
-		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
-		visitor->GetValue_InContainer(params, buf[index + 1], 0);
-	}
+	CopyOut(buf, params);
+
+	params = nullptr;
 	
 	return EZCallErrorCode::Succeed;
 }
 
-ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, FFrame& stack) const
+ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, FFrame& stack, RESULT_DECL) const
 {
 	check(IsInGameThread());
 	check(bAvailable);
@@ -189,14 +151,8 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 	UFunction* currentFunction = stack.CurrentNativeFunction;
 	const FZSharpFunction* zsfunction = FZSharpFieldRegistry::Get().GetFunction(currentFunction);
 	check(zsfunction);
-#if DO_CHECK
-	const UFunction* cur = currentFunction;
-	while (const UFunction* super = cur->GetSuperFunction())
-	{
-		cur = super;
-	}
-	check(cur == Function.Get());
-#endif
+	check(currentFunction->IsChildOf(Function.Get()));
+	check(currentFunction->IsSignatureCompatibleWith(Function.Get()));
 
 	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
 	if (!alc)
@@ -218,16 +174,78 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 			buffer.Slots[i].Type = EZCallBufferSlotType::Uninitialized;
 		}
 
+		UFunction* func = Function.Get();
+
+		// Blueprint doesn't create new stack frame when it calls native function (and we are native)
+		// which results stack.Node points to the caller and stack.CurrentNativeFunction points to us.
+		const bool fromBlueprint = stack.Node != stack.CurrentNativeFunction;
+
+		// For native call, params store directly in stack.Locals. (caller processes params)
+		// For blueprint call, we need to manually alloc memory for params and process bytecode to load them. (callee processes params)
+		void* params = fromBlueprint ? FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment) : stack.Locals;
+
+		// If called from blueprint, we need to fill params.
+		if (fromBlueprint)
+		{
+			for (int32 i = 0; i < ParameterProperties.Num(); ++i)
+			{
+				const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+				visitor->InitializeValue_InContainer(params);
+				// This will load param value from bytecode.
+				stack.Step(object, visitor->ContainerPtrToValuePtr(params, 0));
+			}
+
+			// Here the bytecode should reach EX_EndFunctionParms and we just skip it.
+			check(*stack.Code == EX_EndFunctionParms);
+			stack.SkipCode(1);
+		}
+		
+		// Now we can fill ZCallBuffer.
 		if (!bIsStatic)
 		{
 			TZCallBufferSlotEncoder<UObject*>::Encode(object, buffer[0]);
 		}
 
-		// @TODO: fill buffer
-		
+		for (const auto index : InParamIndices)
+		{
+			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
+			visitor->GetValue_InContainer(params, buffer[bIsStatic ? index : index + 1], 0);
+		}
+
 		res = alc->ZCall(zsfunction->GetZCallHandle(), &buffer);
 
-		// @TODO: copy out
+		// Copy out params.
+		for (const auto index : OutParamIndices)
+		{
+			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
+			FOutParmRec* out = stack.OutParms;
+			// This must succeed, otherwise let it crash by null pointer.
+			while (out->Property != visitor->GetUnderlyingProperty())
+			{
+				out = out->NextOutParm;
+			}
+			visitor->SetValue(out->PropAddr, buffer[bIsStatic ? index : index + 1]);
+		}
+
+		if (ReturnProperty)
+		{
+			ReturnProperty->SetValue(RESULT_PARAM, buffer[-1]);
+		}
+
+		// Destroy params if called from blueprint.
+		if (fromBlueprint)
+		{
+			for (int32 i = 0; i < ParameterProperties.Num(); ++i)
+			{
+				const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+				visitor->DestructValue_InContainer(params);
+			}
+
+			if (ReturnProperty)
+			{
+				ReturnProperty->DestructValue_InContainer(params);
+			}
+		}
 	}
 
 	return res;
@@ -270,20 +288,29 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{
 			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
-			visitor->GetValue_InContainer(params, buffer[i + 1], 0);
+			visitor->InitializeValue_InContainer(params);
+			if (InParamIndices.Contains(i))
+			{
+				visitor->GetValue_InContainer(params, buffer[i + 1], 0);
+			}
 		}
 		
 		res = alc->ZCall(GetDelegateZCallHandle(), &buffer);
-		
-		for (const auto index : OutParamIndices)
+
+		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{
-			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
-			visitor->SetValue_InContainer(params, buffer[index + 1], 0);
+			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+			if (OutParamIndices.Contains(i))
+			{
+				visitor->SetValue_InContainer(params, buffer[i + 1], 0);
+			}
+			visitor->DestructValue_InContainer(params);
 		}
 
 		if (ReturnProperty)
 		{
 			ReturnProperty->SetValue_InContainer(params, buffer[-1], 0);
+			ReturnProperty->DestructValue_InContainer(params);
 		}
 	}
 
@@ -351,11 +378,51 @@ ZSharp::FZFunctionVisitor::FZFunctionVisitor(UFunction* function)
 		const int32 index = ParameterProperties.Emplace(MoveTemp(visitor));
 		if (prop->HasAllPropertyFlags(CPF_OutParm) && !prop->HasAnyPropertyFlags(CPF_ConstParm))
 		{
+			if (prop->HasAllPropertyFlags(CPF_ReferenceParm))
+			{
+				InParamIndices.Emplace(index);
+			}
 			OutParamIndices.Emplace(index);
+		}
+		else
+		{
+			InParamIndices.Emplace(index);
 		}
 	}
 
 	bAvailable = true;
+}
+
+void ZSharp::FZFunctionVisitor::FillParams(void* params, const FZCallBuffer& buf) const
+{
+	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
+	{
+		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+		visitor->InitializeValue_InContainer(params);
+		if (InParamIndices.Contains(i))
+		{
+			visitor->SetValue_InContainer(params, buf[bIsStatic ? i : i + 1], 0);
+		}
+	}
+}
+
+void ZSharp::FZFunctionVisitor::CopyOut(FZCallBuffer& buf, void* params) const
+{
+	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
+	{
+		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+		if (OutParamIndices.Contains(i))
+		{
+			visitor->GetValue_InContainer(params, buf[bIsStatic ? i : i + 1], 0);
+		}
+		visitor->DestructValue_InContainer(params);
+	}
+
+	if (ReturnProperty)
+	{
+		ReturnProperty->GetValue_InContainer(params, buf[-1], 0);
+		ReturnProperty->DestructValue_InContainer(params);
+	}
 }
 
 

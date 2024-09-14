@@ -7,6 +7,8 @@
 #include "ZSharpFieldRegistry.h"
 #include "Algo/TopologicalSort.h"
 #include "ZUnrealFieldDefinitions.h"
+#include "Reflection/Function/ZFunctionVisitor.h"
+#include "Reflection/Function/ZFunctionVisitorRegistry.h"
 #include "UObject/PropertyOptional.h"
 
 namespace ZSharp::ZSharpClass_Private
@@ -55,7 +57,7 @@ namespace ZSharp::ZSharpFunction_Private
 {
 	static DEFINE_FUNCTION(execZCall)
 	{
-		
+		FZFunctionVisitorRegistry::Get().Get(Stack.CurrentNativeFunction)->InvokeZCall(Context, Stack, RESULT_PARAM);
 	}
 }
 

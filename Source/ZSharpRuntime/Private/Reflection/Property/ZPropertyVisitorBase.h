@@ -18,6 +18,7 @@ namespace ZSharp
 
 	public:
 		virtual void InitializeValue(void* dest) const override;
+		virtual void DestructValue(void* dest) const override;
 
 	protected:
 		virtual const FProperty* GetUnderlyingProperty() const override final { return UnderlyingProperty; }

@@ -132,6 +132,11 @@ void ZSharp::IZPropertyVisitor::InitializeValue_InContainer(void* dest) const
 	InitializeValue(ContainerPtrToValuePtr(dest, 0));
 }
 
+void ZSharp::IZPropertyVisitor::DestructValue_InContainer(void* dest) const
+{
+	DestructValue(ContainerPtrToValuePtr(dest, 0));
+}
+
 void ZSharp::IZPropertyVisitor::GetValue_InContainer(const void* src, FZCallBufferSlot& dest, int32 index) const
 {
 	if (const FProperty* underlyingProperty = GetUnderlyingProperty(); underlyingProperty->HasGetter())

@@ -11,21 +11,32 @@ partial class UnrealFieldScanner
 	{
 		foreach (var method in type.Methods)
 		{
-			if (GetCustomAttributeOrDefault(method, typeof(UFunctionAttribute).FullName!) is { } ufunctionAttr)
+			if (GetCustomAttributeOrDefault<UFunctionAttribute>(method) is { } ufunctionAttr)
 			{
-				ScanUFunction(type, cls, method, ufunctionAttr);
+				ScanUFunction(type, method, cls, ufunctionAttr);
 			}
 		}
 	}
 
-	private void ScanUFunction(TypeDefinition type, UnrealClassDefinition cls, MethodDefinition method, CustomAttribute ufunctionAttr)
+	private void ScanUFunction(TypeDefinition type, MethodDefinition method, UnrealClassDefinition cls, CustomAttribute ufunctionAttr)
 	{
+		string name = IsValidAttributeCtorArgIndex(ufunctionAttr, 0) ? GetAttributeCtorArgValue<string>(ufunctionAttr, 0) : method.Name;
+		string zcallName = $"m://{method.Module.Assembly.Name.Name}:{type.FullName}:{name}";
 		UnrealFunctionDefinition def = new()
 		{
-			Name = GetAttributeCtorArgValue<string>(ufunctionAttr, 0),
+			Name = name,
+			ZCallName = zcallName,
 		};
 
-		def.ZCallName = def.Name;
+		if (HasCustomAttribute<BlueprintCallableAttribute>(method))
+		{
+			def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintCallable;
+		}
+		else if (HasCustomAttribute<BlueprintPureAttribute>(method))
+		{
+			def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintCallable;
+			def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintPure;
+		}
 		
 		ScanUParams(method, def);
 

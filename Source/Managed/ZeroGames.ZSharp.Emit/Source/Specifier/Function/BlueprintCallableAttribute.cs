@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Property)]
-public class UPropertyAttribute : Attribute;
+[AttributeUsage(AttributeTargets.Method)]
+public class BlueprintCallableAttribute : Attribute;
 
 

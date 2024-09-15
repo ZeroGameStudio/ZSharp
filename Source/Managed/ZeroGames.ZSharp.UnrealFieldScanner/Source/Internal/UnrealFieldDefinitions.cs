@@ -49,7 +49,7 @@ public class UnrealStructDefinition : UnrealFieldDefinition
 public class UnrealFunctionDefinition : UnrealStructDefinition
 {
 	public EFunctionFlags FunctionFlags { get; set; }
-	public string? ZCallName { get; set; }
+	public required string ZCallName { get; set; }
 	public uint16 RpcId { get; set; }
 	public uint16 RpcResponseId { get; set; }
 }

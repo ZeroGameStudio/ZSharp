@@ -15,13 +15,13 @@ partial class UnrealFieldScanner
 			SuperPath = GetUnrealFieldPath(type.BaseType),
 		};
 
-		if (GetCustomAttributeOrDefault(type, typeof(WithinAttribute).FullName!) is { } withinAttr)
+		if (GetCustomAttributeOrDefault<WithinAttribute>(type) is { } withinAttr)
 		{
 			TypeReference outerTypeRef = GetAttributeCtorArgValue<TypeReference>(withinAttr, 0);
 			cls.WithinPath = GetUnrealFieldPath(outerTypeRef);
 		}
 
-		if (GetCustomAttributeOrDefault(type, typeof(ConfigAttribute).FullName!) is { } configAttr)
+		if (GetCustomAttributeOrDefault<ConfigAttribute>(type) is { } configAttr)
 		{
 			cls.ConfigName = GetAttributeCtorArgValue<string>(configAttr, 0);
 		}

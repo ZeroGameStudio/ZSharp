@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using Mono.Cecil;
-using ZeroGames.ZSharp.Emit.Specifier.Property;
+using ZeroGames.ZSharp.Emit.Specifier;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
@@ -10,13 +10,13 @@ partial class UnrealFieldScanner
 
 	private void ScanUProperties(TypeDefinition type, UnrealStructDefinition strct)
 	{
-		foreach (var prop in type.Properties.Where(prop => GetCustomAttributeOrDefault(prop, typeof(UPropertyAttribute).FullName!) is not null))
+		foreach (var prop in type.Properties.Where(HasCustomAttribute<UPropertyAttribute>))
 		{
-			ScanUProperty(type, strct, prop);
+			ScanUProperty(prop, strct);
 		}
 	}
 
-	private void ScanUProperty(TypeDefinition type, UnrealStructDefinition strct, PropertyDefinition prop)
+	private void ScanUProperty(PropertyDefinition prop, UnrealStructDefinition strct)
 	{
 		UnrealPropertyDefinition def = new()
 		{
@@ -25,9 +25,64 @@ partial class UnrealFieldScanner
 			DescriptorFieldPath = descriptorFieldPath,
 		};
 
-		def.PropertyFlags |= EPropertyFlags.CPF_NativeAccessSpecifierPublic;
-		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
+		{ // Edit
+			if (HasCustomAttribute<EditAnywhereAttribute>(prop))
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_Edit;
+			}
+			else if (HasCustomAttribute<EditInstanceOnlyAttribute>(prop))
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_Edit;
+				def.PropertyFlags |= EPropertyFlags.CPF_DisableEditOnTemplate;
+			}
+			else if (HasCustomAttribute<EditDefaultsOnlyAttribute>(prop))
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_Edit;
+				def.PropertyFlags |= EPropertyFlags.CPF_DisableEditOnInstance;
+			}
+			else if (HasCustomAttribute<VisibleAnywhereAttribute>(prop))
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_Edit;
+				def.PropertyFlags |= EPropertyFlags.CPF_EditConst;
+			}
+			else if (HasCustomAttribute<VisibleInstanceOnlyAttribute>(prop))
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_Edit;
+				def.PropertyFlags |= EPropertyFlags.CPF_EditConst;
+				def.PropertyFlags |= EPropertyFlags.CPF_DisableEditOnTemplate;
+			}
+			else if (HasCustomAttribute<VisibleDefaultsOnlyAttribute>(prop))
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_Edit;
+				def.PropertyFlags |= EPropertyFlags.CPF_EditConst;
+				def.PropertyFlags |= EPropertyFlags.CPF_DisableEditOnInstance;
+			}
+		}
 
+		{ // Native visibility
+			MethodDefinition getter = prop.GetMethod;
+			if (getter.IsPublic)
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_NativeAccessSpecifierPublic;
+			}
+			else
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_NativeAccessSpecifierPrivate;
+			}
+		}
+
+		{ // Blueprint visibility
+			if (HasCustomAttribute<BlueprintReadWriteAttribute>(prop))
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
+			}
+			else if (HasCustomAttribute<BlueprintReadOnlyAttribute>(prop))
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
+				def.PropertyFlags |= EPropertyFlags.CPF_BlueprintReadOnly;
+			}
+		}
+		
 		if (_withMetadata)
 		{
 			ScanMetadata(prop, def);
@@ -38,7 +93,41 @@ partial class UnrealFieldScanner
 
 	private void ScanUParams(MethodDefinition method, UnrealFunctionDefinition function)
 	{
-		
+		foreach (var param in method.Parameters)
+		{
+			ScanUParam(param, function);
+		}
+	}
+
+	private void ScanUParam(ParameterDefinition param, UnrealFunctionDefinition function)
+	{
+		UnrealPropertyDefinition def = new()
+		{
+			Name = param.Name,
+			Type = GetPropertyType(param.ParameterType, out var descriptorFieldPath),
+			DescriptorFieldPath = descriptorFieldPath,
+		};
+
+		def.PropertyFlags |= EPropertyFlags.CPF_Parm;
+		if (param.IsReturnValue)
+		{
+			def.PropertyFlags |= EPropertyFlags.CPF_ReturnParm;
+		}
+		else if (param.IsOut)
+		{
+			def.PropertyFlags |= EPropertyFlags.CPF_OutParm;
+			if (param.IsIn)
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_ReferenceParm;
+			}
+		}
+
+		if (_withMetadata)
+		{
+			ScanMetadata(param, def);
+		}
+
+		function.Properties.Add(def);
 	}
 
 	private EPropertyType GetPropertyType(TypeReference propertyTypeRef, out string? descriptorFieldPath)
@@ -113,9 +202,9 @@ partial class UnrealFieldScanner
 
 	// Strings
 	private const string STRING_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(String);
-	private const string UNREAL_STRING_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "ZeroGames.ZSharp.UnrealEngine.Core.UnrealString";
-	private const string UNREAL_NAME_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "ZeroGames.ZSharp.UnrealEngine.Core.UnrealName";
-	private const string UNREAL_TEXT_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "ZeroGames.ZSharp.UnrealEngine.Core.UnrealText";
+	private const string UNREAL_STRING_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealString";
+	private const string UNREAL_NAME_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealName";
+	private const string UNREAL_TEXT_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealText";
 	
 	// Object wrappers
 	private const string UNREAL_OBJECT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealObjectBase";

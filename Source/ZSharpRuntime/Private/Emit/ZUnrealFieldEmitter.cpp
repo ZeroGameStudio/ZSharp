@@ -375,6 +375,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 	{
 		// Migrate from UECodeGen_Private::ConstructUFunction().
 		constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Transient | RF_MarkAsNative;
+		// Z# function must be native.
+		constexpr EFunctionFlags GCompiledInFunctionFlags = FUNC_Native;
 
 		FStaticConstructObjectParameters params { UFunction::StaticClass() };
 		params.Outer = outer;
@@ -385,17 +387,12 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		FZSharpFunction* zsfunction = FZSharpFieldRegistry::Get().RegisterFunction(function);
 		def.Function = function;
 
-		function->FunctionFlags |= def.FunctionFlags;
+		function->FunctionFlags |= def.FunctionFlags | GCompiledInFunctionFlags;
 		zsfunction->ZCallName = def.ZCallName;
 		function->RPCId = def.RpcId;
 		function->RPCResponseId = def.RpcResponseId;
 
-		const bool isNative = function->HasAllFunctionFlags(FUNC_Native);
-		check(!zsfunction->ZCallName.IsEmpty() || !isNative);
-		if (isNative)
-		{
-			outer->AddNativeFunction(*function->GetName(), ZSharpFunction_Private::execZCall);
-		}
+		outer->AddNativeFunction(*function->GetName(), ZSharpFunction_Private::execZCall);
 
 		EmitProperties(function, def.Properties);
 		AddMetadata(function, def.MetadataMap);

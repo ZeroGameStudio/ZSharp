@@ -31,10 +31,21 @@ partial class UnrealFieldScanner
 
 	private TypeDefinition? GetTypeDefinitionOrDefault(AssemblyDefinition assembly, string typeFullName) => assembly.Modules.SelectMany(module => module.Types).SingleOrDefault(t => t.FullName == typeFullName);
 
+	private CustomAttribute GetCustomAttribute(ICustomAttributeProvider provider, TypeReference attributeTypeRef) => GetCustomAttribute(provider, attributeTypeRef.FullName!);
+	private CustomAttribute GetCustomAttribute(ICustomAttributeProvider provider, Type attributeType) => GetCustomAttribute(provider, attributeType.FullName!);
+	private CustomAttribute GetCustomAttribute<T>(ICustomAttributeProvider provider) => GetCustomAttribute(provider, typeof(T));
 	private CustomAttribute GetCustomAttribute(ICustomAttributeProvider provider, string attributeFullName) => GetCustomAttributeOrDefault(provider, attributeFullName) ?? throw new InvalidOperationException();
 
+	private CustomAttribute? GetCustomAttributeOrDefault(ICustomAttributeProvider provider, TypeReference attributeTypeRef) => GetCustomAttributeOrDefault(provider, attributeTypeRef.FullName!);
+	private CustomAttribute? GetCustomAttributeOrDefault(ICustomAttributeProvider provider, Type attributeType) => GetCustomAttributeOrDefault(provider, attributeType.FullName!);
+	private CustomAttribute? GetCustomAttributeOrDefault<T>(ICustomAttributeProvider provider) => GetCustomAttributeOrDefault(provider, typeof(T));
 	private CustomAttribute? GetCustomAttributeOrDefault(ICustomAttributeProvider provider, string attributeFullName) => provider.CustomAttributes.SingleOrDefault(attr => attr.AttributeType.FullName == attributeFullName);
 
+	private bool HasCustomAttribute(ICustomAttributeProvider provider, TypeReference attributeTypeRef) => HasCustomAttribute(provider, attributeTypeRef.FullName!);
+	private bool HasCustomAttribute(ICustomAttributeProvider provider, Type attributeType) => HasCustomAttribute(provider, attributeType.FullName!);
+	private bool HasCustomAttribute<T>(ICustomAttributeProvider provider) => HasCustomAttribute(provider, typeof(T));
+	private bool HasCustomAttribute(ICustomAttributeProvider provider, string attributeFullName) => GetCustomAttributeOrDefault(provider, attributeFullName) is not null;
+	
 	private object? GetAttributeArgValue(CustomAttributeArgument arg)
 	{
 		// Object type argument.
@@ -65,6 +76,8 @@ partial class UnrealFieldScanner
 
 	private T GetAttributeArgValue<T>(CustomAttributeArgument arg) => (T)GetAttributeArgValue(arg)!;
 
+	private bool IsValidAttributeCtorArgIndex(CustomAttribute attribute, int32 index) => index >= 0 && index < attribute.ConstructorArguments.Count;
+
 	private T GetAttributeCtorArgValue<T>(CustomAttribute attribute, int32 index) => GetAttributeArgValue<T>(attribute.ConstructorArguments[index]);
 
 	private string GetUnrealFieldPath(TypeReference typeRef) => GetUnrealFieldPathOrDefault(typeRef) ?? throw new InvalidOperationException();
@@ -82,7 +95,7 @@ partial class UnrealFieldScanner
 
 	private Dictionary<string, string>? GetMetadataMap(ICustomAttributeProvider provider)
 	{
-		CustomAttribute? umetaAttribute = GetCustomAttributeOrDefault(provider, typeof(UMetaAttribute).FullName!);
+		CustomAttribute? umetaAttribute = GetCustomAttributeOrDefault<UMetaAttribute>(provider);
 		if (umetaAttribute is null)
 		{
 			return null;

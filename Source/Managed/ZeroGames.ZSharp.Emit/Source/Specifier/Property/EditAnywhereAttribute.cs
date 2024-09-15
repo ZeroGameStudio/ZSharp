@@ -3,6 +3,6 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class UPropertyAttribute : Attribute;
+public class EditAnywhereAttribute : Attribute;
 
 

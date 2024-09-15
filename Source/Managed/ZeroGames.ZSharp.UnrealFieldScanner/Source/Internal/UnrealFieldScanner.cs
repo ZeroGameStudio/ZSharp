@@ -100,7 +100,7 @@ internal partial class UnrealFieldScanner : IDisposable
 			return ValueTask.CompletedTask;
 		}
 		
-		if (GetCustomAttributeOrDefault(type, typeof(UClassAttribute).FullName!) is not null)
+		if (HasCustomAttribute<UClassAttribute>(type))
 		{
 			ScanUClass(type);
 		}

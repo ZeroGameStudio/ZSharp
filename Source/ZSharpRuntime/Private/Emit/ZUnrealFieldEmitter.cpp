@@ -363,11 +363,11 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 #undef NEW_PROPERTY
 
-	static void EmitProperties(UStruct* outer, TMap<FName, FZPropertyDefinition>& def)
+	static void EmitProperties(UStruct* outer, TArray<FZPropertyDefinition>& defs)
 	{
-		for (auto& pair : def)
+		for (auto& def : defs)
 		{
-			EmitProperty(outer, pair.Value);
+			EmitProperty(outer, def);
 		}
 	}
 
@@ -397,7 +397,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			outer->AddNativeFunction(*function->GetName(), ZSharpFunction_Private::execZCall);
 		}
 
-		EmitProperties(function, def.PropertyMap);
+		EmitProperties(function, def.Properties);
 		AddMetadata(function, def.MetadataMap);
 
 		function->Bind();
@@ -409,11 +409,11 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		outer->AddFunctionToFunctionMap(function, function->GetFName());
 	}
 
-	static void EmitFunctions(UClass* outer, TMap<FName, FZFunctionDefinition>& def)
+	static void EmitFunctions(UClass* outer, TArray<FZFunctionDefinition>& defs)
 	{
-		for (auto& pair : def)
+		for (auto& def : defs)
 		{
-			EmitFunction(outer, pair.Value);
+			EmitFunction(outer, def);
 		}
 	}
 }
@@ -425,67 +425,67 @@ ZSharp::FZUnrealFieldEmitter& ZSharp::FZUnrealFieldEmitter::Get()
 	return GSingleton;
 }
 
-void ZSharp::FZUnrealFieldEmitter::Emit(FZUnrealFieldManifest& def)
+void ZSharp::FZUnrealFieldEmitter::Emit(FZUnrealFieldManifest& manifest)
 {
 	UE_CLOG(bEmitting, LogZSharpEmit, Fatal, TEXT("Emit is a package-wide atomic operation so can't invoke recursively!!!"));
 	TGuardValue recursionGuard { bEmitting, true };
 
-	if (EmittedModules.Contains(def.ModuleName))
+	if (EmittedModules.Contains(manifest.ModuleName))
 	{
 		return;
 	}
-	EmittedModules.Emplace(def.ModuleName);
+	EmittedModules.Emplace(manifest.ModuleName);
 	
-	InternalEmit(def);
+	InternalEmit(manifest);
 }
 
-void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& def) const
+void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest) const
 {
-	if (def.EnumMap.IsEmpty() && def.StructMap.IsEmpty() && def.ClassMap.IsEmpty() && def.InterfaceMap.IsEmpty() && def.DelegateMap.IsEmpty())
+	if (manifest.Enums.IsEmpty() && manifest.Structs.IsEmpty() && manifest.Classes.IsEmpty() && manifest.Interfaces.IsEmpty() && manifest.Delegates.IsEmpty())
 	{
 		return;
 	}
 	
 	// Migrate from UObjectBase::DeferredRegister().
-	const FString packageName = FString::Printf(TEXT("/Script/%s"), *def.ModuleName.ToString());
+	const FString packageName = FString::Printf(TEXT("/Script/%s"), *manifest.ModuleName.ToString());
 	UPackage* pak = CreatePackage(*packageName);
-	def.Package = pak;
+	manifest.Package = pak;
 
 	pak->SetPackageFlags(PKG_CompiledIn);
 
 	// Enums have no dependency so we can emit them just one step.
-	for (auto& pair : def.EnumMap)
+	for (auto& def : manifest.Enums)
 	{
-		EmitEnum(pak, pair.Value);
+		EmitEnum(pak, def);
 	}
 	
 	// Other fields have dependency so we emit skeleton (placeholder) first.
-	for (auto& pair : def.StructMap)
+	for (auto& def : manifest.Structs)
 	{
-		EmitStructSkeleton(pak, pair.Value);
+		EmitStructSkeleton(pak, def);
 	}
 
-	for (auto& pair : def.ClassMap)
+	for (auto& def : manifest.Classes)
 	{
-		EmitClassSkeleton(pak, pair.Value);
+		EmitClassSkeleton(pak, def);
 	}
 
-	for (auto& pair : def.InterfaceMap)
+	for (auto& def : manifest.Interfaces)
 	{
-		EmitInterfaceSkeleton(pak, pair.Value);
+		EmitInterfaceSkeleton(pak, def);
 	}
 
-	for (auto& pair : def.DelegateMap)
+	for (auto& def : manifest.Delegates)
 	{
-		EmitDelegateSkeleton(pak, pair.Value);
+		EmitDelegateSkeleton(pak, def);
 	}
 
 	// Now that all fields are in memory (but not fully initialized) and we can setup dependency.
 	// IMPORTANT: Structs must finish before others because properties depend on structs need to calculate size.
 	// @TODO: Sort structs by reference.
-	for (auto& pair : def.StructMap)
+	for (auto& def : manifest.Structs)
 	{
-		FinishEmitStruct(pak, pair.Value);
+		FinishEmitStruct(pak, def);
 	}
 
 	// Subclass may depend on super/within class's data i.e. ClassConfigName, SparseClassDataStruct.
@@ -494,10 +494,10 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& def) cons
 	{
 		TArray<const UClass*> classes;
 		TMap<const UClass*, FZClassDefinition*> map;
-		for (auto& pair : def.ClassMap)
+		for (auto& def : manifest.Classes)
 		{
-			classes.Emplace(pair.Value.Class);
-			map.Emplace(pair.Value.Class, &pair.Value);
+			classes.Emplace(def.Class);
+			map.Emplace(def.Class, &def);
 		}
 		
 		Algo::TopologicalSort(classes, [&map](const UClass* cls)
@@ -528,20 +528,20 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& def) cons
 		}
 	}
 
-	for (auto& pair : def.InterfaceMap)
+	for (auto& def : manifest.Interfaces)
 	{
-		FinishEmitInterface(pak, pair.Value);
+		FinishEmitInterface(pak, def);
 	}
 
-	for (auto& pair : def.DelegateMap)
+	for (auto& def : manifest.Delegates)
 	{
-		FinishEmitDelegate(pak, pair.Value);
+		FinishEmitDelegate(pak, def);
 	}
 
 	// Finally, create CDO for all classes.
-	for (const auto& pair : def.ClassMap)
+	for (const auto& def : manifest.Classes)
 	{
-		(void)pair.Value.Class->GetDefaultObject();
+		(void)def.Class->GetDefaultObject();
 	}
 }
 
@@ -644,8 +644,8 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 
 	// Engine code construct functions first and this can make side effects to class instance
 	// so we keep sync with engine code.
-	ZUnrealFieldEmitter_Private::EmitFunctions(cls, def.FunctionMap);
-	ZUnrealFieldEmitter_Private::EmitProperties(cls, def.PropertyMap);
+	ZUnrealFieldEmitter_Private::EmitFunctions(cls, def.Functions);
+	ZUnrealFieldEmitter_Private::EmitProperties(cls, def.Properties);
 
 	// If we have no ClassConfigName then inherit from super.
 	if  (cls->ClassConfigName.IsNone())

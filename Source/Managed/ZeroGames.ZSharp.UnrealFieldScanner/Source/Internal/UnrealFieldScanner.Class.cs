@@ -36,9 +36,9 @@ partial class UnrealFieldScanner
 			cls.MetadataMap["BlueprintType"] = "true";
 		}
 		
-		lock (_manifest.ClassMap)
+		lock (_manifest.Classes)
 		{
-			_manifest.ClassMap[cls.Name] = cls;
+			_manifest.Classes.Add(cls);
 		}
 	}
 	

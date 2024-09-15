@@ -43,7 +43,7 @@ public class UnrealPropertyDefinition : UnrealFieldDefinition
 public class UnrealStructDefinition : UnrealFieldDefinition
 {
 	public string? SuperPath { get; set; }
-	public Dictionary<string, UnrealPropertyDefinition> PropertyMap { get; set; } = new();
+	public List<UnrealPropertyDefinition> Properties { get; set; } = new();
 }
 
 public class UnrealFunctionDefinition : UnrealStructDefinition
@@ -71,7 +71,7 @@ public class UnrealClassDefinition : UnrealStructDefinition
 	public EClassFlags ClassFlags { get; set; }
 	public EClassCastFlags CastFlags { get; set; }
 	public List<string> ImplementedInterfacePaths { get; set; } = new();
-	public Dictionary<string, UnrealFunctionDefinition> FunctionMap { get; set; } = new();
+	public List<UnrealFunctionDefinition> Functions { get; set; } = new();
 }
 
 public class UnrealInterfaceDefinition : UnrealStructDefinition
@@ -87,14 +87,14 @@ public class UnrealDelegateDefinition : UnrealStructDefinition
 public class UnrealFieldManifest
 {
 	public required string ModuleName { get; set; }
-	public Dictionary<string, UnrealEnumDefinition> EnumMap { get; set; } = new();
-	public Dictionary<string, UnrealScriptStructDefinition> StructMap { get; set; } = new();
-	public Dictionary<string, UnrealClassDefinition> ClassMap { get; set; } = new();
-	public Dictionary<string, UnrealInterfaceDefinition> InterfaceMap { get; set; } = new();
-	public Dictionary<string, UnrealDelegateDefinition> DelegateMap { get; set; } = new();
+	public List<UnrealEnumDefinition> Enums { get; set; } = new();
+	public List<UnrealScriptStructDefinition> Structs { get; set; } = new();
+	public List<UnrealClassDefinition> Classes { get; set; } = new();
+	public List<UnrealInterfaceDefinition> Interfaces { get; set; } = new();
+	public List<UnrealDelegateDefinition> Delegates { get; set; } = new();
 
 	[JsonIgnore]
-	public bool IsEmpty => EnumMap.Count + StructMap.Count + ClassMap.Count + InterfaceMap.Count + DelegateMap.Count == 0;
+	public bool IsEmpty => Enums.Count + Structs.Count + Classes.Count + Interfaces.Count + Delegates.Count == 0;
 }
 
 

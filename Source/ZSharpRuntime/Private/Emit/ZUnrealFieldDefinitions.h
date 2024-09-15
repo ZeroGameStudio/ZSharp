@@ -54,7 +54,7 @@ namespace ZSharp
 	struct FZStructDefinition : public FZFieldDefinition
 	{
 		FName SuperPath;
-		TMap<FName, FZPropertyDefinition> PropertyMap;
+		TArray<FZPropertyDefinition> Properties;
 	};
 
 	struct FZFunctionDefinition : public FZStructDefinition
@@ -91,7 +91,7 @@ namespace ZSharp
 
 		TArray<FName> ImplementedInterfacePaths;
 		
-		TMap<FName, FZFunctionDefinition> FunctionMap;
+		TArray<FZFunctionDefinition> Functions;
 	};
 	
 	struct FZInterfaceDefinition : public FZStructDefinition
@@ -110,11 +110,11 @@ namespace ZSharp
 		
 		FName ModuleName;
 		
-		TMap<FName, FZEnumDefinition> EnumMap;
-		TMap<FName, FZScriptStructDefinition> StructMap;
-		TMap<FName, FZClassDefinition> ClassMap;
-		TMap<FName, FZInterfaceDefinition> InterfaceMap;
-		TMap<FName, FZDelegateDefinition> DelegateMap;
+		TArray<FZEnumDefinition> Enums;
+		TArray<FZScriptStructDefinition> Structs;
+		TArray<FZClassDefinition> Classes;
+		TArray<FZInterfaceDefinition> Interfaces;
+		TArray<FZDelegateDefinition> Delegates;
 	};
 }
 

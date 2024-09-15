@@ -18,10 +18,10 @@ namespace ZSharp
 		static FZUnrealFieldEmitter& Get();
 
 	public:
-		void Emit(FZUnrealFieldManifest& def);
+		void Emit(FZUnrealFieldManifest& manifest);
 
 	private:
-		void InternalEmit(FZUnrealFieldManifest& def) const;
+		void InternalEmit(FZUnrealFieldManifest& manifest) const;
 		
 		void EmitEnum(UPackage* pak, FZEnumDefinition& def) const;
 		

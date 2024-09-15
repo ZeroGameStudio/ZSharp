@@ -79,7 +79,7 @@ struct FZStructDefinitionDto : public FZFieldDefinitionDto
 	FName SuperPath;
 
 	UPROPERTY()
-	TMap<FName, FZPropertyDefinitionDto> PropertyMap;
+	TArray<FZPropertyDefinitionDto> Properties;
 };
 
 USTRUCT()
@@ -137,7 +137,7 @@ struct FZClassDefinitionDto : public FZStructDefinitionDto
 	TArray<FName> ImplementedInterfacePaths;
 
 	UPROPERTY()
-	TMap<FName, FZFunctionDefinitionDto> FunctionMap;
+	TArray<FZFunctionDefinitionDto> Functions;
 };
 
 USTRUCT()
@@ -165,19 +165,19 @@ struct FZUnrealFieldManifestDto
 	FName ModuleName;
 
 	UPROPERTY()
-	TMap<FName, FZEnumDefinitionDto> EnumMap;
+	TArray<FZEnumDefinitionDto> Enums;
 	
 	UPROPERTY()
-	TMap<FName, FZScriptStructDefinitionDto> StructMap;
+	TArray<FZScriptStructDefinitionDto> Structs;
 
 	UPROPERTY()
-	TMap<FName, FZClassDefinitionDto> ClassMap;
+	TArray<FZClassDefinitionDto> Classes;
 
 	UPROPERTY()
-	TMap<FName, FZInterfaceDefinitionDto> InterfaceMap;
+	TArray<FZInterfaceDefinitionDto> Interfaces;
 
 	UPROPERTY()
-	TMap<FName, FZDelegateDefinitionDto> DelegateMap;
+	TArray<FZDelegateDefinitionDto> Delegates;
 };
 
 

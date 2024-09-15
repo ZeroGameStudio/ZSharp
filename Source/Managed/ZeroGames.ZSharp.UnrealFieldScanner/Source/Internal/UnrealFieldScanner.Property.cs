@@ -33,7 +33,7 @@ partial class UnrealFieldScanner
 			ScanMetadata(prop, def);
 		}
 
-		strct.PropertyMap[def.Name] = def;
+		strct.Properties.Add(def);
 	}
 
 	private void ScanUParams(MethodDefinition method, UnrealFunctionDefinition function)
@@ -92,47 +92,53 @@ partial class UnrealFieldScanner
 		return type;
 	}
 
+	private const string SYSTEM_NAMESPACE = "System.";
+	private const string ENGINE_NAMESPACE = "ZeroGames.ZSharp.UnrealEngine.";
+	private const string ENGINE_CORE_NAMESPACE = ENGINE_NAMESPACE + "Core.";
+	private const string ENGINE_CORE_UOBJECT_NAMESPACE = ENGINE_NAMESPACE + "CoreUObject.";
+
 	// Primitives
-	private const string UINT8_TYPE_FULL_NAME = "System.Byte";
-	private const string UINT16_TYPE_FULL_NAME = "System.UInt16";
-	private const string UINT32_TYPE_FULL_NAME = "System.UInt32";
-	private const string UINT64_TYPE_FULL_NAME = "System.UInt64";
-	private const string INT8_TYPE_FULL_NAME = "System.SByte";
-	private const string INT16_TYPE_FULL_NAME = "System.Int16";
-	private const string INT32_TYPE_FULL_NAME = "System.Int32";
-	private const string INT64_TYPE_FULL_NAME = "System.Int64";
-	private const string FLOAT_TYPE_FULL_NAME = "System.Single";
-	private const string DOUBLE_TYPE_FULL_NAME = "System.Double";
-	private const string BOOL_TYPE_FULL_NAME = "System.Boolean";
-	private const string ENUM_TYPE_FULL_NAME = "System.Enum";
+	private const string UINT8_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(Byte);
+	private const string UINT16_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(UInt16);
+	private const string UINT32_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(UInt32);
+	private const string UINT64_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(UInt64);
+	private const string INT8_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(SByte);
+	private const string INT16_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(Int16);
+	private const string INT32_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(Int32);
+	private const string INT64_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(Int64);
+	private const string FLOAT_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(Single);
+	private const string DOUBLE_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(Double);
+	private const string BOOL_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(Boolean);
+	private const string ENUM_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(Enum);
 
 	// Strings
-	private const string STRING_TYPE_FULL_NAME = "System.String";
-	private const string UNREAL_STRING_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.Core.UnrealString";
-	private const string UNREAL_NAME_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.Core.UnrealName";
-	private const string UNREAL_TEXT_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.Core.UnrealText";
+	private const string STRING_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(String);
+	private const string UNREAL_STRING_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "ZeroGames.ZSharp.UnrealEngine.Core.UnrealString";
+	private const string UNREAL_NAME_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "ZeroGames.ZSharp.UnrealEngine.Core.UnrealName";
+	private const string UNREAL_TEXT_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "ZeroGames.ZSharp.UnrealEngine.Core.UnrealText";
 	
 	// Object wrappers
-	private const string UNREAL_OBJECT_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.CoreUObject.UnrealObjectBase";
-	private const string SUBCLASSOF_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.CoreUObject.SubclassOf`1";
-	private const string SOFT_CLASS_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.CoreUObject.SoftClassPtr`1";
-	private const string SOFT_OBJECT_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.CoreUObject.SoftObjectPtr`1";
-	private const string WEAK_OBJECT_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.CoreUObject.WeakObjectPtr`1";
-	private const string LAZY_OBJECT_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.CoreUObject.LazyObjectPtr`1";
-	private const string UNREAL_INTERFACE_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.CoreUObject.ScriptInterface`1";
+	private const string UNREAL_OBJECT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealObjectBase";
+	private const string SUBCLASSOF_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "SubclassOf`1";
+	private const string SOFT_CLASS_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "SoftClassPtr`1";
+	private const string SOFT_OBJECT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "SoftObjectPtr`1";
+	private const string WEAK_OBJECT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "WeakObjectPtr`1";
+	private const string LAZY_OBJECT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "LazyObjectPtr`1";
+	private const string UNREAL_INTERFACE_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "ScriptInterface`1";
 	
 	// Containers
-	private const string UNREAL_SCRIPT_STRUCT_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.Core.UnrealStructBase";
-	private const string UNREAL_ARRAY_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.Core.UnrealArray`1";
-	private const string UNREAL_SET_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.Core.UnrealSet`1";
-	private const string UNREAL_MAP_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.Core.UnrealMap`2";
+	private const string UNREAL_SCRIPT_STRUCT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealStructBase";
+	private const string UNREAL_ARRAY_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealArray`1";
+	private const string UNREAL_SET_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealSet`1";
+	private const string UNREAL_MAP_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealMap`2";
+	private const string UNREAL_OPTIONAL_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealOptional`1";
 	
 	// Delegates
-	private const string UNREAL_DELEGATE_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.Core.UnrealDelegateBase";
-	private const string UNREAL_MULTICAST_INLINE_DELEGATE_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.Core.UnrealMulticastInlineDelegateBase";
+	private const string UNREAL_DELEGATE_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealDelegateBase";
+	private const string UNREAL_MULTICAST_INLINE_DELEGATE_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealMulticastInlineDelegateBase";
 	
 	// Special types
-	private const string FIELD_PATH_TYPE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.CoreUObject.FieldPath";
+	private const string FIELD_PATH_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "FieldPath";
 	
 
 }

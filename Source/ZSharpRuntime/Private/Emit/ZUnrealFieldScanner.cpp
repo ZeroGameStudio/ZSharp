@@ -14,15 +14,14 @@
 
 namespace ZSharp::ZUnrealFieldScanner_Private
 {
-	static TMap<FName, FZPropertyDefinition> PropertyDtoMap2DefMap(TMap<FName, FZPropertyDefinitionDto>&& dtoMap)
+	static TArray<FZPropertyDefinition> PropertyDtos2Defs(TArray<FZPropertyDefinitionDto>&& dtos)
 	{
-		TMap<FName, FZPropertyDefinition> defMap;
-		defMap.Reserve(dtoMap.Num());
+		TArray<FZPropertyDefinition> defs;
+		defs.Reserve(dtos.Num());
 		
-		for (auto& pair : dtoMap)
+		for (auto& dto : dtos)
 		{
-			FZPropertyDefinitionDto& dto = pair.Value;
-			FZPropertyDefinition& def = defMap.Emplace(dto.Name);
+			FZPropertyDefinition& def = defs.Emplace_GetRef();
 			def.Name = dto.Name;
 			def.Flags = static_cast<EObjectFlags>(dto.Flags);
 			def.MetadataMap = MoveTemp(dto.MetadataMap);
@@ -40,30 +39,29 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 #undef COPY_SIMPLE_PROPERTY
 		}
 
-		return defMap;
+		return defs;
 	}
 
-	static TMap<FName, FZFunctionDefinition> FunctionDtoMap2DefMap(TMap<FName, FZFunctionDefinitionDto>&& dtoMap)
+	static TArray<FZFunctionDefinition> FunctionDtos2Defs(TArray<FZFunctionDefinitionDto>&& dtoMap)
 	{
-		TMap<FName, FZFunctionDefinition> defMap;
-		defMap.Reserve(dtoMap.Num());
+		TArray<FZFunctionDefinition> defs;
+		defs.Reserve(dtoMap.Num());
 		
-		for (auto& pair : dtoMap)
+		for (auto& dto : dtoMap)
 		{
-			FZFunctionDefinitionDto& dto = pair.Value;
-			FZFunctionDefinition& def = defMap.Emplace(dto.Name);
+			FZFunctionDefinition& def = defs.Emplace_GetRef();
 			def.Name = dto.Name;
 			def.Flags = static_cast<EObjectFlags>(dto.Flags);
 			def.MetadataMap = MoveTemp(dto.MetadataMap);
 			def.SuperPath = dto.SuperPath;
-			def.PropertyMap = PropertyDtoMap2DefMap(MoveTemp(dto.PropertyMap));
+			def.Properties = PropertyDtos2Defs(MoveTemp(dto.Properties));
 			def.FunctionFlags = static_cast<EFunctionFlags>(dto.FunctionFlags);
 			def.ZCallName = MoveTemp(dto.ZCallName);
 			def.RpcId = dto.RpcId;
 			def.RpcResponseId = dto.RpcResponseId;
 		}
 
-		return defMap;
+		return defs;
 	}
 	
 	static FZUnrealFieldManifest ManifestDto2Def(FZUnrealFieldManifestDto&& dto)
@@ -80,21 +78,20 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 		}
 
 		{ // Classes
-			for (auto& pair : dto.ClassMap)
+			for (auto& classDto : dto.Classes)
 			{
-				FZClassDefinitionDto& classDto = pair.Value;
-				FZClassDefinition& classDef = def.ClassMap.Emplace(classDto.Name);
+				FZClassDefinition& classDef = def.Classes.Emplace_GetRef();
 				classDef.Name = classDto.Name;
 				classDef.Flags = static_cast<EObjectFlags>(classDto.Flags);
 				classDef.MetadataMap = MoveTemp(classDto.MetadataMap);
 				classDef.SuperPath = classDto.SuperPath;
-				classDef.PropertyMap = PropertyDtoMap2DefMap(MoveTemp(classDto.PropertyMap));
+				classDef.Properties = PropertyDtos2Defs(MoveTemp(classDto.Properties));
 				classDef.ConfigName = classDto.ConfigName;
 				classDef.WithinPath = classDto.WithinPath;
 				classDef.ClassFlags = static_cast<EClassFlags>(classDto.ClassFlags);
 				classDef.CastFlags = static_cast<EClassCastFlags>(classDto.CastFlags);
 				classDef.ImplementedInterfacePaths = MoveTemp(classDto.ImplementedInterfacePaths);
-				classDef.FunctionMap = FunctionDtoMap2DefMap(MoveTemp(classDto.FunctionMap));
+				classDef.Functions = FunctionDtos2Defs(MoveTemp(classDto.Functions));
 			}
 		}
 

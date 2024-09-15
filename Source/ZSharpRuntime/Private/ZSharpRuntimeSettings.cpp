@@ -38,4 +38,24 @@ void UZSharpRuntimeSettings::ForeachMappedModule(TFunctionRef<void(const FString
 	}
 }
 
+#if WITH_EDITORONLY_DATA
+
+TArray<FString> UZSharpRuntimeSettings::GetModuleOptions()
+{
+	TArray<FModuleStatus> statuses;
+	FModuleManager::Get().QueryModules(statuses);
+
+	TArray<FString> moduleNames;
+	for (const auto& status : statuses)
+	{
+		moduleNames.Emplace(status.Name);
+	}
+
+	moduleNames.StableSort();
+
+	return moduleNames;
+}
+
+#endif
+
 

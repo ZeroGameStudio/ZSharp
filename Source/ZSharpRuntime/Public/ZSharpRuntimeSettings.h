@@ -36,6 +36,12 @@ public:
 	const FZModuleMappingContext* GetModuleMappingContext(const FString& module) const;
 	void ForeachMappedModule(TFunctionRef<void(const FString&, const FZModuleMappingContext&)> action) const;
 
+#if WITH_EDITORONLY_DATA
+private:
+	UFUNCTION()
+	static TArray<FString> GetModuleOptions();
+#endif
+
 private:
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Assembly")
 	FString CoreAssemblyName = ZSHARP_CORE_ASSEMBLY_NAME;
@@ -46,7 +52,7 @@ private:
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Assembly")
 	FString EngineAssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
 	
-	UPROPERTY(Config, EditAnywhere, Category = "Mapping")
+	UPROPERTY(Config, EditAnywhere, Category = "Mapping", meta = (GetKeyOptions = GetModuleOptions))
 	TMap<FString, FZModuleMappingContext> ModuleAssemblyMapping;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Mapping")

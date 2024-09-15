@@ -13,7 +13,7 @@ struct FZModuleMappingContext
 	UPROPERTY(EditAnywhere)
 	FString AssemblyName;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (ConfigRestartRequired = true))
 	bool bHasDynamicFields = false;
 	
 };

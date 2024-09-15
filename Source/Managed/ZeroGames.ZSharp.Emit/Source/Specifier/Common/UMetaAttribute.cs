@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Parameter)]
 public class UMetaAttribute(params string[] pairs) : Attribute
 {
 	public string[] Pairs => pairs;

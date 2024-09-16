@@ -126,10 +126,10 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
         alc.ReleaseConjugate_Red(unmanaged);
     });
     
-    public static delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> SZCall_Black = null;
-    public static delegate* unmanaged<char*, ZCallHandle> SGetZCallHandle_Black = null;
-    public static delegate* unmanaged<uint16, IntPtr, IntPtr> SBuildConjugate_Black = null;
-    public static delegate* unmanaged<uint16, IntPtr, void> SReleaseConjugate_Black = null;
+    public static delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> ZCall_Black = null;
+    public static delegate* unmanaged<char*, ZCallHandle> GetZCallHandle_Black = null;
+    public static delegate* unmanaged<uint16, IntPtr, IntPtr> BuildConjugate_Black = null;
+    public static delegate* unmanaged<uint16, IntPtr, void> ReleaseConjugate_Black = null;
 
 }
 

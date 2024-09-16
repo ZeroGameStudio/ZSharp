@@ -65,8 +65,7 @@ namespace ZSharp::ZGenericClr_Private
 		
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
         {
-#define TO_STRING(FieldName) TEXT(#FieldName)
-#define BUILD_UNMANAGED_FUNCTION(ShortTypeName, FieldName) { G##ShortTypeName##TypeName, TO_STRING(S##FieldName), FZ##ShortTypeName::FieldName }
+#define BUILD_UNMANAGED_FUNCTION(ShortTypeName, FieldName) { G##ShortTypeName##TypeName, TEXT(#FieldName), FZ##ShortTypeName::FieldName }
 
 			BUILD_UNMANAGED_FUNCTION(Core_Interop, CoreLog),
 			
@@ -81,7 +80,6 @@ namespace ZSharp::ZGenericClr_Private
 			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ReleaseConjugate_Black),
 
 #undef BUILD_UNMANAGED_FUNCTION
-#undef TO_STRING
         };
 
 		static void** GManagedFunctions[] =
@@ -147,10 +145,10 @@ namespace ZSharp::ZGenericClr_Private
 		
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
 		{
-			{ *GUnrealEngineInteropTypeName, TEXT("SLog"), FZUnrealEngine_Interop::Log },
-			{ *GUnrealEngineInteropTypeName, TEXT("SIsInGameThread"), FZUnrealEngine_Interop::IsInGameThread },
+			{ *GUnrealEngineInteropTypeName, TEXT("Log"), FZUnrealEngine_Interop::Log },
+			{ *GUnrealEngineInteropTypeName, TEXT("IsInGameThread"), FZUnrealEngine_Interop::IsInGameThread },
 
-			{ *GPathInteropTypeName, TEXT("SGetProjectDir"), FZPath_Interop::GetProjectDir },
+			{ *GPathInteropTypeName, TEXT("GetProjectDir"), FZPath_Interop::GetProjectDir },
 		};
 		
 		static const struct

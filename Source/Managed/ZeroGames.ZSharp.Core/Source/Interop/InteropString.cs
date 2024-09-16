@@ -13,7 +13,7 @@ public readonly struct InteropString : IDisposable
         {
             fixed (char* data = str.ToCharArray())
             {
-                _address = InteropString_Interop.SAlloc(data);
+                _address = InteropString_Interop.Alloc(data);
             }
         }
     }
@@ -30,7 +30,7 @@ public readonly struct InteropString : IDisposable
         {
             unsafe
             {
-                InteropString_Interop.SFree(_address);
+                InteropString_Interop.Free(_address);
             }
         }
     }
@@ -39,12 +39,12 @@ public readonly struct InteropString : IDisposable
 
     public unsafe string Data
     {
-        get => new(InteropString_Interop.SGetData(_address));
+        get => new(InteropString_Interop.GetData(_address));
         set
         {
             fixed (char* data = value.ToCharArray())
             {
-                InteropString_Interop.SSetData(_address, data);
+                InteropString_Interop.SetData(_address, data);
             }
         }
     }

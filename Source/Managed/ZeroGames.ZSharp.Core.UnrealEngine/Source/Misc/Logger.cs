@@ -40,7 +40,7 @@ public static class Logger
         {
             fixed (char* buffer = sb.ToString().ToCharArray())
             {
-                UnrealEngine_Interop.SLog(level, buffer);
+                UnrealEngine_Interop.Log(level, buffer);
             }
         }
     }

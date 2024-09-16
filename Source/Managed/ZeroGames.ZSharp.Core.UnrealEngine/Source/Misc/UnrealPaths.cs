@@ -10,7 +10,7 @@ public static class UnrealPaths
 		get
 		{
 			using InteropString dir = new();
-			Path_Interop.SGetProjectDir(dir.Address);
+			Path_Interop.GetProjectDir(dir.Address);
 			return dir.Data;
 		}
 	}

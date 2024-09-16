@@ -40,7 +40,7 @@ internal static class Logger
         {
             fixed (char* buffer = sb.ToString().ToCharArray())
             {
-                Core_Interop.SCoreLog(level, buffer);
+                Core_Interop.CoreLog(level, buffer);
             }
         }
     }

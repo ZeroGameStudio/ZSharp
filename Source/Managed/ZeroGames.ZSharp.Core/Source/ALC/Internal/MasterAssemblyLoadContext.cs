@@ -261,14 +261,14 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     
     private EZCallErrorCode ZCall_Black(ZCallHandle handle, ZCallBuffer* buffer)
     {
-        return (EZCallErrorCode)MasterAssemblyLoadContext_Interop.SZCall_Black(handle, buffer);
+        return (EZCallErrorCode)MasterAssemblyLoadContext_Interop.ZCall_Black(handle, buffer);
     }
 
     private ZCallHandle GetZCallHandle_Black(string name)
     {
         fixed (char* data = name.ToCharArray())
         {
-            return MasterAssemblyLoadContext_Interop.SGetZCallHandle_Black(data);
+            return MasterAssemblyLoadContext_Interop.GetZCallHandle_Black(data);
         }
     }
 
@@ -280,7 +280,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             throw new InvalidOperationException($"ConjugateRegistryId of type {managed.GetType().FullName} is 0.");
         }
 
-        IntPtr unmanaged = MasterAssemblyLoadContext_Interop.SBuildConjugate_Black(registryId, userdata);
+        IntPtr unmanaged = MasterAssemblyLoadContext_Interop.BuildConjugate_Black(registryId, userdata);
         if (unmanaged != IntPtr.Zero)
         {
             _conjugateMap[unmanaged] = new(registryId, new(managed));
@@ -307,7 +307,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         }
 
         _conjugateMap.Remove(unmanaged);
-        MasterAssemblyLoadContext_Interop.SReleaseConjugate_Black(registryId, unmanaged);
+        MasterAssemblyLoadContext_Interop.ReleaseConjugate_Black(registryId, unmanaged);
     }
 
     private uint16 GetTypeConjugateRegistryId(Type type)

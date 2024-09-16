@@ -174,10 +174,10 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 			buffer.Slots[i].Type = EZCallBufferSlotType::Uninitialized;
 		}
 
-		UFunction* func = Function.Get();
+		const UFunction* func = Function.Get();
 
 		// Blueprint doesn't create new stack frame when it calls native function (and we are native)
-		// which results stack.Node points to the caller and stack.CurrentNativeFunction points to us.
+		// which results in stack.Node points to the caller and stack.CurrentNativeFunction points to us.
 		const bool fromBlueprint = stack.Node != stack.CurrentNativeFunction;
 
 		// For native call, params store directly in stack.Locals. (caller processes params)

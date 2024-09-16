@@ -184,15 +184,43 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		// For blueprint call, we need to manually alloc memory for params and process bytecode to load them. (callee processes params)
 		void* params = fromBlueprint ? FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment) : stack.Locals;
 
+		// For native call, out param link is stack.OutParms. (caller processes params)
+		// For blueprint call, we need to process bytecode to setup out param link. (callee processes params) (@see: ProcessScriptFunction() in ScriptCore.cpp)
+		FOutParmRec* outPramLink = fromBlueprint ? nullptr : stack.OutParms;
+		
 		// If called from blueprint, we need to fill params.
 		if (fromBlueprint)
 		{
+			FOutParmRec** lastOut = &outPramLink;
 			for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 			{
 				const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+				// We need to set Type for all slots, not only in params, so we initialize all properties.
 				visitor->InitializeValue_InContainer(params);
-				// This will load param value from bytecode.
+
+				stack.MostRecentPropertyAddress = nullptr;
+				stack.MostRecentPropertyContainer = nullptr;
+
 				stack.Step(object, visitor->ContainerPtrToValuePtr(params, 0));
+
+				if (OutParamIndices.Contains(i))
+				{
+					CA_SUPPRESS(6263)
+					const auto out = static_cast<FOutParmRec*>(FMemory_Alloca(sizeof(FOutParmRec)));
+					check(stack.MostRecentPropertyAddress);
+					out->PropAddr = stack.MostRecentPropertyAddress;
+					out->Property = const_cast<FProperty*>(visitor->GetUnderlyingProperty());
+
+					if (*lastOut)
+					{
+						(*lastOut)->NextOutParm = out;
+						lastOut = &(*lastOut)->NextOutParm;
+					}
+					else
+					{
+						*lastOut = out;
+					}
+				}
 			}
 
 			// Here the bytecode should reach EX_EndFunctionParms and we just skip it.
@@ -206,42 +234,42 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 			TZCallBufferSlotEncoder<UObject*>::Encode(object, buffer[0]);
 		}
 
-		for (const auto index : InParamIndices)
+		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{
-			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
-			visitor->GetValue_InContainer(params, buffer[bIsStatic ? index : index + 1], 0);
+			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+			// We need to set Type for all slots, not only in params.
+			visitor->GetValue_InContainer(params, buffer[bIsStatic ? i : i + 1], 0);
+		}
+		
+		if (ReturnProperty)
+		{
+			// We need to set Type for all slots, not only in params.
+			ReturnProperty->GetValue(RESULT_PARAM, buffer[-1]);
 		}
 
 		res = alc->ZCall(zsfunction->GetZCallHandle(), &buffer);
 
-		// Copy out params.
-		for (const auto index : OutParamIndices)
+		// Copy out params and destroy them if called from blueprint.
+		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{
-			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[index];
-			FOutParmRec* out = stack.OutParms;
-			// This must succeed, otherwise let it crash by null pointer.
-			while (out->Property != visitor->GetUnderlyingProperty())
+			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+			if (fromBlueprint && OutParamIndices.Contains(i))
 			{
-				out = out->NextOutParm;
+				FOutParmRec* out = outPramLink;
+				// This must succeed, otherwise let it crash by null pointer.
+				while (out->Property != visitor->GetUnderlyingProperty())
+				{
+					out = out->NextOutParm;
+				}
+				visitor->SetValue(out->PropAddr, buffer[bIsStatic ? i : i + 1]);
 			}
-			visitor->SetValue(out->PropAddr, buffer[bIsStatic ? index : index + 1]);
+			visitor->DestructValue_InContainer(params);
 		}
 
 		if (ReturnProperty)
 		{
 			ReturnProperty->SetValue(RESULT_PARAM, buffer[-1]);
-		}
-
-		// Destroy params if called from blueprint.
-		if (fromBlueprint)
-		{
-			for (int32 i = 0; i < ParameterProperties.Num(); ++i)
-			{
-				const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
-				visitor->DestructValue_InContainer(params);
-			}
-
-			if (ReturnProperty)
+			if (fromBlueprint)
 			{
 				ReturnProperty->DestructValue_InContainer(params);
 			}
@@ -289,10 +317,14 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		{
 			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
 			visitor->InitializeValue_InContainer(params);
-			if (InParamIndices.Contains(i))
-			{
-				visitor->GetValue_InContainer(params, buffer[i + 1], 0);
-			}
+			// We need to set Type for all slots, not only in params.
+			visitor->GetValue_InContainer(params, buffer[i + 1], 0);
+		}
+
+		if (ReturnProperty)
+		{
+			// We need to set Type for all slots, not only in params.
+			ReturnProperty->InitializeValue_InContainer(params);
 		}
 		
 		res = alc->ZCall(GetDelegateZCallHandle(), &buffer);

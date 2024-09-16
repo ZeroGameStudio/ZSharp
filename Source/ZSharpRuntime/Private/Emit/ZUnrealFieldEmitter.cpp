@@ -365,9 +365,9 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 	static void EmitProperties(UStruct* outer, TArray<FZPropertyDefinition>& defs)
 	{
-		for (auto& def : defs)
+		for (int32 i = defs.Num() - 1; i >= 0; --i)
 		{
-			EmitProperty(outer, def);
+			EmitProperty(outer, defs[i]);
 		}
 	}
 
@@ -408,9 +408,9 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 	static void EmitFunctions(UClass* outer, TArray<FZFunctionDefinition>& defs)
 	{
-		for (auto& def : defs)
+		for (int32 i = defs.Num() - 1; i >= 0; --i)
 		{
-			EmitFunction(outer, def);
+			EmitFunction(outer, defs[i]);
 		}
 	}
 }

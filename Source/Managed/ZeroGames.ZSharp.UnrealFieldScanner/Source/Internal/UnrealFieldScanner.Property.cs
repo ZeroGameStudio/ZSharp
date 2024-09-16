@@ -18,10 +18,26 @@ partial class UnrealFieldScanner
 
 	private void ScanUProperty(PropertyDefinition prop, UnrealStructDefinition strct)
 	{
+		TypeReference propertyType = prop.PropertyType;
+		if (propertyType.IsArray)
+		{
+			throw new NotSupportedException("UProperty array is not supported.");
+		}
+		
+		if (propertyType.IsByReference)
+		{
+			throw new NotSupportedException("UProperty reference is not supported.");
+		}
+		
+		if (propertyType.IsPointer)
+		{
+			throw new NotSupportedException("UProperty pointer is not supported.");
+		}
+		
 		UnrealPropertyDefinition def = new()
 		{
 			Name = prop.Name,
-			Type = GetPropertyType(prop.PropertyType, out var descriptorFieldPath),
+			Type = GetPropertyType(propertyType, out var descriptorFieldPath),
 			DescriptorFieldPath = descriptorFieldPath,
 		};
 
@@ -101,22 +117,35 @@ partial class UnrealFieldScanner
 
 	private void ScanUParam(ParameterDefinition param, UnrealFunctionDefinition function)
 	{
+		TypeReference parameterType = param.ParameterType;
+		if (parameterType.IsArray)
+		{
+			throw new NotSupportedException("UParam array is not supported.");
+		}
+		
+		if (parameterType.IsPointer)
+		{
+			throw new NotSupportedException("UParam pointer is not supported.");
+		}
+		
 		UnrealPropertyDefinition def = new()
 		{
 			Name = param.Name,
-			Type = GetPropertyType(param.ParameterType, out var descriptorFieldPath),
+			Type = GetPropertyType(parameterType, out var descriptorFieldPath),
 			DescriptorFieldPath = descriptorFieldPath,
 		};
 
 		def.PropertyFlags |= EPropertyFlags.CPF_Parm;
 		if (param.IsReturnValue)
 		{
+			def.PropertyFlags |= EPropertyFlags.CPF_OutParm;
 			def.PropertyFlags |= EPropertyFlags.CPF_ReturnParm;
 		}
-		else if (param.IsOut)
+		else if (parameterType.IsByReference)
 		{
+			function.FunctionFlags |= EFunctionFlags.FUNC_HasOutParms;
 			def.PropertyFlags |= EPropertyFlags.CPF_OutParm;
-			if (param.IsIn)
+			if (!param.IsOut)
 			{
 				def.PropertyFlags |= EPropertyFlags.CPF_ReferenceParm;
 			}
@@ -130,9 +159,42 @@ partial class UnrealFieldScanner
 		function.Properties.Add(def);
 	}
 
+	private void ScanUReturnParam(TypeReference parameterType, UnrealFunctionDefinition function)
+	{
+		if (parameterType.IsArray)
+		{
+			throw new NotSupportedException("UReturnParam array is not supported.");
+		}
+		
+		if (parameterType.IsByReference)
+		{
+			throw new NotSupportedException("UReturnParam reference is not supported.");
+		}
+		
+		if (parameterType.IsPointer)
+		{
+			throw new NotSupportedException("UReturnParam pointer is not supported.");
+		}
+		
+		UnrealPropertyDefinition def = new()
+		{
+			Name = "ReturnValue",
+			Type = GetPropertyType(parameterType, out var descriptorFieldPath),
+			DescriptorFieldPath = descriptorFieldPath,
+		};
+
+		def.PropertyFlags |= EPropertyFlags.CPF_Parm;
+		def.PropertyFlags |= EPropertyFlags.CPF_OutParm;
+		def.PropertyFlags |= EPropertyFlags.CPF_ReturnParm;
+
+		function.Properties.Add(def);
+	}
+
 	private EPropertyType GetPropertyType(TypeReference propertyTypeRef, out string? descriptorFieldPath)
 	{
 		descriptorFieldPath = null;
+
+		propertyTypeRef = propertyTypeRef.GetElementType();
 		
 		EPropertyType type = propertyTypeRef.FullName switch
 		{

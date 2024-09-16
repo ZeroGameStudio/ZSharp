@@ -23,18 +23,18 @@ internal class ZCallDispatcher_Method : IZCallDispatcher
         }
 
         ParameterInfo[] parameterInfos = Method.GetParameters();
-        List<object?> parameters = new();
+        object?[] parameters = new object?[parameterInfos.Length];
         for (int32 i = 0; i < parameterInfos.Length; ++i)
         {
-            parameters.Add((*buffer)[pos++].Object);
+	        parameters[i] = (*buffer)[pos++].Object;
         }
-
-        object? returnValue = Method.Invoke(obj, parameters.ToArray());
+        
+        object? returnValue = Method.Invoke(obj, parameters);
         
         for (int32 i = 0; i < parameterInfos.Length; ++i)
         {
 	        var parameter = parameterInfos[i];
-	        if (parameter.IsOut)
+	        if (parameter.ParameterType.IsByRef)
 	        {
 		        (*buffer)[Method.IsStatic ? i : i + 1].Object = parameters[i];
 	        }

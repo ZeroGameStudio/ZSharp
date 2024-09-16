@@ -39,6 +39,7 @@ partial class UnrealFieldScanner
 		}
 		
 		ScanUParams(method, def);
+		ScanUReturnParam(method.ReturnType, def);
 
 		if (_withMetadata)
 		{

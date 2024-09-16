@@ -18,18 +18,18 @@ internal class ZCallDispatcher_Delegate : IZCallDispatcher
 		int32 pos = 1;
 		MethodInfo method = @delegate.Method;
 		ParameterInfo[] parameterInfos = method.GetParameters();
-		List<object?> parameters = new();
+		object?[] parameters = new object?[parameterInfos.Length];
 		for (int32 i = 0; i < parameterInfos.Length; ++i)
 		{
-			parameters.Add((*buffer)[pos++].Object);
+			parameters[i] = (*buffer)[pos++].Object;
 		}
 
-		object? returnValue = @delegate.DynamicInvoke(parameters.ToArray());
+		object? returnValue = @delegate.DynamicInvoke(parameters);
 
 		for (int32 i = 0; i < parameterInfos.Length; ++i)
 		{
 			var parameter = parameterInfos[i];
-			if (parameter.IsOut)
+			if (parameter.ParameterType.IsByRef)
 			{
 				(*buffer)[i + 1].Object = parameters[i];
 			}

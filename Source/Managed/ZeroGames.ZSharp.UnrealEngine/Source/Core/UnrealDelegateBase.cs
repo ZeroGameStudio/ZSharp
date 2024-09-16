@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
 [ConjugateRegistryId(41)]
-public abstract class UnrealDelegateBase : PlainExportedObjectBase
+public abstract class UnrealDelegateBase : UnrealDynamicDelegateBase
 {
 
 	public static UnrealFunction GetUnrealDelegateSignature(Type t)

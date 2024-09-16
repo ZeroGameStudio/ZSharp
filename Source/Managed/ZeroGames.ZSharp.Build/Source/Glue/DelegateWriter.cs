@@ -38,19 +38,23 @@ public class DelegateWriter : IDisposable, IAsyncDisposable
 			parameters.Add($"{modifier}{param.Type} {param.Name}");
 		}
 		string parameterList = string.Join(", ", parameters);
-		string delegateAttr = $"[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"{Assembly.GetExecutingAssembly().GetName().Version!}\")]\n[UnrealFieldPath(\"{_exportedDelegate.UnrealFieldPath}\")]\n";
+		string delegateAttr = $"[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"{Assembly.GetExecutingAssembly().GetName().Version!.ToString(3)}\")]\n[UnrealFieldPath(__UNREAL_FIELD_PATH)]\n";
 		string baseType = _exportedDelegate.IsSparse ? "UnrealMulticastSparseDelegateBase" : _exportedDelegate.IsMulticast ? "UnrealMulticastInlineDelegateBase" : "UnrealDelegateBase";
 		string signatureDeclaration = $"public delegate {returnType} Signature({parameterList});";
 		string bindMethodName = _exportedDelegate.IsMulticast ? "Add" : "Bind";
 		
 		string delegateDeclaration =
-@$"public class {delegateName} : {baseType}, IConjugate<{delegateName}>
+@$"public class {delegateName} : {baseType}, IConjugate<{delegateName}>, IStaticUnrealFieldPath, IStaticSignature
 {{
 	{signatureDeclaration}
 	public static {delegateName} BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+	public new static string SUnrealFieldPath => __UNREAL_FIELD_PATH;
+	public new static DelegateFunction StaticSignature => UnrealObjectGlobals.LowLevelFindObject<DelegateFunction>(__UNREAL_FIELD_PATH)!;
+	public override string UnrealFieldPath => __UNREAL_FIELD_PATH;	
 	public {delegateName}() : base(typeof(Signature)){{}}
 	public {delegateName}(IntPtr unmanaged) : base(typeof(Signature), unmanaged){{}}
 	public UnrealObject {bindMethodName}(Signature @delegate) => base.{bindMethodName}(@delegate);
+	private const string __UNREAL_FIELD_PATH = ""{_exportedDelegate.UnrealFieldPath}"";
 }}";
 
 		delegateDeclaration = delegateAttr + delegateDeclaration;
@@ -73,6 +77,7 @@ $@"public partial class {outerClassName}
 #region GENERATED CODE
 
 #nullable enable
+#pragma warning disable CS0109 // Member does not hide an inherited member; new keyword is not required
 
 {string.Join('\n', NamespaceHelper.LootNamespace(_exportedDelegate).Where(ns => ns != _exportedDelegate.Namespace).Select(ns => $"using {ns};"))}
 

@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public partial class UnrealObject
+public partial class UnrealObject : IUnrealObject
 {
 
     public bool IsA(UnrealClass @class) => this.ZCall("ex://Object.IsA", @class, false)[-1].Bool;

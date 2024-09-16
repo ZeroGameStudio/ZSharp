@@ -175,7 +175,9 @@ namespace {_exportedClass.Namespace};
 			string @class = _exportedClass.IsInterface ? "interface " : "class ";
 			string? @base = _baseType;
 			string? conjugate = _hasBuildConjugate ? $"IConjugate<{_exportedClass.Name}>" : null;
-			List<string?> bases = [ @base, conjugate ];
+			string? staticFieldPath = _exportedClass.IsClass || _exportedClass.IsStruct ? "IStaticUnrealFieldPath" : null;
+			string? staticField = _exportedClass.IsClass ? "IStaticClass" : _exportedClass.IsStruct ? "IStaticStruct" : null;
+			List<string?> bases = [ @base, conjugate, staticFieldPath, staticField ];
 			
 			string classModifiers = $"public partial {@class}";
 			string baseTypes = string.Join(", ", bases.Where(b => b is not null));

@@ -3,11 +3,9 @@
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(1)]
-public abstract class UnrealObjectBase : UnrealExportedObjectBase, IStaticClass, IUnrealObject
+public abstract class UnrealObjectBase : UnrealExportedObjectBase
 {
 
-    public static UnrealClass SStaticClass => throw new NotSupportedException();
-    
     public abstract UnrealClass __Class { get; }
     
     public DynamicZCallResult ReadUnrealPropertyEx<T>(string name, int32 index)

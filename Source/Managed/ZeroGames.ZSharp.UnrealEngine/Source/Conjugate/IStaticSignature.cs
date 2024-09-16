@@ -2,9 +2,9 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
-public interface IUnrealFieldPath
+public interface IStaticSignature
 {
-	string UnrealFieldPath { get; }
+	static abstract DelegateFunction StaticSignature { get; }
 }
 
 

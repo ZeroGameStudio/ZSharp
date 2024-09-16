@@ -118,7 +118,7 @@ internal static class ContainerHelper
 		// 6 UObject wrappers
 		if (type.IsAssignableTo(typeof(SubclassOfBase)))
 		{
-			desc.Descriptor = SUBCLASSOF_TYPE_ID;
+			desc.Descriptor = SUBCLASS_OF_TYPE_ID;
 			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
@@ -130,7 +130,7 @@ internal static class ContainerHelper
 		}
 		if (type.IsAssignableTo(typeof(SoftObjectPtrBase)))
 		{
-			desc.Descriptor = SOFT_CLASS_PTR_TYPE_ID;
+			desc.Descriptor = SOFT_OBJECT_PTR_TYPE_ID;
 			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
@@ -179,7 +179,7 @@ internal static class ContainerHelper
 	private const IntPtr NAME_TYPE_ID = 13;
 	private const IntPtr TEXT_TYPE_ID = 14;
 
-	private const IntPtr SUBCLASSOF_TYPE_ID = 15;
+	private const IntPtr SUBCLASS_OF_TYPE_ID = 15;
 	private const IntPtr SOFT_CLASS_PTR_TYPE_ID = 16;
 	private const IntPtr SOFT_OBJECT_PTR_TYPE_ID = 17;
 	private const IntPtr WEAK_OBJECT_PTR_TYPE_ID = 18;

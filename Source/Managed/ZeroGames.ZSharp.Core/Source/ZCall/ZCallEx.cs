@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-public struct DynamicZCallResult
+public readonly struct DynamicZCallResult
 {
 	public required int32 Return { get; init; }
 	public required ZCallBufferSlot[] Slots { get; init; }

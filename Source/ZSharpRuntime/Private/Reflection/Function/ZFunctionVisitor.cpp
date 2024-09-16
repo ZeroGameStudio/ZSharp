@@ -205,7 +205,6 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 
 				if (OutParamIndices.Contains(i))
 				{
-					CA_SUPPRESS(6263)
 					const auto out = static_cast<FOutParmRec*>(FMemory_Alloca(sizeof(FOutParmRec)));
 					check(stack.MostRecentPropertyAddress);
 					out->PropAddr = stack.MostRecentPropertyAddress;
@@ -223,7 +222,6 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 				}
 			}
 
-			// Here the bytecode should reach EX_EndFunctionParms and we just skip it.
 			check(*stack.Code == EX_EndFunctionParms);
 			stack.SkipCode(1);
 		}

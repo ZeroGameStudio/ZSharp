@@ -6,8 +6,6 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public abstract class UnrealObjectBase : UnrealExportedObjectBase
 {
 
-    public abstract UnrealClass __Class { get; }
-    
     public DynamicZCallResult ReadUnrealPropertyEx<T>(string name, int32 index)
     {
         string zcallName = $"up:/{_classPath}:{name}";
@@ -44,6 +42,8 @@ public abstract class UnrealObjectBase : UnrealExportedObjectBase
         string zcallName = $"uf:/{_classPath}:{name}";
         return this.ZCall(zcallName, parameters);
     }
+    
+    public abstract UnrealClass __Class { get; }
     
     protected UnrealObjectBase(IntPtr unmanaged) : base(unmanaged){}
 

@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 
 public interface IStaticStruct
 {
-	static abstract UnrealScriptStruct SStaticStruct { get; }
+	static abstract UnrealScriptStruct StaticStruct { get; }
 }
 
 

@@ -104,7 +104,7 @@ internal static class ContainerHelper
 		// UStructs
 		if (type.IsAssignableTo(typeof(UnrealStructBase)))
 		{
-			desc.Descriptor = ((UnrealScriptStruct)type.GetProperty(nameof(IStaticStruct.SStaticStruct))!.GetValue(null)!).Unmanaged;
+			desc.Descriptor = ((UnrealScriptStruct)type.GetProperty(nameof(IStaticStruct.StaticStruct))!.GetValue(null)!).Unmanaged;
 			return true;
 		}
 		

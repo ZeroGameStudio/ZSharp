@@ -231,14 +231,14 @@ namespace {_exportedClass.Namespace};
 			if (_exportedClass.IsClass | _exportedClass.IsInterface)
 			{
 				return
-@"	public new static string SUnrealFieldPath => __UNREAL_FIELD_PATH;
-	public new static UnrealClass SStaticClass => UnrealObjectGlobals.LowLevelFindObject<UnrealClass>(__UNREAL_FIELD_PATH)!;";
+@"	public new static string StaticUnrealFieldPath => __UNREAL_FIELD_PATH;
+	public new static UnrealClass StaticClass => UnrealObjectGlobals.LowLevelFindObject<UnrealClass>(__UNREAL_FIELD_PATH)!;";
 			}
 			if (_exportedClass.IsStruct)
 			{
 				return
-@"	public new static string SUnrealFieldPath => __UNREAL_FIELD_PATH;
-	public new static UnrealScriptStruct SStaticStruct => UnrealObjectGlobals.LowLevelFindObject<UnrealScriptStruct>(__UNREAL_FIELD_PATH)!;";
+@"	public new static string StaticUnrealFieldPath => __UNREAL_FIELD_PATH;
+	public new static UnrealScriptStruct StaticStruct => UnrealObjectGlobals.LowLevelFindObject<UnrealScriptStruct>(__UNREAL_FIELD_PATH)!;";
 			}
 
 			return null;
@@ -297,7 +297,7 @@ namespace {_exportedClass.Namespace};
 			}
 
 			// Intrinsics
-			string userdata = _exportedClass.IsStruct ? "SStaticStruct.Unmanaged" : "IntPtr.Zero";
+			string userdata = _exportedClass.IsStruct ? "StaticStruct.Unmanaged" : "IntPtr.Zero";
 			string? constructorDefault = _exportedClass.IsClass || _exportedClass.IsInterface ? null : $"\tpublic {_exportedClass.Name}(){{ Unmanaged = GetOwningAlc().BuildConjugate(this, {userdata}); }}";
 			string? methodBuildConjugate = _hasBuildConjugate ? $"\tpublic new static {_exportedClass.Name} BuildConjugate(IntPtr unmanaged) => new(unmanaged);" : null;
 			string? constructorRed = _exportedClass.IsInterface ? null : $"\tprotected {_exportedClass.Name}(IntPtr unmanaged) : base(unmanaged){{}}";

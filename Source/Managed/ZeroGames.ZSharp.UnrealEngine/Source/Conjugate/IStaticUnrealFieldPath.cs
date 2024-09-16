@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 
 public interface IStaticUnrealFieldPath
 {
-	static abstract string SUnrealFieldPath { get; }
+	static abstract string StaticUnrealFieldPath { get; }
 }
 
 

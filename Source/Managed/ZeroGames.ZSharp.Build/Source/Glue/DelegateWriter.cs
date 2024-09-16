@@ -48,7 +48,7 @@ public class DelegateWriter : IDisposable, IAsyncDisposable
 {{
 	{signatureDeclaration}
 	public static {delegateName} BuildConjugate(IntPtr unmanaged) => new(unmanaged);
-	public new static string SUnrealFieldPath => __UNREAL_FIELD_PATH;
+	public new static string StaticUnrealFieldPath => __UNREAL_FIELD_PATH;
 	public new static DelegateFunction StaticSignature => UnrealObjectGlobals.LowLevelFindObject<DelegateFunction>(__UNREAL_FIELD_PATH)!;
 	public override string UnrealFieldPath => __UNREAL_FIELD_PATH;	
 	public {delegateName}() : base(typeof(Signature)){{}}

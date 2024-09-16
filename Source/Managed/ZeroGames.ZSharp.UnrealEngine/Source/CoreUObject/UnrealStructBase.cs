@@ -3,14 +3,12 @@
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(2)]
-public abstract class UnrealStructBase : UnrealExportedObjectBase, IStaticStruct
+public abstract class UnrealStructBase : UnrealExportedObjectBase
 {
 	
     public UnrealStructBase(){}
     protected UnrealStructBase(IntPtr unmanaged) : base(unmanaged){}
 
-    public static UnrealScriptStruct SStaticStruct => throw new NotSupportedException();
-    
     public DynamicZCallResult ReadUnrealPropertyEx<T>(string name, int32 index)
     {
 	    string zcallName = $"up:/{UnrealFieldPath}:{name}";

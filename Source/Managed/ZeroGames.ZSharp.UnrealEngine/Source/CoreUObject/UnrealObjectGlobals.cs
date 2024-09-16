@@ -46,6 +46,6 @@ public static class UnrealObjectGlobals
 
 	public static T? LowLevelFindObject<T>(string path) where T : UnrealObject => LowLevelFindObject(path) as T;
 
-	private static UnrealClass GetClassUnchecked(Type type) => (UnrealClass)type.GetProperty(nameof(IStaticClass.SStaticClass))!.GetValue(null)!;
+	private static UnrealClass GetClassUnchecked(Type type) => (UnrealClass)type.GetProperty(nameof(IStaticClass.StaticClass))!.GetValue(null)!;
 	
 }

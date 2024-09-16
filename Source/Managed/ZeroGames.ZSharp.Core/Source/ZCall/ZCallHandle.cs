@@ -8,7 +8,7 @@ namespace ZeroGames.ZSharp.Core;
 public readonly struct ZCallHandle
 {
 
-    public static ZCallHandle Alloc() => new(--_sCurrentHandle);
+    public static ZCallHandle Alloc() => new(--_currentHandle);
     
     public bool IsValid => _handle != 0;
     public bool IsRed => _handle < 0;
@@ -16,7 +16,7 @@ public readonly struct ZCallHandle
 
     private ZCallHandle(int64 handle) => _handle = handle;
     
-    private static int64 _sCurrentHandle;
+    private static int64 _currentHandle;
 
     private readonly int64 _handle;
 

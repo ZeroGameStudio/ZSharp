@@ -88,7 +88,7 @@ internal static class ContainerHelper
 		
 		// 8 integers + 2 floats + 1 boolean + 3 strings + special types
 		IntPtr id;
-		if (STypeMap.TryGetValue(type, out id))
+		if (_typeMap.TryGetValue(type, out id))
 		{
 			desc.Descriptor = id;
 			return true;
@@ -188,7 +188,7 @@ internal static class ContainerHelper
 
 	private const IntPtr FIELD_PATH_TYPE_ID = 21;
 
-	private static Dictionary<Type, IntPtr> STypeMap => new()
+	private static Dictionary<Type, IntPtr> _typeMap => new()
 	{
 		{ typeof(uint8), UINT8_TYPE_ID },
 		{ typeof(uint16), UINT16_TYPE_ID },

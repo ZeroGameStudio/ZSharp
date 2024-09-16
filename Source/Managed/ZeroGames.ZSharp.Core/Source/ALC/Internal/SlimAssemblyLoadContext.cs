@@ -9,7 +9,7 @@ internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, I
     
     public static SlimAssemblyLoadContext Create(string name)
     {
-        if (name == MasterAssemblyLoadContext.INSTANCE_NAME || name == AssemblyLoadContext.Default.Name || _sInstanceMap.ContainsKey(name))
+        if (name == MasterAssemblyLoadContext.INSTANCE_NAME || name == AssemblyLoadContext.Default.Name || _instanceMap.ContainsKey(name))
         {
             throw new Exception();
         }
@@ -21,19 +21,19 @@ internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, I
     {
         base.HandleUnload();
         
-        if (!_sInstanceMap.TryGetValue(Name!, out var alc) || alc != this)
+        if (!_instanceMap.TryGetValue(Name!, out var alc) || alc != this)
         {
             throw new Exception();
         }
 
-        _sInstanceMap.Remove(Name!);
+        _instanceMap.Remove(Name!);
     }
 
-    private static readonly Dictionary<string, SlimAssemblyLoadContext> _sInstanceMap = new();
+    private static readonly Dictionary<string, SlimAssemblyLoadContext> _instanceMap = new();
 
     private SlimAssemblyLoadContext(string name) : base(name)
     {
-        _sInstanceMap[name] = this;
+        _instanceMap[name] = this;
     }
     
 }

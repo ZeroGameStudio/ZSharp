@@ -17,7 +17,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     
     public static MasterAssemblyLoadContext Create()
     {
-        if (_sSingleton is not null)
+        if (_instance is not null)
         {
             throw new InvalidOperationException("Master ALC already exists.");
         }
@@ -45,12 +45,12 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             }
 
             AssemblyLoadContext? callerAlc = GetLoadContext(type!.Assembly);
-            if (callerAlc != _sSingleton && callerAlc != Default)
+            if (callerAlc != _instance && callerAlc != Default)
             {
                 @throw();
             }
         
-            return _sSingleton;
+            return _instance;
         }
     }
 
@@ -217,7 +217,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     protected override void HandleUnload()
     {
-        if (_sSingleton != this)
+        if (_instance != this)
         {
             throw new InvalidOperationException("Master ALC mismatch.");
         }
@@ -237,18 +237,18 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         
         SynchronizationContext.SetSynchronizationContext(_prevSyncContext);
 
-        _sSingleton = null;
+        _instance = null;
         
         base.HandleUnload();
     }
 
     private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 2 << 16;
 
-    private static MasterAssemblyLoadContext? _sSingleton;
+    private static MasterAssemblyLoadContext? _instance;
     
     private MasterAssemblyLoadContext() : base(INSTANCE_NAME)
     {
-        _sSingleton = this;
+        _instance = this;
         
         _prevSyncContext = SynchronizationContext.Current;
         _curSyncContext = new();

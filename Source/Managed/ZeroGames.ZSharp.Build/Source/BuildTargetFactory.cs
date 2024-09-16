@@ -15,7 +15,7 @@ public class BuildTargetFactory : IBuildTargetFactory
 
 	public IBuildTarget CreateTarget(string name)
 	{
-		if (!_sTargetMap.TryGetValue(name.ToLower(), out var targetType))
+		if (!_targetMap.TryGetValue(name.ToLower(), out var targetType))
 		{
 			throw new ArgumentException($"Build with invalid target: {name}");
 		}
@@ -63,21 +63,21 @@ public class BuildTargetFactory : IBuildTargetFactory
 
 	private object Parse(Type type, string value)
 	{
-		if (!_sParserMap.ContainsKey(type))
+		if (!_parserMap.ContainsKey(type))
 		{
 			throw new ArgumentException($"Unsupported argument type {type.FullName}.");
 		}
 
-		return _sParserMap[type](value);
+		return _parserMap[type](value);
 	}
 
 	static BuildTargetFactory()
 	{
-		_sTargetMap = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly())!.Assemblies
+		_targetMap = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly())!.Assemblies
 			.SelectMany(asm => asm.GetTypes().Where(type => type.IsAssignableTo(typeof(IBuildTarget)) && type.GetCustomAttribute<BuildTargetAttribute>() is not null))
 			.ToDictionary(type => type.GetCustomAttribute<BuildTargetAttribute>()!.Name.ToLower());
 
-		_sParserMap = new()
+		_parserMap = new()
 		{
 			{ typeof(string), value => value },
 			{ typeof(uint8), value => uint8.Parse(value) },
@@ -94,8 +94,8 @@ public class BuildTargetFactory : IBuildTargetFactory
 		};
 	}
 
-	private static Dictionary<string, Type> _sTargetMap;
-	private static Dictionary<Type, Func<string, object>> _sParserMap;
+	private static Dictionary<string, Type> _targetMap;
+	private static Dictionary<Type, Func<string, object>> _parserMap;
 		
 	private IBuildEngine _engine;
 

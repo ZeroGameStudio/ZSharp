@@ -6,8 +6,6 @@ namespace ZeroGames.ZSharp.Core;
 
 internal class ZCallDispatcher_Delegate : IZCallDispatcher
 {
-
-	public const string KName = "d://";
 	
 	public unsafe EZCallErrorCode Dispatch(ZCallBuffer* buffer)
 	{
@@ -45,7 +43,9 @@ internal class ZCallDispatcher_Delegate : IZCallDispatcher
 		return EZCallErrorCode.Succeed;
 	}
 
-	public string Name => KName;
+	public string Name => ZCALL_NAME;
+	
+	private const string ZCALL_NAME = "d://";
 
 }
 

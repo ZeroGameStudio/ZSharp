@@ -13,7 +13,7 @@ namespace ZeroGames.ZSharp.Core;
 internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMasterAssemblyLoadContext
 {
 
-    public const string KName = "Master";
+    internal const string INSTANCE_NAME = "Master";
     
     public static MasterAssemblyLoadContext Create()
     {
@@ -242,11 +242,11 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         base.HandleUnload();
     }
 
-    private const int32 _kDefaultConjugateMapCapacity = 65536;
+    private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 2 << 16;
 
     private static MasterAssemblyLoadContext? _sSingleton;
     
-    private MasterAssemblyLoadContext() : base(KName)
+    private MasterAssemblyLoadContext() : base(INSTANCE_NAME)
     {
         _sSingleton = this;
         
@@ -332,7 +332,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private Dictionary<ZCallHandle, IZCallDispatcher> _zcallMap = new();
     private Dictionary<string, ZCallHandle> _zcallName2Handle = new();
     private List<(IZCallResolver Resolver, uint64 Priority)> _zcallResolverLink = new();
-    private Dictionary<IntPtr, ConjugateRec> _conjugateMap = new(_kDefaultConjugateMapCapacity);
+    private Dictionary<IntPtr, ConjugateRec> _conjugateMap = new(DEFAULT_CONJUGATE_MAP_CAPACITY);
     private Dictionary<Type, uint16> _conjugateRegistryIdLookup = new();
     private ConcurrentQueue<IConjugate> _pendingDisposeConjugates = new();
     

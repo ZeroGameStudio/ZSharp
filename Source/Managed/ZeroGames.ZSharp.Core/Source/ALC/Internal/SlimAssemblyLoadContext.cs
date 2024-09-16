@@ -9,7 +9,7 @@ internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, I
     
     public static SlimAssemblyLoadContext Create(string name)
     {
-        if (name == MasterAssemblyLoadContext.KName || name == AssemblyLoadContext.Default.Name || _sInstanceMap.ContainsKey(name))
+        if (name == MasterAssemblyLoadContext.INSTANCE_NAME || name == AssemblyLoadContext.Default.Name || _sInstanceMap.ContainsKey(name))
         {
             throw new Exception();
         }

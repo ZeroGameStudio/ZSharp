@@ -66,7 +66,7 @@ public abstract class ExportedObjectBase : IConjugate
             return;
         }
         
-        if (Unmanaged == IConjugate.KDead)
+        if (IsExpired)
         {
             Logger.Error("Dispose exported object twice.");
             return;
@@ -118,7 +118,7 @@ public abstract class ExportedObjectBase : IConjugate
     public IntPtr Unmanaged { get; protected set; }
     public bool IsBlack { get; }
 
-    public bool IsExpired => Unmanaged == IConjugate.KDead;
+    public bool IsExpired => Unmanaged == IConjugate.DEAD_ADDR;
 
     public bool IsGameThreadOnly => true;
     public object SyncRoot => this;
@@ -204,7 +204,7 @@ public abstract class ExportedObjectBase : IConjugate
     private void MarkAsDead()
     {
         GCHandle.Free();
-        Unmanaged = IConjugate.KDead;
+        Unmanaged = IConjugate.DEAD_ADDR;
         TryBroadcastOnExpired();
     }
 

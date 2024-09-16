@@ -6,14 +6,10 @@ namespace ZeroGames.ZSharp.Build.Solution;
 
 public class SolutionFileBuilder
 {
-	public const string KHeader = "Microsoft Visual Studio Solution File, Format Version 12.00";
-	public const string KFolderGuid = "{2150E333-8FDC-42A3-9474-1A3956D46DE8}";
-	public const string KCsprojGuid = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
-
 	public Guid AddFolder(string name)
 	{
 		Guid guid = Guid.NewGuid();
-		_folders[guid] = $"Project(\"{KFolderGuid}\") = \"{name}\", \"{name}\", \"{FormatGuid(ref guid)}\"\nEndProject";
+		_folders[guid] = $"Project(\"{FOLDER_GUID}\") = \"{name}\", \"{name}\", \"{FormatGuid(ref guid)}\"\nEndProject";
 		_folderName2Guid[name] = guid;
 		return guid;
 	}
@@ -30,7 +26,7 @@ public class SolutionFileBuilder
 		string projectFileExtension = project.ProjectFileExtension;
 		string projectGuid = projectFileExtension switch
 		{
-			".csproj" => KCsprojGuid,
+			".csproj" => CSPROJ_GUID,
 			_ => throw new InvalidOperationException($"Unknown project type: {projectFileExtension}")
 		};
 		Guid guid = Guid.NewGuid();
@@ -69,7 +65,7 @@ public class SolutionFileBuilder
 	{
 		StringBuilder sb = new();
 		sb.Append("\n");
-		sb.Append(KHeader).Append("\n");
+		sb.Append(HEADER).Append("\n");
 
 		foreach (var pair in _folders)
 		{
@@ -115,6 +111,10 @@ public class SolutionFileBuilder
 	}
 
 	private static string FormatGuid(ref readonly Guid guid) => guid.ToString("B").ToUpper();
+	
+	private const string HEADER = "Microsoft Visual Studio Solution File, Format Version 12.00";
+	private const string FOLDER_GUID = "{2150E333-8FDC-42A3-9474-1A3956D46DE8}";
+	private const string CSPROJ_GUID = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
 
 	private Dictionary<Guid, string> _folders = new();
 	private Dictionary<string, Guid> _folderName2Guid = new();

@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.Core;
 
 public interface IConjugate : IGCHandle, IExplicitLifecycle, IDisposable
 {
-    public const IntPtr KDead = 0xDEAD;
+    public const IntPtr DEAD_ADDR = 0xDEAD;
     protected internal void Release();
     IntPtr Unmanaged { get; }
     bool IsBlack { get; }

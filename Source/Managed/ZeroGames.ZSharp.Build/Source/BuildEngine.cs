@@ -5,8 +5,6 @@ namespace ZeroGames.ZSharp.Build;
 public class BuildEngine : IBuildEngine
 {
 
-    public const string KTargetArgumentName = "target";
-
     public BuildEngine(string[] args)
     {
         _argumentMap = args
@@ -32,7 +30,7 @@ public class BuildEngine : IBuildEngine
 
     private IBuildTarget GetTarget()
     {
-        string? target = GetArgument(KTargetArgumentName);
+        string? target = GetArgument(TARGET_ARGUMENT_NAME);
         if (target is null)
         {
             throw new ArgumentException("BuildEngine runs with no target.");
@@ -40,6 +38,8 @@ public class BuildEngine : IBuildEngine
 
         return _targetFactory.CreateTarget(target);
     }
+    
+    private const string TARGET_ARGUMENT_NAME = "target";
 
     private Dictionary<string, string> _argumentMap;
     private BuildTargetFactory _targetFactory;

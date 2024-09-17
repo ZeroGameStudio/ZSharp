@@ -80,6 +80,24 @@ partial class UnrealFieldScanner
 
 	private T GetAttributeCtorArgValue<T>(CustomAttribute attribute, int32 index) => GetAttributeArgValue<T>(attribute.ConstructorArguments[index]);
 
+	private bool DoesAttributeHaveProperty(CustomAttribute attribute, string propertyName) => attribute.Properties.Any(prop => prop.Name == propertyName);
+
+	private T GetAttributePropertyValue<T>(CustomAttribute attribute, string propertyName) => GetAttributeArgValue<T>(attribute.Properties.Single(prop => prop.Name == propertyName).Argument);
+
+	private bool TryGetAttributePropertyValue<T>(CustomAttribute attribute, string propertyName, out T? value)
+	{
+		if (DoesAttributeHaveProperty(attribute, propertyName))
+		{
+			value = GetAttributePropertyValue<T>(attribute, propertyName);
+			return true;
+		}
+		else
+		{
+			value = default;
+			return false;
+		}
+	}
+	
 	private string GetUnrealFieldPath(TypeReference typeRef) => GetUnrealFieldPathOrDefault(typeRef) ?? throw new InvalidOperationException();
 
 	private string? GetUnrealFieldPathOrDefault(TypeReference typeRef)

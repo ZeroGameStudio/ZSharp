@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 partial class UnrealFieldScanner
 {
 
-	private void ScanUClass(TypeDefinition type)
+	private void ScanUClass(TypeDefinition type, CustomAttribute uclassAttr)
 	{
 		UnrealClassDefinition cls = new()
 		{
@@ -15,15 +15,14 @@ partial class UnrealFieldScanner
 			SuperPath = GetUnrealFieldPath(type.BaseType),
 		};
 
-		if (GetCustomAttributeOrDefault<WithinAttribute>(type) is { } withinAttr)
+		if (TryGetAttributePropertyValue<string?>(uclassAttr, nameof(UClassAttribute.Config), out var config) && config is not null)
 		{
-			TypeReference outerTypeRef = GetAttributeCtorArgValue<TypeReference>(withinAttr, 0);
-			cls.WithinPath = GetUnrealFieldPath(outerTypeRef);
+			cls.ConfigName = config;
 		}
-
-		if (GetCustomAttributeOrDefault<ConfigAttribute>(type) is { } configAttr)
+		
+		if (TryGetAttributePropertyValue<TypeReference?>(uclassAttr, nameof(UClassAttribute.Within), out var within) && within is not null)
 		{
-			cls.ConfigName = GetAttributeCtorArgValue<string>(configAttr, 0);
+			cls.WithinPath = GetUnrealFieldPath(within);
 		}
 
 		ScanUFunctions(type, cls);

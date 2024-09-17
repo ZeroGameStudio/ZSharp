@@ -397,6 +397,19 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		EmitProperties(function, def.Properties);
 		AddMetadata(function, def.MetadataMap);
 
+		if (function->HasAllFunctionFlags(FUNC_BlueprintEvent))
+		{
+			if (UFunction* superFunction = outer->GetSuperClass()->FindFunctionByName(function->GetFName()))
+			{
+				UE_CLOG(!function->IsSignatureCompatibleWith(superFunction), LogZSharpEmit, Fatal, TEXT("BlueprintEventOverride [%s] signature mismatch!"), *GetNameSafe(function));
+
+				// Migrate from FBlueprintCompilationManager::FastGenerateSkeletonClass().
+				function->SetSuperStruct(superFunction);
+				function->FunctionFlags |= (superFunction->FunctionFlags & (FUNC_FuncInherit | FUNC_Public | FUNC_Protected | FUNC_Private | FUNC_BlueprintPure));
+				UMetaData::CopyMetadata(superFunction, function);
+			}
+		}
+
 		function->Bind();
 		function->StaticLink(true);
 

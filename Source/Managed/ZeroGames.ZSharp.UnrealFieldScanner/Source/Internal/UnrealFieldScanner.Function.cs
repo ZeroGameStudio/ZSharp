@@ -29,6 +29,12 @@ partial class UnrealFieldScanner
 			ZCallName = zcallName,
 		};
 
+		if (GetCustomAttributeOrDefault<BlueprintEventOverrideAttribute>(method) is { } overrideAttr)
+		{
+			def.Name = GetAttributePropertyValue<string>(overrideAttr, nameof(BlueprintEventOverrideAttribute.EventName));
+			def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintEvent;
+		}
+		
 		if (HasCustomAttribute<BlueprintCallableAttribute>(method))
 		{
 			def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintCallable;
@@ -40,8 +46,11 @@ partial class UnrealFieldScanner
 		}
 		
 		ScanUParams(method, def);
-		ScanUReturnParam(method.ReturnType, def);
-
+		if (method.ReturnType.FullName != typeof(void).FullName)
+		{
+			ScanUReturnParam(method.ReturnType, def);
+		}
+		
 		if (_withMetadata)
 		{
 			ScanMetadata(method, def);

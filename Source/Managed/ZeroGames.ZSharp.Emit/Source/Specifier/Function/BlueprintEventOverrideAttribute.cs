@@ -5,7 +5,7 @@ namespace ZeroGames.ZSharp.Emit.Specifier;
 [AttributeUsage(AttributeTargets.Method)]
 public class BlueprintEventOverrideAttribute : Attribute
 {
-	public string? UnrealFunctionName { get; init; }
+	public required string EventName { get; init; }
 }
 
 

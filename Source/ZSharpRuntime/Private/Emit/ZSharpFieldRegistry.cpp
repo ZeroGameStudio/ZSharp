@@ -24,16 +24,17 @@ const ZSharp::FZSharpFunction* ZSharp::FZSharpFieldRegistry::GetFunction(const U
 	return pFunction ? pFunction->Get() : nullptr;
 }
 
-ZSharp::FZSharpClass* ZSharp::FZSharpFieldRegistry::RegisterClass(const UClass* cls)
+ZSharp::FZSharpClass& ZSharp::FZSharpFieldRegistry::RegisterClass(const UClass* cls)
 {
-	FZSharpClass* zscls = new FZSharpClass;
-	return ClassRegistry.Emplace(cls, zscls).Get();
+	FZSharpClass* zscls = new FZSharpClass { cls };
+	return *ClassRegistry.Emplace(cls, zscls);
 }
 
-ZSharp::FZSharpFunction* ZSharp::FZSharpFieldRegistry::RegisterFunction(const UFunction* function)
+ZSharp::FZSharpFunction& ZSharp::FZSharpFieldRegistry::RegisterFunction(const UFunction* function)
 {
 	FZSharpFunction* zsfunction = new FZSharpFunction;
-	return FunctionRegistry.Emplace(function, zsfunction).Get();
+	zsfunction->Function = function;
+	return *FunctionRegistry.Emplace(function, zsfunction);
 }
 
 ZSharp::FZSharpFieldRegistry::FZSharpFieldRegistry()

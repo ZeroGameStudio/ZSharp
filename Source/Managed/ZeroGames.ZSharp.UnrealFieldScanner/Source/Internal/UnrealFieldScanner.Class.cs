@@ -15,14 +15,43 @@ partial class UnrealFieldScanner
 			SuperPath = GetUnrealFieldPath(type.BaseType),
 		};
 
-		if (TryGetAttributePropertyValue<string?>(uclassAttr, nameof(UClassAttribute.Config), out var config) && config is not null)
+		if (TryGetAttributePropertyValue<string>(uclassAttr, nameof(UClassAttribute.Config), out var config))
 		{
 			cls.ConfigName = config;
 		}
 		
-		if (TryGetAttributePropertyValue<TypeReference?>(uclassAttr, nameof(UClassAttribute.Within), out var within) && within is not null)
+		if (TryGetAttributePropertyValue<TypeReference>(uclassAttr, nameof(UClassAttribute.Within), out var within))
 		{
 			cls.WithinPath = GetUnrealFieldPath(within);
+		}
+
+		{ // Default
+			foreach (var attr in type.CustomAttributes)
+			{
+				if (attr.AttributeType.FullName == typeof(PropertyDefaultOverrideAttribute).FullName)
+				{
+					cls.PropertyDefaults.Add(new ()
+					{
+						PropertyChain = GetAttributePropertyValue<string>(attr, nameof(PropertyDefaultOverrideAttribute.Property)),
+						Buffer = GetAttributePropertyValue<object>(attr, nameof(PropertyDefaultOverrideAttribute.Default)).ToString()!,
+					});
+				}
+				else if (attr.AttributeType.FullName == typeof(DefaultSubobjectClassOverrideAttribute).FullName)
+				{
+					cls.DefaultSubobjectOverrides.Add(new()
+					{
+						Name = GetAttributePropertyValue<string>(attr, nameof(DefaultSubobjectClassOverrideAttribute.Subobject)),
+						ClassPath = "", // @TODO
+					});
+				}
+				else if (attr.AttributeType.FullName == typeof(DontCreateDefaultSubobjectAttribute).FullName)
+				{
+					cls.DefaultSubobjectOverrides.Add(new()
+					{
+						Name = GetAttributeCtorArgValue<string>(attr, 0),
+					});
+				}
+			}
 		}
 
 		ScanUFunctions(type, cls);

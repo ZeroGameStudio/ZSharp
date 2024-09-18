@@ -38,9 +38,6 @@ struct FZSimplePropertyDefinitionDto
 	uint64 PropertyFlags = 0;
 
 	UPROPERTY()
-	FName RepNotifyName;
-
-	UPROPERTY()
 	FName DescriptorFieldPath;
 };
 
@@ -57,10 +54,10 @@ struct FZPropertyDefinitionDto : public FZFieldDefinitionDto
 	uint64 PropertyFlags = 0;
 
 	UPROPERTY()
-	FName RepNotifyName;
+	FName DescriptorFieldPath;
 
 	UPROPERTY()
-	FName DescriptorFieldPath;
+	FName RepNotifyName;
 	
 	UPROPERTY()
 	FZSimplePropertyDefinitionDto InnerProperty;
@@ -117,6 +114,60 @@ struct FZScriptStructDefinitionDto : public FZStructDefinitionDto
 };
 
 USTRUCT()
+struct FZClassDefinitionDto_PropertyDefault
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString PropertyChain;
+
+	UPROPERTY()
+	FString Buffer;
+};
+
+USTRUCT()
+struct FZClassDefinitionDto_DefaultSubobject
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName Name;
+
+	UPROPERTY()
+	FName ClassPath;
+
+	UPROPERTY()
+	bool bOptional = false;
+
+	UPROPERTY()
+	bool bTransient = false;
+
+	UPROPERTY()
+	FName PropertyName;
+
+	UPROPERTY()
+	bool bRootComponent = false;
+
+	UPROPERTY()
+	FName AttachParentDefaultSubobjectName;
+
+	UPROPERTY()
+	FName AttachSocketName;
+};
+
+USTRUCT()
+struct FZClassDefinitionDto_DefaultSubobjectOverride
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName Name;
+
+	UPROPERTY()
+	FName ClassPath;
+};
+
+USTRUCT()
 struct FZClassDefinitionDto : public FZStructDefinitionDto
 {
 	GENERATED_BODY()
@@ -138,6 +189,15 @@ struct FZClassDefinitionDto : public FZStructDefinitionDto
 
 	UPROPERTY()
 	TArray<FZFunctionDefinitionDto> Functions;
+
+	UPROPERTY()
+	TArray<FZClassDefinitionDto_PropertyDefault> PropertyDefaults;
+
+	UPROPERTY()
+	TArray<FZClassDefinitionDto_DefaultSubobject> DefaultSubobjects;
+
+	UPROPERTY()
+	TArray<FZClassDefinitionDto_DefaultSubobjectOverride> DefaultSubobjectOverrides;
 };
 
 USTRUCT()

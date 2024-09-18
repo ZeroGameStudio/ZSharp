@@ -40,13 +40,13 @@ namespace ZSharp
 
 		EPropertyFlags PropertyFlags = CPF_None;
 
-		FName RepNotifyName;
-
 		FName DescriptorFieldPath;
 	};
 	
 	struct FZPropertyDefinition : public FZFieldDefinition, public FZSimplePropertyDefinition
 	{
+		FName RepNotifyName;
+		
 		FZSimplePropertyDefinition InnerProperty;
 		FZSimplePropertyDefinition OuterProperty;
 	};
@@ -81,6 +81,32 @@ namespace ZSharp
 
 	struct FZClassDefinition : public FZStructDefinition
 	{
+		struct FPropertyDefault
+		{
+			FString PropertyChain;
+			FString Buffer;
+		};
+
+		struct FDefaultSubobject
+		{
+			FName Name;
+			FName ClassPath;
+			bool bOptional = false;
+			bool bTransient = false;
+			
+			FName PropertyName;
+			
+			bool bRootComponent = false;
+			FName AttachParentDefaultSubobjectName;
+			FName AttachSocketName;
+		};
+
+		struct FDefaultSubobjectOverride
+		{
+			FName Name;
+			FName ClassPath;
+		};
+		
 		UClass* Class = nullptr;
 		
 		FName ConfigName;
@@ -92,6 +118,10 @@ namespace ZSharp
 		TArray<FName> ImplementedInterfacePaths;
 		
 		TArray<FZFunctionDefinition> Functions;
+
+		TArray<FPropertyDefault> PropertyDefaults;
+		TArray<FDefaultSubobject> DefaultSubobjects;
+		TArray<FDefaultSubobjectOverride> DefaultSubobjectOverrides;
 	};
 	
 	struct FZInterfaceDefinition : public FZStructDefinition

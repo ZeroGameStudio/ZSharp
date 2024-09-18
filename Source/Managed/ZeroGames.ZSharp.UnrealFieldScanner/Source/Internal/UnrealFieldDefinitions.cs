@@ -66,12 +66,39 @@ public class UnrealScriptStructDefinition : UnrealStructDefinition
 
 public class UnrealClassDefinition : UnrealStructDefinition
 {
+	public struct PropertyDefault
+	{
+		public required string PropertyChain { get; set; }
+		public required string Buffer { get; set; }
+	}
+
+	public struct DefaultSubobject
+	{
+		public required string Name { get; set; }
+		public required string ClassPath { get; set; }
+		[JsonPropertyName("bOptional")] public bool IsOptional { get; set; }
+		[JsonPropertyName("bTransient")] public bool IsTransient { get; set; }
+		public string? PropertyName { get; set; }
+		[JsonPropertyName("bRootComponent")] public bool IsRootComponent { get; set; }
+		public string? AttachParentDefaultSubobjectName { get; set; }
+		public string? AttachSocketName { get; set; }
+	}
+
+	public struct DefaultSubobjectOverride
+	{
+		public required string Name { get; set; }
+		public string? ClassPath { get; set; }
+	}
+	
 	public string? ConfigName { get; set; }
 	public string? WithinPath { get; set; }
 	public EClassFlags ClassFlags { get; set; }
 	public EClassCastFlags CastFlags { get; set; }
 	public List<string> ImplementedInterfacePaths { get; set; } = new();
 	public List<UnrealFunctionDefinition> Functions { get; set; } = new();
+	public List<PropertyDefault> PropertyDefaults { get; set; } = new();
+	public List<DefaultSubobject> DefaultSubobjects { get; set; } = new();
+	public List<DefaultSubobjectOverride> DefaultSubobjectOverrides { get; set; } = new();
 }
 
 public class UnrealInterfaceDefinition : UnrealStructDefinition

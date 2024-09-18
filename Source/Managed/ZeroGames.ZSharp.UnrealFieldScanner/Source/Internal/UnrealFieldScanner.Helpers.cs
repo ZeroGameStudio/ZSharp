@@ -1,6 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Mono.Cecil;
 
@@ -46,26 +47,20 @@ partial class UnrealFieldScanner
 	private bool HasCustomAttribute<T>(ICustomAttributeProvider provider) => HasCustomAttribute(provider, typeof(T));
 	private bool HasCustomAttribute(ICustomAttributeProvider provider, string attributeFullName) => GetCustomAttributeOrDefault(provider, attributeFullName) is not null;
 	
-	private object? GetAttributeArgValue(CustomAttributeArgument arg)
+	private object GetAttributeArgValue(CustomAttributeArgument arg, Type type)
 	{
 		// Object type argument.
-		if (arg.Type.FullName == typeof(CustomAttributeArgument).FullName)
+		if (arg.Value is CustomAttributeArgument compositeValue)
 		{
-			arg = (CustomAttributeArgument)arg.Value;
+			arg = compositeValue;
 		}
 		else if (arg.Type.IsArray)
 		{
 			var args = (CustomAttributeArgument[])arg.Value;
-			if (args.Length == 0)
-			{
-				return null;
-			}
-
-			Type arrType = GetAttributeArgValue(args[0])!.GetType().MakeArrayType();
-			Array arr = Array.CreateInstance(arrType, args.Length);
+			Array arr = Array.CreateInstance(type, args.Length);
 			for (int32 i = 0; i < arr.Length; ++i)
 			{
-				arr.SetValue(GetAttributeArgValue(args[i]), i);
+				arr.SetValue(GetAttributeArgValue(args[i], type.GetElementType()!), i);
 			}
 			
 			return arr;
@@ -74,17 +69,31 @@ partial class UnrealFieldScanner
 		return arg.Value;
 	}
 
-	private T GetAttributeArgValue<T>(CustomAttributeArgument arg) => (T)GetAttributeArgValue(arg)!;
+	private T GetAttributeArgValue<T>(CustomAttributeArgument arg) where T : notnull => (T)GetAttributeArgValue(arg, typeof(T));
 
 	private bool IsValidAttributeCtorArgIndex(CustomAttribute attribute, int32 index) => index >= 0 && index < attribute.ConstructorArguments.Count;
 
-	private T GetAttributeCtorArgValue<T>(CustomAttribute attribute, int32 index) => GetAttributeArgValue<T>(attribute.ConstructorArguments[index]);
+	private T GetAttributeCtorArgValue<T>(CustomAttribute attribute, int32 index) where T : notnull => GetAttributeArgValue<T>(attribute.ConstructorArguments[index]);
 
+	private bool TryGetAttributeCtorArgValue<T>(CustomAttribute attribute, int32 index, [NotNullWhen(true)] out T? value) where T : notnull
+	{
+		if (IsValidAttributeCtorArgIndex(attribute, index))
+		{
+			value = GetAttributeCtorArgValue<T>(attribute, index);
+			return true;
+		}
+		else
+		{
+			value = default;
+			return false;
+		}
+	}
+	
 	private bool DoesAttributeHaveProperty(CustomAttribute attribute, string propertyName) => attribute.Properties.Any(prop => prop.Name == propertyName);
 
-	private T GetAttributePropertyValue<T>(CustomAttribute attribute, string propertyName) => GetAttributeArgValue<T>(attribute.Properties.Single(prop => prop.Name == propertyName).Argument);
+	private T GetAttributePropertyValue<T>(CustomAttribute attribute, string propertyName) where T : notnull => GetAttributeArgValue<T>(attribute.Properties.Single(prop => prop.Name == propertyName).Argument);
 
-	private bool TryGetAttributePropertyValue<T>(CustomAttribute attribute, string propertyName, out T? value)
+	private bool TryGetAttributePropertyValue<T>(CustomAttribute attribute, string propertyName, [NotNullWhen(true)] out T? value) where T : notnull
 	{
 		if (DoesAttributeHaveProperty(attribute, propertyName))
 		{
@@ -119,12 +128,7 @@ partial class UnrealFieldScanner
 			return null;
 		}
 		
-		string[]? pairs = GetAttributeCtorArgValue<string[]?>(umetaAttribute, 0);
-		if (pairs is null)
-		{
-			return null;
-		}
-
+		string[] pairs = GetAttributeCtorArgValue<string[]>(umetaAttribute, 0);
 		Dictionary<string, string> map = new(pairs.Length);
 		foreach (var pair in pairs)
 		{

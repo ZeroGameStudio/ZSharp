@@ -3,9 +3,9 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class UPropertyAttribute : Attribute
+public class DefaultSubobjectAttribute : Attribute
 {
-	public object? Default { get; init; }
+	public string? Name { get; init; }
 }
 
 

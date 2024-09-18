@@ -12,11 +12,14 @@ partial class UnrealFieldScanner
 	{
 		foreach (var prop in type.Properties.Where(HasCustomAttribute<UPropertyAttribute>))
 		{
-			ScanUProperty(prop, strct);
+			if (GetCustomAttributeOrDefault<UPropertyAttribute>(prop) is { } upropertyAttr)
+			{
+				ScanUProperty(prop, strct, upropertyAttr);
+			}
 		}
 	}
 
-	private void ScanUProperty(PropertyDefinition prop, UnrealStructDefinition strct)
+	private void ScanUProperty(PropertyDefinition prop, UnrealStructDefinition strct, CustomAttribute upropertyAttr)
 	{
 		TypeReference propertyType = prop.PropertyType;
 		if (propertyType.IsArray)
@@ -41,6 +44,105 @@ partial class UnrealFieldScanner
 			DescriptorFieldPath = descriptorFieldPath,
 		};
 
+		{ // Default
+			if (strct is UnrealClassDefinition cls)
+			{
+				if (TryGetAttributePropertyValue<object>(upropertyAttr, nameof(UPropertyAttribute.Default), out var value))
+				{
+					cls.PropertyDefaults.Add(new ()
+					{
+						PropertyChain = def.Name,
+						Buffer = value.ToString()!,
+					});
+				}
+
+				if (GetCustomAttributeOrDefault<DefaultSubobjectAttribute>(prop) is {} defaultSubobjectAttr)
+				{
+					TryGetAttributePropertyValue<string>(defaultSubobjectAttr, nameof(DefaultSubobjectAttribute.Name), out var name);
+					name ??= def.Name;
+
+					string? parent = default;
+					string? socket = default;
+					if (GetCustomAttributeOrDefault<AttachmentAttribute>(prop) is { } attachmentAttr)
+					{
+						TryGetAttributePropertyValue(attachmentAttr, nameof(AttachmentAttribute.Parent), out parent);
+						TryGetAttributePropertyValue(attachmentAttr, nameof(AttachmentAttribute.Socket), out socket);
+					}
+					
+					cls.DefaultSubobjects.Add(new ()
+					{
+						Name = name,
+						ClassPath = "", // @TODO
+						IsTransient = false, // @TODO
+						PropertyName = def.Name,
+						AttachParentDefaultSubobjectName = parent,
+						AttachSocketName = socket,
+					});
+				}
+				else if (GetCustomAttributeOrDefault<OptionalDefaultSubobjectAttribute>(prop) is {} optionalDefaultSubobjectAttr)
+				{
+					TryGetAttributePropertyValue<string>(optionalDefaultSubobjectAttr, nameof(DefaultSubobjectAttribute.Name), out var name);
+					name ??= def.Name;
+					
+					string? parent = default;
+					string? socket = default;
+					if (GetCustomAttributeOrDefault<AttachmentAttribute>(prop) is { } attachmentAttr)
+					{
+						TryGetAttributePropertyValue(attachmentAttr, nameof(AttachmentAttribute.Parent), out parent);
+						TryGetAttributePropertyValue(attachmentAttr, nameof(AttachmentAttribute.Socket), out socket);
+					}
+					
+					cls.DefaultSubobjects.Add(new ()
+					{
+						Name = name,
+						ClassPath = "", // @TODO
+						IsOptional = true,
+						IsTransient = false, // @TODO
+						PropertyName = def.Name,
+						AttachParentDefaultSubobjectName = parent,
+						AttachSocketName = socket,
+					});
+				}
+				else if (GetCustomAttributeOrDefault<RootComponentAttribute>(prop) is {} rootComponentAttr)
+				{
+					TryGetAttributePropertyValue<string>(rootComponentAttr, nameof(DefaultSubobjectAttribute.Name), out var name);
+					name ??= def.Name;
+					cls.DefaultSubobjects.Add(new ()
+					{
+						Name = name,
+						ClassPath = "", // @TODO
+						IsTransient = false, // @TODO
+						PropertyName = def.Name,
+						IsRootComponent = true,
+					});
+				}
+			}
+		}
+
+		{ // Native visibility
+			MethodDefinition getter = prop.GetMethod;
+			if (getter.IsPublic)
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_NativeAccessSpecifierPublic;
+			}
+			else
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_NativeAccessSpecifierPrivate;
+			}
+		}
+
+		{ // Blueprint visibility
+			if (HasCustomAttribute<BlueprintReadWriteAttribute>(prop))
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
+			}
+			else if (HasCustomAttribute<BlueprintReadOnlyAttribute>(prop))
+			{
+				def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
+				def.PropertyFlags |= EPropertyFlags.CPF_BlueprintReadOnly;
+			}
+		}
+		
 		{ // Edit
 			if (HasCustomAttribute<EditAnywhereAttribute>(prop))
 			{
@@ -72,30 +174,6 @@ partial class UnrealFieldScanner
 				def.PropertyFlags |= EPropertyFlags.CPF_Edit;
 				def.PropertyFlags |= EPropertyFlags.CPF_EditConst;
 				def.PropertyFlags |= EPropertyFlags.CPF_DisableEditOnInstance;
-			}
-		}
-
-		{ // Native visibility
-			MethodDefinition getter = prop.GetMethod;
-			if (getter.IsPublic)
-			{
-				def.PropertyFlags |= EPropertyFlags.CPF_NativeAccessSpecifierPublic;
-			}
-			else
-			{
-				def.PropertyFlags |= EPropertyFlags.CPF_NativeAccessSpecifierPrivate;
-			}
-		}
-
-		{ // Blueprint visibility
-			if (HasCustomAttribute<BlueprintReadWriteAttribute>(prop))
-			{
-				def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
-			}
-			else if (HasCustomAttribute<BlueprintReadOnlyAttribute>(prop))
-			{
-				def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
-				def.PropertyFlags |= EPropertyFlags.CPF_BlueprintReadOnly;
 			}
 		}
 		

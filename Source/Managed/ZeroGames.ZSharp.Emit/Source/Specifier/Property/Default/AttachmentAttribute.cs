@@ -3,9 +3,10 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class UPropertyAttribute : Attribute
+public class AttachmentAttribute : Attribute
 {
-	public object? Default { get; init; }
+	public required string Parent { get; init; }
+	public string? Socket { get; init; }
 }
 
 

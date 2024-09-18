@@ -17,11 +17,31 @@ namespace ZSharp::ZSharpClass_Private
 	{
 		UObject* obj = objectInitializer.GetObj();
 
-		const bool zscls = FZSharpFieldRegistry::Get().IsZSharpClass(cls);
+		const FZSharpClass* zscls = FZSharpFieldRegistry::Get().GetClass(cls);
 		const bool native = cls->IsNative();
 		// If we are dynamic class (Z# class or BPGC) then call super constructor first.
 		if (zscls || !native)
 		{
+			// If we are Z# class, apply default subobject overrides before call super.
+			if (zscls)
+			{
+				for (const auto& defaultSubobjectOverride : zscls->DefaultSubobjectOverrides)
+				{
+					if (defaultSubobjectOverride.ClassPath.IsNone())
+					{
+						objectInitializer.DoNotCreateDefaultSubobject(defaultSubobjectOverride.Name);
+					}
+					else if (const auto overrideClass = LoadClass<UObject>(nullptr, *defaultSubobjectOverride.ClassPath.ToString()))
+					{
+						objectInitializer.SetDefaultSubobjectClass(defaultSubobjectOverride.Name, overrideClass);
+					}
+					else
+					{
+						UE_LOG(LogZSharpEmit, Warning, TEXT("Default subobject override class [%s] not found! Outer: [%s] SubobjectName: [%s]"), *defaultSubobjectOverride.ClassPath.ToString(), *GetNameSafe(obj), *defaultSubobjectOverride.Name.ToString());
+					}
+				}
+			}
+			
 			ConstructObject(objectInitializer, cls->GetSuperClass());
 		}
 
@@ -34,10 +54,83 @@ namespace ZSharp::ZSharpClass_Private
 		// Setup Z# properties for Z# class.
 		if (zscls)
 		{
-			for (TFieldIterator<FProperty> it(cls, EFieldIteratorFlags::ExcludeSuper); it; ++it)
-			{
-				// @TODO: Default value.
-				it->InitializeValue_InContainer(obj);
+			{ // Initialize Z# memory.
+				for (TFieldIterator<FProperty> it(cls, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+				{
+					it->InitializeValue_InContainer(obj);
+				}
+			}
+
+			{ // Setup default subobjects.
+				for (const auto& defaultSubobject : zscls->DefaultSubobjects)
+				{
+					if (const auto defaultSubobjectClass = LoadClass<UObject>(nullptr, *defaultSubobject.ClassPath.ToString()))
+					{
+						// Subclass may not allow us to create so subobject can be null.
+						if (UObject* subobject = obj->CreateDefaultSubobject(defaultSubobject.Name, defaultSubobjectClass, defaultSubobjectClass, !defaultSubobject.bOptional, defaultSubobject.bTransient))
+						{
+							// Associate the subobject with a property.
+							if (defaultSubobject.Property)
+							{
+								defaultSubobject.Property->SetObjectPropertyValue_InContainer(obj, subobject);
+							}
+
+							// Setup scene info.
+							if (defaultSubobject.bRootComponent)
+							{
+								const auto actor = Cast<AActor>(obj);
+								const auto root = Cast<USceneComponent>(subobject);
+								if (ensureAlways(actor) && ensureAlways(root))
+								{
+									USceneComponent* prevRoot = actor->GetRootComponent();
+									actor->SetRootComponent(root);
+									if (prevRoot)
+									{
+										prevRoot->SetupAttachment(root);
+									}
+								}
+							}
+							else if (!defaultSubobject.AttachParentDefaultSubobjectName.IsNone())
+							{
+								ensureAlways(!defaultSubobject.bRootComponent);
+
+								const auto child = Cast<USceneComponent>(subobject);
+								const auto parent = Cast<USceneComponent>(obj->GetDefaultSubobjectByName(defaultSubobject.AttachParentDefaultSubobjectName));
+								if (ensureAlways(child) && ensureAlways(parent))
+								{
+									child->SetupAttachment(parent, defaultSubobject.AttachSocketName);
+								}
+							}
+						}
+					}
+					else
+					{
+						UE_LOG(LogZSharpEmit, Warning, TEXT("Default subobject class [%s] not found! Outer: [%s] SubobjectName: [%s]"), *defaultSubobject.ClassPath.ToString(), *GetNameSafe(obj), *defaultSubobject.Name.ToString());
+					}
+				}
+			}
+
+			{ // Setup property defaults
+				for (const auto& propertyDefault : zscls->PropertyDefaults)
+				{
+					void* propertyAddr = obj;
+					FProperty* tailProperty = propertyDefault.PropertyChain[propertyDefault.PropertyChain.Num() - 1];
+					// Follow the container chain to resolve the actual container.
+					for (const auto& prop : propertyDefault.PropertyChain)
+					{
+						if (const auto objectProp = CastField<FObjectPropertyBase>(prop))
+						{
+							propertyAddr = objectProp->GetObjectPropertyValue_InContainer(propertyAddr);
+						}
+						else
+						{
+							check(prop->IsA<FStructProperty>() || prop == tailProperty);
+							propertyAddr = prop->ContainerPtrToValuePtr<void>(propertyAddr);
+						}
+					}
+					
+					tailProperty->ImportText_Direct(*propertyDefault.Buffer, propertyAddr, nullptr, PPF_None);
+				}
 			}
 		}
 		// Only call self constructor and stop call up because C++ itself will handle the rest.
@@ -92,11 +185,10 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 #endif
 	}
 
-	static void FinishEmitProperty(FZSimplePropertyDefinition& def)
+	static void FinishEmitSimpleProperty(FZSimplePropertyDefinition& def)
 	{
 		FProperty* property = def.Property;
 		property->PropertyFlags |= def.PropertyFlags;
-		property->RepNotifyFunc = def.RepNotifyName;
 
 		// Migrate from FProperty::Init().
 		if (property->GetOwner<UObject>())
@@ -302,7 +394,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			}
 		}
 
-		FinishEmitProperty(def);
+		FinishEmitSimpleProperty(def);
 	}
 
 	static void EmitProperty(FFieldVariant owner, FZPropertyDefinition& def)
@@ -310,7 +402,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		const FName name = def.Name;
 		const EObjectFlags flags = def.Flags;
 		
-		bool needsFinish = true;
+		bool needsFinishSimple = true;
 		switch (def.Type)
 		{
 			// Containers (except Struct)
@@ -350,14 +442,19 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		default:
 			{
 				EmitSimpleProperty(owner, def, name, flags);
-				needsFinish = false;
+				needsFinishSimple = false;
 				break;
 			}
 		}
 
-		if (needsFinish)
+		if (needsFinishSimple)
 		{
-			FinishEmitProperty(def);
+			FinishEmitSimpleProperty(def);
+		}
+
+		{ // Finish emit outer property.
+			FProperty* property = def.Property;
+			property->RepNotifyFunc = def.RepNotifyName;
 		}
 	}
 
@@ -384,11 +481,9 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		params.SetFlags = def.Flags | GCompiledInFlags;
 	
 		const auto function = static_cast<UFunction*>(StaticConstructObject_Internal(params));
-		FZSharpFunction* zsfunction = FZSharpFieldRegistry::Get().RegisterFunction(function);
 		def.Function = function;
 
 		function->FunctionFlags |= def.FunctionFlags | GCompiledInFunctionFlags;
-		zsfunction->ZCallName = def.ZCallName;
 		function->RPCId = def.RpcId;
 		function->RPCResponseId = def.RpcResponseId;
 
@@ -417,6 +512,11 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		function->Next = outer->Children;
 		outer->Children = function;
 		outer->AddFunctionToFunctionMap(function, function->GetFName());
+
+		{ // Finally setup proxy.
+			FZSharpFunction& zsfunction = FZSharpFieldRegistry::Get().RegisterFunction(function);
+			zsfunction.ZCallName = def.ZCallName;
+		}
 	}
 
 	static void EmitFunctions(UClass* outer, TArray<FZFunctionDefinition>& defs)
@@ -548,10 +648,9 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 		FinishEmitDelegate(pak, def);
 	}
 
-	// Finally, create CDO for all classes.
-	for (const auto& def : manifest.Classes)
+	for (auto& def : manifest.Classes)
 	{
-		(void)def.Class->GetDefaultObject();
+		PostEmitClass(pak, def);
 	}
 }
 
@@ -582,7 +681,6 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 	params.SetFlags = def.Flags | GCompiledInFlags;
 	
 	const auto cls = static_cast<UClass*>(StaticConstructObject_Internal(params));
-	FZSharpFieldRegistry::Get().RegisterClass(cls);
 	def.Class = cls;
 
 	// Migrate from UClass(EStaticConstructor).
@@ -606,6 +704,34 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 	typeInfo.bIsAbstract = cls->HasAllClassFlags(CLASS_Abstract);
 	cls->SetCppTypeInfoStatic(&typeInfo);
 	cls->ClassConfigName = def.ConfigName;
+
+	{ // Finally setup proxy.
+		FZSharpClass& zscls = FZSharpFieldRegistry::Get().RegisterClass(cls);
+
+		// Property defaults will be constructed in PostEmitClass().
+		
+        zscls.DefaultSubobjects.Reserve(def.DefaultSubobjects.Num());
+        for (const auto& defaultSubobjectDef : def.DefaultSubobjects)
+        {
+        	FZSharpClass::FDefaultSubobject& defaultSubobject = zscls.DefaultSubobjects.Emplace_GetRef();
+        	defaultSubobject.Name = defaultSubobjectDef.Name;
+        	defaultSubobject.ClassPath = defaultSubobjectDef.ClassPath;
+        	defaultSubobject.bOptional = defaultSubobjectDef.bOptional;
+        	defaultSubobject.bTransient = defaultSubobjectDef.bTransient;
+        	defaultSubobject.Property = CastFieldChecked<FObjectPropertyBase>(cls->FindPropertyByName(defaultSubobjectDef.PropertyName));
+        	defaultSubobject.bRootComponent = defaultSubobjectDef.bRootComponent;
+        	defaultSubobject.AttachParentDefaultSubobjectName = defaultSubobjectDef.AttachParentDefaultSubobjectName;
+        	defaultSubobject.AttachSocketName = defaultSubobjectDef.AttachSocketName;
+        }
+        
+        zscls.DefaultSubobjectOverrides.Reserve(def.DefaultSubobjectOverrides.Num());
+        for (const auto& defaultObjectOverrideDef : def.DefaultSubobjectOverrides)
+        {
+        	FZSharpClass::FDefaultSubobjectOverride& defaultObjectOverride = zscls.DefaultSubobjectOverrides.Emplace_GetRef();
+        	defaultObjectOverride.Name = defaultObjectOverrideDef.Name;
+        	defaultObjectOverride.ClassPath = defaultObjectOverrideDef.ClassPath;
+        }
+	}
 }
 
 void ZSharp::FZUnrealFieldEmitter::EmitInterfaceSkeleton(UPackage* pak, FZInterfaceDefinition& def) const
@@ -693,6 +819,50 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitInterface(UPackage* pak, FZInterfac
 void ZSharp::FZUnrealFieldEmitter::FinishEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const
 {
 	// @TODO
+}
+
+void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinition& def) const
+{
+	UClass* cls = def.Class;
+	
+	{ // Construct property defaults.
+		FZSharpClass* zscls = FZSharpFieldRegistry::Get().GetMutableClass(cls);
+		
+		zscls->PropertyDefaults.Reserve(def.PropertyDefaults.Num());
+		for (const auto& propertyDefaultDef : def.PropertyDefaults)
+		{
+			FZSharpClass::FPropertyDefault& propertyDefault = zscls->PropertyDefaults.Emplace_GetRef();
+
+			// Resolve property chain.
+			TArray<FString> segments;
+			propertyDefaultDef.PropertyChain.ParseIntoArray(segments, TEXT("."));
+			UStruct* cur = cls;
+			for (int32 i = 0; i < segments.Num(); ++i)
+			{
+				const auto containerPropertyName = FName(segments[i]);
+				FProperty* containerProperty = cur->FindPropertyByName(containerPropertyName);
+				propertyDefault.PropertyChain.Emplace(containerProperty);
+
+				if (const auto objectProp = CastField<FObjectPropertyBase>(containerProperty))
+				{
+					cur = objectProp->PropertyClass;
+				}
+				else if (const auto structProp = CastField<FStructProperty>(containerProperty))
+				{
+					cur = structProp->Struct;
+				}
+				else
+				{
+					check(i == segments.Num() - 1);
+				}
+			}
+			
+			propertyDefault.Buffer = propertyDefaultDef.Buffer;
+		}
+	}
+
+	// Create CDO.
+	(void)def.Class->GetDefaultObject();
 }
 
 

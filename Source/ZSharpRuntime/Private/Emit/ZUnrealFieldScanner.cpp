@@ -25,11 +25,11 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 			def.Name = dto.Name;
 			def.Flags = static_cast<EObjectFlags>(dto.Flags);
 			def.MetadataMap = MoveTemp(dto.MetadataMap);
+			def.RepNotifyName = dto.RepNotifyName;
 
 #define COPY_SIMPLE_PROPERTY(DefName, DtoName) \
 			DefName.Type = static_cast<EZPropertyType>(DtoName.Type); \
 			DefName.PropertyFlags = static_cast<EPropertyFlags>(DtoName.PropertyFlags); \
-			DefName.RepNotifyName = DtoName.RepNotifyName; \
 			DefName.DescriptorFieldPath = DtoName.DescriptorFieldPath;
 
 			COPY_SIMPLE_PROPERTY(def, dto);
@@ -92,6 +92,36 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 				classDef.CastFlags = static_cast<EClassCastFlags>(classDto.CastFlags);
 				classDef.ImplementedInterfacePaths = MoveTemp(classDto.ImplementedInterfacePaths);
 				classDef.Functions = FunctionDtos2Defs(MoveTemp(classDto.Functions));
+
+				classDef.PropertyDefaults.Reserve(classDto.PropertyDefaults.Num());
+				for (auto& propertyDefaultDto : classDto.PropertyDefaults)
+				{
+					FZClassDefinition::FPropertyDefault& propertyDefault = classDef.PropertyDefaults.Emplace_GetRef();
+					propertyDefault.PropertyChain = MoveTemp(propertyDefaultDto.PropertyChain);
+					propertyDefault.Buffer = MoveTemp(propertyDefaultDto.Buffer);
+				}
+
+				classDef.DefaultSubobjects.Reserve(classDto.DefaultSubobjects.Num());
+				for (auto& defaultSubobjectDto : classDto.DefaultSubobjects)
+				{
+					FZClassDefinition::FDefaultSubobject& defaultSubobject = classDef.DefaultSubobjects.Emplace_GetRef();
+					defaultSubobject.Name = defaultSubobjectDto.Name;
+					defaultSubobject.ClassPath = defaultSubobjectDto.ClassPath;
+					defaultSubobject.bOptional = defaultSubobjectDto.bOptional;
+					defaultSubobject.bTransient = defaultSubobjectDto.bTransient;
+					defaultSubobject.PropertyName = defaultSubobjectDto.PropertyName;
+					defaultSubobject.bRootComponent = defaultSubobjectDto.bRootComponent;
+					defaultSubobject.AttachParentDefaultSubobjectName = defaultSubobjectDto.AttachParentDefaultSubobjectName;
+					defaultSubobject.AttachSocketName = defaultSubobjectDto.AttachSocketName;
+				}
+
+				classDef.DefaultSubobjectOverrides.Reserve(classDto.DefaultSubobjectOverrides.Num());
+				for (auto& defaultObjectOverrideDto : classDto.DefaultSubobjectOverrides)
+				{
+					FZClassDefinition::FDefaultSubobjectOverride& defaultObjectOverride = classDef.DefaultSubobjectOverrides.Emplace_GetRef();
+					defaultObjectOverride.Name = defaultObjectOverrideDto.Name;
+					defaultObjectOverride.ClassPath = defaultObjectOverrideDto.ClassPath;
+				}
 			}
 		}
 

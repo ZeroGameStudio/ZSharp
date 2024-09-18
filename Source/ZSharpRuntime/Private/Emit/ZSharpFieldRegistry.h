@@ -19,8 +19,8 @@ namespace ZSharp
 		virtual const FZSharpFunction* GetFunction(const UFunction* function) const override;
 
 	public:
-		FZSharpClass* RegisterClass(const UClass* cls);
-		FZSharpFunction* RegisterFunction(const UFunction* function);
+		FZSharpClass& RegisterClass(const UClass* cls);
+		FZSharpFunction& RegisterFunction(const UFunction* function);
 		
 		FZSharpClass* GetMutableClass(const UClass* cls) { return const_cast<FZSharpClass*>(GetClass(cls)); }
 		FZSharpFunction* GetMutableFunction(const UFunction* function) { return const_cast<FZSharpFunction*>(GetFunction(function)); }

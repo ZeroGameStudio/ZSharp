@@ -20,7 +20,7 @@ partial class UnrealFieldScanner
 
 	private void ScanUFunction(TypeDefinition type, MethodDefinition method, UnrealClassDefinition cls, CustomAttribute ufunctionAttr)
 	{
-		TryGetAttributePropertyValue<string?>(ufunctionAttr, nameof(UFunctionAttribute.Name), out var name);
+		TryGetAttributePropertyValue<string>(ufunctionAttr, nameof(UFunctionAttribute.Name), out var name);
 		name ??= method.Name;
 		string zcallName = $"m://{method.Module.Assembly.Name.Name}:{type.FullName}:{name}";
 		UnrealFunctionDefinition def = new()

@@ -8,7 +8,37 @@ namespace ZSharp
 {
 	struct FZSharpClass
 	{
-	
+		struct FPropertyDefault
+		{
+			TArray<FProperty*> PropertyChain;
+			FString Buffer;
+		};
+
+		struct FDefaultSubobject
+		{
+			FName Name;
+			FName ClassPath;
+			bool bOptional = false;
+			bool bTransient = false;
+			
+			FObjectPropertyBase* Property = nullptr;
+			
+			bool bRootComponent = false;
+			FName AttachParentDefaultSubobjectName;
+			FName AttachSocketName;
+		};
+
+		struct FDefaultSubobjectOverride
+		{
+			FName Name;
+			FName ClassPath;
+		};
+
+		const UClass* Class = nullptr;
+		
+		TArray<FPropertyDefault> PropertyDefaults;
+		TArray<FDefaultSubobject> DefaultSubobjects;
+		TArray<FDefaultSubobjectOverride> DefaultSubobjectOverrides;
 	};
 
 	struct FZSharpFunction
@@ -20,6 +50,8 @@ namespace ZSharp
 		FZCallHandle GetZCallHandle() const;
 
 	public:
+		const UFunction* Function = nullptr;
+		
 		FString ZCallName;
 		
 	private:
@@ -27,10 +59,6 @@ namespace ZSharp
 		
 	};
 
-	/**
-	 * There are too many places violate the fucking LSP in engine code, i.e. Assuming that native class is exact UClass but not subclass...
-	 * So we have no way to make a subclass like UZSharpClass inherits from UClass and have to use proxy...
-	 */
 	class ZSHARPRUNTIME_API IZSharpFieldRegistry
 	{
 	public:

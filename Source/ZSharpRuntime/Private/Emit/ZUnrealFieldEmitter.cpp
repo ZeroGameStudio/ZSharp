@@ -203,12 +203,10 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		}
 	}
 
-	static constexpr EObjectFlags GCompiledInPropertyObjectFlags = RF_Public | RF_Transient;
-	static constexpr EPropertyFlags PrimitiveFlags = CPF_ZeroConstructor | CPF_IsPlainOldData | CPF_NoDestructor | CPF_HasGetValueTypeHash;
+	static constexpr EObjectFlags GCompiledInPropertyObjectFlags = RF_Public | RF_Transient | RF_MarkAsNative;
 
-#define NEW_PROPERTY(PropertyTypeName, CompiledInPropertyFlags) \
+#define NEW_PROPERTY(PropertyTypeName) \
 	auto property = new F##PropertyTypeName##Property(owner, name, flags | GCompiledInPropertyObjectFlags); \
-	property->PropertyFlags |= CompiledInPropertyFlags; \
 	def.Property = property;
 	
 	static void EmitSimpleProperty(FFieldVariant owner, FZSimplePropertyDefinition& def, FName name, EObjectFlags flags)
@@ -218,60 +216,59 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			// Primitives
 		case EZPropertyType::UInt8:
 			{
-				NEW_PROPERTY(Byte, PrimitiveFlags);
+				NEW_PROPERTY(Byte);
 				break;
 			}
 		case EZPropertyType::UInt16:
 			{
-				NEW_PROPERTY(UInt16, PrimitiveFlags);
+				NEW_PROPERTY(UInt16);
 				break;
 			}
 		case EZPropertyType::UInt32:
 			{
-				NEW_PROPERTY(UInt32, PrimitiveFlags);
+				NEW_PROPERTY(UInt32);
 				break;
 			}
 		case EZPropertyType::UInt64:
 			{
-				NEW_PROPERTY(UInt64, PrimitiveFlags);
+				NEW_PROPERTY(UInt64);
 				break;
 			}
 		case EZPropertyType::Int8:
 			{
-				NEW_PROPERTY(Int8, PrimitiveFlags);
+				NEW_PROPERTY(Int8);
 				break;
 			}
 		case EZPropertyType::Int16:
 			{
-				NEW_PROPERTY(Int16, PrimitiveFlags);
+				NEW_PROPERTY(Int16);
 				break;
 			}
 		case EZPropertyType::Int32:
 			{
-				NEW_PROPERTY(Int, PrimitiveFlags);
+				NEW_PROPERTY(Int);
 				break;
 			}
 		case EZPropertyType::Int64:
 			{
-				NEW_PROPERTY(Int64, PrimitiveFlags);
+				NEW_PROPERTY(Int64);
 				break;
 			}
 		case EZPropertyType::Float:
 			{
-				NEW_PROPERTY(Float, PrimitiveFlags);
+				NEW_PROPERTY(Float);
 				break;
 			}
 		case EZPropertyType::Double:
 			{
-				NEW_PROPERTY(Double, PrimitiveFlags);
+				NEW_PROPERTY(Double);
 				break;
 			}
 		case EZPropertyType::Enum:
 			{
-				NEW_PROPERTY(Enum, PrimitiveFlags);
+				NEW_PROPERTY(Enum);
 
 				const auto underlyingProperty = new FInt64Property(property, NAME_None, GCompiledInPropertyObjectFlags);
-				property->ElementSize = underlyingProperty->ElementSize;
 				property->SetEnum(FindObjectChecked<UEnum>(nullptr, *def.DescriptorFieldPath.ToString()));
 				property->AddCppProperty(underlyingProperty);
 				
@@ -280,32 +277,37 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			// Strings
 		case EZPropertyType::String:
 			{
-				NEW_PROPERTY(Str, CPF_ZeroConstructor | CPF_HasGetValueTypeHash);
+				NEW_PROPERTY(Str);
 				break;
 			}
 		case EZPropertyType::Name:
 			{
-				NEW_PROPERTY(Name, PrimitiveFlags);
+				NEW_PROPERTY(Name);
 				break;
 			}
 		case EZPropertyType::Text:
 			{
-				NEW_PROPERTY(Text, CPF_None);
+				NEW_PROPERTY(Text);
 				break;
 			}
 			// Object wrappers
+			// @TODO: If PropertyClass has CLASS_DefaultToInstanced in hierarchy, then the property should set CPF_InstancedReference | CPF_ExportObject. (@see UhtObjectPropertyBase.cs)
 		case EZPropertyType::Object:
 			{
-				NEW_PROPERTY(Object, PrimitiveFlags | CPF_TObjectPtrWrapper);
+				NEW_PROPERTY(Object);
 
+				property->PropertyFlags |= CPF_TObjectPtrWrapper; // Migrate from UHT.
+				
 				property->PropertyClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
 		case EZPropertyType::Class:
 			{
-				NEW_PROPERTY(Class, CPF_UObjectWrapper | CPF_HasGetValueTypeHash);
+				NEW_PROPERTY(Class);
 
+				property->PropertyFlags |= CPF_TObjectPtrWrapper; // Migrate from UHT.
+				
 				property->PropertyClass = UClass::StaticClass();
 				property->MetaClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
 				
@@ -313,66 +315,81 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			}
 		case EZPropertyType::SoftClass:
 			{
-				NEW_PROPERTY(SoftClass, CPF_UObjectWrapper | CPF_HasGetValueTypeHash);
+				NEW_PROPERTY(SoftClass);
 
+				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
+				
 				property->MetaClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
 		case EZPropertyType::SoftObject:
 			{
-				NEW_PROPERTY(SoftObject, CPF_UObjectWrapper | CPF_HasGetValueTypeHash);
+				NEW_PROPERTY(SoftObject);
 
+				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
+				
 				property->PropertyClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
+			// There seems to be a TAutoWeakObjectPtr<> and CPF_AutoWeak but I don't see...
 		case EZPropertyType::WeakObject:
 			{
-				NEW_PROPERTY(WeakObject, PrimitiveFlags | CPF_UObjectWrapper);
+				NEW_PROPERTY(WeakObject);
 
+				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
+				
 				property->PropertyClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
 		case EZPropertyType::LazyObject:
 			{
-				NEW_PROPERTY(LazyObject, CPF_IsPlainOldData | CPF_NoDestructor | CPF_UObjectWrapper | CPF_HasGetValueTypeHash);
+				NEW_PROPERTY(LazyObject);
 
+				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
+				
 				property->PropertyClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
 		case EZPropertyType::Interface:
 			{
-				NEW_PROPERTY(Interface, PrimitiveFlags | CPF_UObjectWrapper);
+				NEW_PROPERTY(Interface);
 
+				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
+				
 				property->InterfaceClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
 			// Containers (Struct)
+			// @TODO: If Struct has instanced reference, then the property should set CPF_ContainsInstancedReference. (@see UhtStructProperty.cs)
 		case EZPropertyType::Struct:
 			{
-				NEW_PROPERTY(Struct, CPF_None);
+				NEW_PROPERTY(Struct);
 
 				property->Struct = FindObjectChecked<UScriptStruct>(nullptr, *def.DescriptorFieldPath.ToString());
-				property->ElementSize = property->Struct->GetStructureSize();
 				
 				break;
 			}
 			// Delegates
 		case EZPropertyType::Delegate:
 			{
-				NEW_PROPERTY(Delegate, CPF_None);
+				NEW_PROPERTY(Delegate);
 
+				property->PropertyFlags |= CPF_InstancedReference; // Migrate from UHT.
+				
 				property->SignatureFunction = FindObjectChecked<UDelegateFunction>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
 		case EZPropertyType::MulticastInlineDelegate:
 			{
-				NEW_PROPERTY(MulticastInlineDelegate, CPF_None);
+				NEW_PROPERTY(MulticastInlineDelegate);
+
+				property->PropertyFlags |= CPF_InstancedReference; // Migrate from UHT.
 				
 				property->SignatureFunction = FindObjectChecked<UDelegateFunction>(nullptr, *def.DescriptorFieldPath.ToString());
 				
@@ -381,7 +398,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			// Special types
 		case EZPropertyType::FieldPath:
 			{
-				NEW_PROPERTY(FieldPath, CPF_HasGetValueTypeHash);
+				NEW_PROPERTY(FieldPath);
 
 				property->PropertyClass = FProperty::StaticClass();
 				
@@ -408,34 +425,58 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			// Containers (except Struct)
 		case EZPropertyType::Array:
 			{
-				NEW_PROPERTY(Array, CPF_None);
+				NEW_PROPERTY(Array);
 
-				EmitSimpleProperty(property, def.InnerProperty, {}, RF_NoFlags);
+				EmitSimpleProperty(property, def.InnerProperty, name, RF_NoFlags);
+
+				// Migrate from UHT.
+				property->PropertyFlags |= property->Inner->PropertyFlags & CPF_TObjectPtrWrapper;
+				property->Inner->PropertyFlags = property->PropertyFlags & CPF_PropagateToArrayInner;
 
 				break;
 			}
 		case EZPropertyType::Set:
 			{
-				NEW_PROPERTY(Set, CPF_None);
+				NEW_PROPERTY(Set);
 
-				EmitSimpleProperty(property, def.InnerProperty, {}, RF_NoFlags);
+				// Assume inner property is hashable.
+				def.InnerProperty.PropertyFlags |= CPF_HasGetValueTypeHash;
+
+				EmitSimpleProperty(property, def.InnerProperty, name, RF_NoFlags);
+
+				// Migrate from UHT.
+				property->PropertyFlags |= property->ElementProp->PropertyFlags & CPF_TObjectPtrWrapper;
+				property->ElementProp->PropertyFlags = property->PropertyFlags & CPF_PropagateToSetElement;
 
 				break;
 			}
 		case EZPropertyType::Map:
 			{
-				NEW_PROPERTY(Map, CPF_None);
+				NEW_PROPERTY(Map);
 
-				EmitSimpleProperty(property, def.InnerProperty, {}, RF_NoFlags);
-				EmitSimpleProperty(property, def.OuterProperty, {}, RF_NoFlags);
+				// Assume inner property is hashable.
+				def.InnerProperty.PropertyFlags |= CPF_HasGetValueTypeHash;
 
+				EmitSimpleProperty(property, def.InnerProperty, FName(FString::Printf(TEXT("%s_Key"), *name.ToString())), RF_NoFlags);
+				EmitSimpleProperty(property, def.OuterProperty, name, RF_NoFlags);
+
+				// @TODO: These should migrate from UHT but I don't really understand what it does...
+				property->PropertyFlags |= property->KeyProp->PropertyFlags & CPF_TObjectPtrWrapper;
+				property->PropertyFlags |= property->ValueProp->PropertyFlags & CPF_TObjectPtrWrapper;
+				property->KeyProp->PropertyFlags = property->PropertyFlags & CPF_PropagateToMapKey;
+				property->ValueProp->PropertyFlags = property->PropertyFlags & CPF_PropagateToMapValue;
+				
 				break;
 			}
 		case EZPropertyType::Optional:
 			{
-				NEW_PROPERTY(Optional, CPF_None);
+				NEW_PROPERTY(Optional);
 
-				EmitSimpleProperty(property, def.InnerProperty, {}, RF_NoFlags);
+				EmitSimpleProperty(property, def.InnerProperty, name, RF_NoFlags);
+
+				// Migrate from UHT.
+				property->PropertyFlags |= property->GetValueProperty()->PropertyFlags & CPF_TObjectPtrWrapper;
+				property->GetValueProperty()->PropertyFlags = property->PropertyFlags & CPF_PropagateToOptionalInner;
 
 				break;
 			}

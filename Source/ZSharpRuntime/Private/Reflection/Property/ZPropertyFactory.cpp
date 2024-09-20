@@ -32,41 +32,52 @@ namespace ZSharp::PropertyFactory_Private
 	static void* const GFieldPathTypeId = reinterpret_cast<void*>(21);
 
 	template <std::derived_from<FProperty> T>
-	T* Create(EPropertyFlags flags)
+	T* Create(TFunctionRef<void(T*)> initialize = [](T*){})
 	{
+		class FNullArchive : public FArchive
+		{
+			virtual FArchive& operator<<(FObjectPtr& Value) override
+			{
+				return *this;
+			}
+		};
+		
 		auto prop = new T(nullptr, NAME_None, RF_Public | RF_MarkAsNative | RF_Transient);
-		prop->SetPropertyFlags(flags);
+
+		initialize(prop);
+
+		FNullArchive dummy;
+		prop->Link(dummy);
+		
 		return prop;
 	}
 
-	static constexpr EPropertyFlags PrimitiveFlags = CPF_ZeroConstructor | CPF_IsPlainOldData | CPF_NoDestructor | CPF_HasGetValueTypeHash;
-
 	static TMap<const void*, TFunction<FProperty*(const FZPropertyDesc&)>> FactoryMap
 	{
-		{ GUInt8TypeId, [](const FZPropertyDesc&){ return Create<FByteProperty>(PrimitiveFlags); } },
-		{ GUInt16TypeId, [](const FZPropertyDesc&){ return Create<FUInt16Property>(PrimitiveFlags); } },
-		{ GUInt32TypeId, [](const FZPropertyDesc&){ return Create<FUInt32Property>(PrimitiveFlags); } },
-		{ GUInt64TypeId, [](const FZPropertyDesc&){ return Create<FUInt64Property>(PrimitiveFlags); } },
-		{ GInt8TypeId, [](const FZPropertyDesc&){ return Create<FInt8Property>(PrimitiveFlags); } },
-		{ GInt16TypeId, [](const FZPropertyDesc&){ return Create<FInt16Property>(PrimitiveFlags); } },
-		{ GInt32TypeId, [](const FZPropertyDesc&){ return Create<FIntProperty>(PrimitiveFlags); } },
-		{ GInt64TypeId, [](const FZPropertyDesc&){ return Create<FInt64Property>(PrimitiveFlags); } },
-		{ GFloatTypeId, [](const FZPropertyDesc&){ return Create<FFloatProperty>(PrimitiveFlags); } },
-		{ GDoubleTypeId, [](const FZPropertyDesc&){ return Create<FDoubleProperty>(PrimitiveFlags); } },
-		{ GBoolTypeId, [](const FZPropertyDesc&){ return Create<FBoolProperty>(PrimitiveFlags); } },
+		{ GUInt8TypeId, [](const FZPropertyDesc&){ return Create<FByteProperty>(); } },
+		{ GUInt16TypeId, [](const FZPropertyDesc&){ return Create<FUInt16Property>(); } },
+		{ GUInt32TypeId, [](const FZPropertyDesc&){ return Create<FUInt32Property>(); } },
+		{ GUInt64TypeId, [](const FZPropertyDesc&){ return Create<FUInt64Property>(); } },
+		{ GInt8TypeId, [](const FZPropertyDesc&){ return Create<FInt8Property>(); } },
+		{ GInt16TypeId, [](const FZPropertyDesc&){ return Create<FInt16Property>(); } },
+		{ GInt32TypeId, [](const FZPropertyDesc&){ return Create<FIntProperty>(); } },
+		{ GInt64TypeId, [](const FZPropertyDesc&){ return Create<FInt64Property>(); } },
+		{ GFloatTypeId, [](const FZPropertyDesc&){ return Create<FFloatProperty>(); } },
+		{ GDoubleTypeId, [](const FZPropertyDesc&){ return Create<FDoubleProperty>(); } },
+		{ GBoolTypeId, [](const FZPropertyDesc&){ return Create<FBoolProperty>(); } },
 		
-		{ GStringTypeId, [](const FZPropertyDesc&){ return Create<FStrProperty>(CPF_ZeroConstructor | CPF_HasGetValueTypeHash); } },
-		{ GNameTypeId, [](const FZPropertyDesc&){ return Create<FNameProperty>(PrimitiveFlags); } },
-		{ GTextTypeId, [](const FZPropertyDesc&){ return Create<FTextProperty>(CPF_None); } },
+		{ GStringTypeId, [](const FZPropertyDesc&){ return Create<FStrProperty>(); } },
+		{ GNameTypeId, [](const FZPropertyDesc&){ return Create<FNameProperty>(); } },
+		{ GTextTypeId, [](const FZPropertyDesc&){ return Create<FTextProperty>(); } },
 
-		{ GSubclassOfTypeId, [](const FZPropertyDesc& desc){ auto res = Create<FClassProperty>(CPF_UObjectWrapper | CPF_HasGetValueTypeHash); res->PropertyClass = UClass::StaticClass(); res->MetaClass = static_cast<UClass*>(desc.Metadata); return res; } },
-		{ GSoftClassPtrTypeId, [](const FZPropertyDesc& desc){ auto res = Create<FSoftClassProperty>(CPF_UObjectWrapper | CPF_HasGetValueTypeHash); res->PropertyClass = UClass::StaticClass(); res->MetaClass = static_cast<UClass*>(desc.Metadata); return res; } },
-		{ GSoftObjectPtrTypeId, [](const FZPropertyDesc& desc){ auto res = Create<FSoftObjectProperty>(CPF_UObjectWrapper | CPF_HasGetValueTypeHash); res->PropertyClass = static_cast<UClass*>(desc.Metadata); return res; } },
-		{ GWeakObjectPtrTypeId, [](const FZPropertyDesc& desc){ auto res = Create<FWeakObjectProperty>(PrimitiveFlags | CPF_UObjectWrapper); res->PropertyClass = static_cast<UClass*>(desc.Metadata); return res; } },
-		{ GLazyObjectPtrTypeId, [](const FZPropertyDesc& desc){ auto res = Create<FLazyObjectProperty>(CPF_IsPlainOldData | CPF_NoDestructor | CPF_UObjectWrapper | CPF_HasGetValueTypeHash); res->PropertyClass = static_cast<UClass*>(desc.Metadata); return res; } },
-		{ GScriptInterfaceTypeId, [](const FZPropertyDesc& desc){ auto res = Create<FInterfaceProperty>(PrimitiveFlags | CPF_UObjectWrapper); res->InterfaceClass = static_cast<UClass*>(desc.Metadata); return res; } },
+		{ GSubclassOfTypeId, [](const FZPropertyDesc& desc){ return Create<FClassProperty>([&](FClassProperty* prop){ prop->PropertyClass = UClass::StaticClass(); prop->MetaClass = static_cast<UClass*>(desc.Metadata); }); } },
+		{ GSoftClassPtrTypeId, [](const FZPropertyDesc& desc){ return Create<FSoftClassProperty>([&](FSoftClassProperty* prop){ prop->PropertyClass = UClass::StaticClass(); prop->MetaClass = static_cast<UClass*>(desc.Metadata); }); } },
+		{ GSoftObjectPtrTypeId, [](const FZPropertyDesc& desc){ return Create<FSoftObjectProperty>([&](FSoftObjectProperty* prop){ prop->PropertyClass = static_cast<UClass*>(desc.Metadata); }); } },
+		{ GWeakObjectPtrTypeId, [](const FZPropertyDesc& desc){ return Create<FWeakObjectProperty>([&](FWeakObjectProperty* prop){ prop->PropertyClass = static_cast<UClass*>(desc.Metadata); }); } },
+		{ GLazyObjectPtrTypeId, [](const FZPropertyDesc& desc){ return Create<FLazyObjectProperty>([&](FLazyObjectProperty* prop){ prop->PropertyClass = static_cast<UClass*>(desc.Metadata); }); } },
+		{ GScriptInterfaceTypeId, [](const FZPropertyDesc& desc){ return Create<FInterfaceProperty>([&](FInterfaceProperty* prop){ prop->InterfaceClass = static_cast<UClass*>(desc.Metadata); }); } },
 
-		{ GFieldPathTypeId, [](const FZPropertyDesc&){ return Create<FFieldPathProperty>(CPF_HasGetValueTypeHash); } },
+		{ GFieldPathTypeId, [](const FZPropertyDesc&){ return Create<FFieldPathProperty>(); } },
 	};
 }
 
@@ -82,45 +93,51 @@ FProperty* ZSharp::FZPropertyFactory::Create(const FZPropertyDesc& desc)
 	{
 		if (cls == UClass::StaticClass())
 		{
-			auto prop = PropertyFactory_Private::Create<FClassProperty>(CPF_None);
-			prop->PropertyClass = cls;
-			prop->MetaClass = UObject::StaticClass();
-			return prop;
+			return PropertyFactory_Private::Create<FClassProperty>([&](FClassProperty* prop)
+			{
+				prop->PropertyClass = cls;
+				prop->MetaClass = UObject::StaticClass();
+			});
 		}
 		else
 		{
-			auto prop = PropertyFactory_Private::Create<FObjectProperty>(CPF_None);
-			prop->PropertyClass = cls;
-			return prop;
+			return PropertyFactory_Private::Create<FObjectProperty>([&](FObjectProperty* prop)
+			{
+				prop->PropertyClass = cls;
+			});
 		}
 	}
 	else if (auto scriptStruct = Cast<UScriptStruct>(field))
 	{
-		auto prop = PropertyFactory_Private::Create<FStructProperty>(CPF_None);
-		prop->ElementSize = scriptStruct->GetStructureSize();
-		prop->Struct = scriptStruct;
-		return prop;
+		return PropertyFactory_Private::Create<FStructProperty>([&](FStructProperty* prop)
+		{
+			prop->Struct = scriptStruct;
+		});
 	}
 	else if (auto enm = Cast<UEnum>(field))
 	{
-		auto prop = PropertyFactory_Private::Create<FEnumProperty>(PropertyFactory_Private::PrimitiveFlags);
-		prop->SetEnum(enm);
-		prop->AddCppProperty(PropertyFactory_Private::Create<FInt64Property>(PropertyFactory_Private::PrimitiveFlags));
-		prop->ElementSize = prop->GetUnderlyingProperty()->ElementSize;
+		return PropertyFactory_Private::Create<FEnumProperty>([&](FEnumProperty* prop)
+		{
+			const auto underlyingProperty = new FInt64Property(prop, NAME_None, RF_NoFlags);
+			prop->SetEnum(enm);
+			prop->AddCppProperty(underlyingProperty);
+		});
 	}
 	else if (auto sign = Cast<UDelegateFunction>(field); sign && !sign->IsA<USparseDelegateFunction>())
 	{
 		if (!sign->HasAnyFunctionFlags(FUNC_MulticastDelegate))
 		{
-			auto prop = PropertyFactory_Private::Create<FDelegateProperty>(CPF_None);
-			prop->SignatureFunction = sign;
-			return prop;
+			return PropertyFactory_Private::Create<FDelegateProperty>([&](FDelegateProperty* prop)
+			{
+				prop->SignatureFunction = sign;
+			});
 		}
 		else
 		{
-			auto prop = PropertyFactory_Private::Create<FMulticastInlineDelegateProperty>(CPF_None);
-			prop->SignatureFunction = sign;
-			return prop;
+			return PropertyFactory_Private::Create<FMulticastInlineDelegateProperty>([&](FMulticastInlineDelegateProperty* prop)
+			{
+				prop->SignatureFunction = sign;
+			});
 		}
 	}
 

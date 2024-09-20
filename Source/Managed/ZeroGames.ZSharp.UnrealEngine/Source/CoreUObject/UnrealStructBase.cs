@@ -17,9 +17,9 @@ public abstract class UnrealStructBase : UnrealExportedObjectBase
 
     public DynamicZCallResult ReadUnrealPropertyEx<T>(string name) => ReadUnrealPropertyEx<T>(name, 0);
 
-    public T? ReadUnrealProperty<T>(string name, int32 index) => (T?)ReadUnrealPropertyEx<T>(name, index)[3].Object;
+    public T ReadUnrealProperty<T>(string name, int32 index) => (T)ReadUnrealPropertyEx<T>(name, index)[3].Object!;
 
-    public T? ReadUnrealProperty<T>(string name) => ReadUnrealProperty<T>(name, 0);
+    public T ReadUnrealProperty<T>(string name) => ReadUnrealProperty<T>(name, 0);
 
     public DynamicZCallResult WriteUnrealProperty<T>(string name, int32 index, T value)
     {

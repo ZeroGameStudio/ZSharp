@@ -31,7 +31,7 @@ void ZSharp::FZSelfDescriptiveScriptMap::Add(const FZCallBufferSlot& key, const 
 	void* keyData = FMemory_Alloca_Aligned(Descriptor->Key->GetSize(), Descriptor->Key->GetMinAlignment());
 	KeyPropertyVisitor->SetValue(keyData, key);
 	void* valueData = FMemory_Alloca_Aligned(Descriptor->Value->GetSize(), Descriptor->Value->GetMinAlignment());
-	KeyPropertyVisitor->SetValue(valueData, value);
+	ValuePropertyVisitor->SetValue(valueData, value);
 	
 	helper.AddPair(keyData, valueData);
 }

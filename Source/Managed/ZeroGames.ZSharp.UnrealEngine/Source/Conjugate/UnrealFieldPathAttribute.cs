@@ -2,6 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
+// IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Enum | AttributeTargets.Delegate, Inherited = false)]
 public class UnrealFieldPathAttribute : Attribute
 {

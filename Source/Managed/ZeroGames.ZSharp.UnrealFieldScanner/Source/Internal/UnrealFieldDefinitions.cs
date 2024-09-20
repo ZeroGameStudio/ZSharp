@@ -29,15 +29,30 @@ public enum EPropertyType : uint8
 	FieldPath, // VerseValue is not supported.
 };
 
-public class UnrealPropertyDefinition : UnrealFieldDefinition
+public interface ISimpleUnrealPropertyDefinition
+{
+	EPropertyType Type { get; set; }
+	EPropertyFlags PropertyFlags { get; set; }
+	string? DescriptorFieldPath { get; set; }
+}
+
+public class SimpleUnrealPropertyDefinition : ISimpleUnrealPropertyDefinition
 {
 	public required EPropertyType Type { get; set; }
 	public EPropertyFlags PropertyFlags { get; set; }
-	public string? RepNotifyName { get; set; }
 	public string? DescriptorFieldPath { get; set; }
+}
 
-	public UnrealPropertyDefinition? InnerProperty { get; set; }
-	public UnrealPropertyDefinition? OuterProperty { get; set; }
+public class UnrealPropertyDefinition : UnrealFieldDefinition, ISimpleUnrealPropertyDefinition
+{
+	public required EPropertyType Type { get; set; }
+	public EPropertyFlags PropertyFlags { get; set; }
+	public string? DescriptorFieldPath { get; set; }
+	
+	public string? RepNotifyName { get; set; }
+
+	public SimpleUnrealPropertyDefinition? InnerProperty { get; set; }
+	public SimpleUnrealPropertyDefinition? OuterProperty { get; set; }
 }
 
 public class UnrealStructDefinition : UnrealFieldDefinition

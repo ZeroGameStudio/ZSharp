@@ -2,6 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
+// IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 public sealed partial class UnrealString
 {
 

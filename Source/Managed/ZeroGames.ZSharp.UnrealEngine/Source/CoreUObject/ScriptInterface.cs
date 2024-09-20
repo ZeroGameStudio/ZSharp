@@ -2,6 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
+// IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 public sealed class ScriptInterface<T> : ScriptInterfaceBase, IConjugate<ScriptInterface<T>> where T : IUnrealInterface
 {
 	

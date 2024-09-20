@@ -44,6 +44,11 @@ partial class UnrealFieldScanner
 			DescriptorFieldPath = descriptorFieldPath,
 		};
 
+		if (propertyType is GenericInstanceType genericInstanceType)
+		{
+			ScanElementProperties(genericInstanceType, def);
+		}
+
 		{ // Default
 			if (strct is UnrealClassDefinition cls)
 			{
@@ -213,6 +218,13 @@ partial class UnrealFieldScanner
 			DescriptorFieldPath = descriptorFieldPath,
 		};
 
+		// TypeReference.GetElementType() returns a TypeReference and we must use ByReferenceType.ElementType to get the GenericInstanceType.
+		TypeReference genericInstanceTypeToTest = parameterType is ByReferenceType refParameterType ? refParameterType.ElementType : parameterType;
+		if (genericInstanceTypeToTest is GenericInstanceType genericInstanceType)
+		{
+			ScanElementProperties(genericInstanceType, def);
+		}
+
 		def.PropertyFlags |= EPropertyFlags.CPF_Parm;
 		if (param.IsReturnValue)
 		{
@@ -256,10 +268,15 @@ partial class UnrealFieldScanner
 		
 		UnrealPropertyDefinition def = new()
 		{
-			Name = "ReturnValue",
+			Name = RETURN_PARAM_NAME,
 			Type = GetPropertyType(parameterType, out var descriptorFieldPath),
 			DescriptorFieldPath = descriptorFieldPath,
 		};
+		
+		if (parameterType is GenericInstanceType genericInstanceType)
+		{
+			ScanElementProperties(genericInstanceType, def);
+		}
 
 		def.PropertyFlags |= EPropertyFlags.CPF_Parm;
 		def.PropertyFlags |= EPropertyFlags.CPF_OutParm;
@@ -268,13 +285,88 @@ partial class UnrealFieldScanner
 		function.Properties.Add(def);
 	}
 
+	private void ScanElementProperties(GenericInstanceType outerPropertyType, UnrealPropertyDefinition outerProp)
+	{
+		switch (outerProp.Type)
+		{
+			case EPropertyType.Array:
+			case EPropertyType.Optional:
+			{
+				ScanElementProperty(outerPropertyType.GenericArguments[0], outerProp, false);
+				break;
+			}
+			case EPropertyType.Set:
+			{
+				ScanElementProperty(outerPropertyType.GenericArguments[0], outerProp, true);
+				break;
+			}
+			case EPropertyType.Map:
+			{
+				ScanElementProperty(outerPropertyType.GenericArguments[0], outerProp, true);
+				ScanElementProperty(outerPropertyType.GenericArguments[1], outerProp, false);
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
+	}
+
+	private void ScanElementProperty(TypeReference elementTypeRef, UnrealPropertyDefinition outerProp, bool requiresHashable)
+	{
+		SimpleUnrealPropertyDefinition elementProp = new()
+		{
+			Type = GetPropertyType(elementTypeRef, out var descriptorFieldPath),
+			DescriptorFieldPath = descriptorFieldPath,
+		};
+
+		if (requiresHashable)
+		{
+			bool hashable = true;
+			if (elementProp.Type == EPropertyType.Text || elementProp.Type == EPropertyType.Delegate || elementProp.Type == EPropertyType.MulticastInlineDelegate)
+			{
+				hashable = false;
+			}
+			else if (elementProp.Type == EPropertyType.Struct && !HasCustomAttribute(GetTypeDefinition(elementTypeRef), HASHABLE_ATTRIBUTE_FULL_NAME))
+			{
+				hashable = false;
+			}
+
+			if (!hashable)
+			{
+				throw new InvalidOperationException();
+			}
+		}
+
+		if (outerProp.InnerProperty is null)
+		{
+			outerProp.InnerProperty = elementProp;
+		}
+		else if (outerProp.OuterProperty is null)
+		{
+			outerProp.OuterProperty = elementProp;
+		}
+		else
+		{
+			throw new InvalidOperationException();
+		}
+	}
+
 	private EPropertyType GetPropertyType(TypeReference propertyTypeRef, out string? descriptorFieldPath)
 	{
 		descriptorFieldPath = null;
 
-		propertyTypeRef = propertyTypeRef.GetElementType();
+		if (propertyTypeRef is ByReferenceType refPropertyTypeRef)
+		{
+			// TypeReference.GetElementType() returns a TypeReference and we must use ByReferenceType.ElementType to get the GenericInstanceType.
+			propertyTypeRef = refPropertyTypeRef.ElementType;
+		}
+		// For generic instance type, this is the generic type name, i.e. ZeroGames.ZSharp.UnrealEngine.Core.UnrealArray`1.
+		// For normal type, this is the same as propertyTypeRef.FullName.
+		string propertyTypeName = propertyTypeRef.GetElementType().FullName;
 		
-		EPropertyType type = propertyTypeRef.FullName switch
+		EPropertyType type = propertyTypeName switch
 		{
 			// Primitives
 			UINT8_TYPE_FULL_NAME => EPropertyType.UInt8,
@@ -293,6 +385,11 @@ partial class UnrealFieldScanner
 			UNREAL_STRING_TYPE_FULL_NAME => EPropertyType.String,
 			UNREAL_NAME_TYPE_FULL_NAME => EPropertyType.Name,
 			UNREAL_TEXT_TYPE_FULL_NAME => EPropertyType.Text,
+			// Non-struct containers
+			UNREAL_ARRAY_TYPE_FULL_NAME => EPropertyType.Array,
+			UNREAL_SET_TYPE_FULL_NAME => EPropertyType.Set,
+			UNREAL_MAP_TYPE_FULL_NAME => EPropertyType.Map,
+			UNREAL_OPTIONAL_TYPE_FULL_NAME => EPropertyType.Optional,
 			// Special types
 			FIELD_PATH_TYPE_FULL_NAME => EPropertyType.FieldPath,
 			_ => default
@@ -302,23 +399,75 @@ partial class UnrealFieldScanner
 		{
 			return type;
 		}
-
-		TypeDefinition propertyType = GetTypeDefinition(propertyTypeRef);
-		TypeReference propertyTypeSuperRef = propertyType.BaseType;
-		if (propertyTypeSuperRef.FullName == ENUM_TYPE_FULL_NAME && GetUnrealFieldPathOrDefault(propertyType) is {} unrealFieldPath)
+		
+		// Object wrappers
 		{
-			descriptorFieldPath = unrealFieldPath;
-			return EPropertyType.Enum;
+			type = propertyTypeName switch
+			{
+				UNREAL_CLASS_TYPE_FULL_NAME => EPropertyType.Class,
+				SUBCLASS_OF_TYPE_FULL_NAME => EPropertyType.Class,
+				SOFT_CLASS_TYPE_FULL_NAME => EPropertyType.SoftClass,
+				SOFT_OBJECT_TYPE_FULL_NAME => EPropertyType.SoftObject,
+				WEAK_OBJECT_TYPE_FULL_NAME => EPropertyType.WeakObject,
+				LAZY_OBJECT_TYPE_FULL_NAME => EPropertyType.LazyObject,
+				SCRIPT_INTERFACE_TYPE_FULL_NAME => EPropertyType.Interface,
+				_ => default,
+			};
+
+			if (type != default)
+			{
+				TypeReference descriptorType = propertyTypeRef is GenericInstanceType genericInstanceType ? genericInstanceType.GenericArguments[0] : propertyTypeRef;
+				descriptorFieldPath = GetUnrealFieldPath(descriptorType);
+				return type;
+			}
 		}
 		
-		// @TODO: Object wrappers, containers, delegates
-
-		if (type == default)
+		// UEnum, UObject, UStruct, UDelegate
+		if (GetUnrealFieldPathOrDefault(propertyTypeRef) is { } unrealFieldPath)
 		{
-			throw new NotSupportedException($"Property type [{propertyTypeRef.FullName}] is not supported.");
+			TypeDefinition propertyType = GetTypeDefinition(propertyTypeRef);
+			
+			if (propertyType.IsEnum)
+			{
+				type = EPropertyType.Enum;
+			}
+
+			foreach (var i in propertyType.Interfaces)
+			{
+				type = i.InterfaceType.FullName switch
+				{
+					STATIC_CLASS_INTERFACE_FULL_NAME => EPropertyType.Object,
+					STATIC_STRUCT_INTERFACE_FULL_NAME => EPropertyType.Struct,
+					STATIC_SIGNATURE_INTERFACE_FULL_NAME => EPropertyType.Delegate,
+					_ => default,
+				};
+			}
+
+			if (type == EPropertyType.Delegate)
+			{
+				foreach (var attr in propertyType.CustomAttributes)
+				{
+					string attrTypeFullName = attr.AttributeType.FullName;
+					if (attrTypeFullName == MULTICAST_ATTRIBUTE_FULL_NAME)
+					{
+						type = EPropertyType.MulticastInlineDelegate;
+					}
+					else if (attrTypeFullName == SPARSE_ATTRIBUTE_FULL_NAME)
+					{
+						// Multicast sparse delegate is not supported.
+						type = default;
+					}
+				}
+			}
+
+			if (type != default)
+			{
+				descriptorFieldPath = unrealFieldPath;
+				return type;
+			}
 		}
 
-		return type;
+		throw new NotSupportedException($"Property type [{propertyTypeRef.FullName}] is not supported.");
 	}
 
 	private const string SYSTEM_NAMESPACE = "System.";
@@ -338,7 +487,6 @@ partial class UnrealFieldScanner
 	private const string FLOAT_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(Single);
 	private const string DOUBLE_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(Double);
 	private const string BOOL_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(Boolean);
-	private const string ENUM_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(Enum);
 
 	// Strings
 	private const string STRING_TYPE_FULL_NAME = SYSTEM_NAMESPACE + nameof(String);
@@ -347,28 +495,33 @@ partial class UnrealFieldScanner
 	private const string UNREAL_TEXT_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealText";
 	
 	// Object wrappers
-	private const string UNREAL_OBJECT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealObjectBase";
+	private const string UNREAL_CLASS_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealClass";
 	private const string SUBCLASS_OF_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "SubclassOf`1";
 	private const string SOFT_CLASS_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "SoftClassPtr`1";
 	private const string SOFT_OBJECT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "SoftObjectPtr`1";
 	private const string WEAK_OBJECT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "WeakObjectPtr`1";
 	private const string LAZY_OBJECT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "LazyObjectPtr`1";
-	private const string UNREAL_INTERFACE_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "ScriptInterface`1";
+	private const string SCRIPT_INTERFACE_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "ScriptInterface`1";
 	
 	// Containers
-	private const string UNREAL_SCRIPT_STRUCT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealStructBase";
 	private const string UNREAL_ARRAY_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealArray`1";
 	private const string UNREAL_SET_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealSet`1";
 	private const string UNREAL_MAP_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealMap`2";
 	private const string UNREAL_OPTIONAL_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealOptional`1";
 	
-	// Delegates
-	private const string UNREAL_DELEGATE_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealDelegateBase";
-	private const string UNREAL_MULTICAST_INLINE_DELEGATE_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealMulticastInlineDelegateBase";
-	
 	// Special types
 	private const string FIELD_PATH_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "FieldPath";
 	
+	// Unreal field traits
+	private const string STATIC_CLASS_INTERFACE_FULL_NAME = ENGINE_NAMESPACE + "IStaticClass";
+	private const string STATIC_STRUCT_INTERFACE_FULL_NAME = ENGINE_NAMESPACE + "IStaticStruct";
+	private const string STATIC_SIGNATURE_INTERFACE_FULL_NAME = ENGINE_NAMESPACE + "IStaticSignature";
+	private const string HASHABLE_ATTRIBUTE_FULL_NAME = ENGINE_NAMESPACE + "HashableAttribute";
+	private const string MULTICAST_ATTRIBUTE_FULL_NAME = ENGINE_NAMESPACE + "MulticastAttribute";
+	private const string SPARSE_ATTRIBUTE_FULL_NAME = ENGINE_NAMESPACE + "SparseAttribute";
+
+	// Misc
+	private const string RETURN_PARAM_NAME = "ReturnValue";
 
 }
 

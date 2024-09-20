@@ -2,6 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
+// IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 public sealed class SubclassOf<T> : SubclassOfBase, IConjugate<SubclassOf<T>> where T : IUnrealObject
 {
 	

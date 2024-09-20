@@ -2,6 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
+// IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 public sealed class UnrealSet<T> : UnrealSetBase, IConjugate<UnrealSet<T>>
 {
 	

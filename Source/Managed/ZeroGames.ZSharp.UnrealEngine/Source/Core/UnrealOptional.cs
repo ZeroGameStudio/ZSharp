@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 
+// IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 public sealed class UnrealOptional<T> : UnrealOptionalBase, IConjugate<UnrealOptional<T>>
 {
 	

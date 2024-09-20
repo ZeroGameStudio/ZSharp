@@ -48,7 +48,7 @@ internal partial class UnrealFieldScanner : IDisposable
 
 	public string Scan()
 	{
-		//BlockUntilDebuggerAttached();
+		BlockUntilDebuggerAttached();
 		
 		if (_assembly is null)
 		{

@@ -161,7 +161,7 @@ namespace {_exportedClass.Namespace};
 
 			if (_exportedClass.IsHashableStruct)
 			{
-				attrs.Add("[HashableUnrealStruct]");
+				attrs.Add("[Hashable]");
 			}
 			
 			return string.Join('\n', attrs);

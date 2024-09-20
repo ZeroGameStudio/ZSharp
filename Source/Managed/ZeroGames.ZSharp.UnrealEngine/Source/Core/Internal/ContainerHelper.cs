@@ -26,7 +26,7 @@ internal static class ContainerHelper
 		bool res = CanBeValue(type);
 		if (type.IsAssignableTo(typeof(UnrealStructBase)))
 		{
-			res &= type.GetCustomAttribute<HashableUnrealStructAttribute>() is not null;
+			res &= type.GetCustomAttribute<HashableAttribute>() is not null;
 		}
 
 		return res;

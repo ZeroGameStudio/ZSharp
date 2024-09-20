@@ -2,7 +2,8 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
+// IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-public class HashableUnrealStructAttribute : Attribute;
+public class HashableAttribute : Attribute;
 
 

@@ -39,6 +39,14 @@ public class DelegateWriter : IDisposable, IAsyncDisposable
 		}
 		string parameterList = string.Join(", ", parameters);
 		string delegateAttr = $"[System.CodeDom.Compiler.GeneratedCode(\"ZSharp\", \"{Assembly.GetExecutingAssembly().GetName().Version!.ToString(3)}\")]\n[UnrealFieldPath(__UNREAL_FIELD_PATH)]\n";
+		if (_exportedDelegate.IsSparse)
+		{
+			delegateAttr += "[Sparse]\n";
+		}
+		else if (_exportedDelegate.IsMulticast)
+		{
+			delegateAttr += "[Multicast]\n";
+		}
 		string baseType = _exportedDelegate.IsSparse ? "UnrealMulticastSparseDelegateBase" : _exportedDelegate.IsMulticast ? "UnrealMulticastInlineDelegateBase" : "UnrealDelegateBase";
 		string signatureDeclaration = $"public delegate {returnType} Signature({parameterList});";
 		string bindMethodName = _exportedDelegate.IsMulticast ? "Add" : "Bind";

@@ -14,6 +14,20 @@
 
 namespace ZSharp::ZUnrealFieldScanner_Private
 {
+	// This magic helps us to access multicast delegate invocation list.
+	static TArray<TDelegateBase<FNotThreadSafeNotCheckedDelegateMode>, FMulticastInvocationListAllocatorType>(TMulticastDelegateBase<FDefaultDelegateUserPolicy>::*GInvocationListMemberPtr);
+	template <decltype(GInvocationListMemberPtr) MemberPtr>
+	struct TInvocationListMemberPtrInitializer
+	{
+		TInvocationListMemberPtrInitializer()
+		{
+			GInvocationListMemberPtr = MemberPtr;
+		}
+		static TInvocationListMemberPtrInitializer GInstance;
+	};
+	template <decltype(GInvocationListMemberPtr) MemberPtr> TInvocationListMemberPtrInitializer<MemberPtr> TInvocationListMemberPtrInitializer<MemberPtr>::GInstance;
+	template struct TInvocationListMemberPtrInitializer <&TMulticastDelegateBase<FDefaultDelegateUserPolicy>::InvocationList>;
+
 	static TArray<FZPropertyDefinition> PropertyDtos2Defs(TArray<FZPropertyDefinitionDto>&& dtos)
 	{
 		TArray<FZPropertyDefinition> defs;
@@ -171,16 +185,15 @@ void ZSharp::FZUnrealFieldScanner::Startup()
 				ScanUnrealFieldsForModule(FName(status.Name), false);
 			}
 		}
-		
-		/*
-		 * This is for making sure that ScanUnrealFieldsForModule() is executed after ProcessNewlyLoadedUObjects():
-		 * 1. if USE_PER_MODULE_UOBJECT_BOOTSTRAP || IS_MONOLITHIC, ProcessNewlyLoadedUObjects() only needs to execute once and has already done before.
-		 * 2. if not, ProcessNewlyLoadedUObjects() is executed by FModuleManager::ProcessLoadedObjectsCallback.
-		 *    Here ProcessNewlyLoadedUObjects() should have not bound to the delegate
-		 *    and fortunately, multicast delegate executes reversed, so we don't need to do nothing else.
-		 */
-		check(!FModuleManager::Get().OnProcessLoadedObjectsCallback().IsBound());
-		ProcessLoadedObjectsDelegate = FModuleManager::Get().OnProcessLoadedObjectsCallback().AddRaw(this, &FZUnrealFieldScanner::ScanUnrealFieldsForModule);
+
+		// Since 5.5, ProcessNewlyLoadedUObjects() binds to FModuleManager::ProcessLoadedObjectsCallback super early.
+		// And because multicast delegate invokes inner delegates reversely,
+		// we have to use this magic to ensure that ScanUnrealFieldsForModule() executes after ProcessNewlyLoadedUObjects().
+		auto& delegate = FModuleManager::Get().OnProcessLoadedObjectsCallback();
+		ProcessLoadedObjectsDelegate = delegate.AddRaw(this, &FZUnrealFieldScanner::ScanUnrealFieldsForModule);
+		auto& invocationList = delegate.*ZUnrealFieldScanner_Private::GInvocationListMemberPtr;
+		check(invocationList.Num() == 2);
+		invocationList.Swap(0, 1);
 	}
 	else
 	{

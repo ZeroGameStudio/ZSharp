@@ -2,7 +2,7 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "0.2.0",
-	"FriendlyName": "ZSharp",
+	"FriendlyName": "Z#",
 	"Description": ".NET integration for Unreal Engine.",
 	"Category": "Scripting",
 	"CreatedBy": "Zero Games",

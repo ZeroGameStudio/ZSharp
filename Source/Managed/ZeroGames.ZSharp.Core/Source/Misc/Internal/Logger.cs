@@ -38,7 +38,7 @@ internal static class Logger
 
         unsafe
         {
-            fixed (char* buffer = sb.ToString().ToCharArray())
+            fixed (char* buffer = sb.ToString())
             {
                 Core_Interop.CoreLog(level, buffer);
             }

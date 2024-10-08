@@ -17,7 +17,7 @@ public sealed partial class UnrealName
 		get => ToUnrealString().Data;
 		set
 		{
-			fixed (char* data = value.ToCharArray())
+			fixed (char* data = value)
 			{
 				this.ZCall("ex://Name.SetData", (IntPtr)data);
 			}

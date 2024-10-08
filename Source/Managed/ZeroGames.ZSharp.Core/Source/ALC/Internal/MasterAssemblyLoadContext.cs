@@ -266,7 +266,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     private ZCallHandle GetZCallHandle_Black(string name)
     {
-        fixed (char* data = name.ToCharArray())
+        fixed (char* data = name)
         {
             return MasterAssemblyLoadContext_Interop.GetZCallHandle_Black(data);
         }

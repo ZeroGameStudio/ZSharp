@@ -11,7 +11,7 @@ public readonly struct InteropString : IDisposable
     {
         unsafe
         {
-            fixed (char* data = str.ToCharArray())
+            fixed (char* data = str)
             {
                 _address = InteropString_Interop.Alloc(data);
             }
@@ -42,7 +42,7 @@ public readonly struct InteropString : IDisposable
         get => new(InteropString_Interop.GetData(_address));
         set
         {
-            fixed (char* data = value.ToCharArray())
+            fixed (char* data = value)
             {
                 InteropString_Interop.SetData(_address, data);
             }

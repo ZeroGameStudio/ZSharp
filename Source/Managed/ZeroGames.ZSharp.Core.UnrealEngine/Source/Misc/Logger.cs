@@ -38,7 +38,7 @@ public static class Logger
 
         unsafe
         {
-            fixed (char* buffer = sb.ToString().ToCharArray())
+            fixed (char* buffer = sb.ToString())
             {
                 UnrealEngine_Interop.Log(level, buffer);
             }

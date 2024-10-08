@@ -15,7 +15,7 @@ public sealed partial class UnrealText
 		get => new((char*)this.ZCall("ex://Text.GetData", IntPtr.Zero)[-1].Pointer);
 		set
 		{
-			fixed (char* data = value.ToCharArray())
+			fixed (char* data = value)
 			{
 				this.ZCall("ex://Text.SetData", (IntPtr)data);
 			}

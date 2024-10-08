@@ -2,6 +2,7 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
+using ZeroGames.ZSharp.Core.UnrealEngine.Specifier;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
 

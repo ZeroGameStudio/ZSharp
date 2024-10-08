@@ -1,6 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Runtime.InteropServices;
+using System.Text.Json;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
@@ -24,9 +25,9 @@ internal static class UnrealFieldScanner_Interop
 			string moduleName = new(args->ModuleName);
 			InteropString outManifest = new(args->OutManifest);
 			bool withMetadata = args->WithMetadata > 0;
-			
-			using UnrealFieldScanner scanner = new(assemblyName, moduleName, withMetadata);
-			outManifest.Data = scanner.Scan();
+
+			outManifest.Data = new LegacyUnrealFieldScanner(assemblyName, moduleName, withMetadata).Scan();
+			//outManifest.Data = JsonSerializer.Serialize(new ManifestBuilder(new ModelRegistry(assemblyName, moduleName, withMetadata)).Build());
 		}
 		catch (Exception ex)
 		{

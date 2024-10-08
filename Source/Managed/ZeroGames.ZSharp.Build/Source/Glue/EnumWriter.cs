@@ -34,6 +34,8 @@ public class EnumWriter : IDisposable, IAsyncDisposable
 
 #region GENERATED CODE
 
+using ZeroGames.ZSharp.Core.UnrealEngine.Specifier;
+
 namespace {_exportedEnum.Namespace};
 
 {_enumAttributes}

@@ -3,6 +3,6 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class BlueprintReadOnlyAttribute : Attribute;
+public class BlueprintReadOnlyAttribute : Attribute, IUnrealReflectionSpecifier;
 
 

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
-public class UnrealFieldDefinition
+public abstract class UnrealFieldDefinition
 {
 	public required string Name { get; set; }
 	public EObjectFlags Flags { get; set; }
@@ -55,7 +55,7 @@ public class UnrealPropertyDefinition : UnrealFieldDefinition, ISimpleUnrealProp
 	public SimpleUnrealPropertyDefinition? OuterProperty { get; set; }
 }
 
-public class UnrealStructDefinition : UnrealFieldDefinition
+public abstract class UnrealStructDefinition : UnrealFieldDefinition
 {
 	public string? SuperPath { get; set; }
 	public List<UnrealPropertyDefinition> Properties { get; set; } = new();

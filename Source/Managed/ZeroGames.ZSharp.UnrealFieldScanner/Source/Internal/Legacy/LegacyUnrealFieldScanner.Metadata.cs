@@ -4,7 +4,7 @@ using Mono.Cecil;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
-partial class UnrealFieldScanner
+partial class LegacyUnrealFieldScanner
 {
 
 	private void ScanMetadata(ICustomAttributeProvider provider, UnrealFieldDefinition field)

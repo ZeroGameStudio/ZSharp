@@ -1,6 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Reflection;
+using ZeroGames.ZSharp.Core.UnrealEngine.Specifier;
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 

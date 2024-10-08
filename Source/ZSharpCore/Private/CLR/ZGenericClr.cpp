@@ -18,6 +18,7 @@
 #include "Interop/ZGCHandle.h"
 #include "ALC/ZSlimAssemblyLoadContext.h"
 #include "Interop/ZSlimAssemblyLoadContext_Interop.h"
+#include "Interop/Engine/ZBuild_Interop.h"
 #include "Interop/Engine/ZPath_Interop.h"
 
 namespace ZSharp::ZGenericClr_Private
@@ -140,15 +141,19 @@ namespace ZSharp::ZGenericClr_Private
 
 	static void LoadEngineCoreAssembly(const FString& precompiledDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
+		static const FString GBuildInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("Build_Interop"));
 		static const FString GUnrealEngineInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("UnrealEngine_Interop"));
 		static const FString GPathInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("Path_Interop"));;
 		
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
 		{
+			{ *GBuildInteropTypeName, TEXT("WithEditor"), FZBuild_Interop::WithEditor },
+		
 			{ *GUnrealEngineInteropTypeName, TEXT("Log"), FZUnrealEngine_Interop::Log },
 			{ *GUnrealEngineInteropTypeName, TEXT("IsInGameThread"), FZUnrealEngine_Interop::IsInGameThread },
 
 			{ *GPathInteropTypeName, TEXT("GetProjectDir"), FZPath_Interop::GetProjectDir },
+			{ *GPathInteropTypeName, TEXT("GetPluginDir"), FZPath_Interop::GetPluginDir },
 		};
 		
 		static const struct

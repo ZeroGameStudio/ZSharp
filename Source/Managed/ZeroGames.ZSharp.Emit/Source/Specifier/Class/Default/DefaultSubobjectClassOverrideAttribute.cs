@@ -3,7 +3,7 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-public class DefaultSubobjectClassOverrideAttribute : Attribute
+public class DefaultSubobjectClassOverrideAttribute : Attribute, IUnrealReflectionSpecifier
 {
 	public required string Subobject { get; init; }
 	public required Type Class { get; init; }

@@ -7,7 +7,7 @@ using Mono.Cecil;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
-partial class UnrealFieldScanner
+partial class LegacyUnrealFieldScanner
 {
 
 	private AssemblyDefinition GetTypeAssembly(TypeReference type)
@@ -149,7 +149,7 @@ partial class UnrealFieldScanner
 		Debugger.Break();
 	}
 
-	private const string UNREAL_FIELD_PATH_ATTRIBUTE_FULL_NAME = "ZeroGames.ZSharp.UnrealEngine.UnrealFieldPathAttribute";
+	private const string UNREAL_FIELD_PATH_ATTRIBUTE_FULL_NAME = "ZeroGames.ZSharp.Core.UnrealEngine.Specifier.UnrealFieldPathAttribute";
 	
 }
 

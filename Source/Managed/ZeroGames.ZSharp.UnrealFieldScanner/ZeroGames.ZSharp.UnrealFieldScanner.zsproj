@@ -19,6 +19,7 @@
 	[
 		"ZeroGames.ZSharp.Core",
 		"ZeroGames.ZSharp.Core.UnrealEngine",
+		"ZeroGames.ZSharp.Core.UnrealEngine.Specifier",
 		"ZeroGames.ZSharp.Emit.Specifier"
 	]
 }

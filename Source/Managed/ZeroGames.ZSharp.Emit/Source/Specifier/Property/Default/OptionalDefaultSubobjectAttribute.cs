@@ -3,6 +3,6 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class OptionalDefaultSubobjectAttribute : DefaultSubobjectAttribute;
+public class OptionalDefaultSubobjectAttribute : DefaultSubobjectAttribute, IUnrealReflectionSpecifier;
 
 

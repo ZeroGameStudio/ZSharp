@@ -8,7 +8,14 @@
 	"NeutralLanguage": "zh",
 	"ProjectReferences":
 	[
-		"ZeroGames.ZSharp.Core"
+		"ZeroGames.ZSharp.Core",
+		"ZeroGames.ZSharp.Core.UnrealEngine"
+	],
+	"Usings":
+	[
+		"ZeroGames.ZSharp.Core",
+		"ZeroGames.ZSharp.Core.UnrealEngine",
+		"ZeroGames.ZSharp.Core.UnrealEngine.Specifier"
 	]
 }
 

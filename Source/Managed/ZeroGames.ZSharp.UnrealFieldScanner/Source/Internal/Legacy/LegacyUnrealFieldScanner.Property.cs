@@ -1,11 +1,10 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using Mono.Cecil;
-using ZeroGames.ZSharp.Emit.Specifier;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
-partial class UnrealFieldScanner
+partial class LegacyUnrealFieldScanner
 {
 
 	private void ScanUProperties(TypeDefinition type, UnrealStructDefinition strct)
@@ -472,6 +471,7 @@ partial class UnrealFieldScanner
 
 	private const string SYSTEM_NAMESPACE = "System.";
 	private const string ENGINE_NAMESPACE = "ZeroGames.ZSharp.UnrealEngine.";
+	private const string SPECIFIER_NAMESPACE = "ZeroGames.ZSharp.Core.UnrealEngine.Specifier.";
 	private const string ENGINE_CORE_NAMESPACE = ENGINE_NAMESPACE + "Core.";
 	private const string ENGINE_CORE_UOBJECT_NAMESPACE = ENGINE_NAMESPACE + "CoreUObject.";
 
@@ -516,9 +516,10 @@ partial class UnrealFieldScanner
 	private const string STATIC_CLASS_INTERFACE_FULL_NAME = ENGINE_NAMESPACE + "IStaticClass";
 	private const string STATIC_STRUCT_INTERFACE_FULL_NAME = ENGINE_NAMESPACE + "IStaticStruct";
 	private const string STATIC_SIGNATURE_INTERFACE_FULL_NAME = ENGINE_NAMESPACE + "IStaticSignature";
-	private const string HASHABLE_ATTRIBUTE_FULL_NAME = ENGINE_NAMESPACE + "HashableAttribute";
-	private const string MULTICAST_ATTRIBUTE_FULL_NAME = ENGINE_NAMESPACE + "MulticastAttribute";
-	private const string SPARSE_ATTRIBUTE_FULL_NAME = ENGINE_NAMESPACE + "SparseAttribute";
+	
+	private const string HASHABLE_ATTRIBUTE_FULL_NAME = SPECIFIER_NAMESPACE + "HashableAttribute";
+	private const string MULTICAST_ATTRIBUTE_FULL_NAME = SPECIFIER_NAMESPACE + "MulticastAttribute";
+	private const string SPARSE_ATTRIBUTE_FULL_NAME = SPECIFIER_NAMESPACE + "SparseAttribute";
 
 	// Misc
 	private const string RETURN_PARAM_NAME = "ReturnValue";

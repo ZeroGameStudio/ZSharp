@@ -5,6 +5,17 @@ namespace ZeroGames.ZSharp.Core.UnrealEngine;
 public static class UnrealPaths
 {
 
+	public static unsafe string GetPluginDir(string pluginName)
+	{
+		using InteropString dir = new();
+		fixed (char* pluginNamePtr = pluginName)
+		{
+			Path_Interop.GetPluginDir(pluginNamePtr, dir.Address);
+		}
+
+		return dir.Data;
+	}
+
 	public static unsafe string ProjectDir
 	{
 		get

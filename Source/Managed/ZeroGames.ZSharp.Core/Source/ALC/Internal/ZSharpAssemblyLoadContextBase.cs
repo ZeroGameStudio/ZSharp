@@ -16,14 +16,7 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
     {
         GCHandle = GCHandle.Alloc(this);
 
-        Assembly resolverAssembly = Default.Assemblies.Single(asm => asm.GetCustomAttribute<AssemblyResolverAttribute>() is not null);
-        Type resolverType = resolverAssembly.GetCustomAttribute<AssemblyResolverAttribute>()!.ResolverType;
-        if (!resolverType.IsAssignableTo(typeof(IAssemblyResolver)))
-        {
-            throw new InvalidOperationException();
-        }
-        
-        _resolver = Unsafe.As<IAssemblyResolver>(Activator.CreateInstance(resolverType)!);
+        _resolver = IAssemblyResolver.Create();
             
         Resolving += HandleResolve;
         Unloading += _ => HandleUnload();

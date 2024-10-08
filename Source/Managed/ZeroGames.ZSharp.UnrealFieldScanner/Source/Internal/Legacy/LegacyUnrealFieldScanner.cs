@@ -10,23 +10,17 @@ using IAssemblyResolver = ZeroGames.ZSharp.Core.IAssemblyResolver;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
-internal partial class UnrealFieldScanner : IDisposable
+[Obsolete]
+internal partial class LegacyUnrealFieldScanner : IDisposable
 {
 	
-	public UnrealFieldScanner(string assemblyName, string moduleName, bool withMetadata)
+	public LegacyUnrealFieldScanner(string assemblyName, string moduleName, bool withMetadata)
 	{
-		Assembly resolverAssembly = AssemblyLoadContext.Default.Assemblies.Single(asm => asm.GetCustomAttribute<AssemblyResolverAttribute>() is not null);
-		Type resolverType = resolverAssembly.GetCustomAttribute<AssemblyResolverAttribute>()!.ResolverType;
-		if (!resolverType.IsAssignableTo(typeof(IAssemblyResolver)))
-		{
-			throw new InvalidOperationException();
-		}
-
 		_assemblyName = assemblyName;
 		_moduleName = moduleName;
 		_withMetadata = withMetadata;
 		
-		_resolver = Unsafe.As<IAssemblyResolver>(Activator.CreateInstance(resolverType)!);
+		_resolver = IAssemblyResolver.Create();
 		if (_resolver.Resolve(assemblyName) is { } dllPath)
 		{
 			_assembly = LoadAssemblyDefinition(dllPath);
@@ -35,7 +29,7 @@ internal partial class UnrealFieldScanner : IDisposable
 		_manifest = new() { ModuleName = _moduleName };
 	}
 
-	~UnrealFieldScanner()
+	~LegacyUnrealFieldScanner()
 	{
 		InternalDispose();
 	}

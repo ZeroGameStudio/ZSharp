@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 {
 
-	public UnrealPropertyModel(ModelRegistry registry, PropertyDefinition propertyDef) : base(propertyDef.Name, registry, propertyDef)
+	public UnrealPropertyModel(ModelRegistry registry, PropertyDefinition propertyDef, IUnrealStructModel outer) : base(propertyDef.Name, registry, propertyDef)
 	{
 		TypeReference typeRef = propertyDef.PropertyType;
 		if (typeRef.IsArray || typeRef.IsByReference || typeRef.IsPointer)
@@ -15,6 +15,7 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 			throw new InvalidOperationException();
 		}
 		
+		Outer = outer;
 		Role = EPropertyRole.Member;
 		Type = new(registry, GetDecayedType(typeRef))
 		{
@@ -32,7 +33,7 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 		}
 	}
 
-	public UnrealPropertyModel(ModelRegistry registry, ParameterDefinition parameterDef) : base(parameterDef.Name, registry, parameterDef)
+	public UnrealPropertyModel(ModelRegistry registry, ParameterDefinition parameterDef, IUnrealStructModel outer) : base(parameterDef.Name, registry, parameterDef)
 	{
 		TypeReference typeRef = parameterDef.ParameterType;
 		if (typeRef.IsArray || typeRef.IsPointer)
@@ -40,6 +41,7 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 			throw new InvalidOperationException();
 		}
 		
+		Outer = outer;
 		Role = EPropertyRole.Parameter;
 		Type = new(registry, GetDecayedType(typeRef))
 		{
@@ -49,14 +51,15 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 		};
 	}
 
-	public UnrealPropertyModel(ModelRegistry registry, MethodReturnType returnType) : base(returnType.Name, registry, returnType)
+	public UnrealPropertyModel(ModelRegistry registry, MethodReturnType returnType, IUnrealStructModel outer) : base(RETURN_NAME, registry, returnType)
 	{
 		TypeReference typeRef = returnType.ReturnType;
 		if (typeRef.IsArray || typeRef.IsByReference || typeRef.IsPointer)
 		{
 			throw new InvalidOperationException();
 		}
-		
+
+		Outer = outer;
 		Role = EPropertyRole.Return;
 		Type = new(registry, GetDecayedType(typeRef))
 		{
@@ -64,6 +67,7 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 		};
 	}
 
+	public IUnrealStructModel Outer { get; }
 	public EPropertyRole Role { get; }
 	public TypeModelReference Type { get; }
 
@@ -143,6 +147,8 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 
 	private bool IsAccessorPublic(IPropertyAccessorModel? accessor) => accessor is not null && accessor.Visibility == EMemberVisibility.Public;
 	private bool IsAccessorProtected(IPropertyAccessorModel? accessor) => accessor is not null && accessor.Visibility == EMemberVisibility.Protected;
+
+	private const string RETURN_NAME = "ReturnValue";
 
 }
 

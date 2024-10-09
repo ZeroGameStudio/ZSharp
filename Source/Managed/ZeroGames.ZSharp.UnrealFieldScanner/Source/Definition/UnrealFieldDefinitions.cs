@@ -45,6 +45,7 @@ public class SimpleUnrealPropertyDefinition : ISimpleUnrealPropertyDefinition
 
 public class UnrealPropertyDefinition : UnrealFieldDefinition, ISimpleUnrealPropertyDefinition
 {
+	[JsonIgnore] public UnrealStructDefinition Outer { get; init; } = null!; // Can't use required for JsonIgnore property...
 	public required EPropertyType Type { get; set; }
 	public EPropertyFlags PropertyFlags { get; set; }
 	public string? DescriptorFieldPath { get; set; }
@@ -63,6 +64,7 @@ public abstract class UnrealStructDefinition : UnrealFieldDefinition
 
 public class UnrealFunctionDefinition : UnrealStructDefinition
 {
+	[JsonIgnore] public UnrealClassDefinition Outer { get; init; } = null!; // Can't use required for JsonIgnore property...
 	public EFunctionFlags FunctionFlags { get; set; }
 	public required string ZCallName { get; set; }
 	public uint16 RpcId { get; set; }

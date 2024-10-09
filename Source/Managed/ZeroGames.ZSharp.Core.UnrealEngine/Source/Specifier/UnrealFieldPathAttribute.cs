@@ -3,10 +3,9 @@
 namespace ZeroGames.ZSharp.Core.UnrealEngine.Specifier;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Enum | AttributeTargets.Delegate, Inherited = false)]
-public class UnrealFieldPathAttribute : Attribute, IUnrealReflectionSpecifier
+public class UnrealFieldPathAttribute(string path) : Attribute, IUnrealReflectionSpecifier
 {
-	public UnrealFieldPathAttribute(string path) => Path = path;
-	public string Path { get; }
+	public string Path { get; } = path;
 }
 
 

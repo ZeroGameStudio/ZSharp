@@ -4,7 +4,7 @@ using Mono.Cecil;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
-public static class CustomAttributeProviderExtensions
+internal static class CustomAttributeProviderExtensions
 {
 
 	public static bool HasCustomAttribute(this ICustomAttributeProvider provider, string attributeTypeFullName)

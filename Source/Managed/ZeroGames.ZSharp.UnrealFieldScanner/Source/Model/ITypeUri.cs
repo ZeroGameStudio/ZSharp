@@ -2,9 +2,10 @@
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
-partial class ManifestBuilder
+public interface ITypeUri
 {
-
+	string AssemblyName { get; }
+	string FullName { get; }
 }
 
 

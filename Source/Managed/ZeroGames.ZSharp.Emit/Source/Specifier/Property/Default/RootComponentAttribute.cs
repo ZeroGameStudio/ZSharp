@@ -3,6 +3,6 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class RootComponentAttribute : DefaultSubobjectAttribute, IUnrealReflectionSpecifier;
+public class RootComponentAttribute : Attribute, IUnrealReflectionSpecifier;
 
 

@@ -21,13 +21,15 @@ public readonly struct TypeModelReference : ITypeModel
 
 	internal TypeModelReference(ModelRegistry registry, TypeReference typeRef) : this(registry.GetOrAddTypeModel(typeRef)){}
 	
-	public bool HasSpecifier(Type attributeType) => Type.HasSpecifier(attributeType);
-	public IUnrealReflectionSpecifier? GetSpecifier(Type attributeType) => Type.GetSpecifier(attributeType);
+	public bool HasSpecifier(Type attributeType, bool exactType) => Type.HasSpecifier(attributeType, exactType);
+	public IUnrealReflectionSpecifier? GetSpecifier(Type attributeType, bool exactType) => Type.GetSpecifier(attributeType, exactType);
 	
 	public IModelRegistry Registry { get; init; }
+	public string AssemblyName => Type.AssemblyName;
 	public string FullName { get; init; }
-	public TypeModelReference BaseType => Type.BaseType;
-	
+	public TypeModelReference? BaseType => Type.BaseType;
+	public IReadOnlyList<InterfaceTypeUri> Interfaces => Type.Interfaces;
+
 	public IReadOnlyCollection<IUnrealReflectionSpecifier> Specifiers => Type.Specifiers;
 	
 	public bool IsByRef { get; init; }

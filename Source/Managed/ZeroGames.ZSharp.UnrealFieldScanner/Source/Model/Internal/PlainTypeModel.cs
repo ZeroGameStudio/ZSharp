@@ -10,18 +10,25 @@ internal class PlainTypeModel : ITypeModel
 	public PlainTypeModel(ModelRegistry registry, TypeDefinition typeDef)
 	{
 		Registry = registry;
+		AssemblyName = typeDef.Scope.GetAssemblyName();
 		FullName = typeDef.FullName;
-		BaseType = new(registry, typeDef.BaseType);
+		if (typeDef.BaseType is not null)
+		{
+			BaseType = new(registry, typeDef.BaseType);
+		}
+		Interfaces = typeDef.Interfaces.Select(i => new InterfaceTypeUri(i.InterfaceType.Scope.GetAssemblyName(), i.InterfaceType.FullName)).ToArray();
 		
 		SpecifierResolver.Resolve(registry, typeDef, _specifiers);
 	}
-
-	public bool HasSpecifier(Type attributeType) => _specifiers.Any(spec => spec.GetType().IsAssignableTo(attributeType));
-	public IUnrealReflectionSpecifier? GetSpecifier(Type attributeType) => _specifiers.FirstOrDefault(spec => spec.GetType().IsAssignableTo(attributeType));
-
+	
+	public bool HasSpecifier(Type attributeType, bool exactType) => _specifiers.Any(spec => exactType ? spec.GetType() == attributeType : spec.GetType().IsAssignableTo(attributeType));
+	public IUnrealReflectionSpecifier? GetSpecifier(Type attributeType, bool exactType) => _specifiers.FirstOrDefault(spec => exactType ? spec.GetType() == attributeType : spec.GetType().IsAssignableTo(attributeType));
+	
 	public IModelRegistry Registry { get; }
+	public string AssemblyName { get; }
 	public string FullName { get; }
-	public TypeModelReference BaseType { get; }
+	public TypeModelReference? BaseType { get; }
+	public IReadOnlyList<InterfaceTypeUri> Interfaces { get; }
 
 	public IReadOnlyCollection<IUnrealReflectionSpecifier> Specifiers => _specifiers;
 	

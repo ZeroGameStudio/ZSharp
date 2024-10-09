@@ -8,19 +8,24 @@ internal class IntrinsicTypeModel : ITypeModel
 	public IntrinsicTypeModel(ModelRegistry registry, Type runtimeType)
 	{
 		Registry = registry;
+		AssemblyName = runtimeType.Assembly.GetName().Name!;
 		FullName = runtimeType.FullName!;
 		if (runtimeType.BaseType is not null)
 		{
 			BaseType = new(registry.GetTypeModelUnchecked(runtimeType.BaseType.FullName!));
 		}
+		// We don't care about intrinsic interfaces.
+		Interfaces = Array.Empty<InterfaceTypeUri>();
 	}
 
-	public bool HasSpecifier(Type attributeType) => false;
-	public IUnrealReflectionSpecifier? GetSpecifier(Type attributeType) => null;
+	public bool HasSpecifier(Type attributeType, bool exactType) => false;
+	public IUnrealReflectionSpecifier? GetSpecifier(Type attributeType, bool exactType) => null;
 
 	public IModelRegistry Registry { get; }
+	public string AssemblyName { get; }
 	public string FullName { get; }
-	public TypeModelReference BaseType { get; }
+	public TypeModelReference? BaseType { get; }
+	public IReadOnlyList<InterfaceTypeUri> Interfaces { get; }
 
 	public IReadOnlyCollection<IUnrealReflectionSpecifier> Specifiers => Array.Empty<IUnrealReflectionSpecifier>();
 	

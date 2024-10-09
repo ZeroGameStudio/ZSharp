@@ -7,15 +7,15 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 internal class PropertyAccessorModel : IPropertyAccessorModel
 {
 	
-	public PropertyAccessorModel(MethodDefinition methodDef, ITypeResolver typeResolver)
+	public PropertyAccessorModel(MethodDefinition methodDef, ModelRegistry modelRegistry)
 	{
 		Visibility = methodDef.IsPublic ? EMemberVisibility.Public : methodDef.IsFamily ? EMemberVisibility.Protected : EMemberVisibility.Private;
-		SpecifierResolver.Resolve(typeResolver, methodDef, _specifiers);
+		SpecifierResolver.Resolve(modelRegistry, methodDef, _specifiers);
 	}
 	
-	public bool HasSpecifier(Type attributeType) => _specifiers.Any(spec => spec.GetType().IsAssignableTo(attributeType));
-	public IUnrealReflectionSpecifier? GetSpecifier(Type attributeType) => _specifiers.FirstOrDefault(spec => spec.GetType().IsAssignableTo(attributeType));
-
+	public bool HasSpecifier(Type attributeType, bool exactType) => _specifiers.Any(spec => exactType ? spec.GetType() == attributeType : spec.GetType().IsAssignableTo(attributeType));
+	public IUnrealReflectionSpecifier? GetSpecifier(Type attributeType, bool exactType) => _specifiers.FirstOrDefault(spec => exactType ? spec.GetType() == attributeType : spec.GetType().IsAssignableTo(attributeType));
+	
 	public EMemberVisibility Visibility { get; }
 	public IReadOnlyCollection<IUnrealReflectionSpecifier> Specifiers => _specifiers;
 	

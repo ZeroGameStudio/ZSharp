@@ -26,8 +26,7 @@ internal static class UnrealFieldScanner_Interop
 			InteropString outManifest = new(args->OutManifest);
 			bool withMetadata = args->WithMetadata > 0;
 
-			outManifest.Data = new LegacyUnrealFieldScanner(assemblyName, moduleName, withMetadata).Scan();
-			//outManifest.Data = JsonSerializer.Serialize(new ManifestBuilder(new ModelRegistry(assemblyName, moduleName, withMetadata)).Build());
+			outManifest.Data = JsonSerializer.Serialize(new ManifestBuilder(new ModelRegistry(assemblyName, moduleName, withMetadata)).Build());
 		}
 		catch (Exception ex)
 		{

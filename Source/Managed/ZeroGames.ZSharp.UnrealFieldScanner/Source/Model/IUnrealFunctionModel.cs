@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
 public interface IUnrealFunctionModel : IUnrealStructModel, IMemberModel
 {
-
+	IUnrealClassModel Outer { get; }
 }
 
 

@@ -11,6 +11,7 @@ public enum EPropertyRole
 
 public interface IUnrealPropertyModel : IUnrealFieldModel, IMemberModel
 {
+	IUnrealStructModel Outer { get; }
 	EPropertyRole Role { get; }
 	TypeModelReference Type { get; }
 	IPropertyAccessorModel? Getter { get; }

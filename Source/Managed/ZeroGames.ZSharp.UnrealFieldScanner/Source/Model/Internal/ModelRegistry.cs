@@ -7,12 +7,12 @@ using IAssemblyResolver = ZeroGames.ZSharp.Core.IAssemblyResolver;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
-internal sealed partial class ModelRegistry : IModelRegistry, ITypeResolver
+internal sealed partial class ModelRegistry : IModelRegistry
 {
 
 	public ModelRegistry(string rootAssemblyName, string rootModuleName, bool withMetadata)
 	{
-		BlockUntilDebuggerAttached();
+		// BlockUntilDebuggerAttached();
 		
 		RootAssemblyName = rootAssemblyName;
 		RootModuleName = rootModuleName;

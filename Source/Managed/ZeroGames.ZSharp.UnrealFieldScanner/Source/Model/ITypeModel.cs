@@ -2,11 +2,19 @@
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
-public interface ITypeModel : ISpecifierProvider
+public interface ITypeModel : ITypeUri, ISpecifierProvider, IScanTimeType
 {
 	IModelRegistry Registry { get; }
-	string FullName { get; }
-	TypeModelReference BaseType { get; }
+	TypeModelReference? BaseType { get; }
+	IReadOnlyList<InterfaceTypeUri> Interfaces { get; }
+}
+
+public static class TypeModelExtensions
+{
+
+	public static bool IsObjectRootType(this ITypeModel @this) => @this.FullName == typeof(object).FullName;
+	public static bool IsEnum(this ITypeModel @this) => @this.BaseType?.FullName == typeof(Enum).FullName;
+
 }
 
 

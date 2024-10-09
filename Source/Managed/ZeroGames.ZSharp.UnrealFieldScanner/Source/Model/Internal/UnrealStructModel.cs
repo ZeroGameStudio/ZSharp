@@ -7,7 +7,8 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 internal abstract class UnrealStructModel : UnrealFieldModel, IUnrealStructModel
 {
 
-	protected UnrealStructModel(string name, ITypeResolver typeResolver, ICustomAttributeProvider attributeProvider) : base(name, typeResolver, attributeProvider){}
+	protected UnrealStructModel(string name) : base(name){}
+	protected UnrealStructModel(string name, ModelRegistry modelRegistry, ICustomAttributeProvider attributeProvider) : base(name, modelRegistry, attributeProvider){}
 	
 	public virtual IReadOnlyList<IUnrealPropertyModel> Properties => _properties;
 	

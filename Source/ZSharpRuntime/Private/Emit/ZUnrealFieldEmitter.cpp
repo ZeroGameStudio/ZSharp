@@ -806,6 +806,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 
 	const auto withinClass = !def.WithinPath.IsNone() ? FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString()) : UObject::StaticClass();
 	check(withinClass->IsNative());
+	check(withinClass->IsChildOf(UObject::StaticClass()));
 	cls->ClassWithin = withinClass;
 
 	cls->RegisterDependencies();

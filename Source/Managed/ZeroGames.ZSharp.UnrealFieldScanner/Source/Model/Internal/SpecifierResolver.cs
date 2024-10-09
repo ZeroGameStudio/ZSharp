@@ -10,59 +10,85 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 internal static class SpecifierResolver
 {
 
-	public static void Resolve(ITypeResolver typeResolver, ICustomAttributeProvider attributeProvider, ICollection<IUnrealReflectionSpecifier> specifiers)
+	public static void Resolve(ModelRegistry modelRegistry, ICustomAttributeProvider attributeProvider, ICollection<IUnrealReflectionSpecifier> specifiers)
 	{
 		foreach (var attribute in attributeProvider.CustomAttributes)
 		{
 			TypeReference typeRef = attribute.AttributeType;
-			if (!_specifierAssemblies.Contains(typeRef.Scope.GetAssemblyName()))
+			string assemblyName = typeRef.Scope.GetAssemblyName();
+			if (!_specifierAssemblies.Contains(assemblyName))
 			{
 				continue;
 			}
 			
-			TypeDefinition typeDef = typeResolver.ResolveTypeDefinition(typeRef);
+			TypeDefinition typeDef = modelRegistry.ResolveTypeDefinition(assemblyName, typeRef.FullName);
 			if (typeDef.Interfaces.Any(i => i.InterfaceType.FullName == _specifierInterfaceFullName))
 			{
-				specifiers.Add(CreateSpecifier(attribute, typeDef));
+				specifiers.Add(CreateSpecifier(modelRegistry, attribute, typeDef));
 			}
 		}
 	}
 
-	private static IUnrealReflectionSpecifier CreateSpecifier(CustomAttribute attribute, TypeDefinition typeDef)
+	private static IUnrealReflectionSpecifier CreateSpecifier(ModelRegistry modelRegistry, CustomAttribute attribute, TypeDefinition typeDef)
 	{
 		string assemblyName = typeDef.Scope.GetAssemblyName();
 		Assembly assembly = AssemblyLoadContext.Default.Assemblies.Single(asm => asm.GetName().Name == assemblyName);
-		Type? attributeRuntimeType = assembly.GetType(typeDef.FullName);
-		if (attributeRuntimeType is null)
+		Type? specifierRuntimeType = assembly.GetType(typeDef.FullName);
+		if (specifierRuntimeType is null)
 		{
 			throw new InvalidOperationException();
 		}
 
-		if (!attributeRuntimeType.IsAssignableTo(typeof(IUnrealReflectionSpecifier)))
+		if (!specifierRuntimeType.IsAssignableTo(typeof(IUnrealReflectionSpecifier)))
 		{
 			throw new InvalidOperationException();
 		}
 
-		// Loot constructor parameters
+		// Loot constructor parameters.
+		List<(int32 Index, TypeReference TypeRef)> typeConstructorArguments = new();
 		object?[]? constructorParameters = attribute.HasConstructorArguments ? new object?[attribute.ConstructorArguments.Count] : null;
 		if (constructorParameters is not null)
 		{
 			for (int32 i = 0; i < constructorParameters.Length; ++i)
 			{
-				object? parameter = GetAttributeArgumentValue(attribute.ConstructorArguments[i]);
-				constructorParameters[i] = parameter;
+				CustomAttributeArgument arg = attribute.ConstructorArguments[i];
+				if (arg.Value is TypeReference typeArg)
+				{
+					typeConstructorArguments.Add((i, typeArg));
+					constructorParameters[i] = null;
+				}
+				else
+				{
+					object? parameter = GetAttributeArgumentValue(arg);
+					constructorParameters[i] = parameter;
+				}
 			}
 		}
 		
-		var specifier = (IUnrealReflectionSpecifier)Activator.CreateInstance(attributeRuntimeType, constructorParameters)!;
+		var specifier = (IUnrealReflectionSpecifier)Activator.CreateInstance(specifierRuntimeType, constructorParameters)!;
+		
+		// Fill scanner assembly name and full name.
+		foreach (var arg in typeConstructorArguments)
+		{
+			IScanTimeType scanTimeType = modelRegistry.GetOrAddTypeModel(modelRegistry.ResolveTypeDefinition(arg.TypeRef.Scope.GetAssemblyName(), arg.TypeRef.FullName));
+			SetScannerPropertyForSpecifier(specifier, arg.Index, scanTimeType);
+		}
 
-		// Loot properties and fields
+		// Loot properties and fields.
 		if (attribute.HasProperties)
 		{
 			foreach (var namedArg in attribute.Properties)
 			{
-				object? value = GetAttributeArgumentValue(namedArg.Argument);
-				attributeRuntimeType.GetProperty(namedArg.Name)!.SetValue(specifier, value);
+				CustomAttributeArgument arg = namedArg.Argument;
+				if (arg.Value is TypeReference typeArg)
+				{
+					IScanTimeType scanTimeType = modelRegistry.GetOrAddTypeModel(modelRegistry.ResolveTypeDefinition(typeArg.Scope.GetAssemblyName(), typeArg.FullName));
+					SetScannerPropertyForSpecifier(specifier, namedArg.Name, scanTimeType);
+				}
+				else
+				{
+					specifierRuntimeType.GetProperty(namedArg.Name)!.SetValue(specifier, GetAttributeArgumentValue(arg));
+				}
 			}
 		}
 
@@ -70,21 +96,42 @@ internal static class SpecifierResolver
 		{
 			foreach (var namedArg in attribute.Fields)
 			{
-				object? value = GetAttributeArgumentValue(namedArg.Argument);
-				attributeRuntimeType.GetField(namedArg.Name)!.SetValue(specifier, value);
+				CustomAttributeArgument arg = namedArg.Argument;
+				if (arg.Value is TypeReference typeArg)
+				{
+					IScanTimeType scanTimeType = modelRegistry.GetOrAddTypeModel(modelRegistry.ResolveTypeDefinition(typeArg.Scope.GetAssemblyName(), typeArg.FullName));
+					SetScannerPropertyForSpecifier(specifier, namedArg.Name, scanTimeType);
+				}
+				else
+				{
+					specifierRuntimeType.GetField(namedArg.Name)!.SetValue(specifier, GetAttributeArgumentValue(arg));
+				}
 			}
 		}
 		
 		return specifier;
 	}
+
+	private static void SetScannerPropertyForSpecifier(IUnrealReflectionSpecifier specifier, object key, IScanTimeType value)
+	{
+		Type specifierRuntimeType = specifier.GetType();
+		PropertyInfo? property = specifierRuntimeType.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault(prop => prop.PropertyType.IsAssignableFrom(typeof(IScanTimeType)) && prop.GetCustomAttribute<ScanTimeTypeAttribute>() is {} attribute && (attribute.PropertyName == key as string || attribute.ConstructorArgumentIndex == key as int32?));
+		property?.SetValue(specifier, value);
+	}
 	
 	private static object? GetAttributeArgumentValue(CustomAttributeArgument arg)
 	{
-		if (arg.Value is CustomAttributeArgument compositeValue)
+		while (arg.Value is CustomAttributeArgument compositeValue)
 		{
 			arg = compositeValue;
 		}
-		else if (arg.Type.IsArray)
+		
+		if (arg.Value is TypeReference)
+		{
+			return new NotSupportedException();
+		}
+		
+		if (arg.Type.IsArray)
 		{
 			TypeReference elementTypeRef = arg.Type.GetElementType();
 			string assemblyName = elementTypeRef.Scope.GetAssemblyName();

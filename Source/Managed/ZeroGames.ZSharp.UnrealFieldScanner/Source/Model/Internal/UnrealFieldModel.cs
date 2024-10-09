@@ -6,21 +6,26 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
 internal abstract class UnrealFieldModel : IUnrealFieldModel
 {
-
-	protected UnrealFieldModel(string name, ITypeResolver typeResolver, ICustomAttributeProvider attributeProvider)
+	
+	protected UnrealFieldModel(string name)
 	{
 		Name = name;
-		SpecifierResolver.Resolve(typeResolver, attributeProvider, _specifiers);
 	}
 
-	public virtual bool HasSpecifier(Type attributeType) => _specifiers.Any(spec => spec.GetType().IsAssignableTo(attributeType));
-	public virtual IUnrealReflectionSpecifier? GetSpecifier(Type attributeType) => _specifiers.FirstOrDefault(spec => spec.GetType().IsAssignableTo(attributeType));
+	protected UnrealFieldModel(string name, ModelRegistry modelRegistry, ICustomAttributeProvider attributeProvider) : this(name)
+	{
+		Name = name;
+		SpecifierResolver.Resolve(modelRegistry, attributeProvider, _specifiers);
+	}
+
+	public virtual bool HasSpecifier(Type attributeType, bool exactType) => _specifiers.Any(spec => exactType ? spec.GetType() == attributeType : spec.GetType().IsAssignableTo(attributeType));
+	public virtual IUnrealReflectionSpecifier? GetSpecifier(Type attributeType, bool exactType) => _specifiers.FirstOrDefault(spec => exactType ? spec.GetType() == attributeType : spec.GetType().IsAssignableTo(attributeType));
 	
 	public string Name { get; }
 
 	public virtual IReadOnlyCollection<IUnrealReflectionSpecifier> Specifiers => _specifiers;
 
-	private readonly List<IUnrealReflectionSpecifier> _specifiers = new();
+	protected readonly List<IUnrealReflectionSpecifier> _specifiers = new();
 	
 }
 

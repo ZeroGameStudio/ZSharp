@@ -3,6 +3,6 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class EditDefaultsOnlyAttribute : Attribute, IUnrealReflectionSpecifier;
+public class EditDefaultsOnlyAttribute : EditSpecifierBase, IUnrealReflectionSpecifier;
 
 

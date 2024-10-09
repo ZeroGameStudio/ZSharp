@@ -3,6 +3,6 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class VisibleAnywhereAttribute : Attribute, IUnrealReflectionSpecifier;
+public class VisibleAnywhereAttribute : EditSpecifierBase, IUnrealReflectionSpecifier;
 
 

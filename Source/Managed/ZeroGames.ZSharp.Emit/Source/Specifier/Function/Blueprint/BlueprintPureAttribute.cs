@@ -3,6 +3,9 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Method)]
-public class BlueprintPureAttribute : Attribute, IUnrealReflectionSpecifier;
+public class BlueprintPureAttribute : Attribute, IUnrealReflectionSpecifier
+{
+	public IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintCallableAttribute) ];
+}
 
 

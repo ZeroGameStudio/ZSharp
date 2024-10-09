@@ -3,6 +3,6 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class VisibleInstanceOnlyAttribute : Attribute, IUnrealReflectionSpecifier;
+public class VisibleInstanceOnlyAttribute : EditSpecifierBase, IUnrealReflectionSpecifier;
 
 

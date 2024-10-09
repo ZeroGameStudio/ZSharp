@@ -14,8 +14,6 @@ internal class IntrinsicTypeModel : ITypeModel
 		{
 			BaseType = new(registry.GetTypeModelUnchecked(runtimeType.BaseType.FullName!));
 		}
-		// We don't care about intrinsic interfaces.
-		Interfaces = Array.Empty<InterfaceTypeUri>();
 	}
 
 	public bool HasSpecifier(Type attributeType, bool exactType) => false;
@@ -25,9 +23,9 @@ internal class IntrinsicTypeModel : ITypeModel
 	public string AssemblyName { get; }
 	public string FullName { get; }
 	public TypeModelReference? BaseType { get; }
-	public IReadOnlyList<InterfaceTypeUri> Interfaces { get; }
+	public IReadOnlyList<InterfaceTypeUri> Interfaces { get; } = [];
 
-	public IReadOnlyCollection<IUnrealReflectionSpecifier> Specifiers => Array.Empty<IUnrealReflectionSpecifier>();
+	public IReadOnlyCollection<IUnrealReflectionSpecifier> Specifiers { get; } = [];
 	
 }
 

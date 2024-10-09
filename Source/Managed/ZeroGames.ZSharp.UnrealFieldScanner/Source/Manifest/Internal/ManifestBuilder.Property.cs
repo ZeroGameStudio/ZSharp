@@ -145,7 +145,7 @@ partial class ManifestBuilder
 				throw new InvalidOperationException();
 			}
 
-			descriptorFieldPath = GetUnrealFieldPath(propertyTypeModel.GenericArguments[0]);
+			descriptorFieldPath = propertyTypeModel.GenericArguments[0].GetUnrealFieldPath();
 			return result;
 		}
 		
@@ -204,140 +204,6 @@ partial class ManifestBuilder
 		}
 
 		throw new InvalidOperationException();
-	}
-
-	[SpecifierProcessor]
-	private void ProcessSpecifier_UProperty(UnrealPropertyDefinition def, IUnrealPropertyModel model, UPropertyAttribute specifier)
-	{
-		if (specifier.Default is { } defaultValue)
-		{
-			if (model.Outer is not IUnrealClassModel)
-			{
-				throw new InvalidOperationException();
-			}
-
-			var classDef = (UnrealClassDefinition)def.Outer;
-			classDef.PropertyDefaults.Add(new()
-			{
-				PropertyChain = def.Name,
-				Buffer = defaultValue.ToString()!,
-			});
-		}
-	}
-	
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BlueprintReadWriteAttribute specifier)
-	{
-		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
-	}
-	
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BlueprintReadOnlyAttribute specifier)
-	{
-		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible | EPropertyFlags.CPF_BlueprintReadOnly;
-	}
-	
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EditAnywhereAttribute specifier)
-	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit;
-	}
-	
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EditDefaultsOnlyAttribute specifier)
-	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_DisableEditOnInstance;
-	}
-	
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EditInstanceOnlyAttribute specifier)
-	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_DisableEditOnTemplate;
-	}
-	
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, VisibleAnywhereAttribute specifier)
-	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_EditConst;
-	}
-	
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, VisibleDefaultsOnlyAttribute specifier)
-	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_EditConst | EPropertyFlags.CPF_DisableEditOnInstance;
-	}
-	
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, VisibleInstanceOnlyAttribute specifier)
-	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_EditConst | EPropertyFlags.CPF_DisableEditOnTemplate;
-	}
-	
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, DefaultSubobjectAttribute specifier)
-	{
-		if (model.Outer is not IUnrealClassModel)
-		{
-			throw new InvalidOperationException();
-		}
-
-		if (model.HasSpecifier<OptionalDefaultSubobjectAttribute>())
-		{
-			throw new InvalidOperationException();
-		}
-
-		var attachmentSpecifier = model.GetSpecifier<AttachmentAttribute>();
-		
-		var classDef = (UnrealClassDefinition)def.Outer;
-		classDef.DefaultSubobjects.Add(new()
-		{
-			Name = specifier.Name ?? def.Name,
-			ClassPath = GetUnrealFieldPath(model.Type),
-			PropertyName = def.Name,
-			IsRootComponent = model.HasSpecifier<RootComponentAttribute>(),
-			AttachParentDefaultSubobjectName = attachmentSpecifier?.Parent,
-			AttachSocketName = attachmentSpecifier?.Socket,
-		});
-	}
-	
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, OptionalDefaultSubobjectAttribute specifier)
-	{
-		if (model.Outer is not IUnrealClassModel)
-		{
-			throw new InvalidOperationException();
-		}
-
-		if (model.HasSpecifier<DefaultSubobjectAttribute>(true))
-		{
-			throw new InvalidOperationException();
-		}
-
-		var attachmentSpecifier = model.GetSpecifier<AttachmentAttribute>();
-		
-		var classDef = (UnrealClassDefinition)def.Outer;
-		classDef.DefaultSubobjects.Add(new()
-		{
-			Name = specifier.Name ?? def.Name,
-			ClassPath = GetUnrealFieldPath(model.Type),
-			PropertyName = def.Name,
-			IsOptional = true,
-			IsRootComponent = model.HasSpecifier<RootComponentAttribute>(),
-			AttachParentDefaultSubobjectName = attachmentSpecifier?.Parent,
-			AttachSocketName = attachmentSpecifier?.Socket,
-		});
-	}
-	
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, RootComponentAttribute specifier)
-	{
-		// Do nothing because DefaultSubobject/OptionalDefaultSubobject specifier will deal with us.
-	}
-	
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, AttachmentAttribute specifier)
-	{
-		// Do nothing because DefaultSubobject/OptionalDefaultSubobject specifier will deal with us.
 	}
 
 	// Namespaces

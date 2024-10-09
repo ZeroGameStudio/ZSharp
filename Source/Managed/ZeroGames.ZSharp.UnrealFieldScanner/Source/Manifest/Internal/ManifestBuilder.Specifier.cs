@@ -1,85 +1,196 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
 partial class ManifestBuilder
 {
-
-	[AttributeUsage(AttributeTargets.Method)]
-	private class SpecifierProcessorAttribute : Attribute;
-
+	
 	private void ScanSpecifierProcessors()
 	{
 		Type actionGenericType = typeof(Action<,,>);
-		Type targetType = typeof(ManifestBuilder);
-		foreach (var method in targetType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
+
+		Type[] processorTypes = [ typeof(SpecifierProcessor) ];
+		foreach (var processorType in processorTypes)
 		{
-			if (method.GetCustomAttribute<SpecifierProcessorAttribute>() is not null)
+			object? processorInstance = processorType == typeof(ManifestBuilder) ? this : !processorType.IsAbstract ? Activator.CreateInstance(processorType) : null;
+			foreach (var method in processorType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
 			{
-				ParameterInfo[] parameters = method.GetParameters();
-				if (parameters.Length != 3)
+				if (method.GetCustomAttribute<SpecifierProcessorAttribute>() is {} attribute)
 				{
-					throw new InvalidOperationException();
-				}
+					ParameterInfo[] parameters = method.GetParameters();
+					if (parameters.Length != 3)
+					{
+						throw new InvalidOperationException();
+					}
 
-				if (!parameters[0].ParameterType.IsAssignableTo(typeof(UnrealFieldDefinition)))
-				{
-					throw new IncompleteInitialization();
-				}
+					if (!parameters[0].ParameterType.IsAssignableTo(typeof(UnrealFieldDefinition)))
+					{
+						throw new InvalidOperationException();
+					}
 
-				if (!parameters[1].ParameterType.IsAssignableTo(typeof(ISpecifierProvider)))
-				{
-					throw new InvalidOperationException();
-				}
+					if (!parameters[1].ParameterType.IsAssignableTo(typeof(ISpecifierProvider)))
+					{
+						throw new InvalidOperationException();
+					}
 
-				Type specifierParameterType = parameters[2].ParameterType;
-				if (!specifierParameterType.IsAssignableTo(typeof(IUnrealReflectionSpecifier)))
-				{
-					throw new InvalidOperationException();
+					Type specifierParameterType = parameters[2].ParameterType;
+					if (!specifierParameterType.IsAssignableTo(typeof(IUnrealReflectionSpecifier)))
+					{
+						throw new InvalidOperationException();
+					}
+
+					if (!_specifierProcessorMap.TryGetValue(specifierParameterType, out var recs))
+					{
+						recs = new();
+						_specifierProcessorMap[specifierParameterType] = recs;
+					}
+					
+					Type newProcessorType = actionGenericType.MakeGenericType(method.GetParameters().Select(p => p.ParameterType).ToArray());
+					Delegate processor = Delegate.CreateDelegate(newProcessorType, processorInstance, method);
+					recs.Add(new(processor, attribute));
 				}
-				
-				_specifierProcessorMap.TryGetValue(specifierParameterType, out var oldProcessor);
-				Type newProcessorType = actionGenericType.MakeGenericType(method.GetParameters().Select(p => p.ParameterType).ToArray());
-				Delegate newProcessor = Delegate.CreateDelegate(newProcessorType, this, method);
-				Delegate finalProcessor = Delegate.Combine(oldProcessor, newProcessor);
-				_specifierProcessorMap[specifierParameterType] = finalProcessor;
 			}
 		}
 	}
 
 	private void ProcessSpecifiers(UnrealFieldDefinition fieldDef, ISpecifierProvider specifierProvider)
 	{
+		Type[] allSpecifierTypes = specifierProvider.Specifiers.Distinct().Select(spec => spec.GetType()).ToArray();
+		
 		object[] processorParameters = [ fieldDef, specifierProvider, null! ];
 		foreach (var specifier in specifierProvider.Specifiers)
 		{
 			Type specifierType = specifier.GetType();
-			if (_specifierProcessorMap.TryGetValue(specifierType, out var processor))
+			if (_specifierProcessorMap.TryGetValue(specifierType, out var recs))
 			{
 				processorParameters[2] = specifier;
-				processor.DynamicInvoke(processorParameters);
+				foreach (var rec in recs)
+				{
+					Type[] hierarchicalRequiredSpecifierTypes = specifier.HierarchicalRequirements.Concat(rec.Attribute.HierarchicalRequirements).ToArray();
+					Type[] exactRequiredSpecifierTypes = specifier.ExactRequirements.Concat(rec.Attribute.ExactRequirements).ToArray();
+					if (TryGetSpecifierMissings(allSpecifierTypes, specifierType, hierarchicalRequiredSpecifierTypes, exactRequiredSpecifierTypes, out var missings))
+					{
+						throw new SpecifierMissingException(specifierType, missings, rec.Processor.Method, fieldDef);
+					}
+					
+					Type[] hierarchicalConflictSpecifierTypes = specifier.HierarchicalConflicts.Concat(rec.Attribute.HierarchicalConflicts).ToArray();
+					Type[] exactConflictSpecifierTypes = specifier.ExactConflicts.Concat(rec.Attribute.ExactConflicts).ToArray();
+					if (TryGetSpecifierConflicts(allSpecifierTypes, specifierType, hierarchicalConflictSpecifierTypes, exactConflictSpecifierTypes, out var conflicts))
+					{
+						throw new SpecifierConflictException(specifierType, conflicts, rec.Processor.Method, fieldDef);
+					}
+					
+					rec.Processor.DynamicInvoke(processorParameters);
+				}
 			}
 		}
 	}
 
-	[SpecifierProcessor]
-	private void ProcessSpecifier(UnrealFieldDefinition def, IUnrealFieldModel model, UMetaAttribute specifier)
+	private bool TryGetSpecifierMissings(Type[] allSpecifierTypes, Type currentSpecifierType, Type[] hierarchicalRequiredSpecifierTypes, Type[] exactRequiredSpecifierTypes, [NotNullWhen(true)] out Type[]? missings)
 	{
-		foreach (var pair in specifier.Pairs)
+		List<Type>? result = null;
+		
+		foreach (var requiredSpecifierType in hierarchicalRequiredSpecifierTypes)
 		{
-			string[] kv = pair.Split('=', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-			string key = kv.Length > 0 ? kv[0] : string.Empty;
-			string value = kv.Length > 1 ? kv[1] : string.Empty;
-			if (!string.IsNullOrWhiteSpace(key))
+			bool miss = true;
+			foreach (var specifierTypeToTest in allSpecifierTypes)
 			{
-				def.MetadataMap[key] = value;
+				if (specifierTypeToTest == currentSpecifierType)
+				{
+					continue;
+				}
+				
+				if (specifierTypeToTest.IsAssignableTo(requiredSpecifierType))
+				{
+					miss = false;
+					break;
+				}
+			}
+			
+			if (miss)
+			{
+				result ??= new();
+				result.Add(requiredSpecifierType);
 			}
 		}
+		
+		foreach (var requiredSpecifierType in exactRequiredSpecifierTypes)
+		{
+			bool miss = true;
+			foreach (var specifierTypeToTest in allSpecifierTypes)
+			{
+				if (specifierTypeToTest == currentSpecifierType)
+				{
+					continue;
+				}
+				
+				if (specifierTypeToTest == requiredSpecifierType)
+				{
+					miss = false;
+					break;
+				}
+			}
+			
+			if (miss)
+			{
+				result ??= new();
+				result.Add(requiredSpecifierType);
+			}
+		}
+
+		missings = result?.ToArray();
+		return missings is not null;
 	}
+
+	private bool TryGetSpecifierConflicts(Type[] allSpecifierTypes, Type currentSpecifierType, Type[] hierarchicalConflictSpecifierTypes, Type[] exactConflictSpecifierTypes, [NotNullWhen(true)] out Type[]? conflicts)
+	{
+		List<Type>? result = null;
+		
+		foreach (var specifierTypeToTest in allSpecifierTypes)
+		{
+			if (specifierTypeToTest == currentSpecifierType)
+			{
+				continue;
+			}
+			
+			bool broken = false;
+			foreach (var conflictSpecifierType in hierarchicalConflictSpecifierTypes)
+			{
+				if (specifierTypeToTest.IsAssignableTo(conflictSpecifierType))
+				{
+					result ??= new();
+					result.Add(specifierTypeToTest);
+					broken = true;
+					break;
+				}
+			}
+
+			if (broken)
+			{
+				continue;
+			}
+						
+			foreach (var conflictSpecifierType in exactConflictSpecifierTypes)
+			{
+				if (specifierTypeToTest == conflictSpecifierType)
+				{
+					result ??= new();
+					result.Add(specifierTypeToTest);
+					break;
+				}
+			}
+		}
+
+		conflicts = result?.ToArray();
+		return conflicts is not null;
+	}
+
+	private readonly record struct ProcessorRec(Delegate Processor, SpecifierProcessorAttribute Attribute);
 	
-	private readonly Dictionary<Type, Delegate> _specifierProcessorMap = new();
+	private readonly Dictionary<Type, List<ProcessorRec>> _specifierProcessorMap = new();
 	
 }
 

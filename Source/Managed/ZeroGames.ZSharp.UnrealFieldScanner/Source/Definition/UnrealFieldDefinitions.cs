@@ -6,6 +6,11 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
 public abstract class UnrealFieldDefinition
 {
+	public virtual string GetDisplayName()
+	{
+		return Name;
+	}
+	
 	public required string Name { get; set; }
 	public EObjectFlags Flags { get; set; }
 	public Dictionary<string, string> MetadataMap { get; set; } = new();
@@ -45,6 +50,11 @@ public class SimpleUnrealPropertyDefinition : ISimpleUnrealPropertyDefinition
 
 public class UnrealPropertyDefinition : UnrealFieldDefinition, ISimpleUnrealPropertyDefinition
 {
+	public override string GetDisplayName()
+	{
+		return $"{Outer.GetDisplayName()}.{base.GetDisplayName()}";
+	}
+
 	[JsonIgnore] public UnrealStructDefinition Outer { get; init; } = null!; // Can't use required for JsonIgnore property...
 	public required EPropertyType Type { get; set; }
 	public EPropertyFlags PropertyFlags { get; set; }
@@ -64,6 +74,11 @@ public abstract class UnrealStructDefinition : UnrealFieldDefinition
 
 public class UnrealFunctionDefinition : UnrealStructDefinition
 {
+	public override string GetDisplayName()
+	{
+		return $"{Outer.GetDisplayName()}.{base.GetDisplayName()}";
+	}
+	
 	[JsonIgnore] public UnrealClassDefinition Outer { get; init; } = null!; // Can't use required for JsonIgnore property...
 	public EFunctionFlags FunctionFlags { get; set; }
 	public required string ZCallName { get; set; }

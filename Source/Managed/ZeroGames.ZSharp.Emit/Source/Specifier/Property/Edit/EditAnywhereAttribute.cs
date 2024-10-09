@@ -3,6 +3,6 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class EditAnywhereAttribute : Attribute, IUnrealReflectionSpecifier;
+public class EditAnywhereAttribute : EditSpecifierBase, IUnrealReflectionSpecifier;
 
 

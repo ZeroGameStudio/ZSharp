@@ -10,7 +10,6 @@ partial class SpecifierProcessor
 	{
 		if (specifier.Name is { } overrideName)
 		{
-			def.Name = overrideName;
 			def.ZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{overrideName}";
 		}
 	}

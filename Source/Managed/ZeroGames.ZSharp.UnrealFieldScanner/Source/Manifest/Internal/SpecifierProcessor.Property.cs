@@ -72,7 +72,7 @@ partial class SpecifierProcessor
 		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_EditConst | EPropertyFlags.CPF_DisableEditOnTemplate;
 	}
 	
-	private static void ProcessSpecifier_DefaultSubobject(UnrealPropertyDefinition def, IUnrealPropertyModel model, DefaultSubobjectAttribute specifier, bool optional)
+	private static void ProcessSpecifier_DefaultSubobject(UnrealPropertyDefinition def, IUnrealPropertyModel model, DefaultSubobjectSpecifierBase specifier, bool optional)
 	{
 		if (model.Outer is not IUnrealClassModel)
 		{
@@ -121,6 +121,25 @@ partial class SpecifierProcessor
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, AttachmentAttribute specifier)
 	{
 		// Do nothing because DefaultSubobject/OptionalDefaultSubobject specifier will deal with us.
+	}
+	
+	// Parameter
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, RequiredAttribute specifier)
+	{
+		def.PropertyFlags |= EPropertyFlags.CPF_RequiredParm;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, NotReplicatedAttribute specifier)
+	{
+		UnrealFunctionDefinition? functionDef = def.Outer as UnrealFunctionDefinition;
+		if (functionDef is null || (functionDef.FunctionFlags & EFunctionFlags.FUNC_Net) == EFunctionFlags.FUNC_None)
+		{
+			throw new InvalidOperationException();
+		}
+
+		def.PropertyFlags |= EPropertyFlags.CPF_RepSkip;
 	}
 	
 }

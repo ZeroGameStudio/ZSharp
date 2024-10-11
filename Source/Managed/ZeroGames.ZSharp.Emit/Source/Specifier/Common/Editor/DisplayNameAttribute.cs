@@ -3,9 +3,9 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(SpecifierTargetConstants.AllFields)]
-public class UMetaAttribute(params string[] pairs) : Attribute, IUnrealReflectionSpecifier
+public class DisplayNameAttribute(string value) : Attribute, IUnrealReflectionSpecifier
 {
-	public string[] Pairs => pairs;
+	public string Value { get; } = value;
 }
 
 

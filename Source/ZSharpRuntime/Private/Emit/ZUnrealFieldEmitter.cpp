@@ -802,7 +802,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 	const auto superClass = FindObjectChecked<UClass>(nullptr, *def.SuperPath.ToString());
 	check(superClass->IsNative());
 	cls->SetSuperStruct(superClass);
-	cls->ClassFlags |= superClass->ClassFlags & CLASS_Inherit;
+	cls->ClassFlags |= superClass->ClassFlags & CLASS_ScriptInherit;
 
 	const auto withinClass = !def.WithinPath.IsNone() ? FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString()) : UObject::StaticClass();
 	check(withinClass->IsNative());

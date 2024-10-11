@@ -18,10 +18,6 @@ partial class ManifestBuilder
 		ScanUFunctions(result, classModel);
 		ScanUProperties(result, classModel);
 		
-		// @FIXME
-		result.MetadataMap["IsBlueprintBase"] = "true";
-		result.MetadataMap["BlueprintType"] = "true";
-
 		return result;
 	}
 

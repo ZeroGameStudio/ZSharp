@@ -18,6 +18,15 @@ partial class ManifestBuilder
 		ScanUFunctions(result, classModel);
 		ScanUProperties(result, classModel);
 		
+		foreach (var property in result.Properties)
+		{
+			if ((property.PropertyFlags & EPropertyFlags.CPF_Config) != EPropertyFlags.CPF_None)
+			{
+				result.ClassFlags |= EClassFlags.CLASS_Config;
+				break;
+			}
+		}
+		
 		return result;
 	}
 

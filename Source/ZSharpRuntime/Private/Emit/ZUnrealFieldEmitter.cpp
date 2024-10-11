@@ -838,6 +838,9 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 		{
 			UClass* interfaceClass = FindObjectChecked<UClass>(nullptr, *implementedInterfacePath.ToString());
 			check(interfaceClass->HasAllClassFlags(CLASS_Interface));
+#if WITH_METADATA
+			check(!interfaceClass->HasMetaData("CannotImplementInterfaceInBlueprint"));
+#endif
 			// Interfaces implemented by UZSharpClass is always regarded as implemented in blueprint.
 			FImplementedInterface implementedInterface { interfaceClass, 0, true };
 			cls->Interfaces.Emplace(implementedInterface);

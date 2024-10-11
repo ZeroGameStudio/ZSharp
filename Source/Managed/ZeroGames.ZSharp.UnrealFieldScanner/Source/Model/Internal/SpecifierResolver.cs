@@ -22,28 +22,22 @@ internal static class SpecifierResolver
 			}
 			
 			TypeDefinition typeDef = modelRegistry.ResolveTypeDefinition(assemblyName, typeRef.FullName);
-			if (typeDef.Interfaces.Any(i => i.InterfaceType.FullName == _specifierInterfaceFullName))
+			Assembly assembly = AssemblyLoadContext.Default.Assemblies.Single(asm => asm.GetName().Name == assemblyName);
+			Type? specifierRuntimeType = assembly.GetType(typeDef.FullName);
+			if (specifierRuntimeType is null)
 			{
-				specifiers.Add(CreateSpecifier(modelRegistry, attribute, typeDef));
+				throw new InvalidOperationException();
+			}
+
+			if (specifierRuntimeType.IsAssignableTo(typeof(IUnrealReflectionSpecifier)))
+			{
+				specifiers.Add(CreateSpecifier(modelRegistry, attribute, specifierRuntimeType));
 			}
 		}
 	}
 
-	private static IUnrealReflectionSpecifier CreateSpecifier(ModelRegistry modelRegistry, CustomAttribute attribute, TypeDefinition typeDef)
+	private static IUnrealReflectionSpecifier CreateSpecifier(ModelRegistry modelRegistry, CustomAttribute attribute, Type specifierRuntimeType)
 	{
-		string assemblyName = typeDef.Scope.GetAssemblyName();
-		Assembly assembly = AssemblyLoadContext.Default.Assemblies.Single(asm => asm.GetName().Name == assemblyName);
-		Type? specifierRuntimeType = assembly.GetType(typeDef.FullName);
-		if (specifierRuntimeType is null)
-		{
-			throw new InvalidOperationException();
-		}
-
-		if (!specifierRuntimeType.IsAssignableTo(typeof(IUnrealReflectionSpecifier)))
-		{
-			throw new InvalidOperationException();
-		}
-
 		// Loot constructor parameters.
 		List<(int32 Index, TypeReference TypeRef)> typeConstructorArguments = new();
 		object?[]? constructorParameters = attribute.HasConstructorArguments ? new object?[attribute.ConstructorArguments.Count] : null;

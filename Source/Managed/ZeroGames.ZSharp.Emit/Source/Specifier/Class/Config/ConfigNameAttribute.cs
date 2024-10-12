@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Class)]
-public class ConfigNameAttribute(string name) : Attribute, IUnrealReflectionSpecifier
+public class ConfigNameAttribute(string name) : ClassSpecifierBase
 {
 	public string Name { get; } = name;
 }

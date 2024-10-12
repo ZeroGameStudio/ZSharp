@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Property)]
-public abstract class DefaultSubobjectSpecifierBase : Attribute, IUnrealReflectionSpecifier
+public abstract class DefaultSubobjectSpecifierBase : PropertySpecifierBase
 {
 	public IEnumerable<Type> HierarchicalConflicts => [ typeof(DefaultSubobjectSpecifierBase) ];
 	

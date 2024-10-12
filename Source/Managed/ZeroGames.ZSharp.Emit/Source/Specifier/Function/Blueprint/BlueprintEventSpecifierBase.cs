@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Method)]
-public abstract class BlueprintEventSpecifierBase : Attribute, IUnrealReflectionSpecifier
+public abstract class BlueprintEventSpecifierBase : FunctionSpecifierBase
 {
 	public virtual IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintEventSpecifierBase) ];
 }

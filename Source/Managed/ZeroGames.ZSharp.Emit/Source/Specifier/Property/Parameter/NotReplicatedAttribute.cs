@@ -2,7 +2,6 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Parameter)]
-public class NotReplicatedAttribute : Attribute, IUnrealReflectionSpecifier;
+public class NotReplicatedAttribute : ParameterSpecifierBase;
 
 

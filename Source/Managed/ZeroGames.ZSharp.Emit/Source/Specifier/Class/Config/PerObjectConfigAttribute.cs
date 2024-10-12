@@ -2,7 +2,6 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Class)]
-public class PerObjectConfigAttribute : Attribute, IUnrealReflectionSpecifier;
+public class PerObjectConfigAttribute : ClassSpecifierBase;
 
 

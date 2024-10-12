@@ -2,13 +2,9 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Property)]
-public abstract class BlueprintPropertyVisibilitySpecifierBase : Attribute, IUnrealReflectionSpecifier
+public abstract class BlueprintPropertyVisibilitySpecifierBase : PropertySpecifierBase
 {
-	public IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintPropertyVisibilitySpecifierBase) ];
+	public virtual IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintPropertyVisibilitySpecifierBase) ];
 }
-
-public class BlueprintReadWriteAttribute : BlueprintPropertyVisibilitySpecifierBase;
-public class BlueprintReadOnlyAttribute : BlueprintPropertyVisibilitySpecifierBase;
 
 

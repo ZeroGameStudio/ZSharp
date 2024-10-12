@@ -2,7 +2,6 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Class)]
-public class DeprecatedAttribute : Attribute, IUnrealReflectionSpecifier;
+public class DeprecatedAttribute : ClassSpecifierBase;
 
 

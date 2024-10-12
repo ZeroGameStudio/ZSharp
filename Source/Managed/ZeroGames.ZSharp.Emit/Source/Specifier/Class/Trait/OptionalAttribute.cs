@@ -2,7 +2,6 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Class)]
-public class OptionalAttribute : Attribute, IUnrealReflectionSpecifier;
+public class OptionalAttribute : ClassSpecifierBase;
 
 

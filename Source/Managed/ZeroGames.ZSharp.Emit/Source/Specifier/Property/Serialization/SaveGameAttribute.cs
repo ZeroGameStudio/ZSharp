@@ -2,6 +2,6 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-public class DefaultToInstancedAttribute : ClassSpecifierBase;
+public class SaveGameAttribute : PropertySpecifierBase;
 
 

@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(SpecifierTargetConstants.AllFields)]
-public abstract class DevelopmentStatusSpecifierBase : Attribute, IUnrealReflectionSpecifier
+public abstract class DevelopmentStatusSpecifierBase : CommonSpecifierBase
 {
 	public IEnumerable<Type> HierarchicalConflicts => [ typeof(DevelopmentStatusSpecifierBase) ];
 }

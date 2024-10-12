@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Class)]
-public abstract class ConfigScopeSpecifierBase : Attribute, IUnrealReflectionSpecifier
+public abstract class ConfigScopeSpecifierBase : ClassSpecifierBase
 {
 	public IEnumerable<Type> HierarchicalConflicts => [ typeof(ConfigScopeSpecifierBase) ];
 }

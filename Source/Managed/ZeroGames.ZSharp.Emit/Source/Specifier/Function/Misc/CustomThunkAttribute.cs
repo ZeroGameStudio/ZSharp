@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Method)]
-public class CustomThunkAttribute(string thunkName) : Attribute, IUnrealReflectionSpecifier
+public class CustomThunkAttribute(string thunkName) : FunctionSpecifierBase
 {
 	public IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintEventSpecifierBase) ];
 

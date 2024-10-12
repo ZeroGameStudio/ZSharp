@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(SpecifierTargetConstants.AllFields)]
-public class ShortTooltipAttribute(string value) : Attribute, IUnrealReflectionSpecifier
+public class ShortTooltipAttribute(string value) : CommonSpecifierBase
 {
 	public string Value { get; } = value;
 }

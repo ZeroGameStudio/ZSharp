@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Property)]
-public abstract class EditSpecifierBase : Attribute, IUnrealReflectionSpecifier
+public abstract class EditSpecifierBase : PropertySpecifierBase
 {
 	public IEnumerable<Type> HierarchicalConflicts => [ typeof(EditSpecifierBase) ];
 }

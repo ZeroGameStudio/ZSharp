@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Method)]
-public class SealedEventAttribute : Attribute, IUnrealReflectionSpecifier
+public class SealedEventAttribute : FunctionSpecifierBase
 {
 	public IEnumerable<Type> HierarchicalRequirements => [ typeof(BlueprintRemoteFunctionSpecifierBase) ];
 }

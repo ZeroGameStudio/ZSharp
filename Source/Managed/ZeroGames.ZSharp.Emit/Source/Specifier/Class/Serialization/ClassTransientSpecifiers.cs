@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Class)]
-public abstract class ClassTransientSpecifierBase : Attribute, IUnrealReflectionSpecifier
+public abstract class ClassTransientSpecifierBase : ClassSpecifierBase
 {
 	public IEnumerable<Type> HierarchicalConflicts => [ typeof(ClassTransientSpecifierBase) ];
 }

@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Property)]
-public class RootComponentAttribute : Attribute, IUnrealReflectionSpecifier
+public class RootComponentAttribute : PropertySpecifierBase
 {
 	public IEnumerable<Type> HierarchicalRequirements => [ typeof(DefaultSubobjectAttribute) ];
 }

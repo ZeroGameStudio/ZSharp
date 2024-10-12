@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Class)]
-public class WithinAttribute(Type outerType) : Attribute, IUnrealReflectionSpecifier
+public class WithinAttribute(Type outerType) : ClassSpecifierBase
 {
 	public Type OuterType { get; } = outerType;
 	[ScanTimeType(0)]

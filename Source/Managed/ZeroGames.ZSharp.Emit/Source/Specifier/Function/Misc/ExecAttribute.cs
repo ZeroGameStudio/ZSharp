@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Method)]
-public class ExecAttribute : Attribute, IUnrealReflectionSpecifier
+public class ExecAttribute : FunctionSpecifierBase
 {
 	public IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintRemoteFunctionSpecifierBase) ];
 }

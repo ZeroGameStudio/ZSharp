@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(SpecifierTargetConstants.AllFields)]
-public class CategoryAttribute(string value) : Attribute, IUnrealReflectionSpecifier
+public class CategoryAttribute(string value) : CommonSpecifierBase
 {
 	public string Value { get; } = value;
 }

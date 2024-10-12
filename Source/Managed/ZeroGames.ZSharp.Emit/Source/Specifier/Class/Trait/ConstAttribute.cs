@@ -2,7 +2,6 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(AttributeTargets.Class)]
-public class ConstAttribute : Attribute, IUnrealReflectionSpecifier;
+public class ConstAttribute : ClassSpecifierBase;
 
 

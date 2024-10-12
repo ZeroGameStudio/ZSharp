@@ -2,8 +2,7 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-[AttributeUsage(SpecifierTargetConstants.AllFields)]
-public class UMetaAttribute(params string[] pairs) : Attribute, IUnrealReflectionSpecifier
+public class UMetaAttribute(params string[] pairs) : CommonSpecifierBase
 {
 	public string[] Pairs => pairs;
 }

@@ -434,6 +434,11 @@ void ZSharp::FZFunctionVisitor::FillParams(void* params, const FZCallBuffer& buf
 			visitor->SetValue_InContainer(params, buf[bIsStatic ? i : i + 1], 0);
 		}
 	}
+
+	if (ReturnProperty)
+	{
+		ReturnProperty->InitializeValue_InContainer(params);
+	}
 }
 
 void ZSharp::FZFunctionVisitor::CopyOut(FZCallBuffer& buf, void* params) const

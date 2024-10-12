@@ -40,7 +40,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 
 	check(self);
 	check(self->IsA(func->GetOuterUClass()));
-	
+
 	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
 
 	FillParams(params, buf);
@@ -48,7 +48,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 	self->ProcessEvent(func, params);
 
 	CopyOut(buf, params);
-	
+
 	params = nullptr;
 
 	return EZCallErrorCode::Succeed;
@@ -186,12 +186,12 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 
 		// For native call, out param link is stack.OutParms. (caller processes params)
 		// For blueprint call, we need to process bytecode to setup out param link. (callee processes params) (@see: ProcessScriptFunction() in ScriptCore.cpp)
-		FOutParmRec* outPramLink = fromBlueprint ? nullptr : stack.OutParms;
+		FOutParmRec* outParmLink = fromBlueprint ? nullptr : stack.OutParms;
 		
 		// If called from blueprint, we need to fill params.
 		if (fromBlueprint)
 		{
-			FOutParmRec** lastOut = &outPramLink;
+			FOutParmRec** lastOut = &outParmLink;
 			for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 			{
 				const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
@@ -251,9 +251,9 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{
 			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
-			if (fromBlueprint && OutParamIndices.Contains(i))
+			if (OutParamIndices.Contains(i))
 			{
-				FOutParmRec* out = outPramLink;
+				FOutParmRec* out = outParmLink;
 				// This must succeed, otherwise let it crash by null pointer.
 				while (out->Property != visitor->GetUnderlyingProperty())
 				{
@@ -261,16 +261,16 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 				}
 				visitor->SetValue(out->PropAddr, buffer[bIsStatic ? i : i + 1]);
 			}
-			visitor->DestructValue_InContainer(params);
+			
+			if (fromBlueprint)
+			{
+				visitor->DestructValue_InContainer(params);
+			}
 		}
 
 		if (ReturnProperty)
 		{
 			ReturnProperty->SetValue(RESULT_PARAM, buffer[-1]);
-			if (fromBlueprint)
-			{
-				ReturnProperty->DestructValue_InContainer(params);
-			}
 		}
 	}
 

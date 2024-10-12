@@ -10,6 +10,12 @@ partial class SpecifierProcessor
 	{
 		if (specifier.Name is { } overrideName)
 		{
+			var eventSpecifier = model.GetSpecifier<EventSpecifierBase>();
+			if (eventSpecifier is not null && eventSpecifier is not BlueprintEventOverrideAttribute)
+			{
+				throw new InvalidOperationException();
+			}
+			
 			def.ZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{overrideName}";
 		}
 	}
@@ -42,14 +48,21 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintEventAttribute specifier)
 	{
-		throw new NotImplementedException();
+		if (model.Visibility == EMemberVisibility.Private)
+		{
+			throw new InvalidOperationException();
+		}
+
+		string name = specifier.Implementation ?? $"{def.Name}_Implementation";
+		def.ZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{name}";
+		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_BlueprintEvent;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintEventOverrideAttribute specifier)
 	{
 		def.Name = specifier.Event;
-		def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintEvent;
+		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_BlueprintEvent;
 	}
 	
 	[SpecifierProcessor]

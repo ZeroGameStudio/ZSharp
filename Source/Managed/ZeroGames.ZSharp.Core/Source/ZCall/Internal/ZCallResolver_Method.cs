@@ -34,7 +34,7 @@ internal class ZCallResolver_Method : IZCallResolver
 			return null;
 		}
 
-		MethodInfo[] methods = type.GetMethods().Where(method =>
+		MethodInfo[] methods = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance).Where(method =>
 		{
 			ZCallAttribute? attr = method.GetCustomAttribute<ZCallAttribute>();
 			if (attr is null)

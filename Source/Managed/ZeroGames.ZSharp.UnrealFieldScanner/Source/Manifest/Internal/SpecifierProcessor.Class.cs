@@ -140,6 +140,30 @@ partial class SpecifierProcessor
 	}
 	
 	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, CollapseCategoriesAttribute specifier)
+	{
+		def.ClassFlags |= EClassFlags.CLASS_CollapseCategories;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, DontCollapseCategoriesAttribute specifier)
+	{
+		def.ClassFlags &= ~EClassFlags.CLASS_CollapseCategories;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, AdvancedClassDisplayAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.AdvancedClassDisplay, true);
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, ConversionRootAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.IsConversionRoot, true);
+	}
+	
+	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, ComponentWrapperAttribute specifier)
 	{
 		def.AddMetadata(MetadataConstants.IgnoreCategoryKeywordsInSubclasses, true);

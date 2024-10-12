@@ -5,6 +5,7 @@ namespace ZeroGames.ZSharp.Emit.Specifier;
 public static class MetadataConstants
 {
 
+	// Common metadata names
 	public const string BlueprintType = nameof(BlueprintType);
 	public const string NotBlueprintType = nameof(NotBlueprintType);
 	public const string IsBlueprintBase = nameof(IsBlueprintBase);
@@ -18,8 +19,12 @@ public static class MetadataConstants
 	public const string DevelopmentStatus = nameof(DevelopmentStatus);
 	public const string Experimental = nameof(Experimental);
 	public const string EarlyAccess = nameof(EarlyAccess);
-	public const string EditorConfig = nameof(EditorConfig);
+	
+	// Class metadata names
+	public const string AdvancedClassDisplay = nameof(AdvancedClassDisplay);
+	public const string IsConversionRoot = nameof(IsConversionRoot);
 	public const string IgnoreCategoryKeywordsInSubclasses = nameof(IgnoreCategoryKeywordsInSubclasses);
+	public const string EditorConfig = nameof(EditorConfig);
 
 }
 

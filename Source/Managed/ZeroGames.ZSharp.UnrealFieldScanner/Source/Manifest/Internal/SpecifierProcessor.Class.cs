@@ -99,8 +99,6 @@ partial class SpecifierProcessor
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, DefaultToInstancedAttribute specifier)
 	{
 		def.ClassFlags |= EClassFlags.CLASS_DefaultToInstanced;
-
-		throw new NotImplementedException();
 	}
 	
 	[SpecifierProcessor]

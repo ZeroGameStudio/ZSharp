@@ -116,8 +116,6 @@ partial class SpecifierProcessor
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, InstancedAttribute specifier)
 	{
 		def.PropertyFlags |= EPropertyFlags.CPF_ExportObject | EPropertyFlags.CPF_InstancedReference | EPropertyFlags.CPF_PersistentInstance;
-
-		throw new NotImplementedException();
 	}
 	
 	[SpecifierProcessor]

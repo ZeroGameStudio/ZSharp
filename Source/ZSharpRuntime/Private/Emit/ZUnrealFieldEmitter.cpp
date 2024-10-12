@@ -156,6 +156,54 @@ namespace ZSharp::ZSharpFunction_Private
 
 namespace ZSharp::ZUnrealFieldEmitter_Private
 {
+	/*
+	 * WARNING: This behaves differently from UHT.
+	 *   - STRUCT_HasInstancedReference is shallow scan so struct won't have this flag even if it has a struct property with instanced reference. (@see: UhtScriptStruct.cs)
+	 *   - CPF_ContainsInstancedReference is deep scan so struct properties whose struct has nested instanced reference also have this flag. (@see: UhtStructProperty.cs)
+	 */
+	static bool IsInstancedProperty(const FProperty* property)
+	{
+		if (property->HasAnyPropertyFlags(CPF_InstancedReference | CPF_ContainsInstancedReference))
+		{
+			return true;
+		}
+		
+		const auto structProperty = CastField<FStructProperty>(property);
+		return structProperty && (structProperty->Struct->StructFlags & STRUCT_HasInstancedReference);
+	}
+	
+	static FString MergeNames(const FString& lhs, const FString& rhs, const FString& subtract1, const FString& subtract2)
+	{
+		TArray<FString> lhsNames;
+		lhs.ParseIntoArray(lhsNames, TEXT(" "));
+
+		TArray<FString> rhsNames;
+		rhs.ParseIntoArray(rhsNames, TEXT(" "));
+
+		TArray<FString> subtractNames1;
+		subtract1.ParseIntoArray(subtractNames1, TEXT(" "));
+		
+		TArray<FString> subtractNames2;
+		subtract2.ParseIntoArray(subtractNames2, TEXT(" "));
+
+		for (const auto& name : rhsNames)
+		{
+			lhsNames.AddUnique(name);
+		}
+
+		for (const auto& name : subtractNames1)
+		{
+			lhsNames.Remove(name);
+		}
+		
+		for (const auto& name : subtractNames2)
+		{
+			lhsNames.Remove(name);
+		}
+
+		return FString::Join(lhsNames, TEXT(" "));
+	}
+	
 	static void FatalIfObjectExists(UObject* outer, FName name)
 	{
 		UE_CLOG(!!FindObject<UObject>(outer, *name.ToString()), LogZSharpEmit, Fatal, TEXT("Object [%s].[%s] already exists!!!"), *outer->GetPathName(), *name.ToString());
@@ -291,7 +339,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				break;
 			}
 			// Object wrappers
-			// @TODO: If PropertyClass has CLASS_DefaultToInstanced in hierarchy, then the property should set CPF_InstancedReference | CPF_ExportObject. (@see UhtObjectPropertyBase.cs)
+			// @TODO: If PropertyClass has CLASS_DefaultToInstanced in hierarchy, then the property should set CPF_InstancedReference | CPF_ExportObject. (@see: UhtObjectPropertyBase.cs)
 		case EZPropertyType::Object:
 			{
 				NEW_PROPERTY(Object);
@@ -364,8 +412,12 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				
 				break;
 			}
-			// Containers (Struct)
-			// @TODO: If Struct has instanced reference, then the property should set CPF_ContainsInstancedReference. (@see UhtStructProperty.cs)
+			/* Containers (Struct)
+			 * Note: If struct has instanced reference, then the property should set CPF_ContainsInstancedReference. (@see:
+			 * UhtStructProperty.cs)
+			 * This could not get done here because we need globally complete reflection data.
+			 * So this flag is deferred to PostEmitXXX().
+			 */
 		case EZPropertyType::Struct:
 			{
 				NEW_PROPERTY(Struct);
@@ -422,7 +474,11 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		bool needsFinishSimple = true;
 		switch (def.Type)
 		{
-			// Containers (except Struct)
+			/* Containers (except Struct)
+ 			 * Note: If container has struct properties with instanced reference, then the property should set CPF_ContainsInstancedReference. (@see: UhtContainerProperty.cs)
+ 			 * This could not get done here because we need globally complete reflection data.
+ 			 * So this flag is deferred to PostEmitXXX().
+ 			 */
 		case EZPropertyType::Array:
 			{
 				NEW_PROPERTY(Array);
@@ -642,18 +698,18 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 	// Subclass may depend on super/within class's data i.e. ClassConfigName, SparseClassDataStruct.
 	// So we sort classes to ensure super/within class get constructed before subclass.
 	// Algo::TopologicalSort doesn't support projection or custom hash, so we manually make a projection.
+	TArray<const UClass*> topologicallySortedClasses;
+	TMap<const UClass*, FZClassDefinition*> class2def;
 	{
-		TArray<const UClass*> classes;
-		TMap<const UClass*, FZClassDefinition*> map;
 		for (auto& def : manifest.Classes)
 		{
-			classes.Emplace(def.Class);
-			map.Emplace(def.Class, &def);
+			topologicallySortedClasses.Emplace(def.Class);
+			class2def.Emplace(def.Class, &def);
 		}
 		
-		Algo::TopologicalSort(classes, [&map](const UClass* cls)
+		Algo::TopologicalSort(topologicallySortedClasses, [&class2def](const UClass* cls)
 		{
-			const FZClassDefinition* classDef = map.FindChecked(cls);
+			const FZClassDefinition* classDef = class2def.FindChecked(cls);
 			TArray<UClass*, TInlineAllocator<2>> dependencies;
 			
 			if (const auto superClass = FindObjectChecked<UClass>(nullptr, *classDef->SuperPath.ToString()); FZSharpFieldRegistry::Get().IsZSharpClass(superClass))
@@ -672,10 +728,10 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 			return dependencies;
 		});
 		
-		for (auto cls : classes)
+		for (auto cls : topologicallySortedClasses)
 		{
-			FZClassDefinition* classDef = map.FindChecked(cls);
-			FinishEmitClass(pak, *classDef);
+			FZClassDefinition* def = class2def.FindChecked(cls);
+			FinishEmitClass(pak, *def);
 		}
 	}
 
@@ -689,9 +745,10 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 		FinishEmitDelegate(pak, def);
 	}
 
-	for (auto& def : manifest.Classes)
+	for (auto& cls : topologicallySortedClasses)
 	{
-		PostEmitClass(pak, def);
+		FZClassDefinition* def = class2def.FindChecked(cls);
+		PostEmitClass(pak, *def);
 	}
 }
 
@@ -846,14 +903,34 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 			cls->Interfaces.Emplace(implementedInterface);
 		}
 	}
-
+	
 	ZUnrealFieldEmitter_Private::AddMetadata(cls, def.MetadataMap);
 
-	cls->Bind();
-	cls->StaticLink(true);
-	cls->SetSparseClassDataStruct(cls->GetSparseClassDataArchetypeStruct());
+#if WITH_METADATA
+
+#define MERGE_METADATA(LhsKey, SubtractKey1, SubtractKey2) \
+	{ \
+		const auto pLhsName = def.TransparentDataMap.Find(#LhsKey); \
+		const FString lhsName = pLhsName ? *pLhsName : FString{}; \
+		const FString rhsName = cls->GetSuperClass()->GetMetaData(#LhsKey); \
+		const auto pSubtractName1 = def.TransparentDataMap.Find(#SubtractKey1); \
+		const FString subtractName1 = pSubtractName1 ? *pSubtractName1 : FString{}; \
+		const auto pSubtractName2 = def.TransparentDataMap.Find(#SubtractKey2); \
+		const FString subtractName2 = pSubtractName2 ? *pSubtractName2 : FString{}; \
+		cls->SetMetaData(#LhsKey, *ZUnrealFieldEmitter_Private::MergeNames(lhsName, rhsName, subtractName1, subtractName2)); \
+	}
 	
-	cls->AssembleReferenceTokenStream(true);
+	MERGE_METADATA(ClassGroup,,);
+	MERGE_METADATA(HideFunctions, ShowFunctions,);
+	MERGE_METADATA(ShowCategories,,);
+	MERGE_METADATA(HideCategories,,);
+	MERGE_METADATA(AutoExpandCategories,,);
+	MERGE_METADATA(AutoCollapseCategories, DontAutoCollapseCategories, AutoExpandCategories);
+	MERGE_METADATA(PrioritizeCategories,,);
+
+#undef MERGE_METADATA
+	
+#endif
 }
 
 void ZSharp::FZUnrealFieldEmitter::FinishEmitInterface(UPackage* pak, FZInterfaceDefinition& def) const
@@ -869,6 +946,106 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitDelegate(UPackage* pak, FZDelegateD
 void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinition& def) const
 {
 	UClass* cls = def.Class;
+
+	/* Fixup CLASS_HasInstancedReference for ourselves and CPF_InstancedReference | CPF_ContainsInstancedReference for our own properties.
+	 * This must be deferred here because we need globally complete reflection data.
+	 *
+	 * @FIXME: Currently, instanced container properties may be wrong.
+	 */
+	{
+		bool containsInstancedRef = false;
+		for (TFieldIterator<FProperty> it(cls, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+		{
+			FProperty* property = *it;
+			
+			// First fixup CPF_InstancedReference for object/interface properties whose class has CLASS_DefaultToInstanced.
+			if (const auto objectProperty = CastField<FObjectPropertyBase>(property))
+			{
+				if (objectProperty->PropertyClass->HasAllClassFlags(CLASS_DefaultToInstanced))
+				{
+					property->PropertyFlags |= CPF_InstancedReference | CPF_ExportObject;
+				}
+			}
+
+			if (const auto interfaceProperty = CastField<FInterfaceProperty>(property))
+			{
+				if (interfaceProperty->InterfaceClass->HasAllClassFlags(CLASS_DefaultToInstanced))
+				{
+					property->PropertyFlags |= CPF_InstancedReference | CPF_ExportObject;
+				}
+			}
+			
+			/* Then fixup CPF_ContainsInstancedReference.
+			 * There are three cases we should care about:
+			 *   I: property has CPF_InstancedReference regardless of whether it's class has CLASS_HasInstancedReference.
+			 *  II: property is a struct with instanced reference. (All structs should be ready to use at this point)
+			 * III: property is a container with struct element with instanced reference.
+			 */
+			if (property->HasAllPropertyFlags(CPF_InstancedReference))
+			{
+				containsInstancedRef = true;
+			}
+
+			if (ZUnrealFieldEmitter_Private::IsInstancedProperty(property))
+			{
+				property->PropertyFlags |= CPF_ContainsInstancedReference;
+				containsInstancedRef = true;
+			}
+
+			if (const auto arrayProperty = CastField<FArrayProperty>(property))
+			{
+				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(arrayProperty->Inner))
+				{
+					arrayProperty->Inner->PropertyFlags |= CPF_ContainsInstancedReference;
+					arrayProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+					containsInstancedRef = true;
+				}
+			}
+
+			if (const auto setProperty = CastField<FSetProperty>(property))
+			{
+				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(setProperty->ElementProp))
+				{
+					setProperty->ElementProp->PropertyFlags |= CPF_ContainsInstancedReference;
+					setProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+					containsInstancedRef = true;
+				}
+			}
+
+			if (const auto mapProperty = CastField<FMapProperty>(property))
+			{
+				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(mapProperty->KeyProp))
+				{
+					mapProperty->KeyProp->PropertyFlags |= CPF_ContainsInstancedReference;
+					mapProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+					containsInstancedRef = true;
+				}
+
+				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(mapProperty->ValueProp))
+				{
+					mapProperty->ValueProp->PropertyFlags |= CPF_ContainsInstancedReference;
+					mapProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+					containsInstancedRef = true;
+				}
+			}
+
+			if (const auto optionalProperty = CastField<FOptionalProperty>(property))
+			{
+				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(optionalProperty->GetValueProperty()))
+				{
+					optionalProperty->GetValueProperty()->PropertyFlags |= CPF_ContainsInstancedReference;
+					optionalProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+					containsInstancedRef = true;
+				}
+			}
+		}
+
+		// Finally fixup CLASS_HasInstancedReference.
+		if (containsInstancedRef)
+		{
+			cls->ClassFlags |= CLASS_HasInstancedReference;
+		}
+	}
 	
 	{ // Construct property defaults.
 		FZSharpClass* zscls = FZSharpFieldRegistry::Get().GetMutableClass(cls);
@@ -905,6 +1082,13 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 			propertyDefault.Buffer = propertyDefaultDef.Buffer;
 		}
 	}
+
+	// Compile.
+	cls->Bind();
+	cls->StaticLink(true);
+	cls->SetSparseClassDataStruct(cls->GetSparseClassDataArchetypeStruct());
+	
+	cls->AssembleReferenceTokenStream(true);
 
 	// Create CDO.
 	(void)def.Class->GetDefaultObject();

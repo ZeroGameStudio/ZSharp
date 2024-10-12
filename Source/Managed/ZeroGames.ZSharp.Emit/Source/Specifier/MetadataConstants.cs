@@ -18,6 +18,7 @@ public static class MetadataConstants
 	public const string DevelopmentStatus = nameof(DevelopmentStatus);
 	public const string Experimental = nameof(Experimental);
 	public const string EarlyAccess = nameof(EarlyAccess);
+	public const string EditorConfig = nameof(EditorConfig);
 
 }
 

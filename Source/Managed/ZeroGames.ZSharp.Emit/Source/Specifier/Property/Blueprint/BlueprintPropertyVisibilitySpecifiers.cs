@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.Emit.Specifier;
 
 public abstract class BlueprintPropertyVisibilitySpecifierBase : PropertySpecifierBase
 {
-	public virtual IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintPropertyVisibilitySpecifierBase) ];
+	public override IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintPropertyVisibilitySpecifierBase) ];
 }
 
 

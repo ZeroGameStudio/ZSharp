@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.Emit.Specifier;
 
 public abstract class ClassTransientSpecifierBase : ClassSpecifierBase
 {
-	public IEnumerable<Type> HierarchicalConflicts => [ typeof(ClassTransientSpecifierBase) ];
+	public override IEnumerable<Type> HierarchicalConflicts => [ typeof(ClassTransientSpecifierBase) ];
 }
 
 public class DefaultToTransientAttribute : ClassTransientSpecifierBase;

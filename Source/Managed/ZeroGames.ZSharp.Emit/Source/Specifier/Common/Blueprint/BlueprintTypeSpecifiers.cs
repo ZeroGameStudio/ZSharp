@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.Emit.Specifier;
 
 public abstract class BlueprintTypeSpecifierBase : CommonSpecifierBase
 {
-	public IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintTypeSpecifierBase) ];
+	public override IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintTypeSpecifierBase) ];
 }
 
 public class BlueprintTypeAttribute : BlueprintTypeSpecifierBase;

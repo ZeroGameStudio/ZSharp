@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.Emit.Specifier;
 
 public class ExecAttribute : FunctionSpecifierBase
 {
-	public IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintRemoteFunctionSpecifierBase) ];
+	public override IEnumerable<Type> HierarchicalConflicts => [ typeof(RemoteFunctionSpecifierBase) ];
 }
 
 

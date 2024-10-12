@@ -2,6 +2,6 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-public class NotReplicatedAttribute : ParameterSpecifierBase;
+public class SimpleDisplayAttribute : PropertySpecifierBase;
 
 

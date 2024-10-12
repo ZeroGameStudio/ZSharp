@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.Emit.Specifier;
 
 public abstract class EditSpecifierBase : PropertySpecifierBase
 {
-	public IEnumerable<Type> HierarchicalConflicts => [ typeof(EditSpecifierBase) ];
+	public override IEnumerable<Type> HierarchicalConflicts => [ typeof(EditSpecifierBase) ];
 }
 
 public class EditAnywhereAttribute : EditSpecifierBase;

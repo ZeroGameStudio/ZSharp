@@ -3,6 +3,6 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Method)]
-public abstract class FunctionSpecifierBase : UnrealReflectionSpecifierBase;
+public class AsFieldNotifyAttribute : FunctionSpecifierBase;
 
 

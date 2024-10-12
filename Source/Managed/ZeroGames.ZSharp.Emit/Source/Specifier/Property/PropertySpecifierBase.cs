@@ -3,6 +3,6 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Property)]
-public abstract class PropertySpecifierBase : Attribute, IUnrealReflectionSpecifier;
+public abstract class PropertySpecifierBase : UnrealReflectionSpecifierBase;
 
 

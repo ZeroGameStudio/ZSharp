@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.Emit.Specifier;
 
 public abstract class ConfigScopeSpecifierBase : ClassSpecifierBase
 {
-	public IEnumerable<Type> HierarchicalConflicts => [ typeof(ConfigScopeSpecifierBase) ];
+	public override IEnumerable<Type> HierarchicalConflicts => [ typeof(ConfigScopeSpecifierBase) ];
 }
 
 public class DefaultConfigAttribute : ConfigScopeSpecifierBase;

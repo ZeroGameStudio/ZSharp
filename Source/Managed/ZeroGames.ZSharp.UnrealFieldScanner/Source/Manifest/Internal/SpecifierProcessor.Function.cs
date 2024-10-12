@@ -48,7 +48,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintEventOverrideAttribute specifier)
 	{
-		def.Name = specifier.EventName;
+		def.Name = specifier.Event;
 		def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintEvent;
 	}
 	
@@ -98,6 +98,12 @@ partial class SpecifierProcessor
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, UnreliableAttribute specifier)
 	{
 		// Do nothing. This exists only for requirement checking.
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, AsFieldNotifyAttribute specifier)
+	{
+		throw new NotImplementedException();
 	}
 	
 	[SpecifierProcessor]

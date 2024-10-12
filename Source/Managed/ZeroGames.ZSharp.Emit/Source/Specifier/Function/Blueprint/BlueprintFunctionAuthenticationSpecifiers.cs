@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.Emit.Specifier;
 
 public abstract class BlueprintFunctionAuthenticationSpecifierBase : FunctionSpecifierBase
 {
-	public IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintFunctionAuthenticationSpecifierBase) ];
+	public override IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintFunctionAuthenticationSpecifierBase) ];
 }
 
 public class BlueprintAuthorityOnlyAttribute : BlueprintFunctionAuthenticationSpecifierBase;

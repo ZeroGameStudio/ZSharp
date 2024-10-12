@@ -133,6 +133,50 @@ partial class SpecifierProcessor
 	}
 	
 	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, ReplicatedAttribute specifier)
+	{
+		def.PropertyFlags |= EPropertyFlags.CPF_Net;
+		if (specifier.RepNotify is not null)
+		{
+			def.PropertyFlags |= EPropertyFlags.CPF_RepNotify;
+			def.RepNotifyName = specifier.RepNotify;
+		}
+
+		throw new NotImplementedException();
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, NotReplicatedAttribute specifier)
+	{
+		bool isStructMember = def.Outer is UnrealScriptStructDefinition structDef;
+		bool isRpcParameter = def.Outer is UnrealFunctionDefinition functionDef && (functionDef.FunctionFlags & EFunctionFlags.FUNC_Net) != EFunctionFlags.FUNC_None;
+		if (!isStructMember && !isRpcParameter)
+		{
+			throw new InvalidOperationException();
+		}
+
+		def.PropertyFlags |= EPropertyFlags.CPF_RepSkip;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, GetterAttribute specifier)
+	{
+		throw new NotImplementedException();
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, SetterAttribute specifier)
+	{
+		throw new NotImplementedException();
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, FieldNotifyAttribute specifier)
+	{
+		throw new NotImplementedException();
+	}
+	
+	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EditAnywhereAttribute specifier)
 	{
 		def.PropertyFlags |= EPropertyFlags.CPF_Edit;
@@ -166,6 +210,54 @@ partial class SpecifierProcessor
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, VisibleInstanceOnlyAttribute specifier)
 	{
 		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_EditConst | EPropertyFlags.CPF_DisableEditOnTemplate;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, NoClearAttribute specifier)
+	{
+		def.PropertyFlags |= EPropertyFlags.CPF_NoClear;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EditFixedSizeAttribute specifier)
+	{
+		def.PropertyFlags |= EPropertyFlags.CPF_EditFixedSize;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, InterpAttribute specifier)
+	{
+		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_BlueprintVisible | EPropertyFlags.CPF_Interp;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, NonTransactionalAttribute specifier)
+	{
+		def.PropertyFlags |= EPropertyFlags.CPF_NonTransactional;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, AssetRegistrySearchableAttribute specifier)
+	{
+		def.PropertyFlags |= EPropertyFlags.CPF_AssetRegistrySearchable;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, SimpleDisplayAttribute specifier)
+	{
+		def.PropertyFlags |= EPropertyFlags.CPF_SimpleDisplay;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, AdvancedDisplayAttribute specifier)
+	{
+		def.PropertyFlags |= EPropertyFlags.CPF_AdvancedDisplay;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EditorConfigAttribute specifier)
+	{
+		AddMetadata(def, MetadataConstants.EditorConfig);
 	}
 	
 	private static void ProcessSpecifier_DefaultSubobject(UnrealPropertyDefinition def, IUnrealPropertyModel model, DefaultSubobjectSpecifierBase specifier, bool optional)
@@ -224,18 +316,6 @@ partial class SpecifierProcessor
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, RequiredAttribute specifier)
 	{
 		def.PropertyFlags |= EPropertyFlags.CPF_RequiredParm;
-	}
-	
-	[SpecifierProcessor]
-	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, NotReplicatedAttribute specifier)
-	{
-		UnrealFunctionDefinition? functionDef = def.Outer as UnrealFunctionDefinition;
-		if (functionDef is null || (functionDef.FunctionFlags & EFunctionFlags.FUNC_Net) == EFunctionFlags.FUNC_None)
-		{
-			throw new InvalidOperationException();
-		}
-
-		def.PropertyFlags |= EPropertyFlags.CPF_RepSkip;
 	}
 	
 }

@@ -1046,7 +1046,15 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 			cls->ClassFlags |= CLASS_HasInstancedReference;
 		}
 	}
+
+	// Compile unreal class.
+	cls->Bind();
+	cls->StaticLink(true);
+	cls->SetSparseClassDataStruct(cls->GetSparseClassDataArchetypeStruct());
 	
+	cls->AssembleReferenceTokenStream(true);
+
+	// Compile Z# class.
 	{ // Construct property defaults.
 		FZSharpClass* zscls = FZSharpFieldRegistry::Get().GetMutableClass(cls);
 		
@@ -1082,13 +1090,6 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 			propertyDefault.Buffer = propertyDefaultDef.Buffer;
 		}
 	}
-
-	// Compile.
-	cls->Bind();
-	cls->StaticLink(true);
-	cls->SetSparseClassDataStruct(cls->GetSparseClassDataArchetypeStruct());
-	
-	cls->AssembleReferenceTokenStream(true);
 
 	// Create CDO.
 	(void)def.Class->GetDefaultObject();

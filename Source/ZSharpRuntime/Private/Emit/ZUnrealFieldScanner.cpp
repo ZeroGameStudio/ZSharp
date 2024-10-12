@@ -39,6 +39,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 			def.Name = dto.Name;
 			def.Flags = static_cast<EObjectFlags>(dto.Flags);
 			def.MetadataMap = MoveTemp(dto.MetadataMap);
+			def.TransparentDataMap = MoveTemp(dto.TransparentDataMap);
 			def.RepNotifyName = dto.RepNotifyName;
 
 #define COPY_SIMPLE_PROPERTY(DefName, DtoName) \
@@ -67,6 +68,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 			def.Name = dto.Name;
 			def.Flags = static_cast<EObjectFlags>(dto.Flags);
 			def.MetadataMap = MoveTemp(dto.MetadataMap);
+			def.TransparentDataMap = MoveTemp(dto.TransparentDataMap);
 			def.SuperPath = dto.SuperPath;
 			def.Properties = PropertyDtos2Defs(MoveTemp(dto.Properties));
 			def.FunctionFlags = static_cast<EFunctionFlags>(dto.FunctionFlags);
@@ -98,6 +100,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 				classDef.Name = classDto.Name;
 				classDef.Flags = static_cast<EObjectFlags>(classDto.Flags);
 				classDef.MetadataMap = MoveTemp(classDto.MetadataMap);
+				classDef.TransparentDataMap = MoveTemp(classDto.TransparentDataMap);
 				classDef.SuperPath = classDto.SuperPath;
 				classDef.Properties = PropertyDtos2Defs(MoveTemp(classDto.Properties));
 				classDef.ConfigName = classDto.ConfigName;

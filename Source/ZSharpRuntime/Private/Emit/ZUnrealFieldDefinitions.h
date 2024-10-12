@@ -13,6 +13,7 @@ namespace ZSharp
 		FName Name;
 		EObjectFlags Flags = RF_NoFlags;
 		TMap<FName, FString> MetadataMap;
+		TMap<FName, FString> TransparentDataMap;
 	};
 
 	enum class EZPropertyType : uint8

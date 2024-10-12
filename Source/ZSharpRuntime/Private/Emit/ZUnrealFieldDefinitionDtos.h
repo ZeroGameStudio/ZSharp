@@ -24,6 +24,9 @@ struct FZFieldDefinitionDto
 	
 	UPROPERTY()
 	TMap<FName, FString> MetadataMap;
+	
+	UPROPERTY()
+	TMap<FName, FString> TransparentDataMap;
 };
 
 USTRUCT()

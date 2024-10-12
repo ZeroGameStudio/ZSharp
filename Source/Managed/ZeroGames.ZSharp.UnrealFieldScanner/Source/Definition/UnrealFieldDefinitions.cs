@@ -13,7 +13,8 @@ public abstract class UnrealFieldDefinition
 	
 	public required string Name { get; set; }
 	public EObjectFlags Flags { get; set; }
-	public Dictionary<string, string> MetadataMap { get; set; } = new();
+	public Dictionary<string, string>? MetadataMap { get; set; }
+	public Dictionary<string, string>? TransparentDataMap { get; set; }
 }
 
 // IMPORTANT: KEEP SYNC WITH ZUnrealFieldDefinitions.h

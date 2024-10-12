@@ -176,6 +176,60 @@ partial class SpecifierProcessor
 	}
 	
 	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, ClassGroupAttribute specifier)
+	{
+		def.AddTransparentData(TransparentDataConstants.ClassGroup, string.Join(' ', specifier.Names));
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, ShowFunctionsAttribute specifier)
+	{
+		def.AddTransparentData(TransparentDataConstants.ShowFunctions, string.Join(' ', specifier.Names));
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, HideFunctionsAttribute specifier)
+	{
+		def.AddTransparentData(TransparentDataConstants.HideFunctions, string.Join(' ', specifier.Names));
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, ShowCategoriesAttribute specifier)
+	{
+		def.AddTransparentData(TransparentDataConstants.ShowCategories, string.Join(' ', specifier.Names));
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, HideCategoriesAttribute specifier)
+	{
+		def.AddTransparentData(TransparentDataConstants.HideCategories, string.Join(' ', specifier.Names));
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, AutoExpandCategoriesAttribute specifier)
+	{
+		def.AddTransparentData(TransparentDataConstants.AutoExpandCategories, string.Join(' ', specifier.Names));
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, AutoCollapseCategoriesAttribute specifier)
+	{
+		def.AddTransparentData(TransparentDataConstants.AutoCollapseCategories, string.Join(' ', specifier.Names));
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, DontAutoCollapseCategoriesAttribute specifier)
+	{
+		def.AddTransparentData(TransparentDataConstants.DontAutoCollapseCategories, string.Join(' ', specifier.Names));
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, PrioritizeCategoriesAttribute specifier)
+	{
+		def.AddTransparentData(TransparentDataConstants.PrioritizeCategories, string.Join(' ', specifier.Names));
+	}
+	
+	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, PropertyDefaultOverrideAttribute specifier)
 	{
 		def.PropertyDefaults.Add(new()

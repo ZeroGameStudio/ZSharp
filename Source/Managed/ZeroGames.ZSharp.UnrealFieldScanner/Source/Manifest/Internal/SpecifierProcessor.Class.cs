@@ -104,6 +104,54 @@ partial class SpecifierProcessor
 	}
 	
 	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, EditInlineNewAttribute specifier)
+	{
+		def.ClassFlags |= EClassFlags.CLASS_EditInlineNew;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, NotEditInlineNewAttribute specifier)
+	{
+		def.ClassFlags &= ~EClassFlags.CLASS_EditInlineNew;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, PlaceableAttribute specifier)
+	{
+		def.ClassFlags &= ~EClassFlags.CLASS_NotPlaceable;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, NotPlaceableAttribute specifier)
+	{
+		def.ClassFlags |= EClassFlags.CLASS_NotPlaceable;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, HideDropdownAttribute specifier)
+	{
+		def.ClassFlags |= EClassFlags.CLASS_HideDropDown;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, HiddenAttribute specifier)
+	{
+		def.ClassFlags |= EClassFlags.CLASS_Hidden;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, ComponentWrapperAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.IgnoreCategoryKeywordsInSubclasses, true);
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, EditorConfigNameAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.EditorConfig, specifier.Name);
+	}
+	
+	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, PropertyDefaultOverrideAttribute specifier)
 	{
 		def.PropertyDefaults.Add(new()

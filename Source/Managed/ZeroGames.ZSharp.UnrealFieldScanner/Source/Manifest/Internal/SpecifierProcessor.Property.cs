@@ -257,7 +257,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EditorConfigAttribute specifier)
 	{
-		AddMetadata(def, MetadataConstants.EditorConfig);
+		def.AddMetadata(MetadataConstants.EditorConfig);
 	}
 	
 	private static void ProcessSpecifier_DefaultSubobject(UnrealPropertyDefinition def, IUnrealPropertyModel model, DefaultSubobjectSpecifierBase specifier, bool optional)

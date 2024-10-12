@@ -25,6 +25,10 @@ public static class MetadataConstants
 	public const string IsConversionRoot = nameof(IsConversionRoot);
 	public const string IgnoreCategoryKeywordsInSubclasses = nameof(IgnoreCategoryKeywordsInSubclasses);
 	public const string EditorConfig = nameof(EditorConfig);
+	
+	// Property metadata names
+	public const string BlueprintGetter = nameof(BlueprintGetter);
+	public const string BlueprintSetter = nameof(BlueprintSetter);
 
 }
 

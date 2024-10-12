@@ -39,17 +39,53 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BlueprintGetterAttribute specifier)
 	{
+		IUnrealClassModel? classModel = model.Outer as IUnrealClassModel;
+		if (classModel is null)
+		{
+			throw new InvalidOperationException();
+		}
+
+		IUnrealFunctionModel getterModel = classModel.Functions.Single(func => func.Name == specifier.AccessorName);
+		// @TODO: Check signature
+		
+		UnrealClassDefinition classDef = (UnrealClassDefinition)def.Outer;
+		UnrealFunctionDefinition functionDef = classDef.Functions.Single(func => func.Name == specifier.AccessorName);
+		if ((functionDef.FunctionFlags & EFunctionFlags.FUNC_Event) != EFunctionFlags.FUNC_None)
+		{
+			throw new InvalidOperationException();
+		}
+		
 		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
 		if (!model.HasSpecifier<BlueprintSetterAttribute>())
 		{
 			def.PropertyFlags |= EPropertyFlags.CPF_BlueprintReadOnly;
 		}
+		def.AddMetadata(MetadataConstants.BlueprintGetter, specifier.AccessorName);
+		functionDef.AddMetadata(MetadataConstants.BlueprintGetter);
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BlueprintSetterAttribute specifier)
 	{
+		IUnrealClassModel? classModel = model.Outer as IUnrealClassModel;
+		if (classModel is null)
+		{
+			throw new InvalidOperationException();
+		}
+
+		IUnrealFunctionModel getterModel = classModel.Functions.Single(func => func.Name == specifier.AccessorName);
+		// @TODO: Check signature
+		
+		UnrealClassDefinition classDef = (UnrealClassDefinition)def.Outer;
+		UnrealFunctionDefinition functionDef = classDef.Functions.Single(func => func.Name == specifier.AccessorName);
+		if ((functionDef.FunctionFlags & EFunctionFlags.FUNC_Event) != EFunctionFlags.FUNC_None)
+		{
+			throw new InvalidOperationException();
+		}
+		
 		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
+		def.AddMetadata(MetadataConstants.BlueprintSetter, specifier.AccessorName);
+		functionDef.AddMetadata(MetadataConstants.BlueprintSetter);
 	}
 	
 	[SpecifierProcessor]

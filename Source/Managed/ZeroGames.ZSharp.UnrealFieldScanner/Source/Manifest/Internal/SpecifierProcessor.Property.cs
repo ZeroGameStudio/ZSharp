@@ -148,7 +148,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, NotReplicatedAttribute specifier)
 	{
-		bool isStructMember = def.Outer is UnrealScriptStructDefinition structDef;
+		bool isStructMember = def.Outer is UnrealScriptStructDefinition;
 		bool isRpcParameter = def.Outer is UnrealFunctionDefinition functionDef && (functionDef.FunctionFlags & EFunctionFlags.FUNC_Net) != EFunctionFlags.FUNC_None;
 		if (!isStructMember && !isRpcParameter)
 		{

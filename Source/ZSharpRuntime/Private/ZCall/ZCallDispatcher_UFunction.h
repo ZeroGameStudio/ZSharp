@@ -11,9 +11,7 @@ namespace ZSharp
 	{
 
 	public:
-		explicit FZCallDispatcher_UFunction(const FString& name)
-			: Name(name)
-			, Path(name.RightChop(4)){}
+		explicit FZCallDispatcher_UFunction(const FString& name);
 		
 	public:
 		virtual const FString& GetName() const override { return Name; }
@@ -24,7 +22,8 @@ namespace ZSharp
 
 	private:
 		FString Name;
-		FString Path;
+		FString ClassPath;
+		FName FunctionName;
 		mutable FZFunctionVisitorHandle Function;
 		
 	};

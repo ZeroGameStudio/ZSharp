@@ -149,16 +149,15 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 	check(zsfunction);
 	check(currentFunction->IsChildOf(Function.Get()));
 	check(currentFunction->IsSignatureCompatibleWith(Function.Get()));
-
+	
+	// IMPORTANT: Event if ALC is not available we can't return directly because we always need to balance the stack!!!
 	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
-	if (!alc)
-	{
-		return EZCallErrorCode::AlcUnavailable;
-	}
-
+	EZCallErrorCode res = EZCallErrorCode::AlcUnavailable;
 	const int32 numSlots = (bIsStatic ? 0 : 1) + ParameterProperties.Num() + (ReturnProperty ? 1 : 0);
-	EZCallErrorCode res;
-	alc->PrepareForZCall();
+	if (alc)
+	{
+		alc->PrepareForZCall();
+	}
 	{
 		FZCallBuffer buffer;
 		buffer.Slots = static_cast<FZCallBufferSlot*>(FMemory_Alloca(numSlots * sizeof(FZCallBufferSlot)));
@@ -241,7 +240,10 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 			ReturnProperty->GetValue(RESULT_PARAM, buffer[-1]);
 		}
 
-		res = alc->ZCall(zsfunction->GetZCallHandle(), &buffer);
+		if (alc)
+		{
+			res = alc->ZCall(zsfunction->GetZCallHandle(), &buffer);
+		}
 
 		// Copy out params and destroy them if called from blueprint.
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)

@@ -2,6 +2,7 @@
 
 #include "ZSharpRuntimeModule.h"
 
+#include "ZSharpRuntimeLogChannels.h"
 #include "CLR/IZSharpClr.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "Emit/ZUnrealFieldScanner.h"
@@ -36,8 +37,16 @@ void FZSharpRuntimeModule::StartupModule()
 	ZSharp::FZUnrealFieldScanner::Get().Startup();
 	
 #if WITH_EDITOR
-	FEditorDelegates::PreBeginPIE.AddRaw(this, &ThisClass::HandleBeginPIE);
-	FEditorDelegates::ShutdownPIE.AddRaw(this, &ThisClass::HandleEndPIE);
+	if (!GEditor)
+	{
+		UE_LOG(LogZSharpRuntime, Log, TEXT("Editor standalone process detected. Will create master ALC immediately."));
+		CreateMasterAlc();
+	}
+	else
+	{
+		FEditorDelegates::PreBeginPIE.AddRaw(this, &ThisClass::HandleBeginPIE);
+		FEditorDelegates::ShutdownPIE.AddRaw(this, &ThisClass::HandleEndPIE);
+	}
 #else
 	CreateMasterAlc();
 #endif
@@ -48,8 +57,15 @@ void FZSharpRuntimeModule::ShutdownModule()
 	ZSharp::FZUnrealFieldScanner::Get().Shutdown();
 	
 #if WITH_EDITOR
-	FEditorDelegates::PreBeginPIE.RemoveAll(this);
-	FEditorDelegates::ShutdownPIE.RemoveAll(this);
+	if (!GEditor)
+    {
+    	UnloadMasterAlc();
+    }
+    else
+    {
+    	FEditorDelegates::PreBeginPIE.RemoveAll(this);
+    	FEditorDelegates::ShutdownPIE.RemoveAll(this);
+    }
 #else
 	UnloadMasterAlc();
 #endif

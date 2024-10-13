@@ -6,7 +6,7 @@ namespace ZSharp
 {
 	class FCustomThunkRegistry
 	{
-		friend class FRegisterCustomThunk;
+		friend struct FRegisterCustomThunk;
 		
 	public:
 		FNativeFuncPtr GetFunction(FName name);

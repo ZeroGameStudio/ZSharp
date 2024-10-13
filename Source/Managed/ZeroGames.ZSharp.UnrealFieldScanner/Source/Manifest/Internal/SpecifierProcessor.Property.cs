@@ -193,18 +193,6 @@ partial class SpecifierProcessor
 	}
 	
 	[SpecifierProcessor]
-	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, GetterAttribute specifier)
-	{
-		throw new NotImplementedException();
-	}
-	
-	[SpecifierProcessor]
-	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, SetterAttribute specifier)
-	{
-		throw new NotImplementedException();
-	}
-	
-	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, FieldNotifyAttribute specifier)
 	{
 		throw new NotImplementedException();

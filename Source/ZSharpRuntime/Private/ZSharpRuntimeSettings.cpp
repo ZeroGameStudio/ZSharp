@@ -7,6 +7,7 @@ UZSharpRuntimeSettings::UZSharpRuntimeSettings()
 {
 	IntrinsicModuleAssemblyMapping.Emplace("Core", { EngineAssemblyName, false });
 	IntrinsicModuleAssemblyMapping.Emplace("CoreUObject", { EngineAssemblyName, false });
+	IntrinsicModuleAssemblyMapping.Emplace("FieldNotification", { EngineAssemblyName, false });
 	
 	IntrinsicModuleAssemblyMapping.Emplace("PhysicsCore", { EngineAssemblyName, false });
 	IntrinsicModuleAssemblyMapping.Emplace("InputCore", { EngineAssemblyName, false });

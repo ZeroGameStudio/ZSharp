@@ -11,12 +11,7 @@ public class BlueprintReadOnlyAttribute : BlueprintPropertyReadWriteSpecifierBas
 
 public abstract class BlueprintPropertyAccessorSpecifierBase(string accessorName) : BlueprintNonDelegatePropertyVisibilitySpecifierBase
 {
-	public override IEnumerable<Type> HierarchicalConflicts =>
-	[
-		typeof(BlueprintDelegatePropertyVisibilitySpecifierBase),
-		typeof(BlueprintPropertyReadWriteSpecifierBase),
-		typeof(PropertyAccessorSpecifierBase),
-	];
+	public override IEnumerable<Type> HierarchicalConflicts => [ typeof(BlueprintDelegatePropertyVisibilitySpecifierBase), typeof(BlueprintPropertyReadWriteSpecifierBase) ];
 
 	public string AccessorName { get; } = accessorName;
 }

@@ -68,6 +68,8 @@ namespace ZSharp
 
 		uint16 RpcId = 0;
 		uint16 RpcResponseId = 0;
+
+		FName CustomThunkName;
 	};
 	
 	struct FZEnumDefinition : public FZFieldDefinition
@@ -123,6 +125,8 @@ namespace ZSharp
 		TArray<FPropertyDefault> PropertyDefaults;
 		TArray<FDefaultSubobject> DefaultSubobjects;
 		TArray<FDefaultSubobjectOverride> DefaultSubobjectOverrides;
+		
+		TArray<FName> FieldNotifies;
 	};
 	
 	struct FZInterfaceDefinition : public FZStructDefinition

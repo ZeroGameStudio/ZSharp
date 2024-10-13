@@ -85,6 +85,7 @@ public class UnrealFunctionDefinition : UnrealStructDefinition
 	public required string ZCallName { get; set; }
 	public uint16 RpcId { get; set; }
 	public uint16 RpcResponseId { get; set; }
+	public string? CustomThunkName { get; set; }
 }
 
 public class UnrealEnumDefinition : UnrealFieldDefinition
@@ -132,6 +133,7 @@ public class UnrealClassDefinition : UnrealStructDefinition
 	public List<PropertyDefault> PropertyDefaults { get; set; } = new();
 	public List<DefaultSubobject> DefaultSubobjects { get; set; } = new();
 	public List<DefaultSubobjectOverride> DefaultSubobjectOverrides { get; set; } = new();
+	public List<string> FieldNotifies { get; set; } = new();
 }
 
 public class UnrealInterfaceDefinition : UnrealStructDefinition

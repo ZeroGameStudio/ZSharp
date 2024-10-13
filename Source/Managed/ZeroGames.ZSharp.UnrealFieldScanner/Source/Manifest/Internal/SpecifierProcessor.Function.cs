@@ -116,7 +116,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, AsFieldNotifyAttribute specifier)
 	{
-		throw new NotImplementedException();
+		def.Outer.FieldNotifies.Add(def.Name);
 	}
 	
 	[SpecifierProcessor]
@@ -128,7 +128,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, CustomThunkAttribute specifier)
 	{
-		throw new NotImplementedException();
+		def.CustomThunkName = specifier.ThunkName;
 	}
 	
 }

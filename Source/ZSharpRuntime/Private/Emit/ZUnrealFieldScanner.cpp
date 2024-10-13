@@ -75,6 +75,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 			def.ZCallName = MoveTemp(dto.ZCallName);
 			def.RpcId = dto.RpcId;
 			def.RpcResponseId = dto.RpcResponseId;
+			def.CustomThunkName = dto.CustomThunkName;
 		}
 
 		return defs;
@@ -139,6 +140,8 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 					defaultObjectOverride.Name = defaultObjectOverrideDto.Name;
 					defaultObjectOverride.ClassPath = defaultObjectOverrideDto.ClassPath;
 				}
+
+				classDef.FieldNotifies = MoveTemp(classDto.FieldNotifies);
 			}
 		}
 

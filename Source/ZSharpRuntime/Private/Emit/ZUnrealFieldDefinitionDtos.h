@@ -98,6 +98,9 @@ struct FZFunctionDefinitionDto : public FZStructDefinitionDto
 
 	UPROPERTY()
 	uint16 RpcResponseId = 0;
+
+	UPROPERTY()
+	FName CustomThunkName;
 };
 
 USTRUCT()
@@ -201,6 +204,9 @@ struct FZClassDefinitionDto : public FZStructDefinitionDto
 
 	UPROPERTY()
 	TArray<FZClassDefinitionDto_DefaultSubobjectOverride> DefaultSubobjectOverrides;
+
+	UPROPERTY()
+	TArray<FName> FieldNotifies;
 };
 
 USTRUCT()

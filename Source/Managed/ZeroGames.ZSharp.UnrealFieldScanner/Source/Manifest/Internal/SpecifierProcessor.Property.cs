@@ -195,7 +195,13 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, FieldNotifyAttribute specifier)
 	{
-		throw new NotImplementedException();
+		var classDef = def.Outer as UnrealClassDefinition;
+		if (classDef is null)
+		{
+			throw new InvalidOperationException();
+		}
+		
+		classDef.FieldNotifies.Add(def.Name);
 	}
 	
 	[SpecifierProcessor]

@@ -7,24 +7,18 @@ namespace ZSharp
 	class FCustomThunkRegistry
 	{
 		friend struct FRegisterCustomThunk;
+
+	public:
+		static FCustomThunkRegistry& Get();
 		
 	public:
-		FNativeFuncPtr GetFunction(FName name);
-		GetterFuncPtr GetGetter(FName name);
-		SetterFuncPtr GetSetter(FName name);
-		
-	private:
-		static FCustomThunkRegistry& Get();
-
+		FNativeFuncPtr GetThunk(FName name);
+	
 	private:
 		void Register(FName name, FNativeFuncPtr thunk);
-		void Register(FName name, GetterFuncPtr thunk);
-		void Register(FName name, SetterFuncPtr thunk);
 
 	private:
-		TMap<FName, FNativeFuncPtr> FunctionMap;
-		TMap<FName, GetterFuncPtr> GetterMap;
-		TMap<FName, SetterFuncPtr> SetterMap;
+		TMap<FName, FNativeFuncPtr> ThunkMap;
 		
 	};
 }

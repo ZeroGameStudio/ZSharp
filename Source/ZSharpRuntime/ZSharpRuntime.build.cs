@@ -27,7 +27,9 @@ public class ZSharpRuntime : ModuleRules
 			new string[]
 			{
 				"Core",
+				"FieldNotification",
 				"Engine",
+				
 				"DeveloperSettings",
 				
 				"ZSharpCore",

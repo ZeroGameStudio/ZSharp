@@ -39,6 +39,8 @@ namespace ZSharp
 		TArray<FPropertyDefault> PropertyDefaults;
 		TArray<FDefaultSubobject> DefaultSubobjects;
 		TArray<FDefaultSubobjectOverride> DefaultSubobjectOverrides;
+
+		TArray<UE::FieldNotification::FFieldId> FieldNotifies;
 	};
 
 	struct FZSharpFunction

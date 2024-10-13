@@ -3,6 +3,8 @@
 
 #include "ZUnrealFieldEmitter.h"
 
+#include "CustomThunkRegistry.h"
+#include "INotifyFieldValueChanged.h"
 #include "ZSharpRuntimeLogChannels.h"
 #include "ZSharpFieldRegistry.h"
 #include "Algo/TopologicalSort.h"
@@ -442,7 +444,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		function->RPCId = def.RpcId;
 		function->RPCResponseId = def.RpcResponseId;
 
-		outer->AddNativeFunction(*function->GetName(), ZSharpFunction_Private::execZCall);
+		FNativeFuncPtr thunk = def.CustomThunkName.IsNone() ? ZSharpFunction_Private::execZCall : FCustomThunkRegistry::Get().GetThunk(def.CustomThunkName);
+		outer->AddNativeFunction(*function->GetName(), thunk);
 
 		EmitProperties(function, def.Properties);
 		AddMetadata(function, def.MetadataMap);
@@ -913,9 +916,8 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 	cls->AssembleReferenceTokenStream(true);
 
 	// Compile Z# class.
+	FZSharpClass* zscls = FZSharpFieldRegistry::Get().GetMutableClass(cls);
 	{ // Construct property defaults.
-		FZSharpClass* zscls = FZSharpFieldRegistry::Get().GetMutableClass(cls);
-		
 		zscls->PropertyDefaults.Reserve(def.PropertyDefaults.Num());
 		for (const auto& propertyDefaultDef : def.PropertyDefaults)
 		{
@@ -946,6 +948,36 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 			}
 			
 			propertyDefault.Buffer = propertyDefaultDef.Buffer;
+		}
+	}
+
+	// Construct field notifies.
+	if (!def.FieldNotifies.IsEmpty())
+	{
+		// Super CDO should be ready to use at this point.
+		const UClass* superCls = cls->GetSuperClass();
+		const UObject* superCdo = superCls->GetDefaultObject(false);
+		check(superCdo);
+		const INotifyFieldValueChanged* superInterface = Cast<INotifyFieldValueChanged>(superCdo);
+		int32 currentFieldNotifyIndex;
+		if (superInterface)
+		{
+			superInterface->GetFieldNotificationDescriptor().ForEachField(superCls, [&currentFieldNotifyIndex](UE::FieldNotification::FFieldId)
+			{
+				++currentFieldNotifyIndex;
+				return true;
+			});
+		}
+		else
+		{
+			check(cls->ImplementsInterface(UNotifyFieldValueChanged::StaticClass()));
+			
+			currentFieldNotifyIndex = 0;
+		}
+
+		for (const auto& field : def.FieldNotifies)
+		{
+			zscls->FieldNotifies.Emplace(UE::FieldNotification::FFieldId { field, currentFieldNotifyIndex++ });
 		}
 	}
 

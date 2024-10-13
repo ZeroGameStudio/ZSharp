@@ -10,14 +10,4 @@ ZSharp::FRegisterCustomThunk::FRegisterCustomThunk(FName name, FNativeFuncPtr th
 	FCustomThunkRegistry::Get().Register(name, thunk);
 }
 
-ZSharp::FRegisterCustomThunk::FRegisterCustomThunk(FName name, GetterFuncPtr thunk)
-{
-	FCustomThunkRegistry::Get().Register(name, thunk);
-}
-
-ZSharp::FRegisterCustomThunk::FRegisterCustomThunk(FName name, SetterFuncPtr thunk)
-{
-	FCustomThunkRegistry::Get().Register(name, thunk);
-}
-
 

@@ -16,8 +16,6 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 	check(bAvailable);
 	check(!bIsDelegate);
 
-	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
-
 	FZCallBuffer& buf = *buffer;
 	UFunction* func = Function.Get();
 	UObject* self;
@@ -62,7 +60,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBu
 	check(!bIsMulticastDelegate);
 	check(!bIsStatic);
 
-	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
+	checkf(!bIsRpc, TEXT("RPC is not supported on delegates."));
 
 	FZCallBuffer& buf = *buffer;
 	UFunction* func = Function.Get();
@@ -91,7 +89,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastInlineScriptDe
 	check(!ReturnProperty);
 	check(!bIsStatic);
 
-	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
+	checkf(!bIsRpc, TEXT("RPC is not supported on delegates."));
 
 	FZCallBuffer& buf = *buffer;
 	UFunction* func = Function.Get();
@@ -120,7 +118,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastSparseScriptDe
 	check(!ReturnProperty);
 	check(!bIsStatic);
 
-	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
+	checkf(!bIsRpc, TEXT("RPC is not supported on delegates."));
 
 	FZCallBuffer& buf = *buffer;
 	UFunction* func = Function.Get();
@@ -145,8 +143,6 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 	check(IsInGameThread());
 	check(bAvailable);
 	check(!bIsDelegate);
-
-	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
 
 	UFunction* currentFunction = stack.CurrentNativeFunction;
 	const FZSharpFunction* zsfunction = FZSharpFieldRegistry::Get().GetFunction(currentFunction);
@@ -284,7 +280,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 	check(bIsDelegate);
 	check(!bIsStatic);
 
-	checkf(!bIsRpc, TEXT("RPC is not supported yet."));
+	checkf(!bIsRpc, TEXT("RPC is not supported on delegates."));
 
 	check(object);
 	check(object->Implements<UZManagedDelegateProxyInterface>());
@@ -384,7 +380,7 @@ ZSharp::FZFunctionVisitor::FZFunctionVisitor(UFunction* function)
 	bIsStatic = function->HasAllFunctionFlags(FUNC_Static);
 	bIsDelegate = function->HasAllFunctionFlags(FUNC_Delegate);
 	bIsMulticastDelegate = function->HasAllFunctionFlags(FUNC_MulticastDelegate);
-	bIsRpc = function->HasAnyFunctionFlags(FUNC_NetServer | FUNC_NetClient | FUNC_NetMulticast);
+	bIsRpc = function->HasAllFunctionFlags(FUNC_Net);
 	
 	ParameterProperties.Empty();
 	ReturnProperty.Reset();

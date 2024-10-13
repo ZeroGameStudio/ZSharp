@@ -74,25 +74,34 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, ServerAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetServer;
+		if (model.HasReturnValue())
+		{
+			throw new InvalidOperationException();
+		}
 		
-		throw new NotImplementedException();
+		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetServer;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, ClientAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetClient;
+		if (model.HasReturnValue())
+		{
+			throw new InvalidOperationException();
+		}
 		
-		throw new NotImplementedException();
+		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetClient;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, NetMulticastAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetMulticast;
+		if (model.HasReturnValue())
+		{
+			throw new InvalidOperationException();
+		}
 		
-		throw new NotImplementedException();
+		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetMulticast;
 	}
 	
 	[SpecifierProcessor]

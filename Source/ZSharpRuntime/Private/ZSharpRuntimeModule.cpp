@@ -37,7 +37,7 @@ void FZSharpRuntimeModule::StartupModule()
 	ZSharp::FZUnrealFieldScanner::Get().Startup();
 	
 #if WITH_EDITOR
-	if (!GEditor)
+	if (!GIsEditor)
 	{
 		UE_LOG(LogZSharpRuntime, Log, TEXT("Editor standalone process detected. Will create master ALC immediately."));
 		CreateMasterAlc();
@@ -57,7 +57,7 @@ void FZSharpRuntimeModule::ShutdownModule()
 	ZSharp::FZUnrealFieldScanner::Get().Shutdown();
 	
 #if WITH_EDITOR
-	if (!GEditor)
+	if (!GIsEditor)
     {
     	UnloadMasterAlc();
     }

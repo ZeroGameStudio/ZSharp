@@ -169,14 +169,23 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, ReplicatedAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Net;
-		if (specifier.RepNotify is not null)
+		var classModel = model.Outer as IUnrealClassModel;
+		if (classModel is null)
 		{
-			def.PropertyFlags |= EPropertyFlags.CPF_RepNotify;
-			def.RepNotifyName = specifier.RepNotify;
+			throw new InvalidOperationException();
 		}
-
-		throw new NotImplementedException();
+		
+		def.PropertyFlags |= EPropertyFlags.CPF_Net;
+		if (specifier.Notify is not null)
+		{
+			if (classModel.Functions.All(func => func.Name != specifier.Notify))
+			{
+				throw new InvalidOperationException();
+			}
+			
+			def.PropertyFlags |= EPropertyFlags.CPF_RepNotify;
+			def.RepNotifyName = specifier.Notify;
+		}
 	}
 	
 	[SpecifierProcessor]

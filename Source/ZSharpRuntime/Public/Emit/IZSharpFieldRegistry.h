@@ -34,6 +34,14 @@ namespace ZSharp
 			FName ClassPath;
 		};
 
+		struct FReplicatedProperty
+		{
+			FProperty* Property;
+			ELifetimeCondition Condition;
+			ELifetimeRepNotifyCondition RepNotifyCondition;
+			bool bPushBased;
+		};
+
 		const UClass* Class = nullptr;
 		
 		TArray<FPropertyDefault> PropertyDefaults;
@@ -41,6 +49,7 @@ namespace ZSharp
 		TArray<FDefaultSubobjectOverride> DefaultSubobjectOverrides;
 
 		TArray<UE::FieldNotification::FFieldId> FieldNotifies;
+		TArray<FReplicatedProperty> ReplicatedProperties;
 	};
 
 	struct FZSharpFunction

@@ -9,7 +9,7 @@ public abstract class PropertyReplicatedSpecifierBase : PropertySpecifierBase
 
 public class ReplicatedAttribute : PropertyReplicatedSpecifierBase
 {
-	public string? RepNotify { get; init; }
+	public string? Notify { get; init; }
 }
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]

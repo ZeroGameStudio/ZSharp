@@ -917,6 +917,10 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 
 	// Compile Z# class.
 	FZSharpClass* zscls = FZSharpFieldRegistry::Get().GetMutableClass(cls);
+	// Super class and CDO should be ready to use at this point.
+	const UClass* superCls = cls->GetSuperClass();
+	const UObject* superCdo = superCls->GetDefaultObject(false);
+	check(superCdo);
 	{ // Construct property defaults.
 		zscls->PropertyDefaults.Reserve(def.PropertyDefaults.Num());
 		for (const auto& propertyDefaultDef : def.PropertyDefaults)
@@ -954,10 +958,6 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 	// Construct field notifies.
 	if (!def.FieldNotifies.IsEmpty())
 	{
-		// Super CDO should be ready to use at this point.
-		const UClass* superCls = cls->GetSuperClass();
-		const UObject* superCdo = superCls->GetDefaultObject(false);
-		check(superCdo);
 		const INotifyFieldValueChanged* superInterface = Cast<INotifyFieldValueChanged>(superCdo);
 		int32 currentFieldNotifyIndex;
 		if (superInterface)
@@ -982,7 +982,34 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 	}
 
 	// Create CDO.
-	(void)def.Class->GetDefaultObject();
+	const UObject* cdo = def.Class->GetDefaultObject();
+
+	// Precache replicated properties, then setup runtime replication data.
+	{
+		// Super class's ClassReps should be ready to use at this point.
+		auto currentRepIndex = static_cast<uint16>(superCls->ClassReps.Num());
+		for (TFieldIterator<FProperty> it(cls, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+		{
+			FProperty* property = *it;
+			if (property->HasAllPropertyFlags(CPF_Net))
+			{
+				check(property->RepIndex == 0);
+				property->RepIndex = currentRepIndex++;
+				zscls->ReplicatedProperties.Emplace(FZSharpClass::FReplicatedProperty { property, COND_None, REPNOTIFY_OnChanged, true });
+			}
+		}
+
+		cls->SetUpRuntimeReplicationData();
+		
+#if DO_CHECK
+		// Migrate from UClass::ValidateRuntimeReplicationData().
+		TArray<FLifetimeProperty> lifetimeProps;
+		lifetimeProps.Reserve(cls->ClassReps.Num());
+		cdo->GetLifetimeReplicatedProps(lifetimeProps);
+
+		checkf(lifetimeProps.Num() == cls->ClassReps.Num(), TEXT("Some replicated properties don't get registered."));
+#endif
+	}
 }
 
 

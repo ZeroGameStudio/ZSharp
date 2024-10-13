@@ -4,7 +4,7 @@
 
 namespace ZSharp
 {
-	ZSHARPRUNTIME_API struct FRegisterCustomThunk
+	struct ZSHARPRUNTIME_API FRegisterCustomThunk
 	{
 		FRegisterCustomThunk(FName name, FNativeFuncPtr thunk);
 	};

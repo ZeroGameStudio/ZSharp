@@ -1,6 +1,6 @@
 {
 	"IsShared": true,
-	"ParentFolder": "ZSharp",
+	"Folder": "ZSharp/Engine",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
 	"AssemblyVersion": "0.2.0",

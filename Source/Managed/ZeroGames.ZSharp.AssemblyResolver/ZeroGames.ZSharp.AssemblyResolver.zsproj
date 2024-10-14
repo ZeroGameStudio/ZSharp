@@ -1,6 +1,6 @@
 {
 	"IsPrecompiled": true,
-	"ParentFolder": "ZSharp",
+	"Folder": "ZSharp/Core",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
 	"AssemblyVersion": "0.2.0",

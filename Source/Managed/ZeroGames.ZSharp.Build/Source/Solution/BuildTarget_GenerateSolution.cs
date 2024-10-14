@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Collections.ObjectModel;
+using System.Collections;
 using System.Text;
 using System.Text.Json;
 
@@ -17,14 +17,16 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
             throw new FileNotFoundException($"Project dir {UnrealProjectDir} not exists.");
         }
 
-        List<Task<string>> tasks = _projectMap.Select(pair => GenerateProjectFile(pair.Value)).ToList();
-        tasks.Add(GenerateSolutionFile());
+        List<Task<string>> tasks = _projectMap.Select(pair => GenerateProjectFileAsync(pair.Value)).ToList();
         await Task.WhenAll(tasks);
+        await GenerateSolutionFileAsync();
 
         return string.Join("\n", tasks.Select(task => task.Result));
     }
     
     public string UnrealProjectDir { get; }
+
+
     
     [FactoryConstructor]
     private BuildTarget_GenerateSolution(IBuildEngine engine, [Argument("projectdir")] string projectDir, [Argument("source")] string source) : base(engine)
@@ -120,7 +122,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
         return projects;
     }
 
-    private async Task<string> GenerateProjectFile(ProjectDefinition project)
+    private async Task<string> GenerateProjectFileAsync(ProjectDefinition project)
     {
         string projectFileDir = $"{UnrealProjectDir}/{project.ProjectFileDir}";
         if (Directory.Exists(projectFileDir))
@@ -142,7 +144,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
         return $"Project file generated: {path}";
     }
     
-    private async Task<string> GenerateSolutionFile()
+    private async Task<string> GenerateSolutionFileAsync()
     {
         // @FIXME: Solution file name
         string projectFile = Directory.GetFiles(UnrealProjectDir, "*.*", SearchOption.TopDirectoryOnly).FirstOrDefault(file => Path.GetExtension(file) == ".uproject") ?? throw new InvalidOperationException();
@@ -150,11 +152,28 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
         string path = $"{UnrealProjectDir}/{projectFileShortName}Script.sln";
         await using FileStream fs = File.Create(path);
         await using StreamWriter sw = new(fs, Encoding.UTF8);
-
+        
         SolutionFileBuilder builder = new();
-        Guid zsharpFolder = builder.AddFolder("ZSharp");
-        Guid toolFolder = builder.AddFolder("Program", zsharpFolder);
-        Guid gameFolder = builder.AddFolder("Game");
+
+        SolutionDirectoryTree tree = new();
+        tree.AddDirectory("ZSharp");
+        tree.AddDirectory("Game");
+        foreach (var pair in _projectMap)
+        {
+            tree.AddDirectory(pair.Value.Folder);
+        }
+        
+        foreach (var node in tree)
+        {
+            if (!string.IsNullOrWhiteSpace(node.Parent.Path))
+            {
+                builder.AddFolder(node.Path, node.Parent.Path);
+            }
+            else
+            {
+                builder.AddFolder(node.Path);
+            }
+        }
         
         foreach (var pair in _projectMap)
         {

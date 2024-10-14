@@ -9,16 +9,19 @@ public class ProjectDefinition
 	[JsonIgnore] public string Name { get; set; } = string.Empty;
 	[JsonIgnore] public string SourceDir { get; set; } = string.Empty;
 
-	public string ParentFolder { get; init; } = "Game";
+	public string Folder { get; init; } = "Game";
 
-	public string TargetFramework { get; init; } = "net8.0";
-	public string Language { get; init; } = "C#";
+	public string? TargetFramework { get; init; }
+	public string? Language { get; init; }
+	public string? LanguageVersion { get; init; }
+	public string? RootNamespace { get; init; }
 	public bool IsNullable { get; init; } = true;
 	public bool IsStrongRestrictedNullable { get; init; } = true;
 	public bool IsUnsafeBlockEnabled { get; init; } = true;
 	public bool HasGlue { get; init; } = false;
 	public bool IsPrecompiled { get; init; } = false;
 	public bool IsShared { get; init; } = false;
+	public bool IsRoslynComponent { get; init; } = false;
 
 	public string Authors { get; init; } = string.Empty;
 	public string Company { get; init; } = string.Empty;
@@ -37,9 +40,10 @@ public class ProjectDefinition
 
 	public HashSet<string> Tags { get; init; } = new();
 
-	public string ProjectFileExtension => Language.ToLower() switch
+	public string ProjectFileExtension => Language?.ToLower() switch
 	{
 		"c#" or "cs" or "csharp" => ".csproj",
+		null => ".csproj",
 		_ => throw new ArgumentException($"Unknown language: {Language}")
 	};
 

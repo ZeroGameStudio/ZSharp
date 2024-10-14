@@ -6,18 +6,20 @@ namespace ZeroGames.ZSharp.Build.Solution;
 
 public class SolutionFileBuilder
 {
-	public Guid AddFolder(string name)
+	public Guid AddFolder(string path)
 	{
 		Guid guid = Guid.NewGuid();
+		string name = path.Split('/').Last();
 		_folders[guid] = $"Project(\"{FOLDER_GUID}\") = \"{name}\", \"{name}\", \"{FormatGuid(ref guid)}\"\nEndProject";
-		_folderName2Guid[name] = guid;
+		_folderPath2Guid[path] = guid;
 		return guid;
 	}
 
-	public Guid AddFolder(string name, Guid parentFolder)
+	public Guid AddFolder(string path, string parentFolder)
 	{
-		Guid guid = AddFolder(name);
-		_nestedProjects.Add($"{FormatGuid(ref guid)} = {FormatGuid(ref parentFolder)}");
+		Guid guid = AddFolder(path);
+		Guid parentGuid = _folderPath2Guid[parentFolder];
+		_nestedProjects.Add($"{FormatGuid(ref guid)} = {FormatGuid(ref parentGuid)}");
 		return guid;
 	}
 
@@ -32,28 +34,22 @@ public class SolutionFileBuilder
 		Guid guid = Guid.NewGuid();
 		_projects[guid] = $"Project(\"{projectGuid}\") = \"{project.Name}\", \"{project.ProjectFilePath}\", \"{FormatGuid(ref guid)}\"\nEndProject";
 
-		string parentFolder = project.ParentFolder;
+		string parentFolder = project.Folder;
 		if (!string.IsNullOrWhiteSpace(parentFolder))
 		{
-			if (!_folderName2Guid.TryGetValue(parentFolder, out var parentFolderGuid))
+			if (!_folderPath2Guid.TryGetValue(parentFolder, out var parentFolderGuid))
 			{
 				throw new ArgumentOutOfRangeException($"Solution folder {parentFolder} does not exist.");
 			}
 
 			_postConfigs.Add($"{FormatGuid(ref guid)}.DebugGame|Any CPU.ActiveCfg = DebugGame|Any CPU");
 			_postConfigs.Add($"{FormatGuid(ref guid)}.DebugGame|Any CPU.Build.0 = DebugGame|Any CPU");
-			_postConfigs.Add($"{FormatGuid(ref guid)}.DebugGame Editor|Any CPU.ActiveCfg = DebugGame Editor|Any CPU");
-			_postConfigs.Add($"{FormatGuid(ref guid)}.DebugGame Editor|Any CPU.Build.0 = DebugGame Editor|Any CPU");
 
 			_postConfigs.Add($"{FormatGuid(ref guid)}.Development|Any CPU.ActiveCfg = Development|Any CPU");
 			_postConfigs.Add($"{FormatGuid(ref guid)}.Development|Any CPU.Build.0 = Development|Any CPU");
-			_postConfigs.Add($"{FormatGuid(ref guid)}.Development Editor|Any CPU.ActiveCfg = Development Editor|Any CPU");
-			_postConfigs.Add($"{FormatGuid(ref guid)}.Development Editor|Any CPU.Build.0 = Development Editor|Any CPU");
 
 			_postConfigs.Add($"{FormatGuid(ref guid)}.Shipping|Any CPU.ActiveCfg = Shipping|Any CPU");
 			_postConfigs.Add($"{FormatGuid(ref guid)}.Shipping|Any CPU.Build.0 = Shipping|Any CPU");
-			_postConfigs.Add($"{FormatGuid(ref guid)}.Shipping Editor|Any CPU.ActiveCfg = Shipping Editor|Any CPU");
-			_postConfigs.Add($"{FormatGuid(ref guid)}.Shipping Editor|Any CPU.Build.0 = Shipping Editor|Any CPU");
 
 			_nestedProjects.Add($"{FormatGuid(ref guid)} = {FormatGuid(ref parentFolderGuid)}");
 		}
@@ -81,11 +77,8 @@ public class SolutionFileBuilder
 @"Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		DebugGame|Any CPU = DebugGame|Any CPU
-		DebugGame Editor|Any CPU = DebugGame Editor|Any CPU
 		Development|Any CPU = Development|Any CPU
-		Development Editor|Any CPU = Development Editor|Any CPU
         Shipping|Any CPU = Shipping|Any CPU
-        Shipping Editor|Any CPU = Shipping Editor|Any CPU
 	EndGlobalSection
 ");
 
@@ -117,7 +110,7 @@ public class SolutionFileBuilder
 	private const string CSPROJ_GUID = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}";
 
 	private Dictionary<Guid, string> _folders = new();
-	private Dictionary<string, Guid> _folderName2Guid = new();
+	private Dictionary<string, Guid> _folderPath2Guid = new();
 	private Dictionary<Guid, string> _projects = new();
 	private List<string> _nestedProjects = new();
 	private List<string> _postConfigs = new();

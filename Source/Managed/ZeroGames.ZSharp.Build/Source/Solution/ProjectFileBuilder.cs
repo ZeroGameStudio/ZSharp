@@ -22,11 +22,8 @@ public class ProjectFileBuilder
 		XmlElement projectNode = BuildProjectNode(doc);
 		BuildPropertyGroupNode(doc, projectNode);
 		BuildPropertyGroupByConfiguration("DebugGame", doc, projectNode);
-		BuildPropertyGroupByConfiguration("DebugGame Editor", doc, projectNode);
 		BuildPropertyGroupByConfiguration("Development", doc, projectNode);
-		BuildPropertyGroupByConfiguration("Development Editor", doc, projectNode);
 		BuildPropertyGroupByConfiguration("Shipping", doc, projectNode);
-		BuildPropertyGroupByConfiguration("Shipping Editor", doc, projectNode);
 		BuildItemGroupNode(doc, projectNode);
 		BuildReferenceNode(doc, projectNode);
 		BuildTargetNode(doc, projectNode);
@@ -77,7 +74,9 @@ public class ProjectFileBuilder
 		XmlElement propertyGroupNode = doc.CreateElement("PropertyGroup");
 		void Append(string childName, string childInnerText) => AppendSimpleChild(doc, propertyGroupNode, childName, childInnerText);
 		Append("ProjectName", _project.Name);
-		Append("TargetFramework", "net8.0");
+		Append("TargetFramework", _project.IsRoslynComponent ? "netstandard2.0" : (_project.TargetFramework ?? "net8.0"));
+		Append("LangVersion", _project.LanguageVersion ?? "12");
+		Append("RootNamespace", _project.RootNamespace ?? _project.Name);
 		Append("ImplicitUsings", "disable");
 		Append("Nullable", _project.IsNullable ? "enable" : "disable");
 		Append("AllowUnsafeBlocks", _project.IsUnsafeBlockEnabled.ToString().ToLower());
@@ -86,6 +85,10 @@ public class ProjectFileBuilder
 		Append("AssemblyVersion", _project.AssemblyVersion);
 		Append("FileVersion", _project.FileVersion);
 		Append("NeutralLanguage", _project.NeutralLanguage);
+		if (_project.IsRoslynComponent)
+		{
+			Append("IsRoslynComponent", "true");
+		}
 
 		List<string> finalWarningsToErros = [.._project.WarningsAsErrors];
 		if (_project.IsStrongRestrictedNullable)
@@ -95,7 +98,7 @@ public class ProjectFileBuilder
 
 		finalWarningsToErros.Insert(0, "$(WarningsAsErrors)");
 		Append("WarningsAsErrors", string.Join(';', finalWarningsToErros));
-		Append("Configurations", "DebugGame;DebugGame Editor;Development;Development Editor;Shipping;Shipping Editor");
+		Append("Configurations", "DebugGame;Development;Shipping");
 		Append("Platforms", "AnyCPU");
 		Append("UnrealProjectDir", _unrealProjectDir);
 		Append("ZSharpProjectDir", $"{_unrealProjectDir}/Intermediate/ZSharp/ProjectFiles");
@@ -117,17 +120,17 @@ public class ProjectFileBuilder
 		void Append(string childName, string childInnerText) => AppendSimpleChild(doc, propertyGroupNode, childName, childInnerText);
 		Append("Optimize", config switch
 		{
-			"DebugGame" or "DebugGame Editor" => "false",
+			"DebugGame" => "false",
 			_ => "true"
 		});
 		Append("DebugSymbols", config switch
 		{
-			"Shipping" or "Shipping Editor" => "false",
+			"Shipping" => "false",
 			_ => "true"
 		});
 		Append("DebugType", config switch
 		{
-			"Shipping" or "Shipping Editor" => "none",
+			"Shipping" => "none",
 			_ => "embedded"
 		});
 

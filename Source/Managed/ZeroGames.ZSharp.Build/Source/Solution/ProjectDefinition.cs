@@ -22,6 +22,8 @@ public class ProjectDefinition
 	public bool IsPrecompiled { get; init; } = false;
 	public bool IsShared { get; init; } = false;
 	public bool IsRoslynComponent { get; init; } = false;
+	public bool UsesZSharpAnalyzer { get; init; } = true;
+	public bool ForceNoEmitSourceGenerator { get; init; } = false;
 
 	public string Authors { get; init; } = string.Empty;
 	public string Company { get; init; } = string.Empty;
@@ -33,6 +35,8 @@ public class ProjectDefinition
 
 	public List<string> ProjectReferences { get; init; } = new();
 	public List<string> ExternalReferences { get; init; } = new();
+	public List<string> ProjectAnalyzerReferences { get; init; } = new();
+	public List<string> ExternalAnalyzerReferences { get; init; } = new();
 	public List<string> Usings { get; init; } = new();
 	public Dictionary<string, string> Aliases { get; init; } = new();
 

@@ -187,6 +187,26 @@ public class ProjectFileBuilder
 			itemGroupNode.AppendChild(referenceNode);
 		}
 
+		List<string> finalProjectAnalyzerReferences = [.._project.ProjectAnalyzerReferences];
+		if (_project.UsesZSharpAnalyzer)
+		{
+			finalProjectAnalyzerReferences.Add("ZeroGames.ZSharp.Analyzer");
+		}
+
+		if (_project.ProjectReferences.Contains("ZeroGames.ZSharp.Emit") && !_project.ForceNoEmitSourceGenerator)
+		{
+			finalProjectAnalyzerReferences.Add("ZeroGames.ZSharp.Emit.SourceGenerator");
+		}
+		
+		foreach (var reference in finalProjectAnalyzerReferences)
+		{
+			XmlElement referenceNode = doc.CreateElement("ProjectReference");
+			referenceNode.SetAttribute("Include", $"$(ZSharpProjectDir)/{reference}/{reference}.csproj");
+			referenceNode.SetAttribute("OutputItemType", "Analyzer");
+			referenceNode.SetAttribute("ReferenceOutputAssembly", "false");
+			itemGroupNode.AppendChild(referenceNode);
+		}
+
 		List<string> finalExternalReferences = [.._project.ExternalReferences];
 		foreach (var reference in finalExternalReferences)
 		{
@@ -196,6 +216,23 @@ public class ProjectFileBuilder
 
 			XmlElement referenceNode = doc.CreateElement("Reference");
 			referenceNode.SetAttribute("Include", dllName);
+			XmlElement hintPathNode = doc.CreateElement("HintPath");
+			hintPathNode.InnerText = dllPath;
+			referenceNode.AppendChild(hintPathNode);
+			itemGroupNode.AppendChild(referenceNode);
+		}
+		
+		List<string> finalExternalAnalyzerReferences = [.._project.ExternalAnalyzerReferences];
+		foreach (var reference in finalExternalAnalyzerReferences)
+		{
+			string postfix = reference.EndsWith(".dll") ? string.Empty : ".dll";
+			string dllPath = $"$(SourceDir)/{reference}{postfix}";
+			string dllName = Path.GetFileNameWithoutExtension(dllPath);
+
+			XmlElement referenceNode = doc.CreateElement("Reference");
+			referenceNode.SetAttribute("Include", dllName);
+			referenceNode.SetAttribute("OutputItemType", "Analyzer");
+			referenceNode.SetAttribute("ReferenceOutputAssembly", "false");
 			XmlElement hintPathNode = doc.CreateElement("HintPath");
 			hintPathNode.InnerText = dllPath;
 			referenceNode.AppendChild(hintPathNode);
@@ -227,6 +264,11 @@ public class ProjectFileBuilder
 	private XmlElement BuildTargetNode(XmlDocument doc, XmlElement projectNode)
 	{
 		XmlElement targetNode = doc.CreateElement("Target");
+		
+		if (_project.IsRoslynComponent)
+		{
+			return targetNode;
+		}
 		
 		void AddCopyTarget(string targetDir)
 		{

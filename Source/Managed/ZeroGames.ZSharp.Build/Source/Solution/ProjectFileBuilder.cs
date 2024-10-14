@@ -188,14 +188,17 @@ public class ProjectFileBuilder
 		}
 
 		List<string> finalProjectAnalyzerReferences = [.._project.ProjectAnalyzerReferences];
-		if (_project.UsesZSharpAnalyzer)
+		if (!_project.IsRoslynComponent)
 		{
-			finalProjectAnalyzerReferences.Add("ZeroGames.ZSharp.Analyzer");
-		}
+			if (_project.UsesZSharpAnalyzer)
+			{
+				finalProjectAnalyzerReferences.Add("ZeroGames.ZSharp.Analyzer");
+			}
 
-		if (_project.ProjectReferences.Contains("ZeroGames.ZSharp.Emit") && !_project.ForceNoEmitSourceGenerator)
-		{
-			finalProjectAnalyzerReferences.Add("ZeroGames.ZSharp.Emit.SourceGenerator");
+			if (_project.ProjectReferences.Contains("ZeroGames.ZSharp.Emit") && !_project.ForceNoEmitSourceGenerator)
+			{
+				finalProjectAnalyzerReferences.Add("ZeroGames.ZSharp.Emit.SourceGenerator");
+			}
 		}
 		
 		foreach (var reference in finalProjectAnalyzerReferences)

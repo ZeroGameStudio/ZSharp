@@ -88,6 +88,7 @@ public class ProjectFileBuilder
 		if (_project.IsRoslynComponent)
 		{
 			Append("IsRoslynComponent", "true");
+			Append("EnforceExtendedAnalyzerRules", "true");
 		}
 
 		List<string> finalWarningsToErros = [.._project.WarningsAsErrors];
@@ -178,6 +179,25 @@ public class ProjectFileBuilder
 	private XmlElement BuildReferenceNode(XmlDocument doc, XmlElement projectNode)
 	{
 		XmlElement itemGroupNode = doc.CreateElement("ItemGroup");
+
+		if (_project.IsRoslynComponent)
+		{
+			{
+				XmlElement referenceNode = doc.CreateElement("PackageReference");
+				referenceNode.SetAttribute("Include", "Microsoft.CodeAnalysis.CSharp");
+				referenceNode.SetAttribute("Version", "4.11.0");
+				referenceNode.SetAttribute("PrivateAssets", "all");
+				itemGroupNode.AppendChild(referenceNode);
+			}
+			
+			{
+				XmlElement referenceNode = doc.CreateElement("PackageReference");
+				referenceNode.SetAttribute("Include", "Microsoft.CodeAnalysis.Analyzers");
+				referenceNode.SetAttribute("Version", "3.11.0");
+				referenceNode.SetAttribute("PrivateAssets", "all");
+				itemGroupNode.AppendChild(referenceNode);
+			}
+		}
 
 		List<string> finalProjectReferences = [.._project.ProjectReferences];
 		foreach (var reference in finalProjectReferences)

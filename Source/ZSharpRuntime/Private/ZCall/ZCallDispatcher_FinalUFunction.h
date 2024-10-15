@@ -7,11 +7,13 @@
 
 namespace ZSharp
 {
-	class FZCallDispatcher_UFunction : public IZCallDispatcher
+	class FZCallDispatcher_FinalUFunction : public IZCallDispatcher
 	{
 
 	public:
-		explicit FZCallDispatcher_UFunction(const FString& name);
+		explicit FZCallDispatcher_FinalUFunction(const FString& name)
+			: Name(name)
+			, Path(name.RightChop(5)){}
 		
 	public:
 		virtual const FString& GetName() const override { return Name; }
@@ -22,8 +24,8 @@ namespace ZSharp
 
 	private:
 		FString Name;
-		FString ClassPath;
-		FName FunctionName;
+		FString Path;
+		mutable TWeakObjectPtr<UFunction> FinalFunction;
 		mutable FZFunctionVisitorHandle Function;
 		
 	};

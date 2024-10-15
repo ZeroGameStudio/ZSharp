@@ -18,6 +18,7 @@ namespace ZSharp
 	public:
 		// This is called from ZCallDispatcher_UFunction to support call UFunction from managed side.
 		EZCallErrorCode InvokeUFunction(FZCallBuffer* buffer) const;
+		EZCallErrorCode InvokeUFunction(FZCallBuffer* buffer, const UFunction* finalFunction) const;
 		// These three is called from SelfDescriptiveDelegates to support execute/broadcast dynamic delegate from managed side.
 		EZCallErrorCode InvokeScriptDelegate(FZCallBuffer* buffer) const;
 		EZCallErrorCode InvokeMulticastInlineScriptDelegate(FZCallBuffer* buffer) const;
@@ -28,6 +29,9 @@ namespace ZSharp
 		EZCallErrorCode InvokeZCall(UObject* object, FFrame& stack, RESULT_DECL) const;
 		// This is called from ManagedDelegateProxy to support call managed code via dynamic delegate.
 		EZCallErrorCode InvokeZCall(UObject* object, void* params) const;
+
+	private:
+		EZCallErrorCode InternalInvokeUFunction(FZCallBuffer* buffer, UObject* object, const UFunction* function) const;
 
 	private:
 		static void StaticClearAlcSensitiveStates();

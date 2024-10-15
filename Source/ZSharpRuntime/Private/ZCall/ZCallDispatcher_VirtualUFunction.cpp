@@ -1,13 +1,11 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZCallDispatcher_UFunction.h"
+#include "ZCallDispatcher_VirtualUFunction.h"
 
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
-#include "ZCall/ZCallBuffer.h"
-#include "ZCall/ZCallBufferSlotEncoder.h"
 
-ZSharp::FZCallDispatcher_UFunction::FZCallDispatcher_UFunction(const FString& name)
+ZSharp::FZCallDispatcher_VirtualUFunction::FZCallDispatcher_VirtualUFunction(const FString& name)
 	: Name(name)
 {
 	FString functionName;
@@ -15,7 +13,7 @@ ZSharp::FZCallDispatcher_UFunction::FZCallDispatcher_UFunction(const FString& na
 	FunctionName = FName { functionName };
 }
 
-ZSharp::EZCallErrorCode ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffer* buffer) const
+ZSharp::EZCallErrorCode ZSharp::FZCallDispatcher_VirtualUFunction::Dispatch(FZCallBuffer* buffer) const
 {
 	if (!Function && !InvalidateCache())
 	{
@@ -25,7 +23,7 @@ ZSharp::EZCallErrorCode ZSharp::FZCallDispatcher_UFunction::Dispatch(FZCallBuffe
 	return Function->InvokeUFunction(buffer);
 }
 
-bool ZSharp::FZCallDispatcher_UFunction::InvalidateCache() const
+bool ZSharp::FZCallDispatcher_VirtualUFunction::InvalidateCache() const
 {
 	// @FIXME: Can we just find this function since it must have already loaded?
 	const UClass* cls = LoadObject<UClass>(nullptr, *ClassPath);

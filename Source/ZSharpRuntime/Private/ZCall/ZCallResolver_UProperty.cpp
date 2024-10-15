@@ -7,11 +7,12 @@
 
 ZSharp::IZCallDispatcher* ZSharp::FZCallResolver_UProperty::Resolve(const FString& name) const
 {
+	static const FRegexPattern GPattern { "^(/.+)+\\..+:.+$" };
+	
 	if (name.StartsWith("up:/"))
 	{
 		FString propertyName = name.RightChop(4);
-		FRegexPattern pattern{ "^(/.+)+\\..+:.+$" };
-		FRegexMatcher matcher{ pattern, propertyName };
+		FRegexMatcher matcher { GPattern, propertyName };
 		if (matcher.FindNext())
 		{
 			return new FZCallDispatcher_UProperty { name };

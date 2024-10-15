@@ -17,7 +17,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 	check(!bIsDelegate);
 
 	FZCallBuffer& buf = *buffer;
-	UFunction* func = Function.Get();
+	const UFunction* func = Function.Get();
 	UObject* self;
 	if (!bIsStatic)
 	{
@@ -39,17 +39,31 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 	check(self);
 	check(self->IsA(func->GetOuterUClass()));
 
-	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
+	return InternalInvokeUFunction(buffer, self, func);
+}
 
-	FillParams(params, buf);
+ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer* buffer, const UFunction* finalFunction) const
+{
+	check(IsInGameThread());
+	check(bAvailable);
+	check(!bIsDelegate);
+	check(!bIsStatic);
 
-	self->ProcessEvent(func, params);
+	FZCallBuffer& buf = *buffer;
+	const UFunction* proto = Function.Get();
+	UObject* self = TZCallBufferSlotEncoder<UObject*>::Decode(buf[0]);
+	if (!self)
+	{
+		return EZCallErrorCode::BufferError;
+	}
+	
+	check(finalFunction->IsChildOf(proto));
+	check(finalFunction->IsSignatureCompatibleWith(proto));
 
-	CopyOut(buf, params);
+	check(self);
+	check(self->IsA(finalFunction->GetOuterUClass()));
 
-	params = nullptr;
-
-	return EZCallErrorCode::Succeed;
+	return InternalInvokeUFunction(buffer, self, finalFunction);
 }
 
 ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBuffer* buffer) const
@@ -343,6 +357,23 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 	}
 
 	return res;
+}
+
+ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InternalInvokeUFunction(FZCallBuffer* buffer, UObject* object, const UFunction* function) const
+{
+	FZCallBuffer& buf = *buffer;
+	
+	void* params = FMemory_Alloca_Aligned(function->ParmsSize, function->MinAlignment);
+
+	FillParams(params, buf);
+
+	object->ProcessEvent(const_cast<UFunction*>(function), params);
+
+	CopyOut(buf, params);
+
+	params = nullptr;
+
+	return EZCallErrorCode::Succeed;
 }
 
 void ZSharp::FZFunctionVisitor::StaticClearAlcSensitiveStates()

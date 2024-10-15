@@ -37,6 +37,7 @@ public class ClassWriter : IDisposable, IAsyncDisposable
 
 #nullable enable
 #pragma warning disable CS0109 // Member does not hide an inherited member; new keyword is not required
+#pragma warning disable CS0628 // New protected member declared in sealed type
 
 {string.Join('\n', NamespaceHelper.LootNamespace(_exportedClass).Where(ns => ns != _exportedClass.Namespace).Select(ns => $"using {ns};"))}
 

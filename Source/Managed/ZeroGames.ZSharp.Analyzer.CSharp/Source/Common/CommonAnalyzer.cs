@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace UClassAnalyzer;
+namespace ZeroGames.ZSharp.Analyzer.CSharp;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class CommonAnalyzer : DiagnosticAnalyzer

@@ -212,12 +212,24 @@ public class ProjectFileBuilder
 		{
 			if (_project.UsesZSharpAnalyzer)
 			{
-				finalProjectAnalyzerReferences.Add("ZeroGames.ZSharp.Analyzer");
+				string analyzerProjectName = _project.ProjectType switch
+				{
+					EProjectType.CSharp => "ZeroGames.ZSharp.Analyzer.CSharp",
+					EProjectType.VisualBasic => throw new NotImplementedException(),
+					_ => throw new InvalidOperationException()
+				};
+				finalProjectAnalyzerReferences.Add(analyzerProjectName);
 			}
 
 			if (_project.ProjectReferences.Contains("ZeroGames.ZSharp.Emit") && !_project.ForceNoEmitSourceGenerator)
 			{
-				finalProjectAnalyzerReferences.Add("ZeroGames.ZSharp.Emit.SourceGenerator");
+				string sourceGeneratorProjectName = _project.ProjectType switch
+				{
+					EProjectType.CSharp => "ZeroGames.ZSharp.Emit.SourceGenerator.CSharp",
+					EProjectType.VisualBasic => throw new NotImplementedException(),
+					_ => throw new InvalidOperationException()
+				};
+				finalProjectAnalyzerReferences.Add(sourceGeneratorProjectName);
 			}
 		}
 		

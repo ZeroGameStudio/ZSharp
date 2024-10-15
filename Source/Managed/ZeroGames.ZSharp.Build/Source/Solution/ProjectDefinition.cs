@@ -4,6 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace ZeroGames.ZSharp.Build.Solution;
 
+public enum EProjectType
+{
+	CSharp,
+	VisualBasic,
+}
+
 public class ProjectDefinition
 {
 	[JsonIgnore] public string Name { get; set; } = string.Empty;
@@ -44,11 +50,18 @@ public class ProjectDefinition
 
 	public HashSet<string> Tags { get; init; } = new();
 
-	public string ProjectFileExtension => Language?.ToLower() switch
+	public EProjectType ProjectType => Language?.ToLower() switch
 	{
-		"c#" or "cs" or "csharp" => ".csproj",
-		null => ".csproj",
+		null or "c#" or "cs" or "csharp" => EProjectType.CSharp,
+		"vb" or "visualbasic" => EProjectType.VisualBasic,
 		_ => throw new ArgumentException($"Unknown language: {Language}")
+	};
+
+	public string ProjectFileExtension => ProjectType switch
+	{
+		EProjectType.CSharp => ".csproj",
+		EProjectType.VisualBasic => ".vbproj",
+		_ => throw new ArgumentException($"Unknown project type: {ProjectType}")
 	};
 
 	public string ProjectFileName => $"{Name}{ProjectFileExtension}";

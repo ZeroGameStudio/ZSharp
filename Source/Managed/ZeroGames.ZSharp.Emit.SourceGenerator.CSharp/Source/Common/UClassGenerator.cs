@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace ZeroGames.ZSharp.Emit.SourceGenerator;
+namespace ZeroGames.ZSharp.Emit.SourceGenerator.CSharp;
 
 public class UClassSyntaxWalker : CSharpSyntaxWalker
 {

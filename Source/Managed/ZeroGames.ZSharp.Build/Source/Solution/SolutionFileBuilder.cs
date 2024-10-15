@@ -29,6 +29,7 @@ public class SolutionFileBuilder
 		string projectGuid = projectFileExtension switch
 		{
 			".csproj" => CSPROJ_GUID,
+			".vbproj" => throw new NotImplementedException(),
 			_ => throw new InvalidOperationException($"Unknown project type: {projectFileExtension}")
 		};
 		Guid guid = Guid.NewGuid();

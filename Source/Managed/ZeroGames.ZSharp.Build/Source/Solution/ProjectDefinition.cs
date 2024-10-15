@@ -28,6 +28,7 @@ public class ProjectDefinition
 	public bool IsPrecompiled { get; init; } = false;
 	public bool IsShared { get; init; } = false;
 	public bool IsRoslynComponent { get; init; } = false;
+	public bool HasAnalyzerReleaseTracking { get; init; } = false;
 	public bool UsesZSharpAnalyzer { get; init; } = true;
 	public bool ForceNoEmitSourceGenerator { get; init; } = false;
 

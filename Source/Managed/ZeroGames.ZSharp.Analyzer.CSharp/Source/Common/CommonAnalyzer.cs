@@ -11,15 +11,10 @@ namespace ZeroGames.ZSharp.Analyzer.CSharp;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class CommonAnalyzer : DiagnosticAnalyzer
 {
+    
     public const string DIAGNOSTIC_ID = "ZS0001";
-    private static readonly LocalizableString Title = "UClass class must be partial and not abstract or static";
-    private static readonly LocalizableString MessageFormat = "Class '{0}' marked with [UClass] must be partial and cannot be abstract or static";
-    private static readonly LocalizableString Description = "Classes marked with [UClass] must follow specific rules: they must be partial and cannot be abstract or static.";
-    private const string Category = "Usage";
 
-    private static DiagnosticDescriptor Rule = new(DIAGNOSTIC_ID, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [ _rule ];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -44,7 +39,7 @@ public class CommonAnalyzer : DiagnosticAnalyzer
         var isPartial = classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword);
         if (!isPartial)
         {
-            var diagnostic = Diagnostic.Create(Rule, classDeclaration.Identifier.GetLocation(), classDeclaration.Identifier.Text);
+            var diagnostic = Diagnostic.Create(_rule, classDeclaration.Identifier.GetLocation(), classDeclaration.Identifier.Text);
             context.ReportDiagnostic(diagnostic);
         }
 
@@ -52,10 +47,18 @@ public class CommonAnalyzer : DiagnosticAnalyzer
                                  classDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword);
         if (isAbstractOrStatic)
         {
-            var diagnostic = Diagnostic.Create(Rule, classDeclaration.Identifier.GetLocation(), classDeclaration.Identifier.Text);
+            var diagnostic = Diagnostic.Create(_rule, classDeclaration.Identifier.GetLocation(), classDeclaration.Identifier.Text);
             context.ReportDiagnostic(diagnostic);
         }
     }
+    
+    private const string CATEGORY = "Usage";
+    private static readonly LocalizableString _title = "UClass class must be partial and not abstract or static";
+    private static readonly LocalizableString _messageFormat = "Class '{0}' marked with [UClass] must be partial and cannot be abstract or static";
+    private static readonly LocalizableString _description = "Classes marked with [UClass] must follow specific rules: they must be partial and cannot be abstract or static.";
+
+    private static readonly DiagnosticDescriptor _rule = new(DIAGNOSTIC_ID, _title, _messageFormat, CATEGORY, DiagnosticSeverity.Error, isEnabledByDefault: true, description: _description);
+    
 }
 
 

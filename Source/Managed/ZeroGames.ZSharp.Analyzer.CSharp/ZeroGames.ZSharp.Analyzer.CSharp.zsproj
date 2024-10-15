@@ -1,5 +1,6 @@
 {
 	"IsRoslynComponent": true,
+	"HasAnalyzerReleaseTracking": true,
 	"Folder": "ZSharp/Analyzer",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",

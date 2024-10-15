@@ -11,23 +11,6 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace ZeroGames.ZSharp.Emit.SourceGenerator.CSharp;
 
-public class UClassSyntaxWalker : CSharpSyntaxWalker
-{
-
-	public override void VisitClassDeclaration(ClassDeclarationSyntax node)
-	{
-		if (node.AttributeLists.Any(al => al.Attributes.Any(a => a.Name.ToString() == "UClass" || a.Name.ToString() == "UClassAttribute")))
-		{
-			_uclassDeclarations.Add(node);
-		}
-	}
-	
-	public IReadOnlyList<ClassDeclarationSyntax> UClassDeclarations => _uclassDeclarations;
-
-	private List<ClassDeclarationSyntax> _uclassDeclarations = new();
-
-}
-
 public class UClassSyntaxReceiver : ISyntaxContextReceiver
 {
 	

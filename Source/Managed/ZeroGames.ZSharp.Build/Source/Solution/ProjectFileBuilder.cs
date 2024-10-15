@@ -284,6 +284,21 @@ public class ProjectFileBuilder
 		contentLinkNode.InnerText = $"{_project.Name}.zsproj";
 		contentNode.AppendChild(contentLinkNode);
 		itemGroupNode.AppendChild(contentNode);
+
+		if (_project is { IsRoslynComponent: true, HasAnalyzerReleaseTracking: true })
+		{
+			{
+				XmlElement additionalNode = doc.CreateElement("AdditionalFiles");
+				additionalNode.SetAttribute("Include", "$(SourceDir)/AnalyzerReleases.Shipped.md");
+				itemGroupNode.AppendChild(additionalNode);
+			}
+			
+			{
+				XmlElement additionalNode = doc.CreateElement("AdditionalFiles");
+				additionalNode.SetAttribute("Include", "$(SourceDir)/AnalyzerReleases.Unshipped.md");
+				itemGroupNode.AppendChild(additionalNode);
+			}
+		}
 		
 		if (_project.HasGlue)
 		{

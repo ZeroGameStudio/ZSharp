@@ -52,7 +52,7 @@ private:
 	UPROPERTY(Config, EditAnywhere, Category = "Export")
 	TArray<FString> ForceNotExportFieldPaths;
 
-	UPROPERTY(VisibleAnywhere, Category = "Export")
+	UPROPERTY(Transient, VisibleAnywhere, Category = "Export")
 	TSet<FString> IntrinsicForceNotExportFieldPaths;
 
 private:

@@ -36,6 +36,8 @@ public:
 	const FZModuleMappingContext* GetModuleMappingContext(const FString& module) const;
 	void ForeachMappedModule(TFunctionRef<void(const FString&, const FZModuleMappingContext&)> action) const;
 
+	FString GetFieldAlias(const FString& path) const;
+
 #if WITH_EDITORONLY_DATA
 private:
 	UFUNCTION()
@@ -57,6 +59,12 @@ private:
 
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Mapping")
 	TMap<FString, FZModuleMappingContext> IntrinsicModuleAssemblyMapping;
+
+	UPROPERTY(Config, EditAnywhere, Category = "Aliasing")
+	TMap<FString, FString> FieldAliasMap;
+
+	UPROPERTY(Transient, VisibleAnywhere, Category = "Aliasing")
+	TMap<FString, FString> IntrinsicFieldAliasMap;
 	
 };
 

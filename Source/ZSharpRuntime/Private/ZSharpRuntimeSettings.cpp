@@ -13,6 +13,21 @@ UZSharpRuntimeSettings::UZSharpRuntimeSettings()
 	IntrinsicModuleAssemblyMapping.Emplace("InputCore", { EngineAssemblyName, false });
 	
 	IntrinsicModuleAssemblyMapping.Emplace("Engine", { EngineAssemblyName, false });
+
+	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Object", "UnrealObject");
+
+	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Field", "UnrealField");
+	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Struct", "UnrealStruct");
+	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Class", "UnrealClass");
+	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.ScriptStruct", "UnrealScriptStruct");
+	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Enum", "UnrealEnum");
+	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Interface", "UnrealInterface");
+
+	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Function", "UnrealFunction");
+	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Property", "UnrealProperty");
+
+	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Guid", "UnrealGuid");
+	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.DateTime", "UnrealDateTime");
 }
 
 const FZModuleMappingContext* UZSharpRuntimeSettings::GetModuleMappingContext(const FString& module) const
@@ -37,6 +52,17 @@ void UZSharpRuntimeSettings::ForeachMappedModule(TFunctionRef<void(const FString
 	{
 		action(pair.Key, pair.Value);
 	}
+}
+
+FString UZSharpRuntimeSettings::GetFieldAlias(const FString& path) const
+{
+	const FString* alias = IntrinsicFieldAliasMap.Find(path);
+	if (!alias)
+	{
+		alias = FieldAliasMap.Find(path);
+	}
+
+	return alias ? *alias : FString{};
 }
 
 #if WITH_EDITORONLY_DATA

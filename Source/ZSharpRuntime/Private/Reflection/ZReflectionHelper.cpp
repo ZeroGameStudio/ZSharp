@@ -44,24 +44,6 @@ namespace ZReflectionHelper_Private
 
 FString ZSharp::FZReflectionHelper::GetFieldAliasedName(FFieldVariant field)
 {
-	static const TMap<FString, FString> GAliasMap
-	{
-		{ "Object", "UnrealObject" },
-		
-		{ "Field", "UnrealField" },
-		{ "Struct", "UnrealStruct" },
-		{ "Class", "UnrealClass" },
-		{ "Interface", "UnrealInterface" },
-		{ "ScriptStruct", "UnrealScriptStruct" },
-		{ "Enum", "UnrealEnum" },
-		
-		{ "Function", "UnrealFunction" },
-		{ "Property", "UnrealProperty" },
-
-		{ "Guid", "UnrealGuid" },
-		{ "DateTime", "UnrealDateTime" },
-	};
-
 	if (!field)
 	{
 		return {};
@@ -69,9 +51,10 @@ FString ZSharp::FZReflectionHelper::GetFieldAliasedName(FFieldVariant field)
 
 	// Aliasing.
 	FString name = field.GetName();
-	if (const FString* alias = GAliasMap.Find(name))
+	FString alias = GetDefault<UZSharpRuntimeSettings>()->GetFieldAlias(field.GetPathName());
+	if (!alias.IsEmpty())
 	{
-		name = *alias;
+		name = alias;
 	}
 
 	// Apply rules for specific field type.
@@ -82,7 +65,7 @@ FString ZSharp::FZReflectionHelper::GetFieldAliasedName(FFieldVariant field)
 			name.InsertAt(0, 'I');
 		}
 
-		if (cls->HasAllClassFlags(CLASS_Deprecated))
+		if (cls->HasAllClassFlags(CLASS_Deprecated) && !cls->GetName().ToUpper().EndsWith("_DEPRECATED"))
 		{
 			name.Append("_DEPRECATED");
 		}
@@ -110,7 +93,7 @@ FString ZSharp::FZReflectionHelper::GetFieldAliasedName(FFieldVariant field)
 			name.Append("_EDITORONLY");
 		}
 
-		if (property->HasAllPropertyFlags(CPF_Deprecated))
+		if (property->HasAllPropertyFlags(CPF_Deprecated) && !property->GetName().ToUpper().EndsWith("_DEPRECATED"))
 		{
 			name.Append("_DEPRECATED");
 		}

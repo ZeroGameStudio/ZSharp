@@ -20,36 +20,10 @@ ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Cr
 
 FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 {
-	FString name = Property->GetName();
+	FString name = FZReflectionHelper::GetFieldAliasedName(Property);
 	if (Index)
 	{
 		name.AppendInt(Index);
-	}
-	
-	const UStruct* owner = Property->GetOwnerStruct();
-	TArray structsToCheck { owner };
-	for (TFieldIterator<UFunction> it(owner, EFieldIteratorFlags::ExcludeSuper); it; ++it)
-	{
-		if (it->HasAllFunctionFlags(FUNC_Delegate))
-		{
-			structsToCheck.Emplace(*it);
-		}
-	}
-	
-	for (const auto structToCheck : structsToCheck)
-	{
-		FString nameToCheck;
-		FString alias = FZReflectionHelper::GetUFieldAliasedName(structToCheck);
-		if (!alias.Split(".", nullptr, &nameToCheck, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
-		{
-			nameToCheck = alias;
-		}
-	
-		if (name == nameToCheck)
-		{
-			name.AppendInt(0);
-			break;
-		}
 	}
 	
 	return name;

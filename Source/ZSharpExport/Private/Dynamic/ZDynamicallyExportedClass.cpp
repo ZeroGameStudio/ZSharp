@@ -16,7 +16,7 @@ ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(c
 		return nullptr;
 	}
 
-	if (!FZReflectionHelper::IsUFieldModuleMapped(ustruct))
+	if (!FZReflectionHelper::IsFieldModuleMapped(ustruct))
 	{
 		return nullptr;
 	}
@@ -33,12 +33,12 @@ ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(c
 
 FString ZSharp::FZDynamicallyExportedClass::GetName() const
 {
-	return FZReflectionHelper::GetUFieldAliasedName(Struct);
+	return FZReflectionHelper::GetFieldFullAliasedName(Struct);
 }
 
 FString ZSharp::FZDynamicallyExportedClass::GetModule() const
 {
-	return FZReflectionHelper::GetUFieldModuleName(Struct);
+	return FZReflectionHelper::GetFieldModuleName(Struct);
 }
 
 FString ZSharp::FZDynamicallyExportedClass::GetUnrealFieldPath() const

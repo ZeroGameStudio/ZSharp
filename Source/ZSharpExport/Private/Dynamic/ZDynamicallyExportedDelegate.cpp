@@ -31,12 +31,12 @@ ZSharp::FZDynamicallyExportedDelegate* ZSharp::FZDynamicallyExportedDelegate::Cr
 
 FString ZSharp::FZDynamicallyExportedDelegate::GetName() const
 {
-	return FZReflectionHelper::GetUFieldAliasedName(Signature);
+	return FZReflectionHelper::GetFieldFullAliasedName(Signature);
 }
 
 FString ZSharp::FZDynamicallyExportedDelegate::GetModule() const
 {
-	return FZReflectionHelper::GetUFieldModuleName(Signature);
+	return FZReflectionHelper::GetFieldModuleName(Signature);
 }
 
 FString ZSharp::FZDynamicallyExportedDelegate::GetUnrealFieldPath() const

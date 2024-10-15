@@ -5,11 +5,44 @@
 
 #include "ZSharpRuntimeSettings.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveMulticastSparseScriptDelegate.h"
 #include "Trait/ZManagedTypeInfo.h"
 #include "UObject/PropertyOptional.h"
 
-FString ZSharp::FZReflectionHelper::GetUFieldAliasedName(const UField* field, bool isShortName)
+namespace ZReflectionHelper_Private
+{
+	/**
+	 * Single word name -> Add 0.
+	 * Multiple word name -> Insert _.
+	 * Example:
+	 * Equals -> Equals0
+	 * GetType -> Get_Type
+	 */
+	static void DeconflictName(FString& name)
+	{
+		TArray<int32> newWordIndices;
+		for (int32 i = name.Len() - 1; i > 0; --i)
+		{
+			if (FChar::IsUpper(name[i]))
+			{
+				newWordIndices.Emplace(i);
+			}
+		}
+
+		if (!newWordIndices.IsEmpty())
+		{
+			for (const auto& newWordIndex : newWordIndices)
+			{
+				name.InsertAt(newWordIndex, "_");
+			}
+		}
+		else
+		{
+			name.AppendInt(0);
+		}
+	}
+}
+
+FString ZSharp::FZReflectionHelper::GetFieldAliasedName(FFieldVariant field)
 {
 	static const TMap<FString, FString> GAliasMap
 	{
@@ -34,47 +67,127 @@ FString ZSharp::FZReflectionHelper::GetUFieldAliasedName(const UField* field, bo
 		return {};
 	}
 
-	FString name = field->GetName();
+	// Aliasing.
+	FString name = field.GetName();
 	if (const FString* alias = GAliasMap.Find(name))
 	{
 		name = *alias;
 	}
-	
-	if (auto cls = Cast<UClass>(field))
+
+	// Apply rules for specific field type.
+	if (const auto cls = field.Get<UClass>())
 	{
 		if (cls->HasAllClassFlags(CLASS_Interface))
 		{
 			name.InsertAt(0, 'I');
 		}
+
+		if (cls->HasAllClassFlags(CLASS_Deprecated))
+		{
+			name.Append("_DEPRECATED");
+		}
 	}
-	else if (auto func = Cast<UFunction>(field))
+	else if (const auto delegate = field.Get<UDelegateFunction>())
 	{
 		static const FString GDelegatePostfix = "__DelegateSignature";
-		if (func->HasAllFunctionFlags(FUNC_Delegate) && name.EndsWith(GDelegatePostfix))
+		if (delegate->HasAllFunctionFlags(FUNC_Delegate) && name.EndsWith(GDelegatePostfix))
 		{
 			name.LeftChopInline(GDelegatePostfix.Len());
 		}
 	}
-
-	if (!isShortName)
+	// IMPORTANT: This must be under delegate.
+	else if (const auto function = field.Get<UFunction>())
 	{
-		if (const UField* outer = field->GetTypedOuter<UField>())
+		if (function->HasAllFunctionFlags(FUNC_EditorOnly))
 		{
-			name = GetUFieldAliasedName(outer).Append(".").Append(name);
+			name.Append("_EDITORONLY");
 		}
+	}
+	else if (const auto property = field.Get<FProperty>())
+	{
+		if (property->HasAllPropertyFlags(CPF_EditorOnly))
+		{
+			name.Append("_EDITORONLY");
+		}
+
+		if (property->HasAllPropertyFlags(CPF_Deprecated))
+		{
+			name.Append("_DEPRECATED");
+		}
+	}
+	
+	// Check conflict with owner if field is member property or member function.
+	bool conflicts = false;
+	if (field.IsA<UFunction>() && !field.IsA<UDelegateFunction>() || field.IsA<FProperty>())
+	{
+		// Owner should always exist.
+		const auto owner = field.GetOwnerVariant().Get<UStruct>();
+		TArray structsToCheck { owner };
+		for (TFieldIterator<UDelegateFunction> it(owner); it; ++it)
+		{
+			if (*it != field.Get<UDelegateFunction>())
+			{
+				structsToCheck.Emplace(*it);
+			}
+		}
+	
+		for (const auto structToCheck : structsToCheck)
+		{
+			if (name == GetFieldAliasedName(structToCheck))
+			{
+				conflicts = true;
+				break;
+			}
+		}
+	}
+
+	// Finally check conflict with managed root class System.Object.
+	if (!conflicts)
+	{
+		static const TSet<FString> GManagedConflicts
+		{
+			"GetType",
+			"GetHashCode",
+			"ToString",
+			"MemberwiseClone",
+			"Equals",
+			"ReferenceEquals",
+			"Finalize"
+		};
+
+		if (GManagedConflicts.Contains(name))
+		{
+			conflicts = true;
+		}
+	}
+
+	if (conflicts)
+	{
+		ZReflectionHelper_Private::DeconflictName(name);
 	}
 
 	return name;
 }
 
-FString ZSharp::FZReflectionHelper::GetUFieldAssemblyName(const UField* field)
+FString ZSharp::FZReflectionHelper::GetFieldFullAliasedName(FFieldVariant field)
 {
-	const FString moduleName = GetUFieldModuleName(field);
+	FString name = GetFieldAliasedName(field);
+	if (const auto ownerField = field.GetOwnerVariant().Get<UField>())
+	{
+		name = GetFieldFullAliasedName(ownerField).Append(".").Append(name);
+	}
+
+	return name;
+}
+
+FString ZSharp::FZReflectionHelper::GetFieldAssemblyName(FFieldVariant field)
+{
+	const FString moduleName = GetFieldModuleName(field);
 	const FZModuleMappingContext* ctx = GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(moduleName);
 	return ctx ? ctx->AssemblyName : "";
 }
 
-FString ZSharp::FZReflectionHelper::GetUFieldModuleName(const UField* field)
+FString ZSharp::FZReflectionHelper::GetFieldModuleName(FFieldVariant field)
 {
 	if (!field)
 	{
@@ -82,14 +195,14 @@ FString ZSharp::FZReflectionHelper::GetUFieldModuleName(const UField* field)
 	}
 	
 	FString res;
-	const bool suc = field->GetPackage()->GetName().Split("/", nullptr, &res, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+	const bool suc = field.GetOutermost()->GetName().Split("/", nullptr, &res, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
 	check(suc);
 	return res;
 }
 
-bool ZSharp::FZReflectionHelper::IsUFieldModuleMapped(const UField* field)
+bool ZSharp::FZReflectionHelper::IsFieldModuleMapped(FFieldVariant field)
 {
-	return !!GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(GetUFieldModuleName(field));
+	return !!GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(GetFieldModuleName(field));
 }
 
 const UField* ZSharp::FZReflectionHelper::GetUFieldClosestMappedAncestor(const UField* field)
@@ -99,7 +212,7 @@ const UField* ZSharp::FZReflectionHelper::GetUFieldClosestMappedAncestor(const U
 		return nullptr;
 	}
 	
-	if (IsUFieldModuleMapped(field))
+	if (IsFieldModuleMapped(field))
 	{
 		return field;
 	}
@@ -109,7 +222,7 @@ const UField* ZSharp::FZReflectionHelper::GetUFieldClosestMappedAncestor(const U
 	{
 		for (const UStruct* current = strct->GetSuperStruct(); current; current = current->GetSuperStruct())
 		{
-			if (IsUFieldModuleMapped(current))
+			if (IsFieldModuleMapped(current))
 			{
 				return current;
 			}
@@ -122,19 +235,19 @@ const UField* ZSharp::FZReflectionHelper::GetUFieldClosestMappedAncestor(const U
 bool ZSharp::FZReflectionHelper::GetUFieldRuntimeTypeLocator(const UField* field, FZRuntimeTypeLocatorWrapper& outLocator)
 {
 	const UField* ancestor = GetUFieldClosestMappedAncestor(field);
-	const FString moduleName = GetUFieldModuleName(ancestor);
+	const FString moduleName = GetFieldModuleName(ancestor);
 	if (!moduleName.Len())
 	{
 		return false;
 	}
 	
-	outLocator.AssemblyName = GetUFieldAssemblyName(ancestor);
+	outLocator.AssemblyName = GetFieldAssemblyName(ancestor);
 	if (!outLocator.AssemblyName.Len())
 	{
 		return false;
 	}
 
-	FString alias = GetUFieldAliasedName(ancestor);
+	FString alias = GetFieldFullAliasedName(ancestor);
 	alias.ReplaceCharInline('.', '+');
 	outLocator.TypeName = FString::Printf(TEXT("%s.%s.%s"), *outLocator.AssemblyName, *moduleName, *alias);
 

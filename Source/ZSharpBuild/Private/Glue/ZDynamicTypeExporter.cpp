@@ -15,7 +15,7 @@ void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies) co
 	
 	for (TObjectIterator<UEnum> it; it; ++it)
 	{
-		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetUFieldAssemblyName(*it)))
+		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetFieldAssemblyName(*it)))
 		{
 			continue;
 		}
@@ -25,7 +25,7 @@ void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies) co
 
 	for (TObjectIterator<UScriptStruct> it; it; ++it)
 	{
-		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetUFieldAssemblyName(*it)))
+		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetFieldAssemblyName(*it)))
 		{
 			continue;
 		}
@@ -40,7 +40,7 @@ void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies) co
 			continue;
 		}
 		
-		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetUFieldAssemblyName(*it)))
+		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetFieldAssemblyName(*it)))
 		{
 			continue;
 		}
@@ -50,7 +50,7 @@ void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies) co
 
 	for (TObjectIterator<UDelegateFunction> it; it; ++it)
 	{
-		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetUFieldAssemblyName(*it)))
+		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetFieldAssemblyName(*it)))
 		{
 			continue;
 		}

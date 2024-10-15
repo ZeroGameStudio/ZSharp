@@ -14,8 +14,8 @@ FString ZSharp::FZExportHelper::GetUFieldExportKey(const UField* field)
 		return {};
 	}
 	
-	const FString name = FZReflectionHelper::GetUFieldAliasedName(field);
-	const FString module = FZReflectionHelper::GetUFieldModuleName(field);
+	const FString name = FZReflectionHelper::GetFieldFullAliasedName(field);
+	const FString module = FZReflectionHelper::GetFieldModuleName(field);
 	return FString::Printf(TEXT("%s.%s"), *module, *name);
 }
 
@@ -26,14 +26,14 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetUFieldFullyExportedNa
 		return {};
 	}
 	
-	const FString assemblyName = FZReflectionHelper::GetUFieldAssemblyName(field);
-	const FString moduleName = FZReflectionHelper::GetUFieldModuleName(field);
+	const FString assemblyName = FZReflectionHelper::GetFieldAssemblyName(field);
+	const FString moduleName = FZReflectionHelper::GetFieldModuleName(field);
 	if (!assemblyName.Len() || !moduleName.Len())
 	{
 		return {};
 	}
 
-	return { FString::Printf(TEXT("%s.%s"), *assemblyName, *moduleName), FZReflectionHelper::GetUFieldAliasedName(field), field->IsA<UClass>() };
+	return { FString::Printf(TEXT("%s.%s"), *assemblyName, *moduleName), FZReflectionHelper::GetFieldFullAliasedName(field), field->IsA<UClass>() };
 }
 
 ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExportedTypeName(const FProperty* property)

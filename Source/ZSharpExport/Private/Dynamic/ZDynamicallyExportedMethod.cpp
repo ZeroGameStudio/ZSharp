@@ -37,7 +37,7 @@ ZSharp::FZDynamicallyExportedMethod* ZSharp::FZDynamicallyExportedMethod::Create
 
 FString ZSharp::FZDynamicallyExportedMethod::GetName() const
 {
-	return FZReflectionHelper::GetUFieldAliasedName(Function, true);
+	return FZReflectionHelper::GetFieldAliasedName(Function);
 }
 
 ZSharp::EZExportedMethodFlags ZSharp::FZDynamicallyExportedMethod::GetFlags() const

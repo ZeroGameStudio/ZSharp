@@ -13,7 +13,7 @@ ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(con
 		return nullptr;
 	}
 
-	if (!FZReflectionHelper::IsUFieldModuleMapped(uenum))
+	if (!FZReflectionHelper::IsFieldModuleMapped(uenum))
 	{
 		return nullptr;
 	}
@@ -35,7 +35,7 @@ FString ZSharp::FZDynamicallyExportedEnum::GetName() const
 
 FString ZSharp::FZDynamicallyExportedEnum::GetModule() const
 {
-	return FZReflectionHelper::GetUFieldModuleName(Enum);
+	return FZReflectionHelper::GetFieldModuleName(Enum);
 }
 
 FString ZSharp::FZDynamicallyExportedEnum::GetUnrealFieldPath() const

@@ -27,6 +27,8 @@ public class ZSharpExport : ModuleRules
 			new string[]
 			{
 				"Core",
+				
+				"DeveloperSettings",
                 
 				"ZSharpRuntime",
 			}

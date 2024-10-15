@@ -3,6 +3,7 @@
 
 #include "Static/ZExportHelper.h"
 
+#include "ZSharpExportSettings.h"
 #include "UObject/PropertyOptional.h"
 #include "Reflection/ZReflectionHelper.h"
 #include "Trait/ZExportedTypeName.h"
@@ -188,6 +189,92 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 	};
 
 	return recurse(property, true);
+}
+
+bool ZSharp::FZExportHelper::IsNameDeprecated(const FString& name)
+{
+	FString upperName = name.ToUpper();
+	return upperName.StartsWith("DEPRECATED_") || upperName.EndsWith("_DEPRECATED");
+}
+
+bool ZSharp::FZExportHelper::IsFieldDeprecated(FFieldVariant field)
+{
+	if (GetDefault<UZSharpExportSettings>()->ShouldTreatDeprecatedPostfixAsDeprecated())
+	{
+		if (IsNameDeprecated(field.GetName()))
+		{
+			return true;
+		}
+	}
+
+	if (const auto cls = field.Get<UClass>())
+	{
+		if (cls->HasAllClassFlags(CLASS_Deprecated))
+		{
+			return true;
+		}
+	}
+
+	if (const auto property = field.Get<FProperty>())
+	{
+		if (property->HasAllPropertyFlags(CPF_Deprecated))
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+bool ZSharp::FZExportHelper::IsFieldEditorOnly(FFieldVariant field)
+{
+	if (const auto function = field.Get<UFunction>())
+	{
+		if (function->HasAllFunctionFlags(FUNC_EditorOnly))
+		{
+			return true;
+		}
+	}
+
+	if (const auto property = field.Get<FProperty>())
+	{
+		if (property->HasAllPropertyFlags(CPF_EditorOnly))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool ZSharp::FZExportHelper::ShouldExportFieldBySettings(FFieldVariant field)
+{
+	const FString path = field.GetPathName();
+	const UZSharpExportSettings* settings = GetDefault<UZSharpExportSettings>();
+	if (settings->IsForceExportFieldPath(path))
+	{
+		return true;
+	}
+
+	if (settings->IsForceNotExportFieldPath(path))
+	{
+		return false;
+	}
+	
+	const bool exportDeprecated = GetDefault<UZSharpExportSettings>()->ShouldExportDeprecatedFields();
+	const bool exportEditorOnly = GetDefault<UZSharpExportSettings>()->ShouldExportEditorOnlyFields();
+
+	if (!exportDeprecated && IsFieldDeprecated(field))
+	{
+		return false;
+	}
+
+	if (!exportEditorOnly && IsFieldEditorOnly(field))
+	{
+		return false;
+	}
+
+	return true;
 }
 
 

@@ -4,6 +4,7 @@
 #include "Dynamic/ZDynamicallyExportedClass.h"
 
 #include "ZExportedTypeRegistry.h"
+#include "ZSharpExportSettings.h"
 #include "Dynamic/ZDynamicallyExportedMethod.h"
 #include "Dynamic/ZDynamicallyExportedProperty.h"
 #include "Reflection/ZReflectionHelper.h"
@@ -124,6 +125,11 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 
 	for (TFieldIterator<UFunction> it(Struct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
 	{
+		if (!FZExportHelper::ShouldExportFieldBySettings(*it))
+		{
+			continue;
+		}
+
 		FZDynamicallyExportedMethod* exportedMethod = FZDynamicallyExportedMethod::Create(*it);
 		if (!exportedMethod)
 		{
@@ -136,6 +142,11 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 	for (TFieldIterator<FProperty> it(Struct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
 	{
 		FProperty* property = *it;
+		if (!FZExportHelper::ShouldExportFieldBySettings(property))
+		{
+			continue;
+		}
+		
 		for (int32 i = 0; i < property->ArrayDim; ++i)
 		{
 			FZDynamicallyExportedProperty* exportedProperty = FZDynamicallyExportedProperty::Create(property, i);

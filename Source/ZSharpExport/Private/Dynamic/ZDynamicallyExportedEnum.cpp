@@ -4,7 +4,9 @@
 #include "Dynamic/ZDynamicallyExportedEnum.h"
 
 #include "ZExportedTypeRegistry.h"
+#include "ZSharpExportSettings.h"
 #include "Reflection/ZReflectionHelper.h"
+#include "Static/ZExportHelper.h"
 
 ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(const UEnum* uenum)
 {
@@ -60,11 +62,18 @@ FString ZSharp::FZDynamicallyExportedEnum::GetUnderlyingType() const
 
 void ZSharp::FZDynamicallyExportedEnum::ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const
 {
+	const bool exportDeprecated = GetDefault<UZSharpExportSettings>()->ShouldExportDeprecatedFields();
+
 	for (int32 i = 0; i < Enum->NumEnums(); ++i)
 	{
-		const FString Name = Enum->GetNameStringByIndex(i);
-		const FString Value = FString::Printf(TEXT("%lld"), Enum->GetValueByIndex(i));
-		action(Name, Value);
+		const FString name = Enum->GetNameStringByIndex(i);
+		if (!exportDeprecated && FZExportHelper::IsNameDeprecated(name))
+		{
+			continue;
+		}
+		
+		const FString value = FString::Printf(TEXT("%lld"), Enum->GetValueByIndex(i));
+		action(name, value);
 	}
 }
 

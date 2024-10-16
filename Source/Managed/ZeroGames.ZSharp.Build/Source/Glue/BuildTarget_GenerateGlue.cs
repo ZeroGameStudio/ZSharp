@@ -108,7 +108,7 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		else if (exportedType is ExportedEnum exportedEnum)
 		{
 			await using EnumWriter ew = new(exportedEnum, fs);
-			await ew.WriteAsync();
+			ew.Write();
 		}
 		else if (exportedType is ExportedDelegate exportedDelegate)
 		{

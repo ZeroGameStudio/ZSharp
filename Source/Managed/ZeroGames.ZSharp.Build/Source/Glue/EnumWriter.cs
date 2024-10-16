@@ -2,6 +2,7 @@
 
 using System.Reflection;
 using System.Text;
+using ZeroGames.ZSharp.CodeDom.CSharp;
 
 namespace ZeroGames.ZSharp.Build.Glue;
 
@@ -22,6 +23,22 @@ public class EnumWriter : IDisposable, IAsyncDisposable
 	public async ValueTask DisposeAsync()
 	{
 		await _sw.DisposeAsync();
+	}
+
+	public void Write()
+	{
+		ExportedEnumBuilder builder = new(_exportedEnum.Namespace, _exportedEnum.Name);
+		builder.AddBaseType(_exportedEnum.UnderlyingType);
+		foreach (var pair in _exportedEnum.ValueMap)
+		{
+			builder.AddMember(pair.Key, pair.Value);
+		}
+
+		CompilationUnit compilationUnit = builder.Build();
+		CSharpGenerator generator = new();
+		string content = generator.Generate(compilationUnit);
+
+		_sw.Write(content);
 	}
 
 	public Task WriteAsync() => Task.Run(() =>

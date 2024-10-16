@@ -13,7 +13,7 @@ internal class AttributeListGenerator
 
 	private string GenerateDeclaration(AttributeDeclaration declaration)
 	{
-		string args = declaration.Arguments.Count > 0 ? $"({string.Join(", ", declaration.Arguments)})" : string.Empty;
+		string args = declaration.Arguments?.Count > 0 ? $"({string.Join(", ", declaration.Arguments)})" : string.Empty;
 		return $"{declaration.Name}{args}";
 	}
 	

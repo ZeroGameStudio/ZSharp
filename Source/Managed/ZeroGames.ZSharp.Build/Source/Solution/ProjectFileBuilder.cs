@@ -154,14 +154,14 @@ public class ProjectFileBuilder
 
 		Dictionary<string, string> intrinsicAliases = new()
 		{
-			{ "System.Byte", "uint8" },
-			{ "System.UInt16", "uint16" },
-			{ "System.UInt32", "uint32" },
-			{ "System.UInt64", "uint64" },
-			{ "System.SByte", "int8" },
-			{ "System.Int16", "int16" },
-			{ "System.Int32", "int32" },
-			{ "System.Int64", "int64" },
+			{ "System.Byte", nameof(uint8) },
+			{ "System.UInt16", nameof(uint16) },
+			{ "System.UInt32", nameof(uint32) },
+			{ "System.UInt64", nameof(uint64) },
+			{ "System.SByte", nameof(int8) },
+			{ "System.Int16", nameof(int16) },
+			{ "System.Int32", nameof(int32) },
+			{ "System.Int64", nameof(int64) },
 		};
 
 		foreach (var pair in intrinsicAliases.Concat(_project.Aliases))

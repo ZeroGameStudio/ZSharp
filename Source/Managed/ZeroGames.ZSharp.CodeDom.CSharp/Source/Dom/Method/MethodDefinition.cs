@@ -2,11 +2,10 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class MethodDefinition(EMemberVisibility visibility, string name) : MemberDefinitionBase(visibility, name)
+public class MethodDefinition(EMemberVisibility visibility, string name, TypeReference? returnType, params ParameterDeclaration[]? parameters) : MemberDefinitionBase(visibility, name)
 {
 
-	public string? ReturnType { get; set; }
-	public ParameterList? Parameters { get; set; }
+	public MethodSignature Signature { get; } = new(returnType, parameters);
 	public MethodBody? Body { get; set; }
 	
 	public bool IsDelegate { get; set; }

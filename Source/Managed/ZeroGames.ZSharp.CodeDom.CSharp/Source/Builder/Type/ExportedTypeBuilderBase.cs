@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public abstract class ExportedTypeBuilderBase<TDefinition>(string namespaceName, string typeName) where TDefinition : TypeDefinitionBase
+public abstract class ExportedTypeBuilderBase<TDefinition>(string namespaceName, string typeName, string? unrealFieldPath) where TDefinition : TypeDefinitionBase
 {
 
 	public CompilationUnit Build()
@@ -39,7 +39,10 @@ public abstract class ExportedTypeBuilderBase<TDefinition>(string namespaceName,
 		if (GenerateIntrinsicContent)
 		{
 			definition.AddAttributeList(new AttributeDeclaration("System.CodeDom.Compiler.GeneratedCode", "\"Z#\"", $"\"{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}\""));
-			definition.AddAttributeList(new AttributeDeclaration("UnrealFieldPath", HasUnrealFieldPathConst ? UNREAL_FIELD_PATH_CONST : UnrealFieldPathLiteralText));
+			if (HasUnrealFieldPath)
+			{
+				definition.AddAttributeList(new AttributeDeclaration("UnrealFieldPath", HasUnrealFieldPathConst ? UNREAL_FIELD_PATH_CONST : UnrealFieldPathLiteralText));
+			}
 		}
 
 		foreach (var attr in _attributeAfters)
@@ -69,8 +72,8 @@ public abstract class ExportedTypeBuilderBase<TDefinition>(string namespaceName,
 	public void AddUsingNamespace(string ns) => _usings.Add(ns);
 
 	protected void AddBaseType(string baseType) => _baseTypes.Add(baseType);
-	protected void AddAttributeBefore(string name, params string[] arguments) => _attributeBefores.Add((name, arguments));
-	protected void AddAttributeAfter(string name, params string[] arguments) => _attributeAfters.Add((name, arguments));
+	protected void AddAttributeBefore(string name, params string[]? arguments) => _attributeBefores.Add((name, arguments));
+	protected void AddAttributeAfter(string name, params string[]? arguments) => _attributeAfters.Add((name, arguments));
 
 	protected virtual ClassDefinition? GetOuterClassDefinition() => null;
 	
@@ -82,14 +85,15 @@ public abstract class ExportedTypeBuilderBase<TDefinition>(string namespaceName,
 	
 	protected string Namespace { get; } = namespaceName;
 	protected string TypeName { get; } = typeName;
-	protected string UnrealFieldPath => $"/Script/{Namespace.Split('.').Last()}.{TypeName}";
+	protected string? UnrealFieldPath => unrealFieldPath;
 	protected string UnrealFieldPathLiteralText => $"\"{UnrealFieldPath}\"";
 
 	protected virtual bool GenerateIntrinsicContent => true;
-	
+
+	protected virtual bool HasUnrealFieldPath => true;
 	protected virtual bool HasUnrealFieldPathConst => true;
 
-	private const string UNREAL_FIELD_PATH_CONST = "__UNREAL_FIELD_PATH";
+	protected const string UNREAL_FIELD_PATH_CONST = "__UNREAL_FIELD_PATH";
 	
 	private const string HEADER =
 @"// Copyright Zero Games. All Rights Reserved.
@@ -110,8 +114,8 @@ public abstract class ExportedTypeBuilderBase<TDefinition>(string namespaceName,
 
 	private List<string> _usings = new();
 	private List<string> _baseTypes = new();
-	private List<(string Name, string[] Arguments)> _attributeBefores = new();
-	private List<(string Name, string[] Arguments)> _attributeAfters = new();
+	private List<(string Name, string[]? Arguments)> _attributeBefores = new();
+	private List<(string Name, string[]? Arguments)> _attributeAfters = new();
 
 }
 

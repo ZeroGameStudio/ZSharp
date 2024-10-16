@@ -16,7 +16,7 @@ public class EnumWriter
 
 	public void Write()
 	{
-		ExportedEnumBuilder builder = new(_exportedEnum.Namespace, _exportedEnum.Name)
+		ExportedEnumBuilder builder = new(_exportedEnum.Namespace, _exportedEnum.Name, _exportedEnum.UnrealFieldPath)
 		{
 			UnderlyingType = _exportedEnum.UnderlyingType,
 			IsFlags = _exportedEnum.IsFlags,

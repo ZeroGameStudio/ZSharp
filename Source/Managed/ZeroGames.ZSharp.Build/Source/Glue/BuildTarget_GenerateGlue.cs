@@ -11,7 +11,7 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 	public override async Task<string> BuildAsync()
 	{
 		await SetupRegistry();
-		await Parallel.ForEachAsync(_registry.ExportedTypes, (type, _) => GenerateType(type));
+		Parallel.ForEach(_registry.ExportedTypes, (type, _) => GenerateType(type));
 
 		return "success";
 	}
@@ -94,16 +94,18 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		}
 	}
 
-	private async ValueTask GenerateType(ExportedType exportedType)
+	private void GenerateType(ExportedType exportedType)
 	{
 		string moduleDir = $"{_glueDir}/{exportedType.Assembly}/Glue/{exportedType.Module}";
 		CreateModuleDirectory(moduleDir);
 		
 		if (exportedType is ExportedClass exportedClass)
 		{
-			await using FileStream fs = File.Create($"{moduleDir}/{exportedType.Name}.g.cs");
-			await using LegacyClassWriter cw = new(_registry, exportedClass, fs);
-			await cw.WriteAsync();
+			// await using FileStream fs = File.Create($"{moduleDir}/{exportedType.Name}.g.cs");
+			// await using LegacyClassWriter cw = new(_registry, exportedClass, fs);
+			// await cw.WriteAsync();
+			
+			new ClassWriter(_registry, exportedClass, moduleDir, exportedType.Name).Write();
 		}
 		else if (exportedType is ExportedEnum exportedEnum)
 		{

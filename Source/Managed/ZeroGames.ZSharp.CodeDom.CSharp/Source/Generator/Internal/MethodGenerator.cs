@@ -14,12 +14,12 @@ internal class MethodGenerator
 		string visibility = definition.GetVisibilityText();
 		string modifiers = definition.GetModifiersText();
 		string kind = definition.IsDelegate ? "delegate" : string.Empty;
-		string returnType = definition.ReturnType ?? "void";
+		string returnType = definition.Signature.ReturnType?.TypeName ?? "void";
 		string name = definition.Name;
 		string[] decls = [ visibility, modifiers, kind, returnType, name ];
 		string declList = string.Join(" ", decls.Where(decl => !string.IsNullOrWhiteSpace(decl)));
 
-		var parameters = definition.Parameters is not null ? definition.Parameters.Value.Declarations.Select(p => $"{p.GetKindText()}{p.Type} {p.Name}") : [];
+		var parameters = definition.Signature.Parameters is not null ? definition.Signature.Parameters.Select(p => $"{p.GetKindText()}{p.Type.TypeName} {p.Name}") : [];
 		string parameterList = string.Join(", ", parameters);
 		
 		string methodDecl = $"{declList}({parameterList})";

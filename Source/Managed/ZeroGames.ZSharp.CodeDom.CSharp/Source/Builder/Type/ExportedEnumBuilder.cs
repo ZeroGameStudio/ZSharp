@@ -2,13 +2,13 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class ExportedEnumBuilder(string namespaceName, string typeName) : ExportedTypeBuilderBase<EnumDefinition>(namespaceName, typeName)
+public class ExportedEnumBuilder(string namespaceName, string typeName, string? unrealFieldPath) : ExportedTypeBuilderBase<EnumDefinition>(namespaceName, typeName, unrealFieldPath)
 {
 
 	public void AddMember(string name, string value = "", string comment = "") => _members.Add((name, value, comment));
 
 	public bool IsFlags { get; set; }
-	public string UnderlyingType { get; set; } = "int32";
+	public string UnderlyingType { get; set; } = nameof(int32);
 	
 	protected override EnumDefinition AllocateTypeDefinition() => new(EMemberVisibility.Public, TypeName);
 

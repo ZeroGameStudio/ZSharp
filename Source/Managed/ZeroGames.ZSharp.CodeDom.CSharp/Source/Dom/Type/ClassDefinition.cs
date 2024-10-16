@@ -2,11 +2,9 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class ClassDefinition(EMemberVisibility visibility, string name) : CompositeTypeDefinitionBase(visibility, name)
+public class ClassDefinition(bool isInterface, EMemberVisibility visibility, string name) : CompositeTypeDefinitionBase(visibility, name)
 {
-	
-	public override ETypeKind Kind => ETypeKind.Class;
-	
+	public override ETypeKind Kind { get; } = isInterface ? ETypeKind.Interface : ETypeKind.Class;
 }
 
 

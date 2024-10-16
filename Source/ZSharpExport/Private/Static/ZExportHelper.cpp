@@ -191,6 +191,21 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 	return recurse(property, true);
 }
 
+const UEnum* ZSharp::FZExportHelper::GetUEnumFromProperty(const FProperty* property)
+{
+	if (const auto enumProperty = CastField<FEnumProperty>(property))
+	{
+		return enumProperty->GetEnum();
+	}
+
+	if (const auto numericProperty = CastField<FNumericProperty>(property))
+	{
+		return numericProperty->GetIntPropertyEnum();
+	}
+
+	return nullptr;
+}
+
 bool ZSharp::FZExportHelper::IsNameDeprecated(const FString& name)
 {
 	FString upperName = name.ToUpper();

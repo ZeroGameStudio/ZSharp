@@ -13,6 +13,7 @@ namespace ZSharp
 	public:
 		virtual FString GetName() const = 0;
 		virtual FZFullyExportedTypeName GetType() const = 0;
+		virtual FString GetUnderlyingType() const = 0;
 	};
 }
 

@@ -39,6 +39,11 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedProperty::GetType()
 	return FZExportHelper::GetFPropertyFullyExportedTypeName(Property);
 }
 
+FString ZSharp::FZDynamicallyExportedProperty::GetUnderlyingType() const
+{
+	return FZExportHelper::GetUEnumFromProperty(Property) ? "int64" : FString{};
+}
+
 ZSharp::EZExportedPropertyFlags ZSharp::FZDynamicallyExportedProperty::GetFlags() const
 {
 	return Flags;

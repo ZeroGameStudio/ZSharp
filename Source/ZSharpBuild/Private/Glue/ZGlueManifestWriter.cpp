@@ -64,6 +64,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 			FZExportedParameterDto paramDto;
 			paramDto.Name = param.GetName();
 			paramDto.Type = param.GetType();
+			paramDto.UnderlyingType = param.GetUnderlyingType();
 			paramDto.Flags = static_cast<__underlying_type(EZExportedParameterFlags)>(param.GetFlags());
 			methodDto.Parameters.Emplace(MoveTemp(paramDto));
 		});
@@ -75,6 +76,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 		propertyDto.Name = property.GetName();
 		propertyDto.ZCallName = property.GetZCallName();
 		propertyDto.Type = property.GetType();
+		propertyDto.UnderlyingType = property.GetUnderlyingType();
 		propertyDto.Flags = static_cast<__underlying_type(EZExportedPropertyFlags)>(property.GetFlags());
 		classDto.Properties.Emplace(MoveTemp(propertyDto));
 	});
@@ -137,6 +139,7 @@ void ZSharp::FZGlueManifestWriter::WriteDelegate(const IZExportedDelegate& deleg
 		FZExportedParameterDto paramDto;
 		paramDto.Name = param.GetName();
 		paramDto.Type = param.GetType();
+		paramDto.UnderlyingType = param.GetUnderlyingType();
 		paramDto.Flags = static_cast<__underlying_type(EZExportedParameterFlags)>(param.GetFlags());
 		delegateDto.Parameters.Emplace(MoveTemp(paramDto));
 	});

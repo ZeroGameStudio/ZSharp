@@ -9,19 +9,19 @@ public enum EExportedDelegateKind
 	Sparse,
 }
 
-public class ExportedDelegateBuilder(string namespaceName, string typeName, EExportedDelegateKind kind) : ExportedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName)
+public class ExportedDelegateBuilder(string namespaceName, string typeName, string? unrealFieldPath, EExportedDelegateKind kind) : ExportedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, unrealFieldPath)
 {
 	
 	public EExportedDelegateKind Kind { get; } = kind;
-	public string? ReturnType { get; set; }
-	public ParameterList? Parameters { get; set; }
+	public TypeReference? ReturnType { get; set; }
+	public ParameterDeclaration[]? Parameters { get; set; }
 	public string? OuterClassName { get; set; }
 
 	protected override ClassDefinition? GetOuterClassDefinition()
 	{
 		if (OuterClassName is not null)
 		{
-			return new(EMemberVisibility.Default, OuterClassName)
+			return new(false, EMemberVisibility.Default, OuterClassName)
 			{
 				Modifiers = EMemberModifiers.Partial,
 			};
@@ -30,13 +30,13 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, EExp
 		return base.GetOuterClassDefinition();
 	}
 
-	protected override ClassDefinition AllocateTypeDefinition() => new(EMemberVisibility.Default, TypeName);
+	protected override ClassDefinition AllocateTypeDefinition() => new(false, EMemberVisibility.Default, TypeName);
 
 	protected override void PreAddMainType(CompilationUnit compilationUnit, ClassDefinition? outerClassDefinition)
 	{
 		base.PreAddMainType(compilationUnit, outerClassDefinition);
 
-		ClassDefinition abstractionDefinition = new(EMemberVisibility.Public, TypeName);
+		ClassDefinition abstractionDefinition = new(false, EMemberVisibility.Public, TypeName);
 		abstractionDefinition.Modifiers |= EMemberModifiers.Sealed | EMemberModifiers.Partial;
 
 		switch (Kind)
@@ -64,9 +64,7 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, EExp
 			}
 		}
 
-		MethodDefinition delegateDecl = new(EMemberVisibility.Public, "Signature");
-		delegateDecl.ReturnType = ReturnType;
-		delegateDecl.Parameters = Parameters;
+		MethodDefinition delegateDecl = new(EMemberVisibility.Public, "Signature", ReturnType, Parameters);
 		delegateDecl.IsDelegate = true;
 		abstractionDefinition.AddMember(delegateDecl);
 
@@ -84,6 +82,8 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, EExp
 	}
 
 	protected override IReadOnlyList<string> GetBaseConstructorExtraArguments() => [ "typeof(Signature)" ];
+
+	protected override bool BlackConstructorNeedsCallBase => true;
 
 	protected override string StaticFieldInterfaceName => "IStaticSignature";
 	protected override string StaticFieldTypeName => "DelegateFunction";

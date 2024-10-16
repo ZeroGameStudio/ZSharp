@@ -6,6 +6,7 @@ public class ExportedVariable
 {
 	public required string Name { get; set; }
 	public required FullyExportedTypeName Type { get; set; }
+	public string? UnderlyingType { get; set; }
 }
 
 

@@ -17,14 +17,14 @@ public class DelegateWriter
 	public void Write()
 	{
 		string delegateName = _exportedDelegate.Name.Split('.')[^1];
-		ExportedDelegateBuilder builder = new(_exportedDelegate.Namespace, delegateName, _exportedDelegate.IsSparse ? EExportedDelegateKind.Sparse : _exportedDelegate.IsMulticast ? EExportedDelegateKind.Multicast : EExportedDelegateKind.Unicast);
+		ExportedDelegateBuilder builder = new(_exportedDelegate.Namespace, delegateName, _exportedDelegate.UnrealFieldPath, _exportedDelegate.IsSparse ? EExportedDelegateKind.Sparse : _exportedDelegate.IsMulticast ? EExportedDelegateKind.Multicast : EExportedDelegateKind.Unicast);
 		var usings = NamespaceHelper.LootNamespace(_exportedDelegate).Where(ns => ns != _exportedDelegate.Namespace);
 		foreach (var ns in usings)
 		{
 			builder.AddUsingNamespace(ns);
 		}
 
-		builder.ReturnType = _exportedDelegate.ReturnParameter?.Type.ToString();
+		builder.ReturnType = _exportedDelegate.ReturnParameter?.Type.ToString() is {} typeName ? new(typeName, _exportedDelegate.ReturnParameter.UnderlyingType) : null;
 		
 		List<ParameterDeclaration> parameters = new();
 		foreach (var parameter in _exportedDelegate.Parameters)
@@ -35,9 +35,9 @@ public class DelegateWriter
 			}
 			
 			EParameterKind kind = parameter.IsInOut ? EParameterKind.Ref : parameter.IsOut ? EParameterKind.Out : EParameterKind.In;
-			parameters.Add(new(kind, parameter.Type.ToString(), parameter.Name));
+			parameters.Add(new(kind, new(parameter.Type.ToString(), parameter.UnderlyingType), parameter.Name));
 		}
-		builder.Parameters = new(parameters.ToArray());
+		builder.Parameters = parameters.ToArray();
 
 		if (_exportedDelegate.Name.Contains('.'))
 		{

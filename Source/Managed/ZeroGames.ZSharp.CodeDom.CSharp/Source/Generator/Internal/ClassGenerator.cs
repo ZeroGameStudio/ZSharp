@@ -29,6 +29,15 @@ internal class ClassGenerator : TypeGeneratorBase<ClassDefinition>
 				_methodGenerator ??= new();
 				memberBody = _methodGenerator.Generate(method);
 			}
+			else if (member is PropertyDefinition property)
+			{
+				
+			}
+			else if (member is FieldDefinition field)
+			{
+				_fieldGenerator ??= new();
+				memberBody = _fieldGenerator.Generate(field);
+			}
 			else if (member is ClassDefinition cls)
 			{
 				_classGenerator ??= new();
@@ -54,6 +63,7 @@ internal class ClassGenerator : TypeGeneratorBase<ClassDefinition>
 
 	private BlockGenerator? _blockGenerator;
 	private MethodGenerator? _methodGenerator;
+	private FieldGenerator? _fieldGenerator;
 	private ClassGenerator? _classGenerator;
 
 }

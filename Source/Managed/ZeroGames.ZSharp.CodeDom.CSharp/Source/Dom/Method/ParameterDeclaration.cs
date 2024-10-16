@@ -2,10 +2,10 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public readonly struct ParameterDeclaration(EParameterKind kind, string type, string name)
+public readonly struct ParameterDeclaration(EParameterKind kind, TypeReference type, string name)
 {
 	public EParameterKind Kind { get; } = kind;
-	public string Type { get; } = type;
+	public TypeReference Type { get; } = type;
 	public string Name { get; } = name;
 }
 

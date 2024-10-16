@@ -5,24 +5,13 @@ using ZeroGames.ZSharp.CodeDom.CSharp;
 
 namespace ZeroGames.ZSharp.Build.Glue;
 
-public class EnumWriter : IDisposable
+public class EnumWriter
 {
 
 	public EnumWriter(ExportedAssemblyRegistry registry, ExportedEnum exportedEnum, string directory, string fileName)
 	{
 		_exportedEnum = exportedEnum;
-		_sw = new(File.Create($"{directory}/{fileName}.g.cs"), Encoding.UTF8);
-	}
-
-	~EnumWriter()
-	{
-		InternalDispose();
-	}
-
-	public void Dispose()
-	{
-		InternalDispose();
-		GC.SuppressFinalize(this);
+		_filePath = $"{directory}/{fileName}.g.cs";
 	}
 
 	public void Write()
@@ -41,25 +30,12 @@ public class EnumWriter : IDisposable
 		CSharpGenerator generator = new();
 		string content = generator.Generate(compilationUnit);
 
-		_sw.Write(content);
-	}
-
-	private void InternalDispose()
-	{
-		if (_disposed)
-		{
-			return;
-		}
-
-		_disposed = true;
-		
-		_sw.Dispose();
+		using StreamWriter sw = new(File.Create(_filePath), Encoding.UTF8);
+		sw.Write(content);
 	}
 
 	private ExportedEnum _exportedEnum;
-	private StreamWriter _sw;
-
-	private bool _disposed;
+	private string _filePath;
 
 }
 

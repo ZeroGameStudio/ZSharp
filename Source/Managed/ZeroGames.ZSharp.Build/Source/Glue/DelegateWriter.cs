@@ -1,31 +1,19 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Reflection;
 using System.Text;
 using ZeroGames.ZSharp.CodeDom.CSharp;
 
 namespace ZeroGames.ZSharp.Build.Glue;
 
-public class DelegateWriter : IDisposable
+public class DelegateWriter
 {
 
 	public DelegateWriter(ExportedAssemblyRegistry registry, ExportedDelegate exportedDelegate, string directory, string fileName)
 	{
 		_exportedDelegate = exportedDelegate;
-		_sw = new(File.Create($"{directory}/{fileName}.g.cs"), Encoding.UTF8);
+		_filePath = $"{directory}/{fileName}.g.cs";
 	}
 
-	~DelegateWriter()
-	{
-		InternalDispose();
-	}
-
-	public void Dispose()
-	{
-		InternalDispose();
-		GC.SuppressFinalize(this);
-	}
-	
 	public void Write()
 	{
 		string delegateName = _exportedDelegate.Name.Split('.')[^1];
@@ -60,24 +48,11 @@ public class DelegateWriter : IDisposable
 		CSharpGenerator generator = new();
 		string content = generator.Generate(compilationUnit);
 
-		_sw.Write(content);
-	}
-	
-	private void InternalDispose()
-	{
-		if (_disposed)
-		{
-			return;
-		}
-
-		_disposed = true;
-		
-		_sw.Dispose();
+		using StreamWriter sw = new(File.Create(_filePath), Encoding.UTF8);
+		sw.Write(content);
 	}
 
 	private ExportedDelegate _exportedDelegate;
-	private StreamWriter _sw;
-
-	private bool _disposed;
+	private string _filePath;
 
 }

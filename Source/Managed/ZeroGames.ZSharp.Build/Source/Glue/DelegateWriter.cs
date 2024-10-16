@@ -9,10 +9,10 @@ namespace ZeroGames.ZSharp.Build.Glue;
 public class DelegateWriter : IDisposable
 {
 
-	public DelegateWriter(ExportedAssemblyRegistry registry, ExportedDelegate exportedDelegate, Stream stream)
+	public DelegateWriter(ExportedAssemblyRegistry registry, ExportedDelegate exportedDelegate, string directory, string fileName)
 	{
 		_exportedDelegate = exportedDelegate;
-		_sw = new(stream, Encoding.UTF8);
+		_sw = new(File.Create($"{directory}/{fileName}.g.cs"), Encoding.UTF8);
 	}
 
 	~DelegateWriter()

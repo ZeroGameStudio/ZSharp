@@ -8,10 +8,10 @@ namespace ZeroGames.ZSharp.Build.Glue;
 public class EnumWriter : IDisposable
 {
 
-	public EnumWriter(ExportedAssemblyRegistry registry, ExportedEnum exportedEnum, Stream stream)
+	public EnumWriter(ExportedAssemblyRegistry registry, ExportedEnum exportedEnum, string directory, string fileName)
 	{
 		_exportedEnum = exportedEnum;
-		_sw = new(stream, Encoding.UTF8);
+		_sw = new(File.Create($"{directory}/{fileName}.g.cs"), Encoding.UTF8);
 	}
 
 	~EnumWriter()

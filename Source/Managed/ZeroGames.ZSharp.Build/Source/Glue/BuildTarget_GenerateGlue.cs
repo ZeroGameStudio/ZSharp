@@ -99,20 +99,20 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		string moduleDir = $"{_glueDir}/{exportedType.Assembly}/Glue/{exportedType.Module}";
 		CreateModuleDirectory(moduleDir);
 		
-		await using FileStream fs = File.Create($"{moduleDir}/{exportedType.Name}.g.cs");
 		if (exportedType is ExportedClass exportedClass)
 		{
+			await using FileStream fs = File.Create($"{moduleDir}/{exportedType.Name}.g.cs");
 			await using ClassWriter cw = new(_registry, exportedClass, fs);
 			await cw.WriteAsync();
 		}
 		else if (exportedType is ExportedEnum exportedEnum)
 		{
-			using EnumWriter ew = new(_registry, exportedEnum, fs);
+			using EnumWriter ew = new(_registry, exportedEnum, moduleDir, exportedType.Name);
 			ew.Write();
 		}
 		else if (exportedType is ExportedDelegate exportedDelegate)
 		{
-			using DelegateWriter dw = new(_registry, exportedDelegate, fs);
+			using DelegateWriter dw = new(_registry, exportedDelegate, moduleDir, exportedType.Name);
 			dw.Write();
 		}
 	}

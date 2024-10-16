@@ -37,7 +37,7 @@ public class CSharpGenerator
 		if (compilationUnit.Types.Count > 0)
 		{
 			sb.AppendLine();
-			sb.AppendLine(string.Join(Environment.NewLine, compilationUnit.Types.Select(GenerateTypeDefinition)));
+			sb.AppendLine(string.Join($"{Environment.NewLine}{Environment.NewLine}", compilationUnit.Types.Select(GenerateTypeDefinition)));
 		}
 		
 		// End blocks
@@ -79,6 +79,11 @@ public class CSharpGenerator
 
 	private string GenerateTypeDefinition(TypeDefinitionBase typeDefinition)
 	{
+		if (typeDefinition is ClassDefinition classDefinition)
+		{
+			return new ClassGenerator().Generate(classDefinition);
+		}
+		
 		if (typeDefinition is EnumDefinition enumDefinition)
 		{
 			return new EnumGenerator().Generate(enumDefinition);

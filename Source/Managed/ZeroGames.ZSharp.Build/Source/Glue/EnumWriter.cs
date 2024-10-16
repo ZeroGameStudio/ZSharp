@@ -8,7 +8,7 @@ namespace ZeroGames.ZSharp.Build.Glue;
 public class EnumWriter : IDisposable
 {
 
-	public EnumWriter(ExportedEnum exportedEnum, Stream stream)
+	public EnumWriter(ExportedAssemblyRegistry registry, ExportedEnum exportedEnum, Stream stream)
 	{
 		_exportedEnum = exportedEnum;
 		_sw = new(stream, Encoding.UTF8);
@@ -27,8 +27,11 @@ public class EnumWriter : IDisposable
 
 	public void Write()
 	{
-		ExportedEnumBuilder builder = new(_exportedEnum.Namespace, _exportedEnum.Name);
-		builder.AddBaseType(_exportedEnum.UnderlyingType);
+		ExportedEnumBuilder builder = new(_exportedEnum.Namespace, _exportedEnum.Name)
+		{
+			UnderlyingType = _exportedEnum.UnderlyingType,
+			IsFlags = _exportedEnum.IsFlags,
+		};
 		foreach (var pair in _exportedEnum.ValueMap)
 		{
 			builder.AddMember(pair.Key, pair.Value);

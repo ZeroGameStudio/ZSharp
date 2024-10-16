@@ -2,13 +2,11 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public enum EMemberVisibility
+public enum EParameterKind
 {
-	Default,
-	Public,
-	Internal,
-	Protected,
-	Private,
+	In,
+	Out,
+	Ref,
 }
 
 

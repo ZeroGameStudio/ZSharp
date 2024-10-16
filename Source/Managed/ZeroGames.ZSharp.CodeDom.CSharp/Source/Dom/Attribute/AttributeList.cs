@@ -2,11 +2,9 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class AttributeList(params AttributeDeclaration[] declarations)
+public readonly struct AttributeList(params AttributeDeclaration[] declarations)
 {
-
 	public IReadOnlyList<AttributeDeclaration> Declarations { get; } = declarations;
-
 }
 
 

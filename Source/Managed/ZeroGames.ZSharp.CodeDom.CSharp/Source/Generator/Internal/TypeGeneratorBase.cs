@@ -13,11 +13,11 @@ internal abstract class TypeGeneratorBase<TDefinition> where TDefinition : TypeD
 
 		if (definition.Attributes.Count > 0)
 		{
-			sb.AppendLine(string.Join("\n", definition.Attributes.Select(_attributeListGenerator.Generate)));
+			sb.AppendLine(string.Join(Environment.NewLine, definition.Attributes.Select(_attributeListGenerator.Generate)));
 		}
 
-		string visibility = GetVisibilityText(definition);
-		string modifiers = GetModifiersText(definition);
+		string visibility = definition.GetVisibilityText();
+		string modifiers = definition.GetModifiersText();
 		string kind = GetTypeKindText(definition);
 		string name = definition.Name;
 		string baseList = definition.BaseTypes.Count > 0 ? $": {string.Join(", ", definition.BaseTypes)}" : string.Empty;
@@ -32,7 +32,7 @@ internal abstract class TypeGeneratorBase<TDefinition> where TDefinition : TypeD
 			sb.Append(
 $@"
 {{
-{typeBody.Indent(1)}
+{typeBody.Indent()}
 }}");
 		}
 		else
@@ -44,47 +44,6 @@ $@"
 	}
 
 	protected abstract string GenerateBody(TDefinition definition);
-	
-	private string GetVisibilityText(TypeDefinitionBase definition) => definition.Visibility switch
-	{
-		EMemberVisibility.Public => "public",
-		EMemberVisibility.Internal => "internal",
-		EMemberVisibility.Protected => "protected",
-		EMemberVisibility.Private => "private",
-		_ => throw new NotSupportedException()
-	};
-
-	private string GetModifiersText(TypeDefinitionBase definition)
-	{
-		List<string> modifiers = new();
-		
-		if ((definition.Modifiers & ETypeModifiers.Abstract) != ETypeModifiers.None)
-		{
-			modifiers.Add("abstract");
-		}
-		
-		if ((definition.Modifiers & ETypeModifiers.Sealed) != ETypeModifiers.None)
-		{
-			modifiers.Add("sealed");
-		}
-		
-		if ((definition.Modifiers & ETypeModifiers.Static) != ETypeModifiers.None)
-		{
-			modifiers.Add("static");
-		}
-		
-		if ((definition.Modifiers & ETypeModifiers.Unsafe) != ETypeModifiers.None)
-		{
-			modifiers.Add("unsafe");
-		}
-		
-		if ((definition.Modifiers & ETypeModifiers.Partial) != ETypeModifiers.None)
-		{
-			modifiers.Add("partial");
-		}
-
-		return string.Join(" ", modifiers);
-	}
 
 	private string GetTypeKindText(TypeDefinitionBase definition) => definition.Kind switch
 	{

@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.CodeDom.CSharp;
 internal static class StringExtensions
 {
 	
-	public static string Indent(this string @this, int32 count = 0, string indentUnit = "\t")
+	public static string Indent(this string @this, int32 count = 1, string indentUnit = "\t")
 	{
 		if (count <= 0)
 		{

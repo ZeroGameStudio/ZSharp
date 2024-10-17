@@ -101,10 +101,6 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		
 		if (exportedType is ExportedClass exportedClass)
 		{
-			// await using FileStream fs = File.Create($"{moduleDir}/{exportedType.Name}.g.cs");
-			// await using LegacyClassWriter cw = new(_registry, exportedClass, fs);
-			// await cw.WriteAsync();
-			
 			new ClassWriter(_registry, exportedClass, moduleDir, exportedType.Name).Write();
 		}
 		else if (exportedType is ExportedEnum exportedEnum)

@@ -7,7 +7,7 @@ public static class NamespaceHelper
 
 	public static SortedSet<string> LootNamespace(ExportedClass cls)
 	{
-		SortedSet<string> res = [ "ZeroGames.ZSharp.Core", "ZeroGames.ZSharp.Core.UnrealEngine", "ZeroGames.ZSharp.Core.UnrealEngine.Specifier", "ZeroGames.ZSharp.UnrealEngine" ];
+		SortedSet<string> res = [];
 		LootNamespace(cls.BaseType, res);
 		foreach (var method in cls.Methods)
 		{
@@ -23,18 +23,20 @@ public static class NamespaceHelper
 		}
 
 		res.RemoveWhere(string.IsNullOrWhiteSpace);
+		res.Remove("System");
 		return res;
 	}
 
 	public static SortedSet<string> LootNamespace(ExportedDelegate del)
 	{
-		SortedSet<string> res = [ "ZeroGames.ZSharp.Core", "ZeroGames.ZSharp.Core.UnrealEngine", "ZeroGames.ZSharp.Core.UnrealEngine.Specifier", "ZeroGames.ZSharp.UnrealEngine" ];
+		SortedSet<string> res = [];
 		foreach (var parameter in del.Parameters)
 		{
 			LootNamespace(parameter.Type, res);
 		}
 
 		res.RemoveWhere(string.IsNullOrWhiteSpace);
+		res.Remove("System");
 		return res;
 	}
 

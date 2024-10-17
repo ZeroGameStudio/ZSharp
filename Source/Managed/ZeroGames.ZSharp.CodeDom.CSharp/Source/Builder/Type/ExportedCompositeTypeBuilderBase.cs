@@ -15,16 +15,19 @@ public abstract class ExportedCompositeTypeBuilderBase<TDefinition>(string names
 			{
 				definition.AddBaseType($"IConjugate<{TypeName}>");
 			}
-			if (HasUnrealFieldPathConst)
+
+			bool isConcreteUnrealField = HasUnrealFieldPath && definition.Kind != ETypeKind.Interface;
+			if (isConcreteUnrealField)
 			{
 				definition.AddBaseType("IStaticUnrealFieldPath");
 				definition.AddBaseType(StaticFieldInterfaceName);
 			}
 			
 			string buildConjugate = HasBuildConjugate ? $"public new static {TypeName} BuildConjugate(IntPtr unmanaged) => new(unmanaged);" : string.Empty;
-			string staticUnrealFieldPath = HasUnrealFieldPathConst ? $"public new static string StaticUnrealFieldPath => {UNREAL_FIELD_PATH_CONST};" : string.Empty;
-			string staticField = HasUnrealFieldPathConst ? $"public new static {StaticFieldTypeName} {StaticFieldPropertyName} => UnrealObjectGlobals.LowLevelFindObject<{StaticFieldTypeName}>({UNREAL_FIELD_PATH_CONST})!;" : string.Empty;
-			string overrideUnrealFieldPath = HasUnrealFieldPathConst ? $"public override string UnrealFieldPath => {UNREAL_FIELD_PATH_CONST};" : string.Empty;
+			// Interfaces don't inherit static field interfaces but still have these static members (@see IUnrealObject.cs).
+			string staticUnrealFieldPath = HasUnrealFieldPath ? $"public new static string StaticUnrealFieldPath => {UNREAL_FIELD_PATH_CONST};" : string.Empty;
+			string staticField = HasUnrealFieldPath ? $"public new static {StaticFieldTypeName} {StaticFieldPropertyName} => UnrealObjectGlobals.LowLevelFindObject<{StaticFieldTypeName}>({UNREAL_FIELD_PATH_CONST})!;" : string.Empty;
+			string overrideUnrealFieldPath = isConcreteUnrealField ? $"public override string UnrealFieldPath => {UNREAL_FIELD_PATH_CONST};" : string.Empty;
 			
 			IReadOnlyList<string> baseConstructorExtraArguments = GetBaseConstructorExtraArguments();
 			string blackConstructorArguments = HasBlackConstructor ? string.Join(", ", baseConstructorExtraArguments) : string.Empty;

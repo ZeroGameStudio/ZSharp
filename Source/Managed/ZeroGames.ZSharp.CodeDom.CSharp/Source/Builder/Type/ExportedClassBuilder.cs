@@ -93,7 +93,7 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 	protected override bool GenerateIntrinsicContent => !IsAbstraction;
 
 	protected override bool HasUnrealFieldPath => Kind != EExportedClassKind.Plain;
-	protected override bool HasUnrealFieldPathConst => Kind != EExportedClassKind.Interface && Kind != EExportedClassKind.Plain;
+	protected override bool HasUnrealFieldPathConst => Kind != EExportedClassKind.Plain;
 
 	protected override bool HasBuildConjugate => Kind != EExportedClassKind.Interface;
 

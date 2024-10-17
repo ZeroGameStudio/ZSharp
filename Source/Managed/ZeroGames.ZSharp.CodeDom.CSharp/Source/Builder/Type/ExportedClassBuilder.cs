@@ -33,12 +33,26 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 		_methods.Add(method);
 	}
 
-	public void AddProperty(EMemberVisibility visibility, string type, string name, string zcallName, bool readOnly)
+	public void AddProperty(EMemberVisibility visibility, TypeReference type, string name, string zcallName, int32 index, bool readOnly)
 	{
+		// @TODO: Partial property
+		EMemberModifiers modifiers = EMemberModifiers.None; // EMemberModifiers.Partial;
 
+		PropertyDefinition property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, index, type, readOnly).Build(IsAbstraction);
+		_properties.Add(property);
 	}
 
-	public void AddStaticField(string type, string name)
+	public void AddStaticFieldIfNotExists(TypeReference type, string name)
+	{
+		if (_fields.Any(field => field.Name == name))
+		{
+			return;
+		}
+		
+		AddStaticField(type, name);
+	}
+
+	public void AddStaticField(TypeReference type, string name)
 	{
 		FieldDefinition field = new(EMemberVisibility.Private, name, type)
 		{

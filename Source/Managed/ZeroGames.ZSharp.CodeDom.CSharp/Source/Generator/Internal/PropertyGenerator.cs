@@ -1,0 +1,66 @@
+﻿// Copyright Zero Games. All Rights Reserved.
+
+using System.Text;
+
+namespace ZeroGames.ZSharp.CodeDom.CSharp;
+
+internal class PropertyGenerator
+{
+
+	public string Generate(PropertyDefinition definition)
+	{
+		StringBuilder sb = new();
+		
+		string visibility = definition.GetVisibilityText();
+		string modifiers = definition.GetModifiersText();
+		string type = definition.Type.TypeName;
+		string name = definition.Name;
+		string[] decls = [ visibility, modifiers, type, name ];
+		string propertyDecl = string.Join(" ", decls.Where(decl => !string.IsNullOrWhiteSpace(decl)));
+		sb.Append(propertyDecl);
+
+		bool isAbstraction = definition is { HasGetter: true, Getter: null } || definition is { HasSetter: true, Setter: null };
+		if (isAbstraction)
+		{
+			sb.Append(" { ");
+			if (definition.HasGetter)
+			{
+				sb.Append("get; ");
+			}
+
+			if (definition.HasSetter)
+			{
+				sb.Append("set; ");
+			}
+
+			sb.Append("}");
+		}
+		else
+		{
+			List<string> accessors = new();
+			if (definition.HasGetter)
+			{
+				accessors.Add($"get{Environment.NewLine}{_bodyGenerator.Generate(definition.Getter!.Value)}");
+			}
+			
+			if (definition.HasSetter)
+			{
+				accessors.Add($"set{Environment.NewLine}{_bodyGenerator.Generate(definition.Setter!.Value)}");
+			}
+			
+			string accessorBody = string.Join(Environment.NewLine, accessors);
+			string body = 
+$@"
+{{
+{accessorBody.Indent()}
+}}";
+
+			sb.Append(body);
+		}
+
+		return sb.ToString();
+	}
+
+	private MethodBodyGenerator _bodyGenerator = new();
+	
+}

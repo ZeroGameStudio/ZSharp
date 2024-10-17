@@ -74,6 +74,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 	{
 		FZExportedPropertyDto propertyDto;
 		propertyDto.Name = property.GetName();
+		propertyDto.Index = property.GetIndex();
 		propertyDto.ZCallName = property.GetZCallName();
 		propertyDto.Type = property.GetType();
 		propertyDto.UnderlyingType = property.GetUnderlyingType();

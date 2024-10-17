@@ -97,7 +97,7 @@ $@"unsafe
 	private string MakeCopyOutsAndReturn()
 	{
 		string result = string.Empty;
-		if (Parameters?.Count > 0)
+		if (Parameters?.Any(p => p.Kind != EParameterKind.In) ?? false)
 		{
 			result += $"{Environment.NewLine}{Environment.NewLine}";
 		}

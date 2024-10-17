@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using System.Text;
 using ZeroGames.ZSharp.CodeDom.CSharp;
 
@@ -68,7 +69,7 @@ public class ClassWriter
 			builder.AddMethod(visibility, false, method.IsStatic || _exportedClass.IsInterface, method.Name, method.ZCallName, returnType, parameters.ToArray());
 			if (!abstraction)
 			{
-				builder.AddStaticField("ZCallHandle?", $"_zcallHandleFor{method.ZCallName.Split(':').Last()}");
+				builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{method.ZCallName.Split(':').Last()}");
 			}
 		}
 			
@@ -78,11 +79,16 @@ public class ClassWriter
 			// @TODO: Needs partial properties (C# 13).
 			if (!abstraction)
 			{
-				break;
+				builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{property.ZCallName.Split(':').Last()}");
+				continue;
 			}
 			
 			EMemberVisibility visibility = property.IsPublic ? EMemberVisibility.Public : property.IsProtected ? EMemberVisibility.Protected : EMemberVisibility.Private;
-			builder.AddProperty(visibility, property.Type.ToString(), property.Name, property.ZCallName, !property.IsWritable);
+			builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType), property.Name, property.ZCallName, property.Index, !property.IsWritable);
+			if (!abstraction)
+			{
+				// @TODO: Move AddStaticField() here.
+			}
 		}
 		
 		CompilationUnit compilationUnit = builder.Build();

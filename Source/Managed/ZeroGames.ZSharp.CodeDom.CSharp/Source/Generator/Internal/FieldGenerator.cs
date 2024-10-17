@@ -9,7 +9,7 @@ public class FieldGenerator
 	{
 		string visibility = definition.GetVisibilityText();
 		string modifiers = definition.GetModifiersText();
-		string type = definition.Type;
+		string type = definition.Type.TypeName;
 		string name = definition.Name;
 		string[] decls = [ visibility, modifiers, type, name ];
 		string declList = string.Join(" ", decls.Where(decl => !string.IsNullOrWhiteSpace(decl)));

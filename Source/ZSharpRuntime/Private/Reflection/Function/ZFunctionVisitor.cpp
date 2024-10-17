@@ -47,14 +47,21 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 	check(IsInGameThread());
 	check(bAvailable);
 	check(!bIsDelegate);
-	check(!bIsStatic);
 
 	FZCallBuffer& buf = *buffer;
 	const UFunction* proto = Function.Get();
-	UObject* self = TZCallBufferSlotEncoder<UObject*>::Decode(buf[0]);
-	if (!self)
+	UObject* self;
+	if (!bIsStatic)
 	{
-		return EZCallErrorCode::BufferError;
+		self = TZCallBufferSlotEncoder<UObject*>::Decode(buf[0]);
+		if (!self)
+		{
+			return EZCallErrorCode::BufferError;
+		}
+	}
+	else
+	{
+		self = finalFunction->GetOuterUClass()->GetDefaultObject();
 	}
 	
 	check(finalFunction->IsChildOf(proto));

@@ -11,6 +11,11 @@ internal class PropertyGenerator
 	{
 		StringBuilder sb = new();
 		
+		if (definition.Attributes.Count > 0)
+		{
+			sb.AppendLine(string.Join(Environment.NewLine, definition.Attributes.Select(_attributeListGenerator.Generate)));
+		}
+		
 		string visibility = definition.GetVisibilityText();
 		string modifiers = definition.GetModifiersText();
 		string type = definition.Type.TypeName;
@@ -61,6 +66,7 @@ $@"
 		return sb.ToString();
 	}
 
+	private readonly AttributeListGenerator _attributeListGenerator = new();
 	private MethodBodyGenerator _bodyGenerator = new();
 	
 }

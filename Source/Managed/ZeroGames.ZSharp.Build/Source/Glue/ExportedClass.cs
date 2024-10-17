@@ -24,12 +24,12 @@ public class ExportedClass : ExportedType
 	public required List<ExportedMethod> Methods { get; set; }
 	public required List<ExportedProperty> Properties { get; set; }
 	
-	public bool IsPlain => (Flags & EExportedClassFlags.Plain) != EExportedClassFlags.None;
-	public bool IsClass => (Flags & EExportedClassFlags.Class) != EExportedClassFlags.None;
-	public bool IsStruct => (Flags & EExportedClassFlags.Struct) != EExportedClassFlags.None;
-	public bool IsInterface => (Flags & EExportedClassFlags.Interface) != EExportedClassFlags.None;
-	public bool IsAbstract => (Flags & EExportedClassFlags.Abstract) != EExportedClassFlags.None;
-	public bool IsHashableStruct => IsStruct && (Flags & EExportedClassFlags.Hashable) != EExportedClassFlags.None;
+	public bool IsPlain => Flags.HasFlag(EExportedClassFlags.Plain);
+	public bool IsClass => Flags.HasFlag(EExportedClassFlags.Class);
+	public bool IsStruct => Flags.HasFlag(EExportedClassFlags.Struct);
+	public bool IsInterface => Flags.HasFlag(EExportedClassFlags.Interface);
+	public bool IsAbstract => Flags.HasFlag(EExportedClassFlags.Abstract);
+	public bool IsHashableStruct => IsStruct && Flags.HasFlag(EExportedClassFlags.Hashable);
 }
 
 

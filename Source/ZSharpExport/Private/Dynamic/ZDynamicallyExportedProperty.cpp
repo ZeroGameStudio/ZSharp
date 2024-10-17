@@ -73,12 +73,7 @@ ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(const FProp
 	}
 
 	Flags |= EZExportedPropertyFlags::Readable;
-
-	if (property->IsA<FMulticastDelegateProperty>())
-	{
-		Flags |= EZExportedPropertyFlags::Event;
-	}
-	else
+	if (!property->IsA<FMulticastDelegateProperty>())
 	{
 		Flags |= EZExportedPropertyFlags::Writable;
 	}

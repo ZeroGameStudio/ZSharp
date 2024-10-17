@@ -19,27 +19,32 @@ internal static class MemberDefinitionExtensions
 	{
 		List<string> modifiers = new();
 		
-		if ((@this.Modifiers & EMemberModifiers.Abstract) != EMemberModifiers.None)
+		if (@this.Modifiers.HasFlag(EMemberModifiers.Abstract))
 		{
 			modifiers.Add("abstract");
 		}
 		
-		if ((@this.Modifiers & EMemberModifiers.Sealed) != EMemberModifiers.None)
+		if (@this.Modifiers.HasFlag(EMemberModifiers.Virtual))
+		{
+			modifiers.Add("virtual");
+		}
+		
+		if (@this.Modifiers.HasFlag(EMemberModifiers.Sealed))
 		{
 			modifiers.Add("sealed");
 		}
 		
-		if ((@this.Modifiers & EMemberModifiers.Static) != EMemberModifiers.None)
+		if (@this.Modifiers.HasFlag(EMemberModifiers.Static))
 		{
 			modifiers.Add("static");
 		}
 		
-		if ((@this.Modifiers & EMemberModifiers.Unsafe) != EMemberModifiers.None)
+		if (@this.Modifiers.HasFlag(EMemberModifiers.Unsafe))
 		{
 			modifiers.Add("unsafe");
 		}
 		
-		if ((@this.Modifiers & EMemberModifiers.Partial) != EMemberModifiers.None)
+		if (@this.Modifiers.HasFlag(EMemberModifiers.Partial))
 		{
 			modifiers.Add("partial");
 		}

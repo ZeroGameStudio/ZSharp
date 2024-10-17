@@ -47,7 +47,11 @@ ZSharp::EZExportedMethodFlags ZSharp::FZDynamicallyExportedMethod::GetFlags() co
 
 FString ZSharp::FZDynamicallyExportedMethod::GetZCallName() const
 {
-	return FString::Printf(TEXT("uf:/%s"), *Function->GetPathName());
+	static const TCHAR* GVirtualZCallProtocol = TEXT("uf:/");
+	static const TCHAR* GFinalZCallProtocol = TEXT("uf!:/");
+
+	bool isVirtual = (Flags & EZExportedMethodFlags::Virtual) != EZExportedMethodFlags::None;
+	return FString::Printf(TEXT("%s%s"), isVirtual ? GVirtualZCallProtocol : GFinalZCallProtocol, *Function->GetPathName());
 }
 
 void ZSharp::FZDynamicallyExportedMethod::ForeachParameter(TFunctionRef<void(const IZExportedParameter&)> action) const
@@ -75,10 +79,19 @@ ZSharp::FZDynamicallyExportedMethod::FZDynamicallyExportedMethod(const UFunction
 	{
 		Flags |= EZExportedMethodFlags::Private;
 	}
-	
-	if (Function->HasAllFunctionFlags(FUNC_Static))
+
+	const UClass* owner = Function->GetOwnerClass();
+	if (owner->HasAllClassFlags(CLASS_Interface) || Function->HasAllFunctionFlags(FUNC_Static))
 	{
 		Flags |= EZExportedMethodFlags::Static;
+	}
+	else if (Function->HasAllFunctionFlags(FUNC_Event))
+	{
+		Flags |= EZExportedMethodFlags::Virtual;
+		if (!Function->HasAllFunctionFlags(FUNC_Native))
+		{
+			Flags |= EZExportedMethodFlags::Abstract;
+		}
 	}
 
 	for (TFieldIterator<FProperty> it(Function); it && it->HasAllPropertyFlags(CPF_Parm); ++it)

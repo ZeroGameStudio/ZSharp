@@ -15,10 +15,10 @@ public class ExportedParameter : ExportedVariable
 {
 	public required EExportedParameterFlags Flags { get; set; }
 	
-	public bool IsIn => (Flags & EExportedParameterFlags.In) != EExportedParameterFlags.None;
-	public bool IsOut => (Flags & EExportedParameterFlags.Out) != EExportedParameterFlags.None;
+	public bool IsIn => Flags.HasFlag(EExportedParameterFlags.In);
+	public bool IsOut => Flags.HasFlag(EExportedParameterFlags.Out);
 	public bool IsInOut => IsIn && IsOut;
-	public bool IsReturn => (Flags & EExportedParameterFlags.Return) != EExportedParameterFlags.None;
+	public bool IsReturn => Flags.HasFlag(EExportedParameterFlags.Return);
 }
 
 

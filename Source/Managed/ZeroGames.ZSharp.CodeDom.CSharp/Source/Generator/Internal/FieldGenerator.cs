@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Text;
+
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
 public class FieldGenerator
@@ -7,14 +9,27 @@ public class FieldGenerator
 
 	public string Generate(FieldDefinition definition)
 	{
+		StringBuilder sb = new();
+		
+		if (definition.Attributes.Count > 0)
+		{
+			sb.AppendLine(string.Join(Environment.NewLine, definition.Attributes.Select(_attributeListGenerator.Generate)));
+		}
+		
 		string visibility = definition.GetVisibilityText();
 		string modifiers = definition.GetModifiersText();
 		string type = definition.Type.TypeName;
 		string name = definition.Name;
 		string[] decls = [ visibility, modifiers, type, name ];
 		string declList = string.Join(" ", decls.Where(decl => !string.IsNullOrWhiteSpace(decl)));
-		return declList + ';';
+
+		sb.Append(declList);
+		sb.Append(';');
+
+		return sb.ToString();
 	}
+	
+	private readonly AttributeListGenerator _attributeListGenerator = new();
 	
 }
 

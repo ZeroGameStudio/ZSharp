@@ -14,6 +14,8 @@ namespace ZSharp
 		Protected = 1 << 1,
 		Private = 1 << 2,
 		Static = 1 << 3,
+		Virtual = 1 << 4,
+		Abstract = 1 << 5,
 	};
 	ENUM_CLASS_FLAGS(EZExportedMethodFlags)
 

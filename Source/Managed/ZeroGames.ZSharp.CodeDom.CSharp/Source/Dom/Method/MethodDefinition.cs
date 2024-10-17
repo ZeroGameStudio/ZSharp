@@ -9,6 +9,7 @@ public class MethodDefinition(EMemberVisibility visibility, string name, TypeRef
 	public MethodBody? Body { get; set; }
 	
 	public bool IsDelegate { get; set; }
+	public bool IsPureVirtual { get; set; }
 	
 }
 

@@ -18,7 +18,7 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 	public new void AddAttributeBefore(string name, params string[]? arguments) => base.AddAttributeBefore(name, arguments);
 	public new void AddAttributeAfter(string name, params string[]? arguments) => base.AddAttributeAfter(name, arguments);
 	
-	public void AddMethod(EMemberVisibility visibility, bool isVirtual, bool isStatic, string name, string zcallName, TypeReference? returnType, params ParameterDeclaration[]? parameters)
+	public MethodDefinition AddMethod(EMemberVisibility visibility, bool isVirtual, bool isStatic, string name, string zcallName, TypeReference? returnType, params ParameterDeclaration[]? parameters)
 	{
 		EMemberModifiers modifiers = EMemberModifiers.Partial;
 		if (isVirtual)
@@ -33,28 +33,44 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 		
 		MethodDefinition method = new ZCallMethodBuilder(visibility, modifiers, name, zcallName, returnType, parameters).Build(IsAbstraction);
 		_methods.Add(method);
+
+		return method;
 	}
 
-	public void AddProperty(EMemberVisibility visibility, TypeReference type, string name, string zcallName, int32 index, bool readOnly)
+	public MethodDefinition AddPureVirtualMethod(EMemberVisibility visibility, string name, TypeReference? returnType, params ParameterDeclaration[]? parameters)
+	{
+		MethodDefinition method = new(visibility, name, returnType, parameters)
+		{
+			Modifiers = EMemberModifiers.Virtual,
+			IsPureVirtual = true,
+		};
+		_methods.Add(method);
+
+		return method;
+	}
+
+	public PropertyDefinition AddProperty(EMemberVisibility visibility, TypeReference type, string name, string zcallName, int32 index, bool readOnly)
 	{
 		// @TODO: Partial property
 		EMemberModifiers modifiers = EMemberModifiers.None; // EMemberModifiers.Partial;
 
 		PropertyDefinition property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, index, type, readOnly).Build(IsAbstraction);
 		_properties.Add(property);
+
+		return property;
 	}
 
-	public void AddStaticFieldIfNotExists(TypeReference type, string name)
+	public FieldDefinition AddStaticFieldIfNotExists(TypeReference type, string name)
 	{
-		if (_fields.Any(field => field.Name == name))
+		if (_fields.Find(field => field.Name == name) is {} existingField)
 		{
-			return;
+			return existingField;
 		}
 		
-		AddStaticField(type, name);
+		return AddStaticField(type, name);
 	}
 
-	public void AddStaticField(TypeReference type, string name)
+	public FieldDefinition AddStaticField(TypeReference type, string name)
 	{
 		FieldDefinition field = new(EMemberVisibility.Private, name, type)
 		{
@@ -62,6 +78,8 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 		};
 		
 		_fields.Add(field);
+
+		return field;
 	}
 
 	public EExportedClassKind Kind { get; } = kind;

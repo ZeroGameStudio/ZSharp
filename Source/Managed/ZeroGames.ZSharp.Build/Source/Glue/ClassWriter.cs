@@ -75,10 +75,39 @@ public class ClassWriter
 			}
 
 			TypeReference? returnType = method.ReturnParameter?.Type.ToString() is {} returnTypeName ? new(returnTypeName, method.ReturnParameter.UnderlyingType) : null;
-			builder.AddMethod(visibility, false, method.IsStatic || _exportedClass.IsInterface, method.Name, method.ZCallName, returnType, parameters.ToArray());
+			
+			builder.AddMethod(visibility, false, method.IsStatic, method.Name, method.ZCallName, returnType, parameters.ToArray());
 			if (!abstraction)
 			{
 				builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{method.ZCallName.Split(':').Last()}");
+			}
+
+			if (method.IsVirtual)
+			{
+				// Ignoring abstract allows to call parent on both virtual and abstract functions,
+				// providing a unified approach that reduces cognitive load, but would slightly decrease performance.
+				bool ignoreAbstract = false;
+				string implName = $"{method.Name}_Implementation";
+				MethodDefinition? methodDefinition = null;
+				if (!method.IsAbstract || ignoreAbstract)
+				{
+					// Virtual function uses uf:/ protocol so we need to manually convert to uf!:/
+					string implZCallName = method.ZCallName.Insert(2, "!");
+					methodDefinition = builder.AddMethod(EMemberVisibility.Protected, true, false, implName, implZCallName, returnType, parameters.ToArray());
+					if (!abstraction)
+					{
+						builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{method.ZCallName.Split(':').Last()}_Implementation");
+					}
+				}
+				else if (abstraction)
+				{
+					methodDefinition = builder.AddPureVirtualMethod(EMemberVisibility.Protected, implName, returnType, parameters.ToArray());
+				}
+
+				if (abstraction)
+				{
+					methodDefinition?.AddAttributeList(new AttributeDeclaration("Event"));
+				}
 			}
 		}
 			

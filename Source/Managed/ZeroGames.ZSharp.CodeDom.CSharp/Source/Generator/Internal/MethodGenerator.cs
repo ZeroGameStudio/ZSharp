@@ -11,6 +11,11 @@ internal class MethodGenerator
 	{
 		StringBuilder sb = new();
 		
+		if (definition.Attributes.Count > 0)
+		{
+			sb.AppendLine(string.Join(Environment.NewLine, definition.Attributes.Select(_attributeListGenerator.Generate)));
+		}
+		
 		string visibility = definition.GetVisibilityText();
 		string modifiers = definition.GetModifiersText();
 		string kind = definition.IsDelegate ? "delegate" : string.Empty;
@@ -24,8 +29,12 @@ internal class MethodGenerator
 		
 		string methodDecl = $"{declList}({parameterList})";
 		sb.Append(methodDecl);
-		
-		if (definition.Body is not null)
+
+		if (definition.IsPureVirtual)
+		{
+			sb.Append(" => throw new NotImplementedException();");
+		}
+		else if (definition.Body is not null)
 		{
 			string body = _bodyGenerator.Generate(definition.Body.Value);
 			sb.AppendLine();
@@ -39,6 +48,7 @@ internal class MethodGenerator
 		return sb.ToString();
 	}
 
+	private readonly AttributeListGenerator _attributeListGenerator = new();
 	private MethodBodyGenerator _bodyGenerator = new();
 
 }

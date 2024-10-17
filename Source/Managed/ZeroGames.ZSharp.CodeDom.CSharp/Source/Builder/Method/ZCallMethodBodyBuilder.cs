@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Diagnostics;
 using System.Text;
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
@@ -13,7 +12,8 @@ public class ZCallMethodBodyBuilder(string name, TypeReference? returnType, para
 		StringBuilder sb = new();
 		
 		string shortName = Name.Split(':').Last();
-		string handleFieldName = $"_zcallHandleFor{shortName}";
+		string implPostfix = IsVirtual ? "_Implementation" : string.Empty;
+		string handleFieldName = $"_zcallHandleFor{shortName}{implPostfix}";
 		int32 numSlots = (IsStatic ? 0 : 1) + (Parameters?.Count ?? 0) + (ReturnType is null ? 0 : 1);
 
 		string getHandle = 
@@ -67,6 +67,7 @@ $@"unsafe
 	public IReadOnlyList<ParameterDeclaration>? Parameters { get; } = parameters;
 
 	public bool IsStatic { get; set; }
+	public bool IsVirtual { get; set; }
 
 	private string MakeSlots()
 	{

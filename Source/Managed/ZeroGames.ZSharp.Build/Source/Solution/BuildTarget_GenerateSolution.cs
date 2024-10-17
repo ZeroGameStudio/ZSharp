@@ -25,13 +25,13 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
     }
     
     public string UnrealProjectDir { get; }
-
-
+    public string ZSharpPluginDir { get; }
     
     [FactoryConstructor]
-    private BuildTarget_GenerateSolution(IBuildEngine engine, [Argument("projectdir")] string projectDir, [Argument("source")] string source) : base(engine)
+    private BuildTarget_GenerateSolution(IBuildEngine engine, [Argument("projectdir")] string projectDir, [Argument("zsharpdir")] string zsharpDir, [Argument("source")] string source) : base(engine)
     {
         UnrealProjectDir = projectDir;
+        ZSharpPluginDir = zsharpDir;
         if (!((IUnrealProjectDir)this).IsValid)
         {
             throw new ArgumentException($"Invalid argument projectdir={projectDir}.");
@@ -136,8 +136,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
         await using FileStream fs = File.Create(path);
         await using StreamWriter sw = new(fs, Encoding.UTF8);
 
-        // @FIXME: PluginDir
-        ProjectFileBuilder builder = new(project, UnrealProjectDir, $"{UnrealProjectDir}/Plugins/ZeroGames/ZSharp");
+        ProjectFileBuilder builder = new(project, UnrealProjectDir, ZSharpPluginDir);
 
         await sw.WriteAsync(builder.ToString());
 
@@ -146,7 +145,6 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
     
     private async Task<string> GenerateSolutionFileAsync()
     {
-        // @FIXME: Solution file name
         string projectFile = Directory.GetFiles(UnrealProjectDir, "*.*", SearchOption.TopDirectoryOnly).FirstOrDefault(file => Path.GetExtension(file) == ".uproject") ?? throw new InvalidOperationException();
         string projectFileShortName = Path.GetFileNameWithoutExtension(projectFile);
         string path = $"{UnrealProjectDir}/{projectFileShortName}Script.sln";

@@ -66,6 +66,7 @@ void ZSharp::FZBuildEngine::GenerateSolution(const TArray<FString>& args) const
 
 	const FString targetArg = ZBuildEngine_Private::BuildArgument("target", "solution");
 	const FString projectDirArg = ZBuildEngine_Private::BuildArgument("projectdir", projectDir);
+	const FString zsharpDirArg = ZBuildEngine_Private::BuildArgument("zsharpdir", pluginDir);
 	const FString projectManagedSourceDir = FPaths::Combine(projectDir, "Source/Managed");
 	const FString pluginManagedSourceDir = FPaths::Combine(pluginDir, "Source/Managed");
 	FString dirsToScan = FString::Printf(TEXT("%s;%s"), *projectManagedSourceDir, *pluginManagedSourceDir);
@@ -84,6 +85,7 @@ void ZSharp::FZBuildEngine::GenerateSolution(const TArray<FString>& args) const
 	{
 		*targetArg,
 		*projectDirArg,
+		*zsharpDirArg,
 		*sourceArg,
 	};
 	FZCommonMethodArgs commonArgs { UE_ARRAY_COUNT(argv), argv };

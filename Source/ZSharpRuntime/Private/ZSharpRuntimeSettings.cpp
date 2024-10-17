@@ -28,6 +28,19 @@ UZSharpRuntimeSettings::UZSharpRuntimeSettings()
 
 	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Guid", "UnrealGuid");
 	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.DateTime", "UnrealDateTime");
+
+	// There are some delegates in UWidget with bad name which often cause naming conflicts.
+	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetWidget__DelegateSignature", "GetWidgetDelegate__DelegateSignature");
+	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetText__DelegateSignature", "GetTextDelegate__DelegateSignature");
+	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetInt32__DelegateSignature", "GetInt32Delegate__DelegateSignature");
+	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetFloat__DelegateSignature", "GetFloatDelegate__DelegateSignature");
+	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetBool__DelegateSignature", "GetBoolDelegate__DelegateSignature");
+	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetSlateColor__DelegateSignature", "GetSlateColorDelegate__DelegateSignature");
+	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetLinearColor__DelegateSignature", "GetLinearColorDelegate__DelegateSignature");
+	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetSlateBrush__DelegateSignature", "GetSlateBrushDelegate__DelegateSignature");
+	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetSlateVisibility__DelegateSignature", "GetSlateVisibilityDelegate__DelegateSignature");
+	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetMouseCursor__DelegateSignature", "GetMouseCursorDelegate__DelegateSignature");
+	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetCheckBoxState__DelegateSignature", "GetCheckBoxStateDelegate__DelegateSignature");
 }
 
 const FZModuleMappingContext* UZSharpRuntimeSettings::GetModuleMappingContext(const FString& module) const

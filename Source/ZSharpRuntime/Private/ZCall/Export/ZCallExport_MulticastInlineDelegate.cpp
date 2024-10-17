@@ -4,7 +4,7 @@
 #include "ZCall/ZStaticallyExportZCall.h"
 #include "ZCall/ZStaticallyExportZCallMacros.h"
 
-namespace ZSharp
+namespace ZSharp::ExportMulticastInlineDelegate
 {
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveMulticastInlineScriptDelegate::AddUFunction, FMulticastInlineDelegate::AddUFunction)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveMulticastInlineScriptDelegate::AddManaged, FMulticastInlineDelegate::AddManaged)

@@ -4,7 +4,7 @@
 #include "ZCall/ZStaticallyExportZCall.h"
 #include "ZCall/ZStaticallyExportZCallMacros.h"
 
-namespace ZSharp
+namespace ZSharp::ExportObject
 {
 	namespace ZCallExport_Object_Private
 	{

@@ -4,7 +4,7 @@
 #include "ZCall/ZStaticallyExportZCall.h"
 #include "ZCall/ZStaticallyExportZCallMacros.h"
 
-namespace ZSharp
+namespace ZSharp::ExportArray
 {
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptArray::InsertAt, FArray::InsertAt)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptArray::RemoveAt, FArray::RemoveAt)

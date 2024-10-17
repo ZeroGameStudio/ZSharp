@@ -4,7 +4,7 @@
 #include "ZCall/ZStaticallyExportZCall.h"
 #include "ZCall/ZStaticallyExportZCallMacros.h"
 
-namespace ZSharp
+namespace ZSharp::ExportMap
 {
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptMap::Clear, FMap::Clear)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptMap::Num, FMap::Num)

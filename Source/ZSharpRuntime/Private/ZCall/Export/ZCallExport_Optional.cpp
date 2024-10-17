@@ -4,7 +4,7 @@
 #include "ZCall/ZStaticallyExportZCall.h"
 #include "ZCall/ZStaticallyExportZCallMacros.h"
 
-namespace ZSharp
+namespace ZSharp::ExportOptional
 {
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveOptional::Reset, FOptional::Reset)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveOptional::IsSet, FOptional::IsSet)

@@ -4,7 +4,7 @@
 #include "ZCall/ZStaticallyExportZCall.h"
 #include "ZCall/ZStaticallyExportZCallMacros.h"
 
-namespace ZSharp
+namespace ZSharp::ExportDelegate
 {
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptDelegate::BindUFunction, FDelegate::BindUFunction)
 	ZSHARP_STATIC_EXPORT_ZCALL_EX(FZSelfDescriptiveScriptDelegate::BindManaged, FDelegate::BindManaged)

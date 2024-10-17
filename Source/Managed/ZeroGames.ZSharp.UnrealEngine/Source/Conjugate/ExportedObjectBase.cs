@@ -34,28 +34,6 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 public abstract class ExportedObjectBase : IConjugate
 {
 
-    public static IMasterAssemblyLoadContext GetOwningAlc()
-    {
-        Assembly asm = typeof(ExportedObjectBase).Assembly;
-        AssemblyLoadContext? alc = AssemblyLoadContext.GetLoadContext(asm);
-        if (alc is null)
-        {
-            throw new Exception("Owning ALC not found.");
-        }
-
-        if (alc is IMasterAssemblyLoadContext masterAlc)
-        {
-            if (alc != IMasterAssemblyLoadContext.Instance)
-            {
-                throw new Exception("Owning ALC is MasterAssemblyLoadContext but not the live one.");
-            }
-            
-            return masterAlc;
-        }
-
-        throw new Exception($"Owning ALC is not MasterAssemblyLoadContext but {alc.GetType().Name}");
-    }
-
     public void Dispose() => InternalDispose(false);
 
     public void Release()
@@ -180,7 +158,7 @@ public abstract class ExportedObjectBase : IConjugate
         
         if (fromFinalizer)
         {
-            GetOwningAlc().PushPendingDisposeConjugate(this);
+            MasterAlcCache.Instance.PushPendingDisposeConjugate(this);
             return;
         }
         
@@ -191,7 +169,7 @@ public abstract class ExportedObjectBase : IConjugate
         
         Volatile.Write(ref _hasDisposed, true);
         
-        GetOwningAlc().ReleaseConjugate(Unmanaged);
+        MasterAlcCache.Instance.ReleaseConjugate(Unmanaged);
         MarkAsDead();
 
         if (!fromFinalizer)

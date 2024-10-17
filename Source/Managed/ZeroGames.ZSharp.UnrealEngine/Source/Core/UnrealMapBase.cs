@@ -21,7 +21,7 @@ public abstract class UnrealMapBase : PlainExportedObjectBase
 		
 		SetupUserdata(out var userdata);
 		Userdata* pUserdata = &userdata;
-		Unmanaged = GetOwningAlc().BuildConjugate(this, (IntPtr)pUserdata);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, (IntPtr)pUserdata);
 	}
 	
 	protected UnrealMapBase(Type keyType, Type valueType, IntPtr unmanaged) : base(unmanaged)

@@ -20,7 +20,7 @@ public abstract class UnrealOptionalBase : PlainExportedObjectBase
 		
 		SetupUserdata(out var userdata);
 		Userdata* pUserdata = &userdata;
-		Unmanaged = GetOwningAlc().BuildConjugate(this, (IntPtr)pUserdata);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, (IntPtr)pUserdata);
 	}
 	
 	protected UnrealOptionalBase(Type elementType, IntPtr unmanaged) : base(unmanaged)

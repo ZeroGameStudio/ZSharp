@@ -19,7 +19,7 @@ public abstract class UnrealSetBase : PlainExportedObjectBase
 		
 		SetupUserdata(out var userdata);
 		Userdata* pUserdata = &userdata;
-		Unmanaged = GetOwningAlc().BuildConjugate(this, (IntPtr)pUserdata);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, (IntPtr)pUserdata);
 	}
 	
 	protected UnrealSetBase(Type elementType, IntPtr unmanaged) : base(unmanaged)

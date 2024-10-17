@@ -21,7 +21,7 @@ public abstract class UnrealArrayBase : PlainExportedObjectBase
 		
 		SetupUserdata(out var userdata);
 		Userdata* pUserdata = &userdata;
-		Unmanaged = GetOwningAlc().BuildConjugate(this, (IntPtr)pUserdata);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, (IntPtr)pUserdata);
 	}
 
 	protected UnrealArrayBase(Type elementType, IntPtr unmanaged) : base(unmanaged)

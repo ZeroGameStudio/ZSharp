@@ -33,7 +33,7 @@ public abstract class UnrealDelegateBase : UnrealDynamicDelegateBase
 	{
 		_delegateType = delegateType;
 		
-		Unmanaged = GetOwningAlc().BuildConjugate(this, GetUnrealDelegateSignature(_delegateType).Unmanaged);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, GetUnrealDelegateSignature(_delegateType).Unmanaged);
 	}
 
 	protected UnrealDelegateBase(Type delegateType, IntPtr unmanaged) : base(unmanaged)

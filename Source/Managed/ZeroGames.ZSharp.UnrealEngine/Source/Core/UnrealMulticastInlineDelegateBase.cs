@@ -21,7 +21,7 @@ public abstract class UnrealMulticastInlineDelegateBase : UnrealDynamicDelegateB
 	{
 		_delegateType = delegateType;
 		
-		Unmanaged = GetOwningAlc().BuildConjugate(this, UnrealDelegateBase.GetUnrealDelegateSignature(_delegateType).Unmanaged);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealDelegateBase.GetUnrealDelegateSignature(_delegateType).Unmanaged);
 	}
 
 	protected UnrealMulticastInlineDelegateBase(Type delegateType, IntPtr unmanaged) : base(unmanaged)

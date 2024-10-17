@@ -9,9 +9,4 @@ public class BlueprintEventAttribute : BlueprintEventSpecifierBase
 	public string? Implementation { get; init; }
 }
 
-public class BlueprintEventOverrideAttribute : BlueprintEventSpecifierBase
-{
-	public required string Event { get; init; }
-}
-
 

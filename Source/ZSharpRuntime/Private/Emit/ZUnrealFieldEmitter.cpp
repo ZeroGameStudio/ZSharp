@@ -330,6 +330,14 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 	{
 		const FName name = def.Name;
 		const EObjectFlags flags = def.Flags;
+
+#if DO_CHECK
+		if (const auto ownerStruct = owner.Get<UStruct>())
+		{
+			const FProperty* existingProperty = ownerStruct->FindPropertyByName(name);
+			check(!existingProperty);
+		}
+#endif
 		
 		bool needsFinishSimple = true;
 		switch (def.Type)
@@ -431,37 +439,59 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Transient | RF_MarkAsNative;
 		// Z# function must be native.
 		constexpr EFunctionFlags GCompiledInFunctionFlags = FUNC_Native;
+		
+		UFunction* function;
+		if (!def.IsEventOverride)
+		{
+#if DO_CHECK
+			const UFunction* existingFunction = outer->FindFunctionByName(def.Name);
+			check(!existingFunction);
+#endif
 
-		FStaticConstructObjectParameters params { UFunction::StaticClass() };
-		params.Outer = outer;
-		params.Name = *def.Name.ToString();
-		params.SetFlags = def.Flags | GCompiledInFlags;
+			FStaticConstructObjectParameters params { UFunction::StaticClass() };
+			params.Outer = outer;
+			params.Name = *def.Name.ToString();
+			params.SetFlags = def.Flags | GCompiledInFlags;
 	
-		const auto function = static_cast<UFunction*>(StaticConstructObject_Internal(params));
-		def.Function = function;
+			function = static_cast<UFunction*>(StaticConstructObject_Internal(params));
 
-		function->FunctionFlags |= def.FunctionFlags | GCompiledInFunctionFlags;
-		function->RPCId = def.RpcId;
-		function->RPCResponseId = def.RpcResponseId;
+			function->FunctionFlags |= def.FunctionFlags | GCompiledInFunctionFlags;
+			function->RPCId = def.RpcId;
+			function->RPCResponseId = def.RpcResponseId;
+
+			EmitProperties(function, def.Properties);
+			AddMetadata(function, def.MetadataMap);
+		}
+		else
+		{
+#if DO_CHECK
+			const UFunction* existingFunction = outer->FindFunctionByName(def.Name, EIncludeSuperFlag::ExcludeSuper);
+			check(!existingFunction);
+#endif
+			
+			UFunction* superFunction = outer->GetSuperClass()->FindFunctionByName(def.Name);
+			check(superFunction);
+			check(superFunction->HasAllFunctionFlags(FUNC_Event));
+
+			FObjectDuplicationParameters params { superFunction, outer };
+			params.DestName = *def.Name.ToString();
+			params.ApplyFlags = GCompiledInFlags;
+
+			function = static_cast<UFunction*>(StaticDuplicateObjectEx(params));
+			check(function->IsSignatureCompatibleWith(superFunction));
+
+			function->FunctionFlags |= GCompiledInFunctionFlags;
+
+			// Migrate from FBlueprintCompilationManager::FastGenerateSkeletonClass().
+			function->SetSuperStruct(superFunction);
+			function->FunctionFlags |= (superFunction->FunctionFlags & (FUNC_FuncInherit | FUNC_Public | FUNC_Protected | FUNC_Private | FUNC_BlueprintPure));
+			UMetaData::CopyMetadata(superFunction, function);
+		}
+
+		def.Function = function;
 
 		FNativeFuncPtr thunk = def.CustomThunkName.IsNone() ? ZSharpFunction_Private::execZCall : FCustomThunkRegistry::Get().GetThunk(def.CustomThunkName);
 		outer->AddNativeFunction(*function->GetName(), thunk);
-
-		EmitProperties(function, def.Properties);
-		AddMetadata(function, def.MetadataMap);
-
-		if (function->HasAllFunctionFlags(FUNC_BlueprintEvent))
-		{
-			if (UFunction* superFunction = outer->GetSuperClass()->FindFunctionByName(function->GetFName()))
-			{
-				UE_CLOG(!function->IsSignatureCompatibleWith(superFunction), LogZSharpEmit, Fatal, TEXT("BlueprintEventOverride [%s] signature mismatch!"), *GetNameSafe(function));
-
-				// Migrate from FBlueprintCompilationManager::FastGenerateSkeletonClass().
-				function->SetSuperStruct(superFunction);
-				function->FunctionFlags |= (superFunction->FunctionFlags & (FUNC_FuncInherit | FUNC_Public | FUNC_Protected | FUNC_Private | FUNC_BlueprintPure));
-				UMetaData::CopyMetadata(superFunction, function);
-			}
-		}
 
 		function->Bind();
 		function->StaticLink(true);

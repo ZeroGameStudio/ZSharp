@@ -21,7 +21,7 @@ internal static class SpecifierResolver
 				continue;
 			}
 			
-			TypeDefinition typeDef = modelRegistry.ResolveTypeDefinition(assemblyName, typeRef.FullName);
+			TypeDefinition typeDef = modelRegistry.ResolveTypeDefinition(typeRef);
 			Assembly assembly = AssemblyLoadContext.Default.Assemblies.Single(asm => asm.GetName().Name == assemblyName);
 			Type? specifierRuntimeType = assembly.GetType(typeDef.FullName);
 			if (specifierRuntimeType is null)
@@ -64,7 +64,7 @@ internal static class SpecifierResolver
 		// Fill scanner assembly name and full name.
 		foreach (var arg in typeConstructorArguments)
 		{
-			IScanTimeType scanTimeType = modelRegistry.GetOrAddTypeModel(modelRegistry.ResolveTypeDefinition(arg.TypeRef.Scope.GetAssemblyName(), arg.TypeRef.FullName));
+			IScanTimeType scanTimeType = modelRegistry.GetOrAddTypeModel(modelRegistry.ResolveTypeDefinition(arg.TypeRef));
 			SetScannerPropertyForSpecifier(specifier, arg.Index, scanTimeType);
 		}
 
@@ -76,7 +76,7 @@ internal static class SpecifierResolver
 				CustomAttributeArgument arg = namedArg.Argument;
 				if (arg.Value is TypeReference typeArg)
 				{
-					IScanTimeType scanTimeType = modelRegistry.GetOrAddTypeModel(modelRegistry.ResolveTypeDefinition(typeArg.Scope.GetAssemblyName(), typeArg.FullName));
+					IScanTimeType scanTimeType = modelRegistry.GetOrAddTypeModel(modelRegistry.ResolveTypeDefinition(typeArg));
 					SetScannerPropertyForSpecifier(specifier, namedArg.Name, scanTimeType);
 				}
 				else
@@ -93,7 +93,7 @@ internal static class SpecifierResolver
 				CustomAttributeArgument arg = namedArg.Argument;
 				if (arg.Value is TypeReference typeArg)
 				{
-					IScanTimeType scanTimeType = modelRegistry.GetOrAddTypeModel(modelRegistry.ResolveTypeDefinition(typeArg.Scope.GetAssemblyName(), typeArg.FullName));
+					IScanTimeType scanTimeType = modelRegistry.GetOrAddTypeModel(modelRegistry.ResolveTypeDefinition(typeArg));
 					SetScannerPropertyForSpecifier(specifier, namedArg.Name, scanTimeType);
 				}
 				else

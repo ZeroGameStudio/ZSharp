@@ -81,6 +81,7 @@ public class UnrealFunctionDefinition : UnrealStructDefinition
 	}
 	
 	[JsonIgnore] public UnrealClassDefinition Outer { get; init; } = null!; // Can't use required for JsonIgnore property...
+	public bool IsEventOverride { get; set; }
 	public EFunctionFlags FunctionFlags { get; set; }
 	public required string ZCallName { get; set; }
 	public uint16 RpcId { get; set; }

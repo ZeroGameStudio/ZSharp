@@ -7,17 +7,22 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 internal class UnrealFunctionModel : UnrealStructModel, IUnrealFunctionModel
 {
 
-	public UnrealFunctionModel(ModelRegistry registry, MethodDefinition methodDef, IUnrealClassModel outer) : base(methodDef.Name, registry, methodDef)
+	public UnrealFunctionModel(ModelRegistry registry, MethodDefinition methodDef, IUnrealClassModel outer, string? eventOverrideName) : base(methodDef.Name, registry, methodDef)
 	{
 		Visibility = methodDef.IsPublic ? EMemberVisibility.Public : methodDef.IsFamily ? EMemberVisibility.Protected : EMemberVisibility.Private;
 		Outer = outer;
-		
-		ScanUParams(registry, methodDef);
+		EventOverrideName = eventOverrideName;
+
+		if (EventOverrideName is null)
+		{
+			ScanUParams(registry, methodDef);
+		}
 	}
 	
 	public EMemberVisibility Visibility { get; }
 	public IUnrealClassModel Outer { get; }
-	
+	public string? EventOverrideName { get; }
+
 	private void ScanUParams(ModelRegistry registry, MethodDefinition methodDef)
 	{
 		foreach (var parameter in methodDef.Parameters)

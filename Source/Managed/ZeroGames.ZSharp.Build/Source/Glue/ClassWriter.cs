@@ -106,7 +106,9 @@ public class ClassWriter
 
 				if (abstraction)
 				{
-					methodDefinition?.AddAttributeList(new AttributeDeclaration("Event"));
+					// Method name may be aliased so we take original UFunction name from ZCall name.
+					string eventNameLiteral = $"\"{method.ZCallName.Split(':').Last()}\"";
+					methodDefinition?.AddAttributeList(new AttributeDeclaration("Event", eventNameLiteral));
 				}
 			}
 		}

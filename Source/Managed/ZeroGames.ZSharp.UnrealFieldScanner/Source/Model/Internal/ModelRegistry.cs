@@ -63,6 +63,8 @@ internal sealed partial class ModelRegistry : IModelRegistry
 		CheckDuringInitialization();
 		return GetTypeDefinition(assemblyName, typeFullName);
 	}
+
+	public TypeDefinition ResolveTypeDefinition(TypeReference typeRef) => ResolveTypeDefinition(typeRef.Scope.GetAssemblyName(), typeRef.FullName);
 	
 	public string RootAssemblyName { get; }
 	public string RootModuleName { get; }

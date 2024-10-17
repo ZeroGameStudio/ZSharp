@@ -21,6 +21,14 @@ partial class ManifestBuilder
 			Name = functionModel.Name,
 			ZCallName = $"m://{functionModel.Outer.AssemblyName}:{functionModel.Outer.FullName}:{functionModel.Name}",
 		};
+		
+		// Early out for event override because what we need is only a flag.
+		if (functionModel.EventOverrideName is not null)
+		{
+			result.Name = functionModel.EventOverrideName;
+			result.IsEventOverride = true;
+			return result;
+		}
 
 		result.FunctionFlags |= functionModel.Visibility switch
 		{

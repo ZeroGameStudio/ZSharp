@@ -61,7 +61,8 @@ namespace ZSharp
 	struct FZFunctionDefinition : public FZStructDefinition
 	{
 		UFunction* Function = nullptr;
-		
+
+		bool IsEventOverride = false;
 		EFunctionFlags FunctionFlags = FUNC_None;
 
 		FString ZCallName;

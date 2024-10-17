@@ -27,7 +27,7 @@ public static class MasterAlcCache
 		{
 			throw new Exception("Owning ALC is MasterAssemblyLoadContext but not the live one.");
 		}
-            
+		
 		Instance = masterAlc;
 	}
 }

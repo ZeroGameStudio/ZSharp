@@ -65,6 +65,9 @@ struct FZExportedClassDto : public FZExportedTypeDto
 	FZFullyExportedTypeNameDto BaseType;
 
 	UPROPERTY()
+	TArray<FZFullyExportedTypeNameDto> Interfaces;
+
+	UPROPERTY()
 	TArray<FZExportedMethodDto> Methods;
 
 	UPROPERTY()

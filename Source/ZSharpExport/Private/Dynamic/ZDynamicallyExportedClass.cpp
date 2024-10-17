@@ -73,6 +73,14 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedClass::GetBaseType(
 	return FZExportHelper::GetUFieldFullyExportedName(super);
 }
 
+void ZSharp::FZDynamicallyExportedClass::ForeachInterface(TFunctionRef<void(const FZFullyExportedTypeName&)> action) const
+{
+	for (const auto& interface : Interfaces)
+	{
+		action(interface);
+	}
+}
+
 void ZSharp::FZDynamicallyExportedClass::ForeachMethod(TFunctionRef<void(const IZExportedMethod&)> action) const
 {
 	for (const auto& method : Methods)
@@ -106,6 +114,29 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 			if (uclass->HasAnyClassFlags(CLASS_Abstract) && uclass != UObject::StaticClass())
 			{
 				Flags |= EZExportedClassFlags::Abstract;
+			}
+
+			for (const auto& interface : uclass->Interfaces)
+			{
+				check(interface.Class->IsNative());
+				const UField* mappedInterface = FZReflectionHelper::GetUFieldClosestMappedAncestor(interface.Class);
+				if (!mappedInterface)
+				{
+					continue;
+				}
+
+				if (mappedInterface == UInterface::StaticClass())
+				{
+					continue;
+				}
+
+				FZFullyExportedTypeName name = FZExportHelper::GetUFieldFullyExportedName(mappedInterface);
+				if (Interfaces.ContainsByPredicate([&name](const FZFullyExportedTypeName& interface){ return interface.Name == name.Name; }))
+				{
+					continue;
+				}
+
+				Interfaces.Emplace(name);
 			}
 		}
 	}

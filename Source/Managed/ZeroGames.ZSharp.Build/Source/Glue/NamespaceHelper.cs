@@ -9,6 +9,11 @@ public static class NamespaceHelper
 	{
 		SortedSet<string> res = [];
 		LootNamespace(cls.BaseType, res);
+		foreach (var implementedInterface in cls.Interfaces)
+		{
+			LootNamespace(implementedInterface, res);
+		}
+		
 		foreach (var method in cls.Methods)
 		{
 			foreach (var parameter in method.Parameters)

@@ -26,6 +26,11 @@ namespace ZSharp
 		virtual uint16 GetConjugateRegistryId() const override { return TZConjugateRegistryId_V<T>; }
 		virtual EZExportedClassFlags GetFlags() const override { return Flags; }
 		virtual FZFullyExportedTypeName GetBaseType() const override { return {}; }
+
+		virtual void ForeachInterface(TFunctionRef<void(const FZFullyExportedTypeName&)> action) const override
+		{
+			
+		}
 		
 		virtual void ForeachMethod(TFunctionRef<void(const IZExportedMethod&)> action) const override
 		{

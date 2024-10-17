@@ -21,6 +21,7 @@ namespace ZSharp
 		virtual uint16 GetConjugateRegistryId() const override;
 		virtual EZExportedClassFlags GetFlags() const override;
 		virtual FZFullyExportedTypeName GetBaseType() const override;
+		virtual void ForeachInterface(TFunctionRef<void(const FZFullyExportedTypeName&)> action) const override;
 		virtual void ForeachMethod(TFunctionRef<void(const IZExportedMethod&)> action) const override;
 		virtual void ForeachProperty(TFunctionRef<void(const IZExportedProperty&)> action) const override;
 
@@ -30,6 +31,7 @@ namespace ZSharp
 	private:
 		const UStruct* Struct;
 		EZExportedClassFlags Flags;
+		TArray<FZFullyExportedTypeName> Interfaces;
 		TArray<TUniquePtr<IZExportedMethod>> Methods;
 		TArray<TUniquePtr<IZExportedProperty>> Properties;
 		

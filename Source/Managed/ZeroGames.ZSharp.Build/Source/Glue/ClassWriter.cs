@@ -43,6 +43,15 @@ public class ClassWriter
 			builder.AddAttributeAfter("ConjugateRegistryId", _exportedClass.ConjugateRegistryId.ToString());
 		}
 		
+		// Interfaces
+		if (abstraction)
+		{
+			foreach (var implementedInterface in _exportedClass.Interfaces)
+			{
+				builder.AddInterface(implementedInterface.ToString(false));
+			}
+		}
+		
 		// Methods
 		foreach (var method in _exportedClass.Methods.OrderBy(method => method.IsPublic ? 1 : method.IsProtected ? 2 : 3))
 		{

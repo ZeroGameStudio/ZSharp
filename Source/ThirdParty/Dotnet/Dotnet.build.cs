@@ -16,7 +16,7 @@ public class Dotnet : ModuleRules
 		string platformName = Target.Platform.ToString();
 		string dotnetVersion = "8.0.3";
 
-		string dotnetRoot = Path.Combine("$(BinaryOutputDir)", "dotnet");
+		string dotnetRoot = Path.Combine(PluginDirectory, "Binaries", platformName, "dotnet");
 
 		{ // Copy hostfxr.
 			string hostDir = Path.Combine(dotnetRoot, "host", "fxr", dotnetVersion);
@@ -51,15 +51,18 @@ public class Dotnet : ModuleRules
             }
 		}
 
+		HashSet<string> existingLibs = new();
 		{ // Copy shared libs
+			string sharedDstRoot = Target.bBuildEditor ? $"{PluginDirectory}/Binaries" : "$(TargetOutputDir)/..";
 			string sharedSrcDir = Path.Combine(ModuleDirectory, "shared");
-			string sharedDstDir = Path.Combine("$(BinaryOutputDir)", "..", "Managed", "Shared");
+			string sharedDstDir = Path.Combine(sharedDstRoot, "Managed", "Shared");
 			IEnumerable<string> sharedFiles = GetFiles(sharedSrcDir);
 			foreach (var file in sharedFiles)
 			{
 				string relativePath = file.Substring(sharedSrcDir.Length + 1, file.Length - sharedSrcDir.Length - 1);
-            
-				RuntimeDependencies.Add(Path.Combine(sharedDstDir, relativePath), file);
+				string dstPath = Path.Combine(sharedDstDir, relativePath);
+				RuntimeDependencies.Add(dstPath, file);
+				existingLibs.Add(NormalizePath(dstPath));
 			}
 		}
 
@@ -70,11 +73,18 @@ public class Dotnet : ModuleRules
 		 */
 		if (!Target.bBuildEditor)
 		{
-			IEnumerable<string> managedAssemblies = GetFiles(Path.Combine(PluginDirectory, "Binaries/Managed"));
+			string managedDir = Path.Combine(PluginDirectory, "Binaries/Managed");
+			IEnumerable<string> managedAssemblies = GetFiles(managedDir);
 			foreach (var file in managedAssemblies)
 			{
-				string fileName = Path.GetFileName(file);
-				RuntimeDependencies.Add(Path.Combine("$(TargetOutputDir)/../Managed", fileName), file);
+				string relativePath = file.Substring(managedDir.Length + 1, file.Length - managedDir.Length - 1);
+				string dstPath = Path.Combine("$(TargetOutputDir)/../Managed", relativePath);
+				if (existingLibs.Contains(NormalizePath(dstPath)))
+				{
+					continue;
+				}
+				
+				RuntimeDependencies.Add(dstPath, file);
 			}
 			
 			RuntimeDependencies.Add(Path.Combine(PluginDirectory, "Config/ZSharp.runtimeconfig.json"));
@@ -99,4 +109,10 @@ public class Dotnet : ModuleRules
 
 		return files;
 	}
+
+	private static string NormalizePath(string path)
+	{
+		return path.Replace('\\', '/');
+	}
+	
 }

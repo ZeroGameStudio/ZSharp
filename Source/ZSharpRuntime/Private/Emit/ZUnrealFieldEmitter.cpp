@@ -1014,6 +1014,15 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 		}
 	}
 
+	// Notify registration. Migrate from UObjectLoadAllCompiledInDefaultProperties().
+	{
+		TCHAR PackageName[FName::StringBufferSize];
+		TCHAR ClassName[FName::StringBufferSize];
+		cls->GetOutermost()->GetFName().ToString(PackageName);
+		cls->GetFName().ToString(ClassName);
+		NotifyRegistrationEvent(PackageName, ClassName, ENotifyRegistrationType::NRT_Class, ENotifyRegistrationPhase::NRP_Finished, nullptr, false, cls);
+	}
+
 	// Create CDO.
 	const UObject* cdo = def.Class->GetDefaultObject();
 

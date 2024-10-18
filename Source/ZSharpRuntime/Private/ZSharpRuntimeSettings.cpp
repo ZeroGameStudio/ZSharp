@@ -78,7 +78,7 @@ FString UZSharpRuntimeSettings::GetFieldAlias(const FString& path) const
 	return alias ? *alias : FString{};
 }
 
-#if WITH_EDITORONLY_DATA
+#if WITH_EDITOR
 
 TArray<FString> UZSharpRuntimeSettings::GetModuleOptions()
 {

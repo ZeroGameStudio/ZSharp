@@ -38,7 +38,7 @@ public:
 
 	FString GetFieldAlias(const FString& path) const;
 
-#if WITH_EDITORONLY_DATA
+#if WITH_EDITOR
 private:
 	UFUNCTION()
 	static TArray<FString> GetModuleOptions();

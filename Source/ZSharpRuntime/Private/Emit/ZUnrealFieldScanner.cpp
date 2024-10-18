@@ -189,6 +189,7 @@ void ZSharp::FZUnrealFieldScanner::Startup()
 		{
 			if (status.bIsLoaded)
 			{
+				UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Defer scan existing module [%s]."), *status.Name);
 				ScanUnrealFieldsForModule(FName(status.Name), false);
 			}
 		}
@@ -201,6 +202,8 @@ void ZSharp::FZUnrealFieldScanner::Startup()
 		auto& invocationList = delegate.*ZUnrealFieldScanner_Private::GInvocationListMemberPtr;
 		check(invocationList.Num() == 2);
 		invocationList.Swap(0, 1);
+		
+		UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Successfully hook up ProcessLoadedObjectsDelegate."));
 	}
 	else
 	{
@@ -237,13 +240,17 @@ void ZSharp::FZUnrealFieldScanner::FlushDeferredModules()
 
 void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, bool canProcessNewlyLoadedObject)
 {
+	UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Prepare to scan module [%s]."), *moduleName.ToString());
+	
 	if (moduleName.IsNone())
 	{
+		UE_LOG(LogZSharpEmit, Verbose, TEXT("[UnrealFieldScanner] Skip module without name."));
 		return;
 	}
 
 	if (ScannedModules.Contains(moduleName))
 	{
+		UE_LOG(LogZSharpEmit, Verbose, TEXT("[UnrealFieldScanner] Skip scanned module [%s]."), *moduleName.ToString());
 		return;
 	}
 	ScannedModules.Emplace(moduleName);
@@ -255,6 +262,8 @@ void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, b
 			DeferredModules = TArray<FName>{};
 		}
 		DeferredModules->AddUnique(moduleName);
+		
+		UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Defer scan module [%s] because UObject system has not been ready."), *moduleName.ToString());
 		return;
 	}
 
@@ -263,13 +272,17 @@ void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, b
 	const FZModuleMappingContext* ctx = GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(moduleName.ToString());
 	if (!ctx)
 	{
+		UE_LOG(LogZSharpEmit, Verbose, TEXT("[UnrealFieldScanner] Skip unmapped module [%s]."), *moduleName.ToString());
 		return;
 	}
 
 	if (!ctx->bHasDynamicFields)
 	{
+		UE_LOG(LogZSharpEmit, Verbose, TEXT("[UnrealFieldScanner] Skip module without dynamic fields [%s]."), *moduleName.ToString());
 		return;
 	}
+
+	UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Scan dynamic fields for module [%s]."), *moduleName.ToString());
 	
 	const FString assembly = ctx->AssemblyName;
 	const FString moduleNameStr = moduleName.ToString();
@@ -283,6 +296,8 @@ void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, b
 	} args { *assembly, *moduleNameStr, &outManifest, WITH_METADATA };
 	ScannerAlc->InvokeMethod(ZSHARP_SCANNER_ASSEMBLY_NAME, "ZeroGames.ZSharp.UnrealFieldScanner.UnrealFieldScanner_Interop", "Scan", &args);
 
+	UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Dynamic field manifest for module [%s]: [%s]"), *moduleName.ToString(), *outManifest);
+	
 	if (outManifest.IsEmpty())
 	{
 		return;

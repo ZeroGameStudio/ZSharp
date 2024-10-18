@@ -485,7 +485,10 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			// Migrate from FBlueprintCompilationManager::FastGenerateSkeletonClass().
 			function->SetSuperStruct(superFunction);
 			function->FunctionFlags |= (superFunction->FunctionFlags & (FUNC_FuncInherit | FUNC_Public | FUNC_Protected | FUNC_Private | FUNC_BlueprintPure));
+
+#if WITH_METADATA
 			UMetaData::CopyMetadata(superFunction, function);
+#endif
 		}
 
 		def.Function = function;
@@ -1040,6 +1043,8 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 		checkf(lifetimeProps.Num() == cls->ClassReps.Num(), TEXT("Some replicated properties don't get registered."));
 #endif
 	}
+
+	UE_LOG(LogZSharpEmit, Log, TEXT("Successfully emit Z# class [%s]!"), *cls->GetPathName());
 }
 
 

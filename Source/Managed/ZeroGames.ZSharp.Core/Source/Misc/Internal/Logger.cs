@@ -15,6 +15,62 @@ internal static class Logger
     public static void Verbose(params object?[]? objects) => Log(6, objects);
     public static void VeryVerbose(params object?[]? objects) => Log(7, objects);
     
+    public static void CFatal(bool condition, params object?[]? objects)
+    {
+        if (condition)
+        {
+            Fatal(objects);
+        }
+    }
+    
+    public static void CError(bool condition, params object?[]? objects)
+    {
+        if (condition)
+        {
+            Error(objects);
+        }
+    }
+    
+    public static void CWarning(bool condition, params object?[]? objects)
+    {
+        if (condition)
+        {
+            Warning(objects);
+        }
+    }
+    
+    public static void CDisplay(bool condition, params object?[]? objects)
+    {
+        if (condition)
+        {
+            Display(objects);
+        }
+    }
+    
+    public static void CLog(bool condition, params object?[]? objects)
+    {
+        if (condition)
+        {
+            Log(objects);
+        }
+    }
+    
+    public static void CVerbose(bool condition, params object?[]? objects)
+    {
+        if (condition)
+        {
+            Verbose(objects);
+        }
+    }
+    
+    public static void CVeryVerbose(bool condition, params object?[]? objects)
+    {
+        if (condition)
+        {
+            VeryVerbose(objects);
+        }
+    }
+    
     private static void Log(uint8 level, params object?[]? objects)
     {
         StringBuilder sb = new();

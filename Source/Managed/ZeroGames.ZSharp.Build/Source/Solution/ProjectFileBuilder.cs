@@ -21,9 +21,9 @@ public class ProjectFileBuilder
 		BuildHeader(doc);
 		XmlElement projectNode = BuildProjectNode(doc);
 		BuildPropertyGroupNode(doc, projectNode);
-		BuildPropertyGroupByConfiguration("DebugGame", doc, projectNode);
-		BuildPropertyGroupByConfiguration("Development", doc, projectNode);
-		BuildPropertyGroupByConfiguration("Shipping", doc, projectNode);
+		BuildPropertyGroupByConfiguration(DEBUG_GAME_CONFIGURATION, doc, projectNode);
+		BuildPropertyGroupByConfiguration(DEVELOPMENT_CONFIGURATION, doc, projectNode);
+		BuildPropertyGroupByConfiguration(SHIPPING_CONFIGURATION, doc, projectNode);
 		BuildItemGroupNode(doc, projectNode);
 		BuildReferenceNode(doc, projectNode);
 		BuildTargetNode(doc, projectNode);
@@ -72,7 +72,15 @@ public class ProjectFileBuilder
 	private XmlElement BuildPropertyGroupNode(XmlDocument doc, XmlElement projectNode)
 	{
 		XmlElement propertyGroupNode = doc.CreateElement("PropertyGroup");
-		void Append(string childName, string childInnerText) => AppendSimpleChild(doc, propertyGroupNode, childName, childInnerText);
+
+		void Append(string childName, string childInnerText)
+		{
+			if (!string.IsNullOrWhiteSpace(childInnerText))
+			{
+				AppendSimpleChild(doc, propertyGroupNode, childName, childInnerText); 
+			}
+		}
+		
 		Append("ProjectName", _project.Name);
 		Append("TargetFramework", _project.IsRoslynComponent ? "netstandard2.0" : (_project.TargetFramework ?? "net8.0"));
 		Append("LangVersion", _project.LanguageVersion ?? "12");
@@ -109,6 +117,7 @@ public class ProjectFileBuilder
 		{
 			Append("GlueDir", $"{_unrealProjectDir}/Intermediate/ZSharp/Glue/{_project.Name}");
 		}
+		Append("Tags", string.Join(';', _project.Tags));
 
 		projectNode.AppendChild(propertyGroupNode);
 		return propertyGroupNode;
@@ -121,19 +130,51 @@ public class ProjectFileBuilder
 		void Append(string childName, string childInnerText) => AppendSimpleChild(doc, propertyGroupNode, childName, childInnerText);
 		Append("Optimize", config switch
 		{
-			"DebugGame" => "false",
-			_ => "true"
+			DEBUG_GAME_CONFIGURATION => false.ToString(),
+			_ => true.ToString()
 		});
 		Append("DebugSymbols", config switch
 		{
-			"Shipping" => "false",
-			_ => "true"
+			SHIPPING_CONFIGURATION => false.ToString(),
+			_ => true.ToString()
 		});
 		Append("DebugType", config switch
 		{
-			"Shipping" => "none",
+			SHIPPING_CONFIGURATION => "none",
 			_ => "embedded"
 		});
+
+		string[] constants =
+		[
+			"TRACE",
+			config switch
+			{
+				DEBUG_GAME_CONFIGURATION => "DEBUG",
+				DEVELOPMENT_CONFIGURATION => "DEBUG",
+				SHIPPING_CONFIGURATION => "RELEASE",
+				_ => throw new InvalidOperationException()
+			}
+		];
+		IEnumerable<string> finalConstants = constants.Concat(config switch
+		{
+			DEBUG_GAME_CONFIGURATION => _project.DebugGameConstants,
+			DEVELOPMENT_CONFIGURATION => _project.DevelopmentConstants,
+			SHIPPING_CONFIGURATION => _project.ShippingConstants,
+			_ => throw new InvalidOperationException()
+		});
+		Append("DefineConstants", string.Join(';', finalConstants));
+
+		Dictionary<string, string> propertyMap = config switch
+		{
+			DEBUG_GAME_CONFIGURATION => _project.DebugGamePropertyMap,
+			DEVELOPMENT_CONFIGURATION => _project.DevelopmentPropertyMap,
+			SHIPPING_CONFIGURATION => _project.ShippingPropertyMap,
+			_ => throw new InvalidOperationException()
+		};
+		foreach (var pair in propertyMap)
+		{
+			Append(pair.Key, pair.Value);
+		}
 
 		projectNode.AppendChild(propertyGroupNode);
 		return propertyGroupNode;
@@ -319,16 +360,18 @@ public class ProjectFileBuilder
 		{
 			return targetNode;
 		}
+
+		void AddPostBuildCommand(string command)
+		{
+			XmlElement mkdirNode = doc.CreateElement("Exec");
+			mkdirNode.SetAttribute("Command", command);
+			targetNode.AppendChild(mkdirNode);
+		}
 		
 		void AddCopyTarget(string targetDir)
 		{
-			XmlElement mkdirNode = doc.CreateElement("Exec");
-			mkdirNode.SetAttribute("Command", $"if not exist \"{targetDir}\" mkdir \"{targetDir}\"");
-			targetNode.AppendChild(mkdirNode);
-
-			XmlElement copyNode = doc.CreateElement("Exec");
-			copyNode.SetAttribute("Command", $"copy \"$(TargetPath)\" \"{targetDir}/$(TargetFileName)\"");
-			targetNode.AppendChild(copyNode);
+			AddPostBuildCommand($"if not exist \"{targetDir}\" mkdir \"{targetDir}\"");
+			AddPostBuildCommand($"copy \"$(TargetPath)\" \"{targetDir}/$(TargetFileName)\"");
 		}
 		
 		targetNode.SetAttribute("Name", "PostBuild");
@@ -348,9 +391,18 @@ public class ProjectFileBuilder
 			}
 		}
 
+		foreach (var command in _project.PostBuildCommands)
+		{
+			AddPostBuildCommand(command);
+		}
+
 		projectNode.AppendChild(targetNode);
 		return targetNode;
 	}
+
+	private const string DEBUG_GAME_CONFIGURATION = "DebugGame";
+	private const string DEVELOPMENT_CONFIGURATION = "Development";
+	private const string SHIPPING_CONFIGURATION = "Shipping";
 
 	private ProjectDefinition _project;
 	private string _unrealProjectDir;

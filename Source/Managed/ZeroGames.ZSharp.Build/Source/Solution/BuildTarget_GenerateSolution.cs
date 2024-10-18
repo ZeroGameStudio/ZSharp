@@ -30,8 +30,8 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
     [FactoryConstructor]
     private BuildTarget_GenerateSolution(IBuildEngine engine, [Argument("projectdir")] string projectDir, [Argument("zsharpdir")] string zsharpDir, [Argument("source")] string source) : base(engine)
     {
-        UnrealProjectDir = projectDir;
-        ZSharpPluginDir = zsharpDir;
+        UnrealProjectDir = projectDir.TrimEnd('/', '\\');
+        ZSharpPluginDir = zsharpDir.TrimEnd('/', '\\');
         if (!((IUnrealProjectDir)this).IsValid)
         {
             throw new ArgumentException($"Invalid argument projectdir={projectDir}.");
@@ -109,7 +109,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
                 if (project is not null)
                 {
                     project.Name = Path.GetFileNameWithoutExtension(projectFilePaths[i]);
-                    project.SourceDir = Path.GetDirectoryName(projectFilePaths[i]) ?? string.Empty;
+                    project.SourceDir = Path.GetDirectoryName(projectFilePaths[i])?.Replace('\\', '/') ?? string.Empty;
                     projects.Add(project);
                 }
             }

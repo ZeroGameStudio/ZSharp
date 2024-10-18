@@ -47,9 +47,17 @@ public class ProjectDefinition
 	public List<string> Usings { get; init; } = new();
 	public Dictionary<string, string> Aliases { get; init; } = new();
 
+	public List<string> DebugGameConstants { get; init; } = new();
+	public List<string> DevelopmentConstants { get; init; } = new();
+	public List<string> ShippingConstants { get; init; } = new();
+	
+	public Dictionary<string, string> DebugGamePropertyMap { get; init; } = new();
+	public Dictionary<string, string> DevelopmentPropertyMap { get; init; } = new();
+	public Dictionary<string, string> ShippingPropertyMap { get; init; } = new();
+
 	public List<string> PostBuildCommands { get; init; } = new();
 
-	public HashSet<string> Tags { get; init; } = new();
+	public List<string> Tags { get; init; } = new();
 
 	public EProjectType ProjectType => Language?.ToLower() switch
 	{

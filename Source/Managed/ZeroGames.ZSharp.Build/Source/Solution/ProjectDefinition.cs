@@ -45,6 +45,7 @@ public class ProjectDefinition
 	public List<string> ProjectAnalyzerReferences { get; init; } = new();
 	public List<string> ExternalAnalyzerReferences { get; init; } = new();
 	public List<string> Usings { get; init; } = new();
+	public List<string> StaticUsings { get; init; } = new();
 	public Dictionary<string, string> Aliases { get; init; } = new();
 
 	public List<string> DebugGameConstants { get; init; } = new();

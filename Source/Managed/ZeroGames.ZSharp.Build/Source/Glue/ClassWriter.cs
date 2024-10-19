@@ -108,7 +108,7 @@ public class ClassWriter
 				{
 					// Method name may be aliased so we take original UFunction name from ZCall name.
 					string eventNameLiteral = $"\"{method.ZCallName.Split(':').Last()}\"";
-					methodDefinition?.AddAttributeList(new AttributeDeclaration("EventImplementation", eventNameLiteral));
+					methodDefinition?.AddAttributeListBefore(new AttributeDeclaration("EventImplementation", eventNameLiteral));
 				}
 			}
 		}

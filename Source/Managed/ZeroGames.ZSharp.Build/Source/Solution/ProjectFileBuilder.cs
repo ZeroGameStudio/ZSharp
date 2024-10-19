@@ -95,8 +95,8 @@ public class ProjectFileBuilder
 		Append("NeutralLanguage", _project.NeutralLanguage);
 		if (_project.IsRoslynComponent)
 		{
-			Append("IsRoslynComponent", "true");
-			Append("EnforceExtendedAnalyzerRules", "true");
+			Append("IsRoslynComponent", true.ToString());
+			Append("EnforceExtendedAnalyzerRules", true.ToString());
 		}
 
 		List<string> finalWarningsToErros = [.._project.WarningsAsErrors];
@@ -149,8 +149,8 @@ public class ProjectFileBuilder
 			"TRACE",
 			config switch
 			{
-				DEBUG_GAME_CONFIGURATION => "DEBUG",
-				DEVELOPMENT_CONFIGURATION => "DEBUG",
+				DEBUG_GAME_CONFIGURATION => "DEBUG;CORE_LOG;SCRIPT_LOG;ASSERTION_CHECK;ASSERTION_CHECK_SLOW",
+				DEVELOPMENT_CONFIGURATION => "DEBUG;CORE_LOG;SCRIPT_LOG;ASSERTION_CHECK",
 				SHIPPING_CONFIGURATION => "RELEASE",
 				_ => throw new InvalidOperationException()
 			}
@@ -191,6 +191,25 @@ public class ProjectFileBuilder
 			XmlElement usingNode = doc.CreateElement("Using");
 			usingNode.SetAttribute("Include", us);
 			itemGroupNode.AppendChild(usingNode);
+		}
+
+		List<string> intrinsicStaticUsings = [];
+		if (_project.Name == "ZeroGames.ZSharp.Core" || _project.ProjectReferences.Contains("ZeroGames.ZSharp.Core"))
+		{
+			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.AssertionMacros");
+		}
+
+		if (_project.ProjectReferences.Contains("ZeroGames.ZSharp.Core.UnrealEngine"))
+		{
+			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.UnrealEngine.LoggerMacros");
+		}
+
+		foreach (var us in intrinsicStaticUsings.Concat(_project.StaticUsings))
+		{
+			XmlElement aliasNode = doc.CreateElement("Using");
+			aliasNode.SetAttribute("Include", us);
+			aliasNode.SetAttribute("Static", true.ToString());
+			itemGroupNode.AppendChild(aliasNode);
 		}
 
 		Dictionary<string, string> intrinsicAliases = new()

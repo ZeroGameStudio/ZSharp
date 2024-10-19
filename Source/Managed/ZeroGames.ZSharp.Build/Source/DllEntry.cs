@@ -8,7 +8,10 @@ internal static class DllEntry
 {
 
     [DllMain]
-    private static void DllMain(string[] args) => Logger.Log(new BuildEngine(args).RunAsync().Result);
+    private static void DllMain(string[] args)
+    {
+        string result = new BuildEngine(args).RunAsync().Result;
+    }
 
 }
 

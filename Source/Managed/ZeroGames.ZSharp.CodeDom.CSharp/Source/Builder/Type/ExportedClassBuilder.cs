@@ -44,6 +44,7 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 			Modifiers = EMemberModifiers.Virtual,
 			IsPureVirtual = true,
 		};
+		method.AddAttributeListAfter(new AttributeDeclaration("System.Diagnostics.CodeAnalysis.DoesNotReturn"));
 		_methods.Add(method);
 
 		return method;

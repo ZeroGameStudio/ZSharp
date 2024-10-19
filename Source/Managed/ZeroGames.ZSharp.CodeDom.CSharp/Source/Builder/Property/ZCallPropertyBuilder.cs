@@ -11,10 +11,10 @@ public class ZCallPropertyBuilder(EMemberVisibility visibility, EMemberModifiers
 		// @TODO: Partial property
 		Getter = new ZCallMethodBodyBuilder(ZCallName, Type,
 			new ParameterDeclaration(EParameterKind.In, new("bool", null), string.Empty),
-			new ParameterDeclaration(EParameterKind.In, new("int32", null), Index != 0 ? Index.ToString() : string.Empty)).Build(),
+			new ParameterDeclaration(EParameterKind.In, new(nameof(int32), null), Index != 0 ? Index.ToString() : string.Empty)).Build(),
 		Setter = !IsReadOnly ? new ZCallMethodBodyBuilder(ZCallName, null,
-			new ParameterDeclaration(EParameterKind.In, new("bool", null), "true"),
-			new ParameterDeclaration(EParameterKind.In, new("int32", null), Index != 0 ? Index.ToString() : string.Empty),
+			new ParameterDeclaration(EParameterKind.In, new("bool", null), true.ToString()),
+			new ParameterDeclaration(EParameterKind.In, new(nameof(int32), null), Index != 0 ? Index.ToString() : string.Empty),
 			new ParameterDeclaration(EParameterKind.In, Type, "value")).Build() : null,
 	};
 	

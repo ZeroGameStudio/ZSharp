@@ -33,21 +33,21 @@ public abstract class ExportedTypeBuilderBase<TDefinition>(string namespaceName,
 		
 		foreach (var attr in _attributeBefores)
 		{
-			definition.AddAttributeList(new AttributeDeclaration(attr.Name, attr.Arguments));
+			definition.AddAttributeListAfter(new AttributeDeclaration(attr.Name, attr.Arguments));
 		}
 
 		if (GenerateIntrinsicContent)
 		{
-			definition.AddAttributeList(new AttributeDeclaration("System.CodeDom.Compiler.GeneratedCode", "\"Z#\"", $"\"{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}\""));
+			definition.AddAttributeListAfter(new AttributeDeclaration("System.CodeDom.Compiler.GeneratedCode", "\"Z#\"", $"\"{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}\""));
 			if (HasUnrealFieldPath)
 			{
-				definition.AddAttributeList(new AttributeDeclaration("UnrealFieldPath", HasUnrealFieldPathConst ? UNREAL_FIELD_PATH_CONST : UnrealFieldPathLiteralText));
+				definition.AddAttributeListAfter(new AttributeDeclaration("UnrealFieldPath", HasUnrealFieldPathConst ? UNREAL_FIELD_PATH_CONST : UnrealFieldPathLiteralText));
 			}
 		}
 
 		foreach (var attr in _attributeAfters)
 		{
-			definition.AddAttributeList(new AttributeDeclaration(attr.Name, attr.Arguments));
+			definition.AddAttributeListAfter(new AttributeDeclaration(attr.Name, attr.Arguments));
 		}
 
 		foreach (var baseType in _baseTypes)

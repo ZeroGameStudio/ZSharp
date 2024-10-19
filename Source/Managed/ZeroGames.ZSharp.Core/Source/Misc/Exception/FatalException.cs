@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-namespace ZeroGames.ZSharp.Core.Misc.Thrower;
+namespace ZeroGames.ZSharp.Core;
 
 public class FatalException : Exception
 {

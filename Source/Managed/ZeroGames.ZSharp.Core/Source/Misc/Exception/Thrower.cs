@@ -3,7 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace ZeroGames.ZSharp.Core.Misc.Thrower;
+namespace ZeroGames.ZSharp.Core;
 
 public static class Thrower
 {

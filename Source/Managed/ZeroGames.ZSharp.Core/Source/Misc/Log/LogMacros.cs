@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace ZeroGames.ZSharp.Core;
 
-public static class LoggerMacros
+public static class LogMacros
 {
     
     [Conditional("UE_LOG")]

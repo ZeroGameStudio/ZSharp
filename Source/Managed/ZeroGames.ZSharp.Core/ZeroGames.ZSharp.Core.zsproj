@@ -6,6 +6,10 @@
 	"AssemblyVersion": "0.2.0",
 	"FileVersion": "0.2.0",
 	"NeutralLanguage": "zh",
+	"StaticUsings":
+	[
+		"ZeroGames.ZSharp.Core.CoreLogChannels"
+	],
 	"ExternalReferences":
 	[
 		"../../ThirdParty/Dotnet/shared/Mono.Cecil.dll"

@@ -197,7 +197,7 @@ public class ProjectFileBuilder
 		if (_project.Name == "ZeroGames.ZSharp.Core" || _project.ProjectReferences.Contains("ZeroGames.ZSharp.Core"))
 		{
 			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.AssertionMacros");
-			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.LoggerMacros");
+			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.LogMacros");
 			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.ZSharpLogChannels");
 		}
 

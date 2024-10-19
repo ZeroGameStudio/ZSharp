@@ -3,7 +3,7 @@
 
 #include "ZUnrealFieldEmitter.h"
 
-#include "CustomThunkRegistry.h"
+#include "ZCustomThunkRegistry.h"
 #include "INotifyFieldValueChanged.h"
 #include "ZSharpRuntimeLogChannels.h"
 #include "ZSharpFieldRegistry.h"
@@ -493,7 +493,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 		def.Function = function;
 
-		FNativeFuncPtr thunk = def.CustomThunkName.IsNone() ? ZSharpFunction_Private::execZCall : FCustomThunkRegistry::Get().GetThunk(def.CustomThunkName);
+		FNativeFuncPtr thunk = def.CustomThunkName.IsNone() ? ZSharpFunction_Private::execZCall : FZCustomThunkRegistry::Get().GetThunk(def.CustomThunkName);
 		outer->AddNativeFunction(*function->GetName(), thunk);
 
 		function->Bind();

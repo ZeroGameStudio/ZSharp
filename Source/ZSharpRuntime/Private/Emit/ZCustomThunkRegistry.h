@@ -4,12 +4,12 @@
 
 namespace ZSharp
 {
-	class FCustomThunkRegistry
+	class FZCustomThunkRegistry
 	{
-		friend struct FRegisterCustomThunk;
+		friend struct FZRegisterCustomThunk;
 
 	public:
-		static FCustomThunkRegistry& Get();
+		static FZCustomThunkRegistry& Get();
 		
 	public:
 		FNativeFuncPtr GetThunk(FName name);

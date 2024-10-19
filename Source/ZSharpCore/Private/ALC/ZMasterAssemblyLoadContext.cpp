@@ -271,7 +271,18 @@ ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHan
 {
 	ON_SCOPE_EXIT { PopRedFrame(); };
 
-	return FZMasterAssemblyLoadContext_Interop::GZCall_Red(handle, buffer);
+#if !UE_BUILD_SHIPPING
+	FString fatalMessage;
+	EZCallErrorCode res = FZMasterAssemblyLoadContext_Interop::GZCall_Red(handle, buffer, &fatalMessage);
+	if (!fatalMessage.IsEmpty())
+	{
+		UE_LOG(LogZSharpCore, Fatal, TEXT("Unmanaged fatal error!!! %s"), *fatalMessage);
+	}
+	
+	return res;
+#else
+	return FZMasterAssemblyLoadContext_Interop::GZCall_Red(handle, buffer, nullptr);
+#endif
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle_Red(const FString& name)

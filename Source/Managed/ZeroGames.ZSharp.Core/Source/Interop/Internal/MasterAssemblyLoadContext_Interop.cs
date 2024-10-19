@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -73,16 +74,42 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     }, default);
 
     [UnmanagedCallersOnly]
-    public static EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer) => Uncaught.ErrorIfUncaught(() =>
+    public static EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer, IntPtr fatalMessage)
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
-        if (alc is null)
+        try
         {
-            return EZCallErrorCode.AlcUnavailable;
-        }
+            MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
+            if (alc is null)
+            {
+                return EZCallErrorCode.AlcUnavailable;
+            }
 
-        return alc.ZCall_Red(handle, buffer);
-    }, EZCallErrorCode.UnknownError);
+            return alc.ZCall_Red(handle, buffer);
+        }
+        catch (Exception ex)
+        {
+            if (fatalMessage != default)
+            {
+                for (Exception? currentEx = ex; currentEx is not null; currentEx = currentEx.InnerException)
+                {
+                    if (currentEx is FatalException fatal)
+                    {
+                        using InteropString message = new(fatalMessage);
+                        message.Data = $"{fatal.Message}{Environment.NewLine}{ex}";
+                        break;
+                    }
+                }
+
+            }
+            else
+            {
+                Logger.Error($"Unhandled Exception Detected.\n{ex}");
+                Debugger.Break();
+            }
+
+            return EZCallErrorCode.UnknownError;
+        }
+    }
     
     [UnmanagedCallersOnly]
     public static ZCallHandle GetZCallHandle_Red(char* name) => Uncaught.ErrorIfUncaught(() =>

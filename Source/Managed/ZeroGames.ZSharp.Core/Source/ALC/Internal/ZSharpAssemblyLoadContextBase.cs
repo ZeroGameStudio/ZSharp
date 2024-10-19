@@ -104,10 +104,7 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
                 using AssemblyDefinition assemblyDef = AssemblyDefinition.ReadAssembly(dllPath);
                 foreach (var attr in assemblyDef.CustomAttributes)
                 {
-                    if (attr.AttributeType.FullName == typeof(DllEntryAttribute).FullName)
-                    {
-                        Logger.Fatal($"Assembly {assemblyDef.Name.Name} has DllEntry and cannot be loaded implicitly!!!");
-                    }
+                    Thrower.FatalIf(attr.AttributeType.FullName == typeof(DllEntryAttribute).FullName, $"Assembly {assemblyDef.Name.Name} has DllEntry and cannot be loaded implicitly!!!");
                 }
             }
             catch (Exception)

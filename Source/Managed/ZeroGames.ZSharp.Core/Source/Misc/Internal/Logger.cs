@@ -12,15 +12,6 @@ internal static class Logger
 
     [Conditional("CORE_LOG")]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [DoesNotReturn]
-    public static void Fatal(params object?[]? objects)
-    {
-        Log(1, objects);
-        throw new InvalidOperationException();
-    }
-    
-    [Conditional("CORE_LOG")]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Error(params object?[]? objects) => Log(2, objects);
     
     [Conditional("CORE_LOG")]
@@ -42,17 +33,7 @@ internal static class Logger
     [Conditional("CORE_LOG")]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void VeryVerbose(params object?[]? objects) => Log(7, objects);
-    
-    [Conditional("CORE_LOG")]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void CFatal([DoesNotReturnIf(true)] bool condition, params object?[]? objects)
-    {
-        if (condition)
-        {
-            Fatal(objects);
-        }
-    }
-    
+
     [Conditional("CORE_LOG")]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void CError(bool condition, params object?[]? objects)
@@ -115,6 +96,17 @@ internal static class Logger
     
     private static void Log(uint8 level, params object?[]? objects)
     {
+        unsafe
+        {
+            fixed (char* buffer = GetMessage(objects))
+            {
+                Core_Interop.CoreLog(level, buffer);
+            }
+        }
+    }
+    
+    private static string GetMessage(object?[]? objects)
+    {
         StringBuilder sb = new();
         if (objects is not null)
         {
@@ -134,13 +126,7 @@ internal static class Logger
             }
         }
 
-        unsafe
-        {
-            fixed (char* buffer = sb.ToString())
-            {
-                Core_Interop.CoreLog(level, buffer);
-            }
-        }
+        return sb.ToString();
     }
     
 }

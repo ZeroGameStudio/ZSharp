@@ -10,29 +10,22 @@ public static class Thrower
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	[DoesNotReturn]
-	public static Exception Fatal() => Fatal(null);
-	
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	[DoesNotReturn]
-	public static Exception Fatal(string? message)
+	public static Exception Fatal(string? message = default, Exception? innerException = default)
 	{
-		if (string.IsNullOrWhiteSpace(message))
+		if (string.IsNullOrWhiteSpace(message) && innerException == default)
 		{
 			throw _defaultFatalException ??= new();
 		}
 		
-		throw new FatalException(message);
+		throw new FatalException(message, innerException);
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void FatalIf([DoesNotReturnIf(true)] bool condition) => FatalIf(condition, null);
-	
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void FatalIf([DoesNotReturnIf(true)] bool condition, string? message)
+	public static void FatalIf([DoesNotReturnIf(true)] bool condition, string? message = default, Exception? innerException = default)
 	{
 		if (condition)
 		{
-			Fatal(message);
+			Fatal(message, innerException);
 		}
 	}
 	

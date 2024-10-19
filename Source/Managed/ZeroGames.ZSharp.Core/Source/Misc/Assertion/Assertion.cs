@@ -7,12 +7,12 @@ using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.Core;
 
-public static class AssertionMacros
+public static class Assertion
 {
-	
+
 	[Conditional("ASSERTION_CHECK")]
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void check
+	public static void Check
 	(
 		[DoesNotReturnIf(false)] bool condition,
 		string? message = default,
@@ -23,12 +23,15 @@ public static class AssertionMacros
 	)
 	{
 		CallerInfoHelper.Inject(ref column);
-		Assertion.Check(condition, message, expr, file, line, column);
+		if (!condition)
+		{
+			Fail(expr, message, file, line, column, false);
+		}
 	}
 
 	[Conditional("ASSERTION_CHECK_SLOW")]
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void checkSlow
+	public static void CheckSlow
 	(
 		[DoesNotReturnIf(false)] bool condition,
 		string? message = default,
@@ -39,12 +42,12 @@ public static class AssertionMacros
 	)
 	{
 		CallerInfoHelper.Inject(ref column);
-		Assertion.CheckSlow(condition, message, expr, file, line, column);
+		Check(condition, message, expr, file, line, column);
 	}
 	
 	[Conditional("ASSERTION_CHECK")]
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void checkNoEntry
+	public static void CheckNoEntry
 	(
 		[CallerFilePath] string? file = default,
 		[CallerLineNumber] int32 line = default,
@@ -52,12 +55,12 @@ public static class AssertionMacros
 	)
 	{
 		CallerInfoHelper.Inject(ref column);
-		Assertion.CheckNoEntry(file, line, column);
+		Check(false, "Enclosing block should never be called!", null, file, line, column);
 	}
 
 	[Conditional("ASSERTION_CHECK")]
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void checkNoReentry
+	public static void CheckNoReentry
 	(
 		GCHandle? context = default,
 		[CallerFilePath] string? file = default,
@@ -66,11 +69,14 @@ public static class AssertionMacros
 	)
 	{
 		CallerInfoHelper.Inject(ref context, ref column);
-		Assertion.CheckNoReentry(context, file, line, column);
+		if (!_reentryCache.Add(new(context!.Value, file ?? string.Empty, line, column)))
+		{
+			Check(false, "Enclosing block was called more than once!", null, file, line, column);
+		}
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static IDisposable checkNoRecursion
+	public static IDisposable CheckNoRecursion
 	(
 		GCHandle? context = default,
 		[CallerFilePath] string? file = default,
@@ -80,14 +86,20 @@ public static class AssertionMacros
 	{
 #if ASSERTION_CHECK
 		CallerInfoHelper.Inject(ref context, ref column);
-		return Assertion.CheckNoRecursion(context, file, line, column);
-#else
+		Coordinate coord = new(context!.Value, file ?? string.Empty, line, column);
+		if (_recursionCache.Add(coord))
+		{
+			return new RecursionScope(coord);
+		}
+		
+		Check(false, "Enclosing block was entered recursively!", null, file, line, column);
+#endif
+		
 		return null;
-#endif
 	}
 	
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void verify
+	public static void Verify
 	(
 		[DoesNotReturnIf(false)] bool condition,
 		string? message = default,
@@ -99,12 +111,12 @@ public static class AssertionMacros
 	{
 #if ASSERTION_CHECK
 		CallerInfoHelper.Inject(ref column);
-		Assertion.Verify(condition, message, expr, file, line, column);
+		Check(condition, message, expr, file, line, column);
 #endif
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void verifySlow
+	public static void VerifySlow
 	(
 		[DoesNotReturnIf(false)] bool condition,
 		string? message = default,
@@ -116,12 +128,12 @@ public static class AssertionMacros
 	{
 #if ASSERTION_CHECK_SLOW
 		CallerInfoHelper.Inject(ref column);
-		Assertion.VerifySlow(condition, message, expr, file, line, column);
+		Verify(condition, message, expr, file, line, column);
 #endif
 	}
 	
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void ensure
+	public static void Ensure
 	(
 		[DoesNotReturnIf(false)] bool condition,
 		string? message = default,
@@ -134,12 +146,15 @@ public static class AssertionMacros
 	{
 #if ASSERTION_CHECK
 		CallerInfoHelper.Inject(ref context, ref column);
-		Assertion.Ensure(condition, message, context, expr, file, line, column);
+		if (_ensureCache.Add(new(context!.Value, file ?? string.Empty, line, column)))
+		{
+			EnsureAlways(condition, message, expr, file, line, column);
+		}
 #endif
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void ensureAlways
+	public static void EnsureAlways
 	(
 		[DoesNotReturnIf(false)] bool condition,
 		string? message = default,
@@ -151,9 +166,37 @@ public static class AssertionMacros
 	{
 #if ASSERTION_CHECK_SLOW
 		CallerInfoHelper.Inject(ref column);
-		Assertion.EnsureAlways(condition, message, expr, file, line, column);
+		if (!condition)
+		{
+			Fail(message, expr, file, line, column, true);
+		}
 #endif
 	}
+	
+	private static void Fail(string? message, string? expr, string? file, int32 line, int32 column, bool forceNoFatal)
+	{
+		string finalMessage = $"Assertion [{expr}] failed: {message} at file {file} line {line} column {column}.";
+		if (Debugger.IsAttached || forceNoFatal)
+		{
+			Logger.Error(finalMessage);
+			Debugger.Break();
+		}
+		else
+		{
+			Thrower.Fatal(finalMessage);
+		}
+	}
+
+	private readonly struct RecursionScope(Coordinate coord) : IDisposable
+	{
+		public void Dispose() => Thrower.FatalIf(!_recursionCache.Remove(coord));
+	}
+
+	private readonly record struct Coordinate(GCHandle Context, string File, int32 Line, int32 Column);
+
+	private static HashSet<Coordinate> _reentryCache = new();
+	private static HashSet<Coordinate> _recursionCache = new();
+	private static HashSet<Coordinate> _ensureCache = new();
 	
 }
 

@@ -43,7 +43,7 @@ internal static class Uncaught
         catch (Exception ex)
         {
             Debugger.Break();
-            Logger.Fatal($"Unhandled Fatal Exception!!!\n{ex}");
+            Logger.Error($"Unhandled Fatal Exception!!!\n{ex}");
             return fallback;
         }
     }
@@ -57,7 +57,7 @@ internal static class Uncaught
         catch (Exception ex)
         {
             Debugger.Break();
-            Logger.Fatal($"Unhandled Fatal Exception!!!\n{ex}");
+            Logger.Error($"Unhandled Fatal Exception!!!\n{ex}");
         }
     }
     

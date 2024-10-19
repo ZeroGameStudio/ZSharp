@@ -11,11 +11,6 @@ public static class LoggerMacros
 
 	[Conditional("SCRIPT_LOG")]
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	[DoesNotReturn]
-	public static void UE_FATAL(params object?[]? objects) => Logger.Fatal(objects);
-    
-	[Conditional("SCRIPT_LOG")]
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void UE_ERROR(params object?[]? objects) => Logger.Error(objects);
     
 	[Conditional("SCRIPT_LOG")]
@@ -38,10 +33,6 @@ public static class LoggerMacros
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void UE_VERY_VERBOSE(params object?[]? objects) => Logger.VeryVerbose(objects);
 	
-	[Conditional("SCRIPT_LOG")]
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void UE_CFATAL([DoesNotReturnIf(true)] bool condition, params object?[]? objects) => Logger.CFatal(condition, objects);
-    
 	[Conditional("SCRIPT_LOG")]
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void UE_CERROR(bool condition, params object?[]? objects) => Logger.CError(condition, objects);

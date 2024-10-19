@@ -44,18 +44,21 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 			Modifiers = EMemberModifiers.Virtual,
 			IsPureVirtual = true,
 		};
-		method.AddAttributeListAfter(new AttributeDeclaration("System.Diagnostics.CodeAnalysis.DoesNotReturn"));
 		_methods.Add(method);
 
 		return method;
 	}
 
-	public PropertyDefinition AddProperty(EMemberVisibility visibility, TypeReference type, string name, string zcallName, int32 index, bool readOnly)
+	public PropertyDefinition AddProperty(EMemberVisibility visibility, TypeReference type, string name, string zcallName, int32 index, bool readOnly, bool notnull)
 	{
 		// @TODO: Partial property
 		EMemberModifiers modifiers = EMemberModifiers.None; // EMemberModifiers.Partial;
 
 		PropertyDefinition property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, index, type, readOnly).Build(IsAbstraction);
+		if (notnull)
+		{
+			property.AddAttributeListAfter(new AttributeDeclaration("NotNull"));
+		}
 		_properties.Add(property);
 
 		return property;

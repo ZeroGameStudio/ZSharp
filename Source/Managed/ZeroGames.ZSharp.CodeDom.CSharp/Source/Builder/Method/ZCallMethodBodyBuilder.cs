@@ -132,7 +132,7 @@ $@"unsafe
 		string cast = isEnum ? $"({parameterType.TypeName})" : string.Empty;
 		string slotType = GetSlotType(parameterType);
 		string getTarget = slotType == "Conjugate" ? $".GetTarget<{parameterType.TypeName.TrimEnd('?')}>()" : string.Empty;
-		string nullForgiving = slotType == "Conjugate" && !parameterType.TypeName.EndsWith("?") ? "!" : string.Empty;
+		string nullForgiving = slotType == "Conjugate" ? "!" : string.Empty;
 		return $"{cast}slots[{index}].{slotType}{getTarget}{nullForgiving}";
 	}
 

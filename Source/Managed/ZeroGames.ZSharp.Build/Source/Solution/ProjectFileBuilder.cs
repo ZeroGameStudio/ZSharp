@@ -95,14 +95,14 @@ public class ProjectFileBuilder
 		Append("NeutralLanguage", _project.NeutralLanguage);
 		if (_project.IsRoslynComponent)
 		{
-			Append("IsRoslynComponent", true.ToString());
-			Append("EnforceExtendedAnalyzerRules", true.ToString());
+			Append("IsRoslynComponent", "true");
+			Append("EnforceExtendedAnalyzerRules", "true");
 		}
 
 		List<string> finalWarningsToErros = [.._project.WarningsAsErrors];
 		if (_project.IsStrongRestrictedNullable)
 		{
-			finalWarningsToErros.Add("CS8600;CS8601;CS8602;CS8603;CS8604;CS8609;CS8610;CS8614;CS8616;CS8618;CS8619;CS8622;CS8625");
+			finalWarningsToErros.Add("CS8600;CS8601;CS8602;CS8603;CS8604;CS8609;CS8610;CS8614;CS8616;CS8618;CS8619;CS8622;CS8625;CS8777");
 		}
 
 		finalWarningsToErros.Insert(0, "$(WarningsAsErrors)");
@@ -130,13 +130,13 @@ public class ProjectFileBuilder
 		void Append(string childName, string childInnerText) => AppendSimpleChild(doc, propertyGroupNode, childName, childInnerText);
 		Append("Optimize", config switch
 		{
-			DEBUG_GAME_CONFIGURATION => false.ToString(),
-			_ => true.ToString()
+			DEBUG_GAME_CONFIGURATION => "false",
+			_ => "true"
 		});
 		Append("DebugSymbols", config switch
 		{
-			SHIPPING_CONFIGURATION => false.ToString(),
-			_ => true.ToString()
+			SHIPPING_CONFIGURATION => "false",
+			_ => "true"
 		});
 		Append("DebugType", config switch
 		{
@@ -184,28 +184,28 @@ public class ProjectFileBuilder
 	{
 		XmlElement itemGroupNode = doc.CreateElement("ItemGroup");
 
-		List<string> intrinsicUsings = [ "System", "System.Collections.Generic", "System.Linq" ];
+		List<string> finalUsings = [ "System", "System.Collections.Generic", "System.Linq", .._project.Usings ];
 
-		foreach (var us in intrinsicUsings.Concat(_project.Usings))
+		foreach (var us in finalUsings.Distinct())
 		{
 			XmlElement usingNode = doc.CreateElement("Using");
 			usingNode.SetAttribute("Include", us);
 			itemGroupNode.AppendChild(usingNode);
 		}
 
-		List<string> intrinsicStaticUsings = [];
-		if (_project.Name == "ZeroGames.ZSharp.Core" || _project.ProjectReferences.Contains("ZeroGames.ZSharp.Core"))
+		List<string> finalStaticUsings = [ .._project.StaticUsings ];
+		if (_project.Name == CORE_ASSEMBLY || _project.ProjectReferences.Contains(CORE_ASSEMBLY))
 		{
-			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.AssertionMacros");
-			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.LogMacros");
-			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.ZSharpLogChannels");
+			finalStaticUsings.Add("ZeroGames.ZSharp.Core.AssertionMacros");
+			finalStaticUsings.Add("ZeroGames.ZSharp.Core.LogMacros");
+			finalStaticUsings.Add("ZeroGames.ZSharp.Core.ZSharpLogChannels");
 		}
 
-		foreach (var us in intrinsicStaticUsings.Concat(_project.StaticUsings))
+		foreach (var us in finalStaticUsings.Distinct())
 		{
 			XmlElement aliasNode = doc.CreateElement("Using");
 			aliasNode.SetAttribute("Include", us);
-			aliasNode.SetAttribute("Static", true.ToString());
+			aliasNode.SetAttribute("Static", "true");
 			itemGroupNode.AppendChild(aliasNode);
 		}
 
@@ -221,7 +221,7 @@ public class ProjectFileBuilder
 			{ "System.Int64", nameof(int64) },
 		};
 
-		foreach (var pair in intrinsicAliases.Concat(_project.Aliases))
+		foreach (var pair in intrinsicAliases.Concat(_project.Aliases).DistinctBy(pair => pair.Key))
 		{
 			XmlElement aliasNode = doc.CreateElement("Using");
 			aliasNode.SetAttribute("Include", pair.Key);
@@ -257,7 +257,11 @@ public class ProjectFileBuilder
 		}
 
 		List<string> finalProjectReferences = [.._project.ProjectReferences];
-		foreach (var reference in finalProjectReferences)
+		if (_project.HasGlue)
+		{
+			finalProjectReferences.Add(CORE_ASSEMBLY);
+		}
+		foreach (var reference in finalProjectReferences.Distinct())
 		{
 			XmlElement referenceNode = doc.CreateElement("ProjectReference");
 			referenceNode.SetAttribute("Include", $"$(ZSharpProjectDir)/{reference}/{reference}.csproj");
@@ -290,7 +294,7 @@ public class ProjectFileBuilder
 			}
 		}
 		
-		foreach (var reference in finalProjectAnalyzerReferences)
+		foreach (var reference in finalProjectAnalyzerReferences.Distinct())
 		{
 			XmlElement referenceNode = doc.CreateElement("ProjectReference");
 			referenceNode.SetAttribute("Include", $"$(ZSharpProjectDir)/{reference}/{reference}.csproj");
@@ -300,7 +304,7 @@ public class ProjectFileBuilder
 		}
 
 		List<string> finalExternalReferences = [.._project.ExternalReferences];
-		foreach (var reference in finalExternalReferences)
+		foreach (var reference in finalExternalReferences.Distinct())
 		{
 			string postfix = reference.EndsWith(".dll") ? string.Empty : ".dll";
 			string dllPath = $"$(SourceDir)/{reference}{postfix}";
@@ -315,7 +319,7 @@ public class ProjectFileBuilder
 		}
 		
 		List<string> finalExternalAnalyzerReferences = [.._project.ExternalAnalyzerReferences];
-		foreach (var reference in finalExternalAnalyzerReferences)
+		foreach (var reference in finalExternalAnalyzerReferences.Distinct())
 		{
 			string postfix = reference.EndsWith(".dll") ? string.Empty : ".dll";
 			string dllPath = $"$(SourceDir)/{reference}{postfix}";
@@ -415,6 +419,8 @@ public class ProjectFileBuilder
 		projectNode.AppendChild(targetNode);
 		return targetNode;
 	}
+
+	private const string CORE_ASSEMBLY = "ZeroGames.ZSharp.Core";
 
 	private const string DEBUG_GAME_CONFIGURATION = "DebugGame";
 	private const string DEVELOPMENT_CONFIGURATION = "Development";

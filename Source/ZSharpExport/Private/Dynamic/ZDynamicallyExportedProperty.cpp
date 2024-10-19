@@ -36,12 +36,23 @@ FString ZSharp::FZDynamicallyExportedProperty::GetZCallName() const
 
 ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedProperty::GetType() const
 {
-	return FZExportHelper::GetFPropertyFullyExportedTypeName(Property);
+	FZFullyExportedTypeName name = FZExportHelper::GetFPropertyFullyExportedTypeName(Property);
+	if (bNullInNotNullOut)
+	{
+		name.bNullable = true;
+	}
+
+	return name;
 }
 
 FString ZSharp::FZDynamicallyExportedProperty::GetUnderlyingType() const
 {
 	return FZExportHelper::GetUEnumFromProperty(Property) ? "int64" : FString{};
+}
+
+bool ZSharp::FZDynamicallyExportedProperty::IsNullInNotNullOut() const
+{
+	return bNullInNotNullOut;
 }
 
 ZSharp::EZExportedPropertyFlags ZSharp::FZDynamicallyExportedProperty::GetFlags() const
@@ -56,18 +67,24 @@ int32 ZSharp::FZDynamicallyExportedProperty::GetIndex() const
 
 ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(const FProperty* property, int32 index)
 	: Property(property)
+	, bNullInNotNullOut(false)
 	, Index(index)
 	, Flags(EZExportedPropertyFlags::None)
 {
-	if (Property->HasAllPropertyFlags(CPF_NativeAccessSpecifierPublic) || Property->GetBoolMetaData("AllowPrivateAccess"))
+	if (FZExportHelper::CanFPropertyBeNullInNotNullOut(property))
+	{
+		bNullInNotNullOut = true;
+	}
+	
+	if (property->HasAllPropertyFlags(CPF_NativeAccessSpecifierPublic) || property->GetBoolMetaData("AllowPrivateAccess"))
 	{
 		Flags |= EZExportedPropertyFlags::Public;
 	}
-	else if (Property->HasAllPropertyFlags(CPF_NativeAccessSpecifierProtected))
+	else if (property->HasAllPropertyFlags(CPF_NativeAccessSpecifierProtected))
 	{
 		Flags |= EZExportedPropertyFlags::Protected;
 	}
-	else if (Property->HasAllPropertyFlags(CPF_NativeAccessSpecifierPrivate))
+	else if (property->HasAllPropertyFlags(CPF_NativeAccessSpecifierPrivate))
 	{
 		Flags |= EZExportedPropertyFlags::Private;
 	}

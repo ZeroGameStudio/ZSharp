@@ -35,7 +35,8 @@ public class DelegateWriter
 			}
 			
 			EParameterKind kind = parameter.IsInOut ? EParameterKind.Ref : parameter.IsOut ? EParameterKind.Out : EParameterKind.In;
-			parameters.Add(new(kind, new(parameter.Type.ToString(), parameter.UnderlyingType), parameter.Name));
+			AttributeDeclaration[]? attributes = parameter.IsNullInNotNullOut ? [ new("NotNull") ] : null;
+			parameters.Add(new(kind, new(parameter.Type.ToString(), parameter.UnderlyingType), parameter.Name, attributes));
 		}
 		builder.Parameters = parameters.ToArray();
 

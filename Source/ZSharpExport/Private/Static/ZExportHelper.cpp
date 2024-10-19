@@ -206,6 +206,27 @@ const UEnum* ZSharp::FZExportHelper::GetUEnumFromProperty(const FProperty* prope
 	return nullptr;
 }
 
+bool ZSharp::FZExportHelper::CanFPropertyBeNullInNotNullOut(const FProperty* property)
+{
+	// Null-in-not-null-out means it can be marked as nullable and not null at the same time
+	// when used as property or ref parameter.
+
+	// Primitives and enums is not nullable.
+	if (property->IsA<FNumericProperty>() || property->IsA<FBoolProperty>() || property->IsA<FEnumProperty>())
+	{
+		return false;
+	}
+	
+	// Object is nullable.
+	if (property->IsA<FObjectProperty>())
+	{
+		return false;
+	}
+
+	// The rest are all null-in-not-null-out.
+	return true;
+}
+
 bool ZSharp::FZExportHelper::IsNameDeprecated(const FString& name)
 {
 	FString upperName = name.ToUpper();

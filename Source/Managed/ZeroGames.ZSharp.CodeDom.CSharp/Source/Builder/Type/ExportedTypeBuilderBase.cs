@@ -15,6 +15,7 @@ public abstract class ExportedTypeBuilderBase<TDefinition>(string namespaceName,
 
 		string[] finalUsings =
 		[
+			"System.Diagnostics.CodeAnalysis",
 			"ZeroGames.ZSharp.Core",
 			"ZeroGames.ZSharp.Core.UnrealEngine",
 			"ZeroGames.ZSharp.Core.UnrealEngine.Specifier",

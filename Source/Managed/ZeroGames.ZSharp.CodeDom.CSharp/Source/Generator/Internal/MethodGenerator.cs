@@ -24,7 +24,7 @@ internal class MethodGenerator
 		string[] decls = [ visibility, modifiers, kind, returnType, name ];
 		string declList = string.Join(" ", decls.Where(decl => !string.IsNullOrWhiteSpace(decl)));
 
-		var parameters = definition.Signature.Parameters is not null ? definition.Signature.Parameters.Select(p => $"{p.GetKindText()}{p.Type.TypeName} {p.Name}") : [];
+		var parameters = definition.Signature.Parameters is not null ? definition.Signature.Parameters.Select(GenerateParameterDecl) : [];
 		string parameterList = string.Join(", ", parameters);
 		
 		string methodDecl = $"{declList}({parameterList})";
@@ -32,7 +32,7 @@ internal class MethodGenerator
 
 		if (definition.IsPureVirtual)
 		{
-			sb.Append(" => throw new NotImplementedException();");
+			sb.Append(" => throw Thrower.NotImplemented();");
 		}
 		else if (definition.Body is not null)
 		{
@@ -46,6 +46,16 @@ internal class MethodGenerator
 		}
 
 		return sb.ToString();
+	}
+
+	private string GenerateParameterDecl(ParameterDeclaration parameter)
+	{
+		string attributes = parameter.Attributes is not null ? _attributeListGenerator.Generate(parameter.Attributes.Value) : string.Empty;
+		if (!string.IsNullOrWhiteSpace(attributes))
+		{
+			attributes += ' ';
+		}
+		return $"{attributes}{parameter.GetKindText()}{parameter.Type.TypeName} {parameter.Name}";
 	}
 
 	private readonly AttributeListGenerator _attributeListGenerator = new();

@@ -7,6 +7,11 @@ internal class AttributeListGenerator
 
 	public string Generate(AttributeList attributeList)
 	{
+		if (attributeList.Declarations.Count == 0)
+		{
+			return string.Empty;
+		}
+		
 		var attributeDeclarations = attributeList.Declarations.Select(GenerateDeclaration);
 		return $"[{string.Join(", ", attributeDeclarations)}]";
 	}

@@ -17,6 +17,7 @@ namespace ZSharp
 		virtual FString GetZCallName() const override;
 		virtual FZFullyExportedTypeName GetType() const override;
 		virtual FString GetUnderlyingType() const override;
+		virtual bool IsNullInNotNullOut() const override;
 		virtual EZExportedPropertyFlags GetFlags() const override;
 		virtual int32 GetIndex() const override;
 
@@ -28,6 +29,7 @@ namespace ZSharp
 
 	private:
 		const FProperty* Property;
+		bool bNullInNotNullOut;
 		int32 Index;
 		EZExportedPropertyFlags Flags;
 		

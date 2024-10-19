@@ -24,7 +24,13 @@ FString ZSharp::FZDynamicallyExportedParameter::GetName() const
 
 ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedParameter::GetType() const
 {
-	return FZExportHelper::GetFPropertyFullyExportedTypeName(Property);
+	FZFullyExportedTypeName name = FZExportHelper::GetFPropertyFullyExportedTypeName(Property);
+	if (bNullInNotNullOut)
+	{
+		name.bNullable = true;
+	}
+
+	return name;
 }
 
 FString ZSharp::FZDynamicallyExportedParameter::GetUnderlyingType() const
@@ -37,8 +43,14 @@ ZSharp::EZExportedParameterFlags ZSharp::FZDynamicallyExportedParameter::GetFlag
 	return Flags;
 }
 
+bool ZSharp::FZDynamicallyExportedParameter::IsNullInNotNullOut() const
+{
+	return bNullInNotNullOut;
+}
+
 ZSharp::FZDynamicallyExportedParameter::FZDynamicallyExportedParameter(const FProperty* property)
 	: Property(property)
+	, bNullInNotNullOut(false)
 	, Flags(EZExportedParameterFlags::In)
 {
 	if (!property->HasAnyPropertyFlags(CPF_ConstParm) && property->HasAllPropertyFlags(CPF_OutParm))
@@ -48,10 +60,15 @@ ZSharp::FZDynamicallyExportedParameter::FZDynamicallyExportedParameter(const FPr
 		{
 			Flags &= ~EZExportedParameterFlags::In;
 		}
+		else if (FZExportHelper::CanFPropertyBeNullInNotNullOut(property))
+		{
+			bNullInNotNullOut = true;
+		}
 	}
 	
 	if (property->HasAllPropertyFlags(CPF_ReturnParm))
 	{
+		Flags |= EZExportedParameterFlags::Out;
 		Flags |= EZExportedParameterFlags::Return;
 		Flags &= ~EZExportedParameterFlags::In;
 	}

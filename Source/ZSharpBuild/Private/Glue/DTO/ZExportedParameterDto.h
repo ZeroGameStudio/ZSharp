@@ -21,5 +21,8 @@ struct FZExportedParameterDto
 	FString UnderlyingType;
 
 	UPROPERTY()
+	bool bNullInNotNullOut = false;
+
+	UPROPERTY()
 	uint64 Flags = 0;
 };

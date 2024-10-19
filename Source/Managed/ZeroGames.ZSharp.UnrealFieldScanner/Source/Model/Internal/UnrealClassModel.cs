@@ -14,6 +14,7 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 
 		AssemblyName = typeDef.Scope.GetAssemblyName();
 		FullName = typeDef.FullName;
+		IsInternal = typeDef.IsNotPublic;
 	}
 
 	public void BaseInitialize()
@@ -93,6 +94,7 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 	}
 	
 	public IReadOnlyList<IUnrealFunctionModel> Functions => _functions;
+	public bool IsInternal { get; }
 
 	public bool IsBaseInitialized { get; private set; }
 	public bool IsFullyInitialized { get; private set; }
@@ -166,7 +168,7 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 					// Now this is our root virtual method and let's see if it is marked as Event.
 					foreach (var attribute in methodToTest.CustomAttributes)
 					{
-						if (attribute.AttributeType.FullName == typeof(EventAttribute).FullName)
+						if (attribute.AttributeType.FullName == typeof(EventImplementationAttribute).FullName)
 						{
 							eventOverrideName = (string)attribute.ConstructorArguments[0].Value;
 							return true;

@@ -11,6 +11,7 @@ partial class ManifestBuilder
 		{
 			Name = classModel.Name,
 			SuperPath = classModel.BaseType?.GetUnrealFieldPath(),
+			ClassFlags = classModel.IsInternal ? EClassFlags.CLASS_RequiredAPI : EClassFlags.CLASS_MinimalAPI,
 		};
 
 		ProcessSpecifiers(result, classModel);

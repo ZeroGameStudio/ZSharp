@@ -30,14 +30,14 @@ public static class AssertionMacros
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void checkNoReentry()
 	{
-		
+
 	}
 
 	[Conditional("ASSERTION_CHECK")]
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void checkNoRecursion()
 	{
-		
+
 	}
 	
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -51,26 +51,20 @@ public static class AssertionMacros
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void verifySlow([DoesNotReturnIf(false)] bool condition, string? message) => Assertion.VerifySlow(condition, message);
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static bool ensureAlways([DoesNotReturnIf(false)] bool condition) => Assertion.EnsureAlways(condition);
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static bool ensureAlways([DoesNotReturnIf(false)] bool condition, string? message) => Assertion.EnsureAlways(condition, message);
 	
+	// The following macros depend on call stack, so we don't forward to Assertion but give the same implementation.
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool ensure([DoesNotReturnIf(false)] bool condition) => Assertion.Ensure(condition);
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool ensure([DoesNotReturnIf(false)] bool condition, string? message) => Assertion.Ensure(condition, message);
 
-	// The following macros depend on call stack, so we don't forward to Assertion but give the same implementation.
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static bool ensureAlways([DoesNotReturnIf(false)] bool condition)
-	{
-		return condition;
-	}
-
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static bool ensureAlways([DoesNotReturnIf(false)] bool condition, string? message)
-	{
-		return condition;
-	}
-	
 }
 
 

@@ -16,7 +16,7 @@ internal static class Uncaught
         catch (Exception ex)
         {
             Debugger.Break();
-            Logger.Error($"Unhandled Exception Detected.\n{ex}");
+            UE_ERROR($"Unhandled Exception Detected.\n{ex}");
             return fallback;
         }
     }
@@ -30,7 +30,7 @@ internal static class Uncaught
         catch (Exception ex)
         {
             Debugger.Break();
-            Logger.Error($"Unhandled Exception Detected.\n{ex}");
+            UE_ERROR($"Unhandled Exception Detected.\n{ex}");
         }
     }
     
@@ -43,7 +43,7 @@ internal static class Uncaught
         catch (Exception ex)
         {
             Debugger.Break();
-            Logger.Error($"Unhandled Fatal Exception!!!\n{ex}");
+            UE_ERROR($"Unhandled Fatal Exception!!!\n{ex}");
             return fallback;
         }
     }
@@ -57,7 +57,7 @@ internal static class Uncaught
         catch (Exception ex)
         {
             Debugger.Break();
-            Logger.Error($"Unhandled Fatal Exception!!!\n{ex}");
+            UE_ERROR($"Unhandled Fatal Exception!!!\n{ex}");
         }
     }
     

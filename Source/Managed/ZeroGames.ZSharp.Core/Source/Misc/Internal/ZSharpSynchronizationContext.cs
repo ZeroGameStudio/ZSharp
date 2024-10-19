@@ -38,7 +38,7 @@ internal sealed class ZSharpSynchronizationContext : SynchronizationContext
 		}
 		catch (Exception ex)
 		{
-			Logger.Error($"Unhandled Exception Detected.\n{ex}");
+			UE_ERROR($"Unhandled Exception Detected.\n{ex}");
 		}
 	}
 	

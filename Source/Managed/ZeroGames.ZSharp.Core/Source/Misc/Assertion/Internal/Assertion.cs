@@ -3,12 +3,11 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 
 namespace ZeroGames.ZSharp.Core;
 
-public static class Assertion
+internal static class Assertion
 {
 
 	[Conditional("ASSERTION_CHECK")]
@@ -179,7 +178,7 @@ public static class Assertion
 		string finalMessage = $"Assertion [{expr}] failed: {message} at file {file} line {line} column {column}.";
 		if (Debugger.IsAttached || forceNoFatal)
 		{
-			Logger.Error(finalMessage);
+			UE_ERROR(finalMessage);
 			Debugger.Break();
 		}
 		else

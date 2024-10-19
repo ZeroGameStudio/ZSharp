@@ -149,8 +149,8 @@ public class ProjectFileBuilder
 			"TRACE",
 			config switch
 			{
-				DEBUG_GAME_CONFIGURATION => "DEBUG;CORE_LOG;SCRIPT_LOG;ASSERTION_CHECK;ASSERTION_CHECK_SLOW",
-				DEVELOPMENT_CONFIGURATION => "DEBUG;CORE_LOG;SCRIPT_LOG;ASSERTION_CHECK",
+				DEBUG_GAME_CONFIGURATION => "DEBUG;UE_LOG;ASSERTION_CHECK;ASSERTION_CHECK_SLOW",
+				DEVELOPMENT_CONFIGURATION => "DEBUG;UE_LOG;ASSERTION_CHECK",
 				SHIPPING_CONFIGURATION => "RELEASE",
 				_ => throw new InvalidOperationException()
 			}
@@ -197,11 +197,8 @@ public class ProjectFileBuilder
 		if (_project.Name == "ZeroGames.ZSharp.Core" || _project.ProjectReferences.Contains("ZeroGames.ZSharp.Core"))
 		{
 			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.AssertionMacros");
-		}
-
-		if (_project.ProjectReferences.Contains("ZeroGames.ZSharp.Core.UnrealEngine"))
-		{
-			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.UnrealEngine.LoggerMacros");
+			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.LoggerMacros");
+			intrinsicStaticUsings.Add("ZeroGames.ZSharp.Core.ZSharpLogChannels");
 		}
 
 		foreach (var us in intrinsicStaticUsings.Concat(_project.StaticUsings))

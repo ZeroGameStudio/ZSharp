@@ -8,7 +8,7 @@
 #include "ZSharpCoreLogChannels.h"
 #include "Interfaces/IPluginManager.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
-#include "Interop/ZCore_Interop.h"
+#include "Interop/ZLog_Interop.h"
 #include "Interop/Engine/ZUnrealEngine_Interop.h"
 #include "Interop/ZClr_Interop.h"
 #include "Interop/ZGCHandle_Interop.h"
@@ -60,7 +60,7 @@ namespace ZSharp::ZGenericClr_Private
 	
 	static void LoadCoreAssembly(const FString& precompiledDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
-		static const TCHAR* GCore_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Core_Interop");
+		static const TCHAR* GLog_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Log_Interop");
 		static const TCHAR* GInteropString_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropString_Interop");
 		static const TCHAR* GMasterAssemblyLoadContext_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.MasterAssemblyLoadContext_Interop");
 		
@@ -68,7 +68,7 @@ namespace ZSharp::ZGenericClr_Private
         {
 #define BUILD_UNMANAGED_FUNCTION(ShortTypeName, FieldName) { G##ShortTypeName##TypeName, TEXT(#FieldName), FZ##ShortTypeName::FieldName }
 
-			BUILD_UNMANAGED_FUNCTION(Core_Interop, CoreLog),
+			BUILD_UNMANAGED_FUNCTION(Log_Interop, Log),
 			
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Alloc),
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Free),
@@ -149,7 +149,6 @@ namespace ZSharp::ZGenericClr_Private
 		{
 			{ *GBuildInteropTypeName, TEXT("WithEditor"), FZBuild_Interop::WithEditor },
 		
-			{ *GUnrealEngineInteropTypeName, TEXT("Log"), FZUnrealEngine_Interop::Log },
 			{ *GUnrealEngineInteropTypeName, TEXT("IsInGameThread"), FZUnrealEngine_Interop::IsInGameThread },
 
 			{ *GPathInteropTypeName, TEXT("GetProjectDir"), FZPath_Interop::GetProjectDir },

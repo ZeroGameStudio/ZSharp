@@ -6,7 +6,6 @@ namespace ZSharp
 {
 	struct FZUnrealEngine_Interop
 	{
-		static void Log(uint8 level, const TCHAR* message);
 		static uint8 IsInGameThread();
 	};
 }

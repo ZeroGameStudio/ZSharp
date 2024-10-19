@@ -103,7 +103,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
             }
             else
             {
-                Logger.Error($"Unhandled Exception Detected.\n{ex}");
+                UE_ERROR($"Unhandled Exception Detected.\n{ex}");
                 Debugger.Break();
             }
 

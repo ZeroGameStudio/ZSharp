@@ -58,7 +58,7 @@ partial class ModelRegistry
 		while (!Debugger.IsAttached)
 		{
 			Thread.Sleep(1000);
-			Logger.Warning("Waiting for debugger...");
+			UE_WARNING("Waiting for debugger...");
 		}
 		Debugger.Break();
 	}

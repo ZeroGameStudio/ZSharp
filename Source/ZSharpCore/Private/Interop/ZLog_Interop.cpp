@@ -1,0 +1,45 @@
+﻿// Copyright Zero Games. All Rights Reserved.
+
+
+#include "ZLog_Interop.h"
+
+#include "Misc/ZLogCategoryRegistry.h"
+#include "Misc/ZRegisterLogCategory.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptCore, Log, All)
+ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptCore)
+
+DEFINE_LOG_CATEGORY_STATIC(LogZSharpScript, Log, All)
+ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScript)
+
+void ZSharp::FZLog_Interop::Log(const TCHAR* category, uint8 verbosity, const TCHAR* message)
+{
+	const auto name = FName { category };
+	FLogCategoryBase* pLogCategory = FZLogCategoryRegistry::Get().GetCategory(name);
+	if (!pLogCategory)
+	{
+		pLogCategory = &LogZSharpScript;
+	}
+	FLogCategoryBase& logCategory = *pLogCategory;
+
+	switch (verbosity)
+	{
+#define LOG_CASE(Verbosity) case ELogVerbosity::Verbosity: { UE_LOG_REF(logCategory, Verbosity, TEXT("%s"), message); break; }
+		
+		LOG_CASE(Fatal)
+		LOG_CASE(Error)
+		LOG_CASE(Warning)
+		LOG_CASE(Display)
+		LOG_CASE(Log)
+		LOG_CASE(Verbose)
+		LOG_CASE(VeryVerbose)
+		
+#undef LOG_CASE
+		default:
+			{
+				break;
+			}
+	}
+}
+
+

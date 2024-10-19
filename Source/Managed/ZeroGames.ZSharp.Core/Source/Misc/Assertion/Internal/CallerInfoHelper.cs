@@ -1,6 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
@@ -12,19 +13,20 @@ internal static class CallerInfoHelper
 	
 	public static void Inject(ref int32 column)
 	{
-		GCHandle? dummy = default;
-		Inject(ref dummy, ref column);
+		if (column == default)
+		{
+			column = new StackFrame(2, true).GetFileColumnNumber();
+		}
 	}
 
-	public static void Inject(ref GCHandle? context, ref int32 column)
+	public static void Inject([NotNull] ref AssemblyLoadContext? context, ref int32 column)
 	{
 		StackFrame? frame = null;
 		if (context == null)
 		{
 			frame ??= new(2, true);
 			Assembly assembly = frame.GetMethod()!.DeclaringType!.Assembly;
-			AssemblyLoadContext alc = AssemblyLoadContext.GetLoadContext(assembly)!;
-			context = GCHandle.Alloc(alc, GCHandleType.WeakTrackResurrection);
+			context = AssemblyLoadContext.GetLoadContext(assembly)!;
 		}
 		
 		if (column == default)

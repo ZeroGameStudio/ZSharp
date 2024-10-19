@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Loader;
 
 namespace ZeroGames.ZSharp.Core;
 
@@ -62,14 +63,14 @@ public static class Assertion
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void CheckNoReentry
 	(
-		GCHandle? context = default,
+		AssemblyLoadContext? context = default,
 		[CallerFilePath] string? file = default,
 		[CallerLineNumber] int32 line = default,
 		[CallerColumnNumber] int32 column = default
 	)
 	{
 		CallerInfoHelper.Inject(ref context, ref column);
-		if (!_reentryCache.Add(new(context!.Value, file ?? string.Empty, line, column)))
+		if (!_reentryCache.Add(new(context, file ?? string.Empty, line, column)))
 		{
 			Check(false, "Enclosing block was called more than once!", null, file, line, column);
 		}
@@ -78,7 +79,7 @@ public static class Assertion
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static IDisposable CheckNoRecursion
 	(
-		GCHandle? context = default,
+		AssemblyLoadContext? context = default,
 		[CallerFilePath] string? file = default,
 		[CallerLineNumber] int32 line = default,
 		[CallerColumnNumber] int32 column = default
@@ -86,7 +87,7 @@ public static class Assertion
 	{
 #if ASSERTION_CHECK
 		CallerInfoHelper.Inject(ref context, ref column);
-		Coordinate coord = new(context!.Value, file ?? string.Empty, line, column);
+		Coordinate coord = new(context, file ?? string.Empty, line, column);
 		if (_recursionCache.Add(coord))
 		{
 			return new RecursionScope(coord);
@@ -137,7 +138,7 @@ public static class Assertion
 	(
 		[DoesNotReturnIf(false)] bool condition,
 		string? message = default,
-		GCHandle? context = default,
+		AssemblyLoadContext? context = default,
 		[CallerArgumentExpression(nameof(condition))] string? expr = default,
 		[CallerFilePath] string? file = default,
 		[CallerLineNumber] int32 line = default,
@@ -146,7 +147,7 @@ public static class Assertion
 	{
 #if ASSERTION_CHECK
 		CallerInfoHelper.Inject(ref context, ref column);
-		if (_ensureCache.Add(new(context!.Value, file ?? string.Empty, line, column)))
+		if (_ensureCache.Add(new(context, file ?? string.Empty, line, column)))
 		{
 			EnsureAlways(condition, message, expr, file, line, column);
 		}
@@ -192,7 +193,47 @@ public static class Assertion
 		public void Dispose() => Thrower.FatalIf(!_recursionCache.Remove(coord));
 	}
 
-	private readonly record struct Coordinate(GCHandle Context, string File, int32 Line, int32 Column);
+	private readonly record struct Coordinate
+	{
+		public Coordinate(AssemblyLoadContext context, string file, int32 line, int32 column)
+		{
+			Context = context;
+			File = file;
+			Line = line;
+			Column = column;
+			
+			if (_relevantContexts.Add(context))
+			{
+				context.Unloading += static alc =>
+				{
+					if (_relevantContexts.Remove(alc))
+					{
+						ClearCache(_reentryCache, alc);
+						ClearCache(_recursionCache, alc);
+						ClearCache(_ensureCache, alc);
+					}
+				};
+			}
+		}
+		
+		public AssemblyLoadContext Context { get; }
+		public string File { get; }
+		public int32 Line { get; }
+		public int32 Column { get; }
+
+		private static void ClearCache(HashSet<Coordinate> cache, AssemblyLoadContext context)
+		{
+			foreach (var coord in cache)
+			{
+				if (coord.Context == context)
+				{
+					cache.Remove(coord);
+				}
+			}
+		}
+		
+		private static HashSet<AssemblyLoadContext> _relevantContexts = new();
+	}
 
 	private static HashSet<Coordinate> _reentryCache = new();
 	private static HashSet<Coordinate> _recursionCache = new();

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Loader;
 
 namespace ZeroGames.ZSharp.Core;
 
@@ -59,7 +60,7 @@ public static class AssertionMacros
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void checkNoReentry
 	(
-		GCHandle? context = default,
+		AssemblyLoadContext? context = default,
 		[CallerFilePath] string? file = default,
 		[CallerLineNumber] int32 line = default,
 		[CallerColumnNumber] int32 column = default
@@ -72,7 +73,7 @@ public static class AssertionMacros
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static IDisposable checkNoRecursion
 	(
-		GCHandle? context = default,
+		AssemblyLoadContext? context = default,
 		[CallerFilePath] string? file = default,
 		[CallerLineNumber] int32 line = default,
 		[CallerColumnNumber] int32 column = default
@@ -125,7 +126,7 @@ public static class AssertionMacros
 	(
 		[DoesNotReturnIf(false)] bool condition,
 		string? message = default,
-		GCHandle? context = default,
+		AssemblyLoadContext? context = default,
 		[CallerArgumentExpression(nameof(condition))] string? expr = default,
 		[CallerFilePath] string? file = default,
 		[CallerLineNumber] int32 line = default,

@@ -89,7 +89,7 @@ internal static class DllEntry
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, void*, ELoadAssemblyErrorCode>)&SlimAssemblyLoadContext_Interop.LoadAssembly;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, char*, char*, void*, EInvokeMethodErrorCode>)&SlimAssemblyLoadContext_Interop.InvokeMethod;
 
-        UE_LOG("===================== ZSharp Startup =====================");
+        UE_LOG(LogZSharpScriptCore, "===================== ZSharp Startup =====================");
     });
     
 }

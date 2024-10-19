@@ -131,7 +131,7 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
         }
         catch (Exception ex)
         {
-            UE_ERROR($"Unhandled DllMain Exception:\n{ex}");
+            UE_ERROR(LogZSharpScriptCore, $"Unhandled DllMain Exception:\n{ex}");
             return ELoadAssemblyErrorCode.UnhandledDllMainException;
         }
     }

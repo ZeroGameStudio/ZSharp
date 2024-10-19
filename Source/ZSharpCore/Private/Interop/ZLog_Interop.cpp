@@ -9,10 +9,15 @@
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptCore, Log, All)
 ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptCore)
 
+DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptEngine, Log, All)
+ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptEngine)
+
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScript, Log, All)
 ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScript)
 
-void ZSharp::FZLog_Interop::Log(const TCHAR* category, uint8 verbosity, const TCHAR* message)
+ZSHARP_REGISTER_LOG_CATEGORY(LogTemp)
+
+void ZSharp::FZLog_Interop::Log(const TCHAR* category, ELogVerbosity::Type verbosity, const TCHAR* message)
 {
 	const auto name = FName { category };
 	FLogCategoryBase* pLogCategory = FZLogCategoryRegistry::Get().GetCategory(name);

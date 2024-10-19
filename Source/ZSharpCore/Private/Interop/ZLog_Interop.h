@@ -6,7 +6,7 @@ namespace ZSharp
 {
 	struct FZLog_Interop
 	{
-		static void Log(const TCHAR* category, uint8 verbosity, const TCHAR* message);
+		static void Log(const TCHAR* category, ELogVerbosity::Type verbosity, const TCHAR* message);
 	};
 }
 

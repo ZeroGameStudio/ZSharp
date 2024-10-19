@@ -40,13 +40,13 @@ public abstract class ExportedObjectBase : IConjugate
     {
         if (IsBlack)
         {
-            UE_ERROR("Dispose black conjugate from unmanaged code.");
+            UE_ERROR(LogZSharpScriptEngine, "Dispose black conjugate from unmanaged code.");
             return;
         }
         
         if (IsExpired)
         {
-            UE_ERROR("Dispose exported object twice.");
+            UE_ERROR(LogZSharpScriptEngine, "Dispose exported object twice.");
             return;
         }
         
@@ -140,7 +140,7 @@ public abstract class ExportedObjectBase : IConjugate
                 }
                 catch (Exception ex)
                 {
-                    UE_ERROR($"Unhandled Exception Detected.\n{ex}");
+                    UE_ERROR(LogZSharpScriptEngine, $"Unhandled Exception Detected.\n{ex}");
                 }
 
                 _onExpiredRegistry = null;
@@ -152,7 +152,7 @@ public abstract class ExportedObjectBase : IConjugate
     {
         if (!IsBlack)
         {
-            UE_ERROR("Finalize unmanaged export object.");
+            UE_ERROR(LogZSharpScriptEngine, "Finalize unmanaged export object.");
             return;
         }
         

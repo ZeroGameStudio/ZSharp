@@ -11,7 +11,7 @@ internal static class DllEntry
     private static void DllMain(string[] args)
     {
         string result = new BuildEngine(args).RunAsync().Result;
-        UE_LOG(result);
+        UE_LOG(LogTemp, result);
     }
 
 }

@@ -178,7 +178,7 @@ internal static class Assertion
 		string finalMessage = $"Assertion [{expr}] failed: {message} at file {file} line {line} column {column}.";
 		if (Debugger.IsAttached || forceNoFatal)
 		{
-			UE_ERROR(finalMessage);
+			UE_ERROR(LogZSharpScriptCore, finalMessage);
 			Debugger.Break();
 		}
 		else

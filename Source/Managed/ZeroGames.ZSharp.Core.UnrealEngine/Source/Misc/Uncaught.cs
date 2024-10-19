@@ -16,7 +16,7 @@ public static class Uncaught
         catch (Exception ex)
         {
             Debugger.Break();
-            UE_ERROR($"Unhandled Exception Detected.\n{ex}");
+            UE_ERROR(LogZSharpScriptEngine, $"Unhandled Exception Detected.\n{ex}");
             return fallback;
         }
     }
@@ -30,7 +30,7 @@ public static class Uncaught
         catch (Exception ex)
         {
             Debugger.Break();
-            UE_ERROR($"Unhandled Exception Detected.\n{ex}");
+            UE_ERROR(LogZSharpScriptEngine, $"Unhandled Exception Detected.\n{ex}");
         }
     }
     
@@ -43,7 +43,7 @@ public static class Uncaught
         catch (Exception ex)
         {
             Debugger.Break();
-            UE_ERROR($"Unhandled Fatal Exception!!!\n{ex}");
+            UE_ERROR(LogZSharpScriptEngine, $"Unhandled Fatal Exception!!!\n{ex}");
             return fallback;
         }
     }
@@ -57,7 +57,7 @@ public static class Uncaught
         catch (Exception ex)
         {
             Debugger.Break();
-            UE_ERROR($"Unhandled Fatal Exception!!!\n{ex}");
+            UE_ERROR(LogZSharpScriptEngine, $"Unhandled Fatal Exception!!!\n{ex}");
         }
     }
     

@@ -2,9 +2,8 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-public enum ELogVerbosity
+public enum ELogVerbosity : uint8
 {
-	Fatal = 1,
 	Error = 2,
 	Warning = 3,
 	Display = 4,

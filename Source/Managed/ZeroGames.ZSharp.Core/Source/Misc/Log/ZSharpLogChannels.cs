@@ -4,8 +4,10 @@ namespace ZeroGames.ZSharp.Core;
 
 public static class ZSharpLogChannels
 {
-	public static readonly string LogZSharpScriptCore = nameof(LogZSharpScriptCore);
-	public static readonly string LogZSharpScript = nameof(LogZSharpScript);
+	public const string LogZSharpScriptCore = nameof(LogZSharpScriptCore);
+	public const string LogZSharpScriptEngine = nameof(LogZSharpScriptEngine);
+	public const string LogZSharpScript = nameof(LogZSharpScript);
+	public const string LogTemp = nameof(LogTemp);
 }
 
 

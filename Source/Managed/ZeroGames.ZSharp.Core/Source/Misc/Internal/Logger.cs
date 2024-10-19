@@ -1,13 +1,20 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace ZeroGames.ZSharp.Core;
 
 internal static class Logger
 {
+
+    [DoesNotReturn]
+    public static void Fatal(params object?[]? objects)
+    {
+        Log(1, objects);
+        throw new InvalidOperationException();
+    }
     
-    public static void Fatal(params object?[]? objects) => Log(1, objects);
     public static void Error(params object?[]? objects) => Log(2, objects);
     public static void Warning(params object?[]? objects) => Log(3, objects);
     public static void Display(params object?[]? objects) => Log(4, objects);
@@ -15,7 +22,7 @@ internal static class Logger
     public static void Verbose(params object?[]? objects) => Log(6, objects);
     public static void VeryVerbose(params object?[]? objects) => Log(7, objects);
     
-    public static void CFatal(bool condition, params object?[]? objects)
+    public static void CFatal([DoesNotReturnIf(true)] bool condition, params object?[]? objects)
     {
         if (condition)
         {

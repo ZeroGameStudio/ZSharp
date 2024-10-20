@@ -45,7 +45,7 @@ void FZSharpRuntimeModule::StartupModule()
 	else
 	{
 		FEditorDelegates::PreBeginPIE.AddRaw(this, &ThisClass::HandleBeginPIE);
-		FEditorDelegates::ShutdownPIE.AddRaw(this, &ThisClass::HandleEndPIE);
+		FEditorDelegates::EndPIE.AddRaw(this, &ThisClass::HandleEndPIE);
 	}
 #else
 	CreateMasterAlc();
@@ -64,7 +64,7 @@ void FZSharpRuntimeModule::ShutdownModule()
     else
     {
     	FEditorDelegates::PreBeginPIE.RemoveAll(this);
-    	FEditorDelegates::ShutdownPIE.RemoveAll(this);
+    	FEditorDelegates::EndPIE.RemoveAll(this);
     }
 #else
 	UnloadMasterAlc();

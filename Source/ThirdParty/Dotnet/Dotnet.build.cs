@@ -14,63 +14,69 @@ public class Dotnet : ModuleRules
 		
 		PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "inc"));
 
+		// Basic build info
 		string platformName = Target.Platform.ToString();
+		string moduleDir = ModuleDirectory;
+		string zsharpDir = PluginDirectory;
+		string projectDir = DirectoryReference.FromFile(Target.ProjectFile)!.FullName;
+		
+		// Z# constants
+		// IMPORTANT: KEEP SYNC WITH ZSharpCore.build.cs
+		const string BINARIES_DIR = "Binaries";
+		const string CONFIG_DIR = "Config";
+		const string PRE_COMPILED_DIR = "Precompiled";
+		const string DOTNET_ROOT_DIR = "dotnet";
+		const string HOSTFXR_DLL = "hostfxr.dll";
+		const string CORECLR_DLL = "coreclr.dll";
+		const string CORELIB_DLL = "System.Private.CoreLib.dll";
+		const string RUNTIME_CONFIG_JSON = "ZSharp.runtimeconfig.json";
+		const string NETCOREAPP = "Microsoft.NETCore.App";
+		
+		// Z# configurations
+		// IMPORTANT: KEEP SYNC WITH ZSharpCore.build.cs
 		string dotnetVersion = "8.0.3";
+		string runtimeImpl = "coreclr";
 
-		string dotnetRoot = Path.Combine(PluginDirectory, "Binaries", platformName, "dotnet");
-
-		{ // Copy hostfxr & .runtimeconfig.json
-			string hostDir = Path.Combine(dotnetRoot, "host", "fxr", dotnetVersion);
+		// Copy dotnet
+		string libSrcDir = Path.Combine(moduleDir, "lib", platformName);
+		string frameworkSrcDir = Path.Combine(moduleDir, "framework");
+		string dotnetDstDir = Path.Combine(projectDir, BINARIES_DIR, platformName, DOTNET_ROOT_DIR);
+		string frameworkDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, dotnetVersion);
+		
+		{ // hostfxr
+			string hostSrcDir = Path.Combine(libSrcDir, "host");
+			string hostDstDir = Path.Combine(dotnetDstDir, "host", "fxr", dotnetVersion);
 			
-			string hostfxrSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "host", "hostfxr.dll");
-			string hostfxrDstPath = Path.Combine(hostDir, "hostfxr.dll");
+			string hostfxrSrcPath = Path.Combine(hostSrcDir, HOSTFXR_DLL);
+			string hostfxrDstPath = Path.Combine(hostDstDir, HOSTFXR_DLL);
 			RuntimeDependencies.Add(hostfxrDstPath, hostfxrSrcPath);
 		}
 		
-		string frameworkDir = Path.Combine(dotnetRoot, "shared", "Microsoft.NETCore.App", dotnetVersion);
-		
-		{ // Copy coreclr & CoreLib
-			string runtimeName = "coreclr";
+		{ // coreclr & CoreLib
+			string runtimeSrcDir = Path.Combine(libSrcDir, "runtime", runtimeImpl);
+			string runtimeDstDir = frameworkDstDir;
 			
-			string coreLibSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "runtime", runtimeName, "System.Private.CoreLib.dll");
-			string coreLibDstPath = Path.Combine(frameworkDir, "System.Private.CoreLib.dll");
+			string coreLibSrcPath = Path.Combine(runtimeSrcDir, CORELIB_DLL);
+			string coreLibDstPath = Path.Combine(runtimeDstDir, CORELIB_DLL);
 			RuntimeDependencies.Add(coreLibDstPath, coreLibSrcPath);
 			
-			string runtimeSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "runtime", runtimeName, "coreclr.dll");
-			string runtimeDstPath = Path.Combine(frameworkDir, "coreclr.dll");
+			string runtimeSrcPath = Path.Combine(runtimeSrcDir, CORECLR_DLL);
+			string runtimeDstPath = Path.Combine(runtimeDstDir, CORECLR_DLL);
 			RuntimeDependencies.Add(runtimeDstPath, runtimeSrcPath);
 		}
-
-		{ // Copy BCL
-			string frameworkSrcDir = Path.Combine(ModuleDirectory, "framework");
+		
+		{ // BCL
             IEnumerable<string> frameworkFiles = GetFiles(frameworkSrcDir);
             foreach (var file in frameworkFiles)
             {
-            	string relativePath = file.Substring(frameworkSrcDir.Length + 1, file.Length - frameworkSrcDir.Length - 1);
-            
-            	RuntimeDependencies.Add(Path.Combine(frameworkDir, relativePath), file);
+	            string relativePath = GetRelativePath(file, frameworkSrcDir);
+            	RuntimeDependencies.Add(Path.Combine(frameworkDstDir, relativePath), file);
             }
 		}
-
-		HashSet<string> existingLibs = new();
-		{ // Copy shared libs
-			string sharedDstRoot = Target.bBuildEditor ? $"{PluginDirectory}/Binaries" : "$(TargetOutputDir)/..";
-			string sharedSrcDir = Path.Combine(ModuleDirectory, "shared");
-			string sharedDstDir = Path.Combine(sharedDstRoot, "Managed", "Shared");
-			IEnumerable<string> sharedFiles = GetFiles(sharedSrcDir);
-			foreach (var file in sharedFiles)
-			{
-				string relativePath = file.Substring(sharedSrcDir.Length + 1, file.Length - sharedSrcDir.Length - 1);
-				string dstPath = Path.Combine(sharedDstDir, relativePath);
-				RuntimeDependencies.Add(dstPath, file);
-				existingLibs.Add(NormalizePath(dstPath));
-			}
-		}
-
-		{ // Copy runtimeconfig.json
-			const string RUNTIME_CONFIG_FILE_NAME = "ZSharp.runtimeconfig.json";
-			string runtimeConfigDstPath = $"{DirectoryReference.FromFile(Target.ProjectFile)}/Config/{RUNTIME_CONFIG_FILE_NAME}";
-			string defaultRuntimeConfigPath = Path.Combine(PluginDirectory, $"Config/{RUNTIME_CONFIG_FILE_NAME}");
+		
+		{ // ZSharp.runtimeconfig.json
+			string runtimeConfigDstPath = Path.Combine(projectDir, CONFIG_DIR, RUNTIME_CONFIG_JSON);
+			string defaultRuntimeConfigPath = Path.Combine(zsharpDir, CONFIG_DIR, RUNTIME_CONFIG_JSON);
 			if (File.Exists(runtimeConfigDstPath))
 			{
 				RuntimeDependencies.Add(runtimeConfigDstPath);
@@ -80,34 +86,55 @@ public class Dotnet : ModuleRules
 				RuntimeDependencies.Add(runtimeConfigDstPath, defaultRuntimeConfigPath);
 			}
 		}
-
-		/*
-		 * On staged builds:
-		 * 1. Copy all managed libs to project binaries dir.
-		 */
-		if (!Target.bBuildEditor)
+		
+		// Copy precompiled assemblies
+		string managedDstDir = Path.Combine(projectDir, BINARIES_DIR, "Managed");
+		HashSet<string> existingLibs = new();
 		{
-			string managedDir = Path.Combine(PluginDirectory, "Binaries/Managed");
-			IEnumerable<string> managedAssemblies = GetFiles(managedDir);
-			foreach (var file in managedAssemblies)
+			string precompiledDir = Path.Combine(zsharpDir, PRE_COMPILED_DIR);
+			IEnumerable<string> precompileds = GetFiles(precompiledDir);
+			foreach (var precompiled in precompileds)
 			{
-				string relativePath = file.Substring(managedDir.Length + 1, file.Length - managedDir.Length - 1);
-				string dstPath = Path.Combine("$(TargetOutputDir)/../Managed", relativePath);
-				if (existingLibs.Contains(NormalizePath(dstPath)))
+				string relativePath = GetRelativePath(precompiled, precompiledDir);
+				string dstPath = Path.Combine(managedDstDir, relativePath);
+				// Multiple precompiled dirs have the same assembly, copy only one.
+				if (!existingLibs.Add(NormalizePath(dstPath)))
 				{
 					continue;
 				}
 				
-				RuntimeDependencies.Add(dstPath, file);
+				RuntimeDependencies.Add(dstPath, precompiled);
+			}
+		}
+		
+		// Marks all the rest managed assemblies as runtime dependency.
+		{
+			IEnumerable<string> assemblies = GetFiles(managedDstDir);
+			foreach (var assembly in assemblies)
+			{
+				string relativePath = GetRelativePath(assembly, managedDstDir);
+				string dstPath = Path.Combine(managedDstDir, relativePath);
+				// This assembly is already marked by precompiled.
+				if (existingLibs.Contains(dstPath))
+				{
+					continue;
+				}
+				
+				RuntimeDependencies.Add(dstPath);
 			}
 		}
 	}
 
-	private static IEnumerable<string> GetFiles(string directory, string pattern = "*.*")
+	private static IEnumerable<string> GetFiles(string directory)
 	{
+		if (!Directory.Exists(directory))
+		{
+			return Array.Empty<string>();
+		}
+		
 		var files = new List<string>();
 
-		var strings = Directory.GetFiles(directory, pattern);
+		var strings = Directory.GetFiles(directory);
 
 		foreach (var file in strings)
 		{
@@ -116,10 +143,15 @@ public class Dotnet : ModuleRules
 
 		foreach (var file in Directory.GetDirectories(directory))
 		{
-			files.AddRange(GetFiles(file, pattern));
+			files.AddRange(GetFiles(file));
 		}
 
 		return files;
+	}
+
+	private static string GetRelativePath(string file, string relative)
+	{
+		return file.Substring(relative.Length + 1, file.Length - relative.Length - 1);
 	}
 
 	private static string NormalizePath(string path)

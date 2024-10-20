@@ -36,16 +36,12 @@ namespace ZSharp::ZGenericClr_Private
 		FZUnmanagedFunction* Functions;
 	};
 
-	static void LoadSharedAssemblies(const FString& pluginDir, load_assembly_bytes_fn loadAssembly)
+	static void LoadAssembliesUnderDirectory(const FString& directory, load_assembly_bytes_fn loadAssembly)
 	{
-#if WITH_EDITOR
-		const FString sharedDllRoot = FPaths::Combine(pluginDir, "Binaries/Managed/Shared");
-#else
-		const FString sharedDllRoot = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed/Shared");
-#endif
+		const FString fullDirectory = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", directory);
 		
 		TArray<FString> sharedDllFiles;
-		IFileManager::Get().FindFilesRecursive(sharedDllFiles, *sharedDllRoot, TEXT("*.dll"), true, false);
+		IFileManager::Get().FindFilesRecursive(sharedDllFiles, *fullDirectory, TEXT("*.dll"), true, false);
 
 		TArray<uint8> content;
 		for (const auto& dll : sharedDllFiles)
@@ -58,7 +54,7 @@ namespace ZSharp::ZGenericClr_Private
 		}
 	}
 	
-	static void LoadCoreAssembly(const FString& precompiledDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
+	static void LoadCoreAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
 		static const TCHAR* GLog_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Log_Interop");
 		static const TCHAR* GInteropString_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropString_Interop");
@@ -119,19 +115,12 @@ namespace ZSharp::ZGenericClr_Private
 		void(*dllMain)(const decltype(GArgs)&) = nullptr;
 
 		const FString assemblyName = ZSHARP_CORE_ASSEMBLY_NAME;
-		FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed", assemblyName + ".dll");
+		const FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Core", assemblyName + ".dll");
 		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
 		const FString entryMethodName = TEXT("DllMain");
 
 		TArray<uint8> content;
-		if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
-		{
-			assemblyPath = FPaths::Combine(precompiledDir, assemblyName + ".dll");
-			if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
-			{
-				checkNoEntry();
-			}
-		}
+		verify(FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent));
 		loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
 		getFunctionPointer(*entryTypeName, *entryMethodName, UNMANAGEDCALLERSONLY_METHOD, nullptr, nullptr, reinterpret_cast<void**>(&dllMain));
 		
@@ -139,7 +128,7 @@ namespace ZSharp::ZGenericClr_Private
 		dllMain(GArgs);
 	}
 
-	static void LoadEngineCoreAssembly(const FString& precompiledDir, load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
+	static void LoadCoreEngineAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
 		static const FString GBuildInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("Build_Interop"));
 		static const FString GUnrealEngineInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("UnrealEngine_Interop"));
@@ -163,19 +152,12 @@ namespace ZSharp::ZGenericClr_Private
 		void(*dllMain)(const decltype(GArgs)&) = nullptr;
 
 		const FString assemblyName = ZSHARP_CORE_ENGINE_ASSEMBLY_NAME;
-		FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed", assemblyName + ".dll");
+		const FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Core", assemblyName + ".dll");
 		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
 		const FString entryMethodName = TEXT("DllMain");
 
 		TArray<uint8> content;
-		if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
-		{
-			assemblyPath = FPaths::Combine(precompiledDir, assemblyName + ".dll");
-			if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
-			{
-				checkNoEntry();
-			}
-		}
+		verify(FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent));
 		loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
 		getFunctionPointer(*entryTypeName, *entryMethodName, UNMANAGEDCALLERSONLY_METHOD, nullptr, nullptr, reinterpret_cast<void**>(&dllMain));
 
@@ -183,22 +165,15 @@ namespace ZSharp::ZGenericClr_Private
 		dllMain(GArgs);
 	}
 
-	static void LoadResolverAssembly(const FString& precompiledDir, load_assembly_bytes_fn loadAssembly)
+	static void LoadResolverAssembly(load_assembly_bytes_fn loadAssembly)
 	{
 		const FString assemblyName = ZSHARP_RESOLVER_ASSEMBLY_NAME;
-		FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries/Managed", assemblyName + ".dll");
+		const FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Core", assemblyName + ".dll");
 		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
 		const FString entryMethodName = TEXT("DllMain");
 
 		TArray<uint8> content;
-		if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
-		{
-			assemblyPath = FPaths::Combine(precompiledDir, assemblyName + ".dll");
-			if (!FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent))
-			{
-				checkNoEntry();
-			}
-		}
+		verify(FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent));
 		loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
 	}
 }
@@ -221,11 +196,9 @@ void ZSharp::FZGenericClr::Startup()
 
 	bInitialized = true;
 
-	const FString pluginDir = IPluginManager::Get().FindEnabledPlugin("ZSharp")->GetBaseDir();
-	const FString pluginBinariesDir = FPaths::Combine(pluginDir, "Binaries");
-	const FString dotnetRoot = FPaths::Combine(pluginBinariesDir, ZSHARP_DOTNET_PATH);
+	const FString dotnetRoot = FPaths::Combine(FPaths::ProjectDir(), ZSHARP_DOTNET_PATH_TO_PROJECT);
 
-	const FString hostFXRPath = FPaths::Combine(dotnetRoot, ZSHARP_HOSTFXR_PATH);
+	const FString hostFXRPath = FPaths::Combine(dotnetRoot, ZSHARP_HOSTFXR_PATH_TO_DOTNET);
 	void* hostFXR = FPlatformProcess::GetDllHandle(*hostFXRPath);
 	check(hostFXR);
 
@@ -257,11 +230,11 @@ void ZSharp::FZGenericClr::Startup()
 
 	closeHostFXR(handle);
 
-	const FString precompiledDir = FPaths::Combine(pluginDir, "Precompiled");
-	ZGenericClr_Private::LoadSharedAssemblies(pluginDir, loadAssembly);
-	ZGenericClr_Private::LoadCoreAssembly(precompiledDir, loadAssembly, getFunctionPointer);
-	ZGenericClr_Private::LoadEngineCoreAssembly(precompiledDir, loadAssembly, getFunctionPointer);
-	ZGenericClr_Private::LoadResolverAssembly(precompiledDir, loadAssembly);
+	ZGenericClr_Private::LoadAssembliesUnderDirectory("ForwardShared", loadAssembly);
+	ZGenericClr_Private::LoadCoreAssembly(loadAssembly, getFunctionPointer);
+	ZGenericClr_Private::LoadCoreEngineAssembly(loadAssembly, getFunctionPointer);
+	ZGenericClr_Private::LoadResolverAssembly(loadAssembly);
+	ZGenericClr_Private::LoadAssembliesUnderDirectory("DeferredShared", loadAssembly);
 	
 	FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);
 }

@@ -1,5 +1,5 @@
 {
-	"IsPrecompiled": true,
+	"IsCore": true,
 	"Folder": "ZSharp/Core",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
@@ -12,7 +12,7 @@
 	],
 	"ExternalReferences":
 	[
-		"../../ThirdParty/Dotnet/shared/Mono.Cecil.dll"
+		"../../../Precompiled/ForwardShared/Mono.Cecil.dll"
 	]
 }
 

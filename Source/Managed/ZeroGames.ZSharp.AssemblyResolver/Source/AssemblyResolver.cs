@@ -21,20 +21,9 @@ public class AssemblyResolver : IAssemblyResolver
 			}
 		}
 		
-		_cachedManagedDllDir ??= $"{UnrealPaths.ProjectDir}Binaries/Managed";
-		if (!TryGetDllPath(_cachedManagedDllDir, name, out var path))
-		{
-			// Scan shared and precompiled dir for editor build.
-			if (UnrealBuild.WithEditor)
-			{
-				string pluginDir = UnrealPaths.GetPluginDir("ZSharp");
-				if (!TryGetDllPath($"{pluginDir}/Binaries/Managed/Shared", name, out path))
-				{
-					TryGetDllPath($"{pluginDir}/Precompiled", name, out path);
-				}
-			}
-		}
-
+		_cachedManagedDllDir ??= $"{UnrealPaths.ProjectDir}/Binaries/Managed";
+		
+		TryGetDllPath(_cachedManagedDllDir, name, out var path);
 		return path;
 	}
 

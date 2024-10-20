@@ -397,18 +397,28 @@ public class ProjectFileBuilder
 		targetNode.SetAttribute("Name", "PostBuild");
 		targetNode.SetAttribute("AfterTargets", "PostBuildEvent");
 
-		if (_project.IsShared)
+		bool isPrecompiled = _project.IsPrecompiled;
+		string additionalPath = string.Empty;
+		if (_project.IsCore)
 		{
-			AddCopyTarget("$(ZSharpDir)/Binaries/Managed/Shared");
+			additionalPath = "/Core";
+			isPrecompiled = true;
 		}
-		else
+		else if (_project.IsForwardShared)
 		{
-			AddCopyTarget("$(UnrealProjectDir)/Binaries/Managed");
-			AddCopyTarget("$(ZSharpDir)/Binaries/Managed");
-			if (_project.IsPrecompiled)
-			{
-				AddCopyTarget("$(ZSharpDir)/Precompiled");
-			}
+			additionalPath = "/ForwardShared";
+			isPrecompiled = true;
+		}
+		else if (_project.IsDeferredShared)
+		{
+			additionalPath = "/DeferredShared";
+			isPrecompiled = true;
+		}
+		
+		AddCopyTarget($"$(UnrealProjectDir)/Binaries/Managed{additionalPath}");
+		if (isPrecompiled)
+		{
+			AddCopyTarget($"$(ZSharpDir)/Precompiled{additionalPath}");
 		}
 
 		foreach (var command in _project.PostBuildCommands)

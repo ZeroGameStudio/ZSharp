@@ -1,5 +1,5 @@
 {
-	"IsShared": true,
+	"IsDeferredShared": true,
 	"Folder": "ZSharp/Engine",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",

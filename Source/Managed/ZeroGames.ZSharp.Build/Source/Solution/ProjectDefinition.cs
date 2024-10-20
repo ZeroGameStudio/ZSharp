@@ -26,7 +26,9 @@ public class ProjectDefinition
 	public bool IsUnsafeBlockEnabled { get; init; } = true;
 	public bool HasGlue { get; init; } = false;
 	public bool IsPrecompiled { get; init; } = false;
-	public bool IsShared { get; init; } = false;
+	public bool IsCore { get; init; } = false;
+	public bool IsForwardShared { get; init; } = false;
+	public bool IsDeferredShared { get; init; } = false;
 	public bool IsRoslynComponent { get; init; } = false;
 	public bool HasAnalyzerReleaseTracking { get; init; } = false;
 	public bool UsesZSharpAnalyzer { get; init; } = true;

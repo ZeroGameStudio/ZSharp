@@ -61,15 +61,20 @@ public class ZSharpCore : ModuleRules
 			PrivateDefinitions.Add("ZSHARP_WITH_MONO=1");
 		}
 
+		// Z# constants
+		// IMPORTANT: KEEP SYNC WITH ZSharpCore.build.cs
+		const string RUNTIME_CONFIG_JSON = "ZSharp.runtimeconfig.json";
+		
+		// Z# configurations
+		// IMPORTANT: KEEP SYNC WITH ZSharpCore.build.cs
 		string dotnetVersion = "8.0.3";
-		string runtimeConfigFileName = "ZSharp.runtimeconfig.json";
 		
 		PublicDefinitions.Add($"ZSHARP_PLATFORM=\"{Target.Platform}\"");
 		
 		PublicDefinitions.Add($"ZSHARP_DOTNET_VERSION=\"{dotnetVersion}\"");
-		PublicDefinitions.Add($"ZSHARP_DOTNET_PATH=\"{Target.Platform}/dotnet\"");
-		PublicDefinitions.Add($"ZSHARP_HOSTFXR_PATH=\"host/fxr/{dotnetVersion}/hostfxr.dll\"");
-		PublicDefinitions.Add($"ZSHARP_RUNTIME_CONFIG_FILE_NAME=\"{runtimeConfigFileName}\"");
+		PublicDefinitions.Add($"ZSHARP_DOTNET_PATH_TO_PROJECT=\"Binaries/{Target.Platform}/dotnet\"");
+		PublicDefinitions.Add($"ZSHARP_HOSTFXR_PATH_TO_DOTNET=\"host/fxr/{dotnetVersion}/hostfxr.dll\"");
+		PublicDefinitions.Add($"ZSHARP_RUNTIME_CONFIG_FILE_NAME=\"{RUNTIME_CONFIG_JSON}\"");
 		
 		PublicDefinitions.Add($"ZSHARP_CORE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core\"");
 		PublicDefinitions.Add($"ZSHARP_CORE_ENGINE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core.UnrealEngine\"");

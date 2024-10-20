@@ -86,8 +86,18 @@ public class Dotnet : ModuleRules
 				
 				RuntimeDependencies.Add(dstPath, file);
 			}
-			
-			RuntimeDependencies.Add(Path.Combine(PluginDirectory, "Config/ZSharp.runtimeconfig.json"));
+
+			const string RUNTIME_CONFIG_FILE_NAME = "ZSharp.runtimeconfig.json";
+			string runtimeConfigDstPath = Path.Combine(PluginDirectory, $"Config/{RUNTIME_CONFIG_FILE_NAME}");
+			string projectRuntimeConfigOverridePath = $"$(TargetOutputDir)/../../Config/{RUNTIME_CONFIG_FILE_NAME}";
+			if (File.Exists(projectRuntimeConfigOverridePath))
+			{
+				RuntimeDependencies.Add(runtimeConfigDstPath, projectRuntimeConfigOverridePath);
+			}
+			else
+			{
+				RuntimeDependencies.Add(runtimeConfigDstPath);
+			}
 		}
 	}
 

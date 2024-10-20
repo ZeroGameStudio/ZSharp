@@ -11,8 +11,12 @@ public static class AssemblyLoadContextHelper
 {
 	
 	public static unsafe ELoadAssemblyErrorCode LoadAssembly(AssemblyLoadContext alc, IAssemblyResolver resolver, bool implicitly, string name, void* args, out Assembly? assembly)
-	{
-        assembly = null;
+    {
+        assembly = alc.Assemblies.SingleOrDefault(asm => asm.GetName().Name == name);
+        if (assembly is not null)
+        {
+            return ELoadAssemblyErrorCode.Succeed;
+        }
 
         string? dllPath = resolver.Resolve(name);
         if (dllPath is null)

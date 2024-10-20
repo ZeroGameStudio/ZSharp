@@ -7,7 +7,7 @@
 #include "ZSharpRuntimeLogChannels.h"
 #include "ZSharpRuntimeSettings.h"
 #include "ZUnrealFieldDefinitionDtos.h"
-#include "ALC/IZSlimAssemblyLoadContext.h"
+#include "ALC/IZDefaultAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "Emit/ZUnrealFieldDefinitions.h"
 #include "Emit/ZUnrealFieldEmitter.h"
@@ -180,46 +180,32 @@ ZSharp::FZUnrealFieldScanner& ZSharp::FZUnrealFieldScanner::Get()
 
 void ZSharp::FZUnrealFieldScanner::Startup()
 {
-	ScannerAlc = IZSharpClr::Get().CreateSlimAlc("__UnrealFieldScanner");
-	if (ScannerAlc->LoadAssembly(ZSHARP_SCANNER_ASSEMBLY_NAME) == EZLoadAssemblyErrorCode::Succeed)
+	TArray<FModuleStatus> moduleStatuses;
+	FModuleManager::Get().QueryModules(moduleStatuses);
+	for (const auto& status : moduleStatuses)
 	{
-		TArray<FModuleStatus> moduleStatuses;
-		FModuleManager::Get().QueryModules(moduleStatuses);
-		for (const auto& status : moduleStatuses)
+		if (status.bIsLoaded)
 		{
-			if (status.bIsLoaded)
-			{
-				UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Defer scan existing module [%s]."), *status.Name);
-				ScanUnrealFieldsForModule(FName(status.Name), false);
-			}
+			UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Defer scan existing module [%s]."), *status.Name);
+			ScanUnrealFieldsForModule(FName(status.Name), false);
 		}
+	}
 
-		// Since 5.5, ProcessNewlyLoadedUObjects() binds to FModuleManager::ProcessLoadedObjectsCallback super early.
-		// And because multicast delegate invokes inner delegates reversely,
-		// we have to use this magic to ensure that ScanUnrealFieldsForModule() executes after ProcessNewlyLoadedUObjects().
-		auto& delegate = FModuleManager::Get().OnProcessLoadedObjectsCallback();
-		ProcessLoadedObjectsDelegate = delegate.AddRaw(this, &FZUnrealFieldScanner::ScanUnrealFieldsForModule);
-		auto& invocationList = delegate.*ZUnrealFieldScanner_Private::GInvocationListMemberPtr;
-		check(invocationList.Num() == 2);
-		invocationList.Swap(0, 1);
+	// Since 5.5, ProcessNewlyLoadedUObjects() binds to FModuleManager::ProcessLoadedObjectsCallback super early.
+	// And because multicast delegate invokes inner delegates reversely,
+	// we have to use this magic to ensure that ScanUnrealFieldsForModule() executes after ProcessNewlyLoadedUObjects().
+	auto& delegate = FModuleManager::Get().OnProcessLoadedObjectsCallback();
+	ProcessLoadedObjectsDelegate = delegate.AddRaw(this, &FZUnrealFieldScanner::ScanUnrealFieldsForModule);
+	auto& invocationList = delegate.*ZUnrealFieldScanner_Private::GInvocationListMemberPtr;
+	check(invocationList.Num() == 2);
+	invocationList.Swap(0, 1);
 		
-		UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Successfully hook up ProcessLoadedObjectsDelegate."));
-	}
-	else
-	{
-		ScannerAlc->Unload();
-		ScannerAlc = nullptr;
-	}
+	UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Successfully hook up ProcessLoadedObjectsDelegate."));
 }
 
 void ZSharp::FZUnrealFieldScanner::Shutdown()
 {
-	if (ScannerAlc)
-	{
-		FModuleManager::Get().OnProcessLoadedObjectsCallback().Remove(ProcessLoadedObjectsDelegate);
-		ScannerAlc->Unload();
-		ScannerAlc = nullptr;
-	}
+	FModuleManager::Get().OnProcessLoadedObjectsCallback().Remove(ProcessLoadedObjectsDelegate);
 }
 
 void ZSharp::FZUnrealFieldScanner::FlushDeferredModules()
@@ -294,7 +280,7 @@ void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, b
 		FString* OutManifest;
 		uint8 bWithMetadata;
 	} args { *assembly, *moduleNameStr, &outManifest, WITH_METADATA };
-	ScannerAlc->InvokeMethod(ZSHARP_SCANNER_ASSEMBLY_NAME, "ZeroGames.ZSharp.UnrealFieldScanner.UnrealFieldScanner_Interop", "Scan", &args);
+	IZSharpClr::Get().GetDefaultAlc().InvokeMethod(ZSHARP_SCANNER_ASSEMBLY_NAME, "ZeroGames.ZSharp.UnrealFieldScanner.UnrealFieldScanner_Interop", "Scan", &args);
 
 	UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Dynamic field manifest for module [%s]: [%s]"), *moduleName.ToString(), *outManifest);
 	

@@ -73,6 +73,10 @@ internal static class DllEntry
         // GCHandle interop functions
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, int32>)&GCHandle_Interop.Free;
 
+        // DefaultAssemblyLoadContext interop functions
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, void*, ELoadAssemblyErrorCode>)&DefaultAssemblyLoadContext_Interop.LoadAssembly;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, char*, char*, void*, EInvokeMethodErrorCode>)&DefaultAssemblyLoadContext_Interop.InvokeMethod;
+        
         // MasterAssemblyLoadContext interop functions
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<float, uint8>)&MasterAssemblyLoadContext_Interop.Tick;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<int32>)&MasterAssemblyLoadContext_Interop.Unload;

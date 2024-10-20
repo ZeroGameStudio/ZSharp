@@ -3,7 +3,6 @@
 #pragma once
 
 #include "ZSharpErrorCodes.h"
-#include "Interop/ZGCHandle.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "ZCall/ZCallHandle.h"
 

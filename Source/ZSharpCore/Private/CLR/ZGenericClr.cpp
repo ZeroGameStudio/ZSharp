@@ -17,6 +17,7 @@
 #include "Interop/ZMasterAssemblyLoadContext_Interop.h"
 #include "Interop/ZGCHandle.h"
 #include "ALC/ZSlimAssemblyLoadContext.h"
+#include "Interop/ZDefaultAssemblyLoadContext_Interop.h"
 #include "Interop/ZSlimAssemblyLoadContext_Interop.h"
 #include "Interop/Engine/ZBuild_Interop.h"
 #include "Interop/Engine/ZPath_Interop.h"
@@ -88,6 +89,9 @@ namespace ZSharp::ZGenericClr_Private
 			ADDRESS_OF(FZClr_Interop::GCreateSlimAlc),
 
 			ADDRESS_OF(FZGCHandle_Interop::GFree),
+
+			ADDRESS_OF(FZDefaultAssemblyLoadContext_Interop::GLoadAssembly),
+			ADDRESS_OF(FZDefaultAssemblyLoadContext_Interop::GInvokeMethod),
 
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GTick),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GUnload),
@@ -266,6 +270,16 @@ void ZSharp::FZGenericClr::Shutdown()
 void ZSharp::FZGenericClr::CollectGarbage(int32 generation, bool aggressive, bool blocking, bool compacting)
 {
 	FZClr_Interop::GCollectGarbage(generation, aggressive, blocking, compacting);
+}
+
+ZSharp::IZDefaultAssemblyLoadContext& ZSharp::FZGenericClr::GetDefaultAlc()
+{
+	if (!DefaultAlc)
+	{
+		DefaultAlc = MakeUnique<FZDefaultAssemblyLoadContext>();
+	}
+
+	return *DefaultAlc;
 }
 
 ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()

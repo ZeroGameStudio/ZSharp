@@ -26,7 +26,6 @@ namespace ZSharp
 		void ScanUnrealFieldsForModule(FName moduleName, bool canProcessNewlyLoadedObject);
 		
 	private:
-		IZSlimAssemblyLoadContext* ScannerAlc = nullptr;
 		FDelegateHandle ProcessLoadedObjectsDelegate;
 		
 		TOptional<TArray<FName>> DeferredModules;

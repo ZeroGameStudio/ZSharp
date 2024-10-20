@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CLR/IZSharpClr.h"
+#include "ALC/ZDefaultAssemblyLoadContext.h"
 #include "ALC/ZMasterAssemblyLoadContext.h"
 #include "ALC/ZSlimAssemblyLoadContext.h"
 
@@ -26,6 +27,7 @@ namespace ZSharp
 		virtual void CollectGarbage(int32 generation = -1, bool aggressive = true, bool blocking = false, bool compacting = true) override;
 		
 	public:
+		virtual IZDefaultAssemblyLoadContext& GetDefaultAlc() override;
 		virtual IZMasterAssemblyLoadContext* CreateMasterAlc() override;
 		virtual IZMasterAssemblyLoadContext* GetMasterAlc() override;
 		virtual IZSlimAssemblyLoadContext* CreateSlimAlc(const FString& name) override;
@@ -61,6 +63,7 @@ namespace ZSharp
 
 	private:
 		bool bInitialized = false;
+		TUniquePtr<FZDefaultAssemblyLoadContext> DefaultAlc;
 		TUniquePtr<FZMasterAssemblyLoadContext> MasterAlc;
 		FRWLock SlimAlcMapLock;
 		TMap<FString, TUniquePtr<FZSlimAssemblyLoadContext>> SlimAlcMap;

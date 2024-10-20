@@ -4,6 +4,7 @@
 
 namespace ZSharp
 {
+	class IZDefaultAssemblyLoadContext;
 	class IZMasterAssemblyLoadContext;
 	class IZSlimAssemblyLoadContext;
 
@@ -32,6 +33,7 @@ namespace ZSharp
 		/** Call managed GC. */
 		virtual void CollectGarbage(int32 generation = -1, bool aggressive = true, bool blocking = false, bool compacting = true) = 0;
 	public:
+		virtual IZDefaultAssemblyLoadContext& GetDefaultAlc() = 0;
 		virtual IZMasterAssemblyLoadContext* CreateMasterAlc() = 0;
 		virtual IZMasterAssemblyLoadContext* GetMasterAlc() = 0;
 		virtual IZSlimAssemblyLoadContext* CreateSlimAlc(const FString& name) = 0;

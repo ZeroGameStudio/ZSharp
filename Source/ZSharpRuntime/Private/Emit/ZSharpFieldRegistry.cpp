@@ -39,12 +39,12 @@ ZSharp::FZSharpFunction& ZSharp::FZSharpFieldRegistry::RegisterFunction(const UF
 
 ZSharp::FZSharpFieldRegistry::FZSharpFieldRegistry()
 {
-	MasterAlcUnloadedDelegate = IZSharpClr::Get().RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate::CreateRaw(this, &ThisClass::ClearAlcSensitiveStates));
+	MasterAlcUnloadedDelegate = IZSharpClr::Get().OnMasterAlcUnloaded().AddRaw(this, &ThisClass::ClearAlcSensitiveStates);
 }
 
 ZSharp::FZSharpFieldRegistry::~FZSharpFieldRegistry()
 {
-	IZSharpClr::Get().UnregisterMasterAlcUnloaded(MasterAlcUnloadedDelegate);
+	IZSharpClr::Get().OnMasterAlcUnloaded().Remove(MasterAlcUnloadedDelegate);
 }
 
 void ZSharp::FZSharpFieldRegistry::ClearAlcSensitiveStates()

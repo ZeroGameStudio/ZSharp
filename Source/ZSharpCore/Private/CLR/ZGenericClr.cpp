@@ -299,13 +299,10 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
 	
 	MasterAlc = MakeUnique<FZMasterAssemblyLoadContext>(handle, [this]{ HandleMasterAlcUnloaded(); });
 
-	OnMasterAlcLoaded.Broadcast(MasterAlc.Get());
-
-	OnMasterAlcLoadFrameworks.Broadcast(MasterAlc.Get());
-	OnMasterAlcLoadApplications.Broadcast(MasterAlc.Get());
-	OnMasterAlcLoadPlugins.Broadcast(MasterAlc.Get());
-	
-	OnMasterAlcFullyLoaded.Broadcast(MasterAlc.Get());
+	PreMasterAlcStartupDelegate.Broadcast(MasterAlc.Get());
+	OnMasterAlcStartupDelegate.Broadcast(MasterAlc.Get());
+	PostMasterAlcStartupDelegate.Broadcast(MasterAlc.Get());
+	OnMasterAlcLoadedDelegate.Broadcast(MasterAlc.Get());
 
 	return MasterAlc.Get();
 }
@@ -349,7 +346,7 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericClr::GetSlimAlc(const FStrin
 
 void ZSharp::FZGenericClr::HandleMasterAlcUnloaded()
 {
-	OnMasterAlcUnloaded.Broadcast();
+	OnMasterAlcUnloadedDelegate.Broadcast();
 	
 	MasterAlc = nullptr;
 }
@@ -361,160 +358,15 @@ void ZSharp::FZGenericClr::HandleSlimAlcUnloaded(const FString& name)
 	SlimAlcMap.Remove(name);
 }
 
-FDelegateHandle ZSharp::FZGenericClr::RegisterMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate, bool notifyIfLoaded)
+FDelegateHandle ZSharp::FZGenericClr::CallOrRegisterOnMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate)
 {
-	check(IsInGameThread());
-
-	FDelegateHandle handle = OnMasterAlcLoaded.Add(delegate);
-	if (notifyIfLoaded && MasterAlc)
+	if (MasterAlc)
 	{
 		delegate.ExecuteIfBound(MasterAlc.Get());
 	}
 
-	return handle;
-}
-
-void ZSharp::FZGenericClr::UnregisterMasterAlcLoaded(FDelegateHandle delegate)
-{
-	check(IsInGameThread());
-	
-	OnMasterAlcLoaded.Remove(delegate);
-}
-
-void ZSharp::FZGenericClr::UnregisterMasterAlcLoaded(const void* userObject)
-{
-	check(IsInGameThread());
-	
-	OnMasterAlcLoaded.RemoveAll(userObject);
-}
-
-FDelegateHandle ZSharp::FZGenericClr::RegisterMasterAlcLoadFrameworks(FZOnMasterAlcLoadFrameworks::FDelegate delegate, bool notifyIfLoaded)
-{
-	check(IsInGameThread());
-
-	FDelegateHandle handle = OnMasterAlcLoadFrameworks.Add(delegate);
-	if (notifyIfLoaded && MasterAlc)
-	{
-		delegate.ExecuteIfBound(MasterAlc.Get());
-	}
-
-	return handle;
-}
-
-void ZSharp::FZGenericClr::UnregisterMasterAlcLoadFrameworks(FDelegateHandle delegate)
-{
-	check(IsInGameThread());
-	
-	OnMasterAlcLoadFrameworks.Remove(delegate);
-}
-
-void ZSharp::FZGenericClr::UnregisterMasterAlcLoadFrameworks(const void* userObject)
-{
-	check(IsInGameThread());
-	
-	OnMasterAlcLoadFrameworks.RemoveAll(userObject);
-}
-
-FDelegateHandle ZSharp::FZGenericClr::RegisterMasterAlcLoadApplications(FZOnMasterAlcLoadApplications::FDelegate delegate, bool notifyIfLoaded)
-{
-	check(IsInGameThread());
-
-	FDelegateHandle handle = OnMasterAlcLoadApplications.Add(delegate);
-	if (notifyIfLoaded && MasterAlc)
-	{
-		delegate.ExecuteIfBound(MasterAlc.Get());
-	}
-
-	return handle;
-}
-
-void ZSharp::FZGenericClr::UnregisterMasterAlcLoadApplications(FDelegateHandle delegate)
-{
-	check(IsInGameThread());
-	
-	OnMasterAlcLoadApplications.Remove(delegate);
-}
-
-void ZSharp::FZGenericClr::UnregisterMasterAlcLoadApplications(const void* userObject)
-{
-	check(IsInGameThread());
-	
-	OnMasterAlcLoadApplications.RemoveAll(userObject);
-}
-
-FDelegateHandle ZSharp::FZGenericClr::RegisterMasterAlcLoadPlugins(FZOnMasterAlcLoadPlugins::FDelegate delegate, bool notifyIfLoaded)
-{
-	check(IsInGameThread());
-
-	FDelegateHandle handle = OnMasterAlcLoadPlugins.Add(delegate);
-	if (notifyIfLoaded && MasterAlc)
-	{
-		delegate.ExecuteIfBound(MasterAlc.Get());
-	}
-
-	return handle;
-}
-
-void ZSharp::FZGenericClr::UnregisterMasterAlcLoadPlugins(FDelegateHandle delegate)
-{
-	check(IsInGameThread());
-	
-	OnMasterAlcLoadPlugins.Remove(delegate);
-}
-
-void ZSharp::FZGenericClr::UnregisterMasterAlcLoadPlugins(const void* userObject)
-{
-	check(IsInGameThread());
-	
-	OnMasterAlcLoadPlugins.RemoveAll(userObject);
-}
-
-FDelegateHandle ZSharp::FZGenericClr::RegisterMasterAlcFullyLoaded(FZOnMasterAlcFullyLoaded::FDelegate delegate, bool notifyIfLoaded)
-{
-	check(IsInGameThread());
-
-	FDelegateHandle handle = OnMasterAlcFullyLoaded.Add(delegate);
-	if (notifyIfLoaded && MasterAlc)
-	{
-		delegate.ExecuteIfBound(MasterAlc.Get());
-	}
-
-	return handle;
-}
-
-void ZSharp::FZGenericClr::UnregisterMasterAlcFullyLoaded(FDelegateHandle delegate)
-{
-	check(IsInGameThread());
-	
-	OnMasterAlcFullyLoaded.Remove(delegate);
-}
-
-void ZSharp::FZGenericClr::UnregisterMasterAlcFullyLoaded(const void* userObject)
-{
-	check(IsInGameThread());
-	
-	OnMasterAlcFullyLoaded.RemoveAll(userObject);
-}
-
-FDelegateHandle ZSharp::FZGenericClr::RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate delegate)
-{
-	check(IsInGameThread());
-	
-	return OnMasterAlcUnloaded.Add(delegate);
-}
-
-void ZSharp::FZGenericClr::UnregisterMasterAlcUnloaded(FDelegateHandle delegate)
-{
-	check(IsInGameThread());
-	
-	OnMasterAlcUnloaded.Remove(delegate);
-}
-
-void ZSharp::FZGenericClr::UnregisterMasterAlcUnloaded(const void* userObject)
-{
-	check(IsInGameThread());
-	
-	OnMasterAlcUnloaded.RemoveAll(userObject);
+	// Register even if master ALC exists.
+	return OnMasterAlcLoadedDelegate.Add(delegate);
 }
 
 void ZSharp::FZGenericClr::HandleGarbageCollectComplete()

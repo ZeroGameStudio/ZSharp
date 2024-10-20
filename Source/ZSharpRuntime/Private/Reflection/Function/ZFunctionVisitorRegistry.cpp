@@ -30,12 +30,12 @@ ZSharp::FZFunctionVisitorHandle ZSharp::FZFunctionVisitorRegistry::Get(const UFu
 
 ZSharp::FZFunctionVisitorRegistry::FZFunctionVisitorRegistry()
 {
-	MasterAlcUnloadedDelegate = IZSharpClr::Get().RegisterMasterAlcUnloaded(FZOnMasterAlcUnloaded::FDelegate::CreateRaw(this, &ThisClass::ClearAlcSensitiveStates));
+	MasterAlcUnloadedDelegate = IZSharpClr::Get().OnMasterAlcUnloaded().AddRaw(this, &ThisClass::ClearAlcSensitiveStates);
 }
 
 ZSharp::FZFunctionVisitorRegistry::~FZFunctionVisitorRegistry()
 {
-	IZSharpClr::Get().UnregisterMasterAlcUnloaded(MasterAlcUnloadedDelegate);
+	IZSharpClr::Get().OnMasterAlcUnloaded().Remove(MasterAlcUnloadedDelegate);
 }
 
 const ZSharp::FZFunctionVisitor* ZSharp::FZFunctionVisitorRegistry::Get(FZFunctionVisitorHandle handle) const

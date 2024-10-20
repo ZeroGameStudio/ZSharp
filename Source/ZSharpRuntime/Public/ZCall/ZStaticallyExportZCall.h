@@ -30,18 +30,17 @@ namespace ZSharp
 		{
 			FZStaticallyExportZCall { name, [](FZCallBuffer* buffer)
 			{
-				FZCallBuffer& buf = *buffer;
-
-				TTuple<TArgs...> args { TZCallBufferSlotEncoder<std::decay_t<TArgs>>::Decode(buf[Indices])... };
+				// buffer can be null on static functions so we can't dereference.
+				TTuple<TArgs...> args { TZCallBufferSlotEncoder<std::decay_t<TArgs>>::Decode((*buffer)[Indices])... };
 				if constexpr (std::is_same_v<TRet, void>)
 				{
 					(*Function)(std::forward<TArgs>(args.template Get<Indices>())...);
 				}
 				else
 				{
-					TZCallBufferSlotEncoder<std::decay_t<TRet>>::EncodeRet((*Function)(std::forward<TArgs>(args.template Get<Indices>())...), buf[-1]);
+					TZCallBufferSlotEncoder<std::decay_t<TRet>>::EncodeRet((*Function)(std::forward<TArgs>(args.template Get<Indices>())...), (*buffer)[-1]);
 				}
-				TZTryDecodeZCallBufferSlot<TArgs...>::template EncodeStatic(args, buf);
+				TZTryDecodeZCallBufferSlot<TArgs...>::template EncodeStatic(args, buffer);
 				
 				return EZCallErrorCode::Succeed;
 			}};
@@ -73,7 +72,7 @@ namespace ZSharp
 				{
 					TZCallBufferSlotEncoder<std::decay_t<TRet>>::EncodeRet((pThis->*Function)(std::forward<TArgs>(args.template Get<Indices>())...), buf[-1]);
 				}
-				TZTryDecodeZCallBufferSlot<TArgs...>::template EncodeInstance(args, buf);
+				TZTryDecodeZCallBufferSlot<TArgs...>::template EncodeInstance(args, buffer);
 				
 				return EZCallErrorCode::Succeed;
 			}};
@@ -105,7 +104,7 @@ namespace ZSharp
 				{
 					TZCallBufferSlotEncoder<std::decay_t<TRet>>::EncodeRet((pThis->*Function)(std::forward<TArgs>(args.template Get<Indices>())...), buf[-1]);
 				}
-				TZTryDecodeZCallBufferSlot<TArgs...>::template EncodeInstance(args, buf);
+				TZTryDecodeZCallBufferSlot<TArgs...>::template EncodeInstance(args, buffer);
 					
 				return EZCallErrorCode::Succeed;
 			}};

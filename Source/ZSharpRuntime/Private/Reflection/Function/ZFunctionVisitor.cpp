@@ -16,12 +16,12 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 	check(bAvailable);
 	check(!bIsDelegate);
 
-	FZCallBuffer& buf = *buffer;
+	// buffer can be null on static functions so we can't dereference.
 	const UFunction* func = Function.Get();
 	UObject* self;
 	if (!bIsStatic)
 	{
-		self = TZCallBufferSlotEncoder<UObject*>::Decode(buf[0]);
+		self = TZCallBufferSlotEncoder<UObject*>::Decode((*buffer)[0]);
 		if (!self)
 		{
 			return EZCallErrorCode::BufferError;
@@ -48,12 +48,12 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 	check(bAvailable);
 	check(!bIsDelegate);
 
-	FZCallBuffer& buf = *buffer;
+	// buffer can be null on static functions so we can't dereference.
 	const UFunction* proto = Function.Get();
 	UObject* self;
 	if (!bIsStatic)
 	{
-		self = TZCallBufferSlotEncoder<UObject*>::Decode(buf[0]);
+		self = TZCallBufferSlotEncoder<UObject*>::Decode((*buffer)[0]);
 		if (!self)
 		{
 			return EZCallErrorCode::BufferError;
@@ -90,11 +90,11 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBu
 	
 	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
 
-	FillParams(params, buf);
+	FillParams(params, buffer);
 
 	self.GetUnderlyingInstance()->ProcessDelegate<UObject>(params);
 
-	CopyOut(buf, params);
+	CopyOut(buffer, params);
 	
 	params = nullptr;
 
@@ -119,11 +119,11 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastInlineScriptDe
 	
 	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
 
-	FillParams(params, buf);
+	FillParams(params, buffer);
 
 	self.GetUnderlyingInstance()->ProcessMulticastDelegate<UObject>(params);
 
-	CopyOut(buf, params);
+	CopyOut(buffer, params);
 
 	params = nullptr;
 	
@@ -148,11 +148,11 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastSparseScriptDe
 	
 	void* params = FMemory_Alloca_Aligned(func->ParmsSize, func->MinAlignment);
 
-	FillParams(params, buf);
+	FillParams(params, buffer);
 
 	self.GetDelegatePtr()->ProcessMulticastDelegate<UObject>(params);
 
-	CopyOut(buf, params);
+	CopyOut(buffer, params);
 
 	params = nullptr;
 	
@@ -368,15 +368,13 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 
 ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InternalInvokeUFunction(FZCallBuffer* buffer, UObject* object, const UFunction* function) const
 {
-	FZCallBuffer& buf = *buffer;
-	
 	void* params = FMemory_Alloca_Aligned(function->ParmsSize, function->MinAlignment);
 
-	FillParams(params, buf);
+	FillParams(params, buffer);
 
 	object->ProcessEvent(const_cast<UFunction*>(function), params);
 
-	CopyOut(buf, params);
+	CopyOut(buffer, params);
 
 	params = nullptr;
 
@@ -459,7 +457,7 @@ ZSharp::FZFunctionVisitor::FZFunctionVisitor(UFunction* function)
 	bAvailable = true;
 }
 
-void ZSharp::FZFunctionVisitor::FillParams(void* params, const FZCallBuffer& buf) const
+void ZSharp::FZFunctionVisitor::FillParams(void* params, const FZCallBuffer* buffer) const
 {
 	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 	{
@@ -467,7 +465,7 @@ void ZSharp::FZFunctionVisitor::FillParams(void* params, const FZCallBuffer& buf
 		visitor->InitializeValue_InContainer(params);
 		if (InParamIndices.Contains(i))
 		{
-			visitor->SetValue_InContainer(params, buf[bIsStatic ? i : i + 1], 0);
+			visitor->SetValue_InContainer(params, (*buffer)[bIsStatic ? i : i + 1], 0);
 		}
 	}
 
@@ -477,21 +475,21 @@ void ZSharp::FZFunctionVisitor::FillParams(void* params, const FZCallBuffer& buf
 	}
 }
 
-void ZSharp::FZFunctionVisitor::CopyOut(FZCallBuffer& buf, void* params) const
+void ZSharp::FZFunctionVisitor::CopyOut(FZCallBuffer* buffer, void* params) const
 {
 	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 	{
 		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
 		if (OutParamIndices.Contains(i))
 		{
-			visitor->GetValue_InContainer(params, buf[bIsStatic ? i : i + 1], 0);
+			visitor->GetValue_InContainer(params, (*buffer)[bIsStatic ? i : i + 1], 0);
 		}
 		visitor->DestructValue_InContainer(params);
 	}
 
 	if (ReturnProperty)
 	{
-		ReturnProperty->GetValue_InContainer(params, buf[-1], 0);
+		ReturnProperty->GetValue_InContainer(params, (*buffer)[-1], 0);
 		ReturnProperty->DestructValue_InContainer(params);
 	}
 }

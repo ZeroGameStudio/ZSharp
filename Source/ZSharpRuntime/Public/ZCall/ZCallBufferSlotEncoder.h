@@ -255,38 +255,38 @@ namespace ZSharp
 	struct TZTryDecodeZCallBufferSlot
 	{
 		
-		static void EncodeStatic(const TTuple<TArgs...>& args, FZCallBuffer& buf)
+		static void EncodeStatic(const TTuple<TArgs...>& args, FZCallBuffer* buffer)
 		{
-			Encode(args, buf, 0);
+			Encode(args, buffer, 0);
 		}
 
-		static void EncodeInstance(const TTuple<TArgs...>& args, FZCallBuffer& buf)
+		static void EncodeInstance(const TTuple<TArgs...>& args, FZCallBuffer* buffer)
 		{
-			Encode(args, buf, 1);
+			Encode(args, buffer, 1);
 		}
 
 	private:
-		static void Encode(const TTuple<TArgs...>& args, FZCallBuffer& buf, int32 indexOffset)
+		static void Encode(const TTuple<TArgs...>& args, FZCallBuffer* buffer, int32 indexOffset)
 		{
 			if constexpr (sizeof...(TArgs) > 0)
 			{
-				EncodeAt<0>(args, buf, indexOffset);
+				EncodeAt<0>(args, buffer, indexOffset);
 			}
 		}
 
 		template <int32 Index>
-		static void EncodeAt(const TTuple<TArgs...>& args, FZCallBuffer& buf, int32 indexOffset)
+		static void EncodeAt(const TTuple<TArgs...>& args, FZCallBuffer* buffer, int32 indexOffset)
 		{
 			using TArg = decltype(args.template Get<Index>());
 
 			if constexpr (std::is_lvalue_reference_v<TArg> && !std::is_const_v<std::remove_reference_t<TArg>>)
 			{
-				TZCallBufferSlotEncoder<std::decay_t<TArg>>::template Encode(args.template Get<Index>(), buf[Index + indexOffset]);
+				TZCallBufferSlotEncoder<std::decay_t<TArg>>::template Encode(args.template Get<Index>(), (*buffer)[Index + indexOffset]);
 			}
 			
 			if constexpr (Index < sizeof...(TArgs) - 1)
 			{
-				EncodeAt<Index + 1>(args, buf, indexOffset);
+				EncodeAt<Index + 1>(args, buffer, indexOffset);
 			}
 		}
 		

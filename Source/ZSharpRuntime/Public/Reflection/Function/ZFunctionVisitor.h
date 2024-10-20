@@ -41,8 +41,8 @@ namespace ZSharp
 		explicit FZFunctionVisitor(UFunction* function);
 
 	private:
-		FORCEINLINE void FillParams(void* params, const FZCallBuffer& buf) const;
-		FORCEINLINE void CopyOut(FZCallBuffer& buf, void* params) const;
+		FORCEINLINE void FillParams(void* params, const FZCallBuffer* buffer) const;
+		FORCEINLINE void CopyOut(FZCallBuffer* buffer, void* params) const;
 
 	private:
 		bool IsAvailable() const { return bAvailable; }

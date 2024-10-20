@@ -3,8 +3,10 @@
 #include "ZSharpRuntimeModule.h"
 
 #include "ZSharpRuntimeLogChannels.h"
+#include "ZSharpRuntimeSettings.h"
 #include "CLR/IZSharpClr.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZCommonMethodArgs.h"
 #include "Emit/ZUnrealFieldScanner.h"
 #include "ZCall/ZCallResolver_Export.h"
 #include "ZCall/ZCallResolver_UFunction.h"
@@ -23,6 +25,9 @@ class FZSharpRuntimeModule : public IZSharpRuntimeModule
 	void CreateMasterAlc();
 	void UnloadMasterAlc();
 
+	void HandlePreMasterAlcStartup(ZSharp::IZMasterAssemblyLoadContext* alc);
+	void HandleMasterAlcStartup(ZSharp::IZMasterAssemblyLoadContext* alc);
+
 #if WITH_EDITOR
 	void HandleBeginPIE(const bool simulating);
 	void HandleEndPIE(const bool simulating);
@@ -34,6 +39,9 @@ IMPLEMENT_MODULE(FZSharpRuntimeModule, ZSharpRuntime)
 
 void FZSharpRuntimeModule::StartupModule()
 {
+	ZSharp::IZSharpClr::Get().PreMasterAlcStartup().AddRaw(this, &ThisClass::HandlePreMasterAlcStartup);
+	ZSharp::IZSharpClr::Get().OnMasterAlcStartup().AddRaw(this, &ThisClass::HandleMasterAlcStartup);
+	
 	ZSharp::FZUnrealFieldScanner::Get().Startup();
 	
 #if WITH_EDITOR
@@ -69,11 +77,23 @@ void FZSharpRuntimeModule::ShutdownModule()
 #else
 	UnloadMasterAlc();
 #endif
+
+	ZSharp::IZSharpClr::Get().PreMasterAlcStartup().RemoveAll(this);
+	ZSharp::IZSharpClr::Get().OnMasterAlcStartup().RemoveAll(this);
 }
 
 void FZSharpRuntimeModule::CreateMasterAlc()
 {
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().CreateMasterAlc();
+	ZSharp::IZSharpClr::Get().CreateMasterAlc();
+}
+
+void FZSharpRuntimeModule::UnloadMasterAlc()
+{
+	ZSharp::IZSharpClr::Get().GetMasterAlc()->Unload();
+}
+
+void FZSharpRuntimeModule::HandlePreMasterAlcStartup(ZSharp::IZMasterAssemblyLoadContext* alc)
+{
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_Export{}, 0);
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UFunction{}, 1);
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UProperty{}, 2);
@@ -82,9 +102,19 @@ void FZSharpRuntimeModule::CreateMasterAlc()
 	alc->LoadAssembly(ZSHARP_ENGINE_ASSEMBLY_NAME);
 }
 
-void FZSharpRuntimeModule::UnloadMasterAlc()
+void FZSharpRuntimeModule::HandleMasterAlcStartup(ZSharp::IZMasterAssemblyLoadContext* alc)
 {
-	ZSharp::IZSharpClr::Get().GetMasterAlc()->Unload();
+	GetDefault<UZSharpRuntimeSettings>()->ForeachMasterAlcStartupAssembly([alc](const FZMasterAlcStartupAssembly& assembly)
+	{
+		TArray<const TCHAR*> argv;
+		for (const auto& arg : assembly.Arguments)
+		{
+			argv.Emplace(*arg);
+		}
+			
+		ZSharp::FZCommonMethodArgs commonArgs = { argv.Num(), argv.GetData() };
+		alc->LoadAssembly(assembly.AssemblyName, &commonArgs);
+	});
 }
 
 #if WITH_EDITOR

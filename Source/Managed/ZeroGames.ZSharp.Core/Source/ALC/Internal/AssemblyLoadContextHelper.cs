@@ -54,7 +54,7 @@ public static class AssemblyLoadContextHelper
 
         try
         {
-            return DllMainStatics.TryInvokeDllMain(assembly, args);
+            return TryInvokeDllMain(assembly, args);
         }
         catch (Exception ex)
         {
@@ -92,13 +92,26 @@ public static class AssemblyLoadContextHelper
             return EInvokeMethodErrorCode.MethodNotFound;
         }
         
-        object?[]? parameters = null;
+        if (!TryGetParameters(out var parameters, method, args))
+        {
+            return EInvokeMethodErrorCode.InvalidMethodSignature;
+        }
+        
+        method.Invoke(null, parameters);
+
+        return EInvokeMethodErrorCode.Succeed;
+	}
+    
+    private static unsafe bool TryGetParameters(out object?[]? parameters, MethodInfo method, void* args)
+    {
+        parameters = null;
+        
         ParameterInfo[] parameterInfos = method.GetParameters();
         if (parameterInfos.Length > 0)
         {
             if (parameterInfos.Length != 1)
             {
-                return EInvokeMethodErrorCode.InvalidMethodSignature;
+                return false;
             }
                     
             Type parameterType = parameterInfos[0].ParameterType;
@@ -110,17 +123,41 @@ public static class AssemblyLoadContextHelper
             {
                 if (!parameterType.IsPointer)
                 {
-                    return EInvokeMethodErrorCode.InvalidMethodSignature;
+                    return false;
                 }
                 
                 parameters = [ new IntPtr(args) ];
             }
         }
-        
-        method.Invoke(null, parameters);
 
-        return EInvokeMethodErrorCode.Succeed;
-	}
+        return true;
+    }
+
+    private static unsafe ELoadAssemblyErrorCode TryInvokeDllMain(Assembly assembly, void* args)
+    {
+        DllEntryAttribute? dllEntryAttr = assembly.GetCustomAttribute<DllEntryAttribute>();
+        if (dllEntryAttr is null)
+        {
+            return ELoadAssemblyErrorCode.Succeed;
+        }
+
+        Type dllEntryType = dllEntryAttr.EntryType;
+        MethodInfo? dllMain = dllEntryType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            .FirstOrDefault(method => method.GetCustomAttribute<DllMainAttribute>() is not null);
+        if (dllMain is null)
+        {
+            return ELoadAssemblyErrorCode.DllMainNotFound;
+        }
+        
+        if (!TryGetParameters(out var parameters, dllMain, args))
+        {
+            return ELoadAssemblyErrorCode.InvalidDllMainSignature;
+        }
+        
+        dllMain.Invoke(null, parameters);
+        
+        return ELoadAssemblyErrorCode.Succeed;
+    }
 	
 }
 

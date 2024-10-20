@@ -12,8 +12,9 @@ public enum ELoadAssemblyErrorCode : int32
 	FileNotFound = 201,
 	BadImage = 202,
 
-	InvalidDllMainSignature = 301,
-	UnhandledDllMainException = 302,
+	DllMainNotFound = 301,
+	InvalidDllMainSignature = 302,
+	UnhandledDllMainException = 303,
 }
 
 public enum EInvokeMethodErrorCode : int32

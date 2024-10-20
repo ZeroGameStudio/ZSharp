@@ -18,6 +18,19 @@ struct FZModuleMappingContext
 	
 };
 
+USTRUCT()
+struct FZMasterAlcStartupAssembly
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FString AssemblyName;
+
+	UPROPERTY(EditAnywhere)
+	TArray<FString> Arguments;
+	
+};
+
 /**
  * 
  */
@@ -37,6 +50,8 @@ public:
 	void ForeachMappedModule(TFunctionRef<void(const FString&, const FZModuleMappingContext&)> action) const;
 
 	FString GetFieldAlias(const FString& path) const;
+
+	void ForeachMasterAlcStartupAssembly(TFunctionRef<void(const FZMasterAlcStartupAssembly&)> action) const;
 
 #if WITH_EDITOR
 private:
@@ -65,6 +80,9 @@ private:
 
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Aliasing")
 	TMap<FString, FString> IntrinsicFieldAliasMap;
+
+	UPROPERTY(Config, EditAnywhere, Category = "Master ALC")
+	TArray<FZMasterAlcStartupAssembly> MasterAlcStartupAssemblies;
 	
 };
 

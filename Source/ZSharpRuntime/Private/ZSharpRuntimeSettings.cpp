@@ -78,6 +78,14 @@ FString UZSharpRuntimeSettings::GetFieldAlias(const FString& path) const
 	return alias ? *alias : FString{};
 }
 
+void UZSharpRuntimeSettings::ForeachMasterAlcStartupAssembly(TFunctionRef<void(const FZMasterAlcStartupAssembly&)> action) const
+{
+	for (const auto& assembly : MasterAlcStartupAssemblies)
+	{
+		action(assembly);
+	}
+}
+
 #if WITH_EDITOR
 
 TArray<FString> UZSharpRuntimeSettings::GetModuleOptions()

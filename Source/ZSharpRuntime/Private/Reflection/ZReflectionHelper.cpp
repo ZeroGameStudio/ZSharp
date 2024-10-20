@@ -70,6 +70,13 @@ FString ZSharp::FZReflectionHelper::GetFieldAliasedName(FFieldVariant field)
 			name.Append("_DEPRECATED");
 		}
 	}
+	else if (const auto enm = field.Get<UEnum>())
+	{
+		if (!name.StartsWith("E"))
+		{
+			name.InsertAt(0, "E");
+		}
+	}
 	else if (const auto delegate = field.Get<UDelegateFunction>())
 	{
 		static const FString GDelegatePostfix = "__DelegateSignature";

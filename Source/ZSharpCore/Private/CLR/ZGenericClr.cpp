@@ -239,17 +239,10 @@ void ZSharp::FZGenericClr::Startup()
 	check(closeHostFXR);
 
 	hostfxr_handle handle = nullptr;
-	
-#if WITH_EDITOR
+
 	const FString projectConfigDir = FPaths::ProjectConfigDir();
-	FString runtimeConfigPath = FPaths::Combine(projectConfigDir, ZSHARP_RUNTIME_CONFIG_FILE_NAME);
-	if (!FPaths::FileExists(runtimeConfigPath))
-#endif
-	{
-		const FString pluginConfigDir = FPaths::Combine(pluginDir, "Config");
-		runtimeConfigPath = FPaths::Combine(pluginConfigDir, ZSHARP_RUNTIME_CONFIG_FILE_NAME);
-		check(FPaths::FileExists(runtimeConfigPath));
-	}
+	const FString runtimeConfigPath = FPaths::Combine(projectConfigDir, ZSHARP_RUNTIME_CONFIG_FILE_NAME);
+	check(FPaths::FileExists(runtimeConfigPath));
 
 	UE_LOG(LogZSharpCore, Log, TEXT("Runtime config file detected: [%s]."), *FPaths::ConvertRelativePathToFull(runtimeConfigPath));
 	initializeHostFxr(*runtimeConfigPath, nullptr, &handle);

@@ -76,7 +76,7 @@ public static class AssertionMacros
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static IDisposable checkNoRecursion
+	public static IDisposable? checkNoRecursion
 	(
 		AssemblyLoadContext? context = default,
 		[CallerFilePath] string? file = default,

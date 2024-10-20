@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using EpicGames.Core;
 using UnrealBuildTool;
 
 public class Dotnet : ModuleRules
@@ -10,7 +11,7 @@ public class Dotnet : ModuleRules
 	public Dotnet(ReadOnlyTargetRules Target) : base(Target)
 	{
 		Type = ModuleType.External;
-
+		
 		PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "inc"));
 
 		string platformName = Target.Platform.ToString();
@@ -18,7 +19,7 @@ public class Dotnet : ModuleRules
 
 		string dotnetRoot = Path.Combine(PluginDirectory, "Binaries", platformName, "dotnet");
 
-		{ // Copy hostfxr.
+		{ // Copy hostfxr & .runtimeconfig.json
 			string hostDir = Path.Combine(dotnetRoot, "host", "fxr", dotnetVersion);
 			
 			string hostfxrSrcPath = Path.Combine(ModuleDirectory, "lib", platformName, "host", "hostfxr.dll");
@@ -66,10 +67,23 @@ public class Dotnet : ModuleRules
 			}
 		}
 
+		{ // Copy runtimeconfig.json
+			const string RUNTIME_CONFIG_FILE_NAME = "ZSharp.runtimeconfig.json";
+			string runtimeConfigDstPath = $"{DirectoryReference.FromFile(Target.ProjectFile)}/Config/{RUNTIME_CONFIG_FILE_NAME}";
+			string defaultRuntimeConfigPath = Path.Combine(PluginDirectory, $"Config/{RUNTIME_CONFIG_FILE_NAME}");
+			if (File.Exists(runtimeConfigDstPath))
+			{
+				RuntimeDependencies.Add(runtimeConfigDstPath);
+			}
+			else
+			{
+				RuntimeDependencies.Add(runtimeConfigDstPath, defaultRuntimeConfigPath);
+			}
+		}
+
 		/*
 		 * On staged builds:
 		 * 1. Copy all managed libs to project binaries dir.
-		 * 2. Mark runtimeconfig.json as runtime dependency.
 		 */
 		if (!Target.bBuildEditor)
 		{
@@ -85,18 +99,6 @@ public class Dotnet : ModuleRules
 				}
 				
 				RuntimeDependencies.Add(dstPath, file);
-			}
-
-			const string RUNTIME_CONFIG_FILE_NAME = "ZSharp.runtimeconfig.json";
-			string runtimeConfigDstPath = Path.Combine(PluginDirectory, $"Config/{RUNTIME_CONFIG_FILE_NAME}");
-			string projectRuntimeConfigOverridePath = $"$(TargetOutputDir)/../../Config/{RUNTIME_CONFIG_FILE_NAME}";
-			if (File.Exists(projectRuntimeConfigOverridePath))
-			{
-				RuntimeDependencies.Add(runtimeConfigDstPath, projectRuntimeConfigOverridePath);
-			}
-			else
-			{
-				RuntimeDependencies.Add(runtimeConfigDstPath);
 			}
 		}
 	}

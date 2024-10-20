@@ -4,7 +4,7 @@
 #include "Reflection/Wrapper/ZSelfDescriptiveMulticastSparseScriptDelegate.h"
 
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
-#include "ZCall/ManagedDelegateProxy.h"
+#include "ZCall/ZManagedDelegateProxy.h"
 
 ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::FZSelfDescriptiveMulticastSparseScriptDelegate(FZSelfDescriptiveMulticastSparseScriptDelegate&& other) noexcept
 	: Super(MoveTemp(other))
@@ -42,11 +42,11 @@ UObject* ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::AddManaged(FZGC
 		return nullptr;
 	}
 
-	auto proxy = NewObject<UManagedDelegateProxy>();
+	auto proxy = NewObject<UZManagedDelegateProxy>();
 	proxy->Signature = TStrongObjectPtr { Descriptor };
 	proxy->Delegate = delegate;
 	FScriptDelegate unicast;
-	unicast.BindUFunction(proxy, GET_FUNCTION_NAME_CHECKED(UManagedDelegateProxy, __ZStub));
+	unicast.BindUFunction(proxy, GET_FUNCTION_NAME_CHECKED(UZManagedDelegateProxy, __ZStub));
 	Add(unicast);
 
 	return proxy;

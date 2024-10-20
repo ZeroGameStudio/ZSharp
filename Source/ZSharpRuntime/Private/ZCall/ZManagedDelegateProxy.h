@@ -9,10 +9,10 @@
 #include "Reflection/Wrapper/ZSelfDescriptiveMulticastSparseScriptDelegate.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
 
-#include "ManagedDelegateProxy.generated.h"
+#include "ZManagedDelegateProxy.generated.h"
 
-UCLASS()
-class ZSHARPRUNTIME_API UManagedDelegateProxy final : public UObject, public IZManagedDelegateProxyInterface
+UCLASS(MinimalAPI)
+class UZManagedDelegateProxy final : public UObject, public IZManagedDelegateProxyInterface
 {
 	GENERATED_BODY()
 

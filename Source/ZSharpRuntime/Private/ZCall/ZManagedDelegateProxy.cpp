@@ -1,18 +1,18 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ManagedDelegateProxy.h"
+#include "ZManagedDelegateProxy.h"
 
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
 
-void UManagedDelegateProxy::BeginDestroy()
+void UZManagedDelegateProxy::BeginDestroy()
 {
 	Delegate.Free();
 	
 	UObject::BeginDestroy();
 }
 
-void UManagedDelegateProxy::ProcessEvent(UFunction* function, void* parms)
+void UZManagedDelegateProxy::ProcessEvent(UFunction* function, void* parms)
 {
 	if (function->GetName() != GET_FUNCTION_NAME_CHECKED(ThisClass, __ZStub))
 	{

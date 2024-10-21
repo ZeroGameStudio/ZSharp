@@ -7,7 +7,7 @@
 /**
  * 
  */
-UCLASS(Config = ZSharpExport, DefaultConfig)
+UCLASS(Config = ZSharp, DefaultConfig)
 class ZSHARPEXPORT_API UZSharpExportSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()

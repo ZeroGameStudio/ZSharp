@@ -196,6 +196,7 @@ public class ProjectFileBuilder
 		List<string> finalStaticUsings = [ .._project.StaticUsings ];
 		if (_project.Name == CORE_ASSEMBLY || _project.ProjectReferences.Contains(CORE_ASSEMBLY))
 		{
+			finalStaticUsings.Add("ZeroGames.ZSharp.Core.CoreGlobals");
 			finalStaticUsings.Add("ZeroGames.ZSharp.Core.AssertionMacros");
 			finalStaticUsings.Add("ZeroGames.ZSharp.Core.LogMacros");
 			finalStaticUsings.Add("ZeroGames.ZSharp.Core.ZSharpLogChannels");

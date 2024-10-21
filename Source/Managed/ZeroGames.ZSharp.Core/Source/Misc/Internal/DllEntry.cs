@@ -22,10 +22,20 @@ internal static class DllEntry
         public int32 Count;
         public UnmanagedFunction* Functions;
     }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private unsafe struct UnmanagedProperties
+    {
+        public uint8 IsServer;
+        public uint8 IsClient;
+        public uint8 IsEditor;
+        public void* Config;
+    }
     
     [StructLayout(LayoutKind.Sequential)]
     private unsafe struct Args
     {
+        public UnmanagedProperties UnmanagedProperties;
         public UnmanagedFunctions UnmanagedFunctions;
         public void*** ManagedFunctions;
     }
@@ -33,6 +43,11 @@ internal static class DllEntry
     [UnmanagedCallersOnly]
     private static unsafe void DllMain(Args* args) => Uncaught.FatalIfUncaught(() =>
     {
+        GIsServer = args->UnmanagedProperties.IsServer > 0;
+        GIsClient = args->UnmanagedProperties.IsClient > 0;
+        GIsEditor = args->UnmanagedProperties.IsEditor > 0;
+        GConfig = new Config((IntPtr)args->UnmanagedProperties.Config);
+        
         for (int32 i = 0; i < args->UnmanagedFunctions.Count; ++i)
         {
             UnmanagedFunction* function = args->UnmanagedFunctions.Functions + i;

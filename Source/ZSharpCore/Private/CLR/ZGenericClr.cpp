@@ -6,7 +6,6 @@
 #include "hostfxr.h"
 #include "coreclr_delegates.h"
 #include "ZSharpCoreLogChannels.h"
-#include "Interfaces/IPluginManager.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
 #include "Interop/ZLog_Interop.h"
 #include "Interop/Engine/ZUnrealEngine_Interop.h"
@@ -17,6 +16,7 @@
 #include "Interop/ZMasterAssemblyLoadContext_Interop.h"
 #include "Interop/ZGCHandle.h"
 #include "ALC/ZSlimAssemblyLoadContext.h"
+#include "Interop/ZConfig_Interop.h"
 #include "Interop/ZDefaultAssemblyLoadContext_Interop.h"
 #include "Interop/ZSlimAssemblyLoadContext_Interop.h"
 #include "Interop/Engine/ZBuild_Interop.h"
@@ -58,6 +58,7 @@ namespace ZSharp::ZGenericClr_Private
 	static void LoadCoreAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
 		static const TCHAR* GLog_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Log_Interop");
+		static const TCHAR* GConfig_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Config_Interop");
 		static const TCHAR* GInteropString_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropString_Interop");
 		static const TCHAR* GMasterAssemblyLoadContext_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.MasterAssemblyLoadContext_Interop");
 		
@@ -66,6 +67,11 @@ namespace ZSharp::ZGenericClr_Private
 #define BUILD_UNMANAGED_FUNCTION(ShortTypeName, FieldName) { G##ShortTypeName##TypeName, TEXT(#FieldName), FZ##ShortTypeName::FieldName }
 
 			BUILD_UNMANAGED_FUNCTION(Log_Interop, Log),
+
+			BUILD_UNMANAGED_FUNCTION(Config_Interop, GetFileName),
+			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetSection),
+			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetArray),
+			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetString),
 			
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Alloc),
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Free),
@@ -109,9 +115,18 @@ namespace ZSharp::ZGenericClr_Private
 				
 #undef ADDRESS_OF
 		};
+
+		static const struct
+		{
+			uint8 bIsServer = GIsServer;
+			uint8 bIsClient = GIsClient;
+			uint8 bIsEditor = GIsEditor;
+			FConfigCacheIni* Config = GConfig;
+		} GUnmanagedProperties;
 		
 		static const struct
 		{
+			decltype(GUnmanagedProperties) UnmanagedProperties = GUnmanagedProperties;
 			FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(GUnmanagedFunctions), GUnmanagedFunctions };
 			void*** ManagedFunctions = GManagedFunctions;
 		} GArgs{};

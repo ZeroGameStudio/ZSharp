@@ -42,19 +42,19 @@ namespace ZReflectionHelper_Private
 	}
 }
 
-FString ZSharp::FZReflectionHelper::GetFieldAliasedName(FFieldVariant field)
+FString ZSharp::FZReflectionHelper::GetFieldRedirectedName(FFieldVariant field)
 {
 	if (!field)
 	{
 		return {};
 	}
 
-	// Aliasing.
+	// Redirect.
 	FString name = field.GetName();
-	FString alias = GetDefault<UZSharpRuntimeSettings>()->GetFieldAlias(field.GetPathName());
-	if (!alias.IsEmpty())
+	FString redirectedName = GetDefault<UZSharpRuntimeSettings>()->RedirectFieldName(field.GetPathName());
+	if (!redirectedName.IsEmpty())
 	{
-		name = alias;
+		name = redirectedName;
 	}
 
 	// Apply rules for specific field type.
@@ -123,7 +123,7 @@ FString ZSharp::FZReflectionHelper::GetFieldAliasedName(FFieldVariant field)
 	
 		for (const auto structToCheck : structsToCheck)
 		{
-			if (name == GetFieldAliasedName(structToCheck))
+			if (name == GetFieldRedirectedName(structToCheck))
 			{
 				conflicts = true;
 				break;
@@ -159,12 +159,12 @@ FString ZSharp::FZReflectionHelper::GetFieldAliasedName(FFieldVariant field)
 	return name;
 }
 
-FString ZSharp::FZReflectionHelper::GetFieldFullAliasedName(FFieldVariant field)
+FString ZSharp::FZReflectionHelper::GetFieldRedirectedFullName(FFieldVariant field)
 {
-	FString name = GetFieldAliasedName(field);
+	FString name = GetFieldRedirectedName(field);
 	if (const auto ownerField = field.GetOwnerVariant().Get<UField>())
 	{
-		name = GetFieldFullAliasedName(ownerField).Append(".").Append(name);
+		name = GetFieldRedirectedFullName(ownerField).Append(".").Append(name);
 	}
 
 	return name;
@@ -237,9 +237,9 @@ bool ZSharp::FZReflectionHelper::GetUFieldRuntimeTypeLocator(const UField* field
 		return false;
 	}
 
-	FString alias = GetFieldFullAliasedName(ancestor);
-	alias.ReplaceCharInline('.', '+');
-	outLocator.TypeName = FString::Printf(TEXT("%s.%s.%s"), *outLocator.AssemblyName, *moduleName, *alias);
+	FString name = GetFieldRedirectedFullName(ancestor);
+	name.ReplaceCharInline('.', '+');
+	outLocator.TypeName = FString::Printf(TEXT("%s.%s.%s"), *outLocator.AssemblyName, *moduleName, *name);
 
 	return true;
 }

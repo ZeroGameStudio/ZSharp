@@ -20,7 +20,7 @@ ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Cr
 
 FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 {
-	FString name = FZReflectionHelper::GetFieldAliasedName(Property);
+	FString name = FZReflectionHelper::GetFieldRedirectedName(Property);
 	if (Index)
 	{
 		name.AppendInt(Index);

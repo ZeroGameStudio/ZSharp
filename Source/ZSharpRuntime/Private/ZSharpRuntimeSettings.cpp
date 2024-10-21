@@ -43,9 +43,9 @@ void UZSharpRuntimeSettings::ForeachMappedModule(TFunctionRef<void(const FString
 	}
 }
 
-FString UZSharpRuntimeSettings::GetFieldAlias(const FString& path) const
+FString UZSharpRuntimeSettings::RedirectFieldName(const FString& sourcePath) const
 {
-	const FZFieldNameRedirector* redirector = FieldNameRedirectorHash.Find(FName { path });
+	const FZFieldNameRedirector* redirector = FieldNameRedirectorHash.Find(FName { sourcePath });
 	return redirector ? redirector->TargetName : FString{};
 }
 
@@ -125,12 +125,12 @@ void UZSharpRuntimeSettings::InvalidateCache()
 	FieldNameRedirectorHash.Reset();
 	for (const auto& redirector : FieldNameRedirectors)
 	{
-		FieldNameRedirectorHash.Emplace(FName { redirector.SourceName }, redirector);
+		FieldNameRedirectorHash.Emplace(FName { redirector.SourcePath }, redirector);
 	}
 
 	for (const auto& redirector : IntrinsicFieldNameRedirectors)
 	{
-		FieldNameRedirectorHash.Emplace(FName { redirector.SourceName }, redirector);
+		FieldNameRedirectorHash.Emplace(FName { redirector.SourcePath }, redirector);
 	}
 }
 

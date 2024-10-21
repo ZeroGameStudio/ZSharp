@@ -8,8 +8,8 @@ namespace ZSharp
 	
 	struct ZSHARPRUNTIME_API FZReflectionHelper
 	{
-		static FString GetFieldAliasedName(FFieldVariant field);
-		static FString GetFieldFullAliasedName(FFieldVariant field);
+		static FString GetFieldRedirectedName(FFieldVariant field);
+		static FString GetFieldRedirectedFullName(FFieldVariant field);
 
 		static FString GetFieldAssemblyName(FFieldVariant field);
 		static FString GetFieldModuleName(FFieldVariant field);

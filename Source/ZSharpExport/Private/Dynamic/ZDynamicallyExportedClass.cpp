@@ -34,7 +34,7 @@ ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(c
 
 FString ZSharp::FZDynamicallyExportedClass::GetName() const
 {
-	return FZReflectionHelper::GetFieldFullAliasedName(Struct);
+	return FZReflectionHelper::GetFieldRedirectedFullName(Struct);
 }
 
 FString ZSharp::FZDynamicallyExportedClass::GetModule() const

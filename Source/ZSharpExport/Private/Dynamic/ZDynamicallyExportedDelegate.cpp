@@ -31,7 +31,7 @@ ZSharp::FZDynamicallyExportedDelegate* ZSharp::FZDynamicallyExportedDelegate::Cr
 
 FString ZSharp::FZDynamicallyExportedDelegate::GetName() const
 {
-	return FZReflectionHelper::GetFieldFullAliasedName(Signature);
+	return FZReflectionHelper::GetFieldRedirectedFullName(Signature);
 }
 
 FString ZSharp::FZDynamicallyExportedDelegate::GetModule() const

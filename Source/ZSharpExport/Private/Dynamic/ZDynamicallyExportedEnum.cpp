@@ -32,7 +32,7 @@ ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(con
 
 FString ZSharp::FZDynamicallyExportedEnum::GetName() const
 {
-	return FZReflectionHelper::GetFieldFullAliasedName(Enum);
+	return FZReflectionHelper::GetFieldRedirectedFullName(Enum);
 }
 
 FString ZSharp::FZDynamicallyExportedEnum::GetModule() const

@@ -27,7 +27,7 @@ struct FZFieldNameRedirector
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	FString SourceName;
+	FString SourcePath;
 
 	UPROPERTY(EditAnywhere)
 	FString TargetName;
@@ -65,7 +65,7 @@ public:
 	const FZModuleMappingContext* GetModuleMappingContext(const FString& module) const;
 	void ForeachMappedModule(TFunctionRef<void(const FString&, const FZModuleMappingContext&)> action) const;
 
-	FString GetFieldAlias(const FString& path) const;
+	FString RedirectFieldName(const FString& sourcePath) const;
 
 	void ForeachMasterAlcStartupAssembly(TFunctionRef<void(const FZMasterAlcStartupAssembly&)> action) const;
 

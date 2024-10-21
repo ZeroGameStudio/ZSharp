@@ -13,9 +13,6 @@ class ZSHARPEXPORT_API UZSharpExportSettings : public UDeveloperSettings
 	GENERATED_BODY()
 
 public:
-	UZSharpExportSettings();
-
-public:
 	virtual FName GetContainerName() const override { return TEXT("Editor"); }
 	virtual FName GetCategoryName() const override { return TEXT("ZSharp"); }
 
@@ -24,7 +21,7 @@ public:
 	bool ShouldTreatDeprecatedPostfixAsDeprecated() const { return bTreatDeprecatedPostfixAsDeprecated; }
 	bool ShouldExportEditorOnlyFields() const { return bExportEditorOnlyFields; }
 	bool IsForceExportFieldPath(const FString& path) const { return ForceExportFieldPathsHash.Contains(path); }
-	bool IsForceNotExportFieldPath(const FString& path) const { return IntrinsicForceNotExportFieldPaths.Contains(path) || ForceNotExportFieldPathsHash.Contains(path); }
+	bool IsForceNotExportFieldPath(const FString& path) const { return ForceNotExportFieldPathsHash.Contains(path); }
 
 private:
 	virtual void PostInitProperties() override;
@@ -41,7 +38,7 @@ private:
 	bool bExportDeprecatedFields;
 
 	UPROPERTY(Config, EditAnywhere, Category = "Export", meta = (EditCondition = "!bExportDeprecatedFields", EditConditionHides))
-	bool bTreatDeprecatedPostfixAsDeprecated;
+	bool bTreatDeprecatedPostfixAsDeprecated = true;
 	
 	UPROPERTY(Config, EditAnywhere, Category = "Export")
 	bool bExportEditorOnlyFields;
@@ -51,9 +48,6 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = "Export")
 	TArray<FString> ForceNotExportFieldPaths;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "Export")
-	TSet<FString> IntrinsicForceNotExportFieldPaths;
 
 private:
 	TSet<FString> ForceExportFieldPathsHash;

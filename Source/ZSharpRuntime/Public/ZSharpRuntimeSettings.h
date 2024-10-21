@@ -10,11 +10,27 @@ struct FZModuleMappingContext
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, meta = (GetOptions = "ZSharpRuntime.ZSharpRuntimeSettings.GetModuleOptions"))
+	FString ModuleName;
+
 	UPROPERTY(EditAnywhere)
 	FString AssemblyName;
 
 	UPROPERTY(EditAnywhere, meta = (ConfigRestartRequired = true))
 	bool bHasDynamicFields = false;
+	
+};
+
+USTRUCT()
+struct FZFieldNameRedirector
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FString SourceName;
+
+	UPROPERTY(EditAnywhere)
+	FString TargetName;
 	
 };
 
@@ -60,6 +76,16 @@ private:
 #endif
 
 private:
+	virtual void PostInitProperties() override;
+	virtual void PostReloadConfig(FProperty* PropertyThatWasLoaded) override;
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
+private:
+	void InvalidateCache();
+
+private:
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Assembly")
 	FString CoreAssemblyName = ZSHARP_CORE_ASSEMBLY_NAME;
 
@@ -69,20 +95,24 @@ private:
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Assembly")
 	FString EngineAssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
 	
-	UPROPERTY(Config, EditAnywhere, Category = "Mapping", meta = (GetKeyOptions = GetModuleOptions))
-	TMap<FString, FZModuleMappingContext> ModuleAssemblyMapping;
+	UPROPERTY(Config, EditAnywhere, Category = "Mapping")
+	TArray<FZModuleMappingContext> ModuleMappings;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Mapping")
-	TMap<FString, FZModuleMappingContext> IntrinsicModuleAssemblyMapping;
+	TArray<FZModuleMappingContext> IntrinsicModuleMappings;
 
-	UPROPERTY(Config, EditAnywhere, Category = "Aliasing")
-	TMap<FString, FString> FieldAliasMap;
+	UPROPERTY(Config, EditAnywhere, Category = "Field")
+	TArray<FZFieldNameRedirector> FieldNameRedirectors;
 
-	UPROPERTY(Transient, VisibleAnywhere, Category = "Aliasing")
-	TMap<FString, FString> IntrinsicFieldAliasMap;
+	UPROPERTY(Transient, VisibleAnywhere, Category = "Field")
+	TArray<FZFieldNameRedirector> IntrinsicFieldNameRedirectors;
 
 	UPROPERTY(Config, EditAnywhere, Category = "Master ALC")
 	TArray<FZMasterAlcStartupAssembly> MasterAlcStartupAssemblies;
+
+private:
+	TMap<FName, FZModuleMappingContext> ModuleMappingHash;
+	TMap<FName, FZFieldNameRedirector> FieldNameRedirectorHash;
 	
 };
 

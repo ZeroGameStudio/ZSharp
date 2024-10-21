@@ -5,77 +5,48 @@
 
 UZSharpRuntimeSettings::UZSharpRuntimeSettings()
 {
-	IntrinsicModuleAssemblyMapping.Emplace("Core", { EngineAssemblyName, false });
-	IntrinsicModuleAssemblyMapping.Emplace("CoreUObject", { EngineAssemblyName, false });
-	IntrinsicModuleAssemblyMapping.Emplace("FieldNotification", { EngineAssemblyName, false });
-	
-	IntrinsicModuleAssemblyMapping.Emplace("PhysicsCore", { EngineAssemblyName, false });
-	IntrinsicModuleAssemblyMapping.Emplace("InputCore", { EngineAssemblyName, false });
-	
-	IntrinsicModuleAssemblyMapping.Emplace("Engine", { EngineAssemblyName, false });
+	IntrinsicModuleMappings.Emplace("Core", EngineAssemblyName, false);
+	IntrinsicModuleMappings.Emplace("CoreUObject", EngineAssemblyName, false);
+	IntrinsicModuleMappings.Emplace("FieldNotification", EngineAssemblyName, false);
 
-	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Object", "UnrealObject");
+	IntrinsicModuleMappings.Emplace("PhysicsCore", EngineAssemblyName, false);
+	IntrinsicModuleMappings.Emplace("InputCore", EngineAssemblyName, false);
 
-	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Field", "UnrealField");
-	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Struct", "UnrealStruct");
-	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Class", "UnrealClass");
-	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.ScriptStruct", "UnrealScriptStruct");
-	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Enum", "UnrealEnum");
-	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Interface", "UnrealInterface");
+	IntrinsicModuleMappings.Emplace("Engine", EngineAssemblyName, false);
 
-	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Function", "UnrealFunction");
-	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Property", "UnrealProperty");
+	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Object", "UnrealObject");
 
-	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.Guid", "UnrealGuid");
-	IntrinsicFieldAliasMap.Emplace("/Script/CoreUObject.DateTime", "UnrealDateTime");
+	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Field", "UnrealField");
+	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Struct", "UnrealStruct");
+	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Class", "UnrealClass");
+	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.ScriptStruct", "UnrealScriptStruct");
+	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Enum", "UnrealEnum");
+	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Interface", "UnrealInterface");
 
-	// There are some delegates in UWidget with bad name which often cause naming conflicts.
-	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetWidget__DelegateSignature", "GetWidgetDelegate__DelegateSignature");
-	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetText__DelegateSignature", "GetTextDelegate__DelegateSignature");
-	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetInt32__DelegateSignature", "GetInt32Delegate__DelegateSignature");
-	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetFloat__DelegateSignature", "GetFloatDelegate__DelegateSignature");
-	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetBool__DelegateSignature", "GetBoolDelegate__DelegateSignature");
-	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetSlateColor__DelegateSignature", "GetSlateColorDelegate__DelegateSignature");
-	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetLinearColor__DelegateSignature", "GetLinearColorDelegate__DelegateSignature");
-	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetSlateBrush__DelegateSignature", "GetSlateBrushDelegate__DelegateSignature");
-	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetSlateVisibility__DelegateSignature", "GetSlateVisibilityDelegate__DelegateSignature");
-	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetMouseCursor__DelegateSignature", "GetMouseCursorDelegate__DelegateSignature");
-	IntrinsicFieldAliasMap.Emplace("/Script/UMG.Widget:GetCheckBoxState__DelegateSignature", "GetCheckBoxStateDelegate__DelegateSignature");
+	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Function", "UnrealFunction");
+	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Property", "UnrealProperty");
+
+	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Guid", "UnrealGuid");
+	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.DateTime", "UnrealDateTime");
 }
 
 const FZModuleMappingContext* UZSharpRuntimeSettings::GetModuleMappingContext(const FString& module) const
 {
-	const FZModuleMappingContext* ctx = IntrinsicModuleAssemblyMapping.Find(module);
-	if (!ctx)
-	{
-		ctx = ModuleAssemblyMapping.Find(module);
-	}
-
-	return ctx;
+	return ModuleMappingHash.Find(FName { module });
 }
 
 void UZSharpRuntimeSettings::ForeachMappedModule(TFunctionRef<void(const FString&, const FZModuleMappingContext&)> action) const
 {
-	for (const auto& pair : IntrinsicModuleAssemblyMapping)
+	for (const auto& pair : ModuleMappingHash)
 	{
-		action(pair.Key, pair.Value);
-	}
-
-	for (const auto& pair : ModuleAssemblyMapping)
-	{
-		action(pair.Key, pair.Value);
+		action(pair.Key.ToString(), pair.Value);
 	}
 }
 
 FString UZSharpRuntimeSettings::GetFieldAlias(const FString& path) const
 {
-	const FString* alias = IntrinsicFieldAliasMap.Find(path);
-	if (!alias)
-	{
-		alias = FieldAliasMap.Find(path);
-	}
-
-	return alias ? *alias : FString{};
+	const FZFieldNameRedirector* redirector = FieldNameRedirectorHash.Find(FName { path });
+	return redirector ? redirector->TargetName : FString{};
 }
 
 void UZSharpRuntimeSettings::ForeachMasterAlcStartupAssembly(TFunctionRef<void(const FZMasterAlcStartupAssembly&)> action) const
@@ -90,12 +61,19 @@ void UZSharpRuntimeSettings::ForeachMasterAlcStartupAssembly(TFunctionRef<void(c
 
 TArray<FString> UZSharpRuntimeSettings::GetModuleOptions()
 {
+	const auto cdo = GetDefault<UZSharpRuntimeSettings>();
+	
 	TArray<FModuleStatus> statuses;
 	FModuleManager::Get().QueryModules(statuses);
 
 	TArray<FString> moduleNames;
 	for (const auto& status : statuses)
 	{
+		if (cdo->GetModuleMappingContext(status.Name))
+		{
+			continue;
+		}
+		
 		moduleNames.Emplace(status.Name);
 	}
 
@@ -105,5 +83,55 @@ TArray<FString> UZSharpRuntimeSettings::GetModuleOptions()
 }
 
 #endif
+
+void UZSharpRuntimeSettings::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	InvalidateCache();
+}
+
+void UZSharpRuntimeSettings::PostReloadConfig(FProperty* PropertyThatWasLoaded)
+{
+	Super::PostReloadConfig(PropertyThatWasLoaded);
+
+	InvalidateCache();
+}
+
+#if WITH_EDITOR
+
+void UZSharpRuntimeSettings::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	InvalidateCache();
+}
+
+#endif
+
+void UZSharpRuntimeSettings::InvalidateCache()
+{
+	ModuleMappingHash.Reset();
+	for (const auto& ctx : ModuleMappings)
+	{
+		ModuleMappingHash.Emplace(FName { ctx.ModuleName }, ctx);
+	}
+
+	for (const auto& ctx : IntrinsicModuleMappings)
+	{
+		ModuleMappingHash.Emplace(FName { ctx.ModuleName }, ctx);
+	}
+
+	FieldNameRedirectorHash.Reset();
+	for (const auto& redirector : FieldNameRedirectors)
+	{
+		FieldNameRedirectorHash.Emplace(FName { redirector.SourceName }, redirector);
+	}
+
+	for (const auto& redirector : IntrinsicFieldNameRedirectors)
+	{
+		FieldNameRedirectorHash.Emplace(FName { redirector.SourceName }, redirector);
+	}
+}
 
 

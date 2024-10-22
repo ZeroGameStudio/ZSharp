@@ -49,30 +49,13 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 
 	internal Lifecycle(IExplicitLifecycle underlyingLifecycle)
 	{
-		if (underlyingLifecycle.IsGameThreadOnly)
+		if (underlyingLifecycle.IsExpired)
 		{
-			if (underlyingLifecycle.IsExpired)
-			{
-				_tokenSnapshot = _inlineExpiredToken;
-			}
-			else
-			{
-				_underlyingLifecycle = underlyingLifecycle;
-			}
+			_tokenSnapshot = _inlineExpiredToken;
 		}
 		else
 		{
-			lock (underlyingLifecycle.SyncRoot)
-			{
-				if (underlyingLifecycle.IsExpired)
-				{
-					_tokenSnapshot = _inlineExpiredToken;
-				}
-				else
-				{
-					_underlyingLifecycle = underlyingLifecycle;
-				}
-			}
+			_underlyingLifecycle = underlyingLifecycle;
 		}
 	}
 	
@@ -85,30 +68,13 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 		}
 		else if (underlyingLifecycle is IExplicitLifecycle explicitLifecycle)
 		{
-			if (explicitLifecycle.IsGameThreadOnly)
+			if (explicitLifecycle.IsExpired)
 			{
-				if (explicitLifecycle.IsExpired)
-				{
-					_tokenSnapshot = _inlineExpiredToken;
-				}
-				else
-				{
-					_underlyingLifecycle = explicitLifecycle;
-				}
+				_tokenSnapshot = _inlineExpiredToken;
 			}
 			else
 			{
-				lock (explicitLifecycle.SyncRoot)
-				{
-					if (explicitLifecycle.IsExpired)
-					{
-						_tokenSnapshot = _inlineExpiredToken;
-					}
-					else
-					{
-						_underlyingLifecycle = explicitLifecycle;
-					}
-				}
+				_underlyingLifecycle = explicitLifecycle;
 			}
 		}
 		else

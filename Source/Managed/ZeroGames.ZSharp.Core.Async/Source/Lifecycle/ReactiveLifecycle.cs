@@ -40,27 +40,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 
 		if (_underlyingLifecycle is IExplicitLifecycle explicitLifecycle)
 		{
-			if (explicitLifecycle.IsGameThreadOnly)
-			{
-				return new(this, explicitLifecycle.RegisterOnExpired(callback, state));
-			}
-			else
-			{
-				lock (explicitLifecycle.SyncRoot)
-				{
-					return new(this, explicitLifecycle.RegisterOnExpired((lc, _) =>
-					{
-						if (ThreadHelper.IsInGameThread)
-						{
-							callback(lc, state);
-						}
-						else
-						{
-							ThreadHelper.GameThreadSynchronizationContext.Send(_ => callback(lc, state), null);
-						}
-					}, null));
-				}
-			}
+			return new(this, explicitLifecycle.RegisterOnExpired(callback, state));
 		}
 		else if (_underlyingLifecycle is not null)
 		{
@@ -82,17 +62,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 		
 		if (_underlyingLifecycle is IExplicitLifecycle explicitLifecycle)
 		{
-			if (explicitLifecycle.IsGameThreadOnly)
-			{
-				explicitLifecycle.UnregisterOnExpired(registration.Explicit);
-			}
-			else
-			{
-				lock (explicitLifecycle.SyncRoot)
-				{
-					explicitLifecycle.UnregisterOnExpired(registration.Explicit);
-				}
-			}
+			explicitLifecycle.UnregisterOnExpired(registration.Explicit);
 		}
 		else if (_underlyingLifecycle is not null)
 		{
@@ -154,30 +124,13 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 
 	internal ReactiveLifecycle(IExplicitLifecycle underlyingLifecycle)
 	{
-		if (underlyingLifecycle.IsGameThreadOnly)
+		if (underlyingLifecycle.IsExpired)
 		{
-			if (underlyingLifecycle.IsExpired)
-			{
-				_tokenSnapshot = _inlineExpiredToken;
-			}
-			else
-			{
-				_underlyingLifecycle = underlyingLifecycle;
-			}
+			_tokenSnapshot = _inlineExpiredToken;
 		}
 		else
 		{
-			lock (underlyingLifecycle.SyncRoot)
-			{
-				if (underlyingLifecycle.IsExpired)
-				{
-					_tokenSnapshot = _inlineExpiredToken;
-				}
-				else
-				{
-					_underlyingLifecycle = underlyingLifecycle;
-				}
-			}
+			_underlyingLifecycle = underlyingLifecycle;
 		}
 	}
 	

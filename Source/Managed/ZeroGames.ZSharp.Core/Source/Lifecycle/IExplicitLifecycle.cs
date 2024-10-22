@@ -9,9 +9,6 @@ public interface IExplicitLifecycle
 	bool IsValidRegistration(ExplicitLifecycleExpiredRegistration registration);
 	
 	bool IsExpired { get; }
-	
-	bool IsGameThreadOnly { get; }
-	object SyncRoot { get; }
 }
 
 

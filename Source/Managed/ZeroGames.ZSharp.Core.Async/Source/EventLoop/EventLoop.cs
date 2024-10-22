@@ -223,7 +223,6 @@ internal class EventLoop : IEventLoop
 				Rec rec = innerPair.Value;
 				if (IsValidRec(rec))
 				{
-					// This method is only used by NotifyEvent which already acquires lock, so here we don't lock again.
 					RegisterPending(pair.Key, innerPair.Key, rec);
 				}
 			}

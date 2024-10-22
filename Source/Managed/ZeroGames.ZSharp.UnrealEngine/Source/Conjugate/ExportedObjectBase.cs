@@ -1,9 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.Loader;
 using System.Threading;
 
 namespace ZeroGames.ZSharp.UnrealEngine;
@@ -97,9 +95,6 @@ public abstract class ExportedObjectBase : IConjugate
     public bool IsBlack { get; }
 
     public bool IsExpired => Unmanaged == IConjugate.DEAD_ADDR;
-
-    public bool IsGameThreadOnly => true;
-    public object SyncRoot => this;
 
     private protected ExportedObjectBase()
     {

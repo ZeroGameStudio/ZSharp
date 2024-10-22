@@ -18,6 +18,7 @@
 #include "ALC/ZSlimAssemblyLoadContext.h"
 #include "Interop/ZConfig_Interop.h"
 #include "Interop/ZDefaultAssemblyLoadContext_Interop.h"
+#include "Interop/ZSharpEventLoop_Interop.h"
 #include "Interop/ZSlimAssemblyLoadContext_Interop.h"
 #include "Interop/Engine/ZBuild_Interop.h"
 #include "Interop/Engine/ZPath_Interop.h"
@@ -147,6 +148,38 @@ namespace ZSharp::ZGenericClr_Private
 		dllMain(GArgs);
 	}
 
+	static void LoadCoreAsyncAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
+	{
+		static void** managedFunctions[] =
+		{
+#define ADDRESS_OF(Pointer) reinterpret_cast<void**>(&Pointer)
+
+			ADDRESS_OF(ZSharp::FZSharpEventLoop_Interop::GNotifyEvent),
+				
+	#undef ADDRESS_OF
+		};
+		
+		static const struct
+		{
+			void*** ManagedFunctions = managedFunctions;
+		} GArgs{};
+
+		void(*dllMain)(const decltype(GArgs)&) = nullptr;
+
+		const FString assemblyName = ZSHARP_CORE_ASYNC_ASSEMBLY_NAME;
+		const FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Core", assemblyName + ".dll");
+		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
+		const FString entryMethodName = TEXT("DllMain");
+
+		TArray<uint8> content;
+		verify(FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent));
+		loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
+		getFunctionPointer(*entryTypeName, *entryMethodName, UNMANAGEDCALLERSONLY_METHOD, nullptr, nullptr, reinterpret_cast<void**>(&dllMain));
+		
+		check(dllMain);
+		dllMain(GArgs);
+	}
+
 	static void LoadCoreEngineAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
 		static const FString GBuildInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("Build_Interop"));
@@ -251,6 +284,7 @@ void ZSharp::FZGenericClr::Startup()
 
 	ZGenericClr_Private::LoadAssembliesUnderDirectory("ForwardShared", loadAssembly);
 	ZGenericClr_Private::LoadCoreAssembly(loadAssembly, getFunctionPointer);
+	ZGenericClr_Private::LoadCoreAsyncAssembly(loadAssembly, getFunctionPointer);
 	ZGenericClr_Private::LoadCoreEngineAssembly(loadAssembly, getFunctionPointer);
 	ZGenericClr_Private::LoadResolverAssembly(loadAssembly);
 	ZGenericClr_Private::LoadAssembliesUnderDirectory("DeferredShared", loadAssembly);

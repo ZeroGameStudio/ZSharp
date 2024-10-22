@@ -35,6 +35,7 @@ public class ZSharpCore : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
+				"Engine",
 				"Projects",
 				
 				"Dotnet",
@@ -62,11 +63,11 @@ public class ZSharpCore : ModuleRules
 		}
 
 		// Z# constants
-		// IMPORTANT: KEEP SYNC WITH ZSharpCore.build.cs
+		// IMPORTANT: KEEP SYNC WITH Dotnet.build.cs
 		const string RUNTIME_CONFIG_JSON = "ZSharp.runtimeconfig.json";
 		
 		// Z# configurations
-		// IMPORTANT: KEEP SYNC WITH ZSharpCore.build.cs
+		// IMPORTANT: KEEP SYNC WITH Dotnet.build.cs
 		string dotnetVersion = "8.0.3";
 		
 		PublicDefinitions.Add($"ZSHARP_PLATFORM=\"{Target.Platform}\"");
@@ -77,6 +78,7 @@ public class ZSharpCore : ModuleRules
 		PublicDefinitions.Add($"ZSHARP_RUNTIME_CONFIG_FILE_NAME=\"{RUNTIME_CONFIG_JSON}\"");
 		
 		PublicDefinitions.Add($"ZSHARP_CORE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core\"");
+		PublicDefinitions.Add($"ZSHARP_CORE_ASYNC_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core.Async\"");
 		PublicDefinitions.Add($"ZSHARP_CORE_ENGINE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core.UnrealEngine\"");
 		PublicDefinitions.Add($"ZSHARP_RESOLVER_ASSEMBLY_NAME=\"ZeroGames.ZSharp.AssemblyResolver\"");
 	}

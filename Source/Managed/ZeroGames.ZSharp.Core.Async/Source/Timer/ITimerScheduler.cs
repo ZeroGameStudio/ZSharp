@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.Core.Async;
 
 public interface ITimerScheduler
 {
-	Timer Register(Action<TimeSpan, object?> callback, object? state, TimeSpan rate, bool looped = false, Lifecycle lifecycle = default, Action<LifecycleExpiredException>? onExpired = null);
+	Timer Register(Action<TimeSpan, object?> callback, object? state, TimeSpan rate, bool looped = false, Lifecycle lifecycle = default, Action<LifecycleExpiredException, object?>? onExpired = null);
 
 	void Unregister(Timer timer);
 	void UnregisterAll(Lifecycle lifecycle);

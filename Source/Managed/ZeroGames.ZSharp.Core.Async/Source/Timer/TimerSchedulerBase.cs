@@ -15,7 +15,7 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 		ErrorHandler = errorHandler;
 	}
 
-	public Timer Register(Action<TimeSpan, object?> callback, object? state, TimeSpan rate, bool looped = false, Lifecycle lifecycle = default, Action<LifecycleExpiredException>? onExpired = null)
+	public Timer Register(Action<TimeSpan, object?> callback, object? state, TimeSpan rate, bool looped = false, Lifecycle lifecycle = default, Action<LifecycleExpiredException, object?>? onExpired = null)
 	{
 		ThreadHelper.ValidateGameThread();
 		if (looped && rate < _minLoopRate)
@@ -26,7 +26,7 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 		return InternalRegister(callback, state, rate, looped, lifecycle, onExpired);
 	}
 
-	private Timer InternalRegister(Action<TimeSpan, object?> callback, object? state, TimeSpan rate, bool looped = false, Lifecycle lifecycle = default, Action<LifecycleExpiredException>? onExpired = null)
+	private Timer InternalRegister(Action<TimeSpan, object?> callback, object? state, TimeSpan rate, bool looped = false, Lifecycle lifecycle = default, Action<LifecycleExpiredException, object?>? onExpired = null)
 	{
 		Timer timer = new(this, ++_handle);
 		TimerData data = TimerData.GetFromPool();
@@ -186,7 +186,7 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 					else
 					{
 						expired = true;
-						data.OnExpired?.Invoke(new(data.Lifecycle));
+						data.OnExpired?.Invoke(new(data.Lifecycle), data.State);
 					}
 				}
 				catch (Exception ex)
@@ -266,7 +266,7 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 		public TimeSpan Rate { get; set; }
 		public bool IsLooped { get; set; }
 		public Lifecycle Lifecycle { get; set; }
-		public Action<LifecycleExpiredException>? OnExpired { get; set; }
+		public Action<LifecycleExpiredException, object?>? OnExpired { get; set; }
 		public uint64 SuspendVersion { get; set; }
 		
 		public TimeSpan TriggerTime => StartTime + Rate;

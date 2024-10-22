@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "Misc/ZRegisterLogCategory.h"
+#include "Misc/Log/ZRegisterLogCategory.h"
 
 #include "ZLogCategoryRegistry.h"
 

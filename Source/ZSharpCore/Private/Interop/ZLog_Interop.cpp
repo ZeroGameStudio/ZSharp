@@ -3,8 +3,8 @@
 
 #include "ZLog_Interop.h"
 
-#include "Misc/ZLogCategoryRegistry.h"
-#include "Misc/ZRegisterLogCategory.h"
+#include "Misc/Log/ZLogCategoryRegistry.h"
+#include "Misc/Log/ZRegisterLogCategory.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptCore, Log, All)
 ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptCore)

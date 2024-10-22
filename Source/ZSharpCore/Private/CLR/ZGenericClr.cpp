@@ -18,7 +18,7 @@
 #include "ALC/ZSlimAssemblyLoadContext.h"
 #include "Interop/ZConfig_Interop.h"
 #include "Interop/ZDefaultAssemblyLoadContext_Interop.h"
-#include "Interop/ZSharpEventLoop_Interop.h"
+#include "Interop/ZEventLoop_Interop.h"
 #include "Interop/ZSlimAssemblyLoadContext_Interop.h"
 #include "Interop/Engine/ZBuild_Interop.h"
 #include "Interop/Engine/ZPath_Interop.h"
@@ -154,7 +154,7 @@ namespace ZSharp::ZGenericClr_Private
 		{
 #define ADDRESS_OF(Pointer) reinterpret_cast<void**>(&Pointer)
 
-			ADDRESS_OF(ZSharp::FZSharpEventLoop_Interop::GNotifyEvent),
+			ADDRESS_OF(ZSharp::FZEventLoop_Interop::GNotifyEvent),
 				
 	#undef ADDRESS_OF
 		};

@@ -5,16 +5,16 @@
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
-#include "Interop/ZSharpEventLoop_Interop.h"
+#include "Interop/ZEventLoop_Interop.h"
 
 void FZSharpEventLoopTickFunction::Run() const
 {
-	static const TMap<ETickingGroup, ZSharp::EZSharpEventLoopTickingGroup> GTypeMap
+	static const TMap<ETickingGroup, ZSharp::EZEventLoopTickingGroup> GTypeMap
 	{
-		{ TG_PrePhysics, ZSharp::EZSharpEventLoopTickingGroup::PrePhysicsTick },
-		{ TG_DuringPhysics, ZSharp::EZSharpEventLoopTickingGroup::DuringPhysicsTick },
-		{ TG_PostPhysics, ZSharp::EZSharpEventLoopTickingGroup::PostPhysicsTick },
-		{ TG_PostUpdateWork, ZSharp::EZSharpEventLoopTickingGroup::PostUpdateTick },
+		{ TG_PrePhysics, ZSharp::EZEventLoopTickingGroup::PrePhysicsTick },
+		{ TG_DuringPhysics, ZSharp::EZEventLoopTickingGroup::DuringPhysicsTick },
+		{ TG_PostPhysics, ZSharp::EZEventLoopTickingGroup::PostPhysicsTick },
+		{ TG_PostUpdateWork, ZSharp::EZEventLoopTickingGroup::PostUpdateTick },
 	};
 
 	Owner->NotifyEvent(GTypeMap[TickGroup]);
@@ -32,10 +32,10 @@ void UZSharpEventLoopSubsystem::Initialize(FSubsystemCollectionBase& collection)
 {
 	Super::Initialize(collection);
 
-	FWorldDelegates::OnWorldTickStart.AddUObject(this, &ThisClass::HandleWorldDelegate, ZSharp::EZSharpEventLoopTickingGroup::PreWorldTick);
-	FWorldDelegates::OnWorldPreActorTick.AddUObject(this, &ThisClass::HandleWorldDelegate, ZSharp::EZSharpEventLoopTickingGroup::PreActorTick);
-	FWorldDelegates::OnWorldPostActorTick.AddUObject(this, &ThisClass::HandleWorldDelegate, ZSharp::EZSharpEventLoopTickingGroup::PostActorTick);
-	FWorldDelegates::OnWorldTickEnd.AddUObject(this, &ThisClass::HandleWorldDelegate, ZSharp::EZSharpEventLoopTickingGroup::PostWorldTick);
+	FWorldDelegates::OnWorldTickStart.AddUObject(this, &ThisClass::HandleWorldDelegate, ZSharp::EZEventLoopTickingGroup::PreWorldTick);
+	FWorldDelegates::OnWorldPreActorTick.AddUObject(this, &ThisClass::HandleWorldDelegate, ZSharp::EZEventLoopTickingGroup::PreActorTick);
+	FWorldDelegates::OnWorldPostActorTick.AddUObject(this, &ThisClass::HandleWorldDelegate, ZSharp::EZEventLoopTickingGroup::PostActorTick);
+	FWorldDelegates::OnWorldTickEnd.AddUObject(this, &ThisClass::HandleWorldDelegate, ZSharp::EZEventLoopTickingGroup::PostWorldTick);
 
 	const UWorld& world = GetWorldRef();
 	world.GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ThisClass::NotifyWorldTimerTick));
@@ -70,7 +70,7 @@ bool UZSharpEventLoopSubsystem::DoesSupportWorldType(const EWorldType::Type worl
 
 void UZSharpEventLoopSubsystem::Tick(float DeltaTime)
 {
-	NotifyEvent(ZSharp::EZSharpEventLoopTickingGroup::PostWorldTimerTick);
+	NotifyEvent(ZSharp::EZEventLoopTickingGroup::PostWorldTimerTick);
 }
 
 TStatId UZSharpEventLoopSubsystem::GetStatId() const
@@ -78,7 +78,7 @@ TStatId UZSharpEventLoopSubsystem::GetStatId() const
 	RETURN_QUICK_DECLARE_CYCLE_STAT(UZSharpEventLoopSubsystem, STATGROUP_Tickables);
 }
 
-void UZSharpEventLoopSubsystem::HandleWorldDelegate(UWorld* world, ELevelTick, float, ZSharp::EZSharpEventLoopTickingGroup group)
+void UZSharpEventLoopSubsystem::HandleWorldDelegate(UWorld* world, ELevelTick, float, ZSharp::EZEventLoopTickingGroup group)
 {
 	if (world != GetWorld())
 	{
@@ -88,7 +88,7 @@ void UZSharpEventLoopSubsystem::HandleWorldDelegate(UWorld* world, ELevelTick, f
 	NotifyEvent(group);
 }
 
-void UZSharpEventLoopSubsystem::NotifyEvent(ZSharp::EZSharpEventLoopTickingGroup group)
+void UZSharpEventLoopSubsystem::NotifyEvent(ZSharp::EZEventLoopTickingGroup group)
 {
 	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
 	if (!alc)
@@ -100,12 +100,12 @@ void UZSharpEventLoopSubsystem::NotifyEvent(ZSharp::EZSharpEventLoopTickingGroup
 	ON_SCOPE_EXIT { alc->PopRedFrame(); };
 	
 	const FGameTime time = GetWorldRef().GetTime();
-	ZSharp::FZSharpEventLoop_Interop::GNotifyEvent(group, time.GetDeltaWorldTimeSeconds(), time.GetDeltaRealTimeSeconds(), time.GetWorldTimeSeconds(), time.GetRealTimeSeconds());
+	ZSharp::FZEventLoop_Interop::GNotifyEvent(group, time.GetDeltaWorldTimeSeconds(), time.GetDeltaRealTimeSeconds(), time.GetWorldTimeSeconds(), time.GetRealTimeSeconds());
 }
 
 void UZSharpEventLoopSubsystem::NotifyWorldTimerTick()
 {
-	NotifyEvent(ZSharp::EZSharpEventLoopTickingGroup::DuringWorldTimerTick);
+	NotifyEvent(ZSharp::EZEventLoopTickingGroup::DuringWorldTimerTick);
 	GetWorldRef().GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ThisClass::NotifyWorldTimerTick));
 }
 

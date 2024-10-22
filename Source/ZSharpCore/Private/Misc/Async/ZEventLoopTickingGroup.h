@@ -4,7 +4,7 @@
 
 namespace ZSharp
 {
-	enum class EZSharpEventLoopTickingGroup : uint8
+	enum class EZEventLoopTickingGroup : uint8
 	{
 		PreWorldTick,
 		PreActorTick,

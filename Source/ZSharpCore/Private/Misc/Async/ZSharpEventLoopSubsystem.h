@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ZSharpEventLoopTickingGroup.h"
+#include "ZEventLoopTickingGroup.h"
 
 #include "ZSharpEventLoopSubsystem.generated.h"
 
@@ -60,8 +60,8 @@ public:
 	virtual UWorld* GetTickableGameObjectWorld() const override { return &GetWorldRef(); }
 
 private:
-	void HandleWorldDelegate(UWorld* world, ELevelTick, float, ZSharp::EZSharpEventLoopTickingGroup group);
-	void NotifyEvent(ZSharp::EZSharpEventLoopTickingGroup group);
+	void HandleWorldDelegate(UWorld* world, ELevelTick, float, ZSharp::EZEventLoopTickingGroup group);
+	void NotifyEvent(ZSharp::EZEventLoopTickingGroup group);
 	void NotifyWorldTimerTick();
 
 private:

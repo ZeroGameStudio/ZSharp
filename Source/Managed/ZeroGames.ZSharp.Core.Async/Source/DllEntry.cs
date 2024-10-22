@@ -15,14 +15,12 @@ internal static class DllEntry
     }
     
     [UnmanagedCallersOnly]
-    private static unsafe void DllMain(Args* args) => Uncaught.FatalIfUncaught(() =>
+    private static unsafe void DllMain(Args* args)
     {
         int32 offset = 0;
         
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<EEventLoopTickingGroup, float, float, double, double, void>)&EventLoop_Interop.NotifyEvent;
-
-        return 0;
-    }, -1);
+    }
 
 }
 

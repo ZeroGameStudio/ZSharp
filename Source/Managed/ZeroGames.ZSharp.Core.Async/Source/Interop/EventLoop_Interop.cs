@@ -8,10 +8,10 @@ internal static class EventLoop_Interop
 {
 
 	[UnmanagedCallersOnly]
-	public static void NotifyEvent(EEventLoopTickingGroup group, float worldDeltaSeconds, float realDeltaSeconds, double worldElapsedSeconds, double realElapsedSeconds) => Uncaught.FatalIfUncaught(() =>
+	public static void NotifyEvent(EEventLoopTickingGroup group, float worldDeltaSeconds, float realDeltaSeconds, double worldElapsedSeconds, double realElapsedSeconds)
 	{
 		EventLoop.Instance.NotifyEvent(group, worldDeltaSeconds, realDeltaSeconds, worldElapsedSeconds, realElapsedSeconds);
-	});
+	}
 
 }
 

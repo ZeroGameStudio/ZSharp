@@ -4,11 +4,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Loader;
 
-[assembly: AssemblyResolver(typeof(ZeroGames.ZSharp.AssemblyResolver.AssemblyResolver))]
+[assembly: AssemblyResolver(typeof(ZeroGames.ZSharp.Core.AssemblyResolver.AssemblyResolver))]
 
-namespace ZeroGames.ZSharp.AssemblyResolver;
+namespace ZeroGames.ZSharp.Core.AssemblyResolver;
 
-public class AssemblyResolver : IAssemblyResolver
+internal class AssemblyResolver : IAssemblyResolver
 {
 	
 	public string? Resolve(string name)
@@ -47,6 +47,11 @@ public class AssemblyResolver : IAssemblyResolver
 
 		foreach (var dir in Directory.GetDirectories(baseDir))
 		{
+			if (baseDir == _cachedManagedDllDir && _sharedDirs.Contains(new DirectoryInfo(dir).Name))
+			{
+				continue;
+			}
+			
 			if (TryGetDllPath(dir, assemblyName, out result))
 			{
 				return true;
@@ -55,6 +60,8 @@ public class AssemblyResolver : IAssemblyResolver
 
 		return false;
 	}
+
+	private static readonly HashSet<string> _sharedDirs = [ "Core", "ForwardShared", "DeferredShared" ];
 
 	private string? _cachedManagedDllDir;
 

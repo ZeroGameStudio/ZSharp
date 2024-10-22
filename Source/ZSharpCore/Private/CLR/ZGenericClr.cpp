@@ -148,6 +148,18 @@ namespace ZSharp::ZGenericClr_Private
 		dllMain(GArgs);
 	}
 
+	static void LoadResolverAssembly(load_assembly_bytes_fn loadAssembly)
+	{
+		const FString assemblyName = ZSHARP_RESOLVER_ASSEMBLY_NAME;
+		const FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Core", assemblyName + ".dll");
+		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
+		const FString entryMethodName = TEXT("DllMain");
+
+		TArray<uint8> content;
+		verify(FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent));
+		loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
+	}
+
 	static void LoadCoreAsyncAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
 		static void** managedFunctions[] =
@@ -216,18 +228,6 @@ namespace ZSharp::ZGenericClr_Private
 		check(dllMain);
 		dllMain(GArgs);
 	}
-
-	static void LoadResolverAssembly(load_assembly_bytes_fn loadAssembly)
-	{
-		const FString assemblyName = ZSHARP_RESOLVER_ASSEMBLY_NAME;
-		const FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Core", assemblyName + ".dll");
-		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
-		const FString entryMethodName = TEXT("DllMain");
-
-		TArray<uint8> content;
-		verify(FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent));
-		loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
-	}
 }
 
 ZSharp::FZGenericClr& ZSharp::FZGenericClr::Get()
@@ -284,9 +284,9 @@ void ZSharp::FZGenericClr::Startup()
 
 	ZGenericClr_Private::LoadAssembliesUnderDirectory("ForwardShared", loadAssembly);
 	ZGenericClr_Private::LoadCoreAssembly(loadAssembly, getFunctionPointer);
+	ZGenericClr_Private::LoadResolverAssembly(loadAssembly);
 	ZGenericClr_Private::LoadCoreAsyncAssembly(loadAssembly, getFunctionPointer);
 	ZGenericClr_Private::LoadCoreEngineAssembly(loadAssembly, getFunctionPointer);
-	ZGenericClr_Private::LoadResolverAssembly(loadAssembly);
 	ZGenericClr_Private::LoadAssembliesUnderDirectory("DeferredShared", loadAssembly);
 	
 	FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);

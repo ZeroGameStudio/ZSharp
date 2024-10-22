@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace ZeroGames.ZSharp.Async.ZeroTask;
+namespace ZeroGames.ZSharp.Core.Async;
 
 public abstract class UnderlyingZeroTaskBase<TResult, TImpl> : IPoolableUnderlyingZeroTask<TResult, TImpl> where TImpl : class, IPoolableUnderlyingZeroTask<TResult, TImpl>, new()
 {

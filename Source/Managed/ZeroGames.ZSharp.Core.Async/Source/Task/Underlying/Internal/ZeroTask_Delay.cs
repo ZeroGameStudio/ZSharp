@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace ZeroGames.ZSharp.Async.ZeroTask;
+namespace ZeroGames.ZSharp.Core.Async;
 
 public enum EZeroTaskDelayType
 {

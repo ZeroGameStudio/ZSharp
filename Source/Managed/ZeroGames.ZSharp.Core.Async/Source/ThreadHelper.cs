@@ -3,7 +3,7 @@
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace ZeroGames.ZSharp.Async;
+namespace ZeroGames.ZSharp.Core.Async;
 
 public static class ThreadHelper
 {

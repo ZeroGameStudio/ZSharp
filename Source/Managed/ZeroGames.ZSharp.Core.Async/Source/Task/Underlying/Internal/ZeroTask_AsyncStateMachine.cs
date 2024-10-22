@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-namespace ZeroGames.ZSharp.Async.ZeroTask;
+namespace ZeroGames.ZSharp.Core.Async;
 
 internal class ZeroTask_AsyncStateMachine<TResult> : UnderlyingZeroTaskBase<TResult, ZeroTask_AsyncStateMachine<TResult>>
 {

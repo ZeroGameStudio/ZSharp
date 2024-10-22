@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-namespace ZeroGames.ZSharp.Async;
+namespace ZeroGames.ZSharp.Core.Async;
 
 public interface IReactiveUnderlyingLifecycle : IUnderlyingLifecycle
 {

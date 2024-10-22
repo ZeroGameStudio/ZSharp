@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace ZeroGames.ZSharp.Async.ZeroTask;
+namespace ZeroGames.ZSharp.Core.Async;
 
 /// <summary>
 /// Background heap-allocated object for task which completes asynchronously.

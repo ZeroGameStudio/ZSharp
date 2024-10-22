@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 
-namespace ZeroGames.ZSharp.Async;
+namespace ZeroGames.ZSharp.Core.Async;
 
 public class UnreliableTimerScheduler : TimerSchedulerBase
 {

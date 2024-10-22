@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-namespace ZeroGames.ZSharp.Async.ZeroTask;
+namespace ZeroGames.ZSharp.Core.Async;
 
 // These exist only for ensuring that the implement class matches specific pattern.
 internal interface IAwaiter : IZeroTaskAwaiter

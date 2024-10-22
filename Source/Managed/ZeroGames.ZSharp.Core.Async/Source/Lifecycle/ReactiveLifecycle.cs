@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace ZeroGames.ZSharp.Async;
+namespace ZeroGames.ZSharp.Core.Async;
 
 public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 {

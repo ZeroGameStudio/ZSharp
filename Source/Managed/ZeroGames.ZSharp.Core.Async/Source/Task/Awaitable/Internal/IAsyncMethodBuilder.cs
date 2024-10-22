@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace ZeroGames.ZSharp.Async.ZeroTask;
+namespace ZeroGames.ZSharp.Core.Async;
 
 // These exist only for ensuring that the implement class matches specific pattern.
 internal interface IAsyncMethodBuilder<out TImpl, out TTask, TTaskAwaiter> where TImpl : struct, IAsyncMethodBuilder<TImpl, TTask, TTaskAwaiter> where TTask : IAwaitable<TTaskAwaiter> where TTaskAwaiter : struct, IAwaiter

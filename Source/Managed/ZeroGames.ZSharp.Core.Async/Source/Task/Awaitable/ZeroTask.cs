@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace ZeroGames.ZSharp.Async.ZeroTask;
+namespace ZeroGames.ZSharp.Core.Async;
 
 [AsyncMethodBuilder(typeof(AsyncZeroTaskMethodBuilderVoid))]
 public readonly partial struct ZeroTask : IZeroTask, IAwaitable<ZeroTask.Awaiter>, IEquatable<ZeroTask>

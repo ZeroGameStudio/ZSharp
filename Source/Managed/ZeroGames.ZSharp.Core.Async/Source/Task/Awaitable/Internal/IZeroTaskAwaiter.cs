@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace ZeroGames.ZSharp.Async.ZeroTask;
+namespace ZeroGames.ZSharp.Core.Async;
 
 // Helps to avoid allocating an Action object when await ZeroTask with AsyncZeroTaskMethodBuilder.
 internal interface IZeroTaskAwaiter : INotifyCompletion

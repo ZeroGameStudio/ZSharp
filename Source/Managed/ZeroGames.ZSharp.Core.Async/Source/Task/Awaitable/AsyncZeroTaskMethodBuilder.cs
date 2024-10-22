@@ -161,7 +161,17 @@ internal static class AsyncZeroTaskMethodBuilderShared
 		{
 			// The awaiter isn't specially known. Fall back to doing a normal await.
 			TStateMachine copy = stateMachine;
-			awaiter.OnCompleted(() => { copy.MoveNext(); });
+			awaiter.OnCompleted(() =>
+			{
+				if (ThreadHelper.IsInGameThread)
+				{
+					copy.MoveNext();
+				}
+				else
+				{
+					ThreadHelper.GameThreadSynchronizationContext.Post(state => ((TStateMachine)state!).MoveNext(), copy);
+				}
+			});
 		}
 	}
 	
@@ -170,7 +180,17 @@ internal static class AsyncZeroTaskMethodBuilderShared
 		ThreadHelper.ValidateGameThread();
 		
 		TStateMachine copy = stateMachine;
-		awaiter.UnsafeOnCompleted(() => { copy.MoveNext(); });
+		awaiter.UnsafeOnCompleted(() =>
+		{
+			if (ThreadHelper.IsInGameThread)
+			{
+				copy.MoveNext();
+			}
+			else
+			{
+				ThreadHelper.GameThreadSynchronizationContext.Post(state => ((TStateMachine)state!).MoveNext(), copy);
+			}
+		});
 	}
 	
 }

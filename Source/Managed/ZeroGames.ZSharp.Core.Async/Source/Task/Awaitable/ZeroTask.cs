@@ -8,7 +8,7 @@ namespace ZeroGames.ZSharp.Core.Async;
 public readonly partial struct ZeroTask : IZeroTask, IAwaitable<ZeroTask.Awaiter>, IEquatable<ZeroTask>
 {
 	
-	public readonly struct Awaiter(ZeroTask task) : IAwaiter
+	public readonly struct Awaiter(ZeroTask task) : IAwaiter, IZeroTaskAwaiter
 	{
 		
 		public void OnCompleted(IAsyncStateMachine stateMachine)
@@ -98,7 +98,7 @@ public readonly partial struct ZeroTask : IZeroTask, IAwaitable<ZeroTask.Awaiter
 public readonly partial struct ZeroTask<TResult> : IZeroTask<TResult>, IAwaitable<TResult, ZeroTask<TResult>.Awaiter>, IEquatable<ZeroTask<TResult>>
 {
 	
-	public readonly struct Awaiter(ZeroTask<TResult> task) : IAwaiter<TResult>
+	public readonly struct Awaiter(ZeroTask<TResult> task) : IAwaiter<TResult>, IZeroTaskAwaiter
 	{
 		
 		public void OnCompleted(IAsyncStateMachine stateMachine)

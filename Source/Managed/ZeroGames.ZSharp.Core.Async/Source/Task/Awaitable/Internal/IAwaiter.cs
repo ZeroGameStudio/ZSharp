@@ -3,7 +3,7 @@
 namespace ZeroGames.ZSharp.Core.Async;
 
 // These exist only for ensuring that the implement class matches specific pattern.
-internal interface IAwaiter : IZeroTaskAwaiter
+internal interface IAwaiter
 {
 	bool IsCompleted { get; }
 	void GetResult();

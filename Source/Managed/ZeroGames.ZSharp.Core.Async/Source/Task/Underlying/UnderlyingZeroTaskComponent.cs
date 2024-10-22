@@ -123,7 +123,7 @@ public struct UnderlyingZeroTaskComponent<TResult>
 		}
 		else
 		{
-			_continuation!.Invoke();
+			_continuation?.Invoke();
 		}
 	}
 

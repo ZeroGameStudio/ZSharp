@@ -45,13 +45,9 @@ public partial struct ZeroTask
 		return task;
 	}
 	public static ZeroTask<TimeSpan> Delay(double delayTimeMs, Lifecycle lifecycle = default, bool throwOnExpired = false) => Delay(TimeSpan.FromMilliseconds(delayTimeMs), lifecycle, throwOnExpired);
-	public static ZeroTask<TimeSpan> Delay(TimeSpan delayTime, Lifecycle lifecycle = default, bool throwOnExpired = false) => Delay(EZeroTaskDelayType.WorldPaused, delayTime, lifecycle, throwOnExpired);
+	public static ZeroTask<TimeSpan> Delay(TimeSpan delayTime, Lifecycle lifecycle = default, bool throwOnExpired = false) => Delay(EZeroTaskDelayType.Paused, delayTime, lifecycle, throwOnExpired);
 	public static ZeroTask<TimeSpan> UnpausedDelay(double delayTimeMs, Lifecycle lifecycle = default, bool throwOnExpired = false) => UnpausedDelay(TimeSpan.FromMilliseconds(delayTimeMs), lifecycle, throwOnExpired);
-	public static ZeroTask<TimeSpan> UnpausedDelay(TimeSpan delayTime, Lifecycle lifecycle = default, bool throwOnExpired = false) => Delay(EZeroTaskDelayType.WorldUnpaused, delayTime, lifecycle, throwOnExpired);
-	public static ZeroTask<TimeSpan> RealDelay(double delayTimeMs, Lifecycle lifecycle = default, bool throwOnExpired = false) => Delay(TimeSpan.FromMilliseconds(delayTimeMs), lifecycle, throwOnExpired);
-	public static ZeroTask<TimeSpan> RealDelay(TimeSpan delayTime, Lifecycle lifecycle = default, bool throwOnExpired = false) => Delay(EZeroTaskDelayType.RealPaused, delayTime, lifecycle, throwOnExpired);
-	public static ZeroTask<TimeSpan> RealUnpausedDelay(double delayTimeMs, Lifecycle lifecycle = default, bool throwOnExpired = false) => Delay(TimeSpan.FromMilliseconds(delayTimeMs), lifecycle, throwOnExpired);
-	public static ZeroTask<TimeSpan> RealUnpausedDelay(TimeSpan delayTime, Lifecycle lifecycle = default, bool throwOnExpired = false) => Delay(EZeroTaskDelayType.RealUnpaused, delayTime, lifecycle, throwOnExpired);
+	public static ZeroTask<TimeSpan> UnpausedDelay(TimeSpan delayTime, Lifecycle lifecycle = default, bool throwOnExpired = false) => Delay(EZeroTaskDelayType.Unpaused, delayTime, lifecycle, throwOnExpired);
 
 	public static ZeroTask Yield() => throw new NotImplementedException();
 

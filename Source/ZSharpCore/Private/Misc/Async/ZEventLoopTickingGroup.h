@@ -16,6 +16,9 @@ namespace ZSharp
 		PostUpdateTick,
 		PostActorTick,
 		PostWorldTick,
+		RealtimeTick,
+
+		Num,
 	};
 }
 

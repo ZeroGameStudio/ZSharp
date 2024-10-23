@@ -6,10 +6,10 @@ namespace ZeroGames.ZSharp.Core.Async;
 
 public enum EZeroTaskDelayType
 {
-	WorldPaused,
-	WorldUnpaused,
-	RealPaused,
-	RealUnpaused,
+	Paused,
+	PausedUnreliable,
+	Unpaused,
+	Realtime,
 }
 
 internal class ZeroTask_Delay : UnderlyingZeroTaskBase<TimeSpan, ZeroTask_Delay>
@@ -30,11 +30,11 @@ internal class ZeroTask_Delay : UnderlyingZeroTaskBase<TimeSpan, ZeroTask_Delay>
 	{
 		ITimerScheduler scheduler = _delayType switch
 		{
-			EZeroTaskDelayType.WorldPaused => GlobalTimerScheduler.WorldPausedReliable,
-			EZeroTaskDelayType.WorldUnpaused => GlobalTimerScheduler.WorldUnpausedReliable,
-			EZeroTaskDelayType.RealPaused => GlobalTimerScheduler.RealPausedReliable,
-			EZeroTaskDelayType.RealUnpaused => GlobalTimerScheduler.RealUnpausedReliable,
-			_ => GlobalTimerScheduler.WorldPausedReliable,
+			EZeroTaskDelayType.Paused => GlobalTimerScheduler.Paused,
+			EZeroTaskDelayType.PausedUnreliable => GlobalTimerScheduler.PausedUnreliable,
+			EZeroTaskDelayType.Unpaused => GlobalTimerScheduler.Unpaused,
+			EZeroTaskDelayType.Realtime => GlobalTimerScheduler.Realtime,
+			_ => GlobalTimerScheduler.Paused,
 		};
 		
 		scheduler.Register(static (deltaTime, state) =>

@@ -4,14 +4,14 @@
 
 #include "ZEventLoopTickingGroup.h"
 
-#include "ZSharpEventLoopSubsystem.generated.h"
+#include "ZSharpEventLoopWorldSubsystem.generated.h"
 
-class UZSharpEventLoopSubsystem;
+class UZSharpEventLoopWorldSubsystem;
 
 struct FZSharpEventLoopTickFunction : public FTickFunction
 {
 	
-	FZSharpEventLoopTickFunction(UZSharpEventLoopSubsystem* owner, ETickingGroup group)
+	FZSharpEventLoopTickFunction(UZSharpEventLoopWorldSubsystem* owner, ETickingGroup group)
 		: Owner(owner)
 	{
 		TickGroup = group;
@@ -30,22 +30,22 @@ struct FZSharpEventLoopTickFunction : public FTickFunction
 	void Run() const;
 
 private:
-	UZSharpEventLoopSubsystem* Owner;
+	UZSharpEventLoopWorldSubsystem* Owner;
 	
 };
 
 UCLASS()
-class UZSharpEventLoopSubsystem : public UWorldSubsystem, public FTickableGameObject
+class UZSharpEventLoopWorldSubsystem : public UWorldSubsystem, public FTickableGameObject
 {
 	GENERATED_BODY()
 
 	friend FZSharpEventLoopTickFunction;
 
 public:
-	UZSharpEventLoopSubsystem();
+	UZSharpEventLoopWorldSubsystem();
 
 public:
-	// UWorldSubsystem interface
+	// USubsystem interface
 	virtual void Initialize(FSubsystemCollectionBase& collection) override;
 	virtual void Deinitialize() override;
 	

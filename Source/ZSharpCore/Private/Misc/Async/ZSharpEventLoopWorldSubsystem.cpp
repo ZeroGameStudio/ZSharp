@@ -1,8 +1,9 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "ZSharpEventLoopSubsystem.h"
+#include "ZSharpEventLoopWorldSubsystem.h"
 
+#include "ZSharpEventLoopEngineSubsystem.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "Interop/ZEventLoop_Interop.h"
@@ -20,7 +21,7 @@ void FZSharpEventLoopTickFunction::Run() const
 	Owner->NotifyEvent(GTypeMap[TickGroup]);
 }
 
-UZSharpEventLoopSubsystem::UZSharpEventLoopSubsystem()
+UZSharpEventLoopWorldSubsystem::UZSharpEventLoopWorldSubsystem()
 	: PrePhysicsTickFunction(MakeUnique<FZSharpEventLoopTickFunction>(this, TG_PrePhysics))
 	, DuringPhysicsTickFunction(MakeUnique<FZSharpEventLoopTickFunction>(this, TG_DuringPhysics))
 	, PostPhysicsTickFunction(MakeUnique<FZSharpEventLoopTickFunction>(this, TG_PostPhysics))
@@ -28,7 +29,7 @@ UZSharpEventLoopSubsystem::UZSharpEventLoopSubsystem()
 {
 }
 
-void UZSharpEventLoopSubsystem::Initialize(FSubsystemCollectionBase& collection)
+void UZSharpEventLoopWorldSubsystem::Initialize(FSubsystemCollectionBase& collection)
 {
 	Super::Initialize(collection);
 
@@ -47,7 +48,7 @@ void UZSharpEventLoopSubsystem::Initialize(FSubsystemCollectionBase& collection)
 	PostUpdateTickFunction->RegisterTickFunction(level);
 }
 
-void UZSharpEventLoopSubsystem::Deinitialize()
+void UZSharpEventLoopWorldSubsystem::Deinitialize()
 {
 	PrePhysicsTickFunction->UnRegisterTickFunction();
 	DuringPhysicsTickFunction->UnRegisterTickFunction();
@@ -59,7 +60,7 @@ void UZSharpEventLoopSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-bool UZSharpEventLoopSubsystem::DoesSupportWorldType(const EWorldType::Type worldType) const
+bool UZSharpEventLoopWorldSubsystem::DoesSupportWorldType(const EWorldType::Type worldType) const
 {
 #if WITH_EDITOR
 	return worldType == EWorldType::Game || worldType == EWorldType::PIE;
@@ -68,17 +69,17 @@ bool UZSharpEventLoopSubsystem::DoesSupportWorldType(const EWorldType::Type worl
 #endif
 }
 
-void UZSharpEventLoopSubsystem::Tick(float DeltaTime)
+void UZSharpEventLoopWorldSubsystem::Tick(float DeltaTime)
 {
 	NotifyEvent(ZSharp::EZEventLoopTickingGroup::PostWorldTimerTick);
 }
 
-TStatId UZSharpEventLoopSubsystem::GetStatId() const
+TStatId UZSharpEventLoopWorldSubsystem::GetStatId() const
 {
 	RETURN_QUICK_DECLARE_CYCLE_STAT(UZSharpEventLoopSubsystem, STATGROUP_Tickables);
 }
 
-void UZSharpEventLoopSubsystem::HandleWorldDelegate(UWorld* world, ELevelTick, float, ZSharp::EZEventLoopTickingGroup group)
+void UZSharpEventLoopWorldSubsystem::HandleWorldDelegate(UWorld* world, ELevelTick, float, ZSharp::EZEventLoopTickingGroup group)
 {
 	if (world != GetWorld())
 	{
@@ -88,22 +89,13 @@ void UZSharpEventLoopSubsystem::HandleWorldDelegate(UWorld* world, ELevelTick, f
 	NotifyEvent(group);
 }
 
-void UZSharpEventLoopSubsystem::NotifyEvent(ZSharp::EZEventLoopTickingGroup group)
+void UZSharpEventLoopWorldSubsystem::NotifyEvent(ZSharp::EZEventLoopTickingGroup group)
 {
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
-	if (!alc)
-	{
-		return;
-	}
-
-	alc->PushRedFrame();
-	ON_SCOPE_EXIT { alc->PopRedFrame(); };
-	
 	const FGameTime time = GetWorldRef().GetTime();
-	ZSharp::FZEventLoop_Interop::GNotifyEvent(group, time.GetDeltaWorldTimeSeconds(), time.GetDeltaRealTimeSeconds(), time.GetWorldTimeSeconds(), time.GetRealTimeSeconds());
+	GEngine->GetEngineSubsystem<UZSharpEventLoopEngineSubsystem>()->NotifyEvent(group, time.GetDeltaWorldTimeSeconds(), time.GetDeltaRealTimeSeconds(), time.GetWorldTimeSeconds(), time.GetRealTimeSeconds());
 }
 
-void UZSharpEventLoopSubsystem::NotifyWorldTimerTick()
+void UZSharpEventLoopWorldSubsystem::NotifyWorldTimerTick()
 {
 	NotifyEvent(ZSharp::EZEventLoopTickingGroup::DuringWorldTimerTick);
 	GetWorldRef().GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ThisClass::NotifyWorldTimerTick));

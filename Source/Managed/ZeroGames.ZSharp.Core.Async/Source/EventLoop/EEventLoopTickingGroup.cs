@@ -14,6 +14,7 @@ public enum EEventLoopTickingGroup : uint8
 	PostUpdateTick,
 	PostActorTick,
 	PostWorldTick,
+	RealtimeTick,
 }
 
 

@@ -17,7 +17,7 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 
 	public Timer Register(Action<TimeSpan, object?> callback, object? state, TimeSpan rate, bool looped = false, Lifecycle lifecycle = default, Action<LifecycleExpiredException, object?>? onExpired = null)
 	{
-		ThreadHelper.ValidateGameThread();
+		check(IsInGameThread);
 		if (looped && rate < _minLoopRate)
 		{
 			rate = _minLoopRate;
@@ -78,7 +78,7 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 
 	public void Unregister(Timer timer)
 	{
-		ThreadHelper.ValidateGameThread();
+		check(IsInGameThread);
 		if (timer.Owner != this)
 		{
 			return;
@@ -89,13 +89,13 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 
 	public void UnregisterAll(Lifecycle lifecycle)
 	{
-		ThreadHelper.ValidateGameThread();
+		check(IsInGameThread);
 		throw new NotSupportedException();
 	}
 	
 	public void Suspend(Timer timer)
 	{
-		ThreadHelper.ValidateGameThread();
+		check(IsInGameThread);
 		if (timer.Owner != this)
 		{
 			return;
@@ -106,13 +106,13 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 
 	public void SuspendAll(Lifecycle lifecycle)
 	{
-		ThreadHelper.ValidateGameThread();
+		check(IsInGameThread);
 		throw new NotSupportedException();
 	}
 
 	public void Resume(Timer timer)
 	{
-		ThreadHelper.ValidateGameThread();
+		check(IsInGameThread);
 		if (timer.Owner != this)
 		{
 			return;
@@ -123,19 +123,19 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 
 	public void ResumeAll(Lifecycle lifecycle)
 	{
-		ThreadHelper.ValidateGameThread();
+		check(IsInGameThread);
 		throw new NotSupportedException();
 	}
 
 	public bool IsValidTimer(Timer timer)
 	{
-		ThreadHelper.ValidateGameThread();
+		check(IsInGameThread);
 		return InternalIsValidTimer(timer);
 	}
 
 	public void Tick(float deltaSeconds)
 	{
-		ThreadHelper.ValidateGameThread();
+		check(IsInGameThread);
 		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(deltaSeconds);
 		
 		if (_ticking)

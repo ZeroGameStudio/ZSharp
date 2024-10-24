@@ -3,14 +3,16 @@
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace ZeroGames.ZSharp.Core;
+namespace ZeroGames.ZSharp.Core.Async;
 
-internal sealed class ZSharpSynchronizationContext : SynchronizationContext
+public sealed class ZSharpSynchronizationContext : SynchronizationContext
 {
+
+	public static ZSharpSynchronizationContext Instance { get; }
 
 	public override void Send(SendOrPostCallback d, object? state)
 	{
-		if (Thread.CurrentThread.ManagedThreadId == _threadId)
+		if (IsInGameThread)
 		{
 			ProtectedCall(d, state);
 		}
@@ -38,13 +40,19 @@ internal sealed class ZSharpSynchronizationContext : SynchronizationContext
 		}
 		catch (Exception ex)
 		{
-			UE_ERROR(LogZSharpScriptCore, $"Unhandled Exception Detected.\n{ex}");
+			UE_ERROR(LogZSharpScriptAsync, $"Unhandled Exception Detected.\n{ex}");
 		}
 	}
 	
 	private readonly record struct Rec(SendOrPostCallback Callback, object? State);
 
-	private int32 _threadId = Thread.CurrentThread.ManagedThreadId;
+	static ZSharpSynchronizationContext()
+	{
+		Instance = new();
+		check(Current is null);
+		SetSynchronizationContext(Instance);
+	}
+
 	private ConcurrentQueue<Rec> _recs = new();
 
 }

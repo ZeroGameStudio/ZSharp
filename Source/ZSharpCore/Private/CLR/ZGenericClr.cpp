@@ -8,7 +8,6 @@
 #include "ZSharpCoreLogChannels.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
 #include "Interop/ZLog_Interop.h"
-#include "Interop/Engine/ZUnrealEngine_Interop.h"
 #include "Interop/ZClr_Interop.h"
 #include "Interop/ZGCHandle_Interop.h"
 #include "Interop/ZInteropString_Interop.h"
@@ -119,9 +118,11 @@ namespace ZSharp::ZGenericClr_Private
 
 		static const struct
 		{
-			uint8 bIsServer = GIsServer;
-			uint8 bIsClient = GIsClient;
-			uint8 bIsEditor = GIsEditor;
+			void* IsInGameThreadFuncPtr = &IsInGameThread;
+			bool* GIsServerPtr = &GIsServer;
+			bool* GIsClientPtr = &GIsClient;
+			bool* GIsEditorPtr = &GIsEditor;
+			uint64* GFrameCounterPtr = &GFrameCounter;
 			FConfigCacheIni* Config = GConfig;
 		} GUnmanagedProperties;
 		
@@ -195,15 +196,12 @@ namespace ZSharp::ZGenericClr_Private
 	static void LoadCoreEngineAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
 		static const FString GBuildInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("Build_Interop"));
-		static const FString GUnrealEngineInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("UnrealEngine_Interop"));
 		static const FString GPathInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("Path_Interop"));;
 		
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
 		{
 			{ *GBuildInteropTypeName, TEXT("WithEditor"), FZBuild_Interop::WithEditor },
 		
-			{ *GUnrealEngineInteropTypeName, TEXT("IsInGameThread"), FZUnrealEngine_Interop::IsInGameThread },
-
 			{ *GPathInteropTypeName, TEXT("GetProjectDir"), FZPath_Interop::GetProjectDir },
 			{ *GPathInteropTypeName, TEXT("GetPluginDir"), FZPath_Interop::GetPluginDir },
 		};

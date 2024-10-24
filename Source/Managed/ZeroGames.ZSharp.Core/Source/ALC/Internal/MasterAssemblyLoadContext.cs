@@ -139,8 +139,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         {
             conjugate.Dispose();
         }
-        
-        _curSyncContext.Tick(deltaTime);
     }
     
     public EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
@@ -210,21 +208,11 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         return conjugate;
     }
     
-    public SynchronizationContext SynchronizationContext
-    {
-        get => _curSyncContext;
-    }
-
     protected override void HandleUnload()
     {
         if (_instance != this)
         {
             throw new InvalidOperationException("Master ALC mismatch.");
-        }
-
-        if (SynchronizationContext.Current != SynchronizationContext)
-        {
-            throw new InvalidOperationException("SynchronizationContext mismatch.");
         }
 
         foreach (var pair in _conjugateMap)
@@ -235,8 +223,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             }
         }
         
-        SynchronizationContext.SetSynchronizationContext(_prevSyncContext);
-
         _instance = null;
         
         base.HandleUnload();
@@ -249,10 +235,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private MasterAssemblyLoadContext() : base(INSTANCE_NAME)
     {
         _instance = this;
-        
-        _prevSyncContext = SynchronizationContext.Current;
-        _curSyncContext = new();
-        SynchronizationContext.SetSynchronizationContext(SynchronizationContext);
 
         RegisterZCall(new ZCallDispatcher_Delegate());
         RegisterZCallResolver(new ZCallResolver_Method(), 1);
@@ -326,9 +308,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         return 0;
     }
 
-    private SynchronizationContext? _prevSyncContext;
-    private ZSharpSynchronizationContext _curSyncContext;
-    
     private Dictionary<ZCallHandle, IZCallDispatcher> _zcallMap = new();
     private Dictionary<string, ZCallHandle> _zcallName2Handle = new();
     private List<(IZCallResolver Resolver, uint64 Priority)> _zcallResolverLink = new();

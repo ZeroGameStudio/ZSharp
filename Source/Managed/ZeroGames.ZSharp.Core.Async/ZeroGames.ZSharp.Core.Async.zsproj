@@ -8,13 +8,15 @@
 	"NeutralLanguage": "zh",
 	"ProjectReferences":
 	[
-		"ZeroGames.ZSharp.Core",
-		"ZeroGames.ZSharp.Core.UnrealEngine"
+		"ZeroGames.ZSharp.Core"
 	],
 	"Usings":
 	[
-		"ZeroGames.ZSharp.Core",
-		"ZeroGames.ZSharp.Core.UnrealEngine"
+		"ZeroGames.ZSharp.Core"
+	],
+	"StaticUsings":
+	[
+		"ZeroGames.ZSharp.Core.Async.AsyncLogChannels"
 	]
 }
 

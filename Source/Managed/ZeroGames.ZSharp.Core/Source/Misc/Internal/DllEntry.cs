@@ -26,10 +26,12 @@ internal static class DllEntry
     [StructLayout(LayoutKind.Sequential)]
     private unsafe struct UnmanagedProperties
     {
-        public uint8 IsServer;
-        public uint8 IsClient;
-        public uint8 IsEditor;
-        public void* Config;
+        public void* IsInGameThreadFuncPtr;
+        public uint8* GIsServerPtr;
+        public uint8* GIsClientPtr;
+        public uint8* GIsEditorPtr;
+        public uint64* GFrameCounterPtr;
+        public void* GConfig;
     }
     
     [StructLayout(LayoutKind.Sequential)]
@@ -43,10 +45,12 @@ internal static class DllEntry
     [UnmanagedCallersOnly]
     private static unsafe void DllMain(Args* args) => Uncaught.FatalIfUncaught(() =>
     {
-        GIsServer = args->UnmanagedProperties.IsServer > 0;
-        GIsClient = args->UnmanagedProperties.IsClient > 0;
-        GIsEditor = args->UnmanagedProperties.IsEditor > 0;
-        GConfig = new Config((IntPtr)args->UnmanagedProperties.Config);
+        CoreGlobals_Interop.IsInGameThreadFuncPtr = (delegate* unmanaged<uint8>)args->UnmanagedProperties.IsInGameThreadFuncPtr;
+        CoreGlobals_Interop.GIsServerPtr = args->UnmanagedProperties.GIsServerPtr;
+        CoreGlobals_Interop.GIsClientPtr = args->UnmanagedProperties.GIsClientPtr;
+        CoreGlobals_Interop.GIsEditorPtr = args->UnmanagedProperties.GIsEditorPtr;
+        CoreGlobals_Interop.GFrameCounterPtr = args->UnmanagedProperties.GFrameCounterPtr;
+        GConfig = new Config((IntPtr)args->UnmanagedProperties.GConfig);
         
         for (int32 i = 0; i < args->UnmanagedFunctions.Count; ++i)
         {

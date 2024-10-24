@@ -4,11 +4,14 @@ namespace ZeroGames.ZSharp.Core;
 
 public static class CoreGlobals
 {
+
+	public static unsafe bool IsInGameThread => CoreGlobals_Interop.IsInGameThreadFuncPtr() > 0;
+
+	public static unsafe bool GIsServer => *CoreGlobals_Interop.GIsServerPtr > 0;
+	public static unsafe bool GIsClient => *CoreGlobals_Interop.GIsClientPtr > 0;
+	public static unsafe bool GIsEditor => *CoreGlobals_Interop.GIsEditorPtr > 0;
 	
-	public static bool GIsServer { get; internal set; }
-	public static bool GIsClient { get; internal set; }
-	
-	public static bool GIsEditor { get; internal set; }
+	public static unsafe uint64 GFrameCounter => *CoreGlobals_Interop.GFrameCounterPtr;
 
 	public static IConfig GConfig { get; internal set; } = null!;
 

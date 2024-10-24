@@ -17,7 +17,7 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 	{
 		get
 		{
-			ThreadHelper.ValidateGameThread();
+			check(IsInGameThread);
 
 			if (_underlyingLifecycle is null)
 			{

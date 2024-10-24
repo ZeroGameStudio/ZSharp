@@ -9,6 +9,12 @@
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptCore, Log, All)
 ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptCore)
 
+DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptAssemblyResolver, Log, All)
+ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptAssemblyResolver)
+
+DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptAsync, Log, All)
+ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptAsync)
+
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptEngine, Log, All)
 ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptEngine)
 

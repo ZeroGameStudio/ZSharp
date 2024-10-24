@@ -42,8 +42,6 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 	IntPtr BuildConjugate(IConjugate managed, IntPtr userdata);
 	void ReleaseConjugate(IntPtr unmanaged);
 	void PushPendingDisposeConjugate(IConjugate conjugate);
-
-	SynchronizationContext SynchronizationContext { get; }
 }
 
 

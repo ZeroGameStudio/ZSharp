@@ -149,7 +149,7 @@ internal static class AsyncZeroTaskMethodBuilderShared
 	
 	public static void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : INotifyCompletion where TStateMachine : IAsyncStateMachine
 	{
-		ThreadHelper.ValidateGameThread();
+		check(IsInGameThread);
 		
 		// IZeroTaskAwaiter is internal and only implemented by struct ZeroTask.Awaiter.
 		// The null tests here ensure that the jit can optimize away the interface tests when TAwaiter is a ref type.
@@ -163,13 +163,13 @@ internal static class AsyncZeroTaskMethodBuilderShared
 			TStateMachine copy = stateMachine;
 			awaiter.OnCompleted(() =>
 			{
-				if (ThreadHelper.IsInGameThread)
+				if (IsInGameThread)
 				{
 					copy.MoveNext();
 				}
 				else
 				{
-					ThreadHelper.GameThreadSynchronizationContext.Post(state => ((TStateMachine)state!).MoveNext(), copy);
+					ZSharpSynchronizationContext.Instance.Post(state => ((TStateMachine)state!).MoveNext(), copy);
 				}
 			});
 		}
@@ -177,18 +177,18 @@ internal static class AsyncZeroTaskMethodBuilderShared
 	
 	public static void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : ICriticalNotifyCompletion where TStateMachine : IAsyncStateMachine
 	{
-		ThreadHelper.ValidateGameThread();
+		check(IsInGameThread);
 		
 		TStateMachine copy = stateMachine;
 		awaiter.UnsafeOnCompleted(() =>
 		{
-			if (ThreadHelper.IsInGameThread)
+			if (IsInGameThread)
 			{
 				copy.MoveNext();
 			}
 			else
 			{
-				ThreadHelper.GameThreadSynchronizationContext.Post(state => ((TStateMachine)state!).MoveNext(), copy);
+				ZSharpSynchronizationContext.Instance.Post(state => ((TStateMachine)state!).MoveNext(), copy);
 			}
 		});
 	}

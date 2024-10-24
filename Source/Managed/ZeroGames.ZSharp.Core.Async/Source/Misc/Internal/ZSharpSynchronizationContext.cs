@@ -40,8 +40,12 @@ public sealed class ZSharpSynchronizationContext : SynchronizationContext
 
 	static ZSharpSynchronizationContext()
 	{
-		check(Current is null);
-		SetSynchronizationContext(Instance);
+		if (AsyncSettings.UseZSharpSynchronizationContext)
+		{
+			check(Current is null);
+			SetSynchronizationContext(Instance);
+		}
+
 		IEventLoop.Instance.Register(EEventLoopTickingGroup.RealtimeTick, Tick, null);
 	}
 	

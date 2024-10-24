@@ -163,7 +163,7 @@ internal static class AsyncZeroTaskMethodBuilderShared
 			TStateMachine copy = stateMachine;
 			awaiter.OnCompleted(() =>
 			{
-				if (IsInGameThread)
+				if (IsInGameThread || !AsyncSettings.ForceAsyncZeroTaskMethodContinueOnGameThread)
 				{
 					copy.MoveNext();
 				}
@@ -182,7 +182,7 @@ internal static class AsyncZeroTaskMethodBuilderShared
 		TStateMachine copy = stateMachine;
 		awaiter.UnsafeOnCompleted(() =>
 		{
-			if (IsInGameThread)
+			if (IsInGameThread || !AsyncSettings.ForceAsyncZeroTaskMethodContinueOnGameThread)
 			{
 				copy.MoveNext();
 			}

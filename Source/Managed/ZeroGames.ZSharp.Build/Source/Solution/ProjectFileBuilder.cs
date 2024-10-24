@@ -102,7 +102,7 @@ public class ProjectFileBuilder
 		List<string> finalWarningsToErros = [.._project.WarningsAsErrors];
 		if (_project.IsStrongRestrictedNullable)
 		{
-			finalWarningsToErros.Add("CS8600;CS8601;CS8602;CS8603;CS8604;CS8609;CS8610;CS8614;CS8616;CS8618;CS8619;CS8622;CS8625;CS8777");
+			finalWarningsToErros.Add("CS8600;CS8601;CS8602;CS8603;CS8604;CS8609;CS8610;CS8614;CS8616;CS8618;CS8619;CS8622;CS8625;CS8629;CS8777");
 		}
 
 		finalWarningsToErros.Insert(0, "$(WarningsAsErrors)");

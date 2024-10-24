@@ -8,7 +8,7 @@ namespace ZeroGames.ZSharp.Core.Async;
 public sealed class ZSharpSynchronizationContext : SynchronizationContext
 {
 
-	public static ZSharpSynchronizationContext Instance { get; }
+	public static ZSharpSynchronizationContext Instance { get; } = new();
 
 	public override void Send(SendOrPostCallback d, object? state)
 	{
@@ -23,14 +23,6 @@ public sealed class ZSharpSynchronizationContext : SynchronizationContext
 	}
 
 	public override void Post(SendOrPostCallback d, object? state) => _recs.Enqueue(new(d, state));
-
-	public void Tick(float deltaTime)
-	{
-		while (_recs.TryDequeue(out var rec))
-		{
-			ProtectedCall(rec.Callback, rec.State);
-		}
-	}
 
 	private void ProtectedCall(SendOrPostCallback d, object? state)
 	{
@@ -48,9 +40,17 @@ public sealed class ZSharpSynchronizationContext : SynchronizationContext
 
 	static ZSharpSynchronizationContext()
 	{
-		Instance = new();
 		check(Current is null);
 		SetSynchronizationContext(Instance);
+		IEventLoop.Instance.Register(EEventLoopTickingGroup.RealtimeTick, Tick, null);
+	}
+	
+	private static void Tick(in EventLoopArgs args, object? state)
+	{
+		while (Instance._recs.TryDequeue(out var rec))
+		{
+			Instance.ProtectedCall(rec.Callback, rec.State);
+		}
 	}
 
 	private ConcurrentQueue<Rec> _recs = new();

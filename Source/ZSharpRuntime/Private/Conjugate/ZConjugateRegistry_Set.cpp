@@ -13,10 +13,9 @@ namespace ZSharp::ZConjugateRegistry_Set_Private
 	static TZDeclareConjugateRegistry<FZConjugateRegistry_Set> GDeclare;
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Set::Conjugate(const FProperty* elementPropertyProto, TFunctionRef<void(const FZSelfDescriptiveScriptSet&)> initialize)
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Set::Conjugate(const FProperty* elementProperty, TFunctionRef<void(const FZSelfDescriptiveScriptSet&)> initialize)
 {
-	auto elementProperty = CastField<FProperty>(FField::Duplicate(elementPropertyProto, nullptr));
-	auto sdss = new FZSelfDescriptiveScriptSet { elementProperty };
+	auto sdss = new FZSelfDescriptiveScriptSet { elementProperty, false };
 	initialize(*sdss);
 	
 	void* unmanaged = sdss->GetUnderlyingInstance();
@@ -67,7 +66,7 @@ void* ZSharp::FZConjugateRegistry_Set::BuildConjugate(void* userdata)
 		FZPropertyDesc Desc;
 	} typedUserdata = *static_cast<decltype(typedUserdata)*>(userdata);
 	
-	auto pSdss = MakeUnique<FZSelfDescriptiveScriptSet>(FZPropertyFactory::Create(typedUserdata.Desc));
+	auto pSdss = MakeUnique<FZSelfDescriptiveScriptSet>(FZPropertyFactory::Create(typedUserdata.Desc), true);
 	void* unmanaged = pSdss->GetUnderlyingInstance();
 	ConjugateMap.Emplace(unmanaged, { MoveTemp(pSdss), true });
 	return unmanaged;

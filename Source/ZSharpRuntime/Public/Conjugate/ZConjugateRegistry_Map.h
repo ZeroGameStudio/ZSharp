@@ -32,8 +32,8 @@ namespace ZSharp
 		explicit FZConjugateRegistry_Map(IZMasterAssemblyLoadContext& alc) : Super(alc){}
 
 	public:
-		FZConjugateHandle Conjugate(const FProperty* keyPropertyProto, const FProperty* valuePropertyProto) { return Conjugate(keyPropertyProto, valuePropertyProto, [](const FZSelfDescriptiveScriptMap&){}); }
-		FZConjugateHandle Conjugate(const FProperty* keyPropertyProto, const FProperty* valuePropertyProto, TFunctionRef<void(const FZSelfDescriptiveScriptMap&)> initialize);
+		FZConjugateHandle Conjugate(const FProperty* keyProperty, const FProperty* valueProperty) { return Conjugate(keyProperty, valueProperty, [](const FZSelfDescriptiveScriptMap&){}); }
+		FZConjugateHandle Conjugate(const FProperty* keyProperty, const FProperty* valueProperty, TFunctionRef<void(const FZSelfDescriptiveScriptMap&)> initialize);
 		FZConjugateHandle Conjugate(const FProperty* keyProperty, const FProperty* valueProperty, const FScriptMap* unmanaged);
 		FZSelfDescriptiveScriptMap* Conjugate(FZConjugateHandle handle) const;
 

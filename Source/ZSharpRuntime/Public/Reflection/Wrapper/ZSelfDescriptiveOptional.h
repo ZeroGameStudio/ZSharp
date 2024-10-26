@@ -19,7 +19,7 @@ namespace ZSharp
 	
 	struct ZSHARPRUNTIME_API FZSelfDescriptiveOptional : TZSelfDescriptiveBase<FZSelfDescriptiveOptional, FProperty, void>
 	{
-		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY(FZSelfDescriptiveOptional)
+		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_WITH_OWNS_DESCRIPTOR(FZSelfDescriptiveOptional)
 		
 		FZSelfDescriptiveOptional(FZSelfDescriptiveOptional&& other) noexcept;
 		~FZSelfDescriptiveOptional();

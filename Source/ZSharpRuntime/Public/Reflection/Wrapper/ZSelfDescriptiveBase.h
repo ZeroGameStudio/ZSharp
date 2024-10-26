@@ -31,13 +31,16 @@ namespace ZSharp
 		TUnderlyingInstance* GetUnderlyingInstance() const { return UnderlyingInstance; }
 
 	protected:
-		TZSelfDescriptiveBase(const TDescriptor* descriptor)
+		TZSelfDescriptiveBase(const TDescriptor* descriptor) : TZSelfDescriptiveBase(descriptor, false){}
+		TZSelfDescriptiveBase(const TDescriptor* descriptor, bool ownsDescriptor)
 			: Descriptor(descriptor)
 			, UnderlyingInstance(NewUnderlyingInstance(descriptor))
 			, bOwning(true)
+			, bOwnsDescriptor(ownsDescriptor)
 		{
 			if constexpr (IsUObjectDescriptor)
 			{
+				check(!ownsDescriptor);
 				GCRoot = TStrongObjectPtr<const UObject> { Descriptor };
 			}
 		}
@@ -46,6 +49,7 @@ namespace ZSharp
 			: Descriptor(descriptor)
 			, UnderlyingInstance(underlyingInstance)
 			, bOwning(false)
+			, bOwnsDescriptor(false)
 		{
 			if constexpr (IsUObjectDescriptor)
 			{
@@ -60,6 +64,8 @@ namespace ZSharp
 			UnderlyingInstance = other.UnderlyingInstance;
 			bOwning = other.bOwning;
 			other.bOwning = false;
+			bOwnsDescriptor = other.bOwnsDescriptor;
+			other.bOwnsDescriptor = false;
 		}
 		
 		~TZSelfDescriptiveBase()
@@ -74,7 +80,10 @@ namespace ZSharp
 				{
 					delete UnderlyingInstance;
 				}
+			}
 
+			if (bOwnsDescriptor)
+			{
 				if constexpr (TZSelfDescriptiveTraits<TImpl>::HasCustomDeleteDescriptor)
 				{
 					AsImpl().DeleteDescriptor();
@@ -82,6 +91,10 @@ namespace ZSharp
 				else if (!IsUObjectDescriptor)
 				{
 					delete Descriptor;
+				}
+				else
+				{
+					checkNoEntry();
 				}
 			}
 
@@ -100,6 +113,8 @@ namespace ZSharp
 			UnderlyingInstance = other.UnderlyingInstance;
 			bOwning = other.bOwning;
 			other.bOwning = false;
+			bOwnsDescriptor = other.bOwnsDescriptor;
+			other.bOwnsDescriptor = false;
 
 			return *this;
 		}
@@ -126,6 +141,7 @@ namespace ZSharp
 		const TDescriptor* Descriptor;
 		TUnderlyingInstance* UnderlyingInstance;
 		bool bOwning;
+		bool bOwnsDescriptor;
 		
 	};
 }
@@ -141,5 +157,11 @@ namespace ZSharp
 	friend Super; \
 	ThisClass(const DescriptorType* descriptor) : Super(descriptor){} \
 	ThisClass(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance) : Super(descriptor, underlyingInstance){}
+
+#define ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_WITH_OWNS_DESCRIPTOR(ThisClass) \
+	using Super = TZSelfDescriptiveBase; \
+	friend Super; \
+	ThisClass(const DescriptorType* descriptor, bool ownsDescriptor); \
+	ThisClass(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance);
 
 

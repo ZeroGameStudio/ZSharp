@@ -3,8 +3,8 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveOptional.h"
 
-ZSharp::FZSelfDescriptiveOptional::FZSelfDescriptiveOptional(const DescriptorType* descriptor)
-	: Super(descriptor)
+ZSharp::FZSelfDescriptiveOptional::FZSelfDescriptiveOptional(const DescriptorType* descriptor, bool ownsDescriptor)
+	: Super(descriptor, ownsDescriptor)
 	, Helper(new FOptionalProperty(nullptr, {}, RF_Public | RF_MarkAsNative | RF_Transient))
 	, UnderlyingPropertyVisitor(IZPropertyVisitor::Create(descriptor))
 {

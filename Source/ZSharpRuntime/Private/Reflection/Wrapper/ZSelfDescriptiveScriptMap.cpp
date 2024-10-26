@@ -3,8 +3,8 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptMap.h"
 
-ZSharp::FZSelfDescriptiveScriptMap::FZSelfDescriptiveScriptMap(const DescriptorType* descriptor)
-	: Super(descriptor)
+ZSharp::FZSelfDescriptiveScriptMap::FZSelfDescriptiveScriptMap(const DescriptorType* descriptor, bool ownsDescriptor)
+	: Super(descriptor, ownsDescriptor)
 	, KeyPropertyVisitor(IZPropertyVisitor::Create(descriptor->Key))
 	, ValuePropertyVisitor(IZPropertyVisitor::Create(descriptor->Value))
 {

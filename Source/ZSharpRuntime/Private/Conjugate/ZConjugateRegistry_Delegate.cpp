@@ -12,7 +12,7 @@ namespace ZSharp::ZConjugateRegistry_Delegate_Private
 	static TZDeclareConjugateRegistry<FZConjugateRegistry_Delegate> GDeclare;
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Delegate::Conjugate(const UFunction* signature, TFunctionRef<void(const FZSelfDescriptiveScriptDelegate&)> initialize)
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Delegate::Conjugate(const UDelegateFunction* signature, TFunctionRef<void(const FZSelfDescriptiveScriptDelegate&)> initialize)
 {
 	auto sdsd = new FZSelfDescriptiveScriptDelegate { signature };
 	initialize(*sdsd);
@@ -30,7 +30,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Delegate::Conjugate(const 
 	return {};
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Delegate::Conjugate(const UFunction* signature, const FScriptDelegate* unmanaged)
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Delegate::Conjugate(const UDelegateFunction* signature, const FScriptDelegate* unmanaged)
 {
 	auto mutableUnmanaged = const_cast<FScriptDelegate*>(unmanaged);
 	if (const FZConjugateRec* rec = ConjugateMap.Find(mutableUnmanaged))
@@ -60,7 +60,7 @@ ZSharp::FZSelfDescriptiveScriptDelegate* ZSharp::FZConjugateRegistry_Delegate::C
 
 void* ZSharp::FZConjugateRegistry_Delegate::BuildConjugate(void* userdata)
 {
-	const UFunction* signature = static_cast<UFunction*>(userdata);
+	const auto signature = static_cast<UDelegateFunction*>(userdata);
 
 	auto pSdsd = MakeUnique<FZSelfDescriptiveScriptDelegate>(signature);
     void* unmanaged = pSdsd->GetUnderlyingInstance();

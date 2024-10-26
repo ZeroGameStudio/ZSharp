@@ -32,9 +32,9 @@ namespace ZSharp
 		explicit FZConjugateRegistry_Delegate(IZMasterAssemblyLoadContext& alc) : Super(alc){}
 
 	public:
-		FZConjugateHandle Conjugate(const UFunction* signature) { return Conjugate(signature, [](const FZSelfDescriptiveScriptDelegate&){}); }
-		FZConjugateHandle Conjugate(const UFunction* signature, TFunctionRef<void(const FZSelfDescriptiveScriptDelegate&)> initialize);
-		FZConjugateHandle Conjugate(const UFunction* signature, const FScriptDelegate* unmanaged);
+		FZConjugateHandle Conjugate(const UDelegateFunction* signature) { return Conjugate(signature, [](const FZSelfDescriptiveScriptDelegate&){}); }
+		FZConjugateHandle Conjugate(const UDelegateFunction* signature, TFunctionRef<void(const FZSelfDescriptiveScriptDelegate&)> initialize);
+		FZConjugateHandle Conjugate(const UDelegateFunction* signature, const FScriptDelegate* unmanaged);
 		FZSelfDescriptiveScriptDelegate* Conjugate(FZConjugateHandle handle) const;
 
 	private:

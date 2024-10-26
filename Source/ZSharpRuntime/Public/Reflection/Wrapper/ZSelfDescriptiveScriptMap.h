@@ -19,7 +19,7 @@ namespace ZSharp
 	
 	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptMap : TZSelfDescriptiveBase<FZSelfDescriptiveScriptMap, TPair<const FProperty*, const FProperty*>, FScriptMap>
 	{
-		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY(FZSelfDescriptiveScriptMap)
+		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_WITH_OWNS_DESCRIPTOR(FZSelfDescriptiveScriptMap)
 		
 		FZSelfDescriptiveScriptMap(FZSelfDescriptiveScriptMap&& other) noexcept;
 		

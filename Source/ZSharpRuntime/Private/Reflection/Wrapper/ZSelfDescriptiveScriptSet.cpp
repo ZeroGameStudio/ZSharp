@@ -3,8 +3,8 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptSet.h"
 
-ZSharp::FZSelfDescriptiveScriptSet::FZSelfDescriptiveScriptSet(const DescriptorType* descriptor)
-	: Super(descriptor)
+ZSharp::FZSelfDescriptiveScriptSet::FZSelfDescriptiveScriptSet(const DescriptorType* descriptor, bool ownsDescriptor)
+	: Super(descriptor, ownsDescriptor)
 	, ElementPropertyVisitor(IZPropertyVisitor::Create(descriptor))
 {
 }

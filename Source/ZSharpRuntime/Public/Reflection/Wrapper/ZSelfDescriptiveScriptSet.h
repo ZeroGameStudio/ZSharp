@@ -17,7 +17,7 @@ namespace ZSharp
 	
 	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptSet : TZSelfDescriptiveBase<FZSelfDescriptiveScriptSet, FProperty, FScriptSet>
 	{
-		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY(FZSelfDescriptiveScriptSet)
+		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_WITH_OWNS_DESCRIPTOR(FZSelfDescriptiveScriptSet)
 		
 		FZSelfDescriptiveScriptSet(FZSelfDescriptiveScriptSet&& other) noexcept;
 		

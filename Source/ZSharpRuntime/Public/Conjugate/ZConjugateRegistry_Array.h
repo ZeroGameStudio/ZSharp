@@ -32,8 +32,8 @@ namespace ZSharp
 		explicit FZConjugateRegistry_Array(IZMasterAssemblyLoadContext& alc) : Super(alc){}
 
 	public:
-		FZConjugateHandle Conjugate(const FProperty* elementPropertyProto) { return Conjugate(elementPropertyProto, [](const FZSelfDescriptiveScriptArray&){}); }
-		FZConjugateHandle Conjugate(const FProperty* elementPropertyProto, TFunctionRef<void(const FZSelfDescriptiveScriptArray&)> initialize);
+		FZConjugateHandle Conjugate(const FProperty* elementProperty) { return Conjugate(elementProperty, [](const FZSelfDescriptiveScriptArray&){}); }
+		FZConjugateHandle Conjugate(const FProperty* elementProperty, TFunctionRef<void(const FZSelfDescriptiveScriptArray&)> initialize);
 		FZConjugateHandle Conjugate(const FProperty* elementProperty, const FScriptArray* unmanaged);
 		FZSelfDescriptiveScriptArray* Conjugate(FZConjugateHandle handle) const;
 

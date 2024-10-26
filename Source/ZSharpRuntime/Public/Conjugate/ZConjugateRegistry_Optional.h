@@ -32,8 +32,8 @@ namespace ZSharp
 		explicit FZConjugateRegistry_Optional(IZMasterAssemblyLoadContext& alc) : Super(alc){}
 
 	public:
-		FZConjugateHandle Conjugate(const FProperty* elementPropertyProto) { return Conjugate(elementPropertyProto, static_cast<TFunctionRef<void(const FZSelfDescriptiveOptional&)>>([](const FZSelfDescriptiveOptional&){})); }
-		FZConjugateHandle Conjugate(const FProperty* elementPropertyProto, TFunctionRef<void(const FZSelfDescriptiveOptional&)> initialize);
+		FZConjugateHandle Conjugate(const FProperty* elementProperty) { return Conjugate(elementProperty, static_cast<TFunctionRef<void(const FZSelfDescriptiveOptional&)>>([](const FZSelfDescriptiveOptional&){})); }
+		FZConjugateHandle Conjugate(const FProperty* elementProperty, TFunctionRef<void(const FZSelfDescriptiveOptional&)> initialize);
 		FZConjugateHandle Conjugate(const FProperty* elementProperty, const void* unmanaged);
 		FZSelfDescriptiveOptional* Conjugate(FZConjugateHandle handle) const;
 

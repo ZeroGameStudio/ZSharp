@@ -12,7 +12,7 @@ namespace ZSharp::ZConjugateRegistry_MulticastInlineDelegate_Private
 	static TZDeclareConjugateRegistry<FZConjugateRegistry_MulticastInlineDelegate> GDeclare;
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_MulticastInlineDelegate::Conjugate(const UFunction* signature, TFunctionRef<void(const FZSelfDescriptiveMulticastInlineScriptDelegate&)> initialize)
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_MulticastInlineDelegate::Conjugate(const UDelegateFunction* signature, TFunctionRef<void(const FZSelfDescriptiveMulticastInlineScriptDelegate&)> initialize)
 {
 	auto sdsd = new FZSelfDescriptiveMulticastInlineScriptDelegate { signature };
 	initialize(*sdsd);
@@ -30,7 +30,7 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_MulticastInlineDelegate::C
 	return {};
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_MulticastInlineDelegate::Conjugate(const UFunction* signature, const FMulticastScriptDelegate* unmanaged)
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_MulticastInlineDelegate::Conjugate(const UDelegateFunction* signature, const FMulticastScriptDelegate* unmanaged)
 {
 	auto mutableUnmanaged = const_cast<FMulticastScriptDelegate*>(unmanaged);
 	if (const FZConjugateRec* rec = ConjugateMap.Find(mutableUnmanaged))
@@ -60,7 +60,7 @@ ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate* ZSharp::FZConjugateRegis
 
 void* ZSharp::FZConjugateRegistry_MulticastInlineDelegate::BuildConjugate(void* userdata)
 {
-	const UFunction* signature = static_cast<UFunction*>(userdata);
+	const auto signature = static_cast<UDelegateFunction*>(userdata);
 
 	auto pSdsd = MakeUnique<FZSelfDescriptiveMulticastInlineScriptDelegate>(signature);
     void* unmanaged = pSdsd->GetUnderlyingInstance();

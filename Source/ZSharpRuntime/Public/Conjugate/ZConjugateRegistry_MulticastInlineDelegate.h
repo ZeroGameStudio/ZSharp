@@ -32,9 +32,9 @@ namespace ZSharp
 		explicit FZConjugateRegistry_MulticastInlineDelegate(IZMasterAssemblyLoadContext& alc) : Super(alc){}
 
 	public:
-		FZConjugateHandle Conjugate(const UFunction* signature) { return Conjugate(signature, [](const FZSelfDescriptiveMulticastInlineScriptDelegate&){}); }
-		FZConjugateHandle Conjugate(const UFunction* signature, TFunctionRef<void(const FZSelfDescriptiveMulticastInlineScriptDelegate&)> initialize);
-		FZConjugateHandle Conjugate(const UFunction* signature, const FMulticastScriptDelegate* unmanaged);
+		FZConjugateHandle Conjugate(const UDelegateFunction* signature) { return Conjugate(signature, [](const FZSelfDescriptiveMulticastInlineScriptDelegate&){}); }
+		FZConjugateHandle Conjugate(const UDelegateFunction* signature, TFunctionRef<void(const FZSelfDescriptiveMulticastInlineScriptDelegate&)> initialize);
+		FZConjugateHandle Conjugate(const UDelegateFunction* signature, const FMulticastScriptDelegate* unmanaged);
 		FZSelfDescriptiveMulticastInlineScriptDelegate* Conjugate(FZConjugateHandle handle) const;
 
 	private:

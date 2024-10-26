@@ -37,6 +37,11 @@ namespace ZSharp::ZGenericClr_Private
 		FZUnmanagedFunction* Functions;
 	};
 
+	static void HandleError(const TCHAR* error)
+	{
+		UE_LOG(LogZSharpCore, Error, TEXT("%s"), error);
+	}
+
 	static void LoadAssembliesUnderDirectory(const FString& directory, load_assembly_bytes_fn loadAssembly)
 	{
 		const FString fullDirectory = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", directory);
@@ -248,17 +253,21 @@ void ZSharp::FZGenericClr::Startup()
 
 	const FString dotnetRoot = FPaths::Combine(FPaths::ProjectDir(), ZSHARP_DOTNET_PATH_TO_PROJECT);
 
-	const FString hostFXRPath = FPaths::Combine(dotnetRoot, ZSHARP_HOSTFXR_PATH_TO_DOTNET);
-	void* hostFXR = FPlatformProcess::GetDllHandle(*hostFXRPath);
-	check(hostFXR);
+	const FString hostFxrPath = FPaths::Combine(dotnetRoot, ZSHARP_HOSTFXR_PATH_TO_DOTNET);
+	void* hostFxr = FPlatformProcess::GetDllHandle(*hostFxrPath);
+	check(hostFxr);
+	
+	hostfxr_set_error_writer_fn setErrorWriter = (hostfxr_set_error_writer_fn)FPlatformProcess::GetDllExport(hostFxr, TEXT("hostfxr_set_error_writer"));
+	check(setErrorWriter);
+	setErrorWriter(&ZGenericClr_Private::HandleError);
 
-	hostfxr_initialize_for_runtime_config_fn initializeHostFxr = (hostfxr_initialize_for_runtime_config_fn)
-		FPlatformProcess::GetDllExport(hostFXR, TEXT("hostfxr_initialize_for_runtime_config"));
+	hostfxr_initialize_for_runtime_config_fn initializeHostFxr = (hostfxr_initialize_for_runtime_config_fn)FPlatformProcess::GetDllExport(hostFxr, TEXT("hostfxr_initialize_for_runtime_config"));
 	check(initializeHostFxr);
-	hostfxr_get_runtime_delegate_fn getRuntimeDelegate = (hostfxr_get_runtime_delegate_fn)
-		FPlatformProcess::GetDllExport(hostFXR, TEXT("hostfxr_get_runtime_delegate"));
+	
+	hostfxr_get_runtime_delegate_fn getRuntimeDelegate = (hostfxr_get_runtime_delegate_fn)FPlatformProcess::GetDllExport(hostFxr, TEXT("hostfxr_get_runtime_delegate"));
 	check(getRuntimeDelegate);
-	hostfxr_close_fn closeHostFXR = (hostfxr_close_fn)FPlatformProcess::GetDllExport(hostFXR, TEXT("hostfxr_close"));
+	
+	hostfxr_close_fn closeHostFXR = (hostfxr_close_fn)FPlatformProcess::GetDllExport(hostFxr, TEXT("hostfxr_close"));
 	check(closeHostFXR);
 
 	hostfxr_handle handle = nullptr;

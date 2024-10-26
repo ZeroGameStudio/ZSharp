@@ -1,12 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.IO;
 using System.Reflection;
-using System.Runtime.Loader;
-using System.Security;
-using System.Threading;
 
 namespace ZeroGames.ZSharp.Core;
 
@@ -15,44 +10,13 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     internal const string INSTANCE_NAME = "Master";
     
-    public static MasterAssemblyLoadContext Create()
+    public static MasterAssemblyLoadContext Create(out bool alreadyExists)
     {
-        if (_instance is not null)
-        {
-            throw new InvalidOperationException("Master ALC already exists.");
-        }
-
-        return new();
+        alreadyExists = Instance is not null;
+        return Instance ?? new();
     }
 
-    public static MasterAssemblyLoadContext? Instance
-    {
-        get
-        {
-            Action @throw = () => throw new SecurityException("Code has no permission to access Master ALC.");
-        
-            StackFrame stack = new(1);
-            MethodBase? method = stack.GetMethod();
-            if (method is null)
-            {
-                @throw();
-            }
-
-            Type? type = method!.DeclaringType;
-            if (type is null)
-            {
-                @throw();
-            }
-
-            AssemblyLoadContext? callerAlc = GetLoadContext(type!.Assembly);
-            if (callerAlc != _instance && callerAlc != Default)
-            {
-                @throw();
-            }
-        
-            return _instance;
-        }
-    }
+    public static MasterAssemblyLoadContext? Instance { get; private set; }
 
     public Type? GetType(ref readonly RuntimeTypeLocator locator)
     {
@@ -207,10 +171,10 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         rec.Wref.TryGetTarget(out var conjugate);
         return conjugate;
     }
-    
+
     protected override void HandleUnload()
     {
-        if (_instance != this)
+        if (Instance != this)
         {
             throw new InvalidOperationException("Master ALC mismatch.");
         }
@@ -223,18 +187,16 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             }
         }
         
-        _instance = null;
+        Instance = null;
         
         base.HandleUnload();
     }
 
     private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 2 << 16;
 
-    private static MasterAssemblyLoadContext? _instance;
-    
     private MasterAssemblyLoadContext() : base(INSTANCE_NAME)
     {
-        _instance = this;
+        Instance = this;
 
         RegisterZCall(new ZCallDispatcher_Delegate());
         RegisterZCallResolver(new ZCallResolver_Method(), 1);

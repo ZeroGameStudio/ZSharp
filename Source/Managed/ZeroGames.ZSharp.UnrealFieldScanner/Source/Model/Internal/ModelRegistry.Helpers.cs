@@ -53,6 +53,7 @@ partial class ModelRegistry
 		return assembly.Modules.SelectMany(module => module.Types).Single(t => t.FullName == typeFullName);
 	}
 
+	[Conditional("DEBUG")]
 	private void BlockUntilDebuggerAttached()
 	{
 		while (!Debugger.IsAttached)

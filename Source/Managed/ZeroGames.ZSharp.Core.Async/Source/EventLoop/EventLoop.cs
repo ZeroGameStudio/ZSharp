@@ -118,7 +118,7 @@ internal class EventLoop : IEventLoop
 					}
 					catch (Exception ex)
 					{
-						UE_ERROR(LogTemp, $"Unhandled Exception Detected in Event Loop.\n{ex}");
+						UE_ERROR(LogZSharpScriptAsync, $"Unhandled Exception Detected in Event Loop.\n{ex}");
 					}
 				}
 					

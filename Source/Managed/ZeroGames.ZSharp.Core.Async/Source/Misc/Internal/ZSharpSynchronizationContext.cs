@@ -14,7 +14,7 @@ public sealed class ZSharpSynchronizationContext : SynchronizationContext
 	{
 		if (IsInGameThread)
 		{
-			ProtectedCall(d, state);
+			d(state);
 		}
 		else
 		{
@@ -23,18 +23,6 @@ public sealed class ZSharpSynchronizationContext : SynchronizationContext
 	}
 
 	public override void Post(SendOrPostCallback d, object? state) => _recs.Enqueue(new(d, state));
-
-	private void ProtectedCall(SendOrPostCallback d, object? state)
-	{
-		try
-		{
-			d(state);
-		}
-		catch (Exception ex)
-		{
-			UE_ERROR(LogZSharpScriptAsync, $"Unhandled Exception Detected.\n{ex}");
-		}
-	}
 	
 	private readonly record struct Rec(SendOrPostCallback Callback, object? State);
 
@@ -53,7 +41,7 @@ public sealed class ZSharpSynchronizationContext : SynchronizationContext
 	{
 		while (Instance._recs.TryDequeue(out var rec))
 		{
-			Instance.ProtectedCall(rec.Callback, rec.State);
+			rec.Callback(rec.State);
 		}
 	}
 

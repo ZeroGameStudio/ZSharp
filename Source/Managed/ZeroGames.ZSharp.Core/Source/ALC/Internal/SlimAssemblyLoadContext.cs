@@ -1,17 +1,15 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.Loader;
-
 namespace ZeroGames.ZSharp.Core;
 
 internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, ISlimAssemblyLoadContext
 {
     
-    public static SlimAssemblyLoadContext Create(string name)
+    public static SlimAssemblyLoadContext? Create(string name)
     {
-        if (name == MasterAssemblyLoadContext.INSTANCE_NAME || name == AssemblyLoadContext.Default.Name || _instanceMap.ContainsKey(name))
+        if (name == MasterAssemblyLoadContext.INSTANCE_NAME || name == Default.Name || _instanceMap.ContainsKey(name))
         {
-            throw new Exception();
+            return null;
         }
 
         return new(name);

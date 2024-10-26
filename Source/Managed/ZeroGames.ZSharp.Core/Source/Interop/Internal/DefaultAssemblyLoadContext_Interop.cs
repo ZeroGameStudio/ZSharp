@@ -8,16 +8,32 @@ internal static class DefaultAssemblyLoadContext_Interop
 {
 
     [UnmanagedCallersOnly]
-    public static unsafe ELoadAssemblyErrorCode LoadAssembly(char* assemblyName, void* args) => Uncaught.ErrorIfUncaught(() =>
+    public static unsafe ELoadAssemblyErrorCode LoadAssembly(char* assemblyName, void* args)
     {
-        return DefaultAssemblyLoadContextProxy.Instance.LoadAssembly(new(assemblyName), args, out _);
-    }, ELoadAssemblyErrorCode.UnknownError);
+        try
+        {
+            return DefaultAssemblyLoadContextProxy.Instance.LoadAssembly(new(assemblyName), args, out _);
+        }
+        catch (Exception ex)
+        {
+            UnhandledExceptionHelper.Guard(ex);
+            return ELoadAssemblyErrorCode.UnknownError;
+        }
+    }
 
     [UnmanagedCallersOnly]
-    public static unsafe EInvokeMethodErrorCode InvokeMethod(char* assemblyName, char* typeName, char* methodName, void* args) => Uncaught.ErrorIfUncaught(() =>
+    public static unsafe EInvokeMethodErrorCode InvokeMethod(char* assemblyName, char* typeName, char* methodName, void* args)
     {
-        return DefaultAssemblyLoadContextProxy.Instance.InvokeMethod(new(assemblyName), new(typeName), new(methodName), args);
-    }, EInvokeMethodErrorCode.UnknownError);
+        try
+        {
+            return DefaultAssemblyLoadContextProxy.Instance.InvokeMethod(new(assemblyName), new(typeName), new(methodName), args);
+        }
+        catch (Exception ex)
+        {
+            UnhandledExceptionHelper.Guard(ex);
+            return EInvokeMethodErrorCode.UnknownError;
+        }
+    }
 
 }
 

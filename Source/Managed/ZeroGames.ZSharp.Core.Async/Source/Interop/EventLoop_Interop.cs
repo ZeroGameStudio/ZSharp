@@ -8,9 +8,16 @@ internal static class EventLoop_Interop
 {
 
 	[UnmanagedCallersOnly]
-	public static void NotifyEvent(EEventLoopTickingGroup group, float worldDeltaSeconds, float realDeltaSeconds, double worldElapsedSeconds, double realElapsedSeconds)
+	public static void NotifyEvent(EEventLoopTickingGroup group, float worldDeltaSeconds, float realDeltaSeconds, double worldElapsedSeconds, double realElapsedSeconds, IntPtr fatalMessageBuffer)
 	{
-		EventLoop.Instance.NotifyEvent(group, worldDeltaSeconds, realDeltaSeconds, worldElapsedSeconds, realElapsedSeconds);
+		try
+		{
+			EventLoop.Instance.NotifyEvent(group, worldDeltaSeconds, realDeltaSeconds, worldElapsedSeconds, realElapsedSeconds);
+		}
+		catch (Exception ex)
+		{
+			UnhandledExceptionHelper.Guard(ex, fatalMessageBuffer);
+		}
 	}
 
 }

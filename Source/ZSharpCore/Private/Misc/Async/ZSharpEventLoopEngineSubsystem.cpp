@@ -3,6 +3,7 @@
 
 #include "ZSharpEventLoopEngineSubsystem.h"
 
+#include "ZSharpCoreLogChannels.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "Interop/ZEventLoop_Interop.h"
@@ -47,7 +48,19 @@ void UZSharpEventLoopEngineSubsystem::NotifyEvent(ZSharp::EZEventLoopTickingGrou
 		return;
 	}
 
-	const auto notify = [=]{ ZSharp::FZEventLoop_Interop::GNotifyEvent(group, worldDeltaSeconds, readDeltaSeconds, worldElapsedSeconds, realElapsedSeconds); };
+	const auto notify = [=]
+	{
+#if !UE_BUILD_SHIPPING
+		FString fatalMessage;
+		ZSharp::FZEventLoop_Interop::GNotifyEvent(group, worldDeltaSeconds, readDeltaSeconds, worldElapsedSeconds, realElapsedSeconds, &fatalMessage);
+		if (!fatalMessage.IsEmpty())
+		{
+			UE_LOG(LogZSharpCoreAsync, Fatal, TEXT("Unmanaged fatal error!!! %s"), *fatalMessage);
+		}
+#else
+		ZSharp::FZEventLoop_Interop::GNotifyEvent(group, worldDeltaSeconds, readDeltaSeconds, worldElapsedSeconds, realElapsedSeconds, nullptr);
+#endif
+	};
 
 	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
 	if (!alc)

@@ -43,7 +43,7 @@ internal static class DllEntry
     }
 
     [UnmanagedCallersOnly]
-    private static unsafe void DllMain(Args* args) => Uncaught.FatalIfUncaught(() =>
+    private static unsafe void DllMain(Args* args)
     {
         CoreGlobals_Interop.IsInGameThreadFuncPtr = (delegate* unmanaged<uint8>)args->UnmanagedProperties.IsInGameThreadFuncPtr;
         CoreGlobals_Interop.GIsServerPtr = args->UnmanagedProperties.GIsServerPtr;
@@ -51,7 +51,7 @@ internal static class DllEntry
         CoreGlobals_Interop.GIsEditorPtr = args->UnmanagedProperties.GIsEditorPtr;
         CoreGlobals_Interop.GFrameCounterPtr = args->UnmanagedProperties.GFrameCounterPtr;
         GConfig = new Config((IntPtr)args->UnmanagedProperties.GConfig);
-        
+
         for (int32 i = 0; i < args->UnmanagedFunctions.Count; ++i)
         {
             UnmanagedFunction* function = args->UnmanagedFunctions.Functions + i;
@@ -95,7 +95,7 @@ internal static class DllEntry
         // DefaultAssemblyLoadContext interop functions
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, void*, ELoadAssemblyErrorCode>)&DefaultAssemblyLoadContext_Interop.LoadAssembly;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, char*, char*, void*, EInvokeMethodErrorCode>)&DefaultAssemblyLoadContext_Interop.InvokeMethod;
-        
+
         // MasterAssemblyLoadContext interop functions
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<float, uint8>)&MasterAssemblyLoadContext_Interop.Tick;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<int32>)&MasterAssemblyLoadContext_Interop.Unload;
@@ -106,15 +106,15 @@ internal static class DllEntry
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, ZCallHandle>)&MasterAssemblyLoadContext_Interop.GetZCallHandle_Red;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, InteropRuntimeTypeHandle, IntPtr>)&MasterAssemblyLoadContext_Interop.BuildConjugate_Red;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, void>)&MasterAssemblyLoadContext_Interop.ReleaseConjugate_Red;
-        
+
         // SlimAssemblyLoadContext interop functions
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, int32>)&SlimAssemblyLoadContext_Interop.Unload;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, void*, ELoadAssemblyErrorCode>)&SlimAssemblyLoadContext_Interop.LoadAssembly;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, char*, char*, void*, EInvokeMethodErrorCode>)&SlimAssemblyLoadContext_Interop.InvokeMethod;
 
         UE_LOG(LogZSharpScriptCore, "===================== ZSharp Startup =====================");
-    });
-    
+    }
+
 }
 
 

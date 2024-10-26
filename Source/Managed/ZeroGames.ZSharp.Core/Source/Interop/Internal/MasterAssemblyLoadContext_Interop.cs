@@ -1,8 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.Core;
@@ -10,71 +7,74 @@ namespace ZeroGames.ZSharp.Core;
 internal static unsafe class MasterAssemblyLoadContext_Interop
 {
     
+    // Assume no throw.
     [UnmanagedCallersOnly]
-    public static uint8 Tick(float deltaTime) => Uncaught.ErrorIfUncaught<uint8>(() =>
+    public static uint8 Tick(float deltaTime)
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
-        if (alc is null)
+        MasterAssemblyLoadContext.Instance!.Tick(deltaTime);
+        return 1;
+    }
+
+    [UnmanagedCallersOnly]
+    public static int32 Unload()
+    {
+        try
         {
+            MasterAssemblyLoadContext.Instance!.Unload();
             return 0;
         }
-        
-        alc.Tick(deltaTime);
-        return 1;
-    }, default);
-
-    [UnmanagedCallersOnly]
-    public static int32 Unload() => Uncaught.ErrorIfUncaught(() =>
-    {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
-        if (alc is null)
+        catch (Exception ex)
         {
+            UnhandledExceptionHelper.Guard(ex);
             return -1;
         }
-
-        alc.Unload();
-        return 0;
-    }, -1);
+    }
 
     [UnmanagedCallersOnly]
-    public static ELoadAssemblyErrorCode LoadAssembly(char* assemblyName, void* args) => Uncaught.ErrorIfUncaught(() =>
+    public static ELoadAssemblyErrorCode LoadAssembly(char* assemblyName, void* args)
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
-        if (alc is null)
+        try
         {
-            return ELoadAssemblyErrorCode.AlcUnavailable;
+            return MasterAssemblyLoadContext.Instance!.LoadAssembly(new(assemblyName), args, out _);
         }
-
-        return alc.LoadAssembly(new(assemblyName), args, out _);
-    }, ELoadAssemblyErrorCode.UnknownError);
+        catch (Exception ex)
+        {
+            UnhandledExceptionHelper.Guard(ex);
+            return ELoadAssemblyErrorCode.UnknownError;
+        }
+    }
     
     [UnmanagedCallersOnly]
-    public static EInvokeMethodErrorCode InvokeMethod(char* assemblyName, char* typeName, char* methodName, void* args) => Uncaught.ErrorIfUncaught(() =>
+    public static EInvokeMethodErrorCode InvokeMethod(char* assemblyName, char* typeName, char* methodName, void* args)
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
-        if (alc is null)
+        try
         {
-            return EInvokeMethodErrorCode.AlcUnavailable;
+            return MasterAssemblyLoadContext.Instance!.InvokeMethod(new(assemblyName), new(typeName), new(methodName), args);
         }
-
-        return alc.InvokeMethod(new(assemblyName), new(typeName), new(methodName), args);
-    }, EInvokeMethodErrorCode.UnknownError);
+        catch (Exception ex)
+        {
+            UnhandledExceptionHelper.Guard(ex);
+            return EInvokeMethodErrorCode.UnknownError;
+        }
+    }
 
     [UnmanagedCallersOnly]
-    public static InteropRuntimeTypeHandle GetType(InteropRuntimeTypeLocator* locator) => Uncaught.ErrorIfUncaught(() =>
+    public static InteropRuntimeTypeHandle GetType(InteropRuntimeTypeLocator* locator)
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
-        if (alc is null)
+        try
         {
-            return new InteropRuntimeTypeHandle();
+            RuntimeTypeLocator root = new(locator);
+            return new InteropRuntimeTypeHandle(MasterAssemblyLoadContext.Instance!.GetType(ref root));
         }
-
-        RuntimeTypeLocator root = new(locator);
-        return new InteropRuntimeTypeHandle(alc.GetType(ref root));
-    }, default);
+        catch (Exception ex)
+        {
+            UnhandledExceptionHelper.Guard(ex);
+            return default;
+        }
+    }
 
     [UnmanagedCallersOnly]
-    public static EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer, IntPtr fatalMessage)
+    public static EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer, IntPtr fatalMessageBuffer)
     {
         try
         {
@@ -88,70 +88,57 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
         }
         catch (Exception ex)
         {
-            if (fatalMessage != default)
-            {
-                for (Exception? currentEx = ex; currentEx is not null; currentEx = currentEx.InnerException)
-                {
-                    if (currentEx is FatalException fatal)
-                    {
-                        using InteropString message = new(fatalMessage);
-                        message.Data = $"{fatal.Message}{Environment.NewLine}{ex}";
-                        break;
-                    }
-                }
-
-            }
-            else
-            {
-                UE_ERROR(LogZSharpScriptCore, $"Unhandled Exception Detected.\n{ex}");
-                Debugger.Break();
-            }
-
+            UnhandledExceptionHelper.Guard(ex, fatalMessageBuffer);
             return EZCallErrorCode.UnknownError;
         }
     }
     
     [UnmanagedCallersOnly]
-    public static ZCallHandle GetZCallHandle_Red(char* name) => Uncaught.ErrorIfUncaught(() =>
+    public static ZCallHandle GetZCallHandle_Red(char* name)
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
-        if (alc is null)
+        try
         {
-            return new ZCallHandle();
+            return MasterAssemblyLoadContext.Instance!.GetZCallHandle_Red(new string(name));
         }
-
-        return alc.GetZCallHandle_Red(new string(name));
-    }, default);
-    
-    [UnmanagedCallersOnly]
-    public static IntPtr BuildConjugate_Red(IntPtr unmanaged, InteropRuntimeTypeHandle type) => Uncaught.ErrorIfUncaught(() =>
-    {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
-        if (alc is null)
+        catch (Exception ex)
         {
+            UnhandledExceptionHelper.Guard(ex);
             return default;
         }
-
-        Type? managedType = type.Type;
-        if (managedType is null)
-        {
-            return default;
-        }
-
-        return alc.BuildConjugate_Red(unmanaged, managedType);
-    }, default);
+    }
     
     [UnmanagedCallersOnly]
-    public static void ReleaseConjugate_Red(IntPtr unmanaged) => Uncaught.ErrorIfUncaught(() =>
+    public static IntPtr BuildConjugate_Red(IntPtr unmanaged, InteropRuntimeTypeHandle type)
     {
-        MasterAssemblyLoadContext? alc = MasterAssemblyLoadContext.Instance;
-        if (alc is null)
+        try
         {
-            return;
-        }
+            Type? managedType = type.Type;
+            if (managedType is null)
+            {
+                return default;
+            }
 
-        alc.ReleaseConjugate_Red(unmanaged);
-    });
+            return MasterAssemblyLoadContext.Instance!.BuildConjugate_Red(unmanaged, managedType);
+        }
+        catch (Exception ex)
+        {
+            UnhandledExceptionHelper.Guard(ex);
+            return default;
+        }
+    }
+    
+    [UnmanagedCallersOnly]
+    public static void ReleaseConjugate_Red(IntPtr unmanaged)
+    {
+        try
+        {
+            MasterAssemblyLoadContext.Instance!.ReleaseConjugate_Red(unmanaged);
+        }
+        catch (Exception ex)
+        {
+            UnhandledExceptionHelper.Guard(ex);
+        }
+    }
     
     public static delegate* unmanaged<ZCallHandle, ZCallBuffer*, int32> ZCall_Black = null;
     public static delegate* unmanaged<char*, ZCallHandle> GetZCallHandle_Black = null;

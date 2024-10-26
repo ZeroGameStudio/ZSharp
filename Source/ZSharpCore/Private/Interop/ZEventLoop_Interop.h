@@ -8,7 +8,7 @@ namespace ZSharp
 {
 	struct FZEventLoop_Interop
 	{
-		inline static void(*GNotifyEvent)(EZEventLoopTickingGroup, float, float, double, double) = nullptr;
+		inline static void(*GNotifyEvent)(EZEventLoopTickingGroup, float, float, double, double, FString*) = nullptr;
 	};
 }
 

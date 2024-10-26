@@ -285,7 +285,7 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 
 	protected TimeSpan AccumulatedTime => _accumulatedSeconds.TimeSpan;
 
-	private static void DefaultErrorHandler(Exception exception) => UE_ERROR(LogTemp, $"Unhandled Exception Detected in Timer Scheduler.\n{exception}");
+	private static void DefaultErrorHandler(Exception exception) => UE_ERROR(LogZSharpScriptAsync, $"Unhandled Exception Detected in Timer Scheduler.\n{exception}");
 
 	private bool InternalIsValidTimer(Timer timer) => timer.Owner == this && (_registry.ContainsKey(timer) || _suspendedRegistry.ContainsKey(timer));
 

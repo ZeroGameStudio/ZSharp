@@ -8,26 +8,30 @@ internal static class Clr_Interop
 {
 
     [UnmanagedCallersOnly]
-    public static void CollectGarbage(int32 generation, uint8 bAggressive, uint8 bBlocking, uint8 bCompacting) => Uncaught.ErrorIfUncaught(() =>
+    public static void CollectGarbage(int32 generation, uint8 bAggressive, uint8 bBlocking, uint8 bCompacting)
     {
+        UE_LOG(LogZSharpScriptCore, "Manually call managed GC.");
         GC.Collect();
-    });
+    }
 
     [UnmanagedCallersOnly]
-    public static GCHandle CreateMasterAlc() => Uncaught.ErrorIfUncaught(() =>
+    public static GCHandle CreateMasterAlc()
     {
-        MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Create();
+        MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Create(out var alreadyExists);
+        UE_CWARNING(alreadyExists, LogZSharpScriptCore, "Master ALC already exists.");
 
         return alc.GCHandle;
-    }, default);
+    }
 
     [UnmanagedCallersOnly]
-    public static unsafe GCHandle CreateSlimAlc(char* name) => Uncaught.ErrorIfUncaught(() =>
+    public static unsafe GCHandle CreateSlimAlc(char* name)
     {
-        SlimAssemblyLoadContext alc = SlimAssemblyLoadContext.Create(new string(name));
-
-        return alc.GCHandle;
-    }, default);
+        string nameStr = new(name);
+        SlimAssemblyLoadContext? alc = SlimAssemblyLoadContext.Create(nameStr);
+        UE_CWARNING(alc is null, LogZSharpScriptCore, $"Slim ALC [{nameStr}] already exists.");
+        
+        return alc?.GCHandle ?? default;
+    }
 
 }
 

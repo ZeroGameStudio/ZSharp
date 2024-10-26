@@ -8,7 +8,7 @@ public static class CoreSettings
 	public static bool TreatManagedFatalAsError { get; } = GConfig.GetBoolOrDefault(BaseIniName, Section, nameof(TreatManagedFatalAsError));
 
 	private const string BaseIniName = "ZSharp";
-	private const string Section = "CoreSettings";
+	private const string Section = "Managed." + nameof(CoreSettings);
 
 }
 

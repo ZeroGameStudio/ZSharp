@@ -9,7 +9,7 @@ public static class AsyncSettings
 	public static bool ForceAsyncZeroTaskMethodContinueOnGameThread { get; } = GConfig.GetBoolOrDefault(BaseIniName, Section, nameof(ForceAsyncZeroTaskMethodContinueOnGameThread), true);
 	
 	private const string BaseIniName = "ZSharp";
-	private const string Section = "AsyncSettings";
+	private const string Section = "Managed." + nameof(AsyncSettings);
 
 }
 

@@ -44,7 +44,7 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 				throw new SecurityException("Code has no permission to access Master ALC.");
 			}
 
-			Type? type = method!.DeclaringType;
+			Type? type = method.DeclaringType;
 			if (type is null)
 			{
 				throw new SecurityException("Code has no permission to access Master ALC.");

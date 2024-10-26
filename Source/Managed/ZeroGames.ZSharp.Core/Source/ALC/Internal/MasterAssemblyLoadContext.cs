@@ -199,8 +199,8 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         Instance = this;
 
         RegisterZCall(new ZCallDispatcher_Delegate());
-        RegisterZCallResolver(new ZCallResolver_Method(), 1);
-        RegisterZCallResolver(new ZCallResolver_Property(), 2);
+        RegisterZCallResolver(new ZCallResolver_Method(this), 1);
+        RegisterZCallResolver(new ZCallResolver_Property(this), 2);
     }
     
     private EZCallErrorCode ZCall_Black(ZCallHandle handle, ZCallBuffer* buffer)

@@ -4,17 +4,11 @@ using System.Reflection;
 
 namespace ZeroGames.ZSharp.Core;
 
-internal class ZCallResolver_Method : IZCallResolver
+internal class ZCallResolver_Method(MasterAssemblyLoadContext alc) : IZCallResolver
 {
 	
 	public IZCallDispatcher? Resolve(string name)
 	{
-		IMasterAssemblyLoadContext? alc = IMasterAssemblyLoadContext.Instance;
-		if (alc is null)
-		{
-			return null;
-		}
-		
 		if (!name.StartsWith("m://"))
 		{
 			return null;
@@ -28,7 +22,7 @@ internal class ZCallResolver_Method : IZCallResolver
 		
 		(string assemblyName, string typeName, string methodName) = (paths[0], paths[1], paths[2]);
 		RuntimeTypeLocator locator = new(assemblyName, typeName);
-		Type? type = alc.GetType(ref locator);
+		Type? type = _alc.GetType(ref locator);
 		if (type is null)
 		{
 			return null;
@@ -57,7 +51,9 @@ internal class ZCallResolver_Method : IZCallResolver
 
 		return new ZCallDispatcher_Method { Name = name, Method = methods[0] };
 	}
-	
+
+	private MasterAssemblyLoadContext _alc = alc;
+
 }
 
 

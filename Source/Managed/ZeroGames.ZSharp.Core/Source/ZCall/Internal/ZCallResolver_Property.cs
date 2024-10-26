@@ -2,17 +2,11 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-internal class ZCallResolver_Property : IZCallResolver
+internal class ZCallResolver_Property(MasterAssemblyLoadContext alc) : IZCallResolver
 {
 	
 	public IZCallDispatcher? Resolve(string name)
 	{
-		IMasterAssemblyLoadContext? alc = IMasterAssemblyLoadContext.Instance;
-		if (alc is null)
-		{
-			return null;
-		}
-		
 		if (!name.StartsWith("p://"))
 		{
 			return null;
@@ -20,7 +14,9 @@ internal class ZCallResolver_Property : IZCallResolver
 
 		throw new NotImplementedException();
 	}
-	
+
+	private MasterAssemblyLoadContext _alc = alc;
+
 }
 
 

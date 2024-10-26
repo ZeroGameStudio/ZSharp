@@ -22,7 +22,7 @@ public static class UnhandledExceptionHelper
 			}
 		}
 
-		if (fatalMessageBuffer != default)
+		if (!CoreSettings.TreatManagedFatalAsError && fatalMessageBuffer != default)
 		{
 			using InteropString message = new(fatalMessageBuffer);
 			message.Data = string.Join(Environment.NewLine, messageHeader ?? "Managed Fatal Error!!!", fatalMessage, exception);

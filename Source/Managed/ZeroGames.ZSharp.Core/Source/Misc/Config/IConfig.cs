@@ -45,6 +45,42 @@ public static class ConfigExtensions
 	
 	public static bool TryGetBool(this IConfig @this, string baseIniName, string section, string key, [NotNullWhen(true)] out bool? value)
 		=> @this.TryGetBoolByFileName(@this.GetFileName(baseIniName), section, key, out value);
+
+	public static string GetStringOrDefault(this IConfig @this, string baseIniName, string section, string key)
+		=> @this.GetStringOrDefault(baseIniName, section, key, string.Empty);
+	
+	public static string GetStringOrDefault(this IConfig @this, string baseIniName, string section, string key, string defaultValue)
+		=> @this.TryGetString(baseIniName, section, key, out var value) ? value : defaultValue;
+	
+	public static int32 GetInt32OrDefault(this IConfig @this, string baseIniName, string section, string key)
+		=> @this.GetInt32OrDefault(baseIniName, section, key, default);
+	
+	public static int32 GetInt32OrDefault(this IConfig @this, string baseIniName, string section, string key, int32 defaultValue)
+		=> @this.TryGetInt32(baseIniName, section, key, out var value) ? value.Value : defaultValue;
+	
+	public static int64 GetInt64OrDefault(this IConfig @this, string baseIniName, string section, string key)
+		=> @this.GetInt64OrDefault(baseIniName, section, key, default);
+	
+	public static int64 GetInt64OrDefault(this IConfig @this, string baseIniName, string section, string key, int64 defaultValue)
+		=> @this.TryGetInt64(baseIniName, section, key, out var value) ? value.Value : defaultValue;
+	
+	public static float GetFloatOrDefault(this IConfig @this, string baseIniName, string section, string key)
+		=> @this.GetFloatOrDefault(baseIniName, section, key, default);
+	
+	public static float GetFloatOrDefault(this IConfig @this, string baseIniName, string section, string key, float defaultValue)
+		=> @this.TryGetFloat(baseIniName, section, key, out var value) ? value.Value : defaultValue;
+	
+	public static double GetDoubleOrDefault(this IConfig @this, string baseIniName, string section, string key)
+		=> @this.GetDoubleOrDefault(baseIniName, section, key, default);
+	
+	public static double GetDoubleOrDefault(this IConfig @this, string baseIniName, string section, string key, double defaultValue)
+		=> @this.TryGetDouble(baseIniName, section, key, out var value) ? value.Value : defaultValue;
+	
+	public static bool GetBoolOrDefault(this IConfig @this, string baseIniName, string section, string key)
+		=> @this.GetBoolOrDefault(baseIniName, section, key, default);
+	
+	public static bool GetBoolOrDefault(this IConfig @this, string baseIniName, string section, string key, bool defaultValue)
+		=> @this.TryGetBool(baseIniName, section, key, out var value) ? value.Value : defaultValue;
 	
 	public static bool TryGetInt32ByFileName(this IConfig @this, string fileName, string section, string key, [NotNullWhen(true)] out int32? value)
 	{

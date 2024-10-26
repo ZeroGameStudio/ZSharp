@@ -86,14 +86,31 @@ struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper> \
 	static FString GetExportTypeName() { return #Name; } \
 };
 
+#define DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT(Name, Wrapper, GetReferencedObject, ReferencerName) \
+struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper>, public FGCObject \
+{ \
+	FZSelfDescriptive##Name(const UClass* descriptor) : TZSelfDescriptiveObjectWrapperBase(descriptor){} \
+	FZSelfDescriptive##Name(const UClass* descriptor, WrapperType* underlyingInstance) : TZSelfDescriptiveObjectWrapperBase(descriptor, underlyingInstance){} \
+	FZSelfDescriptive##Name(FZSelfDescriptive##Name&& other) noexcept : TZSelfDescriptiveObjectWrapperBase(MoveTemp(other)){} \
+	static FString GetExportTypeName() { return #Name; } \
+	virtual void AddReferencedObjects(FReferenceCollector& Collector) override \
+	{ \
+		Collector.AddReferencedObject(GetUnderlyingInstance()->GetReferencedObject()); \
+	} \
+	virtual FString GetReferencerName() const override \
+	{ \
+		return #ReferencerName; \
+	} \
+};
+
 namespace ZSharp
 {
-	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(SubclassOf, TSubclassOf<UObject>)
+	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT(SubclassOf, TSubclassOf<UObject>, GetGCPtr, SelfDescriptiveSubclassOf)
 	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(SoftClassPtr, TSoftClassPtr<UObject>)
 	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(SoftObjectPtr, FSoftObjectPtr)
 	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(WeakObjectPtr, FWeakObjectPtr)
 	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(LazyObjectPtr, FLazyObjectPtr)
-	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(ScriptInterface, FScriptInterface)
+	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT(ScriptInterface, FScriptInterface, GetObjectRef, SelfDescriptiveScriptInterface)
 	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(StrongObjectPtr, TStrongObjectPtr<UObject>)
 }
 

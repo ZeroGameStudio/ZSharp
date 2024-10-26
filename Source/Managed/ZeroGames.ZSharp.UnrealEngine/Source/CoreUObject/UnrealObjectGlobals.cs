@@ -17,6 +17,16 @@ public static class UnrealObjectGlobals
 	
 	public static UnrealClass GetClass<T>() where T : IUnrealObject => GetClassUnchecked(typeof(T));
 
+	public static UnrealObject NewObject(UnrealClass cls, UnrealObject? outer, string? name) => ZCallEx.ZCall("ex://ObjectGlobals.NewObject", cls, outer, name is not null ? new UnrealName(name) : null, null)[3].ReadConjugate<UnrealObject>()!;
+
+	public static T NewObject<T>() where T : UnrealObject => (T)NewObject(GetClass<T>(), null, null);
+	
+	public static T NewObject<T>(UnrealObject? outer) where T : UnrealObject => (T)NewObject(GetClass<T>(), outer, null);
+	
+	public static T NewObject<T>(string? name) where T : UnrealObject => (T)NewObject(GetClass<T>(), null, name);
+	
+	public static T NewObject<T>(UnrealObject? outer, string? name) where T : UnrealObject => (T)NewObject(GetClass<T>(), outer, name);
+
 	public static UnrealObject? LoadObject(UnrealClass cls, UnrealObject? outer, string path) => ZCallEx.ZCall("ex://ObjectGlobals.LoadObject", cls, outer, new UnrealString(path), null)[3].ReadConjugate<UnrealObject>();
 
 	public static T? LoadObject<T>(string path) where T : UnrealObject => LoadObject<T>(null, path);

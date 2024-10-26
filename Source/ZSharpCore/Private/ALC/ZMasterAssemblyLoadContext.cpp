@@ -276,7 +276,7 @@ ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHan
 	EZCallErrorCode res = FZMasterAssemblyLoadContext_Interop::GZCall_Red(handle, buffer, &fatalMessage);
 	if (!fatalMessage.IsEmpty())
 	{
-		UE_LOG(LogZSharpCore, Fatal, TEXT("Unmanaged fatal error!!! %s"), *fatalMessage);
+		UE_LOG(LogZSharpCore, Fatal, TEXT("%s"), *fatalMessage);
 	}
 	
 	return res;

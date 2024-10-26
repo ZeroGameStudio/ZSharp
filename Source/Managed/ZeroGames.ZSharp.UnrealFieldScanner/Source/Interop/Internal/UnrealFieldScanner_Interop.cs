@@ -15,6 +15,7 @@ internal static class UnrealFieldScanner_Interop
 		public char* ModuleName;
 		public IntPtr OutManifest;
 		public uint8 WithMetadata;
+		public IntPtr FatalMessageBuffer;
 	}
 	
 	public static unsafe void Scan(ScanArgs* args)
@@ -30,7 +31,7 @@ internal static class UnrealFieldScanner_Interop
 		}
 		catch (Exception ex)
 		{
-			Thrower.Fatal("Unhandled exception detected during scanning unreal fields!", ex);
+			UnhandledExceptionHelper.Guard(ex, args->FatalMessageBuffer, "Unhandled exception detected during scanning unreal fields!!!");
 		}
 	}
 

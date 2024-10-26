@@ -55,7 +55,7 @@ void UZSharpEventLoopEngineSubsystem::NotifyEvent(ZSharp::EZEventLoopTickingGrou
 		ZSharp::FZEventLoop_Interop::GNotifyEvent(group, worldDeltaSeconds, readDeltaSeconds, worldElapsedSeconds, realElapsedSeconds, &fatalMessage);
 		if (!fatalMessage.IsEmpty())
 		{
-			UE_LOG(LogZSharpCoreAsync, Fatal, TEXT("Unmanaged fatal error!!! %s"), *fatalMessage);
+			UE_LOG(LogZSharpCoreAsync, Fatal, TEXT("%s"), *fatalMessage);
 		}
 #else
 		ZSharp::FZEventLoop_Interop::GNotifyEvent(group, worldDeltaSeconds, readDeltaSeconds, worldElapsedSeconds, realElapsedSeconds, nullptr);

@@ -3,11 +3,19 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptArray.h"
 
+#include "NativePropertyDescriptorCheckMacros.h"
+
 ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const DescriptorType* descriptor, bool ownsDescriptor)
 	: Super(descriptor, ownsDescriptor)
 	, ElementPropertyVisitor(IZPropertyVisitor::Create(descriptor))
 {
-
+#if DO_CHECK
+	if (ownsDescriptor)
+	{
+		const FProperty* property = descriptor;
+		CHECK_NATIVE_PROPERTY_DESCRIPTOR();
+	}
+#endif
 }
 
 ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance)

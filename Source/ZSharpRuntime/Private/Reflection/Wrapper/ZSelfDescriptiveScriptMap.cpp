@@ -3,11 +3,27 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptMap.h"
 
+#include "NativePropertyDescriptorCheckMacros.h"
+
 ZSharp::FZSelfDescriptiveScriptMap::FZSelfDescriptiveScriptMap(const DescriptorType* descriptor, bool ownsDescriptor)
 	: Super(descriptor, ownsDescriptor)
 	, KeyPropertyVisitor(IZPropertyVisitor::Create(descriptor->Key))
 	, ValuePropertyVisitor(IZPropertyVisitor::Create(descriptor->Value))
 {
+#if DO_CHECK
+	if (ownsDescriptor)
+	{
+		{
+			const FProperty* property = descriptor->Key;
+			CHECK_NATIVE_PROPERTY_DESCRIPTOR();
+		}
+
+		{
+			const FProperty* property = descriptor->Value;
+			CHECK_NATIVE_PROPERTY_DESCRIPTOR();
+		}
+	}
+#endif
 }
 
 ZSharp::FZSelfDescriptiveScriptMap::FZSelfDescriptiveScriptMap(const DescriptorType* descriptor, UnderlyingInstanceType* underlyingInstance)

@@ -3,11 +3,21 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveOptional.h"
 
+#include "NativePropertyDescriptorCheckMacros.h"
+
 ZSharp::FZSelfDescriptiveOptional::FZSelfDescriptiveOptional(const DescriptorType* descriptor, bool ownsDescriptor)
 	: Super(descriptor, ownsDescriptor)
 	, Helper(new FOptionalProperty(nullptr, {}, RF_Public | RF_MarkAsNative | RF_Transient))
 	, UnderlyingPropertyVisitor(IZPropertyVisitor::Create(descriptor))
 {
+#if DO_CHECK
+	if (ownsDescriptor)
+	{
+		const FProperty* property = descriptor;
+		CHECK_NATIVE_PROPERTY_DESCRIPTOR();
+	}
+#endif
+	
 	// FOptionalProperty owns it's ValueProperty, so we have to make a copy.
 	auto duplicatedValueProperty = CastField<FProperty>(FField::Duplicate(descriptor, nullptr));
 	Helper->SetValueProperty(duplicatedValueProperty);

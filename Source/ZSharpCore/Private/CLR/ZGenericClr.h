@@ -38,6 +38,7 @@ namespace ZSharp
 		virtual TMulticastDelegateRegistration<void(IZMasterAssemblyLoadContext*)>& OnMasterAlcStartup() override { return OnMasterAlcStartupDelegate; }
 		virtual TMulticastDelegateRegistration<void(IZMasterAssemblyLoadContext*)>& PostMasterAlcStartup() override { return PostMasterAlcStartupDelegate; }
 		virtual TMulticastDelegateRegistration<void(IZMasterAssemblyLoadContext*)>& OnMasterAlcLoaded() override { return OnMasterAlcLoadedDelegate; }
+		virtual TMulticastDelegateRegistration<void(IZMasterAssemblyLoadContext*)>& OnMasterAlcUnloading() override { return OnMasterAlcUnloadingDelegate; }
 		virtual TMulticastDelegateRegistration<void()>& OnMasterAlcUnloaded() override { return OnMasterAlcUnloadedDelegate; }
 		virtual FDelegateHandle CallOrRegisterOnMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate) override;
 		
@@ -61,6 +62,7 @@ namespace ZSharp
 		FZOnMasterAlcStartup OnMasterAlcStartupDelegate;
 		FZPostMasterAlcStartup PostMasterAlcStartupDelegate;
 		FZOnMasterAlcLoaded OnMasterAlcLoadedDelegate;
+		FZOnMasterAlcUnloading OnMasterAlcUnloadingDelegate;
 		FZOnMasterAlcUnloaded OnMasterAlcUnloadedDelegate;
 		
 	};

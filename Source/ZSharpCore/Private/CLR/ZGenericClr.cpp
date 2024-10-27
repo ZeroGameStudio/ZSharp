@@ -343,7 +343,8 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
 	
 	if (MasterAlc)
 	{
-		UE_LOG(LogZSharpCore, Fatal, TEXT("Master ALC already exists!"));
+		UE_LOG(LogZSharpCore, Warning, TEXT("Master ALC already exists!"));
+		return MasterAlc.Get();
 	}
 
 	FZGCHandle handle = FZClr_Interop::GCreateMasterAlc();
@@ -373,9 +374,10 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericClr::CreateSlimAlc(const FSt
 {
 	FWriteScopeLock _(SlimAlcMapLock);
 	
-	if (SlimAlcMap.Contains(name))
+	if (const auto pAlc = SlimAlcMap.Find(name))
 	{
-		UE_LOG(LogZSharpCore, Fatal, TEXT("Slim ALC [%s] already exists!"), *name);
+		UE_LOG(LogZSharpCore, Warning, TEXT("Slim ALC [%s] already exists!"), *name);
+		return pAlc->Get();
 	}
 
 	FZGCHandle handle = FZClr_Interop::GCreateSlimAlc(*name);

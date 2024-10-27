@@ -33,25 +33,6 @@ public abstract class ExportedObjectBase : IConjugate
 {
 
     public void Dispose() => InternalDispose(false);
-
-    public void Release()
-    {
-        if (IsBlack)
-        {
-            UE_ERROR(LogZSharpScriptEngine, "Dispose black conjugate from unmanaged code.");
-            return;
-        }
-        
-        if (IsExpired)
-        {
-            UE_ERROR(LogZSharpScriptEngine, "Dispose exported object twice.");
-            return;
-        }
-        
-        MarkAsDead();
-        
-        GC.SuppressFinalize(this);
-    }
     
     public ExplicitLifecycleExpiredRegistration RegisterOnExpired(Action<IExplicitLifecycle, object?> callback, object? state)
     {
@@ -94,7 +75,7 @@ public abstract class ExportedObjectBase : IConjugate
     public IntPtr Unmanaged { get; protected set; }
     public bool IsBlack { get; }
 
-    public bool IsExpired => Unmanaged == IConjugate.DEAD_ADDR;
+    public bool IsExpired => Unmanaged == DEAD_ADDR;
 
     private protected ExportedObjectBase()
     {
@@ -110,6 +91,25 @@ public abstract class ExportedObjectBase : IConjugate
     }
 
     ~ExportedObjectBase() => InternalDispose(true);
+    
+    void IConjugate.Release()
+    {
+        if (IsBlack)
+        {
+            UE_ERROR(LogZSharpScriptEngine, "Dispose black conjugate from unmanaged code.");
+            return;
+        }
+        
+        if (IsExpired)
+        {
+            UE_ERROR(LogZSharpScriptEngine, "Dispose exported object twice.");
+            return;
+        }
+        
+        MarkAsDead();
+        
+        GC.SuppressFinalize(this);
+    }
     
     private void TryBroadcastOnExpired()
     {
@@ -157,12 +157,12 @@ public abstract class ExportedObjectBase : IConjugate
             return;
         }
         
-        if (Volatile.Read(ref _hasDisposed))
+        if (Volatile.Read(ref _disposed))
         {
             return;
         }
         
-        Volatile.Write(ref _hasDisposed, true);
+        Volatile.Write(ref _disposed, true);
         
         MasterAlcCache.Instance.ReleaseConjugate(this);
         MarkAsDead();
@@ -177,13 +177,15 @@ public abstract class ExportedObjectBase : IConjugate
     private void MarkAsDead()
     {
         GCHandle.Free();
-        Unmanaged = IConjugate.DEAD_ADDR;
+        Unmanaged = DEAD_ADDR;
         TryBroadcastOnExpired();
     }
 
     private readonly record struct OnExpiredCallbackRec(Action<IExplicitLifecycle, object?> Callback, object? State);
     
-    private bool _hasDisposed;
+    private const IntPtr DEAD_ADDR = 0xDEAD;
+    
+    private bool _disposed;
     
     private uint64 _onExpiredRegistrationHandle;
     private bool _hasBroadcastOnExpired;

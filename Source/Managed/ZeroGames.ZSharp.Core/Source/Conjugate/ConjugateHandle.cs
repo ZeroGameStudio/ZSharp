@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-public readonly struct ConjugateHandle
+public readonly struct ConjugateHandle : IEquatable<ConjugateHandle>
 {
 
     public ConjugateHandle(IConjugate? conjugate)
@@ -12,8 +12,21 @@ public readonly struct ConjugateHandle
             _handle = conjugate.Unmanaged;
         }
     }
+    
+    public override bool Equals(object? obj)
+    {
+        return obj is ConjugateHandle other && Equals(other);
+    }
 
-    public override int32 GetHashCode() => _handle.GetHashCode();
+    public override int32 GetHashCode()
+    {
+        return _handle.GetHashCode();
+    }
+    
+    public bool Equals(ConjugateHandle other)
+    {
+        return _handle == other._handle;
+    }
 
     public T? GetTarget<T>() where T : class, IConjugate
     {

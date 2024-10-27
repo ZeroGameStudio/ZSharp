@@ -7,7 +7,7 @@ using Mono.Cecil;
 
 namespace ZeroGames.ZSharp.Core;
 
-public static class AssemblyLoadContextHelper
+internal static class AssemblyLoadContextHelper
 {
 	
 	public static unsafe ELoadAssemblyErrorCode LoadAssembly(AssemblyLoadContext alc, IAssemblyResolver resolver, bool implicitly, string name, void* args, out Assembly? assembly)
@@ -58,7 +58,7 @@ public static class AssemblyLoadContextHelper
         }
         catch (Exception ex)
         {
-            UE_ERROR(LogZSharpScriptCore, $"Unhandled DllMain Exception:\n{ex}");
+            UnhandledExceptionHelper.Guard(ex, "Unhandled DllMain exception.");
             return ELoadAssemblyErrorCode.UnhandledDllMainException;
         }
 	}

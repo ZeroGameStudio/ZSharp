@@ -6,7 +6,7 @@ namespace ZeroGames.ZSharp.Core;
 
 public interface IGCHandle
 {
-    public GCHandle GCHandle { get; }
+	GCHandle GCHandle { get; }
 }
 
 

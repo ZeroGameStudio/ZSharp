@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace ZeroGames.ZSharp.Core;
 
-internal class ZCallDispatcher_Method : IZCallDispatcher
+internal sealed class ZCallDispatcher_Method(string name, MethodInfo method) : IZCallDispatcher
 {
 	
 	public unsafe EZCallErrorCode Dispatch(ZCallBuffer* buffer)
@@ -48,9 +48,9 @@ internal class ZCallDispatcher_Method : IZCallDispatcher
         return EZCallErrorCode.Succeed;
 	}
 
-	public required string Name { get; init; }
-	public required MethodInfo Method { get; init; }
-	
+	public string Name { get; } = name;
+	public MethodInfo Method { get; } = method;
+
 }
 
 

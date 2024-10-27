@@ -14,7 +14,7 @@ public static class Thrower
 	{
 		if (string.IsNullOrWhiteSpace(message) && innerException == default)
 		{
-			throw _defaultFatalException ??= new();
+			throw _defaultFatalException;
 		}
 		
 		throw new FatalException(message, innerException);
@@ -31,15 +31,15 @@ public static class Thrower
 	
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	[DoesNotReturn]
-	public static Exception NoEntry() => throw (_noEntryException ??= new());
+	public static Exception NoEntry() => throw _noEntryException;
 	
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	[DoesNotReturn]
-	public static Exception NotImplemented() => throw (_notImplementedException ??= new());
+	public static Exception NotImplemented() => throw _notImplementedException;
 
-	private static FatalException? _defaultFatalException;
-	private static InvalidOperationException? _noEntryException;
-	private static NotImplementedException? _notImplementedException;
+	private static readonly FatalException _defaultFatalException = new();
+	private static readonly InvalidOperationException _noEntryException = new();
+	private static readonly NotImplementedException _notImplementedException = new();
 	
 }
 

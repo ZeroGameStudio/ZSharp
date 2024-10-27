@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-internal class ZCallDispatcher_Property : IZCallDispatcher
+internal sealed class ZCallDispatcher_Property(string name) : IZCallDispatcher
 {
 	
 	public unsafe EZCallErrorCode Dispatch(ZCallBuffer* buffer)
@@ -10,8 +10,8 @@ internal class ZCallDispatcher_Property : IZCallDispatcher
 		throw new NotImplementedException();
 	}
 
-	public required string Name { get; init; }
-	
+	public string Name { get; } = name;
+
 }
 
 

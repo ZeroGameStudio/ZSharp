@@ -1,15 +1,22 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
-using Mono.Cecil;
 
 namespace ZeroGames.ZSharp.Core;
 
 internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZSharpAssemblyLoadContext
 {
+
+    public unsafe ELoadAssemblyErrorCode LoadAssembly(string name, void* args, out Assembly? assembly) => InternalLoadAssembly(name, args, out assembly, false);
+
+    public unsafe EInvokeMethodErrorCode InvokeMethod(string assemblyName, string typeName, string methodName, void* args)
+    {
+        return AssemblyLoadContextHelper.InvokeMethod(this, assemblyName, typeName, methodName, args);
+    }
+    
+    public GCHandle GCHandle { get; }
     
     protected ZSharpAssemblyLoadContextBase(string name) : base(name, true)
     {
@@ -20,15 +27,6 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
         Resolving += HandleResolve;
         Unloading += _ => HandleUnload();
     }
-
-    public unsafe ELoadAssemblyErrorCode LoadAssembly(string name, void* args, out Assembly? assembly) => InternalLoadAssembly(name, args, out assembly, false);
-
-    public unsafe EInvokeMethodErrorCode InvokeMethod(string assemblyName, string typeName, string methodName, void* args)
-    {
-        return AssemblyLoadContextHelper.InvokeMethod(this, assemblyName, typeName, methodName, args);
-    }
-    
-    public GCHandle GCHandle { get; }
 
     protected virtual void HandleUnload(){}
     
@@ -43,7 +41,7 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
         return assembly;
     }
 
-    private IAssemblyResolver _resolver;
+    private readonly IAssemblyResolver _resolver;
 
 }
 

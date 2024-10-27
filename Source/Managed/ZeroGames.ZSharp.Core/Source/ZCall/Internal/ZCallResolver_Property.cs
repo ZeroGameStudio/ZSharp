@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-internal class ZCallResolver_Property(MasterAssemblyLoadContext alc) : IZCallResolver
+internal sealed class ZCallResolver_Property(MasterAssemblyLoadContext alc) : IZCallResolver
 {
 	
 	public IZCallDispatcher? Resolve(string name)
@@ -15,7 +15,7 @@ internal class ZCallResolver_Property(MasterAssemblyLoadContext alc) : IZCallRes
 		throw new NotImplementedException();
 	}
 
-	private MasterAssemblyLoadContext _alc = alc;
+	private readonly MasterAssemblyLoadContext _alc = alc;
 
 }
 

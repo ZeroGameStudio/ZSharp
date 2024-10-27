@@ -7,6 +7,6 @@ namespace System.Runtime.CompilerServices;
 /// but it's no longer found, may have been removed? (Thanks, Microsoft!)
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
-internal class CallerColumnNumberAttribute : Attribute;
+internal sealed class CallerColumnNumberAttribute : Attribute;
 
 

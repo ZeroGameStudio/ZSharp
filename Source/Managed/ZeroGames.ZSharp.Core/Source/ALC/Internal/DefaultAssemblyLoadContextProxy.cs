@@ -5,7 +5,7 @@ using System.Runtime.Loader;
 
 namespace ZeroGames.ZSharp.Core;
 
-internal class DefaultAssemblyLoadContextProxy
+internal sealed class DefaultAssemblyLoadContextProxy
 {
 
 	public static DefaultAssemblyLoadContextProxy Instance { get; } = new();
@@ -25,7 +25,7 @@ internal class DefaultAssemblyLoadContextProxy
 		_resolver = IAssemblyResolver.Create();
 	}
 
-	private IAssemblyResolver _resolver;
+	private readonly IAssemblyResolver _resolver;
 
 }
 

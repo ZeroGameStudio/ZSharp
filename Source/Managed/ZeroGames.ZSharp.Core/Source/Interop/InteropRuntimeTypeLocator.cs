@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 namespace ZeroGames.ZSharp.Core;
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct InteropRuntimeTypeLocator
+public readonly unsafe struct InteropRuntimeTypeLocator
 {
-	public char* AssemblyName;
-	public char* TypeName;
-	public InteropRuntimeTypeLocator* TypeParameters;
-	public int32 NumTypeParameters;
+	public readonly char* AssemblyName;
+	public readonly char* TypeName;
+	public readonly InteropRuntimeTypeLocator* TypeParameters;
+	public readonly int32 NumTypeParameters;
 }
 
 

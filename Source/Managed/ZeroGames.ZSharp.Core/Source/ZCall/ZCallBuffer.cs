@@ -701,15 +701,9 @@ public struct ZCallBufferSlot
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct ZCallBuffer
+public readonly unsafe struct ZCallBuffer(ZCallBufferSlot* slots, int32 numSlots)
 {
-
-	public ZCallBuffer(ZCallBufferSlot* slots, int32 numSlots)
-	{
-		_slots = slots;
-		_numSlots = numSlots;
-	}
-
+	
 	public ref ZCallBufferSlot this[int32 index]
 	{
 		get
@@ -730,8 +724,8 @@ public unsafe struct ZCallBuffer
 
 	public int32 NumSlots => _numSlots;
 	
-    private ZCallBufferSlot* _slots;
-    private int32 _numSlots;
+    private readonly ZCallBufferSlot* _slots = slots;
+    private readonly int32 _numSlots = numSlots;
     
 }
 

@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace ZeroGames.ZSharp.Core;
 
-internal class ZCallResolver_Method(MasterAssemblyLoadContext alc) : IZCallResolver
+internal sealed class ZCallResolver_Method(MasterAssemblyLoadContext alc) : IZCallResolver
 {
 	
 	public IZCallDispatcher? Resolve(string name)
@@ -49,10 +49,10 @@ internal class ZCallResolver_Method(MasterAssemblyLoadContext alc) : IZCallResol
 			return null;
 		}
 
-		return new ZCallDispatcher_Method { Name = name, Method = methods[0] };
+		return new ZCallDispatcher_Method(name, methods[0]);
 	}
 
-	private MasterAssemblyLoadContext _alc = alc;
+	private readonly MasterAssemblyLoadContext _alc = alc;
 
 }
 

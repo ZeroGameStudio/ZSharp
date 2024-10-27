@@ -26,13 +26,13 @@ internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, I
 
         _instanceMap.Remove(Name!);
     }
-
-    private static readonly Dictionary<string, SlimAssemblyLoadContext> _instanceMap = new();
-
+    
     private SlimAssemblyLoadContext(string name) : base(name)
     {
         _instanceMap[name] = this;
     }
+
+    private static readonly Dictionary<string, SlimAssemblyLoadContext> _instanceMap = new();
     
 }
 

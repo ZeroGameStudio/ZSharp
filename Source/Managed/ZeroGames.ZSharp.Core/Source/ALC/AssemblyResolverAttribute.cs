@@ -3,9 +3,9 @@
 namespace ZeroGames.ZSharp.Core;
 
 [AttributeUsage(AttributeTargets.Assembly)]
-public class AssemblyResolverAttribute(Type type) : Attribute
+public sealed class AssemblyResolverAttribute(Type type) : Attribute
 {
-	public Type ResolverType => type;
+	public Type ResolverType { get; } = type;
 }
 
 

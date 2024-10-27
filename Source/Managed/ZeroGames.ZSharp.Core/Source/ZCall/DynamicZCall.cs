@@ -2,31 +2,34 @@
 
 namespace ZeroGames.ZSharp.Core;
 
-public readonly struct DynamicZCallResult
+public readonly struct DynamicZCallResult(ZCallBufferSlot[] slots)
 {
-	public required int32 Return { get; init; }
-	public required ZCallBufferSlot[] Slots { get; init; }
 
+	public int32 NumSlots => _slots.Length;
+	
 	public ref readonly ZCallBufferSlot this[int32 index]
 	{
 		get
 		{
 			if (index < 0)
 			{
-				index = Slots.Length + index;
+				index = _slots.Length + index;
 			}
 			
-			if (index < 0 || index >= Slots.Length)
+			if (index < 0 || index >= _slots.Length)
 			{
 				throw new ArgumentOutOfRangeException();
 			}
 
-			return ref Slots[index];
+			return ref _slots[index];
 		}
 	}
+
+	private readonly ZCallBufferSlot[] _slots = slots;
+
 }
 
-public static class ZCallEx
+public static class DynamicZCall
 {
 
 	public static DynamicZCallResult ZCall(ZCallHandle handle, params object?[] parameters) => InternalZCall(MasterAssemblyLoadContext.Instance!, handle, parameters);
@@ -65,7 +68,7 @@ public static class ZCallEx
 			alc.ZCall(handle, &buffer);
 		}
 		
-		return new() { Return = 0, Slots = slots };
+		return new(slots);
 	}
 	
 	private static unsafe DynamicZCallResult InternalZCall(this IConjugate @this, IMasterAssemblyLoadContext alc, ZCallHandle handle, params object?[] parameters)
@@ -83,7 +86,7 @@ public static class ZCallEx
 			alc.ZCall(handle, &buffer);
 		}
 		
-		return new() { Return = 0, Slots = slots };
+		return new(slots);
 	}
 	
 }

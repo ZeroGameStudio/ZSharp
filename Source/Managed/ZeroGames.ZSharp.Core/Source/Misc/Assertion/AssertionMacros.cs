@@ -235,12 +235,12 @@ public static class AssertionMacros
 			}
 		}
 		
-		private static HashSet<AssemblyLoadContext> _relevantContexts = new();
+		private static readonly HashSet<AssemblyLoadContext> _relevantContexts = new();
 	}
 
-	private static HashSet<Coordinate> _reentryCache = new();
-	private static HashSet<Coordinate> _recursionCache = new();
-	private static HashSet<Coordinate> _ensureCache = new();
+	private static readonly HashSet<Coordinate> _reentryCache = new();
+	private static readonly HashSet<Coordinate> _recursionCache = new();
+	private static readonly HashSet<Coordinate> _ensureCache = new();
 	
 }
 

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace ZeroGames.ZSharp.Core;
 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct CommonMethodArgs
+internal readonly unsafe struct CommonMethodArgs
 {
     public string[] Parse()
     {
@@ -18,8 +18,8 @@ internal unsafe struct CommonMethodArgs
         return args;
     }
     
-    public int32 Argc;
-    public char** Argv;
+    public readonly int32 Argc;
+    public readonly char** Argv;
 }
 
 

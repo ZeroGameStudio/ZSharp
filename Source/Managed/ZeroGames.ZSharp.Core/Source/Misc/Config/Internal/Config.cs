@@ -4,14 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ZeroGames.ZSharp.Core;
 
-internal sealed class Config : IConfig
+internal sealed class Config(IntPtr unmanaged) : IConfig
 {
 	
-	public Config(IntPtr unmanaged)
-	{
-		_unmanaged = unmanaged;
-	}
-
 	public unsafe string GetFileName(string baseIniName)
 	{
 		using InteropString fileName = new();
@@ -84,9 +79,9 @@ internal sealed class Config : IConfig
 		
 		return suc;
 	}
-
-	private readonly IntPtr _unmanaged;
-
+	
+	private readonly IntPtr _unmanaged = unmanaged;
+	
 }
 
 

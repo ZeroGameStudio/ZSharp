@@ -3,6 +3,6 @@
 namespace ZeroGames.ZSharp.Core;
 
 [AttributeUsage(AttributeTargets.Method)]
-public class DllMainAttribute : Attribute;
+public sealed class DllMainAttribute : Attribute;
 
 

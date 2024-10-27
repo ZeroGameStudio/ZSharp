@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.Core;
 
 public interface IZCallAttribute
 {
-	public string? Name { get; }
+	string? Name { get; }
 }
 
 

@@ -3,10 +3,9 @@
 namespace ZeroGames.ZSharp.Core;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class ConjugateRegistryIdAttribute : Attribute
+public sealed class ConjugateRegistryIdAttribute(uint16 id) : Attribute
 {
-	public ConjugateRegistryIdAttribute(uint16 id) => Id = id;
-	public uint16 Id { get; }
+	public uint16 Id { get; } = id;
 }
 
 

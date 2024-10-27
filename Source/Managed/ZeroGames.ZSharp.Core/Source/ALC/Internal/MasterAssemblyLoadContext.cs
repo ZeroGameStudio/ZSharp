@@ -7,8 +7,6 @@ namespace ZeroGames.ZSharp.Core;
 
 internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadContextBase, IMasterAssemblyLoadContext
 {
-
-    internal const string INSTANCE_NAME = "Master";
     
     public static MasterAssemblyLoadContext Create(out bool alreadyExists)
     {
@@ -153,7 +151,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             throw new InvalidOperationException($"Conjugate [{unmanaged}] does not exists.");
         }
 
-        if (!rec.Wref.TryGetTarget(out var conjugate))
+        if (!rec.WeakRef.TryGetTarget(out var conjugate))
         {
             throw new InvalidOperationException($"Conjugate [{unmanaged}] has already dead.");
         }
@@ -168,9 +166,11 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             throw new InvalidOperationException($"Conjugate [{unmanaged}] does not exists.");
         }
 
-        rec.Wref.TryGetTarget(out var conjugate);
+        rec.WeakRef.TryGetTarget(out var conjugate);
         return conjugate;
     }
+    
+    public const string INSTANCE_NAME = "Master";
 
     protected override void HandleUnload()
     {
@@ -181,7 +181,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
         foreach (var pair in _conjugateMap)
         {
-            if (pair.Value.Wref.TryGetTarget(out var conjugate) && conjugate.IsBlack)
+            if (pair.Value.WeakRef.TryGetTarget(out var conjugate) && conjugate.IsBlack)
             {
                 conjugate.Dispose();
             }
@@ -191,8 +191,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         
         base.HandleUnload();
     }
-
-    private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 2 << 16;
 
     private MasterAssemblyLoadContext() : base(INSTANCE_NAME)
     {
@@ -269,15 +267,17 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
         return 0;
     }
-
-    private Dictionary<ZCallHandle, IZCallDispatcher> _zcallMap = new();
-    private Dictionary<string, ZCallHandle> _zcallName2Handle = new();
-    private List<(IZCallResolver Resolver, uint64 Priority)> _zcallResolverLink = new();
-    private Dictionary<IntPtr, ConjugateRec> _conjugateMap = new(DEFAULT_CONJUGATE_MAP_CAPACITY);
-    private Dictionary<Type, uint16> _conjugateRegistryIdLookup = new();
-    private ConcurrentQueue<IConjugate> _pendingDisposeConjugates = new();
     
-    private readonly record struct ConjugateRec(uint16 RegistryId, WeakReference<IConjugate> Wref);
+    private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 1 << 16;
+
+    private readonly Dictionary<ZCallHandle, IZCallDispatcher> _zcallMap = new();
+    private readonly Dictionary<string, ZCallHandle> _zcallName2Handle = new();
+    private readonly List<(IZCallResolver Resolver, uint64 Priority)> _zcallResolverLink = new();
+    private readonly Dictionary<IntPtr, ConjugateRec> _conjugateMap = new(DEFAULT_CONJUGATE_MAP_CAPACITY);
+    private readonly Dictionary<Type, uint16> _conjugateRegistryIdLookup = new();
+    private readonly ConcurrentQueue<IConjugate> _pendingDisposeConjugates = new();
+    
+    private readonly record struct ConjugateRec(uint16 RegistryId, WeakReference<IConjugate> WeakRef);
 
 }
 

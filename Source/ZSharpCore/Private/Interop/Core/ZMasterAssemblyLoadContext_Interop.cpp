@@ -1,9 +1,8 @@
 // Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZMasterAssemblyLoadContext_Interop.h"
 
-#include "ZSehHelper.h"
+#include "Interop/Misc/ZSehHelper.h"
 #include "ALC/ZMasterAssemblyLoadContext.h"
 #include "CLR/ZGenericClr.h"
 

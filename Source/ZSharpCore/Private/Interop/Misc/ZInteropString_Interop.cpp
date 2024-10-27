@@ -1,6 +1,5 @@
 // Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZInteropString_Interop.h"
 
 FString& ZSharp::FZInteropString_Interop::Alloc(const TCHAR* data)
@@ -22,3 +21,5 @@ void ZSharp::FZInteropString_Interop::SetData(FString& address, const TCHAR* dat
 {
 	address = data;
 }
+
+

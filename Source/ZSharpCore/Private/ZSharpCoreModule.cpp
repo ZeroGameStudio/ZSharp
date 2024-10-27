@@ -65,12 +65,12 @@ IMPLEMENT_MODULE(FZSharpCoreModule, ZSharpCore)
 
 void FZSharpCoreModule::StartupModule()
 {
-	FZSharpClr::Get().Startup();
+	ZSharp::FZSharpClr::Get().Startup();
 }
 
 void FZSharpCoreModule::ShutdownModule()
 {
-	FZSharpClr::Get().Shutdown();
+	ZSharp::FZSharpClr::Get().Shutdown();
 }
 
 

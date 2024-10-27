@@ -6,7 +6,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPCORE_API IZDefaultAssemblyLoadContext : public IZAssemblyLoadContext
+	class IZDefaultAssemblyLoadContext : public IZAssemblyLoadContext
 	{
 		// These operations are banned on default ALC.
 		virtual FZGCHandle GetGCHandle() const override final { checkNoEntry(); return {}; }

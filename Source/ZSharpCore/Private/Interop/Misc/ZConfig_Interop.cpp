@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZConfig_Interop.h"
 
 void ZSharp::FZConfig_Interop::GetFileName(FConfigCacheIni* config, const TCHAR* baseIniName, FString& fileName)

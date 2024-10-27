@@ -22,11 +22,11 @@ namespace ZSharp
  	 *
  	 * @see IZAssemblyLoadContext
  	 */
-	class ZSHARPCORE_API IZSharpClr
+	class IZSharpClr
 	{
 	public:
 		/** Get the unique CLR object for the current process. */
-		static IZSharpClr& Get();
+		ZSHARPCORE_API static IZSharpClr& Get();
 		
 	public:
 		/** Call managed GC. */
@@ -46,8 +46,8 @@ namespace ZSharp
 		virtual FDelegateHandle CallOrRegisterOnMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate) = 0;
 		// Helpers
 	public:
-		int32 Run(const FString& name, void* args = nullptr, const FString& alcName = "");
-		int32 RunAsync(const FString& name, void* args = nullptr, const FString& alcName = "");
+		ZSHARPCORE_API int32 Run(const FString& name, void* args = nullptr, const FString& alcName = "");
+		ZSHARPCORE_API int32 RunAsync(const FString& name, void* args = nullptr, const FString& alcName = "");
 
 	public:
 		virtual ~IZSharpClr(){}

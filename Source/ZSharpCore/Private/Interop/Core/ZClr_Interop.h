@@ -13,3 +13,5 @@ namespace ZSharp
 		inline static FZGCHandle(*GCreateSlimAlc)(const TCHAR*) = nullptr;
 	};
 }
+
+

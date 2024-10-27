@@ -8,7 +8,7 @@ namespace ZSharp
 {
 	struct FZCallBuffer;
 	
-	class ZSHARPCORE_API IZCallDispatcher
+	class IZCallDispatcher
 	{
 	public:
 		virtual ~IZCallDispatcher(){}

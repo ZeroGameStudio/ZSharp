@@ -7,7 +7,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPCORE_API IZAssemblyLoadContext : public IZGCHandle
+	class IZAssemblyLoadContext : public IZGCHandle
 	{
 	public:
 		virtual void Unload() = 0;

@@ -7,7 +7,7 @@ namespace ZSharp
 	class IZConjugateRegistry;
 	
 	template <typename T>
-	concept CZConjugateRegistryImpl = (bool)TPointerIsConvertibleFromTo<T, IZConjugateRegistry>::Value;
+	concept CZConjugateRegistryImpl = static_cast<bool>(TPointerIsConvertibleFromTo<T, IZConjugateRegistry>::Value);
 }
 
 

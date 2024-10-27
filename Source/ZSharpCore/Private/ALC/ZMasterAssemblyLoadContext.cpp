@@ -1,10 +1,9 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZMasterAssemblyLoadContext.h"
 
 #include "ZSharpCoreLogChannels.h"
-#include "Interop/ZMasterAssemblyLoadContext_Interop.h"
+#include "Interop/Core/ZMasterAssemblyLoadContext_Interop.h"
 #include "Interop/ZRuntimeTypeLocator.h"
 #include "ZCall/IZCallDispatcher.h"
 #include "Conjugate/ZConjugateRegistryDeclarations.h"

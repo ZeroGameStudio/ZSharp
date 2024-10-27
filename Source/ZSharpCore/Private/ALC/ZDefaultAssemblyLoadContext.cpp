@@ -1,9 +1,8 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZDefaultAssemblyLoadContext.h"
 
-#include "Interop/ZDefaultAssemblyLoadContext_Interop.h"
+#include "Interop/Core/ZDefaultAssemblyLoadContext_Interop.h"
 
 ZSharp::EZLoadAssemblyErrorCode ZSharp::FZDefaultAssemblyLoadContext::LoadAssembly(const FString& assemblyName, void* args)
 {

@@ -8,7 +8,7 @@
 
 class UZSharpEventLoopWorldSubsystem;
 
-struct FZSharpEventLoopTickFunction : public FTickFunction
+struct FZSharpEventLoopTickFunction final : public FTickFunction
 {
 	
 	FZSharpEventLoopTickFunction(UZSharpEventLoopWorldSubsystem* owner, ETickingGroup group)
@@ -34,7 +34,7 @@ private:
 	
 };
 
-UCLASS()
+UCLASS(MinimalAPI, Transient)
 class UZSharpEventLoopWorldSubsystem : public UWorldSubsystem, public FTickableGameObject
 {
 	GENERATED_BODY()

@@ -22,7 +22,7 @@ namespace ZSharp
 		TArray<FZRuntimeTypeLocatorWrapper> TypeParameters;
 	};
 	
-	class ZSHARPCORE_API IZMasterAssemblyLoadContext : public IZAssemblyLoadContext
+	class IZMasterAssemblyLoadContext : public IZAssemblyLoadContext
 	{
 	public:
 		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeLocatorWrapper& locator) = 0;

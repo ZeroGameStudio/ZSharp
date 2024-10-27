@@ -1,12 +1,8 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZSharpEventLoopWorldSubsystem.h"
 
 #include "ZSharpEventLoopEngineSubsystem.h"
-#include "ALC/IZMasterAssemblyLoadContext.h"
-#include "CLR/IZSharpClr.h"
-#include "Interop/ZEventLoop_Interop.h"
 
 void FZSharpEventLoopTickFunction::Run() const
 {

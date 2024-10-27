@@ -1,9 +1,8 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZSlimAssemblyLoadContext.h"
 
-#include "Interop/ZSlimAssemblyLoadContext_Interop.h"
+#include "Interop/Core/ZSlimAssemblyLoadContext_Interop.h"
 
 void ZSharp::FZSlimAssemblyLoadContext::Unload()
 {

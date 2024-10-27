@@ -1,24 +1,23 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "CLR/ZGenericClr.h"
 
 #include "hostfxr.h"
 #include "coreclr_delegates.h"
 #include "ZSharpCoreLogChannels.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
-#include "Interop/ZLog_Interop.h"
-#include "Interop/ZClr_Interop.h"
-#include "Interop/ZGCHandle_Interop.h"
-#include "Interop/ZInteropString_Interop.h"
+#include "Interop/Misc/ZLog_Interop.h"
+#include "Interop/Core/ZClr_Interop.h"
+#include "Interop/Core/ZGCHandle_Interop.h"
+#include "Interop/Misc/ZInteropString_Interop.h"
 #include "ALC/ZMasterAssemblyLoadContext.h"
-#include "Interop/ZMasterAssemblyLoadContext_Interop.h"
+#include "Interop/Core/ZMasterAssemblyLoadContext_Interop.h"
 #include "Interop/ZGCHandle.h"
 #include "ALC/ZSlimAssemblyLoadContext.h"
-#include "Interop/ZConfig_Interop.h"
-#include "Interop/ZDefaultAssemblyLoadContext_Interop.h"
-#include "Interop/ZEventLoop_Interop.h"
-#include "Interop/ZSlimAssemblyLoadContext_Interop.h"
+#include "Interop/Misc/ZConfig_Interop.h"
+#include "Interop/Core/ZDefaultAssemblyLoadContext_Interop.h"
+#include "Interop/Async/ZEventLoop_Interop.h"
+#include "Interop/Core/ZSlimAssemblyLoadContext_Interop.h"
 #include "Interop/Engine/ZBuild_Interop.h"
 #include "Interop/Engine/ZPath_Interop.h"
 

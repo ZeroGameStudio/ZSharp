@@ -1,12 +1,11 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZSharpEventLoopEngineSubsystem.h"
 
 #include "ZSharpCoreLogChannels.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
-#include "CLR/IZSharpClr.h"
-#include "Interop/ZEventLoop_Interop.h"
+#include "CLR/ZSharpClr.h"
+#include "Interop/Async/ZEventLoop_Interop.h"
 
 UZSharpEventLoopEngineSubsystem::UZSharpEventLoopEngineSubsystem()
 	: TickingGroupMask(false, static_cast<int32>(ZSharp::EZEventLoopTickingGroup::Num))
@@ -62,7 +61,7 @@ void UZSharpEventLoopEngineSubsystem::NotifyEvent(ZSharp::EZEventLoopTickingGrou
 #endif
 	};
 
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc();
+	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::FZSharpClr::Get().GetMasterAlc();
 	if (!alc)
 	{
 		notify();

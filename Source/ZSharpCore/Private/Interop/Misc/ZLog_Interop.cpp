@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZLog_Interop.h"
 
 #include "Misc/Log/ZLogCategoryRegistry.h"

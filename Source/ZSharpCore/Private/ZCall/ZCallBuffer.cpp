@@ -1,6 +1,5 @@
 // Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZCall/ZCallBuffer.h"
 
 FString ZSharp::ToString(EZCallBufferSlotType type)

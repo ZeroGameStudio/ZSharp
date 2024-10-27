@@ -6,7 +6,7 @@ namespace ZSharp
 {
 	class IZCallDispatcher;
 	
-	class ZSHARPCORE_API IZCallResolver
+	class IZCallResolver
 	{
 	public:
 		virtual ~IZCallResolver(){}
@@ -14,3 +14,5 @@ namespace ZSharp
 		virtual IZCallDispatcher* Resolve(const FString& name) const = 0;
 	};
 }
+
+

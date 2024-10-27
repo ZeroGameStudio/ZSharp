@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZLogCategoryRegistry.h"
 
 ZSharp::FZLogCategoryRegistry& ZSharp::FZLogCategoryRegistry::Get()

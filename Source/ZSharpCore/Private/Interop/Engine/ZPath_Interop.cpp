@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZPath_Interop.h"
 
 #include "Interfaces/IPluginManager.h"

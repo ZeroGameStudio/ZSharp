@@ -4,6 +4,9 @@
 
 #include "ZGenericClr.h"
 
-using FZSharpClr = ZSharp::FZGenericClr;
+namespace ZSharp
+{
+	using FZSharpClr = FZGenericClr;
+}
 
 

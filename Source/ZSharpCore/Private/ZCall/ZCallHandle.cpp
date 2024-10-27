@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZCall/ZCallHandle.h"
 
 ZSharp::FZCallHandle ZSharp::FZCallHandle::Alloc()

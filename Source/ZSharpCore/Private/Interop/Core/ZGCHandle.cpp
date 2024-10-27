@@ -14,3 +14,5 @@ void ZSharp::FZGCHandle::Free()
 	FZGCHandle_Interop::GFree(*this);
 	Handle = nullptr;
 }
+
+

@@ -15,22 +15,16 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 		{
 			StackFrame stack = new(1);
 			MethodBase? method = stack.GetMethod();
-			if (method is null)
-			{
-				throw new SecurityException("Code has no permission to access Master ALC.");
-			}
-
+			check(method is not null);
+			
 			Type? type = method.DeclaringType;
-			if (type is null)
-			{
-				throw new SecurityException("Code has no permission to access Master ALC.");
-			}
+			check(type is not null);
 
 			MasterAssemblyLoadContext? result = MasterAssemblyLoadContext.Instance;
-			AssemblyLoadContext? callerAlc = AssemblyLoadContext.GetLoadContext(type!.Assembly);
+			AssemblyLoadContext? callerAlc = AssemblyLoadContext.GetLoadContext(type.Assembly);
 			if (callerAlc != result && callerAlc != AssemblyLoadContext.Default)
 			{
-				throw new SecurityException("Code has no permission to access Master ALC.");
+				throw new SecurityException($"Code from ALC [{callerAlc?.Name ?? "Unknown"}] has no permission to access Master ALC.");
 			}
 			
 			return result;

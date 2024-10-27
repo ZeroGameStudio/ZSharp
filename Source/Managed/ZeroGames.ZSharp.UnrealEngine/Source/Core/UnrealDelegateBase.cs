@@ -12,12 +12,8 @@ public abstract class UnrealDelegateBase : UnrealDynamicDelegateBase
 
 	public static UnrealFunction GetUnrealDelegateSignature(Type t)
 	{
-		if (t.GetCustomAttribute<UnrealFieldPathAttribute>() is {} attr)
-		{
-			return UnrealObjectGlobals.LowLevelFindObject<UnrealFunction>(attr.Path)!;
-		}
-
-		throw new ArgumentException();
+		verify(t.GetCustomAttribute<UnrealFieldPathAttribute>() is var attr && attr is not null);
+		return UnrealObjectGlobals.LowLevelFindObject<UnrealFunction>(attr.Path)!;
 	}
 
 	public void Bind(UnrealObject obj, string name) => this.ZCall("ex://Delegate.BindUFunction", obj, new UnrealName(name));
@@ -43,10 +39,7 @@ public abstract class UnrealDelegateBase : UnrealDynamicDelegateBase
 
 	protected UnrealObject Bind(Delegate @delegate)
 	{
-		if (@delegate.GetType() != _delegateType)
-		{
-			throw new InvalidOperationException();
-		}
+		check(@delegate.GetType() == _delegateType);
 
 		GCHandle handle = GCHandle.Alloc(@delegate);
 		return this.ZCall("ex://Delegate.BindManaged", handle, null)[-1].ReadConjugate<UnrealObject>()!;

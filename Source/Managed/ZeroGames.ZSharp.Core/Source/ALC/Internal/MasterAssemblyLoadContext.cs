@@ -36,10 +36,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             
             if (t.IsGenericType)
             {
-                if (locator.TypeParameters is null)
-                {
-                    throw new InvalidOperationException();
-                }
+                check(locator.TypeParameters is not null);
 
                 Type[] tps = new Type[locator.TypeParameters.Length];
                 for (int32 i = 0; i < tps.Length; ++i)
@@ -146,16 +143,8 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public void ReleaseConjugate_Red(IntPtr unmanaged)
     {
-        if (!_conjugateMap.Remove(unmanaged, out var rec))
-        {
-            throw new InvalidOperationException($"Conjugate [{unmanaged}] does not exists.");
-        }
-
-        if (!rec.WeakRef.TryGetTarget(out var conjugate))
-        {
-            throw new InvalidOperationException($"Conjugate [{unmanaged}] has already dead.");
-        }
-        
+        verify(_conjugateMap.Remove(unmanaged, out var rec));
+        verify(rec.WeakRef.TryGetTarget(out var conjugate));
         conjugate.Release();
     }
 
@@ -163,10 +152,11 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     {
         if (!_conjugateMap.TryGetValue(unmanaged, out var rec))
         {
-            throw new InvalidOperationException($"Conjugate [{unmanaged}] does not exists.");
+            return null;
         }
 
-        rec.WeakRef.TryGetTarget(out var conjugate);
+        // Recorded conjugate should always be alive.
+        verify(rec.WeakRef.TryGetTarget(out var conjugate));
         return conjugate;
     }
     
@@ -174,10 +164,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     protected override void HandleUnload()
     {
-        if (Instance != this)
-        {
-            throw new InvalidOperationException("Master ALC mismatch.");
-        }
+        check(Instance == this);
 
         foreach (var pair in _conjugateMap)
         {
@@ -217,36 +204,21 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private IntPtr BuildConjugate_Black(IConjugate managed, IntPtr userdata)
     {
         uint16 registryId = GetTypeConjugateRegistryId(managed.GetType());
-        if (registryId == 0)
-        {
-            throw new InvalidOperationException($"ConjugateRegistryId of type {managed.GetType().FullName} is 0.");
-        }
+        check(registryId > 0, $"Type {managed.GetType().FullName} does not have a valid conjugate registry id");
 
         IntPtr unmanaged = MasterAssemblyLoadContext_Interop.BuildConjugate_Black(registryId, userdata);
-        if (unmanaged != IntPtr.Zero)
-        {
-            _conjugateMap[unmanaged] = new(registryId, new(managed));
-        }
-        else
-        {
-            throw new InvalidOperationException();
-        }
+        check(unmanaged != default);
+        _conjugateMap[unmanaged] = new(registryId, new(managed));
 
         return unmanaged;
     }
 
     private void ReleaseConjugate_Black(IntPtr unmanaged)
     {
-        if (!_conjugateMap.TryGetValue(unmanaged, out var rec))
-        {
-            throw new InvalidOperationException($"Conjugate [{unmanaged}] does not exists.");
-        }
+        verify(_conjugateMap.TryGetValue(unmanaged, out var rec));
 
         uint16 registryId = rec.RegistryId;
-        if (registryId == 0)
-        {
-            throw new InvalidOperationException($"ConjugateRegistryId of unmanaged {unmanaged} is 0.");
-        }
+        check(registryId > 0);
 
         _conjugateMap.Remove(unmanaged);
         MasterAssemblyLoadContext_Interop.ReleaseConjugate_Black(registryId, unmanaged);

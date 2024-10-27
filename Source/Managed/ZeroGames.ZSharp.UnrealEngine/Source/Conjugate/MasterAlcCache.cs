@@ -13,22 +13,11 @@ public static class MasterAlcCache
 	{
 		Assembly asm = Assembly.GetExecutingAssembly();
 		AssemblyLoadContext? alc = AssemblyLoadContext.GetLoadContext(asm);
-		if (alc is null)
-		{
-			throw new Exception("Owning ALC not found.");
-		}
-
-		if (alc is not IMasterAssemblyLoadContext masterAlc)
-		{
-			throw new Exception($"Owning ALC is not MasterAssemblyLoadContext but {alc.GetType().Name}");
-		}
-
-		if (alc != IMasterAssemblyLoadContext.Instance)
-		{
-			throw new Exception("Owning ALC is MasterAssemblyLoadContext but not the live one.");
-		}
+		check(alc is not null);
+		check(alc is IMasterAssemblyLoadContext);
+		check(alc == IMasterAssemblyLoadContext.Instance);
 		
-		Instance = masterAlc;
+		Instance = (IMasterAssemblyLoadContext)alc;
 	}
 }
 

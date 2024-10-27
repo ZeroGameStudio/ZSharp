@@ -1,7 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
 
 namespace ZeroGames.ZSharp.Core;
@@ -10,14 +9,14 @@ public interface IAssemblyResolver
 {
 	static IAssemblyResolver Create()
 	{
-		Assembly resolverAssembly = AssemblyLoadContext.Default.Assemblies.Single(asm => asm.GetCustomAttribute<AssemblyResolverAttribute>() is not null);
-		Type resolverType = resolverAssembly.GetCustomAttribute<AssemblyResolverAttribute>()!.ResolverType;
-		if (!resolverType.IsAssignableTo(typeof(IAssemblyResolver)))
-		{
-			throw new InvalidOperationException();
-		}
+		AssemblyResolverAttribute attribute = AssemblyLoadContext.Default.Assemblies
+			.Select(asm => asm.GetCustomAttribute<AssemblyResolverAttribute>())
+			.Single(attr => attr is not null)!;
+		Type resolverType = attribute.ResolverType;
 		
-		return Unsafe.As<IAssemblyResolver>(Activator.CreateInstance(resolverType)!);
+		check(resolverType.IsAssignableTo(typeof(IAssemblyResolver)));
+		verify(Activator.CreateInstance(resolverType) is var resolver && resolver is not null);
+		return (IAssemblyResolver)resolver;
 	}
 	
 	string? Resolve(string name);

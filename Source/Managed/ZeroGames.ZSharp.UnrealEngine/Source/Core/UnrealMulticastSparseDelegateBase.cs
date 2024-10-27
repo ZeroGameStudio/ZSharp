@@ -31,10 +31,7 @@ public abstract class UnrealMulticastSparseDelegateBase : UnrealDynamicDelegateB
 	
 	protected UnrealObject Add(Delegate @delegate)
 	{
-		if (@delegate.GetType() != _delegateType)
-		{
-			throw new InvalidOperationException();
-		}
+		check(@delegate.GetType() == _delegateType);
 
 		GCHandle handle = GCHandle.Alloc(@delegate);
 		return this.ZCall("ex://MulticastSparseDelegate.AddManaged", handle, null)[-1].ReadConjugate<UnrealObject>()!;

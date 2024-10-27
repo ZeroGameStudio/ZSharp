@@ -31,12 +31,8 @@ public sealed class UnrealOptional<T> : UnrealOptionalBase, IConjugate<UnrealOpt
 	{
 		get
 		{
-			if (Get(out var valueObj))
-			{
-				return (T)valueObj;
-			}
-
-			throw new InvalidOperationException();
+			verify(Get(out var valueObj));
+			return (T)valueObj;
 		}
 		set => Set(value);
 	}

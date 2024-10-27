@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -42,21 +43,18 @@ public abstract class UnrealMapBase : PlainExportedObjectBase
 		return res[-1].Bool;
 	}
 	
+	[Conditional("ASSERTION_CHECK")]
 	private void ValidateElementType()
 	{
-		if (!ContainerHelper.CanBeKey(_keyType) || !ContainerHelper.CanBeValue(_valueType))
-		{
-			throw new ArgumentOutOfRangeException();
-		}
+		check(ContainerHelper.CanBeKey(_keyType));
+		check(ContainerHelper.CanBeValue(_valueType));
 	}
 	
 	private void SetupUserdata(out Userdata userdata)
 	{
 		userdata = default;
-		if (!ContainerHelper.TryGetPropertyDesc(_keyType, out userdata.KeyProperty) || !ContainerHelper.TryGetPropertyDesc(_valueType, out userdata.ValueProperty))
-		{
-			throw new ArgumentOutOfRangeException();
-		}
+		verify(ContainerHelper.TryGetPropertyDesc(_keyType, out userdata.KeyProperty));
+		verify(ContainerHelper.TryGetPropertyDesc(_valueType, out userdata.ValueProperty));
 	}
 
 	private readonly Type _keyType;

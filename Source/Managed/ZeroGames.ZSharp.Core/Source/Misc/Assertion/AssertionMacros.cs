@@ -112,6 +112,11 @@ public static class AssertionMacros
 #if ASSERTION_CHECK
 		CallerInfoHelper.Inject(ref column);
 		check(condition, message, expr, file, line, column);
+#else
+		if (!condition)
+		{
+			throw new AssertionFailedException();
+		}
 #endif
 	}
 
@@ -129,6 +134,11 @@ public static class AssertionMacros
 #if ASSERTION_CHECK_SLOW
 		CallerInfoHelper.Inject(ref column);
 		verify(condition, message, expr, file, line, column);
+#else
+		if (!condition)
+		{
+			throw new AssertionFailedException();
+		}
 #endif
 	}
 	
@@ -177,6 +187,7 @@ public static class AssertionMacros
 		return condition;
 	}
 	
+	[DoesNotReturn]
 	private static void Fail(string? message, string? expr, string? file, int32 line, int32 column, bool forceNoFatal)
 	{
 		string finalMessage = $"Assertion [{expr}] failed: {message} at file {file} line {line} column {column}.";
@@ -189,11 +200,14 @@ public static class AssertionMacros
 		{
 			Thrower.Fatal(finalMessage);
 		}
+		
+		throw new AssertionFailedException(finalMessage);
 	}
 
 	private readonly struct RecursionScope(Coordinate coord) : IDisposable
 	{
-		public void Dispose() => Thrower.FatalIf(!_recursionCache.Remove(coord));
+		public void Dispose() => Thrower.FatalIf(!_recursionCache.Remove(_coord));
+		private readonly Coordinate _coord = coord;
 	}
 
 	private readonly record struct Coordinate

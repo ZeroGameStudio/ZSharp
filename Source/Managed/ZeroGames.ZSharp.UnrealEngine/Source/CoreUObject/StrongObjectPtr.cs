@@ -10,16 +10,11 @@ public sealed class StrongObjectPtr<T> : StrongObjectPtrBase, IConjugate<StrongO
 	public StrongObjectPtr() : base(typeof(T)){}
 	public StrongObjectPtr(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 	
-	public StrongObjectPtr(UnrealObject? obj) : this()
+	public StrongObjectPtr(T? obj) : this()
 	{
 		if (obj is null)
 		{
 			return;
-		}
-
-		if (!obj.IsA<T>())
-		{
-			throw new NotSupportedException();
 		}
 
 		_Object = obj;

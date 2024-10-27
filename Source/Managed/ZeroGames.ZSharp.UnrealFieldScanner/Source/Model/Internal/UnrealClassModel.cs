@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using Mono.Cecil;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
@@ -49,7 +50,7 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 	{
 		get
 		{
-			CheckInvariant();
+			check(IsFullyInitialized);
 			return base.Specifiers;
 		}
 	}
@@ -58,7 +59,7 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 	{
 		get
 		{
-			CheckInvariant();
+			check(IsFullyInitialized);
 			return base.Properties;
 		}
 	}
@@ -71,10 +72,7 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 	{
 		get
 		{
-			if (!IsBaseInitialized)
-			{
-				throw new InvalidOperationException();
-			}
+			check(IsBaseInitialized);
 
 			return _baseType;
 		}
@@ -84,10 +82,7 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 	{
 		get
 		{
-			if (!IsBaseInitialized)
-			{
-				throw new InvalidOperationException();
-			}
+			check(IsBaseInitialized);
 
 			return _interfaces;
 		}
@@ -98,14 +93,6 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 
 	public bool IsBaseInitialized { get; private set; }
 	public bool IsFullyInitialized { get; private set; }
-
-	private void CheckInvariant()
-	{
-		if (!IsFullyInitialized)
-		{
-			throw new InvalidOperationException();
-		}
-	}
 	
 	private void ScanUFunctions()
 	{

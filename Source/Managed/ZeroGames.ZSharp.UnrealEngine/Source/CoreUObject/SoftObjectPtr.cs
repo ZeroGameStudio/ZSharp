@@ -11,16 +11,11 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase, IConjugate<SoftObjectP
 	public SoftObjectPtr() : base(typeof(T)){}
 	public SoftObjectPtr(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 	
-	public SoftObjectPtr(UnrealObject? obj) : this()
+	public SoftObjectPtr(T? obj) : this()
 	{
 		if (obj is null)
 		{
 			return;
-		}
-
-		if (!obj.IsA<T>())
-		{
-			throw new NotSupportedException();
 		}
 
 		_Object = obj;

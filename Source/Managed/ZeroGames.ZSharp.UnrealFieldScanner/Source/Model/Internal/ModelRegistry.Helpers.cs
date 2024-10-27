@@ -12,26 +12,10 @@ partial class ModelRegistry
 	private class PoisonedAssemblyResolver : Mono.Cecil.IAssemblyResolver
 	{
 		public void Dispose(){}
-		public AssemblyDefinition Resolve(AssemblyNameReference name) => throw new NotSupportedException();
-		public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters) => throw new NotSupportedException();
+		public AssemblyDefinition Resolve(AssemblyNameReference name) => throw Thrower.NoEntry();
+		public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters) => throw Thrower.NoEntry();
 	}
 
-	private void CheckDuringInitialization()
-	{
-		if (IsFullyInitialized)
-		{
-			throw new InvalidOperationException();
-		}
-	}
-
-	private void CheckInvariant()
-	{
-		if (!IsFullyInitialized)
-		{
-			throw new InvalidOperationException();
-		}
-	}
-	
 	private AssemblyDefinition LoadAssemblyDefinition(string assemblyName)
 	{
 		lock (_referencedAssemblyMap)

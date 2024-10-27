@@ -8,12 +8,9 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, UPropertyAttribute specifier)
 	{
-		if (specifier.Default is { } defaultValue)
+		if (specifier.Default is {} defaultValue)
 		{
-			if (model.Outer is not IUnrealClassModel)
-			{
-				throw new InvalidOperationException();
-			}
+			check(def.Outer is UnrealClassDefinition);
 
 			var classDef = (UnrealClassDefinition)def.Outer;
 			classDef.PropertyDefaults.Add(new()
@@ -39,21 +36,15 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BlueprintGetterAttribute specifier)
 	{
-		IUnrealClassModel? classModel = model.Outer as IUnrealClassModel;
-		if (classModel is null)
-		{
-			throw new InvalidOperationException();
-		}
-
+		check(model.Outer is IUnrealClassModel);
+		
+		var classModel = (IUnrealClassModel)model.Outer;
 		IUnrealFunctionModel getterModel = classModel.Functions.Single(func => func.Name == specifier.AccessorName);
 		// @TODO: Check signature
 		
 		UnrealClassDefinition classDef = (UnrealClassDefinition)def.Outer;
 		UnrealFunctionDefinition functionDef = classDef.Functions.Single(func => func.Name == specifier.AccessorName);
-		if ((functionDef.FunctionFlags & EFunctionFlags.FUNC_Event) != EFunctionFlags.FUNC_None)
-		{
-			throw new InvalidOperationException();
-		}
+		check(!functionDef.FunctionFlags.HasFlag(EFunctionFlags.FUNC_Event));
 		
 		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
 		if (!model.HasSpecifier<BlueprintSetterAttribute>())
@@ -67,21 +58,15 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BlueprintSetterAttribute specifier)
 	{
-		IUnrealClassModel? classModel = model.Outer as IUnrealClassModel;
-		if (classModel is null)
-		{
-			throw new InvalidOperationException();
-		}
-
+		check(model.Outer is IUnrealClassModel);
+		
+		var classModel = (IUnrealClassModel)model.Outer;
 		IUnrealFunctionModel getterModel = classModel.Functions.Single(func => func.Name == specifier.AccessorName);
 		// @TODO: Check signature
 		
 		UnrealClassDefinition classDef = (UnrealClassDefinition)def.Outer;
 		UnrealFunctionDefinition functionDef = classDef.Functions.Single(func => func.Name == specifier.AccessorName);
-		if ((functionDef.FunctionFlags & EFunctionFlags.FUNC_Event) != EFunctionFlags.FUNC_None)
-		{
-			throw new InvalidOperationException();
-		}
+		check(!functionDef.FunctionFlags.HasFlag(EFunctionFlags.FUNC_Event));
 		
 		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
 		def.AddMetadata(MetadataConstants.BlueprintSetter, specifier.AccessorName);
@@ -169,19 +154,13 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, ReplicatedAttribute specifier)
 	{
-		var classModel = model.Outer as IUnrealClassModel;
-		if (classModel is null)
-		{
-			throw new InvalidOperationException();
-		}
+		check(model.Outer is IUnrealClassModel);
 		
+		var classModel = (IUnrealClassModel)model.Outer;
 		def.PropertyFlags |= EPropertyFlags.CPF_Net;
 		if (specifier.Notify is not null)
 		{
-			if (classModel.Functions.All(func => func.Name != specifier.Notify))
-			{
-				throw new InvalidOperationException();
-			}
+			check(classModel.Functions.Any(func => func.Name == specifier.Notify));
 			
 			def.PropertyFlags |= EPropertyFlags.CPF_RepNotify;
 			def.RepNotifyName = specifier.Notify;
@@ -192,11 +171,8 @@ partial class SpecifierProcessor
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, NotReplicatedAttribute specifier)
 	{
 		bool isStructMember = def.Outer is UnrealScriptStructDefinition;
-		bool isRpcParameter = def.Outer is UnrealFunctionDefinition functionDef && (functionDef.FunctionFlags & EFunctionFlags.FUNC_Net) != EFunctionFlags.FUNC_None;
-		if (!isStructMember && !isRpcParameter)
-		{
-			throw new InvalidOperationException();
-		}
+		bool isRpcParameter = def.Outer is UnrealFunctionDefinition functionDef && functionDef.FunctionFlags.HasFlag(EFunctionFlags.FUNC_Net);
+		check(isStructMember || isRpcParameter);
 
 		def.PropertyFlags |= EPropertyFlags.CPF_RepSkip;
 	}
@@ -204,12 +180,9 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, FieldNotifyAttribute specifier)
 	{
-		var classDef = def.Outer as UnrealClassDefinition;
-		if (classDef is null)
-		{
-			throw new InvalidOperationException();
-		}
+		check(def.Outer is UnrealClassDefinition);
 		
+		var classDef = (UnrealClassDefinition)def.Outer;
 		classDef.FieldNotifies.Add(def.Name);
 	}
 	
@@ -299,23 +272,14 @@ partial class SpecifierProcessor
 	
 	private static void ProcessSpecifier_DefaultSubobject(UnrealPropertyDefinition def, IUnrealPropertyModel model, DefaultSubobjectSpecifierBase specifier, bool optional)
 	{
-		if (model.Outer is not IUnrealClassModel)
-		{
-			throw new InvalidOperationException();
-		}
-
-		if (model.HasSpecifier<DefaultSubobjectAttribute>(true))
-		{
-			throw new InvalidOperationException();
-		}
+		check(def.Outer is UnrealClassDefinition);
 
 		var attachmentSpecifier = model.GetSpecifier<AttachmentAttribute>();
-		
 		var classDef = (UnrealClassDefinition)def.Outer;
 		classDef.DefaultSubobjects.Add(new()
 		{
 			Name = specifier.Name ?? def.Name,
-			ClassPath = model.Type.GetUnrealFieldPath() ?? throw new InvalidOperationException(),
+			ClassPath = model.Type.GetUnrealFieldPath() ?? throw Thrower.NoEntry(),
 			PropertyName = def.Name,
 			IsOptional = optional,
 			IsRootComponent = model.HasSpecifier<RootComponentAttribute>(),

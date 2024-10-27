@@ -10,10 +10,9 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 	public UnrealPropertyModel(ModelRegistry registry, PropertyDefinition propertyDef, IUnrealStructModel outer) : base(propertyDef.Name, registry, propertyDef)
 	{
 		TypeReference typeRef = propertyDef.PropertyType;
-		if (typeRef.IsArray || typeRef.IsByReference || typeRef.IsPointer)
-		{
-			throw new InvalidOperationException();
-		}
+		check(!typeRef.IsArray);
+		check(!typeRef.IsByReference);
+		check(!typeRef.IsPointer);
 		
 		Outer = outer;
 		Role = EPropertyRole.Member;
@@ -36,11 +35,9 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 	public UnrealPropertyModel(ModelRegistry registry, ParameterDefinition parameterDef, IUnrealStructModel outer) : base(parameterDef.Name, registry, parameterDef)
 	{
 		TypeReference typeRef = parameterDef.ParameterType;
-		if (typeRef.IsArray || typeRef.IsPointer)
-		{
-			throw new InvalidOperationException();
-		}
-		
+		check(!typeRef.IsArray);
+		check(!typeRef.IsPointer);
+
 		Outer = outer;
 		Role = EPropertyRole.Parameter;
 		Type = new(registry, GetDecayedType(typeRef))
@@ -54,10 +51,9 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 	public UnrealPropertyModel(ModelRegistry registry, MethodReturnType returnType, IUnrealStructModel outer) : base(RETURN_NAME, registry, returnType)
 	{
 		TypeReference typeRef = returnType.ReturnType;
-		if (typeRef.IsArray || typeRef.IsByReference || typeRef.IsPointer)
-		{
-			throw new InvalidOperationException();
-		}
+		check(!typeRef.IsArray);
+		check(!typeRef.IsByReference);
+		check(!typeRef.IsPointer);
 
 		Outer = outer;
 		Role = EPropertyRole.Return;

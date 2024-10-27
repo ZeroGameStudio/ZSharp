@@ -45,10 +45,7 @@ public struct UnderlyingLifecycleComponent(IUnderlyingLifecycle lifecycle)
 
 	public void SetExpired()
 	{
-		if (_expired)
-		{
-			throw new InvalidOperationException();
-		}
+		check(!_expired);
 		
 		_expired = true;
 		if (_registry is not null)
@@ -68,7 +65,7 @@ public struct UnderlyingLifecycleComponent(IUnderlyingLifecycle lifecycle)
 	{
 		if (token != Token)
 		{
-			throw new InvalidOperationException();
+			throw new InvalidOperationException("Token expired.");
 		}
 	}
 
@@ -76,7 +73,7 @@ public struct UnderlyingLifecycleComponent(IUnderlyingLifecycle lifecycle)
 	{
 		if (_lifecycle is not IReactiveUnderlyingLifecycle)
 		{
-			throw new InvalidOperationException();
+			throw new InvalidOperationException("Lifecycle is not reactive.");
 		}
 	}
 	

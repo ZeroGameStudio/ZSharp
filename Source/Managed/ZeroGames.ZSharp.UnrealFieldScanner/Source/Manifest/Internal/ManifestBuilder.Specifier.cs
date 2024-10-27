@@ -21,26 +21,12 @@ partial class ManifestBuilder
 				if (method.GetCustomAttribute<SpecifierProcessorAttribute>() is {} attribute)
 				{
 					ParameterInfo[] parameters = method.GetParameters();
-					if (parameters.Length != 3)
-					{
-						throw new InvalidOperationException();
-					}
-
-					if (!parameters[0].ParameterType.IsAssignableTo(typeof(UnrealFieldDefinition)))
-					{
-						throw new InvalidOperationException();
-					}
-
-					if (!parameters[1].ParameterType.IsAssignableTo(typeof(ISpecifierProvider)))
-					{
-						throw new InvalidOperationException();
-					}
+					check(parameters.Length == 3);
+					check(parameters[0].ParameterType.IsAssignableTo(typeof(UnrealFieldDefinition)));
+					check(parameters[1].ParameterType.IsAssignableTo(typeof(ISpecifierProvider)));
 
 					Type specifierParameterType = parameters[2].ParameterType;
-					if (!specifierParameterType.IsAssignableTo(typeof(IUnrealReflectionSpecifier)))
-					{
-						throw new InvalidOperationException();
-					}
+					check(specifierParameterType.IsAssignableTo(typeof(IUnrealReflectionSpecifier)));
 
 					if (!_specifierProcessorMap.TryGetValue(specifierParameterType, out var recs))
 					{

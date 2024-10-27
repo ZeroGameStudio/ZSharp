@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -56,31 +57,8 @@ internal static class DllEntry
         {
             UnmanagedFunction* function = args->UnmanagedFunctions.Functions + i;
             string typeName = new(function->TypeName);
-            Type? type = Assembly.GetExecutingAssembly().GetType(typeName);
-            if (type is null)
-            {
-                throw new Exception($"Binding failed, type not found. {typeName}");
-            }
-
             string fieldName = new(function->FieldName);
-            FieldInfo? field = type.GetField(fieldName);
-            if (field is null)
-            {
-                throw new Exception($"Binding failed, field not found. {typeName}.{fieldName}");
-            }
-
-            if (!field.IsStatic)
-            {
-                throw new Exception($"Binding failed, field is not static. {typeName}.{fieldName}");
-            }
-
-            if (!field.FieldType.IsUnmanagedFunctionPointer)
-            {
-                throw new Exception(
-                    $"Binding failed, field is not unmanaged function pointer. {typeName}.{fieldName}");
-            }
-
-            field.SetValue(null, (IntPtr)function->Address);
+            InteropBindingHelper.GetStaticFunctionPointerField(typeName, fieldName).SetValue(null, (IntPtr)function->Address);
         }
 
         int32 offset = 0;

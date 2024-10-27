@@ -11,16 +11,11 @@ public sealed class LazyObjectPtr<T> : LazyObjectPtrBase, IConjugate<LazyObjectP
 	public LazyObjectPtr() : base(typeof(T)){}
 	public LazyObjectPtr(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 	
-	public LazyObjectPtr(UnrealObject? obj) : this()
+	public LazyObjectPtr(T? obj) : this()
 	{
 		if (obj is null)
 		{
 			return;
-		}
-
-		if (!obj.IsA<T>())
-		{
-			throw new NotSupportedException();
 		}
 
 		_Object = obj;

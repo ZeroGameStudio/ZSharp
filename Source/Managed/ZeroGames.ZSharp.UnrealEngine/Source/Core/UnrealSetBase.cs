@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
@@ -32,21 +33,16 @@ public abstract class UnrealSetBase : PlainExportedObjectBase
 	protected void Remove(object? value) => this.ZCall("ex://Set.Remove", value);
 	protected bool Contains(object? value) => this.ZCall("ex://Set.Contains", value, false)[-1].Bool;
 	
+	[Conditional("ASSERTION_CHECK")]
 	private void ValidateElementType()
 	{
-		if (!ContainerHelper.CanBeKey(_elementType))
-		{
-			throw new ArgumentOutOfRangeException();
-		}
+		check(ContainerHelper.CanBeKey(_elementType));
 	}
 	
 	private void SetupUserdata(out Userdata userdata)
 	{
 		userdata = default;
-		if (!ContainerHelper.TryGetPropertyDesc(_elementType, out userdata.ElementProperty))
-		{
-			throw new ArgumentOutOfRangeException();
-		}
+		verify(ContainerHelper.TryGetPropertyDesc(_elementType, out userdata.ElementProperty));
 	}
 
 	private readonly Type _elementType;

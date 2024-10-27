@@ -111,18 +111,10 @@ public abstract class ExportedObjectBase : IConjugate
         GC.SuppressFinalize(this);
     }
     
-    private void TryBroadcastOnExpired()
+    private void BroadcastOnExpired()
     {
-        if (_hasBroadcastOnExpired)
-        {
-            return;
-        }
-
-        if (!IsExpired)
-        {
-            throw new InvalidOperationException();
-        }
-
+        check(!_hasBroadcastOnExpired);
+        
         _hasBroadcastOnExpired = true;
         if (_onExpiredRegistry is not null)
         {
@@ -178,7 +170,7 @@ public abstract class ExportedObjectBase : IConjugate
     {
         GCHandle.Free();
         Unmanaged = DEAD_ADDR;
-        TryBroadcastOnExpired();
+        BroadcastOnExpired();
     }
 
     private readonly record struct OnExpiredCallbackRec(Action<IExplicitLifecycle, object?> Callback, object? State);

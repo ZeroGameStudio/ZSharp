@@ -9,10 +9,7 @@ public abstract class UnderlyingZeroTaskBase<TResult, TImpl> : IPoolableUnderlyi
 
 	public UnderlyingZeroTaskBase()
 	{
-		if (GetType() != typeof(TImpl))
-		{
-			throw new InvalidOperationException();
-		}
+		check(GetType() == typeof(TImpl));
 	}
 
 	void IPoolableUnderlyingZeroTask<TResult, TImpl>.Initialize() => _comp.Initialize();

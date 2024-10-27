@@ -12,12 +12,9 @@ public partial class UnrealEnum
 
 	public static UnrealEnum GetUnrealEnum(Type t)
 	{
-		if (t.IsEnum && t.GetCustomAttribute<UnrealFieldPathAttribute>() is {} attr)
-		{
-			return UnrealObjectGlobals.LowLevelFindObject<UnrealEnum>(attr.Path)!;
-		}
-
-		throw new ArgumentException();
+		check(t.IsEnum);
+		verify(t.GetCustomAttribute<UnrealFieldPathAttribute>() is var attr && attr is not null);
+		return UnrealObjectGlobals.LowLevelFindObject<UnrealEnum>(attr.Path)!;
 	}
 
 }

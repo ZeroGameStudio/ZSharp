@@ -39,10 +39,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintEventAttribute specifier)
 	{
-		if (model.Visibility == EMemberVisibility.Private)
-		{
-			throw new InvalidOperationException();
-		}
+		check(model.Visibility != EMemberVisibility.Private);
 
 		string name = specifier.Implementation ?? $"{def.Name}_Implementation";
 		def.ZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{name}";
@@ -58,10 +55,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, ServerAttribute specifier)
 	{
-		if (model.HasReturnValue())
-		{
-			throw new InvalidOperationException();
-		}
+		check(!model.HasReturnValue());
 		
 		string name = specifier.Implementation ?? $"{def.Name}_Implementation";
 		def.ZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{name}";
@@ -71,10 +65,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, ClientAttribute specifier)
 	{
-		if (model.HasReturnValue())
-		{
-			throw new InvalidOperationException();
-		}
+		check(!model.HasReturnValue());
 		
 		string name = specifier.Implementation ?? $"{def.Name}_Implementation";
 		def.ZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{name}";
@@ -84,10 +75,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, NetMulticastAttribute specifier)
 	{
-		if (model.HasReturnValue())
-		{
-			throw new InvalidOperationException();
-		}
+		check(!model.HasReturnValue());
 		
 		string name = specifier.Implementation ?? $"{def.Name}_Implementation";
 		def.ZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{name}";

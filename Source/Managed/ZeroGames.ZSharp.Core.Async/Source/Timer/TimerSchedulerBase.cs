@@ -90,7 +90,7 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 	public void UnregisterAll(Lifecycle lifecycle)
 	{
 		check(IsInGameThread);
-		throw new NotSupportedException();
+		throw new NotImplementedException();
 	}
 	
 	public void Suspend(Timer timer)
@@ -107,7 +107,7 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 	public void SuspendAll(Lifecycle lifecycle)
 	{
 		check(IsInGameThread);
-		throw new NotSupportedException();
+		throw new NotImplementedException();
 	}
 
 	public void Resume(Timer timer)
@@ -124,7 +124,7 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 	public void ResumeAll(Lifecycle lifecycle)
 	{
 		check(IsInGameThread);
-		throw new NotSupportedException();
+		throw new NotImplementedException();
 	}
 
 	public bool IsValidTimer(Timer timer)
@@ -136,11 +136,11 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 	public void Tick(float deltaSeconds)
 	{
 		check(IsInGameThread);
-		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(deltaSeconds);
-		
-		if (_ticking)
+		check(deltaSeconds > 0);
+
+		if (!ensure(!_ticking))
 		{
-			throw new InvalidOperationException();
+			return;
 		}
 		
 		_ticking = true;

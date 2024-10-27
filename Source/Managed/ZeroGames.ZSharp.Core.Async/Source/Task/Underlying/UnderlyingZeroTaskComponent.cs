@@ -57,7 +57,7 @@ public struct UnderlyingZeroTaskComponent<TResult>
 
 		if (!_completed)
 		{
-			throw new InvalidOperationException();
+			throw new InvalidOperationException("ZeroTask only supports await.");
 		}
 		
 		_error?.Throw();
@@ -96,7 +96,7 @@ public struct UnderlyingZeroTaskComponent<TResult>
 	{
 		if (token != Token)
 		{
-			throw new InvalidOperationException();
+			throw new InvalidOperationException("Token expired.");
 		}
 	}
 
@@ -104,16 +104,13 @@ public struct UnderlyingZeroTaskComponent<TResult>
 	{
 		if (_continuation is not null || _stateMachine is not null)
 		{
-			throw new InvalidOperationException();
+			throw new InvalidOperationException("Await one instance of ZeroTask more than once.");
 		}
 	}
 
 	private void SignalCompletion()
 	{
-		if (_completed)
-		{
-			throw new InvalidOperationException();
-		}
+		check(!_completed);
 
 		_completed = true;
 

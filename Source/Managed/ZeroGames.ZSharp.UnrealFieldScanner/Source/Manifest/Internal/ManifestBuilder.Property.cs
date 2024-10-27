@@ -74,11 +74,8 @@ partial class ManifestBuilder
 			{
 				hashable = false;
 			}
-
-			if (!hashable)
-			{
-				throw new InvalidOperationException();
-			}
+			
+			verify(hashable);
 		}
 
 		return result;
@@ -86,26 +83,20 @@ partial class ManifestBuilder
 
 	private void ScanMemberProperty(UnrealPropertyDefinition result, IUnrealPropertyModel propertyModel)
 	{
-		if (propertyModel.Role != EPropertyRole.Member)
-		{
-			throw new InvalidOperationException();
-		}
+		check(propertyModel.Role == EPropertyRole.Member);
 		
 		result.PropertyFlags |= propertyModel.Visibility switch
 		{
 			EMemberVisibility.Public => EPropertyFlags.CPF_NativeAccessSpecifierPublic,
 			EMemberVisibility.Protected => EPropertyFlags.CPF_NativeAccessSpecifierProtected,
 			EMemberVisibility.Private => EPropertyFlags.CPF_NativeAccessSpecifierPrivate,
-			_ => throw new InvalidOperationException(),
+			_ => throw Thrower.NoEntry()
 		};
 	}
 
 	private void ScanParameterProperty(UnrealPropertyDefinition result, IUnrealPropertyModel propertyModel)
 	{
-		if (propertyModel.Role != EPropertyRole.Parameter && propertyModel.Role != EPropertyRole.Return)
-		{
-			throw new InvalidOperationException();
-		}
+		check(propertyModel.Role != EPropertyRole.Member);
 		
 		result.PropertyFlags |= EPropertyFlags.CPF_Parm;
 		if (propertyModel.Role == EPropertyRole.Parameter)
@@ -140,10 +131,7 @@ partial class ManifestBuilder
 		// so we do this separately with the first step.
 		if (_sealedTypeWithDescriptorMap.TryGetValue(fullName, out result))
 		{
-			if (propertyTypeModel.GenericArguments?.Count != 1)
-			{
-				throw new InvalidOperationException();
-			}
+			check(propertyTypeModel.GenericArguments?.Count == 1);
 
 			descriptorFieldPath = propertyTypeModel.GenericArguments[0].GetUnrealFieldPath();
 			return result;
@@ -183,10 +171,7 @@ partial class ManifestBuilder
 			{
 				foreach (var specifier in propertyTypeModel.Specifiers)
 				{
-					if (specifier is SparseAttribute)
-					{
-						throw new NotSupportedException();
-					}
+					check(specifier is not SparseAttribute);
 					
 					if (specifier is MulticastAttribute)
 					{
@@ -203,7 +188,7 @@ partial class ManifestBuilder
 			}
 		}
 
-		throw new InvalidOperationException();
+		throw Thrower.NoEntry();
 	}
 
 	// Namespaces

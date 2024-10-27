@@ -18,9 +18,9 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase, IConjugate<SoftClassPtr<
 			return;
 		}
 		
-		if (!cls.IsChildOf(UnrealObjectGlobals.GetClass<T>()))
+		if (!ensure(cls.IsChildOf(UnrealObjectGlobals.GetClass<T>())))
 		{
-			throw new NotSupportedException();
+			return;
 		}
 
 		_Object = cls;

@@ -11,16 +11,11 @@ public sealed class WeakObjectPtr<T> : WeakObjectPtrBase, IConjugate<WeakObjectP
 	public WeakObjectPtr() : base(typeof(T)){}
 	public WeakObjectPtr(IntPtr unmanaged) : base(typeof(T), unmanaged){}
 	
-	public WeakObjectPtr(UnrealObject? obj) : this()
+	public WeakObjectPtr(T? obj) : this()
 	{
 		if (obj is null)
 		{
 			return;
-		}
-
-		if (!obj.IsA<T>())
-		{
-			throw new NotSupportedException();
 		}
 
 		_Object = obj;

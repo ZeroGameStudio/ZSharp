@@ -19,12 +19,10 @@ internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, I
     {
         base.HandleUnload();
         
-        if (!_instanceMap.TryGetValue(Name!, out var alc) || alc != this)
+        if (ensure(_instanceMap.TryGetValue(Name!, out var alc) && alc == this))
         {
-            throw new Exception();
+            _instanceMap.Remove(Name!);
         }
-
-        _instanceMap.Remove(Name!);
     }
     
     private SlimAssemblyLoadContext(string name) : base(name)

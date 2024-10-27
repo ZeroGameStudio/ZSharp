@@ -35,7 +35,7 @@ partial class ManifestBuilder
 			EMemberVisibility.Public => EFunctionFlags.FUNC_Public,
 			EMemberVisibility.Protected => EFunctionFlags.FUNC_Protected,
 			EMemberVisibility.Private => EFunctionFlags.FUNC_Private,
-			_ => throw new InvalidOperationException(),
+			_ => throw Thrower.NoEntry()
 		};
 
 		ProcessSpecifiers(result, functionModel);

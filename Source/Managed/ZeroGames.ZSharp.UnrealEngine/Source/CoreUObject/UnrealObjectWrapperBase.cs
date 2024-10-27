@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
+
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 public abstract class UnrealObjectWrapperBase : PlainExportedObjectBase
@@ -33,18 +35,16 @@ public abstract class UnrealObjectWrapperBase : PlainExportedObjectBase
 		set => this.ZCall($"ex://{_ZCallClassName}.Set", value);
 	}
 	
+	[Conditional("ASSERTION_CHECK")]
 	private void ValidateElementType()
 	{
 		bool objectMatch = _objectType.IsAssignableTo(typeof(UnrealObjectBase)) && _allowObject;
 		bool interfaceMatch = _objectType.IsAssignableTo(typeof(IUnrealInterface)) && _allowInterface;
-		if (!objectMatch && !interfaceMatch)
-		{
-			throw new NotSupportedException();
-		}
+		check(objectMatch || interfaceMatch);
 	}
 
-	private Type _objectType;
-	private bool _allowObject;
-	private bool _allowInterface;
+	private readonly Type _objectType;
+	private readonly bool _allowObject;
+	private readonly bool _allowInterface;
 
 }

@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -38,21 +39,16 @@ public abstract class UnrealOptionalBase : PlainExportedObjectBase
 	}
 	protected void Set(object? value) => this.ZCall("ex://Optional.Set", value);
 	
+	[Conditional("ASSERTION_CHECK")]
 	private void ValidateElementType()
 	{
-		if (!ContainerHelper.CanBeValue(_elementType))
-		{
-			throw new ArgumentOutOfRangeException();
-		}
+		check(ContainerHelper.CanBeValue(_elementType));
 	}
 	
 	private void SetupUserdata(out Userdata userdata)
 	{
 		userdata = default;
-		if (!ContainerHelper.TryGetPropertyDesc(_elementType, out userdata.ElementProperty))
-		{
-			throw new ArgumentOutOfRangeException();
-		}
+		verify(ContainerHelper.TryGetPropertyDesc(_elementType, out userdata.ElementProperty));
 	}
 
 	private readonly Type _elementType;

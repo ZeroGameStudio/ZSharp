@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Core;
@@ -33,21 +34,16 @@ public abstract class UnrealArrayBase : PlainExportedObjectBase
 	protected object? Get(int32 index) => this.ZCall("ex://Array.Get", index, _elementType)[-1].Object;
 	protected void Set(int32 index, object? value) => this.ZCall("ex://Array.Set", index, value);
 	
+	[Conditional("ASSERTION_CHECK")]
 	private void ValidateElementType()
 	{
-		if (!ContainerHelper.CanBeValue(_elementType))
-		{
-			throw new ArgumentOutOfRangeException();
-		}
+		check(ContainerHelper.CanBeValue(_elementType));
 	}
 	
 	private void SetupUserdata(out Userdata userdata)
 	{
 		userdata = default;
-		if (!ContainerHelper.TryGetPropertyDesc(_elementType, out userdata.ElementProperty))
-		{
-			throw new ArgumentOutOfRangeException();
-		}
+		verify(ContainerHelper.TryGetPropertyDesc(_elementType, out userdata.ElementProperty));
 	}
 
 	private readonly Type _elementType;

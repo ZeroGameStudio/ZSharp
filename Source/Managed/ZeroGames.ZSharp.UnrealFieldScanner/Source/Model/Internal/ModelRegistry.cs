@@ -25,13 +25,13 @@ internal sealed partial class ModelRegistry : IModelRegistry
 
 	public ITypeModel GetTypeModel(string fullName)
 	{
-		CheckInvariant();
+		check(IsFullyInitialized);
 		return GetTypeModelUnchecked(fullName);
 	}
 
 	public bool TryGetTypeModel(string fullName, [NotNullWhen(true)] out ITypeModel? typeModel)
 	{
-		CheckInvariant();
+		check(IsFullyInitialized);
 		return TryGetTypeModelUnchecked(fullName, out typeModel);
 	}
 	
@@ -41,14 +41,11 @@ internal sealed partial class ModelRegistry : IModelRegistry
 	
 	public ITypeModel GetOrAddTypeModel(TypeReference typeRef)
 	{
-		CheckDuringInitialization();
+		check(!IsFullyInitialized);
 		
 		if (!TryGetTypeModelUnchecked(typeRef.FullName, out var model))
 		{
-			if (typeRef.IsArray)
-			{
-				throw new InvalidOperationException();
-			}
+			check(!typeRef.IsArray);
 			
 			TypeDefinition typeDef = GetTypeDefinition(typeRef);
 			model = new PlainTypeModel(this, typeDef);
@@ -60,7 +57,7 @@ internal sealed partial class ModelRegistry : IModelRegistry
 
 	public TypeDefinition ResolveTypeDefinition(string assemblyName, string typeFullName)
 	{
-		CheckDuringInitialization();
+		check(!IsFullyInitialized);
 		return GetTypeDefinition(assemblyName, typeFullName);
 	}
 

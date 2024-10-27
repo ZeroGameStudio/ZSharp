@@ -18,9 +18,9 @@ public sealed class ScriptInterface<T> : ScriptInterfaceBase, IConjugate<ScriptI
 			return;
 		}
 
-		if (!obj.Implements<T>())
+		if (!ensure(obj.Implements<T>()))
 		{
-			throw new NotSupportedException();
+			return;
 		}
 
 		_Object = obj;

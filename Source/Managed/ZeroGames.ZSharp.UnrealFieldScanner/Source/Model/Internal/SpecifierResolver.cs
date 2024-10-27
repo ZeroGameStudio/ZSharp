@@ -23,11 +23,7 @@ internal static class SpecifierResolver
 			
 			TypeDefinition typeDef = modelRegistry.ResolveTypeDefinition(typeRef);
 			Assembly assembly = AssemblyLoadContext.Default.Assemblies.Single(asm => asm.GetName().Name == assemblyName);
-			Type? specifierRuntimeType = assembly.GetType(typeDef.FullName);
-			if (specifierRuntimeType is null)
-			{
-				throw new InvalidOperationException();
-			}
+			verify(assembly.GetType(typeDef.FullName) is var specifierRuntimeType && specifierRuntimeType is not null);
 
 			if (specifierRuntimeType.IsAssignableTo(typeof(IUnrealReflectionSpecifier)))
 			{
@@ -130,11 +126,7 @@ internal static class SpecifierResolver
 			TypeReference elementTypeRef = arg.Type.GetElementType();
 			string assemblyName = elementTypeRef.Scope.GetAssemblyName();
 			Assembly assembly = AssemblyLoadContext.Default.Assemblies.Single(asm => asm.GetName().Name == assemblyName);
-			Type? elementType = assembly.GetType(elementTypeRef.FullName);
-			if (elementType is null)
-			{
-				throw new InvalidOperationException();
-			}
+			verify(assembly.GetType(elementTypeRef.FullName) is var elementType && elementType is not null);
 			
 			var args = (CustomAttributeArgument[])arg.Value;
 			Array arr = Array.CreateInstance(elementType.MakeArrayType(), args.Length);

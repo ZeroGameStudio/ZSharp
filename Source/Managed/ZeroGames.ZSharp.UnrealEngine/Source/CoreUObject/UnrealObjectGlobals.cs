@@ -7,11 +7,7 @@ public static class UnrealObjectGlobals
 
 	public static UnrealClass GetClass(Type type)
 	{
-		if (!type.IsAssignableTo(typeof(IUnrealObject)))
-		{
-			throw new ArgumentOutOfRangeException(nameof(type));
-		}
-
+		check(type.IsAssignableTo(typeof(IUnrealObject)));
 		return GetClassUnchecked(type);
 	}
 	
@@ -44,11 +40,8 @@ public static class UnrealObjectGlobals
 	public static T FindObjectChecked<T>(UnrealObject? outer, string path, bool exactClass) where T : UnrealObject
 	{
 		T? res = FindObject<T>(outer, path, exactClass);
-		if (res is null)
-		{
-			throw new InvalidOperationException();
-		}
-
+		
+		check(res is not null);
 		return res;
 	}
 

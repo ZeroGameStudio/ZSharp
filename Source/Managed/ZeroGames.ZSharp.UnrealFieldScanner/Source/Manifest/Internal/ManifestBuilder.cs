@@ -35,7 +35,7 @@ internal sealed partial class ManifestBuilder
 		}
 		else
 		{
-			throw new NotSupportedException($"Unknown root type: {typeModel.GetType().FullName}");
+			Thrower.NoEntry();
 		}
 	}
 

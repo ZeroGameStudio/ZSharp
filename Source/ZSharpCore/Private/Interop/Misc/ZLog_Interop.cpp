@@ -6,21 +6,20 @@
 #include "Misc/Log/ZRegisterLogCategory.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptCore, Log, All)
-ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptCore)
-
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptAssemblyResolver, Log, All)
-ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptAssemblyResolver)
-
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptAsync, Log, All)
-ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptAsync)
-
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptEngine, Log, All)
-ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptEngine)
-
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScript, Log, All)
-ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScript)
 
-ZSHARP_REGISTER_LOG_CATEGORY(LogTemp)
+namespace ZSharp::ZLog_Interop_Private
+{
+	FZRegisterLogCategory RegisterLogZSharpScriptCore { LogZSharpScriptCore };
+	FZRegisterLogCategory RegisterLogZSharpScriptAssemblyResolver { LogZSharpScriptAssemblyResolver };
+	FZRegisterLogCategory RegisterLogZSharpScriptAsync { LogZSharpScriptAsync };
+	FZRegisterLogCategory RegisterLogZSharpScriptEngine { LogZSharpScriptEngine };
+	FZRegisterLogCategory RegisterLogZSharpScript { LogZSharpScript };
+	FZRegisterLogCategory RegisterLogTemp { LogTemp };
+}
 
 void ZSharp::FZLog_Interop::Log(const TCHAR* category, ELogVerbosity::Type verbosity, const TCHAR* message)
 {

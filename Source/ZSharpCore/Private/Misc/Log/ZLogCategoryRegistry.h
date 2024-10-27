@@ -15,7 +15,7 @@ namespace ZSharp
 		FLogCategoryBase* GetCategory(FName name);
 	
 	private:
-		void Register(FName name, FLogCategoryBase& category);
+		void Register(FLogCategoryBase& category);
 
 	private:
 		TMap<FName, FLogCategoryBase*> CategoryMap;

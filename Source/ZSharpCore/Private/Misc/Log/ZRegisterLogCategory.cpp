@@ -4,9 +4,9 @@
 
 #include "ZLogCategoryRegistry.h"
 
-ZSharp::FZRegisterLogCategory::FZRegisterLogCategory(FName name, FLogCategoryBase& category)
+ZSharp::FZRegisterLogCategory::FZRegisterLogCategory(FLogCategoryBase& category)
 {
-	FZLogCategoryRegistry::Get().Register(name, category);
+	FZLogCategoryRegistry::Get().Register(category);
 }
 
 

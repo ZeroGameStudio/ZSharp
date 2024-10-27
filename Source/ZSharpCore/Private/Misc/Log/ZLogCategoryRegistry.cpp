@@ -15,8 +15,9 @@ FLogCategoryBase* ZSharp::FZLogCategoryRegistry::GetCategory(FName name)
 	return category ? *category : nullptr;
 }
 
-void ZSharp::FZLogCategoryRegistry::Register(FName name, FLogCategoryBase& category)
+void ZSharp::FZLogCategoryRegistry::Register(FLogCategoryBase& category)
 {
+	FName name = category.GetCategoryName();
 	check(!CategoryMap.Contains(name));
 	CategoryMap.Emplace(name, &category);
 }

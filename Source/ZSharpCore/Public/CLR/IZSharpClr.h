@@ -17,11 +17,39 @@ namespace ZSharp
 
 	/**
  	 * Represents a running CLR.
- 	 * A CLR object is automatically created when the module is loaded based on the configuration.
- 	 * The lifecycle of the CLR object accompanies the entire process, and there is one and only one CLR object per process.
- 	 * The CLR object internally maintains multiple AssemblyLoadContexts to achieve environment isolation.
  	 *
- 	 * @see IZAssemblyLoadContext
+ 	 * A .NET runtime will automatically set up based on which implementation you choose when this module is loaded.
+ 	 * Generally, it uses CoreCLR for desktop platforms, and Mono for other platforms.
+ 	 * For those platforms who prohibit JIT compilation, interpreter mode will be used.
+ 	 * The lifecycle of the runtime accompanies the entire process, and there is one and only one CLR object per process.
+ 	 * The runtime internally maintains multiple System.Runtime.Loader.AssemblyLoadContext instances to achieve environment isolation.
+ 	 *
+ 	 * There are three types of ALC in Z# architecture:
+ 	 *   a. Default ALC: Specifically referring to System.Runtime.Loader.AssemblyLoadContext.Default.
+ 	 *                   This is the built-in ALC of the .NET runtime, where all assemblies run by default.
+ 	 *                   You can load assemblies into Default ALC and interact with it simply through reflection.
+ 	 *                   
+ 	 *   b. Master ALC:  This is the main ALC of Z#, which features the 'Conjugate' and 'ZCall' mechanisms,
+ 	 *					 allowing complex interactions between managed and unmanaged code.
+ 	 *					 The bridge connecting the UObject world and the managed world in Z# is just built on the Master ALC.
+ 	 *					 Master ALC can be loaded and unloaded repeatedly to support hot reload mechanisms,
+ 	 *					 but only one instance can exist at any given time.
+ 	 *					 In most cases, the lifecycle of the Master ALC is managed automatically by Z#.
+ 	 *					 Of course, you can explicitly load and unload the Master ALC,
+ 	 *					 but this requires a sufficient understanding of the internals of Z#.
+ 	 *					 
+ 	 *   c. Slim ALC:    This is a lightweight ALC with an interface set similar to Default ALC,
+ 	 *					 allowing only assembly loading and simple calls.
+ 	 *					 However, Default ALC contains globally shared state,
+ 	 *					 frequent interaction with Default ALC may lead to unpredictable side effects.
+ 	 *					 Therefore, Slim ALC comes into play to enable relatively independent code to run in a sandbox,
+ 	 *					 minimizing the impact on the global environment.
+ 	 *					 Slim ALC has a name property, allowing multiple instances with different names to coexist.
+ 	 *					 Slim ALC needs to be explicitly unloaded after use.
+ 	 *
+ 	 * Use this interface as an entry point to interact with .NET runtime.
+ 	 *
+ 	 * @library This is a library interface - you should just consume this and have no reason to implement this.
  	 */
 	class IZSharpClr
 	{

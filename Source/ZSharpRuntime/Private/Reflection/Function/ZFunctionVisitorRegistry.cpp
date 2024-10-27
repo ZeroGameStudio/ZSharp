@@ -7,9 +7,9 @@
 
 const ZSharp::FZFunctionVisitorRegistry& ZSharp::FZFunctionVisitorRegistry::Get()
 {
-	static const FZFunctionVisitorRegistry GSingleton;
+	static const FZFunctionVisitorRegistry GInstance;
 
-	return GSingleton;
+	return GInstance;
 }
 
 ZSharp::FZFunctionVisitorHandle ZSharp::FZFunctionVisitorRegistry::Get(const UFunction* function) const

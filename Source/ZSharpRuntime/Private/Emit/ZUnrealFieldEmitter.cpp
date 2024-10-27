@@ -521,9 +521,9 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 ZSharp::FZUnrealFieldEmitter& ZSharp::FZUnrealFieldEmitter::Get()
 {
-	static FZUnrealFieldEmitter GSingleton;
+	static FZUnrealFieldEmitter GInstance;
 
-	return GSingleton;
+	return GInstance;
 }
 
 void ZSharp::FZUnrealFieldEmitter::Emit(FZUnrealFieldManifest& manifest)

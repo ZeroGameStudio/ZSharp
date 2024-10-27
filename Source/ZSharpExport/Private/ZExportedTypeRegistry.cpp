@@ -5,9 +5,9 @@
 
 ZSharp::FZExportedTypeRegistry& ZSharp::FZExportedTypeRegistry::Get()
 {
-	static FZExportedTypeRegistry GSingleton;
+	static FZExportedTypeRegistry GInstance;
 
-	return GSingleton;
+	return GInstance;
 }
 
 ZSharp::FZExportedTypeRegistry::FZExportedTypeRegistry()

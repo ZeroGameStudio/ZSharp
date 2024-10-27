@@ -7,9 +7,9 @@
 
 ZSharp::FZSharpFieldRegistry& ZSharp::FZSharpFieldRegistry::Get()
 {
-	static FZSharpFieldRegistry GSingleton;
+	static FZSharpFieldRegistry GInstance;
 
-	return GSingleton;
+	return GInstance;
 }
 
 const ZSharp::FZSharpClass* ZSharp::FZSharpFieldRegistry::GetClass(const UClass* cls) const

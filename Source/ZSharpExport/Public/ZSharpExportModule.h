@@ -11,8 +11,8 @@ class IZSharpExportModule : public IModuleInterface
 public:
 	static FORCEINLINE IZSharpExportModule& Get()
 	{
-		static IZSharpExportModule& GSingleton = FModuleManager::LoadModuleChecked<IZSharpExportModule>("ZSharpExport");
-		return GSingleton;
+		static IZSharpExportModule& GInstance = FModuleManager::LoadModuleChecked<IZSharpExportModule>("ZSharpExport");
+		return GInstance;
 	}
 
 	static FORCEINLINE bool IsAvailable()

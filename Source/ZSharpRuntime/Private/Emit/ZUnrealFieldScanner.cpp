@@ -173,9 +173,9 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 
 ZSharp::FZUnrealFieldScanner& ZSharp::FZUnrealFieldScanner::Get()
 {
-	static FZUnrealFieldScanner GSingleton;
+	static FZUnrealFieldScanner GInstance;
 
-	return GSingleton;
+	return GInstance;
 }
 
 void ZSharp::FZUnrealFieldScanner::Startup()

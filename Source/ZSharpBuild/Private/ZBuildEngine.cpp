@@ -58,9 +58,9 @@ namespace ZSharp::ZBuildEngine_Private
 
 ZSharp::FZBuildEngine& ZSharp::FZBuildEngine::Get()
 {
-	static FZBuildEngine GSingleton;
+	static FZBuildEngine GInstance;
 
-	return GSingleton;
+	return GInstance;
 }
 
 void ZSharp::FZBuildEngine::GenerateSolution(const TArray<FString>& args) const

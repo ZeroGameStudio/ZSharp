@@ -234,9 +234,9 @@ namespace ZSharp::ZGenericClr_Private
 
 ZSharp::FZGenericClr& ZSharp::FZGenericClr::Get()
 {
-	static FZGenericClr GSingleton;
+	static FZGenericClr GInstance;
 
-	return GSingleton;
+	return GInstance;
 }
 
 void ZSharp::FZGenericClr::Startup()

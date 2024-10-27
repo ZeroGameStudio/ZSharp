@@ -11,8 +11,8 @@ class IZSharpCoreModule : public IModuleInterface
 public:
 	static FORCEINLINE IZSharpCoreModule& Get()
 	{
-		static IZSharpCoreModule& GSingleton = FModuleManager::LoadModuleChecked<IZSharpCoreModule>("ZSharpCore");
-		return GSingleton;
+		static IZSharpCoreModule& GInstance = FModuleManager::LoadModuleChecked<IZSharpCoreModule>("ZSharpCore");
+		return GInstance;
 	}
 
 	static FORCEINLINE bool IsAvailable()

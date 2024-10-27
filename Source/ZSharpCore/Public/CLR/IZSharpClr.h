@@ -25,7 +25,7 @@ namespace ZSharp
  	 * The runtime internally maintains multiple System.Runtime.Loader.AssemblyLoadContext instances to achieve environment isolation.
  	 *
  	 * There are three types of ALC in Z# architecture:
- 	 *   a. Default ALC: Specifically referring to System.Runtime.Loader.AssemblyLoadContext.Default.
+ 	 *   a. Default ALC: Specifically refers to System.Runtime.Loader.AssemblyLoadContext.Default.
  	 *                   This is the built-in ALC of the .NET runtime, where all assemblies run by default.
  	 *                   You can load assemblies into Default ALC and interact with it simply through reflection.
  	 *                   

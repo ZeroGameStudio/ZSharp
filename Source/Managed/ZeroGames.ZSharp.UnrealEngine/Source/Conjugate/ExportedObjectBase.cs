@@ -164,7 +164,7 @@ public abstract class ExportedObjectBase : IConjugate
         
         Volatile.Write(ref _hasDisposed, true);
         
-        MasterAlcCache.Instance.ReleaseConjugate(Unmanaged);
+        MasterAlcCache.Instance.ReleaseConjugate(this);
         MarkAsDead();
 
         if (!fromFinalizer)

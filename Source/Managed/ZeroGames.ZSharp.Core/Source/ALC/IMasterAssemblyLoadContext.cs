@@ -45,7 +45,7 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 	EZCallErrorCode ZCall(ZCallHandle handle, ZCallBuffer* buffer);
 	ZCallHandle GetZCallHandle(string name);
 	IntPtr BuildConjugate(IConjugate managed, IntPtr userdata);
-	void ReleaseConjugate(IntPtr unmanaged);
+	void ReleaseConjugate(IConjugate conjugate);
 	void PushPendingDisposeConjugate(IConjugate conjugate);
 }
 

@@ -88,7 +88,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     public EZCallErrorCode ZCall(ZCallHandle handle, ZCallBuffer* buffer) => ZCall_Black(handle, buffer);
     public ZCallHandle GetZCallHandle(string name) => GetZCallHandle_Black(name);
     public IntPtr BuildConjugate(IConjugate managed, IntPtr userdata) => BuildConjugate_Black(managed, userdata);
-    public void ReleaseConjugate(IntPtr unmanaged) => ReleaseConjugate_Black(unmanaged);
+    public void ReleaseConjugate(IConjugate conjugate) => ReleaseConjugate_Black(conjugate.Unmanaged);
     
     public void PushPendingDisposeConjugate(IConjugate conjugate)
     {

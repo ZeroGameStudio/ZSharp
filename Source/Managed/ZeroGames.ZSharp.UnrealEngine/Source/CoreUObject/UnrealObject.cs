@@ -6,9 +6,9 @@ public partial class UnrealObject : IUnrealObject
 {
 
     public bool IsA(UnrealClass @class) => this.ZCall("ex://Object.IsA", @class, false)[-1].Bool;
-    public bool IsA<T>() where T : UnrealObject => IsA(UnrealObjectGlobals.GetClass<T>());
+    public bool IsA<T>() where T : UnrealObject => IsA(GetStaticClass<T>());
     public bool Implements(UnrealClass @interface) => this.ZCall("ex://Object.Implements", @interface, false)[-1].Bool;
-    public bool Implements<T>() where T : IUnrealInterface => Implements(UnrealObjectGlobals.GetClass<T>());
+    public bool Implements<T>() where T : IUnrealInterface => Implements(GetStaticClass<T>());
 
     public void MarkAsGarbage() => this.ZCall("ex://Object.MarkAsGarbage", [ null ]);
     

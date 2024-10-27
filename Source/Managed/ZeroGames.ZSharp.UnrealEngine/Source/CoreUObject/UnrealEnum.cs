@@ -14,7 +14,7 @@ public partial class UnrealEnum
 	{
 		check(t.IsEnum);
 		verify(t.GetCustomAttribute<UnrealFieldPathAttribute>() is var attr && attr is not null);
-		return UnrealObjectGlobals.LowLevelFindObject<UnrealEnum>(attr.Path)!;
+		return LowLevelFindObject<UnrealEnum>(attr.Path)!;
 	}
 
 }

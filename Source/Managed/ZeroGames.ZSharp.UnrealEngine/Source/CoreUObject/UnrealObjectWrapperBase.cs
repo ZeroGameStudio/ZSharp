@@ -16,7 +16,7 @@ public abstract class UnrealObjectWrapperBase : PlainExportedObjectBase
 		_allowInterface = allowInterface;
 		ValidateElementType();
 		
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealObjectGlobals.GetClass(_objectType).Unmanaged);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, GetStaticClass(_objectType).Unmanaged);
 	}
 
 	protected UnrealObjectWrapperBase(Type objectType, bool allowObject, bool allowInterface, IntPtr unmanaged) : base(unmanaged)

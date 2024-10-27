@@ -98,7 +98,7 @@ internal static class ContainerHelper
 		// UClasses
 		if (type.IsAssignableTo(typeof(UnrealObjectBase)))
 		{
-			desc.Descriptor = UnrealObjectGlobals.GetClass(type).Unmanaged;
+			desc.Descriptor = GetStaticClass(type).Unmanaged;
 			return true;
 		}
 		
@@ -120,37 +120,37 @@ internal static class ContainerHelper
 		if (type.IsAssignableTo(typeof(SubclassOfBase)))
 		{
 			desc.Descriptor = SUBCLASS_OF_TYPE_ID;
-			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = GetStaticClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(SoftClassPtrBase)))
 		{
 			desc.Descriptor = SOFT_CLASS_PTR_TYPE_ID;
-			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = GetStaticClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(SoftObjectPtrBase)))
 		{
 			desc.Descriptor = SOFT_OBJECT_PTR_TYPE_ID;
-			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = GetStaticClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(WeakObjectPtrBase)))
 		{
 			desc.Descriptor = WEAK_OBJECT_PTR_TYPE_ID;
-			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = GetStaticClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(LazyObjectPtrBase)))
 		{
 			desc.Descriptor = LAZY_OBJECT_PTR_TYPE_ID;
-			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = GetStaticClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(ScriptInterfaceBase)))
 		{
 			desc.Descriptor = SCRIPT_INTERFACE_TYPE_ID;
-			desc.Metadata = UnrealObjectGlobals.GetClass(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = GetStaticClass(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		

@@ -13,7 +13,7 @@ public abstract class UnrealDelegateBase : UnrealDynamicDelegateBase
 	public static UnrealFunction GetUnrealDelegateSignature(Type t)
 	{
 		verify(t.GetCustomAttribute<UnrealFieldPathAttribute>() is var attr && attr is not null);
-		return UnrealObjectGlobals.LowLevelFindObject<UnrealFunction>(attr.Path)!;
+		return LowLevelFindObject<UnrealFunction>(attr.Path)!;
 	}
 
 	public void Bind(UnrealObject obj, string name) => this.ZCall("ex://Delegate.BindUFunction", obj, new UnrealName(name));

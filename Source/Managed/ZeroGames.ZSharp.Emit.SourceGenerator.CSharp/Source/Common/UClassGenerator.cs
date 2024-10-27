@@ -145,7 +145,7 @@ public partial class {className} : IConjugate<{className}>, IStaticUnrealFieldPa
 
 	public new static {className} BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 	public new static string StaticUnrealFieldPath => __UNREAL_FIELD_PATH;
-	public new static UnrealClass StaticClass => UnrealObjectGlobals.LowLevelFindObject<UnrealClass>(__UNREAL_FIELD_PATH)!;
+	public new static UnrealClass StaticClass => LowLevelFindObject<UnrealClass>(__UNREAL_FIELD_PATH)!;
 	public override string UnrealFieldPath => __UNREAL_FIELD_PATH;
 	protected {className}(IntPtr unmanaged) : base(unmanaged){{}}
 	private const string __UNREAL_FIELD_PATH = ""{unrealFieldPath}"";

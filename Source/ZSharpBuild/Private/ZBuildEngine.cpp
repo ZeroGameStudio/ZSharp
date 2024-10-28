@@ -12,7 +12,7 @@
 namespace ZSharp::ZBuildEngine_Private
 {
 	static FAutoConsoleCommand GCmdZSharpGens(
-		TEXT("zs.gens"),
+		TEXT("z#.gens"),
 		TEXT("Generate ZSharp solution and project files."),
 		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& args)
 		{
@@ -21,7 +21,7 @@ namespace ZSharp::ZBuildEngine_Private
 		ECVF_Default);
 
 	static FAutoConsoleCommand GCmdZSharpGeng(
-		TEXT("zs.geng"),
+		TEXT("z#.geng"),
 		TEXT("Generate ZSharp glue code."),
 		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& args)
 		{

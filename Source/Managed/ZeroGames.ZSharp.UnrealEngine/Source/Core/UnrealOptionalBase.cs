@@ -10,9 +10,9 @@ namespace ZeroGames.ZSharp.UnrealEngine.Core;
 public abstract class UnrealOptionalBase : PlainExportedObjectBase
 {
 	
-	public void Reset() => this.ZCall("ex://Optional.Reset");
+	public void Reset() => this.ZCall(MasterAlcCache.Instance, "ex://Optional.Reset");
 
-	public bool IsSet => this.ZCall("ex://Optional.IsSet", false)[-1].Bool;
+	public bool IsSet => this.ZCall(MasterAlcCache.Instance, "ex://Optional.IsSet", false)[-1].Bool;
 	
 	protected unsafe UnrealOptionalBase(Type elementType)
 	{
@@ -32,12 +32,12 @@ public abstract class UnrealOptionalBase : PlainExportedObjectBase
 
 	protected bool Get([NotNullWhen(true)] out object? value)
 	{
-		DynamicZCallResult res = this.ZCall("ex://Optional.Get", _elementType);
+		DynamicZCallResult res = this.ZCall(MasterAlcCache.Instance, "ex://Optional.Get", _elementType);
 		value = res[1].Object;
 
 		return res[-1].Bool;
 	}
-	protected void Set(object? value) => this.ZCall("ex://Optional.Set", value);
+	protected void Set(object? value) => this.ZCall(MasterAlcCache.Instance, "ex://Optional.Set", value);
 	
 	[Conditional("ASSERTION_CHECK")]
 	private void ValidateElementType()

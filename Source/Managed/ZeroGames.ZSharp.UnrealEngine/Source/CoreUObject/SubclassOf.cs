@@ -23,13 +23,13 @@ public sealed class SubclassOf<T> : SubclassOfBase, IConjugate<SubclassOf<T>> wh
 			return;
 		}
 
-		_Object = cls;
+		UntypedObject = cls;
 	}
 	
 	public UnrealClass? Class
 	{
-		get => (UnrealClass?)_Object;
-		set => _Object = value;
+		get => (UnrealClass?)UntypedObject;
+		set => UntypedObject = value;
 	}
 	
 }

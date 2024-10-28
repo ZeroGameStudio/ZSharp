@@ -10,7 +10,7 @@ public sealed partial class UnrealName
 
 	public override string ToString() => Data;
 
-	public UnrealString ToUnrealString() => this.ZCall("ex://Name.ToString", [ null ])[-1].ReadConjugate<UnrealString>()!;
+	public UnrealString ToUnrealString() => this.ZCall(MasterAlcCache.Instance, "ex://Name.ToString", [ null ])[-1].ReadConjugate<UnrealString>()!;
 
 	public unsafe string Data
 	{
@@ -19,7 +19,7 @@ public sealed partial class UnrealName
 		{
 			fixed (char* data = value)
 			{
-				this.ZCall("ex://Name.SetData", (IntPtr)data);
+				this.ZCall(MasterAlcCache.Instance, "ex://Name.SetData", (IntPtr)data);
 			}
 		}
 	}

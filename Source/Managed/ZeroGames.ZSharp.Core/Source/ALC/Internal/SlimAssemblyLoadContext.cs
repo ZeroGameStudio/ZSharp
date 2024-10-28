@@ -17,12 +17,12 @@ internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, I
 
     protected override void HandleUnload()
     {
-        base.HandleUnload();
-        
         if (ensure(_instanceMap.TryGetValue(Name!, out var alc) && alc == this))
         {
             _instanceMap.Remove(Name!);
         }
+        
+        base.HandleUnload();
     }
     
     private SlimAssemblyLoadContext(string name) : base(name)

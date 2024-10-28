@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public abstract class UnrealObjectWrapperBase : PlainExportedObjectBase
 {
 
-	public bool IsValid => _Object is not null;
+	public bool IsValid => UntypedObject is not null;
 	
 	protected UnrealObjectWrapperBase(Type objectType, bool allowObject, bool allowInterface)
 	{
@@ -27,12 +27,12 @@ public abstract class UnrealObjectWrapperBase : PlainExportedObjectBase
 		ValidateElementType();
 	}
 	
-	protected abstract string _ZCallClassName { get; }
+	protected abstract string ZCallClassName { get; }
 	
-	protected UnrealObject? _Object
+	protected UnrealObject? UntypedObject
 	{
-		get => this.ZCall($"ex://{_ZCallClassName}.Get", [ null ])[-1].ReadConjugate<UnrealObject>();
-		set => this.ZCall($"ex://{_ZCallClassName}.Set", value);
+		get => this.ZCall(MasterAlcCache.Instance, $"ex://{ZCallClassName}.Get", [ null ])[-1].ReadConjugate<UnrealObject>();
+		set => this.ZCall(MasterAlcCache.Instance, $"ex://{ZCallClassName}.Set", value);
 	}
 	
 	[Conditional("ASSERTION_CHECK")]

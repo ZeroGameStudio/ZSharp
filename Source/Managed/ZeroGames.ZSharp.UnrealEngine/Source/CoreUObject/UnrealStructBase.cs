@@ -12,7 +12,7 @@ public abstract class UnrealStructBase : UnrealExportedObjectBase
     public DynamicZCallResult ReadUnrealPropertyEx<T>(string name, int32 index)
     {
 	    string zcallName = $"up:/{UnrealFieldPath}:{name}";
-	    return this.ZCall(zcallName, false, index, typeof(T));
+	    return this.ZCall(MasterAlcCache.Instance, zcallName, false, index, typeof(T));
     }
 
     public DynamicZCallResult ReadUnrealPropertyEx<T>(string name) => ReadUnrealPropertyEx<T>(name, 0);
@@ -24,7 +24,7 @@ public abstract class UnrealStructBase : UnrealExportedObjectBase
     public DynamicZCallResult WriteUnrealProperty<T>(string name, int32 index, T value)
     {
 	    string zcallName = $"up:/{UnrealFieldPath}:{name}";
-	    return this.ZCall(zcallName, true, index, value);
+	    return this.ZCall(MasterAlcCache.Instance, zcallName, true, index, value);
     }
 
     public DynamicZCallResult WriteUnrealProperty<T>(string name, T value) => WriteUnrealProperty(name, 0, value);

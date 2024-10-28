@@ -23,17 +23,17 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase, IConjugate<SoftClassPtr<
 			return;
 		}
 
-		_Object = cls;
+		UntypedObject = cls;
 	}
 	
 	public UnrealClass? Class
 	{
-		get => (UnrealClass?)_Object;
-		set => _Object = value;
+		get => (UnrealClass?)UntypedObject;
+		set => UntypedObject = value;
 	}
 
-	public bool IsNull => this.ZCall("ex://SoftClass.IsNull", false)[-1].Bool;
-	public SubclassOf<T> Load => new((UnrealClass?)this.ZCall("ex://SoftClass.Load", [null])[-1].Object);
+	public bool IsNull => this.ZCall(MasterAlcCache.Instance, "ex://SoftClass.IsNull", false)[-1].Bool;
+	public SubclassOf<T> Load => new((UnrealClass?)this.ZCall(MasterAlcCache.Instance, "ex://SoftClass.Load", [null])[-1].Object);
 
 }
 

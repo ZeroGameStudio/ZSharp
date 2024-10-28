@@ -5,7 +5,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public partial class UnrealStruct
 {
 
-	public bool IsChildOf(UnrealStruct? other) => this.ZCall("ex://Struct.IsChildOf", other, false)[-1].Bool;
+	public bool IsChildOf(UnrealStruct? other) => this.ZCall(MasterAlcCache.Instance, "ex://Struct.IsChildOf", other, false)[-1].Bool;
 
 }
 

@@ -18,16 +18,16 @@ public sealed class LazyObjectPtr<T> : LazyObjectPtrBase, IConjugate<LazyObjectP
 			return;
 		}
 
-		_Object = obj;
+		UntypedObject = obj;
 	}
 	
 	public T? Object
 	{
-		get => (T?)_Object;
-		set => _Object = value;
+		get => (T?)UntypedObject;
+		set => UntypedObject = value;
 	}
 	
-	public bool IsNull => this.ZCall("ex://LazyObject.IsNull", false)[-1].Bool;
+	public bool IsNull => this.ZCall(MasterAlcCache.Instance, "ex://LazyObject.IsNull", false)[-1].Bool;
 	
 }
 

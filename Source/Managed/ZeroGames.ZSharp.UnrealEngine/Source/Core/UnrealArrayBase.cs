@@ -9,11 +9,11 @@ namespace ZeroGames.ZSharp.UnrealEngine.Core;
 public abstract class UnrealArrayBase : PlainExportedObjectBase
 {
 	
-	public void InsertAt(int32 index) => this.ZCall("ex://Array.InsertAt", index);
-	public void RemoveAt(int32 index) => this.ZCall("ex://Array.RemoveAt", index);
-	public void Clear() => this.ZCall("ex://Array.Clear");
+	public void InsertAt(int32 index) => this.ZCall(MasterAlcCache.Instance, "ex://Array.InsertAt", index);
+	public void RemoveAt(int32 index) => this.ZCall(MasterAlcCache.Instance, "ex://Array.RemoveAt", index);
+	public void Clear() => this.ZCall(MasterAlcCache.Instance, "ex://Array.Clear");
 	
-	public int32 Count => this.ZCall("ex://Array.Num", 0)[-1].Int32;
+	public int32 Count => this.ZCall(MasterAlcCache.Instance, "ex://Array.Num", 0)[-1].Int32;
 
 	protected unsafe UnrealArrayBase(Type elementType)
 	{
@@ -31,8 +31,8 @@ public abstract class UnrealArrayBase : PlainExportedObjectBase
 		ValidateElementType();
 	}
 	
-	protected object? Get(int32 index) => this.ZCall("ex://Array.Get", index, _elementType)[-1].Object;
-	protected void Set(int32 index, object? value) => this.ZCall("ex://Array.Set", index, value);
+	protected object? Get(int32 index) => this.ZCall(MasterAlcCache.Instance, "ex://Array.Get", index, _elementType)[-1].Object;
+	protected void Set(int32 index, object? value) => this.ZCall(MasterAlcCache.Instance, "ex://Array.Set", index, value);
 	
 	[Conditional("ASSERTION_CHECK")]
 	private void ValidateElementType()

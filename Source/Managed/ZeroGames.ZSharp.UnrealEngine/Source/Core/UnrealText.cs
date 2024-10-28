@@ -12,12 +12,12 @@ public sealed partial class UnrealText
 
 	public unsafe string Data
 	{
-		get => new((char*)this.ZCall("ex://Text.GetData", IntPtr.Zero)[-1].Pointer);
+		get => new((char*)this.ZCall(MasterAlcCache.Instance, "ex://Text.GetData", IntPtr.Zero)[-1].Pointer);
 		set
 		{
 			fixed (char* data = value)
 			{
-				this.ZCall("ex://Text.SetData", (IntPtr)data);
+				this.ZCall(MasterAlcCache.Instance, "ex://Text.SetData", (IntPtr)data);
 			}
 		}
 	}

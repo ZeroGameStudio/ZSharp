@@ -10,9 +10,9 @@ namespace ZeroGames.ZSharp.UnrealEngine.Core;
 public abstract class UnrealMapBase : PlainExportedObjectBase
 {
 	
-	public void Clear() => this.ZCall("ex://Map.Clear");
+	public void Clear() => this.ZCall(MasterAlcCache.Instance, "ex://Map.Clear");
 	
-	public int32 Count => this.ZCall("ex://Map.Num", 0)[-1].Int32;
+	public int32 Count => this.ZCall(MasterAlcCache.Instance, "ex://Map.Num", 0)[-1].Int32;
 	
 	protected unsafe UnrealMapBase(Type keyType, Type valueType)
 	{
@@ -32,12 +32,12 @@ public abstract class UnrealMapBase : PlainExportedObjectBase
 		ValidateElementType();
 	}
 	
-	protected void Add(object? key, object? value) => this.ZCall("ex://Map.Add", key, value);
-	protected void Remove(object? key) => this.ZCall("ex://Map.Remove", key);
+	protected void Add(object? key, object? value) => this.ZCall(MasterAlcCache.Instance, "ex://Map.Add", key, value);
+	protected void Remove(object? key) => this.ZCall(MasterAlcCache.Instance, "ex://Map.Remove", key);
 
 	protected bool Find(object? key, [NotNullWhen(true)] out object? value)
 	{
-		DynamicZCallResult res = this.ZCall("ex://Map.Find", key, _valueType, false);
+		DynamicZCallResult res = this.ZCall(MasterAlcCache.Instance, "ex://Map.Find", key, _valueType, false);
 		value = res[2].Object;
 
 		return res[-1].Bool;

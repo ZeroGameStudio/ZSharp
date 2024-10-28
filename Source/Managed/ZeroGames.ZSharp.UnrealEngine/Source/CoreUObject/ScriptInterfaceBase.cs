@@ -7,7 +7,7 @@ public abstract class ScriptInterfaceBase : UnrealObjectWrapperBase
 {
 	protected ScriptInterfaceBase(Type objectType) : base(objectType, false, true){}
 	protected ScriptInterfaceBase(Type objectType, IntPtr unmanaged) : base(objectType, false, true, unmanaged){}
-	protected override string _ZCallClassName => "Interface";
+	protected override string ZCallClassName => "Interface";
 }
 
 

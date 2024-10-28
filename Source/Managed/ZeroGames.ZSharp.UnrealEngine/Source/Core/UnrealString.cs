@@ -10,16 +10,16 @@ public sealed partial class UnrealString
 
     public override string ToString() => Data;
 
-    public int32 Len => this.ZCall("ex://String.Len", 0)[1].Int32;
+    public int32 Len => this.ZCall(MasterAlcCache.Instance, "ex://String.Len", 0)[1].Int32;
 
     public unsafe string Data
     {
-        get => new((char*)this.ZCall("ex://String.GetData", IntPtr.Zero)[-1].Pointer);
+        get => new((char*)this.ZCall(MasterAlcCache.Instance, "ex://String.GetData", IntPtr.Zero)[-1].Pointer);
         set
         {
             fixed (char* data = value)
             {
-                this.ZCall("ex://String.SetData", (IntPtr)data);
+                this.ZCall(MasterAlcCache.Instance, "ex://String.SetData", (IntPtr)data);
             }
         }
     }

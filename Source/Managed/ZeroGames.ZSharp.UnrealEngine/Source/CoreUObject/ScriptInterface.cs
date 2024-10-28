@@ -23,13 +23,13 @@ public sealed class ScriptInterface<T> : ScriptInterfaceBase, IConjugate<ScriptI
 			return;
 		}
 
-		_Object = obj;
+		UntypedObject = obj;
 	}
 
 	public UnrealObject? Object
 	{
-		get => _Object;
-		set => _Object = value;
+		get => UntypedObject;
+		set => UntypedObject = value;
 	}
 	
 }

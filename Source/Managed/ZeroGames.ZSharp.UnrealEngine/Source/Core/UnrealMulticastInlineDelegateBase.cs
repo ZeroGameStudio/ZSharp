@@ -9,13 +9,13 @@ namespace ZeroGames.ZSharp.UnrealEngine.Core;
 public abstract class UnrealMulticastInlineDelegateBase : UnrealDynamicDelegateBase
 {
 	
-	public void Add(UnrealObject obj, string name) => this.ZCall("ex://MulticastInlineDelegate.AddUFunction", obj, new UnrealName(name));
-	public void Remove(UnrealObject obj, string name) => this.ZCall("ex://MulticastInlineDelegate.RemoveUFunction", obj, new UnrealName(name));
-	public void RemoveAll(UnrealObject obj) => this.ZCall("ex://MulticastInlineDelegate.RemoveAll", obj);
-	public void Clear() => this.ZCall("ex://MulticastInlineDelegate.Clear");
-	public DynamicZCallResult Broadcast(params object?[] parameters) => this.ZCall("ex://MulticastInlineDelegate.Broadcast", parameters);
+	public void Add(UnrealObject obj, string name) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.AddUFunction", obj, new UnrealName(name));
+	public void Remove(UnrealObject obj, string name) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.RemoveUFunction", obj, new UnrealName(name));
+	public void RemoveAll(UnrealObject obj) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.RemoveAll", obj);
+	public void Clear() => this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.Clear");
+	public DynamicZCallResult Broadcast(params object?[] parameters) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.Broadcast", parameters);
 	
-	public bool IsBound => this.ZCall("ex://MulticastInlineDelegate.IsBound", false)[-1].Bool;
+	public bool IsBound => this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.IsBound", false)[-1].Bool;
 	
 	protected UnrealMulticastInlineDelegateBase(Type delegateType)
 	{
@@ -34,7 +34,7 @@ public abstract class UnrealMulticastInlineDelegateBase : UnrealDynamicDelegateB
 		check(@delegate.GetType() == _delegateType);
 
 		GCHandle handle = GCHandle.Alloc(@delegate);
-		return this.ZCall("ex://MulticastInlineDelegate.AddManaged", handle, null)[-1].ReadConjugate<UnrealObject>()!;
+		return this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.AddManaged", handle, null)[-1].ReadConjugate<UnrealObject>()!;
 	}
 	
 	private readonly Type _delegateType;

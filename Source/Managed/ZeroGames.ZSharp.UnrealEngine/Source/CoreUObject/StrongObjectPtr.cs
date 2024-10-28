@@ -17,13 +17,13 @@ public sealed class StrongObjectPtr<T> : StrongObjectPtrBase, IConjugate<StrongO
 			return;
 		}
 
-		_Object = obj;
+		UntypedObject = obj;
 	}
 	
 	public T? Object
 	{
-		get => (T?)_Object;
-		set => _Object = value;
+		get => (T?)UntypedObject;
+		set => UntypedObject = value;
 	}
 	
 }

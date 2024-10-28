@@ -28,27 +28,25 @@ public readonly struct DynamicZCallResult(ZCallBufferSlot[] slots)
 public static class DynamicZCall
 {
 
-	public static DynamicZCallResult ZCall(ZCallHandle handle, params object?[] parameters) => InternalZCall(MasterAssemblyLoadContext.Instance!, handle, parameters);
+	public static DynamicZCallResult ZCall(IMasterAssemblyLoadContext alc, ZCallHandle handle, params object?[] parameters) => InternalZCall(alc, handle, parameters);
 	
-	public static DynamicZCallResult ZCall(string name, out ZCallHandle outHandle, params object?[] parameters)
+	public static DynamicZCallResult ZCall(IMasterAssemblyLoadContext alc, string name, out ZCallHandle outHandle, params object?[] parameters)
 	{
-		MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Instance!;
 		outHandle = alc.GetZCallHandle(name);
 		return InternalZCall(alc, outHandle, parameters);
 	}
 
-	public static DynamicZCallResult ZCall(string name, params object?[] parameters) => ZCall(name, out _, parameters);
+	public static DynamicZCallResult ZCall(IMasterAssemblyLoadContext alc, string name, params object?[] parameters) => ZCall(alc, name, out _, parameters);
 	
-	public static DynamicZCallResult ZCall(this IConjugate @this, ZCallHandle handle, params object?[] parameters) => InternalZCall(@this, MasterAssemblyLoadContext.Instance!, handle, parameters);
+	public static DynamicZCallResult ZCall(this IConjugate @this, IMasterAssemblyLoadContext alc, ZCallHandle handle, params object?[] parameters) => @this.InternalZCall(alc, handle, parameters);
 	
-	public static DynamicZCallResult ZCall(this IConjugate @this, string name, out ZCallHandle outHandle, params object?[] parameters)
+	public static DynamicZCallResult ZCall(this IConjugate @this, IMasterAssemblyLoadContext alc, string name, out ZCallHandle outHandle, params object?[] parameters)
 	{
-		MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Instance!;
 		outHandle = alc.GetZCallHandle(name);
 		return InternalZCall(@this, alc, outHandle, parameters);
 	}
 
-	public static DynamicZCallResult ZCall(this IConjugate @this, string name, params object?[] parameters) => ZCall(@this, name, out _, parameters);
+	public static DynamicZCallResult ZCall(this IConjugate @this, IMasterAssemblyLoadContext alc, string name, params object?[] parameters) => @this.ZCall(alc, name, out _, parameters);
 	
 	private static unsafe DynamicZCallResult InternalZCall(IMasterAssemblyLoadContext alc, ZCallHandle handle, params object?[] parameters)
 	{

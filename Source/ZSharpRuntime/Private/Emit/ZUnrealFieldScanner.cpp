@@ -6,6 +6,7 @@
 #include "JsonObjectConverter.h"
 #include "ZSharpRuntimeLogChannels.h"
 #include "ZSharpRuntimeSettings.h"
+#include "ZStealInvocationList.h"
 #include "ZUnrealFieldDefinitionDtos.h"
 #include "ALC/IZDefaultAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
@@ -14,20 +15,8 @@
 
 namespace ZSharp::ZUnrealFieldScanner_Private
 {
-	// This magic helps us to access multicast delegate invocation list.
-	static TArray<TDelegateBase<FNotThreadSafeNotCheckedDelegateMode>, FMulticastInvocationListAllocatorType>(TMulticastDelegateBase<FDefaultDelegateUserPolicy>::*GInvocationListMemberPtr);
-	template <decltype(GInvocationListMemberPtr) MemberPtr>
-	struct TInvocationListMemberPtrInitializer
-	{
-		TInvocationListMemberPtrInitializer()
-		{
-			GInvocationListMemberPtr = MemberPtr;
-		}
-		static TInvocationListMemberPtrInitializer GInstance;
-	};
-	template <decltype(GInvocationListMemberPtr) MemberPtr> TInvocationListMemberPtrInitializer<MemberPtr> TInvocationListMemberPtrInitializer<MemberPtr>::GInstance;
-	template struct TInvocationListMemberPtrInitializer <&TMulticastDelegateBase<FDefaultDelegateUserPolicy>::InvocationList>;
-
+	ZSHARP_STEAL_INVOCATION_LIST(GInvocationListMemberPtr)
+	
 	static TArray<FZPropertyDefinition> PropertyDtos2Defs(TArray<FZPropertyDefinitionDto>&& dtos)
 	{
 		TArray<FZPropertyDefinition> defs;
@@ -197,8 +186,10 @@ void ZSharp::FZUnrealFieldScanner::Startup()
 	auto& delegate = FModuleManager::Get().OnProcessLoadedObjectsCallback();
 	ProcessLoadedObjectsDelegate = delegate.AddRaw(this, &FZUnrealFieldScanner::ScanUnrealFieldsForModule);
 	auto& invocationList = delegate.*ZUnrealFieldScanner_Private::GInvocationListMemberPtr;
-	check(invocationList.Num() == 2);
-	invocationList.Swap(0, 1);
+	for (int32 i = invocationList.Num() - 2; i >= 0; --i)
+	{
+		invocationList.Swap(i, i + 1);
+	}
 		
 	UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Successfully hook up ProcessLoadedObjectsDelegate."));
 }

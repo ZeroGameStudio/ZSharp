@@ -49,14 +49,6 @@ FString UZSharpRuntimeSettings::RedirectFieldName(const FString& sourcePath) con
 	return redirector ? redirector->TargetName : FString{};
 }
 
-void UZSharpRuntimeSettings::ForeachMasterAlcStartupAssembly(TFunctionRef<void(const FZMasterAlcStartupAssembly&)> action) const
-{
-	for (const auto& assembly : MasterAlcStartupAssemblies)
-	{
-		action(assembly);
-	}
-}
-
 #if WITH_EDITOR
 
 TArray<FString> UZSharpRuntimeSettings::GetModuleOptions()

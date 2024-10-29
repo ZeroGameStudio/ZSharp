@@ -23,7 +23,7 @@ public readonly struct InteropRuntimeTypeHandle : IEquatable<InteropRuntimeTypeH
 		return obj is InteropRuntimeTypeHandle other && Equals(other);
 	}
 
-	public override int GetHashCode()
+	public override int32 GetHashCode()
 	{
 		return _handle.GetHashCode();
 	}

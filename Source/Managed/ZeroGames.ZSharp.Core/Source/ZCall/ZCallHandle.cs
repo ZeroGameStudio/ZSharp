@@ -15,7 +15,7 @@ public readonly struct ZCallHandle : IEquatable<ZCallHandle>
         return obj is ZCallHandle other && Equals(other);
     }
 
-    public override int GetHashCode()
+    public override int32 GetHashCode()
     {
         return _handle.GetHashCode();
     }

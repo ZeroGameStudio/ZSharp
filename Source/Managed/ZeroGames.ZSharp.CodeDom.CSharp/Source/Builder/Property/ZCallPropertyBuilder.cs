@@ -2,17 +2,17 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class ZCallPropertyBuilder(EMemberVisibility visibility, EMemberModifiers modifiers, string name, string zcallName, int32 index, TypeReference type, bool readOnly)
+public class ZCallPropertyBuilder(EMemberVisibility visibility, EMemberModifiers modifiers, string name, string zcallName, int32 index, TypeReference type, bool needsUnsafeBlock, bool readOnly)
 {
 	
 	public PropertyDefinition Build(bool abstraction) => new(Visibility, Name, Type, true, !IsReadOnly)
 	{
 		Modifiers = Modifiers,
 		// @TODO: Partial property
-		Getter = new ZCallMethodBodyBuilder(ZCallName, Type,
+		Getter = new ZCallMethodBodyBuilder(ZCallName, Type, NeedsUnsafeBlock,
 			new ParameterDeclaration(EParameterKind.In, new("bool", null), string.Empty),
 			new ParameterDeclaration(EParameterKind.In, new(nameof(int32), null), Index != 0 ? Index.ToString() : string.Empty)).Build(),
-		Setter = !IsReadOnly ? new ZCallMethodBodyBuilder(ZCallName, null,
+		Setter = !IsReadOnly ? new ZCallMethodBodyBuilder(ZCallName, null, NeedsUnsafeBlock,
 			new ParameterDeclaration(EParameterKind.In, new("bool", null), "true"),
 			new ParameterDeclaration(EParameterKind.In, new(nameof(int32), null), Index != 0 ? Index.ToString() : string.Empty),
 			new ParameterDeclaration(EParameterKind.In, Type, "value")).Build() : null,
@@ -24,6 +24,7 @@ public class ZCallPropertyBuilder(EMemberVisibility visibility, EMemberModifiers
 	public string ZCallName { get; } = zcallName;
 	public int32 Index { get; } = index;
 	public TypeReference Type { get; } = type;
+	public bool NeedsUnsafeBlock { get; } = needsUnsafeBlock;
 	public bool IsReadOnly { get; } = readOnly;
 	
 }

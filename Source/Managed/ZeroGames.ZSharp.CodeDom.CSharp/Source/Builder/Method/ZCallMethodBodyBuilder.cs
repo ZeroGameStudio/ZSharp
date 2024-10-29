@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class ZCallMethodBodyBuilder(string name, TypeReference? returnType, params ParameterDeclaration[]? parameters)
+public class ZCallMethodBodyBuilder(string name, TypeReference? returnType, bool needsUnsafeBlock, params ParameterDeclaration[]? parameters)
 {
 
 	public MethodBody Build()
@@ -53,17 +53,18 @@ ZCallBuffer buffer = new(slots, NUM_SLOTS);";
 			sb.Append(MakeCopyOutsAndReturn());
 		}
 
-		string body = 
+		string body = NeedsUnsafeBlock ?
 $@"unsafe
 {{
 {sb.ToString().Indent()}
-}}";
+}}" : sb.ToString();
 		
 		return new(body);
 	}
 
 	public string Name { get; } = name;
 	public TypeReference? ReturnType { get; } = returnType;
+	public bool NeedsUnsafeBlock { get; } = needsUnsafeBlock;
 	public IReadOnlyList<ParameterDeclaration>? Parameters { get; } = parameters;
 
 	public bool IsStatic { get; set; }
@@ -132,7 +133,7 @@ $@"unsafe
 		string cast = isEnum ? $"({parameterType.TypeName})" : string.Empty;
 		string slotType = GetSlotType(parameterType);
 		string getTarget = slotType == "Conjugate" ? $".GetTarget<{parameterType.TypeName.TrimEnd('?')}>()" : string.Empty;
-		string nullForgiving = slotType == "Conjugate" ? "!" : string.Empty;
+		string nullForgiving = slotType == "Conjugate" && !parameterType.TypeName.EndsWith("?") ? "!" : string.Empty;
 		return $"{cast}slots[{index}].{slotType}{getTarget}{nullForgiving}";
 	}
 

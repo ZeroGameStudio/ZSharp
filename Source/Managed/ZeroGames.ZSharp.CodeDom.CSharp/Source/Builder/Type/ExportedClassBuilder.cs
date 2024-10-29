@@ -31,7 +31,7 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 			modifiers |= EMemberModifiers.Static;
 		}
 		
-		MethodDefinition method = new ZCallMethodBuilder(visibility, modifiers, name, zcallName, returnType, parameters).Build(IsAbstraction);
+		MethodDefinition method = new ZCallMethodBuilder(visibility, modifiers, name, zcallName, returnType, false, parameters).Build(IsAbstraction);
 		_methods.Add(method);
 
 		return method;
@@ -49,15 +49,15 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 		return method;
 	}
 
-	public PropertyDefinition AddProperty(EMemberVisibility visibility, TypeReference type, string name, string zcallName, int32 index, bool readOnly, bool notnull)
+	public PropertyDefinition AddProperty(EMemberVisibility visibility, TypeReference type, string name, string zcallName, int32 index, bool readOnly, bool allowNull)
 	{
 		// @TODO: Partial property
 		EMemberModifiers modifiers = EMemberModifiers.None; // EMemberModifiers.Partial;
 
-		PropertyDefinition property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, index, type, readOnly).Build(IsAbstraction);
-		if (notnull)
+		PropertyDefinition property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, index, type, false, readOnly).Build(IsAbstraction);
+		if (allowNull)
 		{
-			property.AddAttributeListAfter(new AttributeDeclaration("NotNull"));
+			property.AddAttributeListAfter(new AttributeDeclaration("AllowNull"));
 		}
 		_properties.Add(property);
 
@@ -95,6 +95,9 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 	protected override void BuildTypeDefinition(ClassDefinition definition)
 	{
 		base.BuildTypeDefinition(definition);
+
+		// @TODO: Partial property
+		definition.Modifiers |= EMemberModifiers.Unsafe;
 
 		if (IsAbstraction && BaseType is not null)
 		{

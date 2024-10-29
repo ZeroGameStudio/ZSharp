@@ -70,7 +70,7 @@ public class ClassWriter
 				}
 			
 				EParameterKind kind = parameter.IsInOut ? EParameterKind.Ref : parameter.IsOut ? EParameterKind.Out : EParameterKind.In;
-				AttributeDeclaration[]? attributes = abstraction && parameter is { IsNullInNotNullOut: true, IsInOut: true } ? [ new("NotNull") ] : null;
+				AttributeDeclaration[]? attributes = abstraction && parameter is { IsNullInNotNullOut: true, IsInOut: true } ? [ new("AllowNull") ] : null;
 				parameters.Add(new(kind, new(parameter.Type.ToString(), parameter.UnderlyingType), parameter.Name, attributes));
 			}
 

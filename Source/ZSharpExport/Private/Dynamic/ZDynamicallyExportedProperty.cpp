@@ -36,13 +36,7 @@ FString ZSharp::FZDynamicallyExportedProperty::GetZCallName() const
 
 ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedProperty::GetType() const
 {
-	FZFullyExportedTypeName name = FZExportHelper::GetFPropertyFullyExportedTypeName(Property);
-	if (bNullInNotNullOut)
-	{
-		name.bNullable = true;
-	}
-
-	return name;
+	return FZExportHelper::GetFPropertyFullyExportedTypeName(Property);
 }
 
 FString ZSharp::FZDynamicallyExportedProperty::GetUnderlyingType() const

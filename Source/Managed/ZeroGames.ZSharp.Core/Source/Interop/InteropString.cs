@@ -1,47 +1,49 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace ZeroGames.ZSharp.Core;
 
-public readonly struct InteropString : IDisposable
+public readonly unsafe struct InteropString : IDisposable
 {
 
-    public InteropString() : this(string.Empty){}
+    public InteropString() : this(null){}
     
-    public InteropString(string str)
+    public InteropString(string? str)
     {
-        unsafe
+        _black = true;
+        fixed (char* data = str)
         {
-            fixed (char* data = str)
-            {
-                _address = InteropString_Interop.Alloc(data);
-            }
+            _address = InteropString_Interop.Alloc(data);
         }
     }
 
     public InteropString(IntPtr address)
     {
-        _unmanaged = true;
         _address = address;
     }
 
     public void Dispose()
     {
-        if (!_unmanaged)
+        if (_black)
         {
-            unsafe
-            {
-                InteropString_Interop.Free(_address);
-            }
+            InteropString_Interop.Free(_address);
         }
     }
 
     public override string ToString() => Data;
 
-    public unsafe string Data
+    [AllowNull]
+    public string Data
     {
-        get => new(InteropString_Interop.GetData(_address));
+        get => _address != IntPtr.Zero ? new(InteropString_Interop.GetData(_address)) : string.Empty;
         set
         {
+            if (_address == IntPtr.Zero)
+            {
+                return;
+            }
+            
             fixed (char* data = value)
             {
                 InteropString_Interop.SetData(_address, data);
@@ -51,7 +53,7 @@ public readonly struct InteropString : IDisposable
 
     public IntPtr Address => _address;
 
-    private readonly bool _unmanaged;
+    private readonly bool _black;
     private readonly IntPtr _address;
 
 }

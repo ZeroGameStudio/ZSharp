@@ -6,10 +6,12 @@
 #include "coreclr_delegates.h"
 #include "ZSharpCoreLogChannels.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
+#include "Interop/Misc/Console_Interop.h"
 #include "Interop/Misc/ZLog_Interop.h"
 #include "Interop/Core/ZClr_Interop.h"
 #include "Interop/Core/ZGCHandle_Interop.h"
 #include "Interop/Misc/ZInteropString_Interop.h"
+#include "Interop/Misc/ZInteropStringArray_Interop.h"
 #include "ALC/ZMasterAssemblyLoadContext.h"
 #include "Interop/Core/ZMasterAssemblyLoadContext_Interop.h"
 #include "Interop/ZGCHandle.h"
@@ -61,14 +63,36 @@ namespace ZSharp::ZGenericClr_Private
 	
 	static void LoadCoreAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
+		static const TCHAR* GInteropString_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropString_Interop");
+		static const TCHAR* GInteropStringArray_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropStringArray_Interop");
+		static const TCHAR* GMasterAssemblyLoadContext_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.MasterAssemblyLoadContext_Interop");
 		static const TCHAR* GLog_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Log_Interop");
 		static const TCHAR* GConfig_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Config_Interop");
-		static const TCHAR* GInteropString_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropString_Interop");
-		static const TCHAR* GMasterAssemblyLoadContext_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.MasterAssemblyLoadContext_Interop");
+		static const TCHAR* GConsole_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Console_Interop");
 		
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
         {
 #define BUILD_UNMANAGED_FUNCTION(ShortTypeName, FieldName) { G##ShortTypeName##TypeName, TEXT(#FieldName), FZ##ShortTypeName::FieldName }
+			
+			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Alloc),
+			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Free),
+			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, GetData),
+			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, SetData),
+
+			BUILD_UNMANAGED_FUNCTION(InteropStringArray_Interop, Alloc),
+			BUILD_UNMANAGED_FUNCTION(InteropStringArray_Interop, Free),
+			BUILD_UNMANAGED_FUNCTION(InteropStringArray_Interop, Count),
+			BUILD_UNMANAGED_FUNCTION(InteropStringArray_Interop, Get),
+			BUILD_UNMANAGED_FUNCTION(InteropStringArray_Interop, Set),
+			BUILD_UNMANAGED_FUNCTION(InteropStringArray_Interop, Add),
+			BUILD_UNMANAGED_FUNCTION(InteropStringArray_Interop, InsertAt),
+			BUILD_UNMANAGED_FUNCTION(InteropStringArray_Interop, RemoveAt),
+			BUILD_UNMANAGED_FUNCTION(InteropStringArray_Interop, Clear),
+
+			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ZCall_Black),
+			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, GetZCallHandle_Black),
+			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, BuildConjugate_Black),
+			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ReleaseConjugate_Black),
 
 			BUILD_UNMANAGED_FUNCTION(Log_Interop, Log),
 
@@ -76,16 +100,15 @@ namespace ZSharp::ZGenericClr_Private
 			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetSection),
 			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetArray),
 			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetString),
-			
-			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Alloc),
-			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Free),
-			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, GetData),
-			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, SetData),
 
-			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ZCall_Black),
-			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, GetZCallHandle_Black),
-			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, BuildConjugate_Black),
-			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ReleaseConjugate_Black),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryExecuteCommand),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryGetValue),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TrySetValue),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterOnChanged),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryUnregisterOnChanged),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterCommand),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterVariable),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryUnregisterObject),
 
 #undef BUILD_UNMANAGED_FUNCTION
         };
@@ -116,6 +139,9 @@ namespace ZSharp::ZGenericClr_Private
 			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GUnload),
 			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GLoadAssembly),
 			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GInvokeMethod),
+
+			ADDRESS_OF(FZConsole_Interop::GHandleExecuteCommand),
+			ADDRESS_OF(FZConsole_Interop::GHandleVariableChanged),
 				
 #undef ADDRESS_OF
 		};

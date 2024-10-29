@@ -1,0 +1,36 @@
+﻿// Copyright Zero Games. All Rights Reserved.
+
+using System.Runtime.InteropServices;
+
+namespace ZeroGames.ZSharp.Core;
+
+internal static unsafe class Console_Interop
+{
+
+	[UnmanagedCallersOnly]
+	public static void HandleExecuteCommand(char* nameBuffer, IntPtr argsAddr)
+	{
+		using InteropStringArray argsBuffer = new(argsAddr);
+		
+		ConsoleManager.HandleExecuteCommand(new(nameBuffer), argsBuffer.ToStringArray());
+	}
+
+	[UnmanagedCallersOnly]
+	public static void HandleVariableChanged(char* nameBuffer)
+	{
+		ConsoleManager.HandleVariableChanged(new(nameBuffer));
+	}
+
+	public static delegate* unmanaged<char*, uint8> TryExecuteCommand;
+	public static delegate* unmanaged<char*, IntPtr, uint8> TryGetValue;
+	public static delegate* unmanaged<char*, char*, uint8> TrySetValue;
+	public static delegate* unmanaged<char*, uint8> TryRegisterOnChanged;
+	public static delegate* unmanaged<char*, uint8> TryUnregisterOnChanged;
+
+	public static delegate* unmanaged<char*, char*, uint8> TryRegisterCommand;
+	public static delegate* unmanaged<char*, char*, char*, uint8> TryRegisterVariable;
+	public static delegate* unmanaged<char*, uint8> TryUnregisterObject;
+
+}
+
+

@@ -37,15 +37,25 @@ internal class ZeroTask_Delay : UnderlyingZeroTaskBase<TimeSpan, ZeroTask_Delay>
 			_ => GlobalTimerScheduler.Paused,
 		};
 		
-		scheduler.Register(static (deltaTime, state) =>
+		_delayTimer = scheduler.Register(static (deltaTime, state) =>
 		{
 			ZeroTask_Delay @this = Unsafe.As<ZeroTask_Delay>(state!);
 			@this.Comp.SetResult(deltaTime);
-		}, this, _delayTime, false, Lifecycle, static (ex, state) => throw ex);
+			@this._delayTimer.Unregister(); // Ensure only trigger once.
+		}, this, _delayTime, false, Lifecycle, static (ex, state) =>
+		{
+			ZeroTask_Delay @this = Unsafe.As<ZeroTask_Delay>(state!);
+			if (@this.ShouldThrowOnLifecycleExpired)
+			{
+				throw ex;
+			}
+		});
 	}
-
+	
 	private EZeroTaskDelayType _delayType;
 	private TimeSpan _delayTime;
+	
+	private Timer _delayTimer;
 
 }
 

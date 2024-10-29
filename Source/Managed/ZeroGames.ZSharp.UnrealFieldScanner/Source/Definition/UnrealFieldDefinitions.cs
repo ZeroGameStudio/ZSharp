@@ -62,6 +62,9 @@ public class UnrealPropertyDefinition : UnrealFieldDefinition, ISimpleUnrealProp
 	public string? DescriptorFieldPath { get; set; }
 	
 	public string? RepNotifyName { get; set; }
+	public ERepCondition RepCondition { get; set; }
+	public ERepNotifyCondition RepNotifyCondition { get; set; }
+	public bool IsRepPushBased { get; set; }
 
 	public SimpleUnrealPropertyDefinition? InnerProperty { get; set; }
 	public SimpleUnrealPropertyDefinition? OuterProperty { get; set; }

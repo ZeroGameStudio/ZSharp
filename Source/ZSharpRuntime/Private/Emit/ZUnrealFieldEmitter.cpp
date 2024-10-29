@@ -1028,6 +1028,15 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 
 	// Precache replicated properties, then setup runtime replication data.
 	{
+		TMap<FName, const FZPropertyDefinition*> netPropertyName2Def;
+		for (const auto& propertyDef : def.Properties)
+		{
+			if (propertyDef.PropertyFlags & CPF_Net)
+			{
+				netPropertyName2Def.Emplace(propertyDef.Name, &propertyDef);
+			}
+		}
+		
 		// Super class's ClassReps should be ready to use at this point.
 		auto currentRepIndex = static_cast<uint16>(superCls->ClassReps.Num());
 		for (TFieldIterator<FProperty> it(cls, EFieldIteratorFlags::ExcludeSuper); it; ++it)
@@ -1035,9 +1044,12 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 			FProperty* property = *it;
 			if (property->HasAllPropertyFlags(CPF_Net))
 			{
+				const auto pPropertyDef = netPropertyName2Def.Find(property->GetFName());
+				check(pPropertyDef && *pPropertyDef);
+				const FZPropertyDefinition& propertyDef = **pPropertyDef;
 				check(property->RepIndex == 0);
 				property->RepIndex = currentRepIndex++;
-				zscls->ReplicatedProperties.Emplace(FZSharpClass::FReplicatedProperty { property, COND_None, REPNOTIFY_OnChanged, true });
+				zscls->ReplicatedProperties.Emplace(FZSharpClass::FReplicatedProperty { property, propertyDef.RepCondition, propertyDef.RepNotifyCondition, propertyDef.IsRepPushBased });
 			}
 		}
 

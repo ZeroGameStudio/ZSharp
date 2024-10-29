@@ -9,11 +9,12 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 partial class ModelRegistry
 {
 	
-	private class PoisonedAssemblyResolver : Mono.Cecil.IAssemblyResolver
+	private sealed class AssemblyResolver(ModelRegistry registry) : Mono.Cecil.IAssemblyResolver
 	{
 		public void Dispose(){}
-		public AssemblyDefinition Resolve(AssemblyNameReference name) => throw Thrower.NoEntry();
-		public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters) => throw Thrower.NoEntry();
+		public AssemblyDefinition Resolve(AssemblyNameReference name) => Resolve(name, new() { AssemblyResolver = new AssemblyResolver(_registry) });
+		public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters) => _registry.LoadAssemblyDefinition(name.Name);
+		private ModelRegistry _registry = registry;
 	}
 
 	private AssemblyDefinition LoadAssemblyDefinition(string assemblyName)
@@ -22,7 +23,7 @@ partial class ModelRegistry
 		{
 			if (!_referencedAssemblyMap.TryGetValue(assemblyName, out var assembly))
 			{
-				assembly = AssemblyDefinition.ReadAssembly(_resolver.Resolve(assemblyName), new() { AssemblyResolver = new PoisonedAssemblyResolver() });
+				assembly = AssemblyDefinition.ReadAssembly(_resolver.Resolve(assemblyName), new() { AssemblyResolver = new AssemblyResolver(this) });
 				_referencedAssemblyMap.Add(assembly);
 			}
 

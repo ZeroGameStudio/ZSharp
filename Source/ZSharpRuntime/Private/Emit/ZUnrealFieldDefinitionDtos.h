@@ -61,6 +61,15 @@ struct FZPropertyDefinitionDto : public FZFieldDefinitionDto
 
 	UPROPERTY()
 	FName RepNotifyName;
+
+	UPROPERTY()
+	int32 RepCondition = 0;
+
+	UPROPERTY()
+	int32 RepNotifyCondition = 0;
+
+	UPROPERTY()
+	bool IsRepPushBased = false;
 	
 	UPROPERTY()
 	FZSimplePropertyDefinitionDto InnerProperty;

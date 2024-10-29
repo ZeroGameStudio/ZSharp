@@ -164,6 +164,9 @@ partial class SpecifierProcessor
 			
 			def.PropertyFlags |= EPropertyFlags.CPF_RepNotify;
 			def.RepNotifyName = specifier.Notify;
+			def.RepCondition = specifier.Condition;
+			def.RepNotifyCondition = specifier.NotifyCondition;
+			def.IsRepPushBased = specifier.IsPushBased;
 		}
 	}
 	

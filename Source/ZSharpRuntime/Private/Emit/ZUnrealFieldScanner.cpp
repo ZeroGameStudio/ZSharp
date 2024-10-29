@@ -30,6 +30,9 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 			def.MetadataMap = MoveTemp(dto.MetadataMap);
 			def.TransparentDataMap = MoveTemp(dto.TransparentDataMap);
 			def.RepNotifyName = dto.RepNotifyName;
+			def.RepCondition = static_cast<ELifetimeCondition>(dto.RepCondition);
+			def.RepNotifyCondition = static_cast<ELifetimeRepNotifyCondition>(dto.RepNotifyCondition);
+			def.IsRepPushBased = dto.IsRepPushBased;
 
 #define COPY_SIMPLE_PROPERTY(DefName, DtoName) \
 			DefName.Type = static_cast<EZPropertyType>(DtoName.Type); \

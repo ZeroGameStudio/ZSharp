@@ -47,6 +47,9 @@ namespace ZSharp
 	struct FZPropertyDefinition : public FZFieldDefinition, public FZSimplePropertyDefinition
 	{
 		FName RepNotifyName;
+		ELifetimeCondition RepCondition = COND_None;
+		ELifetimeRepNotifyCondition RepNotifyCondition = REPNOTIFY_OnChanged;
+		bool IsRepPushBased = false;
 		
 		FZSimplePropertyDefinition InnerProperty;
 		FZSimplePropertyDefinition OuterProperty;

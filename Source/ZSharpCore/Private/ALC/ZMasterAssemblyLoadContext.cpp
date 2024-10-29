@@ -166,13 +166,26 @@ void ZSharp::FZMasterAssemblyLoadContext::PrepareForZCall()
 	bZCallPrepared = true;
 }
 
-ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall(FZCallHandle handle, FZCallBuffer* buffer)
+void ZSharp::FZMasterAssemblyLoadContext::SkipZCall()
+{
+	check(IsInGameThread());
+	check(bZCallPrepared);
+	
+	bZCallPrepared = false;
+	PopRedFrame();
+}
+
+ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall(FZCallHandle handle, FZCallBuffer* buffer, bool isInline)
 {
 	check(IsInGameThread());
 	check(bZCallPrepared);
 
-	bZCallPrepared = false;
-	return ZCall_Red(handle, buffer);
+	if (!isInline)
+	{
+		bZCallPrepared = false;
+	}
+
+	return ZCall_Red(handle, buffer, isInline);
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const FString& name)
@@ -266,9 +279,9 @@ bool ZSharp::FZMasterAssemblyLoadContext::Tick(float deltaTime)
 	return FZMasterAssemblyLoadContext_Interop::GTick(deltaTime) > 0;
 }
 
-ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer)
+ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer, bool isInline)
 {
-	ON_SCOPE_EXIT { PopRedFrame(); };
+	ON_SCOPE_EXIT { if (!isInline) { PopRedFrame(); } };
 
 #if !UE_BUILD_SHIPPING
 	FString fatalMessage;

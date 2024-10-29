@@ -52,6 +52,7 @@ void ZSharp::FZSharpFieldRegistry::ClearAlcSensitiveStates()
 	for (const auto& pair : FunctionRegistry)
 	{
 		pair.Value->ZCallHandle = {};
+		pair.Value->ValidateZCallHandle = {};
 	}
 }
 

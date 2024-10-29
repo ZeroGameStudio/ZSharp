@@ -33,7 +33,8 @@ namespace ZSharp
 		virtual void PushRedFrame() = 0;
 		virtual void PopRedFrame() = 0;
 		virtual void PrepareForZCall() = 0;
-		virtual EZCallErrorCode ZCall(FZCallHandle handle, FZCallBuffer* buffer) = 0;
+		virtual void SkipZCall() = 0;
+		virtual EZCallErrorCode ZCall(FZCallHandle handle, FZCallBuffer* buffer, bool isInline) = 0;
 		virtual FZCallHandle GetZCallHandle(const FString& name) = 0;
 		virtual void* BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type) = 0;
 		virtual void ReleaseConjugate(void* unmanaged) = 0;

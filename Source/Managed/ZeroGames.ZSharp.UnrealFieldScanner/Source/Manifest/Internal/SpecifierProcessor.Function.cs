@@ -85,6 +85,8 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, WithValidationAttribute specifier)
 	{
+		string name = specifier.Implementation ?? $"{def.Name}_Validate";
+		def.ValidateZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{name}";
 		def.FunctionFlags |= EFunctionFlags.FUNC_NetValidate;
 	}
 	

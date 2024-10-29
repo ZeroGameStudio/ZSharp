@@ -507,6 +507,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		{ // Finally setup proxy.
 			FZSharpFunction& zsfunction = FZSharpFieldRegistry::Get().RegisterFunction(function);
 			zsfunction.ZCallName = def.ZCallName;
+			zsfunction.ValidateZCallName = def.ValidateZCallName;
 		}
 	}
 

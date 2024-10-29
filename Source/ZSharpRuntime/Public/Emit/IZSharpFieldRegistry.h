@@ -59,14 +59,17 @@ namespace ZSharp
 
 	public:
 		FZCallHandle GetZCallHandle() const;
+		FZCallHandle GetValidateZCallHandle() const;
 
 	public:
 		const UFunction* Function = nullptr;
 		
 		FString ZCallName;
+		FString ValidateZCallName;
 		
 	private:
 		mutable FZCallHandle ZCallHandle{};
+		mutable FZCallHandle ValidateZCallHandle{};
 		
 	};
 

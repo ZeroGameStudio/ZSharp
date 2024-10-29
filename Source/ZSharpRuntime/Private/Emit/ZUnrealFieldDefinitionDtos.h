@@ -106,6 +106,9 @@ struct FZFunctionDefinitionDto : public FZStructDefinitionDto
 	FString ZCallName;
 
 	UPROPERTY()
+	FString ValidateZCallName;
+
+	UPROPERTY()
 	uint16 RpcId = 0;
 
 	UPROPERTY()

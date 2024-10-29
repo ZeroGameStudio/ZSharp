@@ -87,6 +87,7 @@ public class UnrealFunctionDefinition : UnrealStructDefinition
 	public bool IsEventOverride { get; set; }
 	public EFunctionFlags FunctionFlags { get; set; }
 	public required string ZCallName { get; set; }
+	public string? ValidateZCallName { get; set; }
 	public uint16 RpcId { get; set; }
 	public uint16 RpcResponseId { get; set; }
 	public string? CustomThunkName { get; set; }

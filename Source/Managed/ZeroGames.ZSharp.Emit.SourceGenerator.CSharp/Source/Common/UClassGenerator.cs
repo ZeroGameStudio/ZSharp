@@ -204,7 +204,7 @@ public partial class {className} : IConjugate<{className}>, IStaticUnrealFieldPa
 		string validate = string.Empty;
 		if (ufunctionSymbol.GetAttributes().Any(attr => attr.AttributeClass?.ToDisplayString() == "ZeroGames.ZSharp.Emit.Specifier.WithValidationAttribute"))
 		{
-			validate = $"\n{implVisibility} partial bool {name}_Validate({parameterDeclarationList});";
+			validate = $"\n[ZCall]\n{implVisibility} partial bool {name}_Validate({parameterDeclarationList});";
 		}
 		
 		string code =

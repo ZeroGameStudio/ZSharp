@@ -187,7 +187,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		FMemory::Memzero(buffer.Slots, numSlots * sizeof(FZCallBufferSlot));
 		for (int32 i = 0; i < numSlots; ++i)
 		{
-			buffer.Slots[i].Type = EZCallBufferSlotType::Uninitialized;
+			buffer[i].Type = EZCallBufferSlotType::Uninitialized;
 		}
 
 		const UFunction* func = Function.Get();
@@ -263,7 +263,35 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 
 		if (alc)
 		{
-			res = alc->ZCall(zsfunction->GetZCallHandle(), &buffer);
+			bool validatePassed = true;
+			if (!zsfunction->ValidateZCallName.IsEmpty())
+			{
+				check(func->HasAllFunctionFlags(FUNC_Net | FUNC_NetValidate));
+				
+				const int32 validateNumSlots = numSlots + 1;
+				FZCallBuffer validateBuffer;
+				validateBuffer.Slots = static_cast<FZCallBufferSlot*>(FMemory_Alloca(validateNumSlots * sizeof(FZCallBufferSlot)));
+				validateBuffer.NumSlots = validateNumSlots;
+				FMemory::Memzero(validateBuffer.Slots, validateNumSlots * sizeof(FZCallBufferSlot));
+				for (int32 i = 0; i < validateNumSlots - 1; ++i)
+				{
+					validateBuffer[i] = buffer[i];
+				}
+				validateBuffer[-1] = FZCallBufferSlot::FromBool(false);
+
+				alc->ZCall(zsfunction->GetValidateZCallHandle(), &validateBuffer, true);
+				validatePassed = validateBuffer[-1].ReadBool();
+			}
+
+			if (validatePassed)
+			{
+				res = alc->ZCall(zsfunction->GetZCallHandle(), &buffer, false);
+			}
+			else
+			{
+				RPC_ValidateFailed(*FString::Printf(TEXT("%s_Validate"), *func->GetName()));
+				alc->SkipZCall();
+			}
 		}
 
 		// Copy out params and destroy them if called from blueprint.
@@ -325,7 +353,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		FMemory::Memzero(buffer.Slots, numSlots * sizeof(FZCallBufferSlot));
 		for (int32 i = 0; i < numSlots; ++i)
 		{
-			buffer.Slots[i].Type = EZCallBufferSlotType::Uninitialized;
+			buffer[i].Type = EZCallBufferSlotType::Uninitialized;
 		}
 
 		TZCallBufferSlotEncoder<FZGCHandle>::Encode(CastChecked<IZManagedDelegateProxyInterface>(object)->ManagedDelegateProxy_GetDelegate(), buffer[0]);
@@ -344,7 +372,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 			ReturnProperty->InitializeValue_InContainer(params);
 		}
 		
-		res = alc->ZCall(GetDelegateZCallHandle(), &buffer);
+		res = alc->ZCall(GetDelegateZCallHandle(), &buffer, false);
 
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{

@@ -66,6 +66,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 			def.Properties = PropertyDtos2Defs(MoveTemp(dto.Properties));
 			def.FunctionFlags = static_cast<EFunctionFlags>(dto.FunctionFlags);
 			def.ZCallName = MoveTemp(dto.ZCallName);
+			def.ValidateZCallName = MoveTemp(dto.ValidateZCallName);
 			def.RpcId = dto.RpcId;
 			def.RpcResponseId = dto.RpcResponseId;
 			def.CustomThunkName = dto.CustomThunkName;

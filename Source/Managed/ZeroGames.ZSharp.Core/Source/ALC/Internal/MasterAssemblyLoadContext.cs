@@ -18,7 +18,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public Type? GetType(ref readonly RuntimeTypeLocator locator)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         Dictionary<string, Assembly> asmLookup = Assemblies.Concat(Default.Assemblies).ToDictionary(asm => asm.GetName().Name!);
 
@@ -63,7 +63,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public ZCallHandle RegisterZCall(IZCallDispatcher dispatcher)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         ZCallHandle handle = ZCallHandle.Alloc();
         _zcallMap[handle] = dispatcher;
@@ -74,7 +74,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public void RegisterZCallResolver(IZCallResolver resolver, uint64 priority)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         _zcallResolverLink.Add((resolver, priority));
         _zcallResolverLink.Sort((lhs, rhs) =>
@@ -90,42 +90,42 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public EZCallErrorCode ZCall(ZCallHandle handle, ZCallBuffer* buffer)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         return ZCall_Black(handle, buffer);
     }
 
     public ZCallHandle GetZCallHandle(string name)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         return GetZCallHandle_Black(name);
     }
 
     public IntPtr BuildConjugate(IConjugate managed, IntPtr userdata)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         return BuildConjugate_Black(managed, userdata);
     }
 
     public void ReleaseConjugate(IConjugate conjugate)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         ReleaseConjugate_Black(conjugate.Unmanaged);
     }
     
     public void PushPendingDisposeConjugate(IConjugate conjugate)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         _pendingDisposeConjugates.Enqueue(conjugate);
     }
 
     public void Tick(float deltaTime)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         while (_pendingDisposeConjugates.TryDequeue(out var conjugate))
         {
@@ -135,7 +135,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     
     public EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         if (!_zcallMap.TryGetValue(handle, out var dispatcher))
         {
@@ -147,7 +147,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public ZCallHandle GetZCallHandle_Red(string name)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         if (!_zcallName2Handle.TryGetValue(name, out var handle))
         {
@@ -167,7 +167,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public IntPtr BuildConjugate_Red(IntPtr unmanaged, Type type)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         Type conjugateType = typeof(IConjugate<>).MakeGenericType(type);
         if (type.IsAssignableTo(conjugateType))
@@ -182,7 +182,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public void ReleaseConjugate_Red(IntPtr unmanaged)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         verify(_conjugateMap.Remove(unmanaged, out var rec));
         verify(rec.WeakRef.TryGetTarget(out var conjugate));
@@ -191,7 +191,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public IConjugate? Conjugate(IntPtr unmanaged)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         if (!_conjugateMap.TryGetValue(unmanaged, out var rec))
         {

@@ -11,4 +11,17 @@ public interface IZSharpAssemblyLoadContext : IGCHandle
 	bool IsUnloaded { get; }
 }
 
+public static class ZSharpAssemblyLoadContextExtensions
+{
+
+	public static void GuardUnloaded(this IZSharpAssemblyLoadContext @this)
+	{
+		if (@this.IsUnloaded)
+		{
+			throw new AlcUnloadedException();
+		}
+	}
+	
+}
+
 

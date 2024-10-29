@@ -11,18 +11,18 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
 
     public unsafe ELoadAssemblyErrorCode LoadAssembly(string name, void* args, out Assembly? assembly)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         return InternalLoadAssembly(name, args, out assembly, false);
     }
 
     public unsafe EInvokeMethodErrorCode InvokeMethod(string assemblyName, string typeName, string methodName, void* args)
     {
-        check(!IsUnloaded);
+        this.GuardUnloaded();
         
         return AssemblyLoadContextHelper.InvokeMethod(this, assemblyName, typeName, methodName, args);
     }
-    
+
     public GCHandle GCHandle { get; }
     
     public bool IsUnloaded { get; private set; }

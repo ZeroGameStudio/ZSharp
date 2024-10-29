@@ -31,7 +31,7 @@ internal static class UnrealFieldScanner_Interop
 		}
 		catch (Exception ex)
 		{
-			UnhandledExceptionHelper.Guard(ex, args->FatalMessageBuffer, "Unhandled exception detected during scanning unreal fields!!!");
+			UnhandledExceptionHelper.Guard(ex, "Unhandled exception detected during scanning unreal fields!!!", null, args->FatalMessageBuffer);
 		}
 	}
 

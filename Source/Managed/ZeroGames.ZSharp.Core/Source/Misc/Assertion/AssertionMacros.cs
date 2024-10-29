@@ -25,7 +25,7 @@ public static class AssertionMacros
 		CallerInfoHelper.Inject(ref column);
 		if (!condition)
 		{
-			Fail(expr, message, file, line, column, false);
+			Fail(message, expr, file, line, column, false);
 		}
 	}
 

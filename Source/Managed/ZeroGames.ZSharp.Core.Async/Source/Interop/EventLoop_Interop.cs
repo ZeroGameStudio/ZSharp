@@ -16,7 +16,7 @@ internal static class EventLoop_Interop
 		}
 		catch (Exception ex)
 		{
-			UnhandledExceptionHelper.Guard(ex, fatalMessageBuffer);
+			UnhandledExceptionHelper.Guard(ex, null, LogZSharpScriptAsync, fatalMessageBuffer);
 		}
 	}
 

@@ -7,14 +7,20 @@ namespace ZeroGames.ZSharp.Core;
 public static class UnhandledExceptionHelper
 {
 
-	public static void Guard(Exception exception) => Guard(exception, default, null);
-	public static void Guard(Exception exception, IntPtr fatalMessageBuffer) => Guard(exception, fatalMessageBuffer, null);
-	public static void Guard(Exception exception, string? messageHeader) => Guard(exception, default, messageHeader);
-	public static void Guard(Exception exception, IntPtr fatalMessageBuffer, string? messageHeader)
+	public static void Guard(Exception exception) => Guard(exception, IntPtr.Zero);
+	public static void Guard(Exception exception, IntPtr fatalMessageBuffer) => Guard(exception, null, null, fatalMessageBuffer);
+	public static void Guard(Exception exception, string? messageHeader) => Guard(exception, messageHeader, null);
+	public static void Guard(Exception exception, string? messageHeader, string? logCategory) => Guard(exception, messageHeader, logCategory, IntPtr.Zero);
+	public static void Guard(Exception exception, string? messageHeader, string? logCategory, IntPtr fatalMessageBuffer)
 	{
 		string? fatalMessage = null;
 		for (Exception? currentEx = exception; currentEx is not null; currentEx = currentEx.InnerException)
 		{
+			if (CoreSettings.SuppressAlcUnloadedException && currentEx is AlcUnloadedException)
+			{
+				return;
+			}
+			
 			if (currentEx is FatalException fatal)
 			{
 				fatalMessage = fatal.Message;
@@ -29,7 +35,7 @@ public static class UnhandledExceptionHelper
 		}
 		else
 		{
-			UE_ERROR(LogZSharpScriptCore, string.Join(Environment.NewLine, messageHeader ?? "Unhandled exception detected.", fatalMessage, exception));
+			UE_ERROR(logCategory ?? LogZSharpScriptCore, string.Join(Environment.NewLine, messageHeader ?? "Unhandled exception detected.", fatalMessage, exception));
 		}
 
 		Debugger.Break();

@@ -127,7 +127,7 @@ public abstract class ExportedObjectBase : IConjugate
                 }
                 catch (Exception ex)
                 {
-                    UE_ERROR(LogZSharpScriptEngine, $"Unhandled Exception Detected.\n{ex}");
+                    UnhandledExceptionHelper.Guard(ex, null, LogZSharpScriptEngine);
                 }
 
                 _onExpiredRegistry = null;

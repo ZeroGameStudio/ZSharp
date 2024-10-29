@@ -7,20 +7,14 @@ void ZSharp::FZConfig_Interop::GetFileName(FConfigCacheIni* config, const TCHAR*
 	fileName = config->GetConfigFilename(baseIniName);
 }
 
-uint8 ZSharp::FZConfig_Interop::TryGetSection(FConfigCacheIni* config, const TCHAR* fileName, const TCHAR* section, FString& values)
+uint8 ZSharp::FZConfig_Interop::TryGetSection(FConfigCacheIni* config, const TCHAR* fileName, const TCHAR* section, TArray<FString>& values)
 {
-	TArray<FString> valueArray;
-	bool suc = config->GetSection(section, valueArray, fileName);
-	values = FString::Join(valueArray, TEXT(";"));
-	return suc;
+	return config->GetSection(section, values, fileName);
 }
 
-uint8 ZSharp::FZConfig_Interop::TryGetArray(FConfigCacheIni* config, const TCHAR* fileName, const TCHAR* section, const TCHAR* key, FString& values)
+uint8 ZSharp::FZConfig_Interop::TryGetArray(FConfigCacheIni* config, const TCHAR* fileName, const TCHAR* section, const TCHAR* key, TArray<FString>& values)
 {
-	TArray<FString> valueArray;
-	bool suc = !!config->GetArray(section, key, valueArray, fileName);
-	values = FString::Join(valueArray, TEXT(";"));
-	return suc;
+	return !!config->GetArray(section, key, values, fileName);
 }
 
 uint8 ZSharp::FZConfig_Interop::TryGetString(FConfigCacheIni* config, const TCHAR* fileName, const TCHAR* section, const TCHAR* key, FString& value)

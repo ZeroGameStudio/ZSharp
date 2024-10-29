@@ -4,13 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ZeroGames.ZSharp.Core;
 
-/*
- * @TODO:
- * Currently, there is a bug in Section and Array:
- * If an element itself contains a ';', it will be incorrectly split.
- * A solution is to implement an escape sequence, converting the ';' within the element to ';;'.
- * When splitting, only split on ';' but not on ';;', and after splitting, revert ';;' back to ';'.
- */
 public interface IConfig
 {
 	string GetFileName(string baseIniName);

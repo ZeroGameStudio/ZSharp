@@ -19,7 +19,7 @@ namespace ZSharp
 		// This is called from ZCallDispatcher_UFunction to support call UFunction from managed side.
 		EZCallErrorCode InvokeUFunction(FZCallBuffer* buffer) const;
 		EZCallErrorCode InvokeUFunction(FZCallBuffer* buffer, const UFunction* finalFunction) const;
-		// These three is called from SelfDescriptiveDelegates to support execute/broadcast dynamic delegate from managed side.
+		// These three are called from SelfDescriptiveDelegates to support execute/broadcast dynamic delegate from managed side.
 		EZCallErrorCode InvokeScriptDelegate(FZCallBuffer* buffer) const;
 		EZCallErrorCode InvokeMulticastInlineScriptDelegate(FZCallBuffer* buffer) const;
 		EZCallErrorCode InvokeMulticastSparseScriptDelegate(FZCallBuffer* buffer) const;

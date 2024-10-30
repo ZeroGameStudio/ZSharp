@@ -10,18 +10,18 @@ void UZSharpExportSettings::PostInitProperties()
 	InvalidateCache();
 }
 
-void UZSharpExportSettings::PostReloadConfig(FProperty* PropertyThatWasLoaded)
+void UZSharpExportSettings::PostReloadConfig(FProperty* reloadedProperty)
 {
-	Super::PostReloadConfig(PropertyThatWasLoaded);
+	Super::PostReloadConfig(reloadedProperty);
 	
 	InvalidateCache();
 }
 
 #if WITH_EDITOR
 
-void UZSharpExportSettings::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void UZSharpExportSettings::PostEditChangeProperty(FPropertyChangedEvent& event)
 {
-	Super::PostEditChangeProperty(PropertyChangedEvent);
+	Super::PostEditChangeProperty(event);
 	
 	InvalidateCache();
 }

@@ -62,9 +62,9 @@ private:
 
 private:
 	virtual void PostInitProperties() override;
-	virtual void PostReloadConfig(FProperty* PropertyThatWasLoaded) override;
+	virtual void PostReloadConfig(FProperty* reloadedProperty) override;
 #if WITH_EDITOR
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& event) override;
 #endif
 
 private:

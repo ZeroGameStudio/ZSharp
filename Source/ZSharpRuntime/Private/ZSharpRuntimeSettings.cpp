@@ -83,18 +83,18 @@ void UZSharpRuntimeSettings::PostInitProperties()
 	InvalidateCache();
 }
 
-void UZSharpRuntimeSettings::PostReloadConfig(FProperty* PropertyThatWasLoaded)
+void UZSharpRuntimeSettings::PostReloadConfig(FProperty* reloadedProperty)
 {
-	Super::PostReloadConfig(PropertyThatWasLoaded);
+	Super::PostReloadConfig(reloadedProperty);
 
 	InvalidateCache();
 }
 
 #if WITH_EDITOR
 
-void UZSharpRuntimeSettings::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void UZSharpRuntimeSettings::PostEditChangeProperty(FPropertyChangedEvent& event)
 {
-	Super::PostEditChangeProperty(PropertyChangedEvent);
+	Super::PostEditChangeProperty(event);
 
 	InvalidateCache();
 }

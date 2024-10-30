@@ -438,7 +438,11 @@ void FZSharpRuntimeModule::HandleMasterAlcStartup(ZSharp::IZMasterAssemblyLoadCo
 			argv.Emplace(*arg);
 		}
 		ZSharp::FZCommonMethodArgs commonArgs = { argv.Num(), argv.GetData() };
-		alc->LoadAssembly(assemblyName, &commonArgs);
+		const ZSharp::EZLoadAssemblyErrorCode err = alc->LoadAssembly(assemblyName, &commonArgs);
+		if (err != ZSharp::EZLoadAssemblyErrorCode::Succeed)
+		{
+			UE_LOG(LogZSharpRuntime, Fatal, TEXT("Master ALC startup assembly [%s] load failed with error code [%d]"), *assemblyName, err);
+		}
 	}
 }
 

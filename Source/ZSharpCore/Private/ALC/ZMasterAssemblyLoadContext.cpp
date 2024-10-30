@@ -104,7 +104,7 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const F
 	
 	FZRuntimeTypeHandle handle = FZMasterAssemblyLoadContext_Interop::GGetType(interopLocator);
 
-	free(interopLocator); // Do NOT use ON_SCOPE_EXIT because we don't know destruction order.
+	free(interopLocator);
 
 	return handle;
 }

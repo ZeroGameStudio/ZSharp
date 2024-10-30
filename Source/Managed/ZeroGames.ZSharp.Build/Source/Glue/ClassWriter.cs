@@ -70,8 +70,8 @@ public class ClassWriter
 				}
 			
 				EParameterKind kind = parameter.IsInOut ? EParameterKind.Ref : parameter.IsOut ? EParameterKind.Out : EParameterKind.In;
-				AttributeDeclaration[]? attributes = abstraction && parameter is { IsNullInNotNullOut: true, IsInOut: true } ? [ new("AllowNull") ] : null;
-				parameters.Add(new(kind, new(parameter.Type.ToString(), parameter.UnderlyingType), parameter.Name, attributes));
+				AttributeDeclaration[]? attributes = abstraction && parameter is { IsNullInNotNullOut: true, IsInOut: true } ? [ new("NotNull") ] : null;
+				parameters.Add(new(kind, new(parameter.Type.ToString(), parameter.UnderlyingType, parameter.IsNullInNotNullOut), parameter.Name, attributes));
 			}
 
 			TypeReference? returnType = method.ReturnParameter?.Type.ToString() is {} returnTypeName ? new(returnTypeName, method.ReturnParameter.UnderlyingType) : null;
@@ -124,7 +124,7 @@ public class ClassWriter
 			}
 			
 			EMemberVisibility visibility = property.IsPublic ? EMemberVisibility.Public : property.IsProtected ? EMemberVisibility.Protected : EMemberVisibility.Private;
-			builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType), property.Name, property.ZCallName, property.Index, !property.IsWritable, property.IsNullInNotNullOut);
+			builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType, property.IsNullInNotNullOut), property.Name, property.ZCallName, property.Index, !property.IsWritable, property.IsNullInNotNullOut);
 			if (!abstraction)
 			{
 				// @TODO: Move AddStaticField() here.

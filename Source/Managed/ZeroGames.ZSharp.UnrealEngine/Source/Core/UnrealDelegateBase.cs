@@ -22,7 +22,7 @@ public abstract class UnrealDelegateBase : UnrealDynamicDelegateBase
 	public bool IsBoundToObject(UnrealObject obj) => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.IsBoundToObject", obj, false)[-1].Bool;
 	
 	public UnrealObject? Object => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.GetObject", [ null ])[-1].ReadConjugate<UnrealObject>();
-	public string FunctionName => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.GetFunctionName", [null])[-1].ReadConjugate<UnrealName>()!.ToString();
+	public string FunctionName => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.GetFunctionName", [null])[-1].ReadConjugateChecked<UnrealName>().ToString();
 	public bool IsBound => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.IsBound", false)[-1].Bool;
 	
 	protected UnrealDelegateBase(Type delegateType)
@@ -42,7 +42,7 @@ public abstract class UnrealDelegateBase : UnrealDynamicDelegateBase
 		check(@delegate.GetType() == _delegateType);
 
 		GCHandle handle = GCHandle.Alloc(@delegate);
-		return this.ZCall(MasterAlcCache.Instance, "ex://Delegate.BindManaged", handle, null)[-1].ReadConjugate<UnrealObject>()!;
+		return this.ZCall(MasterAlcCache.Instance, "ex://Delegate.BindManaged", handle, null)[-1].ReadConjugateChecked<UnrealObject>();
 	}
 	
 	private readonly Type _delegateType;

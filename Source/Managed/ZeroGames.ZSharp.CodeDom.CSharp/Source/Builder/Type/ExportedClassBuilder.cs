@@ -55,7 +55,7 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 		EMemberModifiers modifiers = EMemberModifiers.None; // EMemberModifiers.Partial;
 
 		PropertyDefinition property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, index, type, false, readOnly).Build(IsAbstraction);
-		if (allowNull)
+		if (!readOnly && allowNull)
 		{
 			property.AddAttributeListAfter(new AttributeDeclaration("AllowNull"));
 		}

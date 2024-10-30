@@ -34,7 +34,7 @@ public abstract class UnrealMulticastSparseDelegateBase : UnrealDynamicDelegateB
 		check(@delegate.GetType() == _delegateType);
 
 		GCHandle handle = GCHandle.Alloc(@delegate);
-		return this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.AddManaged", handle, null)[-1].ReadConjugate<UnrealObject>()!;
+		return this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.AddManaged", handle, null)[-1].ReadConjugateChecked<UnrealObject>();
 	}
 	
 	private readonly Type _delegateType;

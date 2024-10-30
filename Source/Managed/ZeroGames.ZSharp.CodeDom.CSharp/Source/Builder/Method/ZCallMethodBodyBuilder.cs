@@ -21,10 +21,7 @@ $@"const string ZCALL_NAME = ""{Name}"";
 IMasterAssemblyLoadContext alc = MasterAlcCache.Instance;
 {handleFieldName} ??= alc.GetZCallHandle(ZCALL_NAME);
 ZCallHandle handle = {handleFieldName}.Value;
-if (!handle.IsBlack)
-{{
-	throw new InvalidOperationException();
-}}";
+check(handle.IsBlack);";
 
 		sb.Append(getHandle);
 
@@ -132,9 +129,10 @@ $@"unsafe
 		bool isEnum = !string.IsNullOrWhiteSpace(parameterType.UnderlyingType);
 		string cast = isEnum ? $"({parameterType.TypeName})" : string.Empty;
 		string slotType = GetSlotType(parameterType);
-		string getTarget = slotType == "Conjugate" ? $".GetTarget<{parameterType.TypeName.TrimEnd('?')}>()" : string.Empty;
-		string nullForgiving = slotType == "Conjugate" && !parameterType.TypeName.EndsWith("?") ? "!" : string.Empty;
-		return $"{cast}slots[{index}].{slotType}{getTarget}{nullForgiving}";
+		bool nullable = parameterType.TypeName.EndsWith("?");
+		string notnullType = parameterType.TypeName.TrimEnd('?');
+		string getTarget = slotType == "Conjugate" ? nullable && !parameterType.IsNotNullOut ? $".GetTarget<{notnullType}>()" : $".GetTargetChecked<{notnullType}>()" : string.Empty;
+		return $"{cast}slots[{index}].{slotType}{getTarget}";
 	}
 
 	private string GetSlotType(TypeReference parameterType) => (string.IsNullOrWhiteSpace(parameterType.UnderlyingType) ? parameterType.TypeName : parameterType.UnderlyingType) switch

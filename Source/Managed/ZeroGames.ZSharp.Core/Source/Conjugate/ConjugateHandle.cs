@@ -43,6 +43,14 @@ public readonly struct ConjugateHandle : IEquatable<ConjugateHandle>
 
         return alc.Conjugate(_handle) as T;
     }
+
+    public T GetTargetChecked<T>() where T : class, IConjugate
+    {
+        check(IsValid);
+        verify(MasterAssemblyLoadContext.Instance is var alc && alc is not null);
+        verify(alc.Conjugate(_handle) is var result && result is T);
+        return (T)result;
+    }
     
     public bool IsValid => _handle != IntPtr.Zero;
 

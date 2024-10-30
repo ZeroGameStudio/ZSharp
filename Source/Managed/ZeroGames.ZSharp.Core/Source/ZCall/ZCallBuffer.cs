@@ -390,6 +390,7 @@ public struct ZCallBufferSlot
 	}
 
 	public readonly T? ReadConjugate<T>() where T : class, IConjugate => ReadConjugate().GetTarget<T>();
+	public readonly T ReadConjugateChecked<T>() where T : class, IConjugate => ReadConjugate().GetTargetChecked<T>();
 	public void WriteConjugate<T>(T? value) where T : class, IConjugate => WriteConjugate(new ConjugateHandle(value));
 
 	public readonly object? ReadObject()

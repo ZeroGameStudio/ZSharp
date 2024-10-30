@@ -370,7 +370,7 @@ bool FZSharpRuntimeModule::ParseStartupAssembly(const FString& startupAssembly, 
 
 		if (!skip)
 		{
-			token.Append(&c);
+			token.AppendChar(c);
 		}
 		
 		if (finish)

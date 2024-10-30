@@ -2,7 +2,6 @@
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
@@ -32,7 +31,11 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 public abstract class ExportedObjectBase : IConjugate
 {
 
-    public void Dispose() => InternalDispose(false);
+    public void Dispose()
+    {
+        InternalDispose();
+        GC.SuppressFinalize(this);
+    }
     
     public ExplicitLifecycleExpiredRegistration RegisterOnExpired(Action<IExplicitLifecycle, object?> callback, object? state)
     {
@@ -90,21 +93,12 @@ public abstract class ExportedObjectBase : IConjugate
         IsBlack = false;
     }
 
-    ~ExportedObjectBase() => InternalDispose(true);
+    ~ExportedObjectBase() => InternalDispose();
     
     void IConjugate.Release()
     {
-        if (IsBlack)
-        {
-            UE_ERROR(LogZSharpScriptEngine, "Dispose black conjugate from unmanaged code.");
-            return;
-        }
-        
-        if (IsExpired)
-        {
-            UE_ERROR(LogZSharpScriptEngine, "Dispose exported object twice.");
-            return;
-        }
+        check(!IsBlack);
+        check(!IsExpired);
         
         MarkAsDead();
         
@@ -135,39 +129,33 @@ public abstract class ExportedObjectBase : IConjugate
         }
     }
 
-    private void InternalDispose(bool fromFinalizer)
+    private void InternalDispose()
     {
-        if (!IsBlack)
-        {
-            UE_ERROR(LogZSharpScriptEngine, "Finalize unmanaged export object.");
-            return;
-        }
+        check(IsBlack);
+        check(!IsExpired);
         
-        if (fromFinalizer)
+        if (!IsInGameThread)
         {
             MasterAlcCache.Instance.PushPendingDisposeConjugate(this);
             return;
         }
         
-        if (Volatile.Read(ref _disposed))
+        if (_disposed)
         {
             return;
         }
-        
-        Volatile.Write(ref _disposed, true);
+
+        _disposed = true;
         
         MasterAlcCache.Instance.ReleaseConjugate(this);
         MarkAsDead();
-
-        if (!fromFinalizer)
-        {
-            GC.SuppressFinalize(this);
-        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void MarkAsDead()
     {
+        check(!IsExpired);
+        
         GCHandle.Free();
         Unmanaged = DEAD_ADDR;
         BroadcastOnExpired();

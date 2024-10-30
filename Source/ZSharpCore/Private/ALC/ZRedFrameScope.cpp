@@ -6,12 +6,21 @@
 
 ZSharp::FZRedFrameScope::FZRedFrameScope()
 {
-	FZSharpClr::Get().GetMasterAlc()->PushRedFrame();
+	IZMasterAssemblyLoadContext* alc = FZSharpClr::Get().GetMasterAlc();
+	CapturedAlc = alc;
+	if (alc)
+	{
+		alc->PushRedFrame();
+	}
 }
 
 ZSharp::FZRedFrameScope::~FZRedFrameScope()
 {
-	FZSharpClr::Get().GetMasterAlc()->PopRedFrame();
+	IZMasterAssemblyLoadContext* alc = FZSharpClr::Get().GetMasterAlc();
+	if (ensureAlways(alc == CapturedAlc))
+	{
+		alc->PopRedFrame();
+	}
 }
 
 

@@ -8,6 +8,8 @@ namespace ZSharp
 	{
 		FZRedFrameScope();
 		~FZRedFrameScope();
+	private:
+		void* CapturedAlc;
 	};
 }
 

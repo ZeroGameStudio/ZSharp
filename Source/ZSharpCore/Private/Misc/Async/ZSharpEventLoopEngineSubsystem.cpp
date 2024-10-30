@@ -4,6 +4,7 @@
 
 #include "ZSharpCoreLogChannels.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZRedFrameScope.h"
 #include "CLR/ZSharpClr.h"
 #include "Interop/Async/ZEventLoop_Interop.h"
 
@@ -68,10 +69,10 @@ void UZSharpEventLoopEngineSubsystem::NotifyEvent(ZSharp::EZEventLoopTickingGrou
 		return;
 	}
 
-	alc->PushRedFrame();
-	ON_SCOPE_EXIT { alc->PopRedFrame(); };
-
-	notify();
+	ZSharp::FZRedFrameScope scope;
+	{
+		notify();
+	}
 }
 
 

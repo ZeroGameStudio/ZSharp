@@ -2,6 +2,7 @@
 
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace ZeroGames.ZSharp.Core;
 
@@ -132,21 +133,14 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         }
         else
         {
-            _pendingDisposeConjugates.Enqueue(conjugate);
+            lock (_pendingDisposedConjugates)
+            {
+                _pendingDisposedConjugates.Enqueue(conjugate);
+                GameThreadScheduler.Post(FlushPendingDisposedConjugates, this);
+            }
         }
     }
 
-    public void Tick(float deltaTime)
-    {
-        check(IsInGameThread);
-        this.GuardUnloaded();
-
-        while (_pendingDisposeConjugates.TryDequeue(out var conjugate))
-        {
-            conjugate.Dispose();
-        }
-    }
-    
     public EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
     {
         this.GuardUnloaded();
@@ -222,20 +216,30 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     protected override void HandleUnload()
     {
-        check(_pendingDisposeConjugates.Count == 0);
-        check(Instance == this);
-
-        foreach (var pair in _conjugateMap)
+        try
         {
-            if (pair.Value.WeakRef.TryGetTarget(out var conjugate) && conjugate.IsBlack)
+            check(Instance == this);
+
+            // Dispose all conjugates to ensure that there is no resource leak.
+            foreach (var pair in _conjugateMap)
             {
+                verify(pair.Value.WeakRef.TryGetTarget(out var conjugate));
+                check(conjugate.IsBlack); // All red conjugates should have been released at this point.
                 conjugate.Dispose();
             }
+
+            // Now there should be nothing in conjugate map.
+            check(_conjugateMap.Count == 0);
+
+            // Manually flush pending disposed conjugates before mark IsUnloaded.
+            FlushPendingDisposedConjugates(this);
+
+            Instance = null;
         }
-        
-        Instance = null;
-        
-        base.HandleUnload();
+        finally
+        {
+            base.HandleUnload();
+        }
     }
 
     private MasterAssemblyLoadContext() : base(INSTANCE_NAME)
@@ -299,6 +303,24 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         return 0;
     }
     
+    private static void FlushPendingDisposedConjugates(object? state)
+    {
+        MasterAssemblyLoadContext @this = Unsafe.As<MasterAssemblyLoadContext>(state!);
+        lock (@this._pendingDisposedConjugates)
+        {
+            if (@this.IsUnloaded)
+            {
+                check(@this._pendingDisposedConjugates.Count == 0);
+                return;
+            }
+
+            while (@this._pendingDisposedConjugates.TryDequeue(out var conjugate))
+            {
+                conjugate.Dispose();
+            }
+        }
+    }
+    
     private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 1 << 16;
 
     private readonly Dictionary<ZCallHandle, IZCallDispatcher> _zcallMap = new();
@@ -306,7 +328,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private readonly List<(IZCallResolver Resolver, uint64 Priority)> _zcallResolverLink = new();
     private readonly Dictionary<IntPtr, ConjugateRec> _conjugateMap = new(DEFAULT_CONJUGATE_MAP_CAPACITY);
     private readonly Dictionary<Type, uint16> _conjugateRegistryIdLookup = new();
-    private readonly ConcurrentQueue<IConjugate> _pendingDisposeConjugates = new();
+    private readonly Queue<IConjugate> _pendingDisposedConjugates = new();
     
     private readonly record struct ConjugateRec(uint16 RegistryId, WeakReference<IConjugate> WeakRef);
 

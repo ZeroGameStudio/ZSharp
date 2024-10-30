@@ -169,7 +169,7 @@ internal static class AsyncZeroTaskMethodBuilderShared
 				}
 				else
 				{
-					ZSharpSynchronizationContext.Instance.Post(state => ((TStateMachine)state!).MoveNext(), copy);
+					GameThreadScheduler.Instance.Post(state => ((TStateMachine)state!).MoveNext(), copy);
 				}
 			});
 		}
@@ -188,7 +188,7 @@ internal static class AsyncZeroTaskMethodBuilderShared
 			}
 			else
 			{
-				ZSharpSynchronizationContext.Instance.Post(state => ((TStateMachine)state!).MoveNext(), copy);
+				GameThreadScheduler.Instance.Post(state => ((TStateMachine)state!).MoveNext(), copy);
 			}
 		});
 	}

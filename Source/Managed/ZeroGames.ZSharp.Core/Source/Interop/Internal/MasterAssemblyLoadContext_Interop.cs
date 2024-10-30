@@ -6,14 +6,6 @@ namespace ZeroGames.ZSharp.Core;
 
 internal static unsafe class MasterAssemblyLoadContext_Interop
 {
-    
-    // Assume no throw.
-    [UnmanagedCallersOnly]
-    public static uint8 Tick(float deltaTime)
-    {
-        MasterAssemblyLoadContext.Instance!.Tick(deltaTime);
-        return 1;
-    }
 
     [UnmanagedCallersOnly]
     public static int32 Unload()

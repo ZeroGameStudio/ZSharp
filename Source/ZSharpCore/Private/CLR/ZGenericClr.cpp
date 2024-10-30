@@ -126,7 +126,6 @@ namespace ZSharp::ZGenericClr_Private
 			ADDRESS_OF(FZDefaultAssemblyLoadContext_Interop::GLoadAssembly),
 			ADDRESS_OF(FZDefaultAssemblyLoadContext_Interop::GInvokeMethod),
 
-			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GTick),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GUnload),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GLoadAssembly),
 			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GInvokeMethod),

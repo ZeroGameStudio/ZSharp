@@ -18,7 +18,6 @@ namespace ZSharp
 		static void* BuildConjugate_Black(uint16 registryId, void* userdata);
 		static void ReleaseConjugate_Black(uint16 registryId, void* unmanaged);
 
-		inline static uint8(*GTick)(float) = nullptr;
 		inline static int32(*GUnload)() = nullptr;
 		inline static EZLoadAssemblyErrorCode(*GLoadAssembly)(const TCHAR*, void*) = nullptr;
 		inline static EZInvokeMethodErrorCode(*GInvokeMethod)(const TCHAR*, const TCHAR*, const TCHAR*, void*) = nullptr;

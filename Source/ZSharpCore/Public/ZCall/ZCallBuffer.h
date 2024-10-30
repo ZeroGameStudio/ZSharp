@@ -116,6 +116,9 @@ namespace ZSharp
 		int32 NumSlots;
 		
 	};
+
+	static_assert(TIsPODType<FZCallBufferSlot>::Value, "ZCallBufferSlot must be POD type!");
+	static_assert(TIsPODType<FZCallBuffer>::Value, "ZCallBuffer must be POD type!");
 }
 
 #define ZSHARP_ZCALL_BUFFER_COMBINE_INNER(A, B) A##B

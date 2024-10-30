@@ -270,11 +270,8 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 				FZCallBuffer validateBuffer;
 				validateBuffer.Slots = static_cast<FZCallBufferSlot*>(FMemory_Alloca(validateNumSlots * sizeof(FZCallBufferSlot)));
 				validateBuffer.NumSlots = validateNumSlots;
-				FMemory::Memzero(validateBuffer.Slots, validateNumSlots * sizeof(FZCallBufferSlot));
-				for (int32 i = 0; i < validateNumSlots - 1; ++i)
-				{
-					validateBuffer[i] = buffer[i];
-				}
+				// ZCallBufferSlot is POD type so we can use memcpy.
+				FMemory::Memcpy(validateBuffer.Slots, buffer.Slots, (validateNumSlots - 1) * sizeof(FZCallBufferSlot));
 				validateBuffer[-1] = FZCallBufferSlot::FromBool(false);
 
 				alc->ZCall(zsfunction->GetValidateZCallHandle(), &validateBuffer);

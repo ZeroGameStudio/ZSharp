@@ -13,7 +13,6 @@ ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle hand
 	, UnloadCallback(MoveTemp(unloadCallback))
 	, bUnloaded(false)
 	, RedStackDepth(0)
-	, bZCallPrepared(false)
 {
 	FZConjugateRegistryDeclarations::ForeachDeclaration([this](uint16 id, const TUniqueFunction<IZConjugateRegistry*(IZMasterAssemblyLoadContext&)>& factory)
 	{
@@ -157,35 +156,12 @@ void ZSharp::FZMasterAssemblyLoadContext::PopRedFrame()
 	--RedStackDepth;
 }
 
-void ZSharp::FZMasterAssemblyLoadContext::PrepareForZCall()
+ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall(FZCallHandle handle, FZCallBuffer* buffer)
 {
 	check(IsInGameThread());
-	check(!bZCallPrepared);
-	
-	PushRedFrame();
-	bZCallPrepared = true;
-}
+	check(IsInRedStack());
 
-void ZSharp::FZMasterAssemblyLoadContext::SkipZCall()
-{
-	check(IsInGameThread());
-	check(bZCallPrepared);
-	
-	bZCallPrepared = false;
-	PopRedFrame();
-}
-
-ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall(FZCallHandle handle, FZCallBuffer* buffer, bool isInline)
-{
-	check(IsInGameThread());
-	check(bZCallPrepared);
-
-	if (!isInline)
-	{
-		bZCallPrepared = false;
-	}
-
-	return ZCall_Red(handle, buffer, isInline);
+	return ZCall_Red(handle, buffer);
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const FString& name)
@@ -198,7 +174,7 @@ ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const F
 void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type)
 {
 	check(IsInGameThread());
-	
+
 	return BuildConjugate_Red(unmanaged, type);
 }
 
@@ -279,10 +255,8 @@ bool ZSharp::FZMasterAssemblyLoadContext::Tick(float deltaTime)
 	return FZMasterAssemblyLoadContext_Interop::GTick(deltaTime) > 0;
 }
 
-ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer, bool isInline)
+ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer)
 {
-	ON_SCOPE_EXIT { if (!isInline) { PopRedFrame(); } };
-
 #if !UE_BUILD_SHIPPING
 	FString fatalMessage;
 	EZCallErrorCode res = FZMasterAssemblyLoadContext_Interop::GZCall_Red(handle, buffer, &fatalMessage);

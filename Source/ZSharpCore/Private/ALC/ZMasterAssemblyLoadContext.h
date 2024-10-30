@@ -38,9 +38,7 @@ namespace ZSharp
 
 		virtual void PushRedFrame() override;
 		virtual void PopRedFrame() override;
-		virtual void PrepareForZCall() override;
-		virtual void SkipZCall() override;
-		virtual EZCallErrorCode ZCall(FZCallHandle handle, FZCallBuffer* buffer, bool isInline) override;
+		virtual EZCallErrorCode ZCall(FZCallHandle handle, FZCallBuffer* buffer) override;
 		virtual FZCallHandle GetZCallHandle(const FString& name) override;
 		virtual void* BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type) override;
 		virtual void ReleaseConjugate(void* unmanaged) override;
@@ -56,7 +54,7 @@ namespace ZSharp
 	private:
 		bool Tick(float deltaTime);
 		
-		EZCallErrorCode ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer, bool isInline);
+		EZCallErrorCode ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer);
 		FZCallHandle GetZCallHandle_Red(const FString& name);
 		void* BuildConjugate_Red(void* unmanaged, FZRuntimeTypeHandle type);
 		void ReleaseConjugate_Red(void* unmanaged);
@@ -78,7 +76,6 @@ namespace ZSharp
 
 		TSparseArray<TUniquePtr<IZConjugateRegistry>> ConjugateRegistries;
 		int32 RedStackDepth;
-		bool bZCallPrepared;
 
 		FTSTicker::FDelegateHandle TickDelegate;
 		FDelegateHandle GCDelegate;

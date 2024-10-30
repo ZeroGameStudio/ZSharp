@@ -3,6 +3,7 @@
 
 #include "Reflection/Function/ZFunctionVisitor.h"
 
+#include "ALC/ZRedFrameScope.h"
 #include "Emit/IZSharpFieldRegistry.h"
 #include "Emit/ZSharpFieldRegistry.h"
 #include "ZCall/ZCallBufferSlotEncoder.h"
@@ -175,10 +176,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
 	EZCallErrorCode res = EZCallErrorCode::AlcUnavailable;
 	const int32 numSlots = (bIsStatic ? 0 : 1) + ParameterProperties.Num() + (ReturnProperty ? 1 : 0);
-	if (alc)
-	{
-		alc->PrepareForZCall();
-	}
+	FZRedFrameScope scope;
 	{
 		FZCallBuffer buffer;
 		buffer.Slots = static_cast<FZCallBufferSlot*>(FMemory_Alloca(numSlots * sizeof(FZCallBufferSlot)));
@@ -279,18 +277,17 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 				}
 				validateBuffer[-1] = FZCallBufferSlot::FromBool(false);
 
-				alc->ZCall(zsfunction->GetValidateZCallHandle(), &validateBuffer, true);
+				alc->ZCall(zsfunction->GetValidateZCallHandle(), &validateBuffer);
 				validatePassed = validateBuffer[-1].ReadBool();
 			}
 
 			if (validatePassed)
 			{
-				res = alc->ZCall(zsfunction->GetZCallHandle(), &buffer, false);
+				res = alc->ZCall(zsfunction->GetZCallHandle(), &buffer);
 			}
 			else
 			{
 				RPC_ValidateFailed(*FString::Printf(TEXT("%s_Validate"), *func->GetName()));
-				alc->SkipZCall();
 			}
 		}
 
@@ -344,7 +341,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 
 	const int32 numSlots = 1 + ParameterProperties.Num() + (ReturnProperty ? 1 : 0);
 	EZCallErrorCode res;
-	alc->PrepareForZCall();
+	FZRedFrameScope scope;
 	{
 		FZCallBuffer buffer;
 		buffer.Slots = static_cast<FZCallBufferSlot*>(FMemory_Alloca(numSlots * sizeof(FZCallBufferSlot)));
@@ -372,7 +369,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 			ReturnProperty->InitializeValue_InContainer(params);
 		}
 		
-		res = alc->ZCall(GetDelegateZCallHandle(), &buffer, false);
+		res = alc->ZCall(GetDelegateZCallHandle(), &buffer);
 
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{

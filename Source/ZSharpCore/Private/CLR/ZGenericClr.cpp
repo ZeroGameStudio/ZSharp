@@ -4,6 +4,7 @@
 
 #include "hostfxr.h"
 #include "coreclr_delegates.h"
+#include "ZSharpClr.h"
 #include "ZSharpCoreLogChannels.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
 #include "Interop/Misc/Console_Interop.h"
@@ -25,6 +26,21 @@
 
 namespace ZSharp::ZGenericClr_Private
 {
+	static FAutoConsoleCommand GCmdFullGC
+	{
+		TEXT("z#.gc"),
+		TEXT("Perform a full managed GC."),
+		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>&){ FZSharpClr::Get().CollectGarbage(); }),
+		ECVF_Default
+	};
+	
+	static TAutoConsoleVariable<bool> GCVarPerformManagedGCAfterUnmanagedGC
+	{
+		TEXT("z#.PerformManagedGCAfterUnmanagedGC"),
+		false,
+		TEXT("If enabled, perform a full managed GC after unmanaged GC.")
+	};
+	
 	struct FZUnmanagedFunction
 	{
 		const TCHAR* TypeName;
@@ -453,7 +469,10 @@ FDelegateHandle ZSharp::FZGenericClr::CallOrRegisterOnMasterAlcLoaded(FZOnMaster
 
 void ZSharp::FZGenericClr::HandleGarbageCollectComplete()
 {
-	CollectGarbage();
+	if (ZGenericClr_Private::GCVarPerformManagedGCAfterUnmanagedGC.GetValueOnGameThread())
+	{
+		CollectGarbage();
+	}
 }
 
 

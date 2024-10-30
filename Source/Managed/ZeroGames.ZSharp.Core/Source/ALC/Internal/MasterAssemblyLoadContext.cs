@@ -182,7 +182,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         if (type.IsAssignableTo(conjugateType))
         {
             IConjugate conjugate = (IConjugate)type.GetMethod("BuildConjugate")!.Invoke(null, new object[] { unmanaged })!;
-            _conjugateMap[unmanaged] = new(0, new(conjugate));
+            _conjugateMap[unmanaged] = new(0, new(conjugate, true));
             return unmanaged;
         }
 
@@ -271,7 +271,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
         IntPtr unmanaged = MasterAssemblyLoadContext_Interop.BuildConjugate_Black(registryId, userdata);
         check(unmanaged != default);
-        _conjugateMap[unmanaged] = new(registryId, new(managed));
+        _conjugateMap[unmanaged] = new(registryId, new(managed, true));
 
         return unmanaged;
     }

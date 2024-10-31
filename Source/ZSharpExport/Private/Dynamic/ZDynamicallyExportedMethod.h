@@ -6,7 +6,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPEXPORT_API FZDynamicallyExportedMethod : public IZExportedMethod, public FNoncopyable
+	class FZDynamicallyExportedMethod : public IZExportedMethod, public FNoncopyable
 	{
 
 	public:

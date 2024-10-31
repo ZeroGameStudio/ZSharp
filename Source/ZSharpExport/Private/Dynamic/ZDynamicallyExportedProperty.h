@@ -6,7 +6,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPEXPORT_API FZDynamicallyExportedProperty : public IZExportedProperty
+	class FZDynamicallyExportedProperty : public IZExportedProperty
 	{
 
 	public:

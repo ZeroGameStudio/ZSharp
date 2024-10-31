@@ -1,10 +1,10 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "Dynamic/ZDynamicallyExportedProperty.h"
+#include "ZDynamicallyExportedProperty.h"
 
 #include "Reflection/ZReflectionHelper.h"
-#include "Static/ZExportHelper.h"
+#include "ZExportHelper.h"
 
 ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Create(const FProperty* property, int32 index)
 {

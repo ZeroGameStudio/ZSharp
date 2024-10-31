@@ -1,9 +1,9 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "Dynamic/ZDynamicallyExportedParameter.h"
+#include "ZDynamicallyExportedParameter.h"
 
-#include "Static/ZExportHelper.h"
+#include "ZExportHelper.h"
 
 ZSharp::FZDynamicallyExportedParameter* ZSharp::FZDynamicallyExportedParameter::Create(const FProperty* property)
 {

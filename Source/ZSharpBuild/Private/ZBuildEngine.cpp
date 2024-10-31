@@ -3,9 +3,9 @@
 
 #include "ZBuildEngine.h"
 
+#include "IZExportedTypeRegistry.h"
 #include "ALC/ZCommonMethodArgs.h"
 #include "CLR/IZSharpClr.h"
-#include "Glue/ZDynamicTypeExporter.h"
 #include "Glue/ZGlueManifestWriter.h"
 #include "Interfaces/IPluginManager.h"
 
@@ -116,8 +116,8 @@ void ZSharp::FZBuildEngine::GenerateGlue(const TArray<FString>& args) const
 				value.ParseIntoArray(assemblies, TEXT(","));
 			}
 		}
-	
-		FZDynamicTypeExporter{}.Export(assemblies);
+
+		IZExportedTypeRegistry::Get().ExportDynamicTypes(assemblies);
 		FZGlueManifestWriter{}.Write(assemblies);
 	}
 	

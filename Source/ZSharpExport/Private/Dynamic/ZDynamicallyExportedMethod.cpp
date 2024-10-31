@@ -1,9 +1,9 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "Dynamic/ZDynamicallyExportedMethod.h"
+#include "ZDynamicallyExportedMethod.h"
 
-#include "Dynamic/ZDynamicallyExportedParameter.h"
+#include "ZDynamicallyExportedParameter.h"
 #include "Reflection/ZReflectionHelper.h"
 
 ZSharp::FZDynamicallyExportedMethod* ZSharp::FZDynamicallyExportedMethod::Create(const UFunction* function)

@@ -1,14 +1,13 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "Dynamic/ZDynamicallyExportedClass.h"
+#include "ZDynamicallyExportedClass.h"
 
 #include "ZExportedTypeRegistry.h"
-#include "ZSharpExportSettings.h"
-#include "Dynamic/ZDynamicallyExportedMethod.h"
-#include "Dynamic/ZDynamicallyExportedProperty.h"
+#include "ZDynamicallyExportedMethod.h"
+#include "ZDynamicallyExportedProperty.h"
 #include "Reflection/ZReflectionHelper.h"
-#include "Static/ZExportHelper.h"
+#include "ZExportHelper.h"
 
 ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(const UStruct* ustruct)
 {

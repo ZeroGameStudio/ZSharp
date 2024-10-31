@@ -1,7 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "Static/ZExportHelper.h"
+#include "ZExportHelper.h"
 
 #include "ZSharpExportSettings.h"
 #include "UObject/PropertyOptional.h"

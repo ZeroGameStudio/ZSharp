@@ -6,7 +6,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPEXPORT_API FZDynamicallyExportedEnum : public IZExportedEnum
+	class FZDynamicallyExportedEnum : public IZExportedEnum
 	{
 
 	public:

@@ -8,7 +8,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPEXPORT_API FZDynamicallyExportedClass : public IZExportedClass, public FNoncopyable
+	class FZDynamicallyExportedClass : public IZExportedClass, public FNoncopyable
 	{
 
 	public:

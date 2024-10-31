@@ -7,7 +7,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPEXPORT_API FZDynamicallyExportedDelegate : public IZExportedDelegate, public FNoncopyable
+	class FZDynamicallyExportedDelegate : public IZExportedDelegate, public FNoncopyable
 	{
 
 	public:

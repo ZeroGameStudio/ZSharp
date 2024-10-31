@@ -1,10 +1,10 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 
-#include "Dynamic/ZDynamicallyExportedDelegate.h"
+#include "ZDynamicallyExportedDelegate.h"
 
 #include "ZExportedTypeRegistry.h"
-#include "Dynamic/ZDynamicallyExportedParameter.h"
+#include "ZDynamicallyExportedParameter.h"
 #include "Reflection/ZReflectionHelper.h"
 
 ZSharp::FZDynamicallyExportedDelegate* ZSharp::FZDynamicallyExportedDelegate::Create(const UDelegateFunction* signature)

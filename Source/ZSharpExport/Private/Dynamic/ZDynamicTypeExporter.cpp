@@ -3,14 +3,14 @@
 
 #include "ZDynamicTypeExporter.h"
 
-#include "Dynamic/ZDynamicallyExportedClass.h"
-#include "Dynamic/ZDynamicallyExportedDelegate.h"
-#include "Dynamic/ZDynamicallyExportedEnum.h"
+#include "ZDynamicallyExportedClass.h"
+#include "ZDynamicallyExportedDelegate.h"
+#include "ZDynamicallyExportedEnum.h"
 #include "Emit/IZSharpFieldRegistry.h"
 #include "Reflection/ZReflectionHelper.h"
-#include "Static/ZExportHelper.h"
+#include "ZExportHelper.h"
 
-void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies) const
+void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies)
 {
 	IZSharpFieldRegistry& registry = IZSharpFieldRegistry::Get();
 

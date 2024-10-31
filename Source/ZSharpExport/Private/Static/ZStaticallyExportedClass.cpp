@@ -2,6 +2,7 @@
 
 
 #include "Static/ZStaticallyExportedClass.h"
+#include "Static/ZStaticallyExportedClassMacros.h"
 
 #include "ZExportedTypeRegistry.h"
 

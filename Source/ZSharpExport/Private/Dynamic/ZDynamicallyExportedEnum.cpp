@@ -1,12 +1,12 @@
 // Copyright Zero Games. All Rights Reserved.
 
 
-#include "Dynamic/ZDynamicallyExportedEnum.h"
+#include "ZDynamicallyExportedEnum.h"
 
 #include "ZExportedTypeRegistry.h"
 #include "ZSharpExportSettings.h"
 #include "Reflection/ZReflectionHelper.h"
-#include "Static/ZExportHelper.h"
+#include "ZExportHelper.h"
 
 ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(const UEnum* uenum)
 {

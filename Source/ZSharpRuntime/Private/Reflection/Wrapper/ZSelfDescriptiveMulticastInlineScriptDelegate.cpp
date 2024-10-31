@@ -9,7 +9,7 @@
 ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::FZSelfDescriptiveMulticastInlineScriptDelegate(FZSelfDescriptiveMulticastInlineScriptDelegate&& other) noexcept
 	: Super(MoveTemp(other))
 {
-	Visitor = other.Visitor;
+	Visitor = MoveTemp(other.Visitor);
 }
 
 void ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::AddUFunction(UObject* object, FName name)
@@ -74,15 +74,15 @@ ZSharp::EZCallErrorCode ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::
 		return EZCallErrorCode::ExternalError;
 	}
 	
-	if (!Visitor)
+	if (!Visitor || !*Visitor)
 	{
-		if (Visitor = FZFunctionVisitorRegistry::Get().Get(Descriptor); !Visitor)
+		if (Visitor = MakePimpl<FZFunctionVisitorHandle>(FZFunctionVisitorRegistry::Get().Get(Descriptor)); !Visitor || !*Visitor)
 		{
 			return EZCallErrorCode::DispatcherNotFound;
 		}
 	}
 	
-	return Visitor->InvokeMulticastInlineScriptDelegate(buffer);
+	return (*Visitor)->InvokeMulticastInlineScriptDelegate(buffer);
 }
 
 bool ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::IsBound() const
@@ -94,7 +94,7 @@ ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate& ZSharp::FZSelfDescriptiv
 {
 	Super::operator=(MoveTemp(other));
 	
-	Visitor = other.Visitor;
+	Visitor = MoveTemp(other.Visitor);
 
 	return *this;
 }

@@ -5,11 +5,11 @@
 #include "ZSelfDescriptiveBase.h"
 #include "ZSharpErrorCodes.h"
 #include "Interop/ZGCHandle.h"
-#include "Reflection/Function/ZFunctionVisitorHandle.h"
 
 namespace ZSharp
 {
 	struct FZCallBuffer;
+	struct FZFunctionVisitorHandle;
 
 	struct ZSHARPRUNTIME_API FZSelfDescriptiveMulticastSparseScriptDelegate : TZSelfDescriptiveBase<FZSelfDescriptiveMulticastSparseScriptDelegate, USparseDelegateFunction, FSparseDelegate>
 	{
@@ -36,7 +36,7 @@ namespace ZSharp
 		const UObject* GetOwner() const;
 
 	private:
-		FZFunctionVisitorHandle Visitor;
+		TPimplPtr<FZFunctionVisitorHandle> Visitor;
 		
 	};
 }

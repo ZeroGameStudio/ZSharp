@@ -12,7 +12,7 @@ public class Dotnet : ModuleRules
 	{
 		Type = ModuleType.External;
 		
-		PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "inc"));
+		PublicSystemIncludePaths.Add(Path.Combine(ModuleDirectory, "inc"));
 
 		// Basic build info
 		string platformName = Target.Platform.ToString();

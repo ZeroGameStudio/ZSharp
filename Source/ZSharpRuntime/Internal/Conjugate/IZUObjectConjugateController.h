@@ -4,7 +4,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPRUNTIME_API IZUObjectConjugateController
+	class IZUObjectConjugateController
 	{
 		friend class FZConjugateRegistry_UObject;
 	public:

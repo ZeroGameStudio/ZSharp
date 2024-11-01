@@ -159,6 +159,8 @@ namespace ZSharp
 		virtual ~IZSharpClr(){}
 		
 	};
+
+	static_assert(sizeof(TCHAR) == 2, "Z# expects that TCHAR is 16-bit.");
 }
 
 

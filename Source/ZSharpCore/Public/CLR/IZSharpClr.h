@@ -49,13 +49,17 @@ namespace ZSharp
  	 *
  	 * Use this interface as an entry point to interact with .NET runtime.
  	 *
- 	 * @library This is a library interface - you should just consume this and have no reason to implement this.
+ 	 * [Library Interface] - you should just consume this and have no reason to implement this.
  	 */
 	class IZSharpClr
 	{
 		
 	public:
-		/** Get a proxy object for the CLR instance of current process. */
+		/**
+		 * Gets the proxy object represents the CLR instance of current process.
+		 *
+		 * @return The proxy object represents the CLR instance of current process.
+		 */
 		ZSHARPCORE_API static IZSharpClr& Get();
 		
 	public:
@@ -66,71 +70,105 @@ namespace ZSharp
 		virtual void CollectGarbage(int32 generation = -1, bool aggressive = true, bool blocking = false, bool compacting = true) = 0;
 
 	public:
-		/** Get a proxy object for System.Runtime.Loader.AssemblyLoadContext.Default. */
+		/**
+		 * Gets the proxy object represents System.Runtime.Loader.AssemblyLoadContext.Default.
+		 *
+		 * @return The proxy object represents System.Runtime.Loader.AssemblyLoadContext.Default.
+		 */
 		virtual IZDefaultAssemblyLoadContext& GetDefaultAlc() = 0;
 
 		/**
-		 * Create an instance of ZeroGames.ZSharp.Core.IMasterAssemblyLoadContext.
+		 * Creates an instance of ZeroGames.ZSharp.Core.IMasterAssemblyLoadContext.
 		 * If the ALC already exists, a warning will be issued.
 		 * IMPORTANT: You don't own the returned pointer so don't store it if you don't know what you are doing!
-		 * 
-		 * @return A proxy object for the newly created or existing ALC.
+		 *
+		 * @return The proxy object represents the newly created or existing ALC.
 		 */
 		virtual IZMasterAssemblyLoadContext* CreateMasterAlc() = 0;
 
 		/**
-		 * Get a proxy object for existing instance of ZeroGames.ZSharp.Core.IMasterAssemblyLoadContext.
-		 * If no instance exists, nullptr will be returned.
+		 * Gets the proxy object represents the existing instance of ZeroGames.ZSharp.Core.IMasterAssemblyLoadContext.
 		 * IMPORTANT: You don't own the returned pointer so don't store it if you don't know what you are doing!
+		 *
+		 * @return The proxy object represents the existing instance of ZeroGames.ZSharp.Core.IMasterAssemblyLoadContext.
+		 *         If no instance exists, nullptr will be returned.
 		 */
 		virtual IZMasterAssemblyLoadContext* GetMasterAlc() = 0;
 
 		/**
- 		 * Create an instance of ZeroGames.ZSharp.Core.ISlimAssemblyLoadContext.
+ 		 * Creates an instance of ZeroGames.ZSharp.Core.ISlimAssemblyLoadContext.
  		 * If the input name doesn't conform the contract, a warning will be issued.
  		 * IMPORTANT: You don't own the returned pointer so don't store it if you don't know what you are doing!
  		 *
  		 * @param name Name of the instance. Should be neither "Default" nor "Master". 
- 		 * @return A proxy object for the newly created or existing ALC.
- 		 *		   If name doesn't conform the contract, nullptr will be returned.
+ 		 * @return The proxy object represents the newly created or existing ALC.
+ 		 *         If name doesn't conform the contract, nullptr will be returned.
  		 */
 		virtual IZSlimAssemblyLoadContext* CreateSlimAlc(const FString& name) = 0;
 		
 		/**
- 		 * Get a proxy object for existing instance of ZeroGames.ZSharp.Core.ISlimAssemblyLoadContext with provided name.
- 		 * If no instance exists or name doesn't conform the contract, nullptr will be returned.
+ 		 * Gets the proxy object represents the existing instance of ZeroGames.ZSharp.Core.ISlimAssemblyLoadContext with provided name.
  		 * IMPORTANT: You don't own the returned pointer so don't store it if you don't know what you are doing!
+ 		 *
+ 		 * @return The proxy object represents the existing instance of ZeroGames.ZSharp.Core.ISlimAssemblyLoadContext with provided name.
+ 		 *         If no instance exists or name doesn't conform the contract, nullptr will be returned.
  		 */
 		virtual IZSlimAssemblyLoadContext* GetSlimAlc(const FString& name) = 0;
 		
 	public:
-		/** Event fired immediately after the Master ALC is allocated. */
+		/**
+		 * Gets the event fired immediately after the Master ALC is allocated.
+		 *
+		 * @return The event fired immediately after the Master ALC is allocated.
+		 */
 		virtual TMulticastDelegateRegistration<void(IZMasterAssemblyLoadContext*)>& PreMasterAlcStartup() = 0;
 
-		/** Event fired immediately after PreMasterAlcStartup does. */
+		/**
+		 * Gets the event fired immediately after PreMasterAlcStartup does.
+		 *
+		 * @return The event fired immediately after PreMasterAlcStartup does.
+		 */
 		virtual TMulticastDelegateRegistration<void(IZMasterAssemblyLoadContext*)>& OnMasterAlcStartup() = 0;
 
-		/** Event fired immediately after OnMasterAlcStartup does. */
+		/**
+		 * Gets the event fired immediately after OnMasterAlcStartup does.
+		 *
+		 * @return The event fired immediately after OnMasterAlcStartup does.
+		 */
 		virtual TMulticastDelegateRegistration<void(IZMasterAssemblyLoadContext*)>& PostMasterAlcStartup() = 0;
 
-		/** Event fired immediately after PostMasterAlcStartup does. */
+		/**
+		 * Gets the event fired immediately after PostMasterAlcStartup does.
+		 *
+		 * @return The event fired immediately after PostMasterAlcStartup does.
+		 */
 		virtual TMulticastDelegateRegistration<void(IZMasterAssemblyLoadContext*)>& OnMasterAlcLoaded() = 0;
 
-		/** Event fired just before Master ALC unloads and releases any resource. */
+		/**
+		 * Gets the event fired just before Master ALC unloads and releases any resource.
+		 *
+		 * @return The event fired just before Master ALC unloads and releases any resource.
+		 */
 		virtual TMulticastDelegateRegistration<void(IZMasterAssemblyLoadContext*)>& OnMasterAlcUnloading() = 0;
 
-		/** Event fired immediately after ALC has finished unloading. */
+		/**
+		 * Gets the event fired immediately after ALC has finished unloading.
+		 *
+		 * @return The event fired immediately after ALC has finished unloading.
+		 */
 		virtual TMulticastDelegateRegistration<void()>& OnMasterAlcUnloaded() = 0;
 
 		/**
-		 * Bind to OnMasterAlcLoaded.
+		 * Binds to OnMasterAlcLoaded.
 		 * If Master ALC already exists, the input delegate will be fired inplace.
+		 *
+		 * @return The handle represents the bound delegate.
 		 */
 		virtual FDelegateHandle CallOrRegisterOnMasterAlcLoaded(FZOnMasterAlcLoaded::FDelegate delegate) = 0;
 
 	public:
 		/**
-		 * Create an anonymous Slim ALC, load the specified assembly, and call DllMain.
+		 * Creates an anonymous Slim ALC, load the specified assembly, and call DllMain.
 		 * This function assumes the user function is synchronous,
 		 * so the ALC created will be immediately unloaded after the assembly is loaded.
 		 * If the assembly doesn't exist, or doesn't have DllEntry, nothing happens.
@@ -143,7 +181,7 @@ namespace ZSharp
 		ZSHARPCORE_API int32 Run(const FString& name, void* args = nullptr, const FString& alcName = "");
 
 		/**
- 		 * Create an anonymous Slim ALC, load the specified assembly, and call DllMain.
+ 		 * Creates an anonymous Slim ALC, load the specified assembly, and call DllMain.
  		 * This function assumes the user function is asynchronous,
  		 * so the ALC created won't be unloaded automatically and you are responsible for unloading it.
  		 * If the assembly doesn't exist, or doesn't have DllEntry, nothing happens.

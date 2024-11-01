@@ -388,13 +388,13 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
 		return MasterAlc.Get();
 	}
 
-	FZGCHandle handle = FZClr_Interop::GCreateMasterAlc();
-	if (!handle)
+	if (!FZClr_Interop::GCreateMasterAlc())
 	{
+		UE_LOG(LogZSharpCore, Warning, TEXT("Master ALC already exists!"));
 		return nullptr;
 	}
 	
-	MasterAlc = MakeUnique<FZMasterAssemblyLoadContext>(handle, [this]{ HandleMasterAlcUnloaded(); });
+	MasterAlc = MakeUnique<FZMasterAssemblyLoadContext>([this]{ HandleMasterAlcUnloaded(); });
 
 	PreMasterAlcStartupDelegate.Broadcast(MasterAlc.Get());
 	OnMasterAlcStartupDelegate.Broadcast(MasterAlc.Get());

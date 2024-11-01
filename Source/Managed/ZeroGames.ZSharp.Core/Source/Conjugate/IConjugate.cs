@@ -1,10 +1,13 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Runtime.InteropServices;
+
 namespace ZeroGames.ZSharp.Core;
 
-public interface IConjugate : IDisposable, IExplicitLifecycle, IGCHandle
+public interface IConjugate : IDisposable, IExplicitLifecycle
 {
 	protected internal void Release();
+	GCHandle GCHandle { get; }
     IntPtr Unmanaged { get; }
     bool IsBlack { get; }
 }

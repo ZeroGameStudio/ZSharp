@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ALC/IZSlimAssemblyLoadContext.h"
+#include "Interop/ZGCHandle.h"
 
 namespace ZSharp
 {
@@ -20,9 +21,6 @@ namespace ZSharp
 		virtual ~FZSlimAssemblyLoadContext() override { Handle.Free(); }
 
 	public:
-		// IZGCHandle
-		virtual FZGCHandle GetGCHandle() const override { return Handle; }
-		
 		// IZAssemblyLoadContext
 		virtual void Unload() override;
 

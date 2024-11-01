@@ -1,7 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 
 namespace ZeroGames.ZSharp.Core;
@@ -22,15 +21,11 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
         
         return AssemblyLoadContextHelper.InvokeMethod(this, assemblyName, typeName, methodName, args);
     }
-
-    public GCHandle GCHandle { get; }
     
     public bool IsUnloaded { get; private set; }
     
     protected ZSharpAssemblyLoadContextBase(string name) : base(name, true)
     {
-        GCHandle = GCHandle.Alloc(this);
-
         _resolver = IAssemblyResolver.Create();
         
         Resolving += HandleResolve;

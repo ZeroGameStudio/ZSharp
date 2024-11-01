@@ -8,9 +8,8 @@
 #include "ZCall/IZCallDispatcher.h"
 #include "Conjugate/ZConjugateRegistryDeclarations.h"
 
-ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(FZGCHandle handle, TUniqueFunction<void()>&& unloadCallback)
-	: Handle(handle)
-	, UnloadCallback(MoveTemp(unloadCallback))
+ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(TUniqueFunction<void()>&& unloadCallback)
+	: UnloadCallback(MoveTemp(unloadCallback))
 	, bUnloaded(false)
 	, RedStackDepth(0)
 {
@@ -27,8 +26,6 @@ ZSharp::FZMasterAssemblyLoadContext::~FZMasterAssemblyLoadContext()
 	check(bUnloaded);
 	
 	FCoreUObjectDelegates::GarbageCollectComplete.Remove(GCDelegate);
-	
-	Handle.Free();
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::Unload()

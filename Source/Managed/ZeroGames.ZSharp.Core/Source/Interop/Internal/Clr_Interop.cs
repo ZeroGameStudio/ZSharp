@@ -15,12 +15,12 @@ internal static class Clr_Interop
     }
 
     [UnmanagedCallersOnly]
-    public static GCHandle CreateMasterAlc()
+    public static uint8 CreateMasterAlc()
     {
         MasterAssemblyLoadContext alc = MasterAssemblyLoadContext.Create(out var alreadyExists);
         UE_CWARNING(alreadyExists, LogZSharpScriptCore, "Master ALC already exists.");
 
-        return alc.GCHandle;
+        return (uint8)(alreadyExists ? 0 : 1);
     }
 
     [UnmanagedCallersOnly]

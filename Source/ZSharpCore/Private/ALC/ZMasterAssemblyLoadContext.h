@@ -17,13 +17,10 @@ namespace ZSharp
 		using ThisClass = FZMasterAssemblyLoadContext;
 
 	public:
-		FZMasterAssemblyLoadContext(FZGCHandle handle, TUniqueFunction<void()>&& unloadCallback);
+		FZMasterAssemblyLoadContext(TUniqueFunction<void()>&& unloadCallback);
 		virtual ~FZMasterAssemblyLoadContext() override;
 
 	public:
-		// IZGCHandle
-		virtual FZGCHandle GetGCHandle() const override { return Handle; }
-
 		// IZAssemblyLoadContext
 		virtual void Unload() override;
 
@@ -63,7 +60,6 @@ namespace ZSharp
 		void HandleGarbageCollectComplete();
 
 	private:
-		FZGCHandle Handle;
 		TUniqueFunction<void()> UnloadCallback;
 		bool bUnloaded;
 

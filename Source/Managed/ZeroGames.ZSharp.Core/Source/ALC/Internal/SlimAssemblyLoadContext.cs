@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Runtime.InteropServices;
+
 namespace ZeroGames.ZSharp.Core;
 
 internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, ISlimAssemblyLoadContext
@@ -14,19 +16,29 @@ internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, I
 
         return new(name);
     }
+    
+    public GCHandle GCHandle { get; }
 
     protected override void HandleUnload()
     {
-        if (ensure(_instanceMap.TryGetValue(Name!, out var alc) && alc == this))
+        try
         {
-            _instanceMap.Remove(Name!);
+            if (ensure(_instanceMap.TryGetValue(Name!, out var alc) && alc == this))
+            {
+                _instanceMap.Remove(Name!);
+            }
+
+            base.HandleUnload();
         }
-        
-        base.HandleUnload();
+        finally
+        {
+            GCHandle.Free();
+        }
     }
     
     private SlimAssemblyLoadContext(string name) : base(name)
     {
+        GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
         _instanceMap[name] = this;
     }
 

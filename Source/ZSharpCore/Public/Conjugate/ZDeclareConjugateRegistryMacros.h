@@ -10,3 +10,4 @@
 #define ZSHARP_DECLARE_CONJUGATE_REGISTRY_EX(RegistryType, RegistryName) namespace ZSharp::__ZDeclareConjugateRegistry_Private { static TZDeclareConjugateRegistry<RegistryType> ZSHARP_DECLARE_CONJUGATE_REGISTRY_COMBINE(__GDeclareConjugateRegistry, RegistryName, __LINE__); }
 #define ZSHARP_DECLARE_CONJUGATE_REGISTRY(RegistryType) ZSHARP_DECLARE_CONJUGATE_REGISTRY_EX(RegistryType, RegistryType)
 
+

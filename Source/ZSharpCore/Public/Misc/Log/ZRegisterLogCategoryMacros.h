@@ -10,3 +10,4 @@
 #define ZSHARP_REGISTER_LOG_CATEGORY_EX(Category, CategoryName) namespace ZSharp::__ZRegisterLogCategory_Private { static FZRegisterLogCategory ZSHARP_REGISTER_LOG_CATEGORY_COMBINE(__GRegisterLogCategory, CategoryName, __LINE__) { Category }; }
 #define ZSHARP_REGISTER_LOG_CATEGORY(Category) ZSHARP_REGISTER_LOG_CATEGORY_EX(Category, Category)
 
+

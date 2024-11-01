@@ -107,14 +107,14 @@ namespace ZSharp
 				return;
 			}
 
-			if (rec->bOwning)
-			{
-				delete rec->TypedUnmanaged;
-			}
-
 			if (!rec->bBlack)
 			{
 				Alc.ReleaseConjugate(unmanaged);
+			}
+
+			if (rec->bOwning)
+			{
+				delete rec->TypedUnmanaged;
 			}
 
 			ConjugateMap.Remove(unmanaged);

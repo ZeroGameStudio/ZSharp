@@ -3,6 +3,7 @@
 
 #include "Conjugate/ZRegularConjugateRegistries.h"
 
+#include "ALC/ZRuntimeTypeUri.h"
 #include "Trait/ZManagedTypeInfo.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"
 
@@ -11,10 +12,10 @@
 #define IMPLEMENT_REGISTRY(Type) \
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_##Type::GetManagedType(const ConjugateType* unmanaged) const \
 { \
-	FZRuntimeTypeLocatorWrapper locator; \
-	locator.AssemblyName = TZManagedTypeInfo<F##Type>::GetAssemblyName(); \
-	locator.TypeName = TZManagedTypeInfo<F##Type>::GetFullName(); \
-	return Alc.GetType(locator); \
+	FZRuntimeTypeUri uri; \
+	uri.AssemblyName = TZManagedTypeInfo<F##Type>::GetAssemblyName(); \
+	uri.TypeName = TZManagedTypeInfo<F##Type>::GetFullName(); \
+	return Alc.GetType(uri); \
 } \
 namespace ZSharp::ZRegularConjugateRegistries_Private \
 { \

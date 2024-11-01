@@ -4,7 +4,7 @@
 
 namespace ZSharp
 {
-	struct FZRuntimeTypeLocatorWrapper;
+	struct FZRuntimeTypeUri;
 	
 	struct ZSHARPRUNTIME_API FZReflectionHelper
 	{
@@ -16,10 +16,10 @@ namespace ZSharp
 		static bool IsFieldModuleMapped(FFieldVariant field);
 		
 		static const UField* GetUFieldClosestMappedAncestor(const UField* field);
-		static bool GetUFieldRuntimeTypeLocator(const UField* field, FZRuntimeTypeLocatorWrapper& outLocator);
+		static bool GetUFieldRuntimeTypeLocator(const UField* field, FZRuntimeTypeUri& outLocator);
 		
-		static bool GetFFieldClassRuntimeTypeLocator(const FFieldClass* cls, FZRuntimeTypeLocatorWrapper& outLocator);
-		static bool GetNonContainerFPropertyRuntimeTypeLocator(const FProperty* property, FZRuntimeTypeLocatorWrapper& outLocator);
+		static bool GetFFieldClassRuntimeTypeLocator(const FFieldClass* cls, FZRuntimeTypeUri& outLocator);
+		static bool GetNonContainerFPropertyRuntimeTypeLocator(const FProperty* property, FZRuntimeTypeUri& outLocator);
 		
 	};
 }

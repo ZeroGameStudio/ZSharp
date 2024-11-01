@@ -4,6 +4,7 @@
 #include "Conjugate/ZConjugateRegistry_Delegate.h"
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZRuntimeTypeUri.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"
 #include "Reflection/ZReflectionHelper.h"
 
@@ -94,11 +95,11 @@ void ZSharp::FZConjugateRegistry_Delegate::GetAllConjugates(TArray<void*>& outCo
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Delegate::GetManagedType(const UFunction* signature) const
 {
-	FZRuntimeTypeLocatorWrapper locator;
-	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(signature, locator))
+	FZRuntimeTypeUri uri;
+	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(signature, uri))
 	{
 		return {};
 	}
 	
-	return Alc.GetType(locator);
+	return Alc.GetType(uri);
 }

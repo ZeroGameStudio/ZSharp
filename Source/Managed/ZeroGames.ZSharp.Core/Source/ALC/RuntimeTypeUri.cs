@@ -11,7 +11,7 @@ public readonly struct RuntimeTypeLocator
 		TypeName = typeName;
 	}
 	
-	public unsafe RuntimeTypeLocator(InteropRuntimeTypeLocator* locator)
+	public unsafe RuntimeTypeLocator(InteropRuntimeTypeUri* locator)
 	{
 		AssemblyName = new(locator->AssemblyName);
 		TypeName = new(locator->TypeName);

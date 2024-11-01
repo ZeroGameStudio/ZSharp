@@ -4,6 +4,7 @@
 #include "Conjugate/ZConjugateRegistry_Map.h"
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZRuntimeTypeUri.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"
 #include "Reflection/ZReflectionHelper.h"
 #include "Reflection/Property/ZPropertyFactory.h"
@@ -103,25 +104,25 @@ void ZSharp::FZConjugateRegistry_Map::GetAllConjugates(TArray<void*>& outConjuga
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Map::GetManagedType(const FProperty* keyProperty, const FProperty* valueProperty) const
 {
-	FZRuntimeTypeLocatorWrapper locator;
-	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FMapProperty::StaticClass(), locator))
+	FZRuntimeTypeUri uri;
+	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FMapProperty::StaticClass(), uri))
 	{
 		return {};
 	}
 	
-	FZRuntimeTypeLocatorWrapper& inner = locator.TypeParameters.AddDefaulted_GetRef();
+	FZRuntimeTypeUri& inner = uri.TypeParameters.AddDefaulted_GetRef();
 	if (!FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(keyProperty, inner))
 	{
 		return {};
 	}
 
-	FZRuntimeTypeLocatorWrapper& outer = locator.TypeParameters.AddDefaulted_GetRef();
+	FZRuntimeTypeUri& outer = uri.TypeParameters.AddDefaulted_GetRef();
 	if (!FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(valueProperty, outer))
 	{
 		return {};
 	}
 	
-	return Alc.GetType(locator);
+	return Alc.GetType(uri);
 }
 
 

@@ -6,6 +6,7 @@
 #include "ZUObjectConjugateController_Actor.h"
 #include "ZUObjectConjugateController_GC.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZRuntimeTypeUri.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"
 #include "Reflection/ZReflectionHelper.h"
 
@@ -136,13 +137,13 @@ void ZSharp::FZConjugateRegistry_UObject::NotifyLifecycleExpired(UObject* unmana
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UObject::GetManagedType(const UObject* unmanaged) const
 {
-	FZRuntimeTypeLocatorWrapper locator;
-	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(unmanaged->GetClass(), locator))
+	FZRuntimeTypeUri uri;
+	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(unmanaged->GetClass(), uri))
 	{
 		return {};
 	}
 	
-	return Alc.GetType(locator);
+	return Alc.GetType(uri);
 }
 
 

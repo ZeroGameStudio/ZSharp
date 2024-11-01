@@ -3,8 +3,9 @@
 #include "ZMasterAssemblyLoadContext.h"
 
 #include "ZSharpCoreLogChannels.h"
+#include "ALC/ZRuntimeTypeUri.h"
 #include "Interop/Core/ZMasterAssemblyLoadContext_Interop.h"
-#include "Interop/ZRuntimeTypeLocator.h"
+#include "Interop/ZInteropRuntimeTypeUri.h"
 #include "ZCall/IZCallDispatcher.h"
 #include "Conjugate/ZConjugateRegistryDeclarations.h"
 
@@ -64,19 +65,19 @@ ZSharp::EZInvokeMethodErrorCode ZSharp::FZMasterAssemblyLoadContext::InvokeMetho
 	return FZMasterAssemblyLoadContext_Interop::GInvokeMethod(*assemblyName, *typeName, *methodName, args);
 }
 
-ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const FZRuntimeTypeLocatorWrapper& locator)
+ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const FZRuntimeTypeUri& uri)
 {
 	check(IsInGameThread());
 
-	TFunction<FZRuntimeTypeLocator(const FZRuntimeTypeLocatorWrapper&)> convert;
-	convert = [&convert](const FZRuntimeTypeLocatorWrapper& cur)
+	TFunction<FZInteropRuntimeTypeUri(const FZRuntimeTypeUri&)> convert;
+	convert = [&convert](const FZRuntimeTypeUri& cur)
 	{
 		const int32 num = cur.TypeParameters.Num();
 		
-		FZRuntimeTypeLocator interopLocator;
+		FZInteropRuntimeTypeUri interopLocator;
 		interopLocator.AssemblyName = *cur.AssemblyName;
 		interopLocator.TypeName = *cur.TypeName;
-		interopLocator.TypeParameters = num ? new FZRuntimeTypeLocator[cur.TypeParameters.Num()] : nullptr;
+		interopLocator.TypeParameters = num ? new FZInteropRuntimeTypeUri[cur.TypeParameters.Num()] : nullptr;
 		interopLocator.NumTypeParameters = num;
 		for (int32 i = 0; i < num; ++i)
 		{
@@ -86,8 +87,8 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const F
 		return interopLocator;
 	};
 
-	TFunction<void(const FZRuntimeTypeLocator&)> free;
-	free = [&free](const FZRuntimeTypeLocator& cur)
+	TFunction<void(const FZInteropRuntimeTypeUri&)> free;
+	free = [&free](const FZInteropRuntimeTypeUri& cur)
 	{
 		for (int32 i = cur.NumTypeParameters - 1; i >= 0; --i)
 		{
@@ -97,7 +98,7 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const F
 		delete[] cur.TypeParameters;
 	};
 
-	const FZRuntimeTypeLocator interopLocator = convert(locator);
+	const FZInteropRuntimeTypeUri interopLocator = convert(uri);
 	
 	FZRuntimeTypeHandle handle = FZMasterAssemblyLoadContext_Interop::GGetType(interopLocator);
 

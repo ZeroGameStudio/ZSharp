@@ -4,6 +4,7 @@
 #include "Conjugate/ZConjugateRegistry_MulticastSparseDelegate.h"
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZRuntimeTypeUri.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"
 #include "Reflection/ZReflectionHelper.h"
 
@@ -68,11 +69,11 @@ void ZSharp::FZConjugateRegistry_MulticastSparseDelegate::GetAllConjugates(TArra
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_MulticastSparseDelegate::GetManagedType(const USparseDelegateFunction* signature) const
 {
-	FZRuntimeTypeLocatorWrapper locator;
-	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(signature, locator))
+	FZRuntimeTypeUri uri;
+	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(signature, uri))
 	{
 		return {};
 	}
 	
-	return Alc.GetType(locator);
+	return Alc.GetType(uri);
 }

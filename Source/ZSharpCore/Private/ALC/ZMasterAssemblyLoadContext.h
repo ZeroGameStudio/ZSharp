@@ -28,7 +28,7 @@ namespace ZSharp
 		virtual EZInvokeMethodErrorCode InvokeMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args) override;
 
 		// IZMasterAssemblyLoadContext
-		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeLocatorWrapper& locator) override;
+		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeUri& uri) override;
 
 		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) override;
 		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) override;

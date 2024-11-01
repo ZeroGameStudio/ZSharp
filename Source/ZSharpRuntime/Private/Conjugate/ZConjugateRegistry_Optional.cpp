@@ -4,6 +4,7 @@
 #include "Conjugate/ZConjugateRegistry_Optional.h"
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZRuntimeTypeUri.h"
 #include "Conjugate/ZDeclareConjugateRegistry.h"
 #include "Reflection/ZReflectionHelper.h"
 #include "Reflection/Property/ZPropertyFactory.h"
@@ -98,19 +99,19 @@ void ZSharp::FZConjugateRegistry_Optional::GetAllConjugates(TArray<void*>& outCo
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Optional::GetManagedType(const FProperty* elementProperty) const
 {
-	FZRuntimeTypeLocatorWrapper locator;
-	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FOptionalProperty::StaticClass(), locator))
+	FZRuntimeTypeUri uri;
+	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FOptionalProperty::StaticClass(), uri))
 	{
 		return {};
 	}
 	
-	FZRuntimeTypeLocatorWrapper& inner = locator.TypeParameters.AddDefaulted_GetRef();
+	FZRuntimeTypeUri& inner = uri.TypeParameters.AddDefaulted_GetRef();
 	if (!FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(elementProperty, inner))
 	{
 		return {};
 	}
 	
-	return Alc.GetType(locator);
+	return Alc.GetType(uri);
 }
 
 

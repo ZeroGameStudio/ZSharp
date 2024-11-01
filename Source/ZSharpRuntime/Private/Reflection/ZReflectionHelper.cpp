@@ -5,6 +5,7 @@
 
 #include "ZSharpRuntimeSettings.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZRuntimeTypeUri.h"
 #include "Trait/ZManagedTypeInfo.h"
 #include "UObject/PropertyOptional.h"
 
@@ -222,7 +223,7 @@ const UField* ZSharp::FZReflectionHelper::GetUFieldClosestMappedAncestor(const U
 	return nullptr;
 }
 
-bool ZSharp::FZReflectionHelper::GetUFieldRuntimeTypeLocator(const UField* field, FZRuntimeTypeLocatorWrapper& outLocator)
+bool ZSharp::FZReflectionHelper::GetUFieldRuntimeTypeLocator(const UField* field, FZRuntimeTypeUri& outLocator)
 {
 	const UField* ancestor = GetUFieldClosestMappedAncestor(field);
 	const FString moduleName = GetFieldModuleName(ancestor);
@@ -244,9 +245,9 @@ bool ZSharp::FZReflectionHelper::GetUFieldRuntimeTypeLocator(const UField* field
 	return true;
 }
 
-bool ZSharp::FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(const FFieldClass* cls, FZRuntimeTypeLocatorWrapper& outLocator)
+bool ZSharp::FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(const FFieldClass* cls, FZRuntimeTypeUri& outLocator)
 {
-	static const TMap<FFieldClass*, FZRuntimeTypeLocatorWrapper> GProtoMap
+	static const TMap<FFieldClass*, FZRuntimeTypeUri> GProtoMap
 	{
 		{ FByteProperty::StaticClass(), { TZManagedTypeInfo<uint8>::GetAssemblyName(), TZManagedTypeInfo<uint8>::GetFullName() } },
 		{ FUInt16Property::StaticClass(), { TZManagedTypeInfo<uint16>::GetAssemblyName(), TZManagedTypeInfo<uint16>::GetFullName() } },
@@ -279,7 +280,7 @@ bool ZSharp::FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(const FFieldCl
 		{ FFieldPathProperty::StaticClass(), { TZManagedTypeInfo<FFieldPath>::GetAssemblyName(), TZManagedTypeInfo<FFieldPath>::GetFullName() } },
 	};
 
-	const FZRuntimeTypeLocatorWrapper* proto = GProtoMap.Find(cls);
+	const FZRuntimeTypeUri* proto = GProtoMap.Find(cls);
 	if (!proto)
 	{
 		checkNoEntry()
@@ -290,7 +291,7 @@ bool ZSharp::FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(const FFieldCl
 	return true;
 }
 
-bool ZSharp::FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(const FProperty* property, FZRuntimeTypeLocatorWrapper& outLocator)
+bool ZSharp::FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(const FProperty* property, FZRuntimeTypeUri& outLocator)
 {
 	if (!ensure(!property->IsA<FArrayProperty>() && !property->IsA<FSetProperty>() && !property->IsA<FMapProperty>() && !property->IsA<FOptionalProperty>()))
 	{
@@ -346,7 +347,7 @@ bool ZSharp::FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(cons
 		ensure(outLocator.TypeName.EndsWith("1"));
 		ensure(property->IsA<FObjectPropertyBase>() && !property->IsA<FObjectProperty>());
 		
-		FZRuntimeTypeLocatorWrapper& inner = outLocator.TypeParameters.Emplace_GetRef();
+		FZRuntimeTypeUri& inner = outLocator.TypeParameters.Emplace_GetRef();
 		if (const auto classProp = CastField<FClassProperty>(property))
 		{
 			return GetUFieldRuntimeTypeLocator(classProp->MetaClass, inner);

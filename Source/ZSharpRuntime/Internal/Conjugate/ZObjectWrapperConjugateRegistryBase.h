@@ -4,6 +4,7 @@
 
 #include "ZConjugateRegistryBase.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZRuntimeTypeUri.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "Trait/ZConjugateRegistryId.h"
 #include "Conjugate/ZConjugateHandle.h"
@@ -115,13 +116,13 @@ namespace ZSharp
 	private:
 		FZRuntimeTypeHandle GetManagedType(const UClass* cls) const
 		{
-			FZRuntimeTypeLocatorWrapper locator;
-			locator.AssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
-			locator.TypeName = FString::Printf(TEXT("%s.CoreUObject.%s`1"), *locator.AssemblyName, *T::GetExportTypeName());
-			FZRuntimeTypeLocatorWrapper& inner = locator.TypeParameters.Emplace_GetRef();
+			FZRuntimeTypeUri uri;
+			uri.AssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
+			uri.TypeName = FString::Printf(TEXT("%s.CoreUObject.%s`1"), *uri.AssemblyName, *T::GetExportTypeName());
+			FZRuntimeTypeUri& inner = uri.TypeParameters.Emplace_GetRef();
 			FZReflectionHelper::GetUFieldRuntimeTypeLocator(cls, inner);
 	
-			return Alc.GetType(locator);
+			return Alc.GetType(uri);
 		}
 		
 	private:

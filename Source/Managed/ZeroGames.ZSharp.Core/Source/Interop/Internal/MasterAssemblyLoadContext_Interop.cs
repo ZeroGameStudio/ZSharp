@@ -51,7 +51,7 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     }
 
     [UnmanagedCallersOnly]
-    public static InteropRuntimeTypeHandle GetType(InteropRuntimeTypeLocator* locator)
+    public static InteropRuntimeTypeHandle GetType(InteropRuntimeTypeUri* locator)
     {
         try
         {

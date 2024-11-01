@@ -29,23 +29,24 @@ namespace ZSharp
  	 *                   This is the built-in ALC of the .NET runtime, where all assemblies run by default.
  	 *                   You can load assemblies into Default ALC and interact with it simply through reflection.
  	 *                   
- 	 *   b. Master ALC:  This is the main ALC of Z#, which features the 'Conjugate' and 'ZCall' mechanisms,
- 	 *					 allowing complex interactions between managed and unmanaged code.
- 	 *					 The bridge connecting the UObject world and the managed world in Z# is just built on the Master ALC.
- 	 *					 Master ALC can be loaded and unloaded repeatedly to support hot reload mechanisms,
- 	 *					 but only one instance can exist at any given time.
- 	 *					 In most cases, the lifecycle of the Master ALC is managed automatically by Z#.
- 	 *					 Of course, you can explicitly load and unload the Master ALC,
- 	 *					 but this requires a sufficient understanding of the internals of Z#.
+ 	 *   b. Master ALC:  Specifically refers to ZeroGames.ZSharp.Core.IMasterAssemblyLoadContext.Instance.
+ 	 *                   This is the main ALC of Z#, which features the 'Conjugate' and 'ZCall' mechanisms,
+ 	 *                   allowing complex interactions between managed and unmanaged code.
+ 	 *                   The bridge connecting the UObject world and the managed world in Z# is just built on the Master ALC.
+ 	 *                   Master ALC can be loaded and unloaded repeatedly to support hot reload mechanisms,
+ 	 *                   but only one instance can exist at any given time.
+ 	 *                   In most cases, the lifecycle of the Master ALC is managed automatically by Z#.
+ 	 *                   Of course, you can explicitly load and unload the Master ALC,
+ 	 *                   but this requires a sufficient understanding of the internals of Z#.
  	 *					 
  	 *   c. Slim ALC:    This is a lightweight ALC with an interface set similar to Default ALC,
- 	 *					 allowing only assembly loading and simple calls.
- 	 *					 However, Default ALC contains globally shared state,
- 	 *					 frequent interaction with Default ALC may lead to unpredictable side effects.
- 	 *					 Therefore, Slim ALC comes into play to enable relatively independent code to run in a sandbox,
- 	 *					 minimizing the impact on the global environment.
- 	 *					 Slim ALC has a name property, allowing multiple instances with different names to coexist.
- 	 *					 Slim ALC needs to be explicitly unloaded after use.
+ 	 *                   allowing only assembly loading and simple calls.
+ 	 *                   However, Default ALC contains globally shared state,
+ 	 *                   frequent interaction with Default ALC may lead to unpredictable side effects.
+ 	 *                   Therefore, Slim ALC comes into play to enable relatively independent code to run in a sandbox,
+ 	 *                   minimizing the impact on the global environment.
+ 	 *                   Slim ALC has a name property, allowing multiple instances with different names to coexist.
+ 	 *                   Slim ALC needs to be explicitly unloaded after use.
  	 *
  	 * Use this interface as an entry point to interact with .NET runtime.
  	 *
@@ -64,7 +65,7 @@ namespace ZSharp
 		
 	public:
 		/**
-		 * Call managed GC.
+		 * Performs a .NET garbage collection.
 		 * Parameters have no effect yet.
 		 */
 		virtual void CollectGarbage(int32 generation = -1, bool aggressive = true, bool blocking = false, bool compacting = true) = 0;
@@ -80,7 +81,7 @@ namespace ZSharp
 		/**
 		 * Creates an instance of ZeroGames.ZSharp.Core.IMasterAssemblyLoadContext.
 		 * If the ALC already exists, a warning will be issued.
-		 * IMPORTANT: You don't own the returned pointer so don't store it if you don't know what you are doing!
+		 * IMPORTANT: You don't own the returned pointer so don't store it unless you know what you are doing!
 		 *
 		 * @return The proxy object represents the newly created or existing ALC.
 		 */
@@ -88,30 +89,30 @@ namespace ZSharp
 
 		/**
 		 * Gets the proxy object represents the existing instance of ZeroGames.ZSharp.Core.IMasterAssemblyLoadContext.
-		 * IMPORTANT: You don't own the returned pointer so don't store it if you don't know what you are doing!
+		 * IMPORTANT: You don't own the returned pointer so don't store it unless you know what you are doing!
 		 *
 		 * @return The proxy object represents the existing instance of ZeroGames.ZSharp.Core.IMasterAssemblyLoadContext.
-		 *         If no instance exists, nullptr will be returned.
+		 *         If no instance exists, nullptr is returned.
 		 */
 		virtual IZMasterAssemblyLoadContext* GetMasterAlc() = 0;
 
 		/**
  		 * Creates an instance of ZeroGames.ZSharp.Core.ISlimAssemblyLoadContext.
  		 * If the input name doesn't conform the contract, a warning will be issued.
- 		 * IMPORTANT: You don't own the returned pointer so don't store it if you don't know what you are doing!
+ 		 * IMPORTANT: You don't own the returned pointer so don't store it unless you know what you are doing!
  		 *
  		 * @param name Name of the instance. Should be neither "Default" nor "Master". 
  		 * @return The proxy object represents the newly created or existing ALC.
- 		 *         If name doesn't conform the contract, nullptr will be returned.
+ 		 *         If name doesn't conform the contract, nullptr is returned.
  		 */
 		virtual IZSlimAssemblyLoadContext* CreateSlimAlc(const FString& name) = 0;
 		
 		/**
- 		 * Gets the proxy object represents the existing instance of ZeroGames.ZSharp.Core.ISlimAssemblyLoadContext with provided name.
- 		 * IMPORTANT: You don't own the returned pointer so don't store it if you don't know what you are doing!
+ 		 * Gets the proxy object represents the existing instance of ZeroGames.ZSharp.Core.ISlimAssemblyLoadContext with the given name.
+ 		 * IMPORTANT: You don't own the returned pointer so don't store it unless you know what you are doing!
  		 *
- 		 * @return The proxy object represents the existing instance of ZeroGames.ZSharp.Core.ISlimAssemblyLoadContext with provided name.
- 		 *         If no instance exists or name doesn't conform the contract, nullptr will be returned.
+ 		 * @return The proxy object represents the existing instance of ZeroGames.ZSharp.Core.ISlimAssemblyLoadContext with the given name.
+ 		 *         If no instance exists or name doesn't conform the contract, nullptr is returned.
  		 */
 		virtual IZSlimAssemblyLoadContext* GetSlimAlc(const FString& name) = 0;
 		
@@ -183,7 +184,7 @@ namespace ZSharp
 		/**
  		 * Creates an anonymous Slim ALC, load the specified assembly, and call DllMain.
  		 * This function assumes the user function is asynchronous,
- 		 * so the ALC created won't be unloaded automatically and you are responsible for unloading it.
+ 		 * so the ALC created won't be unloaded automatically, it's up to you to unload it.
  		 * If the assembly doesn't exist, or doesn't have DllEntry, nothing happens.
  		 *
  		 * @param name Name of the pending assembly.

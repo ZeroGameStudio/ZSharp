@@ -4,6 +4,9 @@
 
 namespace ZSharp
 {
+	/**
+	 * See System.Runtime.InteropServices.GCHandle.
+	 */
 	struct FZGCHandle
 	{
 

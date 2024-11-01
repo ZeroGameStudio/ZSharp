@@ -4,6 +4,9 @@
 
 namespace ZSharp
 {
+	/**
+	 * See ZeroGames.ZSharp.Core.EZLoadAssemblyErrorCode.
+	 */
 	enum class EZLoadAssemblyErrorCode : int32
 	{
 		Succeed = 0,
@@ -19,6 +22,9 @@ namespace ZSharp
 		UnhandledDllMainException = 303,
 	};
 
+	/**
+ 	 * See ZeroGames.ZSharp.Core.EZInvokeMethodErrorCode.
+ 	 */
 	enum class EZInvokeMethodErrorCode : int32
 	{
 		Succeed = 0,
@@ -37,6 +43,9 @@ namespace ZSharp
 		UnhandledException = 404,
 	};
 
+	/**
+ 	 * See ZeroGames.ZSharp.Core.EZCallErrorCode.
+ 	 */
 	enum class EZCallErrorCode : int32
 	{
 		Succeed = 0,

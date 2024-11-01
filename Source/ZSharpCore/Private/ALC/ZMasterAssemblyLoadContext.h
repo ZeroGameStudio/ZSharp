@@ -30,30 +30,32 @@ namespace ZSharp
 		// IZMasterAssemblyLoadContext
 		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeUri& uri) override;
 
-		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) override;
-		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) override;
-
-		virtual void PushRedFrame() override;
-		virtual void PopRedFrame() override;
-		virtual EZCallErrorCode ZCall(FZCallHandle handle, FZCallBuffer* buffer) override;
-		virtual FZCallHandle GetZCallHandle(const FString& name) override;
+		virtual IZConjugateRegistry& GetConjugateRegistry(uint16 id) const override;
 		virtual void* BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type) override;
 		virtual void ReleaseConjugate(void* unmanaged) override;
-
-		virtual IZConjugateRegistry& GetConjugateRegistry(uint16 id) override;
+		virtual void PushRedFrame() override;
+		virtual void PopRedFrame() override;
+		
+		virtual FZCallHandle RegisterZCall(IZCallDispatcher* dispatcher) override;
+		virtual void RegisterZCallResolver(IZCallResolver* resolver, uint64 priority) override;
+		virtual FZCallHandle GetZCallHandle(const FString& name) override;
+		virtual EZCallErrorCode ZCall(FZCallHandle handle, FZCallBuffer* buffer) override;
 		
 	public:
-		EZCallErrorCode ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const;
-		FZCallHandle GetZCallHandle_Black(const FString& name);
 		void* BuildConjugate_Black(uint16 registryId, void* userdata);
 		void ReleaseConjugate_Black(uint16 registryId, void* unmanaged);
-
+		
+		FZCallHandle GetZCallHandle_Black(const FString& name);
+		EZCallErrorCode ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const;
+	
 	private:
-		EZCallErrorCode ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer);
-		FZCallHandle GetZCallHandle_Red(const FString& name);
 		void* BuildConjugate_Red(void* unmanaged, FZRuntimeTypeHandle type);
 		void ReleaseConjugate_Red(void* unmanaged);
+		
+		FZCallHandle GetZCallHandle_Red(const FString& name);
+		EZCallErrorCode ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer);
 
+	private:
 		bool IsInRedStack() const { return !!RedStackDepth; }
 		
 	private:

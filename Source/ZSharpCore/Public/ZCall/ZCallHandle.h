@@ -4,6 +4,9 @@
 
 namespace ZSharp
 {
+	/**
+	 * See ZeroGames.ZSharp.Core.ZCallHandle.
+	 */
 	struct FZCallHandle
 	{
 

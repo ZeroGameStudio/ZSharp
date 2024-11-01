@@ -4,6 +4,9 @@
 
 namespace ZSharp
 {
+	/**
+	 * See ZeroGames.ZSharp.Core.RuntimeTypeUri
+	 */
 	struct FZRuntimeTypeUri
 	{
 		FString AssemblyName;

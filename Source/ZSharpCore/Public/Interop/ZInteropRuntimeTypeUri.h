@@ -4,6 +4,9 @@
 
 namespace ZSharp
 {
+	/**
+	 * See ZeroGames.ZSharp.Core.InteropRuntimeTypeUri.
+	 */
 	struct FZInteropRuntimeTypeUri
 	{
 		const TCHAR* AssemblyName;

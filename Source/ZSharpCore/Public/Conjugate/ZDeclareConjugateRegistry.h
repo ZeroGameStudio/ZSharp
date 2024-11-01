@@ -13,7 +13,14 @@ namespace ZSharp
 	{
 		ZSHARPCORE_API void DeclareConjugateRegistry(uint16 id, TUniqueFunction<IZConjugateRegistry*(IZMasterAssemblyLoadContext&)>&& factory);
 	}
-	
+
+	/**
+	 * Declares a conjugate registry to automatically register to Master ALC.
+	 * Generally you don't need to care about this
+	 * because Z# has implemented necessary conjugates for interacting with Unreal Engine.
+	 * 
+	 * @tparam T Type of the conjugate registry.
+	 */
 	template <CZConjugateRegistryImpl T>
 	struct TZDeclareConjugateRegistry
 	{

@@ -23,6 +23,9 @@
 
 namespace ZSharp
 {
+	/**
+	 * See ZeroGames.ZSharp.Core.EZCallBufferSlotType
+	 */
 	enum class EZCallBufferSlotType : uint8
 	{
 #define Op(Type) Type,
@@ -33,7 +36,10 @@ namespace ZSharp
 	};
 
 	ZSHARPCORE_API FString ToString(EZCallBufferSlotType type);
-	
+
+	/**
+	 * See ZeroGames.ZSharp.Core.ZCallBufferSlotValue.
+	 */
 	union FZCallBufferSlotValue
 	{
 		uint8 UInt8;
@@ -52,6 +58,9 @@ namespace ZSharp
 		FZConjugateHandle Conjugate;
 	};
 
+	/**
+	 * See ZeroGames.ZSharp.Core.ZCallBufferSlot.
+	 */
 	struct ZSHARPCORE_API FZCallBufferSlot
 	{
 		
@@ -105,7 +114,10 @@ namespace ZSharp
 		
 	};
 
-	// NOTE: Do NOT Construct/Read/Write this directly, use helper functions and macros below.
+	/**
+	 * see ZeroGames.ZSharp.Core.ZCallBuffer.
+	 * Do NOT Construct/Read/Write this directly, use helper functions and macros below.
+	 */
 	struct ZSHARPCORE_API FZCallBuffer
 	{
 		

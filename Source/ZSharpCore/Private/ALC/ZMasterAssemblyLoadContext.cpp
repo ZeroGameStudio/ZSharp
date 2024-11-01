@@ -53,15 +53,11 @@ void ZSharp::FZMasterAssemblyLoadContext::Unload()
 
 ZSharp::EZLoadAssemblyErrorCode ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const FString& assemblyName, void* args)
 {
-	check(IsInGameThread());
-    
     return FZMasterAssemblyLoadContext_Interop::GLoadAssembly(*assemblyName, args);
 }
 
 ZSharp::EZInvokeMethodErrorCode ZSharp::FZMasterAssemblyLoadContext::InvokeMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args)
 {
-	check(IsInGameThread());
-	
 	return FZMasterAssemblyLoadContext_Interop::GInvokeMethod(*assemblyName, *typeName, *methodName, args);
 }
 
@@ -107,24 +103,26 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const F
 	return handle;
 }
 
-ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::RegisterZCall(IZCallDispatcher* dispatcher)
+ZSharp::IZConjugateRegistry& ZSharp::FZMasterAssemblyLoadContext::GetConjugateRegistry(uint16 id) const
 {
 	check(IsInGameThread());
-	
-	FZCallHandle handle = FZCallHandle::Alloc();
+	check(ConjugateRegistries.IsValidIndex(id));
 
-	ZCallMap.Emplace(handle, dispatcher);
-	ZCallName2Handle.Emplace(dispatcher->GetName(), handle);
-
-	return handle;
+	return *ConjugateRegistries[id];
 }
 
-void ZSharp::FZMasterAssemblyLoadContext::RegisterZCallResolver(IZCallResolver* resolver, uint64 priority)
+void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type)
 {
 	check(IsInGameThread());
-	
-	ZCallResolverLink.Emplace(TTuple<uint64, TUniquePtr<IZCallResolver>> { priority, resolver });
-	ZCallResolverLink.StableSort([](auto& lhs, auto& rhs){ return lhs.template Get<0>() < rhs.template Get<0>(); });
+
+	return BuildConjugate_Red(unmanaged, type);
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(void* unmanaged)
+{
+	check(IsInGameThread());
+
+	ReleaseConjugate_Red(unmanaged);
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::PushRedFrame()
@@ -152,12 +150,24 @@ void ZSharp::FZMasterAssemblyLoadContext::PopRedFrame()
 	--RedStackDepth;
 }
 
-ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall(FZCallHandle handle, FZCallBuffer* buffer)
+ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::RegisterZCall(IZCallDispatcher* dispatcher)
 {
 	check(IsInGameThread());
-	check(IsInRedStack());
+	
+	FZCallHandle handle = FZCallHandle::Alloc();
 
-	return ZCall_Red(handle, buffer);
+	ZCallMap.Emplace(handle, dispatcher);
+	ZCallName2Handle.Emplace(dispatcher->GetName(), handle);
+
+	return handle;
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::RegisterZCallResolver(IZCallResolver* resolver, uint64 priority)
+{
+	check(IsInGameThread());
+	
+	ZCallResolverLink.Emplace(TTuple<uint64, TUniquePtr<IZCallResolver>> { priority, resolver });
+	ZCallResolverLink.StableSort([](auto& lhs, auto& rhs){ return lhs.template Get<0>() < rhs.template Get<0>(); });
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const FString& name)
@@ -167,26 +177,51 @@ ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const F
 	return GetZCallHandle_Red(name);
 }
 
-void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type)
+ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall(FZCallHandle handle, FZCallBuffer* buffer)
 {
 	check(IsInGameThread());
+	check(IsInRedStack());
 
-	return BuildConjugate_Red(unmanaged, type);
+	return ZCall_Red(handle, buffer);
 }
 
-void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(void* unmanaged)
+void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate_Black(uint16 registryId, void* userdata)
 {
 	check(IsInGameThread());
 
-	ReleaseConjugate_Red(unmanaged);
+	return GetConjugateRegistry(registryId).BuildConjugate(userdata);
 }
 
-ZSharp::IZConjugateRegistry& ZSharp::FZMasterAssemblyLoadContext::GetConjugateRegistry(uint16 id)
+void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate_Black(uint16 registryId, void* unmanaged)
 {
 	check(IsInGameThread());
-	check(ConjugateRegistries.IsValidIndex(id));
 
-	return *ConjugateRegistries[id];
+	GetConjugateRegistry(registryId).ReleaseConjugate(unmanaged);
+}
+
+ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle_Black(const FString& name)
+{
+	check(IsInGameThread());
+
+	FZCallHandle handle{};
+	const FZCallHandle* pHandle = ZCallName2Handle.Find(name);
+	if (!pHandle)
+	{
+		for (const auto& resolver : ZCallResolverLink)
+		{
+			if (IZCallDispatcher* dispatcher = resolver.Get<1>()->Resolve(name))
+			{
+				check(dispatcher->GetName() == name);
+				handle = RegisterZCall(dispatcher);
+			}
+		}
+	}
+	else
+	{
+		handle = *pHandle;
+	}
+
+	return handle;
 }
 
 ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const
@@ -208,42 +243,19 @@ ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Black(FZCallH
 	return (*pDispatcher)->Dispatch(buffer);
 }
 
-ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle_Black(const FString& name)
+void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate_Red(void* unmanaged, FZRuntimeTypeHandle type)
 {
-	check(IsInGameThread());
-
-	FZCallHandle handle{};
-	const FZCallHandle* pHandle = ZCallName2Handle.Find(name);
-	if (!pHandle)
-	{
-		for (const auto& resolver : ZCallResolverLink)
-		{
-			if (IZCallDispatcher* dispatcher = resolver.Get<1>()->Resolve(name))
-			{
-				handle = RegisterZCall(dispatcher);
-			}
-		}
-	}
-	else
-	{
-		handle = *pHandle;
-	}
-
-	return handle;
+	return FZMasterAssemblyLoadContext_Interop::GBuildConjugate_Red(unmanaged, type);
 }
 
-void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate_Black(uint16 registryId, void* userdata)
+void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate_Red(void* unmanaged)
 {
-	check(IsInGameThread());
-
-	return GetConjugateRegistry(registryId).BuildConjugate(userdata);
+	FZMasterAssemblyLoadContext_Interop::GReleaseConjugate_Red(unmanaged);
 }
 
-void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate_Black(uint16 registryId, void* unmanaged)
+ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle_Red(const FString& name)
 {
-	check(IsInGameThread());
-
-	GetConjugateRegistry(registryId).ReleaseConjugate(unmanaged);
+	return FZMasterAssemblyLoadContext_Interop::GGetZCallHandle_Red(*name);
 }
 
 ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer)
@@ -260,21 +272,6 @@ ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHan
 #else
 	return FZMasterAssemblyLoadContext_Interop::GZCall_Red(handle, buffer, nullptr);
 #endif
-}
-
-ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle_Red(const FString& name)
-{
-	return FZMasterAssemblyLoadContext_Interop::GGetZCallHandle_Red(*name);
-}
-
-void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate_Red(void* unmanaged, FZRuntimeTypeHandle type)
-{
-	return FZMasterAssemblyLoadContext_Interop::GBuildConjugate_Red(unmanaged, type);
-}
-
-void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate_Red(void* unmanaged)
-{
-	FZMasterAssemblyLoadContext_Interop::GReleaseConjugate_Red(unmanaged);
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::HandleGarbageCollectComplete()

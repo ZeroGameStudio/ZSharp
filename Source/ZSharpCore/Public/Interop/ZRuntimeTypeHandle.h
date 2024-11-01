@@ -4,6 +4,9 @@
 
 namespace ZSharp
 {
+	/**
+	 * See ZeroGames.ZSharp.Core.InteropRuntimeTypeHandle.
+	 */
 	struct FZRuntimeTypeHandle
 	{
 		operator bool() const

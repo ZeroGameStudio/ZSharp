@@ -4,6 +4,9 @@
 
 namespace ZSharp
 {
+	/**
+	 * See ZeroGames.ZSharp.Core.CommonMethodArgs.
+	 */
 	struct FZCommonMethodArgs
 	{
 		int32 Argc;

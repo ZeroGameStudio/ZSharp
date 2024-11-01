@@ -5,13 +5,10 @@
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ALC/ZRuntimeTypeUri.h"
-#include "Conjugate/ZDeclareConjugateRegistry.h"
+#include "Conjugate/ZDeclareConjugateRegistryMacros.h"
 #include "Reflection/ZReflectionHelper.h"
 
-namespace ZSharp::ZConjugateRegistry_MulticastInlineDelegate_Private
-{
-	static TZDeclareConjugateRegistry<FZConjugateRegistry_MulticastInlineDelegate> GDeclare;
-}
+ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_MulticastInlineDelegate)
 
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_MulticastInlineDelegate::Conjugate(const UDelegateFunction* signature, TFunctionRef<void(const FZSelfDescriptiveMulticastInlineScriptDelegate&)> initialize)
 {

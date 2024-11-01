@@ -3,15 +3,14 @@
 
 #include "Conjugate/ZObjectWrapperConjugateRegisties.h"
 
-#include "Conjugate/ZDeclareConjugateRegistry.h"
+#include "Conjugate/ZDeclareConjugateRegistryMacros.h"
 
-namespace ZSharp::ZConjugateRegistry_UObject_Private
-{
-	static TZDeclareConjugateRegistry<FZConjugateRegistry_SubclassOf> GDeclareSubclassOf;
-	static TZDeclareConjugateRegistry<FZConjugateRegistry_SoftClassPtr> GDeclareSoftClassPtr;
-	static TZDeclareConjugateRegistry<FZConjugateRegistry_SoftObjectPtr> GDeclareSoftObjectPtr;
-	static TZDeclareConjugateRegistry<FZConjugateRegistry_WeakObjectPtr> GDeclareWeakObjectPtr;
-	static TZDeclareConjugateRegistry<FZConjugateRegistry_LazyObjectPtr> GDeclareLazyObjectPtr;
-	static TZDeclareConjugateRegistry<FZConjugateRegistry_ScriptInterface> GDeclareScriptInterface;
-	static TZDeclareConjugateRegistry<FZConjugateRegistry_StrongObjectPtr> GDeclareStrongObjectPtr;
-}
+ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_SubclassOf)
+ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_SoftClassPtr)
+ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_SoftObjectPtr)
+ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_WeakObjectPtr)
+ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_LazyObjectPtr)
+ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_ScriptInterface)
+ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_StrongObjectPtr)
+
+

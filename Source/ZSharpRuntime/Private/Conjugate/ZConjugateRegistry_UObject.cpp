@@ -7,13 +7,10 @@
 #include "ZUObjectConjugateController_GC.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ALC/ZRuntimeTypeUri.h"
-#include "Conjugate/ZDeclareConjugateRegistry.h"
+#include "Conjugate/ZDeclareConjugateRegistryMacros.h"
 #include "Reflection/ZReflectionHelper.h"
 
-namespace ZSharp::ZConjugateRegistry_UObject_Private
-{
-	static TZDeclareConjugateRegistry<FZConjugateRegistry_UObject> GDeclare;
-}
+ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_UObject)
 
 ZSharp::FZConjugateRegistry_UObject::FZConjugateRegistry_UObject(IZMasterAssemblyLoadContext& alc)
 	: Super(alc)

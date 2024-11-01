@@ -5,14 +5,11 @@
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ALC/ZRuntimeTypeUri.h"
-#include "Conjugate/ZDeclareConjugateRegistry.h"
+#include "Conjugate/ZDeclareConjugateRegistryMacros.h"
 #include "Reflection/ZReflectionHelper.h"
 #include "Reflection/Property/ZPropertyFactory.h"
 
-namespace ZSharp::ZConjugateRegistry_Map_Private
-{
-	static TZDeclareConjugateRegistry<FZConjugateRegistry_Map> GDeclare;
-}
+ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_Map)
 
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Map::Conjugate(const FProperty* keyProperty, const FProperty* valueProperty, TFunctionRef<void(const FZSelfDescriptiveScriptMap&)> initialize)
 {

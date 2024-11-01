@@ -12,7 +12,7 @@ namespace ZSharp
 		int32 NumTypeParameters;
 	};
 	
-	static_assert(TIsPODType<FZInteropRuntimeTypeUri>::Value, "RuntimeTypeLocator must be POD type!");
+	static_assert(TIsPODType<FZInteropRuntimeTypeUri>::Value, "InteropRuntimeTypeUri must be POD type!");
 }
 
 

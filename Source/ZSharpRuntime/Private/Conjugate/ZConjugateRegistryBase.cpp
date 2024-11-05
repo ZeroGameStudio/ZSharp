@@ -20,7 +20,7 @@ void ZSharp::FZConjugateRegistryBase::PushRedFrame()
 
 void ZSharp::FZConjugateRegistryBase::PopRedFrame()
 {
-	ZConjugateRegistryBase_Private::FZRedFrame frame = RedStack.Pop();
+	FZRedFrame frame = RedStack.Pop();
 	for (const auto& conjugate : frame.CapturedConjugates)
 	{
 		ReleaseConjugate(conjugate);

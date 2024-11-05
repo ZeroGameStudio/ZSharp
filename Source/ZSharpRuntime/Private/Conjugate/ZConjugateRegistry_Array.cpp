@@ -15,83 +15,31 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FPr
 {
 	auto sdsa = new FZSelfDescriptiveScriptArray { elementProperty, false };
 	initialize(*sdsa);
-	
-	void* unmanaged = sdsa->GetUnderlyingInstance();
 	const FZRuntimeTypeHandle type = GetManagedType(elementProperty);
-	if (Alc.BuildConjugate(unmanaged, type))
-	{
-		ConjugateMap.Emplace(unmanaged, { TUniquePtr<FZSelfDescriptiveScriptArray>(sdsa), false });
-		CaptureConjugate(unmanaged);
+	return BuildConjugate_Red(sdsa, type);
+}
 
+ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FProperty* elementProperty, FScriptArray* unmanaged)
+{
+	if (const FZSelfDescriptiveScriptArray* sdsa = FindConjugateWrapper(unmanaged))
+	{
+		check(sdsa->GetDescriptor()->GetClass() == elementProperty->GetClass());
 		return { unmanaged };
 	}
 
-	return {};
-}
-
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FProperty* elementProperty, const FScriptArray* unmanaged)
-{
-	auto mutableUnmanaged = const_cast<FScriptArray*>(unmanaged);
-	if (const FZConjugateRec* rec = ConjugateMap.Find(mutableUnmanaged))
-	{
-		check(rec->Array->GetDescriptor()->GetClass() == elementProperty->GetClass());
-		return { mutableUnmanaged };
-	}
-
+	auto sdsa = new FZSelfDescriptiveScriptArray { elementProperty, unmanaged };
 	const FZRuntimeTypeHandle type = GetManagedType(elementProperty);
-	if (Alc.BuildConjugate(mutableUnmanaged, type))
-	{
-		ConjugateMap.Emplace(mutableUnmanaged, { MakeUnique<FZSelfDescriptiveScriptArray>(elementProperty, mutableUnmanaged), false });
-		CaptureConjugate(mutableUnmanaged);
-
-		return { mutableUnmanaged };
-	}
-
-	return {};
+	return BuildConjugate_Red(sdsa, type);
 }
 
-ZSharp::FZSelfDescriptiveScriptArray* ZSharp::FZConjugateRegistry_Array::Conjugate(FZConjugateHandle handle) const
-{
-	const void* unmanaged = handle.Handle;
-	const FZConjugateRec* rec = ConjugateMap.Find(unmanaged);
-	return rec ? rec->Array.Get() : nullptr;
-}
-
-void* ZSharp::FZConjugateRegistry_Array::BuildConjugate(void* userdata)
+ZSharp::FZSelfDescriptiveScriptArray* ZSharp::FZConjugateRegistry_Array::BuildConjugateWrapper(void* userdata)
 {
 	struct
 	{
 		FZPropertyDesc Desc;
 	} typedUserdata = *static_cast<decltype(typedUserdata)*>(userdata);
 	
-	auto pSdsa = MakeUnique<FZSelfDescriptiveScriptArray>(FZPropertyFactory::Create(typedUserdata.Desc), true);
-	void* unmanaged = pSdsa->GetUnderlyingInstance();
-	ConjugateMap.Emplace(unmanaged, { MoveTemp(pSdsa), true });
-	return unmanaged;
-}
-
-void ZSharp::FZConjugateRegistry_Array::ReleaseConjugate(void* unmanaged)
-{
-	const FZConjugateRec* rec = ConjugateMap.Find(unmanaged);
-	if (!rec)
-	{
-		return;
-	}
-	
-	if (!rec->bBlack)
-	{
-		Alc.ReleaseConjugate(unmanaged);
-	}
-
-	ConjugateMap.Remove(unmanaged);
-}
-
-void ZSharp::FZConjugateRegistry_Array::GetAllConjugates(TArray<void*>& outConjugates) const
-{
-	for (const auto& pair : ConjugateMap)
-	{
-		outConjugates.Emplace(pair.Key);
-	}
+	return new FZSelfDescriptiveScriptArray { FZPropertyFactory::Create(typedUserdata.Desc), true };
 }
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Array::GetManagedType(const FProperty* elementProperty) const

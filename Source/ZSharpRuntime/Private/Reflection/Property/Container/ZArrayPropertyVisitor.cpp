@@ -6,7 +6,7 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "ZCall/ZCallBuffer.h"
-#include "Conjugate/ZConjugateRegistry_Array.h"
+#include "Conjugate/ZStrangeConjugateRegistries.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptArray.h"
 
 void ZSharp::FZArrayPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const

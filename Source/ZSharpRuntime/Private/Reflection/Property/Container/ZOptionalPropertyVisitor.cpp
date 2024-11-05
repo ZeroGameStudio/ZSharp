@@ -6,7 +6,7 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "ZCall/ZCallBuffer.h"
-#include "Conjugate/ZConjugateRegistry_Optional.h"
+#include "Conjugate/ZStrangeConjugateRegistries.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveOptional.h"
 
 void ZSharp::FZOptionalPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const

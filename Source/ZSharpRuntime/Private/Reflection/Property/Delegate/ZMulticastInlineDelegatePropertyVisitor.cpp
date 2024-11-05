@@ -6,7 +6,7 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "ZCall/ZCallBuffer.h"
-#include "Conjugate/ZConjugateRegistry_MulticastInlineDelegate.h"
+#include "Conjugate/ZStrangeConjugateRegistries.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveMulticastInlineScriptDelegate.h"
 
 void ZSharp::FZMulticastInlineDelegatePropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const

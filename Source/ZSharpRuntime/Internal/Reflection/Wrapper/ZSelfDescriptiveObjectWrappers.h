@@ -75,7 +75,6 @@ namespace ZSharp
 		bool bOwning;
 		
 	};
-}
 
 #define DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(Name, Wrapper) \
 struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper> \
@@ -103,17 +102,16 @@ struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper>, pu
 	} \
 };
 
-namespace ZSharp
-{
-	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT(SubclassOf, TSubclassOf<UObject>, GetGCPtr, SelfDescriptiveSubclassOf)
-	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(SoftClassPtr, TSoftClassPtr<UObject>)
-	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(SoftObjectPtr, FSoftObjectPtr)
-	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(WeakObjectPtr, FWeakObjectPtr)
-	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(LazyObjectPtr, FLazyObjectPtr)
-	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT(ScriptInterface, FScriptInterface, GetObjectRef, SelfDescriptiveScriptInterface)
-	DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(StrongObjectPtr, TStrongObjectPtr<UObject>)
-}
+DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT(SubclassOf, TSubclassOf<UObject>, GetGCPtr, SelfDescriptiveSubclassOf)
+DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(SoftClassPtr, TSoftClassPtr<UObject>)
+DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(SoftObjectPtr, FSoftObjectPtr)
+DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(WeakObjectPtr, FWeakObjectPtr)
+DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(LazyObjectPtr, FLazyObjectPtr)
+DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT(ScriptInterface, FScriptInterface, GetObjectRef, SelfDescriptiveScriptInterface)
+DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(StrongObjectPtr, TStrongObjectPtr<UObject>)
 
+#undef DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT
 #undef DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER
+}
 
 

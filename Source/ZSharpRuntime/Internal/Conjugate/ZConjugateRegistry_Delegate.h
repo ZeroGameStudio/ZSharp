@@ -2,51 +2,28 @@
 
 #pragma once
 
-#include "ZConjugateRegistryBase.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
+#include "ZStrangeConjugateRegistryBase.h"
 #include "Interop/ZRuntimeTypeHandle.h"
-#include "Trait/ZConjugateRegistryId.h"
-#include "Conjugate/ZConjugateHandle.h"
 
 namespace ZSharp
 {
-	class IZMasterAssemblyLoadContext;
+	struct FZSelfDescriptiveScriptDelegate;
 	
-	class ZSHARPRUNTIME_API FZConjugateRegistry_Delegate : public FZConjugateRegistryBase, public FNoncopyable
+	class ZSHARPRUNTIME_API FZConjugateRegistry_Delegate : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_Delegate, FZSelfDescriptiveScriptDelegate>
 	{
 
-		using Super = FZConjugateRegistryBase;
-		using ThisClass = FZConjugateRegistry_Delegate;
+		friend Super;
+		friend TZStrangeConjugateRegistryBase;
 
 	public:
-		static constexpr uint16 RegistryId = TZConjugateRegistryId_V<FZSelfDescriptiveScriptDelegate>;
+		FZConjugateRegistry_Delegate(IZMasterAssemblyLoadContext& alc) : TZStrangeConjugateRegistryBase(alc){}
 
 	private:
-		struct FZConjugateRec
-		{
-			TUniquePtr<FZSelfDescriptiveScriptDelegate> Delegate;
-			bool bBlack;
-		};
-
-	public:
-		explicit FZConjugateRegistry_Delegate(IZMasterAssemblyLoadContext& alc) : Super(alc){}
-
-	public:
-		FZConjugateHandle Conjugate(const UDelegateFunction* signature) { return Conjugate(signature, [](const FZSelfDescriptiveScriptDelegate&){}); }
-		FZConjugateHandle Conjugate(const UDelegateFunction* signature, TFunctionRef<void(const FZSelfDescriptiveScriptDelegate&)> initialize);
-		FZConjugateHandle Conjugate(const UDelegateFunction* signature, const FScriptDelegate* unmanaged);
-		FZSelfDescriptiveScriptDelegate* Conjugate(FZConjugateHandle handle) const;
+		static FZSelfDescriptiveScriptDelegate* BuildConjugateWrapper(void* userdata);
+		static void ValidateConjugateWrapper(const UDelegateFunction* descriptor, const FZSelfDescriptiveScriptDelegate* wrapper);
 
 	private:
-		virtual void* BuildConjugate(void* userdata) override;
-		virtual void ReleaseConjugate(void* unmanaged) override;
-		virtual void GetAllConjugates(TArray<void*>& outConjugates) const override;
-
-	private:
-		FZRuntimeTypeHandle GetManagedType(const UFunction* signature) const;
-		
-	private:
-		TMap<void*, FZConjugateRec> ConjugateMap;
+		FZRuntimeTypeHandle GetManagedType(const UDelegateFunction* descriptor) const;
 	
 	};
 }

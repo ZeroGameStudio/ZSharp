@@ -3,12 +3,11 @@
 #pragma once
 
 #include "ZStrangeConjugateRegistryBase.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveScriptMap.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 
 namespace ZSharp
 {
-	class IZMasterAssemblyLoadContext;
+	struct FZSelfDescriptiveScriptMap;
 	
 	class ZSHARPRUNTIME_API FZConjugateRegistry_Map : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_Map, FZSelfDescriptiveScriptMap>
 	{

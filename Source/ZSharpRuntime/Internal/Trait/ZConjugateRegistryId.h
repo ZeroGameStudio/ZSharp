@@ -11,12 +11,12 @@
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptMap.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptSet.h"
+#include "Reflection/Wrapper/ZSelfDescriptiveScriptStruct.h"
 
 namespace ZSharp
 {
 	constexpr uint16 GUObjectConjugateRegistryId = 1;
-	constexpr uint16 GUStructConjugateRegistryId = 2;
-	
+
 	template <CZStaticallyExportableClass T, typename = void>
 	struct TZConjugateRegistryId;
 
@@ -24,7 +24,9 @@ namespace ZSharp
 	constexpr uint16 TZConjugateRegistryId_V = TZConjugateRegistryId<T>::Value;
 }
 
-#define ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ExportedType, RegistryId) template<> struct ZSharp::TZConjugateRegistryId<ExportedType> { static_assert(RegistryId != GUObjectConjugateRegistryId && RegistryId != GUStructConjugateRegistryId); static constexpr uint16 Value = RegistryId; };
+#define ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ExportedType, RegistryId) template<> struct ZSharp::TZConjugateRegistryId<ExportedType> { static_assert(RegistryId != GUObjectConjugateRegistryId); static constexpr uint16 Value = RegistryId; };
+
+ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(ZSharp::FZSelfDescriptiveScriptStruct, 2)
 
 ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(FString, 11)
 ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(FName, 12)

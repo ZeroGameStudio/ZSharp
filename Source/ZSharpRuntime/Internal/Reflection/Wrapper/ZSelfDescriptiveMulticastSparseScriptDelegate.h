@@ -11,6 +11,12 @@ namespace ZSharp
 	struct FZCallBuffer;
 	struct FZFunctionVisitorHandle;
 
+	template <>
+	struct TZSelfDescriptiveTraits<struct FZSelfDescriptiveMulticastSparseScriptDelegate> : FZSelfDescriptiveTraitsBase
+	{
+		static constexpr bool HasCustomNewUnderlyingInstance = true;
+	};
+
 	struct ZSHARPRUNTIME_API FZSelfDescriptiveMulticastSparseScriptDelegate : TZSelfDescriptiveBase<FZSelfDescriptiveMulticastSparseScriptDelegate, USparseDelegateFunction, FSparseDelegate>
 	{
 		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_AUTO_CTOR(FZSelfDescriptiveMulticastSparseScriptDelegate)
@@ -31,6 +37,9 @@ namespace ZSharp
 		
 		FZSelfDescriptiveMulticastSparseScriptDelegate& operator=(FZSelfDescriptiveMulticastSparseScriptDelegate&& other) noexcept;
 
+	private:
+		static UnderlyingInstanceType* NewUnderlyingInstance(const DescriptorType* descriptor);
+		
 	private:
 		void Add(const FScriptDelegate& unicast);
 		const UObject* GetOwner() const;

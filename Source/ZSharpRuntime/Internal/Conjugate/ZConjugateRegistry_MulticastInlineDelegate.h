@@ -2,51 +2,28 @@
 
 #pragma once
 
-#include "ZConjugateRegistryBase.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveMulticastInlineScriptDelegate.h"
+#include "ZStrangeConjugateRegistryBase.h"
 #include "Interop/ZRuntimeTypeHandle.h"
-#include "Trait/ZConjugateRegistryId.h"
-#include "Conjugate/ZConjugateHandle.h"
 
 namespace ZSharp
 {
-	class IZMasterAssemblyLoadContext;
+	struct FZSelfDescriptiveMulticastInlineScriptDelegate;
 	
-	class ZSHARPRUNTIME_API FZConjugateRegistry_MulticastInlineDelegate : public FZConjugateRegistryBase, public FNoncopyable
+	class ZSHARPRUNTIME_API FZConjugateRegistry_MulticastInlineDelegate : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_MulticastInlineDelegate, FZSelfDescriptiveMulticastInlineScriptDelegate>
 	{
 
-		using Super = FZConjugateRegistryBase;
-		using ThisClass = FZConjugateRegistry_MulticastInlineDelegate;
+		friend Super;
+		friend TZStrangeConjugateRegistryBase;
 
 	public:
-		static constexpr uint16 RegistryId = TZConjugateRegistryId_V<FZSelfDescriptiveMulticastInlineScriptDelegate>;
+		FZConjugateRegistry_MulticastInlineDelegate(IZMasterAssemblyLoadContext& alc) : TZStrangeConjugateRegistryBase(alc){}
 
 	private:
-		struct FZConjugateRec
-		{
-			TUniquePtr<FZSelfDescriptiveMulticastInlineScriptDelegate> Delegate;
-			bool bBlack;
-		};
-
-	public:
-		explicit FZConjugateRegistry_MulticastInlineDelegate(IZMasterAssemblyLoadContext& alc) : Super(alc){}
-
-	public:
-		FZConjugateHandle Conjugate(const UDelegateFunction* signature) { return Conjugate(signature, [](const FZSelfDescriptiveMulticastInlineScriptDelegate&){}); }
-		FZConjugateHandle Conjugate(const UDelegateFunction* signature, TFunctionRef<void(const FZSelfDescriptiveMulticastInlineScriptDelegate&)> initialize);
-		FZConjugateHandle Conjugate(const UDelegateFunction* signature, const FMulticastScriptDelegate* unmanaged);
-		FZSelfDescriptiveMulticastInlineScriptDelegate* Conjugate(FZConjugateHandle handle) const;
+		static FZSelfDescriptiveMulticastInlineScriptDelegate* BuildConjugateWrapper(void* userdata);
+		static void ValidateConjugateWrapper(const UDelegateFunction* descriptor, const FZSelfDescriptiveMulticastInlineScriptDelegate* wrapper);
 
 	private:
-		virtual void* BuildConjugate(void* userdata) override;
-		virtual void ReleaseConjugate(void* unmanaged) override;
-		virtual void GetAllConjugates(TArray<void*>& outConjugates) const override;
-
-	private:
-		FZRuntimeTypeHandle GetManagedType(const UFunction* signature) const;
-		
-	private:
-		TMap<void*, FZConjugateRec> ConjugateMap;
+		FZRuntimeTypeHandle GetManagedType(const UDelegateFunction* descriptor) const;
 	
 	};
 }

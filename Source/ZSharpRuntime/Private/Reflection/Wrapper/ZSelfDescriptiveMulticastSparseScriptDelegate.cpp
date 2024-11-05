@@ -115,6 +115,12 @@ ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate& ZSharp::FZSelfDescriptiv
 	return *this;
 }
 
+ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::UnderlyingInstanceType* ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::NewUnderlyingInstance(const DescriptorType* descriptor)
+{
+	checkNoEntry();
+	return nullptr;
+}
+
 void ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::Add(const FScriptDelegate& unicast)
 {
 	UnderlyingInstance->__Internal_AddUnique(GetOwner(), Descriptor->DelegateName, unicast);

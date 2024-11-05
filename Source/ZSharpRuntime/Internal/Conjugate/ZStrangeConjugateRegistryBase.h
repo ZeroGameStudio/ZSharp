@@ -1,6 +1,7 @@
 // Copyright Zero Games. All Rights Reserved.
 
 #pragma once
+
 #include "ZConjugateRegistryBase.h"
 
 namespace ZSharp
@@ -23,21 +24,31 @@ namespace ZSharp
 	public:
 		FZConjugateHandle Conjugate(const DescriptorType* descriptor, TFunctionRef<void(const ConjugateType&)> initialize = [](const ConjugateType&){})
 		{
-			auto wrapper = new ConjugateType { descriptor, false };
+			ConjugateType* wrapper;
+			if constexpr (TConjugate::IsUObjectDescriptor)
+			{
+				wrapper = new ConjugateType { descriptor };
+			}
+			else
+			{
+				wrapper = new ConjugateType { descriptor, false };
+			}
+
 			initialize(*wrapper);
 			const FZRuntimeTypeHandle type = AsImpl().GetManagedType(descriptor);
 			return Super::BuildConjugate_Red(wrapper, type);
 		}
 		
-        FZConjugateHandle Conjugate(const DescriptorType* descriptor, UnderlyingInstanceType* unmanaged)
+        FZConjugateHandle Conjugate(const DescriptorType* descriptor, const UnderlyingInstanceType* unmanaged)
 		{
-			if (const ConjugateWrapperType* wrapper = Super::FindConjugateWrapper(unmanaged))
+			const auto mutableUnmanaged = const_cast<UnderlyingInstanceType*>(unmanaged);
+			if (const ConjugateWrapperType* wrapper = Super::FindConjugateWrapper(mutableUnmanaged))
 			{
 				ThisClass::ValidateConjugateWrapper(descriptor, wrapper);
-				return { unmanaged };
+				return { mutableUnmanaged };
 			}
 
-			auto wrapper = new ConjugateType { descriptor, unmanaged };
+			auto wrapper = new ConjugateType { descriptor, mutableUnmanaged };
 			const FZRuntimeTypeHandle type = AsImpl().GetManagedType(descriptor);
 			return Super::BuildConjugate_Red(wrapper, type);
 		}
@@ -50,9 +61,6 @@ namespace ZSharp
 	private:
 		TImpl& AsImpl() { return static_cast<TImpl&>(*this); }
 
-	private:
-		static constexpr bool IsUObjectDescriptor = TConjugate::IsUObjectDescriptor;
-		
 	};
 }
 

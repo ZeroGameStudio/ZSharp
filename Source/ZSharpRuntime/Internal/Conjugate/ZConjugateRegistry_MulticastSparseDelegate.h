@@ -2,42 +2,28 @@
 
 #pragma once
 
-#include "ZConjugateRegistryBase.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveMulticastSparseScriptDelegate.h"
+#include "ZStrangeConjugateRegistryBase.h"
 #include "Interop/ZRuntimeTypeHandle.h"
-#include "Trait/ZConjugateRegistryId.h"
-#include "Conjugate/ZConjugateHandle.h"
 
 namespace ZSharp
 {
-	class IZMasterAssemblyLoadContext;
+	struct FZSelfDescriptiveMulticastSparseScriptDelegate;
 	
-	class ZSHARPRUNTIME_API FZConjugateRegistry_MulticastSparseDelegate : public FZConjugateRegistryBase, public FNoncopyable
+	class ZSHARPRUNTIME_API FZConjugateRegistry_MulticastSparseDelegate : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_MulticastSparseDelegate, FZSelfDescriptiveMulticastSparseScriptDelegate>
 	{
 
-		using Super = FZConjugateRegistryBase;
-		using ThisClass = FZConjugateRegistry_MulticastSparseDelegate;
+		friend Super;
+		friend TZStrangeConjugateRegistryBase;
 
 	public:
-		static constexpr uint16 RegistryId = TZConjugateRegistryId_V<FZSelfDescriptiveMulticastSparseScriptDelegate>;
-
-	public:
-		explicit FZConjugateRegistry_MulticastSparseDelegate(IZMasterAssemblyLoadContext& alc) : Super(alc){}
-
-	public:
-		FZConjugateHandle Conjugate(const USparseDelegateFunction* signature, const FSparseDelegate* unmanaged);
-		FZSelfDescriptiveMulticastSparseScriptDelegate* Conjugate(FZConjugateHandle handle) const;
+		FZConjugateRegistry_MulticastSparseDelegate(IZMasterAssemblyLoadContext& alc) : TZStrangeConjugateRegistryBase(alc){}
 
 	private:
-		virtual void* BuildConjugate(void* userdata) override;
-		virtual void ReleaseConjugate(void* unmanaged) override;
-		virtual void GetAllConjugates(TArray<void*>& outConjugates) const override;
+		static FZSelfDescriptiveMulticastSparseScriptDelegate* BuildConjugateWrapper(void* userdata);
+		static void ValidateConjugateWrapper(const USparseDelegateFunction* descriptor, const FZSelfDescriptiveMulticastSparseScriptDelegate* wrapper);
 
 	private:
-		FZRuntimeTypeHandle GetManagedType(const USparseDelegateFunction* signature) const;
-		
-	private:
-		TMap<void*, TUniquePtr<FZSelfDescriptiveMulticastSparseScriptDelegate>> ConjugateMap;
+		FZRuntimeTypeHandle GetManagedType(const USparseDelegateFunction* descriptor) const;
 	
 	};
 }

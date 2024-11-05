@@ -13,7 +13,7 @@
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_UObject)
 
 ZSharp::FZConjugateRegistry_UObject::FZConjugateRegistry_UObject(IZMasterAssemblyLoadContext& alc)
-	: Super(alc)
+	: Alc(alc)
 {
 	RegisterController(new FZUObjectConjugateController_GC);
 	RegisterController(new FZUObjectConjugateController_Actor);
@@ -70,6 +70,20 @@ void ZSharp::FZConjugateRegistry_UObject::RegisterController(IZUObjectConjugateC
 	}
 }
 
+void ZSharp::FZConjugateRegistry_UObject::Release()
+{
+	TArray<void*> reds;
+	for (const auto& pair : ConjugateMap)
+	{
+		reds.Emplace(pair.Key);
+	}
+
+	for (const auto red : reds)
+	{
+		ReleaseConjugate_Red(red);
+	}
+}
+
 void* ZSharp::FZConjugateRegistry_UObject::BuildConjugate(void* userdata)
 {
 	// There is no black UObject conjugate.
@@ -79,13 +93,8 @@ void* ZSharp::FZConjugateRegistry_UObject::BuildConjugate(void* userdata)
 
 void ZSharp::FZConjugateRegistry_UObject::ReleaseConjugate(void* unmanaged)
 {
-	if (!ConjugateMap.Contains(unmanaged))
-	{
-		return;
-	}
-	
-	Alc.ReleaseConjugate(unmanaged);
-	ConjugateMap.Remove(unmanaged);
+	// There is no black UObject conjugate.
+	checkNoEntry();
 }
 
 void ZSharp::FZConjugateRegistry_UObject::PushRedFrame()
@@ -98,11 +107,11 @@ void ZSharp::FZConjugateRegistry_UObject::PopRedFrame()
 	// UObject conjugate is released by UEGC, not red frame.
 }
 
-void ZSharp::FZConjugateRegistry_UObject::GetAllConjugates(TArray<void*>& outConjugates) const
+void ZSharp::FZConjugateRegistry_UObject::ReleaseConjugate_Red(void* unmanaged)
 {
-	for (const auto& pair : ConjugateMap)
+	if (ConjugateMap.Remove(unmanaged))
 	{
-		outConjugates.Emplace(pair.Key);
+		Alc.ReleaseConjugate(unmanaged);
 	}
 }
 
@@ -129,7 +138,7 @@ void ZSharp::FZConjugateRegistry_UObject::NotifyConjugated(UObject* unmanaged)
 
 void ZSharp::FZConjugateRegistry_UObject::NotifyLifecycleExpired(UObject* unmanaged)
 {
-	ReleaseConjugate(unmanaged);
+	ReleaseConjugate_Red(unmanaged);
 }
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UObject::GetManagedType(const UObject* unmanaged) const

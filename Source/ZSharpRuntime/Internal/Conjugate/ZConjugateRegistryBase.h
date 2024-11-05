@@ -9,37 +9,6 @@
 
 namespace ZSharp
 {
-	class IZMasterAssemblyLoadContext;
-	
-	class FZConjugateRegistryBase : public IZConjugateRegistry
-	{
-
-	public:
-		explicit FZConjugateRegistryBase(IZMasterAssemblyLoadContext& alc)
-			: Alc(alc){}
-
-	public:
-		virtual void Release() override;
-		virtual void PushRedFrame() override;
-		virtual void PopRedFrame() override;
-
-	protected:
-		virtual void GetAllConjugates(TArray<void*>& outConjugates) const = 0;
-
-	protected:
-		void CaptureConjugate(void* unmanaged);
-
-	protected:
-		struct FZRedFrame
-		{
-			TArray<void*> CapturedConjugates;
-		};
-		
-		IZMasterAssemblyLoadContext& Alc;
-		TArray<FZRedFrame> RedStack;
-		
-	};
-
 	template <typename TImpl, typename TConjugate, typename TConjugateWrapper = TConjugate>
 	class TZConjugateRegistryBase : public IZConjugateRegistry, public FNoncopyable
 	{
@@ -117,12 +86,18 @@ namespace ZSharp
 	private:
 		virtual void Release() override
 		{
+			TArray<void*> reds;
 			for (const auto& pair : ConjugateMap)
 			{
 				if (!pair.Value.bBlack)
 				{
-					ReleaseConjugate_Red(pair.Key);
+					reds.Emplace(pair.Key);
 				}
+			}
+
+			for (const auto red : reds)
+			{
+				ReleaseConjugate_Red(red);
 			}
 		}
 		

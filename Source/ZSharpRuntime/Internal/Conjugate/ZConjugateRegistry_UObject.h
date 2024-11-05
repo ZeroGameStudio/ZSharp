@@ -2,18 +2,19 @@
 
 #pragma once
 
+#include "Conjugate/IZConjugateRegistry.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "Trait/ZConjugateRegistryId.h"
 #include "Conjugate/ZConjugateHandle.h"
-#include "Conjugate/ZConjugateRegistryBase.h"
 #include "Conjugate/IZUObjectConjugateController.h"
 
 namespace ZSharp
 {
-	class ZSHARPRUNTIME_API FZConjugateRegistry_UObject : public FZConjugateRegistryBase, public FNoncopyable
+	class IZMasterAssemblyLoadContext;
+	
+	class ZSHARPRUNTIME_API FZConjugateRegistry_UObject : public IZConjugateRegistry, public FNoncopyable
 	{
 
-		using Super = FZConjugateRegistryBase;
 		using ThisClass = FZConjugateRegistry_UObject;
 
 	public:
@@ -30,13 +31,14 @@ namespace ZSharp
 		void RegisterController(IZUObjectConjugateController* controller);
 
 	private:
+		virtual void Release() override;
 		virtual void* BuildConjugate(void* userdata) override;
 		virtual void ReleaseConjugate(void* unmanaged) override;
 		virtual void PushRedFrame() override;
 		virtual void PopRedFrame() override;
-		virtual void GetAllConjugates(TArray<void*>& outConjugates) const override;
 
 	private:
+		void ReleaseConjugate_Red(void* unmanaged);
 		bool CanBuildConjugate(UObject* unmanaged) const;
 		void NotifyConjugated(UObject* unmanaged);
 		void NotifyLifecycleExpired(UObject* unmanaged);
@@ -45,6 +47,7 @@ namespace ZSharp
 		FZRuntimeTypeHandle GetManagedType(const UObject* unmanaged) const;
 
 	private:
+		IZMasterAssemblyLoadContext& Alc;
 		TMap<void*, FObjectKey> ConjugateMap;
 
 		TArray<TUniquePtr<IZUObjectConjugateController>> Controllers;

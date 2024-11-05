@@ -11,7 +11,7 @@ namespace ZSharp
 	class TZObjectWrapperPropertyVisitorBase : public FZObjectPropertyVisitorBase
 	{
 
-		using WrapperType = typename TSelfDescriptiveObjectWrapper::WrapperType;
+		using UnderlyingInstanceType = typename TSelfDescriptiveObjectWrapper::UnderlyingInstanceType;
 		
 	public:
 		explicit TZObjectWrapperPropertyVisitorBase(const TProperty* underlyingProperty)
@@ -35,7 +35,7 @@ namespace ZSharp
 		
 		virtual void GetRef(const void* src, FZCallBufferSlot& dest) const override
 		{
-			dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<TConjugateRegistry>().Conjugate(GetDescriptor(), (WrapperType*)src));
+			dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<TConjugateRegistry>().Conjugate(GetDescriptor(), (UnderlyingInstanceType*)src));
 		}
 		
 		virtual void SetValue(void* dest, const FZCallBufferSlot& src) const override
@@ -54,11 +54,11 @@ namespace ZSharp
 	private:
 		const UClass* GetDescriptor() const
 		{
-			if constexpr (std::is_same_v<WrapperType, FScriptInterface>)
+			if constexpr (std::is_same_v<UnderlyingInstanceType, FScriptInterface>)
 			{
 				return UnderlyingWrapperProperty->InterfaceClass;
 			}
-			else if constexpr (std::is_same_v<WrapperType, TSoftClassPtr<UObject>> || std::is_same_v<WrapperType, TSubclassOf<UObject>>)
+			else if constexpr (std::is_same_v<UnderlyingInstanceType, TSoftClassPtr<UObject>> || std::is_same_v<UnderlyingInstanceType, TSubclassOf<UObject>>)
 			{
 				return UnderlyingWrapperProperty->MetaClass;
 			}

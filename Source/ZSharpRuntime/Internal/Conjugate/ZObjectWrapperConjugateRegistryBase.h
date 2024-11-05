@@ -6,127 +6,62 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ALC/ZRuntimeTypeUri.h"
 #include "Interop/ZRuntimeTypeHandle.h"
-#include "Trait/ZConjugateRegistryId.h"
 #include "Conjugate/ZConjugateHandle.h"
 #include "Reflection/ZReflectionHelper.h"
 
 namespace ZSharp
 {
-	template <typename T>
-	class TZObjectWrapperConjugateRegistryBase : public FZConjugateRegistryBase, public FNoncopyable
+	template <typename TImpl, typename TConjugate>
+	class TZObjectWrapperConjugateRegistryBase : public TZConjugateRegistryBase<TImpl, TConjugate>
 	{
 
-		using WrapperType = typename T::WrapperType;
+	public:
+		using Super = TZConjugateRegistryBase<TImpl, TConjugate>;
+		using ThisClass = TImpl;
+		using ConjugateType = TConjugate;
+		using ConjugateWrapperType = TConjugate;
+		using UnderlyingInstanceType = typename TConjugate::UnderlyingInstanceType;
 
 	public:
-		static constexpr uint16 RegistryId = TZConjugateRegistryId_V<T>;
+		explicit TZObjectWrapperConjugateRegistryBase(IZMasterAssemblyLoadContext& alc) : Super(alc){}
 
-	private:
-		struct FZConjugateRec
+	public:
+		FZConjugateHandle Conjugate(const UClass* descriptor) { return Conjugate(descriptor, [](const ConjugateWrapperType&){}); }
+		FZConjugateHandle Conjugate(const UClass* descriptor, TFunctionRef<void(const ConjugateWrapperType&)> initialize)
 		{
-			TUniquePtr<T> Wrapper;
-			bool bBlack;
-		};
-
-	public:
-		explicit TZObjectWrapperConjugateRegistryBase(IZMasterAssemblyLoadContext& alc) : FZConjugateRegistryBase(alc){}
-
-	public:
-		FZConjugateHandle Conjugate(const UClass* descriptor) { return Conjugate(descriptor, [](const T&){}); }
-		FZConjugateHandle Conjugate(const UClass* descriptor, TFunctionRef<void(const T&)> initialize)
-		{
+			auto wrapper = new ConjugateWrapperType { descriptor };
+			initialize(*wrapper);
 			const FZRuntimeTypeHandle type = GetManagedType(descriptor);
-			auto sdow = new T { descriptor };
-			initialize(*sdow);
-			void* unmanaged = sdow->GetUnderlyingInstance();
-			if (Alc.BuildConjugate(unmanaged, type))
-			{
-				ConjugateMap.Emplace(unmanaged, { TUniquePtr<T>(sdow), false });
-				CaptureConjugate(unmanaged);
-
-				return { unmanaged };
-			}
-
-			return {};
+			return Super::BuildConjugate_Red(wrapper, type);
 		}
 		
-		FZConjugateHandle Conjugate(const UClass* descriptor, const WrapperType* unmanaged)
+		FZConjugateHandle Conjugate(const UClass* descriptor, const UnderlyingInstanceType* unmanaged)
 		{
-			auto mutableUnmanaged = (WrapperType*)unmanaged;
-			if (const FZConjugateRec* rec = ConjugateMap.Find(mutableUnmanaged))
+			auto mutableUnmanaged = const_cast<UnderlyingInstanceType*>(unmanaged);
+			if (const ConjugateWrapperType* wrapper = Super::FindConjugateWrapper(unmanaged))
 			{
-				check(rec->Wrapper->GetDescriptor() == descriptor);
+				check(wrapper->GetDescriptor() == descriptor);
 				return { mutableUnmanaged };
 			}
 
+			const auto wrapper = new ConjugateWrapperType { descriptor, mutableUnmanaged };
 			const FZRuntimeTypeHandle type = GetManagedType(descriptor);
-			if (Alc.BuildConjugate(mutableUnmanaged, type))
-			{
-				TUniquePtr<T> pSdow = MakeUnique<T>(descriptor, mutableUnmanaged);
-				ConjugateMap.Emplace(mutableUnmanaged, { MoveTemp(pSdow), false });
-				CaptureConjugate(mutableUnmanaged);
-
-				return { mutableUnmanaged };
-			}
-
-			return {};
+			return Super::BuildConjugate_Red(wrapper, type);
 		}
 		
-		T* Conjugate(FZConjugateHandle handle) const
-		{
-			const void* unmanaged = handle.Handle;
-			const FZConjugateRec* rec = ConjugateMap.Find(unmanaged);
-			return rec ? rec->Wrapper.Get() : nullptr;
-		}
-
-	private:
-		virtual void* BuildConjugate(void* userdata) override
-		{
-			const auto descriptor = static_cast<UClass*>(userdata);
-			auto pSdow = MakeUnique<T>(descriptor);
-			void* unmanaged = pSdow->GetUnderlyingInstance();
-			ConjugateMap.Emplace(unmanaged, { MoveTemp(pSdow), true });
-			return unmanaged;
-		}
-		
-		virtual void ReleaseConjugate(void* unmanaged) override
-		{
-			const FZConjugateRec* rec = ConjugateMap.Find(unmanaged);
-			if (!rec)
-			{
-				return;
-			}
-
-			if (!rec->bBlack)
-			{
-				Alc.ReleaseConjugate(unmanaged);
-			}
-
-			ConjugateMap.Remove(unmanaged);
-		}
-		
-		virtual void GetAllConjugates(TArray<void*>& outConjugates) const override
-		{
-			for (const auto& pair : ConjugateMap)
-			{
-				outConjugates.Emplace(pair.Key);
-			}
-		}
+		ConjugateType* Conjugate(FZConjugateHandle handle) const { return Super::Conjugate(handle); }
 
 	private:
 		FZRuntimeTypeHandle GetManagedType(const UClass* cls) const
 		{
 			FZRuntimeTypeUri uri;
 			uri.AssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
-			uri.TypeName = FString::Printf(TEXT("%s.CoreUObject.%s`1"), *uri.AssemblyName, *T::GetExportTypeName());
+			uri.TypeName = FString::Printf(TEXT("%s.CoreUObject.%s`1"), *uri.AssemblyName, *ConjugateType::GetExportTypeName());
 			FZRuntimeTypeUri& inner = uri.TypeParameters.Emplace_GetRef();
 			FZReflectionHelper::GetUFieldRuntimeTypeLocator(cls, inner);
 	
-			return Alc.GetType(uri);
+			return Super::Alc.GetType(uri);
 		}
-		
-	private:
-		TMap<void*, FZConjugateRec> ConjugateMap;
 		
 	};
 }

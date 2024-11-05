@@ -63,8 +63,8 @@ namespace ZSharp
 		FZRuntimeTypeHandle GetManagedType() const
 		{
 			FZRuntimeTypeUri uri;
-			uri.AssemblyName = TZManagedTypeInfo<TConjugate>::GetAssemblyName();
-			uri.TypeName = TZManagedTypeInfo<TConjugate>::GetFullName();
+			uri.AssemblyName = TZManagedTypeInfo<ConjugateType>::GetAssemblyName();
+			uri.TypeName = TZManagedTypeInfo<ConjugateType>::GetFullName();
 			return Super::Alc.GetType(uri);
 		}
 

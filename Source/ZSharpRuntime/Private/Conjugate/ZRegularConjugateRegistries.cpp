@@ -5,8 +5,6 @@
 
 #include "Conjugate/ZDeclareConjugateRegistryMacros.h"
 
-namespace ZSharp
-{
 #define IMPLEMENT_REGISTRY(Type) ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_##Type)
 
 	IMPLEMENT_REGISTRY(String)
@@ -15,7 +13,6 @@ namespace ZSharp
 
 	IMPLEMENT_REGISTRY(FieldPath)
 
-	#undef IMPLEMENT_REGISTRY
-}
+#undef IMPLEMENT_REGISTRY
 
 

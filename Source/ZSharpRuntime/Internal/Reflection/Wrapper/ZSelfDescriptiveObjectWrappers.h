@@ -9,7 +9,7 @@ namespace ZSharp
 	{
 
 		static constexpr bool IsClass = std::is_same_v<T, TSubclassOf<UObject>> || std::is_same_v<T, TSoftClassPtr<UObject>>;
-		using WrapperType = T;
+		using UnderlyingInstanceType = T;
 		using ObjectType = std::conditional_t<IsClass, UClass, UObject>;
 
 		TZSelfDescriptiveObjectWrapperBase(const UClass* descriptor)
@@ -37,7 +37,7 @@ namespace ZSharp
 		T* GetUnderlyingInstance() const { return UnderlyingInstance; }
 		UObject* Get() const
 		{
-			if constexpr (std::is_same_v<WrapperType, FScriptInterface>)
+			if constexpr (std::is_same_v<UnderlyingInstanceType, FScriptInterface>)
 			{
 				return UnderlyingInstance->GetObject();
 			}
@@ -48,13 +48,13 @@ namespace ZSharp
 		}
 		void Set(ObjectType* obj)
 		{
-			if constexpr (std::is_same_v<WrapperType, FScriptInterface>)
+			if constexpr (std::is_same_v<UnderlyingInstanceType, FScriptInterface>)
 			{
-				*UnderlyingInstance = WrapperType { obj, obj->GetInterfaceAddress(const_cast<UClass*>(Descriptor.Get())) };
+				*UnderlyingInstance = UnderlyingInstanceType { obj, obj->GetInterfaceAddress(const_cast<UClass*>(Descriptor.Get())) };
 			}
 			else
 			{
-				*UnderlyingInstance = WrapperType { obj };
+				*UnderlyingInstance = UnderlyingInstanceType { obj };
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace ZSharp
 struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper> \
 { \
 	FZSelfDescriptive##Name(const UClass* descriptor) : TZSelfDescriptiveObjectWrapperBase(descriptor){} \
-	FZSelfDescriptive##Name(const UClass* descriptor, WrapperType* underlyingInstance) : TZSelfDescriptiveObjectWrapperBase(descriptor, underlyingInstance){} \
+	FZSelfDescriptive##Name(const UClass* descriptor, UnderlyingInstanceType* underlyingInstance) : TZSelfDescriptiveObjectWrapperBase(descriptor, underlyingInstance){} \
 	FZSelfDescriptive##Name(FZSelfDescriptive##Name&& other) noexcept : TZSelfDescriptiveObjectWrapperBase(MoveTemp(other)){} \
 	static FString GetExportTypeName() { return #Name; } \
 };
@@ -89,7 +89,7 @@ struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper> \
 struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper>, public FGCObject \
 { \
 	FZSelfDescriptive##Name(const UClass* descriptor) : TZSelfDescriptiveObjectWrapperBase(descriptor){} \
-	FZSelfDescriptive##Name(const UClass* descriptor, WrapperType* underlyingInstance) : TZSelfDescriptiveObjectWrapperBase(descriptor, underlyingInstance){} \
+	FZSelfDescriptive##Name(const UClass* descriptor, UnderlyingInstanceType* underlyingInstance) : TZSelfDescriptiveObjectWrapperBase(descriptor, underlyingInstance){} \
 	FZSelfDescriptive##Name(FZSelfDescriptive##Name&& other) noexcept : TZSelfDescriptiveObjectWrapperBase(MoveTemp(other)){} \
 	static FString GetExportTypeName() { return #Name; } \
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override \

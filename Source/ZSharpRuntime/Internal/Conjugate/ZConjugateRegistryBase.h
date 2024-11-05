@@ -82,7 +82,7 @@ namespace ZSharp
 		{
 			auto wrapper = TUniquePtr<ConjugateWrapperType> { rawWrapper };
 			void* unmanaged = wrapper->GetUnderlyingInstance();
-			if (Alc.BuildConjugate(unmanaged, managedType))
+			if (LIKELY(Alc.BuildConjugate(unmanaged, managedType)))
 			{
 				ConjugateMap.Emplace(unmanaged, { MoveTemp(wrapper), false });
 				CaptureConjugate(unmanaged);
@@ -186,12 +186,5 @@ namespace ZSharp
 		
 	};
 }
-
-#define ZSHARP_CONJUGATE_REGISTRY_GENERATED_BODY(RegistryType) \
-	friend Super; \
-public: \
-	explicit RegistryType(IZMasterAssemblyLoadContext& alc) : Super(alc){} \
-public: \
-	ConjugateType* Conjugate(FZConjugateHandle handle) const { return Super::Conjugate(handle); }
 
 

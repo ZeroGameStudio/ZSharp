@@ -2,25 +2,25 @@
 
 #pragma once
 
-#include "ZConjugateRegistryBase.h"
+#include "ZStrangeConjugateRegistryBase.h"
 #include "Interop/ZRuntimeTypeHandle.h"
-#include "Conjugate/ZConjugateHandle.h"
 
 namespace ZSharp
 {
 	struct FZSelfDescriptiveScriptArray;
 	
-	class ZSHARPRUNTIME_API FZConjugateRegistry_Array : public TZConjugateRegistryBase<FZConjugateRegistry_Array, FZSelfDescriptiveScriptArray>
+	class ZSHARPRUNTIME_API FZConjugateRegistry_Array : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_Array, FZSelfDescriptiveScriptArray>
 	{
-		ZSHARP_CONJUGATE_REGISTRY_GENERATED_BODY(FZConjugateRegistry_Array)
+
+		friend Super;
+		friend TZStrangeConjugateRegistryBase;
 
 	public:
-		// FZConjugateHandle Conjugate(const FProperty* elementProperty) { return Conjugate(elementProperty, ); }
-		FZConjugateHandle Conjugate(const FProperty* elementProperty, TFunctionRef<void(const FZSelfDescriptiveScriptArray&)> initialize = [](const FZSelfDescriptiveScriptArray&){});
-		FZConjugateHandle Conjugate(const FProperty* elementProperty, FScriptArray* unmanaged);
+		FZConjugateRegistry_Array(IZMasterAssemblyLoadContext& alc) : TZStrangeConjugateRegistryBase(alc){}
 
 	private:
 		static FZSelfDescriptiveScriptArray* BuildConjugateWrapper(void* userdata);
+		static void ValidateConjugateWrapper(const FProperty* elementProperty, const FZSelfDescriptiveScriptArray* wrapper);
 
 	private:
 		FZRuntimeTypeHandle GetManagedType(const FProperty* elementProperty) const;

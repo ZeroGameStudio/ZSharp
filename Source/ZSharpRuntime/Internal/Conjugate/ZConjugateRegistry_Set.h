@@ -2,51 +2,28 @@
 
 #pragma once
 
-#include "ZConjugateRegistryBase.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveScriptSet.h"
+#include "ZStrangeConjugateRegistryBase.h"
 #include "Interop/ZRuntimeTypeHandle.h"
-#include "Trait/ZConjugateRegistryId.h"
-#include "Conjugate/ZConjugateHandle.h"
 
 namespace ZSharp
 {
-	class IZMasterAssemblyLoadContext;
-	
-	class ZSHARPRUNTIME_API FZConjugateRegistry_Set : public FZConjugateRegistryBase, public FNoncopyable
+	struct FZSelfDescriptiveScriptSet;
+
+	class ZSHARPRUNTIME_API FZConjugateRegistry_Set : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_Set, FZSelfDescriptiveScriptSet>
 	{
 
-		using Super = FZConjugateRegistryBase;
-		using ThisClass = FZConjugateRegistry_Set;
+		friend Super;
+		friend TZStrangeConjugateRegistryBase;
 
 	public:
-		static constexpr uint16 RegistryId = TZConjugateRegistryId_V<FZSelfDescriptiveScriptSet>;
+		FZConjugateRegistry_Set(IZMasterAssemblyLoadContext& alc) : TZStrangeConjugateRegistryBase(alc){}
 
 	private:
-		struct FZConjugateRec
-		{
-			TUniquePtr<FZSelfDescriptiveScriptSet> Set;
-			bool bBlack;
-		};
-
-	public:
-		explicit FZConjugateRegistry_Set(IZMasterAssemblyLoadContext& alc) : Super(alc){}
-
-	public:
-		FZConjugateHandle Conjugate(const FProperty* elementProperty) { return Conjugate(elementProperty, [](const FZSelfDescriptiveScriptSet&){}); }
-		FZConjugateHandle Conjugate(const FProperty* elementProperty, TFunctionRef<void(const FZSelfDescriptiveScriptSet&)> initialize);
-		FZConjugateHandle Conjugate(const FProperty* elementProperty, const FScriptSet* unmanaged);
-		FZSelfDescriptiveScriptSet* Conjugate(FZConjugateHandle handle) const;
-
-	private:
-		virtual void* BuildConjugate(void* userdata) override;
-		virtual void ReleaseConjugate(void* unmanaged) override;
-		virtual void GetAllConjugates(TArray<void*>& outConjugates) const override;
+		static FZSelfDescriptiveScriptSet* BuildConjugateWrapper(void* userdata);
+		static void ValidateConjugateWrapper(const FProperty* elementProperty, const FZSelfDescriptiveScriptSet* wrapper);
 
 	private:
 		FZRuntimeTypeHandle GetManagedType(const FProperty* elementProperty) const;
-		
-	private:
-		TMap<void*, FZConjugateRec> ConjugateMap;
 	
 	};
 }

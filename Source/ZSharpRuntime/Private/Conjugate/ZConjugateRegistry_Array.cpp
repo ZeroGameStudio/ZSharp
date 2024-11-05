@@ -11,27 +11,6 @@
 
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_Array)
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FProperty* elementProperty, TFunctionRef<void(const FZSelfDescriptiveScriptArray&)> initialize)
-{
-	auto sdsa = new FZSelfDescriptiveScriptArray { elementProperty, false };
-	initialize(*sdsa);
-	const FZRuntimeTypeHandle type = GetManagedType(elementProperty);
-	return BuildConjugate_Red(sdsa, type);
-}
-
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Array::Conjugate(const FProperty* elementProperty, FScriptArray* unmanaged)
-{
-	if (const FZSelfDescriptiveScriptArray* sdsa = FindConjugateWrapper(unmanaged))
-	{
-		check(sdsa->GetDescriptor()->GetClass() == elementProperty->GetClass());
-		return { unmanaged };
-	}
-
-	auto sdsa = new FZSelfDescriptiveScriptArray { elementProperty, unmanaged };
-	const FZRuntimeTypeHandle type = GetManagedType(elementProperty);
-	return BuildConjugate_Red(sdsa, type);
-}
-
 ZSharp::FZSelfDescriptiveScriptArray* ZSharp::FZConjugateRegistry_Array::BuildConjugateWrapper(void* userdata)
 {
 	struct
@@ -40,6 +19,11 @@ ZSharp::FZSelfDescriptiveScriptArray* ZSharp::FZConjugateRegistry_Array::BuildCo
 	} typedUserdata = *static_cast<decltype(typedUserdata)*>(userdata);
 	
 	return new FZSelfDescriptiveScriptArray { FZPropertyFactory::Create(typedUserdata.Desc), true };
+}
+
+void ZSharp::FZConjugateRegistry_Array::ValidateConjugateWrapper(const FProperty* elementProperty, const FZSelfDescriptiveScriptArray* wrapper)
+{
+	check(wrapper->GetDescriptor()->GetClass() == elementProperty->GetClass());
 }
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Array::GetManagedType(const FProperty* elementProperty) const

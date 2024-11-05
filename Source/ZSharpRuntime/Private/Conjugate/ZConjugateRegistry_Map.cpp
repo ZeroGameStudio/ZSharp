@@ -11,96 +11,41 @@
 
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_Map)
 
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Map::Conjugate(const FProperty* keyProperty, const FProperty* valueProperty, TFunctionRef<void(const FZSelfDescriptiveScriptMap&)> initialize)
-{
-	auto desc = new TPair<const FProperty*, const FProperty*> { keyProperty, valueProperty };
-	auto sdsm = new FZSelfDescriptiveScriptMap { desc, false };
-	initialize(*sdsm);
-	
-	void* unmanaged = sdsm->GetUnderlyingInstance();
-	const FZRuntimeTypeHandle type = GetManagedType(keyProperty, valueProperty);
-	if (Alc.BuildConjugate(unmanaged, type))
-	{
-		ConjugateMap.Emplace(unmanaged, { TUniquePtr<FZSelfDescriptiveScriptMap>(sdsm), false });
-		CaptureConjugate(unmanaged);
-
-		return { unmanaged };
-	}
-
-	return {};
-}
-
-ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_Map::Conjugate(const FProperty* keyProperty, const FProperty* valueProperty, const FScriptMap* unmanaged)
-{
-	auto mutableUnmanaged = const_cast<FScriptMap*>(unmanaged);
-	if (const FZConjugateRec* rec = ConjugateMap.Find(mutableUnmanaged))
-	{
-		check(rec->Map->GetDescriptor()->Key->GetClass() == keyProperty->GetClass());
-		check(rec->Map->GetDescriptor()->Value->GetClass() == valueProperty->GetClass());
-		return { mutableUnmanaged };
-	}
-
-	const FZRuntimeTypeHandle type = GetManagedType(keyProperty, valueProperty);
-	if (Alc.BuildConjugate(mutableUnmanaged, type))
-	{
-		auto desc = new TPair<const FProperty*, const FProperty*> { keyProperty, valueProperty };
-		ConjugateMap.Emplace(mutableUnmanaged, { MakeUnique<FZSelfDescriptiveScriptMap>(desc, mutableUnmanaged), false });
-		CaptureConjugate(mutableUnmanaged);
-
-		return { mutableUnmanaged };
-	}
-
-	return {};
-}
-
-ZSharp::FZSelfDescriptiveScriptMap* ZSharp::FZConjugateRegistry_Map::Conjugate(FZConjugateHandle handle) const
-{
-	const void* unmanaged = handle.Handle;
-	const FZConjugateRec* rec = ConjugateMap.Find(unmanaged);
-	return rec ? rec->Map.Get() : nullptr;
-}
-
-void* ZSharp::FZConjugateRegistry_Map::BuildConjugate(void* userdata)
+ZSharp::FZSelfDescriptiveScriptMap* ZSharp::FZConjugateRegistry_Map::BuildConjugateWrapper(void* userdata)
 {
 	struct
 	{
 		FZPropertyDesc KeyDesc;
 		FZPropertyDesc ValueDesc;
 	} typedUserdata = *static_cast<decltype(typedUserdata)*>(userdata);
+
+	const FProperty* keyProperty = FZPropertyFactory::Create(typedUserdata.KeyDesc);
+	FProperty* valueProperty = FZPropertyFactory::Create(typedUserdata.ValueDesc);
+
+	int32 valueOffset = FScriptMap::GetScriptLayout(keyProperty->GetSize(), keyProperty->GetMinAlignment(), valueProperty->GetSize(), valueProperty->GetMinAlignment()).ValueOffset;
+	UEProperty_Private::FProperty_DoNotUse::Unsafe_AlterOffset(*valueProperty, valueOffset);
 	
-	auto desc = new TPair<const FProperty*, const FProperty*> { FZPropertyFactory::Create(typedUserdata.KeyDesc), FZPropertyFactory::Create(typedUserdata.ValueDesc) };
-	auto pSdsm = MakeUnique<FZSelfDescriptiveScriptMap>(desc, true);
-	void* unmanaged = pSdsm->GetUnderlyingInstance();
-	ConjugateMap.Emplace(unmanaged, { MoveTemp(pSdsm), true });
-	return unmanaged;
-}
-
-void ZSharp::FZConjugateRegistry_Map::ReleaseConjugate(void* unmanaged)
-{
-	const FZConjugateRec* rec = ConjugateMap.Find(unmanaged);
-	if (!rec)
-	{
-		return;
-	}
+	auto desc = new TPair<const FProperty*, const FProperty*> { keyProperty, valueProperty };
 	
-	if (!rec->bBlack)
-	{
-		Alc.ReleaseConjugate(unmanaged);
-	}
-
-	ConjugateMap.Remove(unmanaged);
+	return new FZSelfDescriptiveScriptMap { desc, true };
 }
 
-void ZSharp::FZConjugateRegistry_Map::GetAllConjugates(TArray<void*>& outConjugates) const
+void ZSharp::FZConjugateRegistry_Map::ValidateConjugateWrapper(const TPair<const FProperty*, const FProperty*>* descriptor, const FZSelfDescriptiveScriptMap* wrapper)
 {
-	for (const auto& pair : ConjugateMap)
-	{
-		outConjugates.Emplace(pair.Key);
-	}
+	const FProperty* keyProperty = descriptor->Key;
+	const FProperty* valueProperty = descriptor->Value;
+
+	check(wrapper->GetDescriptor()->Key->GetClass() == keyProperty->GetClass());
+	check(wrapper->GetDescriptor()->Value->GetClass() == valueProperty->GetClass());
+	
+	delete descriptor;
 }
 
-ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Map::GetManagedType(const FProperty* keyProperty, const FProperty* valueProperty) const
+ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Map::GetManagedType(const TPair<const FProperty*, const FProperty*>* descriptor) const
 {
+	const FProperty* keyProperty = descriptor->Key;
+	const FProperty* valueProperty = descriptor->Value;
+	
 	FZRuntimeTypeUri uri;
 	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FMapProperty::StaticClass(), uri))
 	{

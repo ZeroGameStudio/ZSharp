@@ -62,7 +62,7 @@ public class ClassWriter
 				parameters.Add(new(EParameterKind.In, new("UnrealObject", null), "@this"));
 			}
 
-			bool hasOutParameter = method.Parameters.Any(p => p.IsOut);
+			bool hasOutParameter = method.Parameters.Any(p => p is { IsReturn: false, IsOut: true });
 			bool hasDefaultValue = false;
 			foreach (var parameter in method.Parameters)
 			{

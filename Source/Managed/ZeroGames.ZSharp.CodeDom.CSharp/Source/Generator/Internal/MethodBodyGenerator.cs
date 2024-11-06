@@ -7,9 +7,9 @@ internal class MethodBodyGenerator
 	
 	public string Generate(MethodBody body)
 	{
-		return 
+		return
 $@"{{
-{body.Content.Indent()}
+{string.Join($"{Environment.NewLine}{Environment.NewLine}", body.Contents.Where(block => !string.IsNullOrWhiteSpace(block.Content))).Indent()}
 }}";
 	}
 	

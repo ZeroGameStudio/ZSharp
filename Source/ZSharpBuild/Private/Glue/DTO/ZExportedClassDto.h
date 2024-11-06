@@ -3,55 +3,11 @@
 #pragma once
 
 #include "ZExportedTypeDto.h"
-#include "ZExportedParameterDto.h"
+#include "ZExportedMethodDto.h"
+#include "ZExportedPropertyDto.h"
 #include "ZFullyExportedTypeNameDto.h"
 
 #include "ZExportedClassDto.generated.h"
-
-USTRUCT()
-struct FZExportedMethodDto
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString Name;
-
-	UPROPERTY()
-	FString ZCallName;
-
-	UPROPERTY()
-	uint64 Flags = 0;
-
-	UPROPERTY()
-	TArray<FZExportedParameterDto> Parameters;
-};
-
-USTRUCT()
-struct FZExportedPropertyDto
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString Name;
-
-	UPROPERTY()
-	FString ZCallName;
-
-	UPROPERTY()
-	FZFullyExportedTypeNameDto Type;
-
-	UPROPERTY()
-	FString UnderlyingType;
-	
-	UPROPERTY()
-	bool bNullInNotNullOut = false;
-
-	UPROPERTY()
-	uint64 Flags = 0;
-
-	UPROPERTY()
-	int32 Index = 0;
-};
 
 USTRUCT()
 struct FZExportedClassDto : public FZExportedTypeDto

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "ZExportedDefaultValue.h"
 #include "ZFullyExportedTypeName.h"
 
 namespace ZSharp
@@ -20,6 +21,8 @@ namespace ZSharp
 		static bool IsFieldEditorOnly(FFieldVariant field);
 
 		static bool ShouldExportFieldBySettings(FFieldVariant field);
+
+		static FZExportedDefaultValue GetParameterDefaultValue(const FProperty* parameter);
 		
 	};
 }

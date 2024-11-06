@@ -9,6 +9,9 @@ public sealed partial class UnrealName
 	public UnrealName(string content) : this() => Data = content;
 
 	public override string ToString() => Data;
+	
+	public static implicit operator UnrealName(string value) => new(value);
+	public static implicit operator string(UnrealName value) => value.Data;
 
 	public UnrealString ToUnrealString() => this.ZCall(MasterAlcCache.Instance, "ex://Name.ToString", [ null ])[-1].ReadConjugateChecked<UnrealString>();
 

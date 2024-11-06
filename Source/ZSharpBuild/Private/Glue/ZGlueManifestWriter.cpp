@@ -73,6 +73,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 			paramDto.UnderlyingType = param.GetUnderlyingType();
 			paramDto.bNullInNotNullOut = param.IsNullInNotNullOut();
 			paramDto.Flags = static_cast<__underlying_type(EZExportedParameterFlags)>(param.GetFlags());
+			paramDto.DefaultValue = param.GetDefaultValue();
 			methodDto.Parameters.Emplace(MoveTemp(paramDto));
 		});
 		classDto.Methods.Emplace(MoveTemp(methodDto));

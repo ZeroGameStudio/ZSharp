@@ -50,12 +50,14 @@ internal class MethodGenerator
 
 	private string GenerateParameterDecl(ParameterDeclaration parameter)
 	{
+		string defaultValueComment = !string.IsNullOrWhiteSpace(parameter.DefaultValue.Body.Content) && !parameter.DefaultValue.Body.Content.Contains('\n') ? $" /* {parameter.DefaultValue.Body} */" : string.Empty;
+		string defaultValue = !string.IsNullOrWhiteSpace(parameter.DefaultValue.Signature.Content) ? $" = {parameter.DefaultValue.Signature.Content}{defaultValueComment}" : string.Empty;
 		string attributes = parameter.Attributes is not null ? _attributeListGenerator.Generate(parameter.Attributes.Value) : string.Empty;
 		if (!string.IsNullOrWhiteSpace(attributes))
 		{
 			attributes += ' ';
 		}
-		return $"{attributes}{parameter.GetKindText()}{parameter.Type.TypeName} {parameter.Name}";
+		return $"{attributes}{parameter.GetKindText()}{parameter.Type.TypeName} {parameter.Name}{defaultValue}";
 	}
 
 	private readonly AttributeListGenerator _attributeListGenerator = new();

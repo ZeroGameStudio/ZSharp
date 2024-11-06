@@ -2,27 +2,19 @@
 
 #pragma once
 
-#include "ZFullyExportedTypeNameDto.h"
+#include "ZExportedDefaultValueDto.h"
+#include "ZExportedVariableDto.h"
 
 #include "ZExportedParameterDto.generated.h"
 
 USTRUCT()
-struct FZExportedParameterDto
+struct FZExportedParameterDto : public FZExportedVariableDto
 {
 	GENERATED_BODY()
 
 	UPROPERTY()
-	FString Name;
-
-	UPROPERTY()
-	FZFullyExportedTypeNameDto Type;
-
-	UPROPERTY()
-	FString UnderlyingType;
-
-	UPROPERTY()
-	bool bNullInNotNullOut = false;
-
-	UPROPERTY()
 	uint64 Flags = 0;
+
+	UPROPERTY()
+	FZExportedDefaultValueDto DefaultValue;
 };

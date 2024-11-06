@@ -23,6 +23,8 @@ public:
 	bool IsForceExportFieldPath(const FString& path) const { return ForceExportFieldPathsHash.Contains(path); }
 	bool IsForceNotExportFieldPath(const FString& path) const { return ForceNotExportFieldPathsHash.Contains(path); }
 
+	bool ShouldUseLooseDefaultParameterName() const { return bUseLooseDefaultParameterName; }
+
 private:
 	virtual void PostInitProperties() override;
 	virtual void PostReloadConfig(FProperty* reloadedProperty) override;
@@ -48,6 +50,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = "Export")
 	TArray<FString> ForceNotExportFieldPaths;
+
+	UPROPERTY(Config, EditAnywhere, Category = "Export|Function")
+	bool bUseLooseDefaultParameterName;
 
 private:
 	TSet<FString> ForceExportFieldPathsHash;

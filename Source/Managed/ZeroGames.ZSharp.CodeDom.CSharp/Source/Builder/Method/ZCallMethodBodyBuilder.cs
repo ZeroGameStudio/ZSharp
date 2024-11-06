@@ -50,13 +50,15 @@ ZCallBuffer buffer = new(slots, NUM_SLOTS);";
 			sb.Append(MakeCopyOutsAndReturn());
 		}
 
-		string body = NeedsUnsafeBlock ?
+		Block body = NeedsUnsafeBlock ?
 $@"unsafe
 {{
 {sb.ToString().Indent()}
 }}" : sb.ToString();
+
+		Block defaultValues = _defaultValueBuilder.Build();
 		
-		return new(body);
+		return new(defaultValues, body);
 	}
 
 	public string Name { get; } = name;
@@ -150,6 +152,8 @@ $@"unsafe
 		nameof(Boolean) or "bool" => "Bool",
 		_ => "Conjugate",
 	};
+
+	private ParameterDefaultValueBodyBuilder _defaultValueBuilder = new(parameters);
 
 }
 

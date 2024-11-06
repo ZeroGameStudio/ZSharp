@@ -3,6 +3,7 @@
 #pragma once
 
 #include "IZExportedVariable.h"
+#include "ZExportedDefaultValue.h"
 
 namespace ZSharp
 {
@@ -19,6 +20,7 @@ namespace ZSharp
 	{
 	public:
 		virtual EZExportedParameterFlags GetFlags() const = 0;
+		virtual FZExportedDefaultValue GetDefaultValue() const = 0;
 	public:
 		bool HasAnyFlags(EZExportedParameterFlags flags) const { return !!(GetFlags() & flags); }
 		bool HasAllFlags(EZExportedParameterFlags flags) const { return (GetFlags() & flags) == flags; }

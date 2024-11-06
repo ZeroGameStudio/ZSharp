@@ -43,6 +43,11 @@ ZSharp::EZExportedParameterFlags ZSharp::FZDynamicallyExportedParameter::GetFlag
 	return Flags;
 }
 
+ZSharp::FZExportedDefaultValue ZSharp::FZDynamicallyExportedParameter::GetDefaultValue() const
+{
+	return FZExportHelper::GetParameterDefaultValue(Property);
+}
+
 bool ZSharp::FZDynamicallyExportedParameter::IsNullInNotNullOut() const
 {
 	return bNullInNotNullOut;

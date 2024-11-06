@@ -10,6 +10,9 @@ public sealed partial class UnrealString
 
     public override string ToString() => Data;
 
+    public static implicit operator UnrealString(string value) => new(value);
+    public static implicit operator string(UnrealString value) => value.Data;
+
     public int32 Len => this.ZCall(MasterAlcCache.Instance, "ex://String.Len", 0)[1].Int32;
 
     public unsafe string Data

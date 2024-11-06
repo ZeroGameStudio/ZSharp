@@ -18,6 +18,7 @@ namespace ZSharp
 		virtual FString GetUnderlyingType() const override;
 		virtual bool IsNullInNotNullOut() const override;
 		virtual EZExportedParameterFlags GetFlags() const override;
+		virtual FZExportedDefaultValue GetDefaultValue() const override;
 
 	private:
 		explicit FZDynamicallyExportedParameter(const FProperty* property);

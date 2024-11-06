@@ -61,7 +61,9 @@ public class ClassWriter
 			{
 				parameters.Add(new(EParameterKind.In, new("UnrealObject", null), "@this"));
 			}
-			
+
+			bool hasOutParameter = method.Parameters.Any(p => p.IsOut);
+			bool hasDefaultValue = false;
 			foreach (var parameter in method.Parameters)
 			{
 				if (parameter.IsReturn)
@@ -70,8 +72,26 @@ public class ClassWriter
 				}
 			
 				EParameterKind kind = parameter.IsInOut ? EParameterKind.Ref : parameter.IsOut ? EParameterKind.Out : EParameterKind.In;
+
+				ParameterDefaultValue defaultValue = default;
+				if (!hasOutParameter)
+				{
+					defaultValue = abstraction ? new(new(parameter.DefaultValue.Signature.Text), new(parameter.DefaultValue.Body.Text)) : new(default, new(parameter.DefaultValue.Body.Text));
+					if (abstraction)
+					{
+						if (!string.IsNullOrWhiteSpace(defaultValue.Signature.Content))
+						{
+							hasDefaultValue = true;
+						}
+						else if (hasDefaultValue)
+						{
+							defaultValue = new(new("default"), default);
+						}
+					}
+				}
+				
 				AttributeDeclaration[]? attributes = abstraction && parameter is { IsNullInNotNullOut: true, IsInOut: true } ? [ new("NotNull") ] : null;
-				parameters.Add(new(kind, new(parameter.Type.ToString(), parameter.UnderlyingType, parameter.IsNullInNotNullOut), parameter.Name, attributes));
+				parameters.Add(new(kind, new(parameter.Type.ToString(), parameter.UnderlyingType, parameter.IsNullInNotNullOut), parameter.Name, defaultValue, attributes));
 			}
 
 			TypeReference? returnType = method.ReturnParameter?.Type.ToString() is {} returnTypeName ? new(returnTypeName, method.ReturnParameter.UnderlyingType) : null;
@@ -89,11 +109,18 @@ public class ClassWriter
 				bool ignoreAbstract = false;
 				string implName = $"{method.Name}_Implementation";
 				MethodDefinition? methodDefinition = null;
+				// Remove default value info.
+				ParameterDeclaration[] eventImplParameters = new ParameterDeclaration[parameters.Count];
+				for (int32 i = 0; i < eventImplParameters.Length; ++i)
+				{
+					ParameterDeclaration parameter = parameters[i];
+					eventImplParameters[i] = new(parameter.Kind, parameter.Type, parameter.Name, parameter.Attributes?.Declarations.ToArray() ?? []);
+				}
 				if (!method.IsAbstract || ignoreAbstract)
 				{
 					// Virtual function uses uf:/ protocol so we need to manually convert to uf!:/
 					string implZCallName = method.ZCallName.Insert(2, "!");
-					methodDefinition = builder.AddMethod(EMemberVisibility.Protected, true, false, implName, implZCallName, returnType, parameters.ToArray());
+					methodDefinition = builder.AddMethod(EMemberVisibility.Protected, true, false, implName, implZCallName, returnType, eventImplParameters);
 					if (!abstraction)
 					{
 						builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{method.ZCallName.Split(':').Last()}_Implementation");
@@ -101,7 +128,7 @@ public class ClassWriter
 				}
 				else if (abstraction)
 				{
-					methodDefinition = builder.AddPureVirtualMethod(EMemberVisibility.Protected, implName, returnType, parameters.ToArray());
+					methodDefinition = builder.AddPureVirtualMethod(EMemberVisibility.Protected, implName, returnType, eventImplParameters);
 				}
 
 				if (abstraction)

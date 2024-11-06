@@ -2,9 +2,9 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public readonly struct MethodBody(string content)
+public readonly struct MethodBody(params Block[]? contents)
 {
-	public string Content { get; } = content;
+	public Block[] Contents { get; } = contents ?? [];
 }
 
 

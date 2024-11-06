@@ -216,6 +216,15 @@ bool ZSharp::FZExportHelper::CanFPropertyBeNullInNotNullOut(const FProperty* pro
 	{
 		return false;
 	}
+
+	// Subclassof is null-in-not-null-out.
+	if (const auto classProperty = CastField<FClassProperty>(property))
+	{
+		if (classProperty->MetaClass != UObject::StaticClass())
+		{
+			return true;
+		}
+	}
 	
 	// Object is nullable.
 	if (property->IsA<FObjectProperty>())
@@ -311,6 +320,146 @@ bool ZSharp::FZExportHelper::ShouldExportFieldBySettings(FFieldVariant field)
 	}
 
 	return true;
+}
+
+ZSharp::FZExportedDefaultValue ZSharp::FZExportHelper::GetParameterDefaultValue(const FProperty* parameter)
+{
+	ensure(parameter->HasAllPropertyFlags(CPF_Parm));
+	
+	const auto function = Cast<UFunction>(parameter->GetOwnerStruct());
+	if (!ensure(function))
+	{
+		return {};
+	}
+
+	if (!ensure(!function->HasAnyFunctionFlags(FUNC_Delegate)))
+	{
+		return {};
+	}
+
+	const FString parameterName = parameter->GetName();
+	FString defaultValueText;
+	bool hasDefaultValue = false;
+
+	// Migrates from UEdGraphSchema_K2::FindFunctionParameterDefaultValue().
+	
+	const FString& defaultValue = function->GetMetaData(*parameterName);
+	if (!defaultValue.IsEmpty() && GetDefault<UZSharpExportSettings>()->ShouldUseLooseDefaultParameterName())
+	{
+		// Specified default value in the metadata
+		defaultValueText = defaultValue;
+		hasDefaultValue = true;
+	}
+	else
+	{
+		const FName cppDefaultValueKey { FString::Printf(TEXT("CPP_Default_%s"), *parameterName) };
+		const FString& cppDefaultValue = function->GetMetaData(cppDefaultValueKey);
+		if (!cppDefaultValue.IsEmpty())
+		{
+			defaultValueText = cppDefaultValue;
+			hasDefaultValue = true;
+		}
+	}
+
+	if (!hasDefaultValue)
+	{
+		return {};
+	}
+	
+	FString signature;
+	FString body;
+
+	if (const UEnum* enm = GetUEnumFromProperty(parameter))
+	{
+		FString value;
+		if (!defaultValueText.Split("::", nullptr, &value, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
+		{
+			value = defaultValueText;
+		}
+		signature = FString::Printf(TEXT("%s.%s"), *FZReflectionHelper::GetFieldRedirectedName(enm), *value);
+	}
+	else if (parameter->IsA<FNumericProperty>()
+			 || parameter->IsA<FBoolProperty>())
+	{
+		signature = defaultValueText.ToLower();
+		if (parameter->IsA<FFloatProperty>())
+		{
+			signature.AppendChar(TEXT('f'));
+		}
+	}
+	else if (parameter->IsA<FStrProperty>()
+			 || parameter->IsA<FAnsiStrProperty>()
+			 || parameter->IsA<FUtf8StrProperty>()
+			 || parameter->IsA<FNameProperty>())
+	{
+		signature = "null";
+		body = FString::Printf(TEXT("@\"%s\""), *defaultValueText);
+	}
+	else if (parameter->IsA<FNameProperty>())
+	{
+		signature = "null";
+		FName value;
+		parameter->ImportText_Direct(*defaultValueText, &value, nullptr, PPF_None);
+		body = FString::Printf(TEXT("@\"%s\""), *value.ToString());
+	}
+	else if (parameter->IsA<FTextProperty>())
+	{
+		signature = "null";
+		FText value;
+		parameter->ImportText_Direct(*defaultValueText, &value, nullptr, PPF_None);
+		body = FString::Printf(TEXT("@\"%s\""), *value.ToString());
+	}
+	else if (parameter->IsA<FObjectPropertyBase>())
+	{
+		signature = "null";
+	}
+	else if (const auto structParameter = CastField<FStructProperty>(parameter))
+	{
+		signature = "null";
+		// Migrates from [UhtStructDefaultValue].
+		const UScriptStruct* scriptStruct = structParameter->Struct;
+		if (scriptStruct == TBaseStructure<FVector>::Get())
+		{
+			FVector value;
+			parameter->ImportText_Direct(*defaultValueText, &value, nullptr, PPF_None);
+			body = FString::Printf(TEXT("new() { X = %.6f, Y = %.6f, Z = %.6f }"), value.X, value.Y, value.Z);
+		}
+		else if (scriptStruct == TBaseStructure<FRotator>::Get())
+		{
+			FRotator value;
+			parameter->ImportText_Direct(*defaultValueText, &value, nullptr, PPF_None);
+			body = FString::Printf(TEXT("new() { Pitch = %.6f, Yaw = %.6f, Roll = %.6f }"), value.Pitch, value.Yaw, value.Roll);
+		}
+		else if (scriptStruct == TBaseStructure<FVector2D>::Get())
+		{
+			FVector2D value;
+			parameter->ImportText_Direct(*defaultValueText, &value, nullptr, PPF_None);
+			body = FString::Printf(TEXT("new() { X = %.3f, Y = %.3f }"), value.X, value.Y);
+		}
+		else if (scriptStruct == TBaseStructure<FLinearColor>::Get())
+		{
+			FLinearColor value;
+			parameter->ImportText_Direct(*defaultValueText, &value, nullptr, PPF_None);
+			body = FString::Printf(TEXT("new() { R = %.6ff, G = %.6ff, B = %.6ff, A = %.6ff }"), value.R, value.G, value.B, value.A);
+		}
+		else if (scriptStruct == TBaseStructure<FColor>::Get())
+		{
+			FColor value;
+			parameter->ImportText_Direct(*defaultValueText, &value, nullptr, PPF_None);
+			body = FString::Printf(TEXT("new() { R = %d, G = %d, B = %d, A = %d }"), value.R, value.G, value.B, value.A);
+		}
+		else
+		{
+			body = "new()";
+		}
+	}
+	else
+	{
+		ensureAlways(false);
+	}
+	
+	// @FIXME: This is now C# expressions, but it was supposed to be language-agnostic.
+	return { { signature }, { body } };
 }
 
 

@@ -338,33 +338,24 @@ ZSharp::FZExportedDefaultValue ZSharp::FZExportHelper::GetParameterDefaultValue(
 	}
 
 	const FString parameterName = parameter->GetName();
-	FString defaultValueText;
-	bool hasDefaultValue = false;
-
-	// Migrates from UEdGraphSchema_K2::FindFunctionParameterDefaultValue().
-	
-	const FString& defaultValue = function->GetMetaData(*parameterName);
-	if (!defaultValue.IsEmpty() && GetDefault<UZSharpExportSettings>()->ShouldUseLooseDefaultParameterName())
+	const FString* defaultValue = nullptr;
+	if (GetDefault<UZSharpExportSettings>()->ShouldUseLooseDefaultParameterName())
 	{
-		// Specified default value in the metadata
-		defaultValueText = defaultValue;
-		hasDefaultValue = true;
+		defaultValue = function->FindMetaData(*parameterName);
 	}
-	else
+
+	if (!defaultValue)
 	{
 		const FName cppDefaultValueKey { FString::Printf(TEXT("CPP_Default_%s"), *parameterName) };
-		const FString& cppDefaultValue = function->GetMetaData(cppDefaultValueKey);
-		if (!cppDefaultValue.IsEmpty())
-		{
-			defaultValueText = cppDefaultValue;
-			hasDefaultValue = true;
-		}
+		defaultValue = function->FindMetaData(cppDefaultValueKey);
 	}
 
-	if (!hasDefaultValue)
+	if (!defaultValue)
 	{
 		return {};
 	}
+	
+	FString defaultValueText = *defaultValue;
 	
 	FString signature;
 	FString body;
@@ -378,8 +369,7 @@ ZSharp::FZExportedDefaultValue ZSharp::FZExportHelper::GetParameterDefaultValue(
 		}
 		signature = FString::Printf(TEXT("%s.%s"), *FZReflectionHelper::GetFieldRedirectedName(enm), *value);
 	}
-	else if (parameter->IsA<FNumericProperty>()
-			 || parameter->IsA<FBoolProperty>())
+	else if (parameter->IsA<FNumericProperty>() || parameter->IsA<FBoolProperty>())
 	{
 		signature = defaultValueText.ToLower();
 		if (parameter->IsA<FFloatProperty>())

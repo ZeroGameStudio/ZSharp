@@ -1,6 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 using Mono.Cecil;
 using IAssemblyResolver = ZeroGames.ZSharp.Core.IAssemblyResolver;
@@ -169,10 +170,8 @@ internal sealed partial class ModelRegistry : IModelRegistry
 	}
 	
 	private readonly IAssemblyResolver _resolver = IAssemblyResolver.Create();
-	
-	private readonly AssemblyContainer _referencedAssemblyMap = new();
 
-	private readonly object _containerLock = new();
+	private readonly Lock _containerLock = new();
 	private readonly List<ITypeModel> _rootTypes = new();
 	private readonly Dictionary<string, ITypeModel> _typeMap = new();
 	

@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
@@ -28,7 +29,7 @@ internal sealed partial class ManifestBuilder
 		if (typeModel is IUnrealClassModel classModel)
 		{
 			UnrealClassDefinition classDef = ScanClassModel(classModel);
-			lock (manifest.Classes)
+			lock (_manifestLock)
 			{
 				manifest.Classes.Add(classDef);
 			}
@@ -40,6 +41,7 @@ internal sealed partial class ManifestBuilder
 	}
 
 	private readonly IModelRegistry _modelRegistry;
+	private readonly Lock _manifestLock = new();
 
 }
 

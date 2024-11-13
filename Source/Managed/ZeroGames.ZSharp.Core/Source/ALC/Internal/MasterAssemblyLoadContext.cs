@@ -3,6 +3,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace ZeroGames.ZSharp.Core;
 
@@ -133,7 +134,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         }
         else
         {
-            lock (_pendingDisposedConjugates)
+            lock (_pendingDisposedConjugatesLock)
             {
                 _pendingDisposedConjugates.Enqueue(conjugate);
                 GameThreadScheduler.Post(FlushPendingDisposedConjugates, this);
@@ -306,7 +307,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private static void FlushPendingDisposedConjugates(object? state)
     {
         MasterAssemblyLoadContext @this = Unsafe.As<MasterAssemblyLoadContext>(state!);
-        lock (@this._pendingDisposedConjugates)
+        lock (@this._pendingDisposedConjugatesLock)
         {
             if (@this.IsUnloaded)
             {
@@ -329,7 +330,8 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private readonly Dictionary<IntPtr, ConjugateRec> _conjugateMap = new(DEFAULT_CONJUGATE_MAP_CAPACITY);
     private readonly Dictionary<Type, uint16> _conjugateRegistryIdLookup = new();
     private readonly Queue<IConjugate> _pendingDisposedConjugates = new();
-    
+    private readonly Lock _pendingDisposedConjugatesLock = new();
+
     private readonly record struct ConjugateRec(uint16 RegistryId, WeakReference<IConjugate> WeakRef);
 
 }

@@ -19,7 +19,7 @@ partial class ModelRegistry
 
 	private AssemblyDefinition LoadAssemblyDefinition(string assemblyName)
 	{
-		lock (_referencedAssemblyMap)
+		lock (_referencedAssemblyMapLock)
 		{
 			if (!_referencedAssemblyMap.TryGetValue(assemblyName, out var assembly))
 			{
@@ -48,6 +48,9 @@ partial class ModelRegistry
 		}
 		Debugger.Break();
 	}
+
+    private readonly AssemblyContainer _referencedAssemblyMap = new();
+    private readonly Lock _referencedAssemblyMapLock = new();
 
 }
 

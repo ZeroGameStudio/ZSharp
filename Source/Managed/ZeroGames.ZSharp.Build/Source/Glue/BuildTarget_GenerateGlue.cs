@@ -126,10 +126,10 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 
 	private string[]? _assemblies;
 	
-	private ExportedAssemblyRegistry _registry = new();
+	private readonly ExportedAssemblyRegistry _registry = new();
 	private string _glueDir;
-	private object _codeDirLock = new();
-	private object _moduleDirLock = new();
+	private readonly Lock _codeDirLock = new();
+	private readonly Lock _moduleDirLock = new();
 }
 
 

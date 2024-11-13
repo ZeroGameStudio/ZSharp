@@ -27,50 +27,51 @@ public class Dotnet : ModuleRules
 		const string PRE_COMPILED_DIR = "Precompiled";
 		const string DOTNET_ROOT_DIR = "dotnet";
 		const string HOSTFXR_DLL = "hostfxr.dll";
-		const string CORECLR_DLL = "coreclr.dll";
-		const string CORELIB_DLL = "System.Private.CoreLib.dll";
 		const string RUNTIME_CONFIG_JSON = "ZSharp.runtimeconfig.json";
 		const string NETCOREAPP = "Microsoft.NETCore.App";
 		
 		// Z# configurations
 		// IMPORTANT: KEEP SYNC WITH ZSharpCore.build.cs
-		string dotnetVersion = "8.0.3";
-		string runtimeImpl = "coreclr";
+		const bool useMonoForEditorBuild = false;
+		const string dotnetVersion = "9.0.0";
+		string runtimeImpl = Target.bBuildEditor && useMonoForEditorBuild ? "mono" : platformName switch
+		{
+			"Win64" or "Linux" or "LinuxArm64" => "coreclr",
+			_ => "mono",
+		};
 
-		// Copy dotnet
-		string libSrcDir = Path.Combine(moduleDir, "lib", platformName);
-		string frameworkSrcDir = Path.Combine(moduleDir, "framework");
+		// Copy runtime
+		string dotnetRoot = Path.Combine(moduleDir, "runtime", dotnetVersion);
+		string nativeSrcDir = Path.Combine(dotnetRoot, "native", platformName);
 		string dotnetDstDir = Path.Combine(projectDir, BINARIES_DIR, platformName, DOTNET_ROOT_DIR);
-		string frameworkDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, dotnetVersion);
 		
 		{ // hostfxr
-			string hostSrcDir = Path.Combine(libSrcDir, "host");
-			string hostDstDir = Path.Combine(dotnetDstDir, "host", "fxr", dotnetVersion);
-			
-			string hostfxrSrcPath = Path.Combine(hostSrcDir, HOSTFXR_DLL);
-			string hostfxrDstPath = Path.Combine(hostDstDir, HOSTFXR_DLL);
+			string hostfxrSrcPath = Path.Combine(nativeSrcDir, HOSTFXR_DLL);
+			string hostfxrDstPath = Path.Combine(dotnetDstDir, "host", "fxr", dotnetVersion, HOSTFXR_DLL);
 			RuntimeDependencies.Add(hostfxrDstPath, hostfxrSrcPath);
 		}
 		
-		{ // coreclr & CoreLib
-			string runtimeSrcDir = Path.Combine(libSrcDir, "runtime", runtimeImpl);
-			string runtimeDstDir = frameworkDstDir;
+		{ // native
+			string runtimeSrcDir = Path.Combine(nativeSrcDir, runtimeImpl);
+			string runtimeDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, dotnetVersion);
 			
-			string coreLibSrcPath = Path.Combine(runtimeSrcDir, CORELIB_DLL);
-			string coreLibDstPath = Path.Combine(runtimeDstDir, CORELIB_DLL);
-			RuntimeDependencies.Add(coreLibDstPath, coreLibSrcPath);
-			
-			string runtimeSrcPath = Path.Combine(runtimeSrcDir, CORECLR_DLL);
-			string runtimeDstPath = Path.Combine(runtimeDstDir, CORECLR_DLL);
-			RuntimeDependencies.Add(runtimeDstPath, runtimeSrcPath);
+			IEnumerable<string> libs = GetFiles(runtimeSrcDir);
+			foreach (var lib in libs)
+			{
+				string relativePath = GetRelativePath(lib, runtimeSrcDir);
+				RuntimeDependencies.Add(Path.Combine(runtimeDstDir, relativePath), lib);
+			}
 		}
 		
-		{ // BCL
-            IEnumerable<string> frameworkFiles = GetFiles(frameworkSrcDir);
-            foreach (var file in frameworkFiles)
+		{ // lib
+			string libSrcDir = Path.Combine(dotnetRoot, "lib");
+			string libDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, dotnetVersion);
+			
+            IEnumerable<string> libs = GetFiles(libSrcDir);
+            foreach (var lib in libs)
             {
-	            string relativePath = GetRelativePath(file, frameworkSrcDir);
-            	RuntimeDependencies.Add(Path.Combine(frameworkDstDir, relativePath), file);
+	            string relativePath = GetRelativePath(lib, libSrcDir);
+            	RuntimeDependencies.Add(Path.Combine(libDstDir, relativePath), lib);
             }
 		}
 		
@@ -125,7 +126,7 @@ public class Dotnet : ModuleRules
 		}
 	}
 
-	private static IEnumerable<string> GetFiles(string directory)
+	private static IEnumerable<string> GetFiles(string directory, string pattern = "*.*")
 	{
 		if (!Directory.Exists(directory))
 		{
@@ -134,7 +135,7 @@ public class Dotnet : ModuleRules
 		
 		var files = new List<string>();
 
-		var strings = Directory.GetFiles(directory);
+		var strings = Directory.GetFiles(directory, pattern);
 
 		foreach (var file in strings)
 		{

@@ -44,8 +44,6 @@ public class ZSharpRuntime : ModuleRules
 				
 				"Json",
 				"JsonUtilities",
-				
-				"ZSharpRuntime",
 			}
 		);
 		

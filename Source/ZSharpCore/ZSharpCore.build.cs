@@ -68,7 +68,7 @@ public class ZSharpCore : ModuleRules
 		
 		// Z# configurations
 		// IMPORTANT: KEEP SYNC WITH Dotnet.build.cs
-		string dotnetVersion = "8.0.3";
+		string dotnetVersion = "9.0.0";
 		
 		PublicDefinitions.Add($"ZSHARP_PLATFORM=\"{Target.Platform}\"");
 		

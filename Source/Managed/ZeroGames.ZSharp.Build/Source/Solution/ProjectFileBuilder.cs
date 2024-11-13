@@ -82,8 +82,8 @@ public class ProjectFileBuilder
 		}
 		
 		Append("ProjectName", _project.Name);
-		Append("TargetFramework", _project.IsRoslynComponent ? "netstandard2.0" : (_project.TargetFramework ?? "net8.0"));
-		Append("LangVersion", _project.LanguageVersion ?? "12");
+		Append("TargetFramework", _project.IsRoslynComponent ? "netstandard2.0" : _project.TargetFramework ?? "net9.0");
+		Append("LangVersion", _project.LanguageVersion ?? "13");
 		Append("RootNamespace", _project.RootNamespace ?? _project.Name);
 		Append("ImplicitUsings", "disable");
 		Append("Nullable", _project.IsNullable ? "enable" : "disable");

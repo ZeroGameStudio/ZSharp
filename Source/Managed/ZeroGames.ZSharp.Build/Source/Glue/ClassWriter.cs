@@ -143,18 +143,11 @@ public class ClassWriter
 		// Properties
 		foreach (var property in _exportedClass.Properties.OrderBy(prop => prop.IsPublic ? 1 : prop.IsProtected ? 2 : 3))
 		{
-			// @TODO: Needs partial properties (C# 13).
-			if (!abstraction)
-			{
-				builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{property.ZCallName.Split(':').Last()}");
-				continue;
-			}
-			
 			EMemberVisibility visibility = property.IsPublic ? EMemberVisibility.Public : property.IsProtected ? EMemberVisibility.Protected : EMemberVisibility.Private;
 			builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType, property.IsNullInNotNullOut), property.Name, property.ZCallName, property.Index, !property.IsWritable, property.IsNullInNotNullOut);
 			if (!abstraction)
 			{
-				// @TODO: Move AddStaticField() here.
+				builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{property.ZCallName.Split(':').Last()}");
 			}
 		}
 		

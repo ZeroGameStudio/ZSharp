@@ -51,8 +51,7 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 
 	public PropertyDefinition AddProperty(EMemberVisibility visibility, TypeReference type, string name, string zcallName, int32 index, bool readOnly, bool allowNull)
 	{
-		// @TODO: Partial property
-		EMemberModifiers modifiers = EMemberModifiers.None; // EMemberModifiers.Partial;
+		EMemberModifiers modifiers = EMemberModifiers.Partial;
 
 		PropertyDefinition property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, index, type, false, readOnly).Build(IsAbstraction);
 		if (!readOnly && allowNull)
@@ -96,8 +95,10 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 	{
 		base.BuildTypeDefinition(definition);
 
-		// @TODO: Partial property
-		definition.Modifiers |= EMemberModifiers.Unsafe;
+		if (!IsAbstraction)
+		{
+			definition.Modifiers |= EMemberModifiers.Unsafe;
+		}
 
 		if (IsAbstraction && BaseType is not null)
 		{

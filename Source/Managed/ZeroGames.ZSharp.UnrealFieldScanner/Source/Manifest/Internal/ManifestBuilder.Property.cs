@@ -239,7 +239,6 @@ partial class ManifestBuilder
 		{ typeof(double).FullName!, EPropertyType.Double },
 		{ typeof(bool).FullName!, EPropertyType.Bool },
 		
-		{ typeof(string).FullName!, EPropertyType.String },
 		{ UNREAL_STRING_TYPE_FULL_NAME, EPropertyType.String },
 		{ UNREAL_NAME_TYPE_FULL_NAME, EPropertyType.Name },
 		{ UNREAL_TEXT_TYPE_FULL_NAME, EPropertyType.Text },

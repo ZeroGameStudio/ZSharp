@@ -7,7 +7,7 @@
 #include "Emit/IZSharpFieldRegistry.h"
 #include "Emit/ZSharpFieldRegistry.h"
 #include "ZCall/ZCallBufferSlotEncoder.h"
-#include "ZCall/ZManagedDelegateProxyInterface.h"
+#include "ZCall/ZManagedDelegateProxy.h"
 
 ZSharp::FZCallHandle ZSharp::FZFunctionVisitor::DelegateZCallHandle{};
 
@@ -328,7 +328,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 	checkf(!bIsRpc, TEXT("RPC is not supported on delegates."));
 
 	check(object);
-	check(object->Implements<UZManagedDelegateProxyInterface>());
+	check(object->Implements<UZManagedDelegateProxy>());
 
 	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
 	if (!alc)
@@ -350,7 +350,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 			buffer[i].Type = EZCallBufferSlotType::Uninitialized;
 		}
 
-		TZCallBufferSlotEncoder<FZGCHandle>::Encode(CastChecked<IZManagedDelegateProxyInterface>(object)->ManagedDelegateProxy_GetDelegate(), buffer[0]);
+		TZCallBufferSlotEncoder<FZGCHandle>::Encode(CastChecked<IZManagedDelegateProxy>(object)->ManagedDelegateProxy_GetDelegate(), buffer[0]);
 
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{

@@ -37,7 +37,7 @@ namespace ZSharp
 	};
 }
 
-UCLASS(MinimalAPI)
+UCLASS(MinimalAPI, meta = (ZSharpNoExport))
 class UZUObjectConjugateController_Actor_Proxy : public UObject
 {
 	GENERATED_BODY()

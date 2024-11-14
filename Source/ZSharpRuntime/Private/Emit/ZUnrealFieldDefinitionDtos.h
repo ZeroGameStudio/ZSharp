@@ -11,7 +11,7 @@ static_assert(std::is_same_v<__underlying_type(EClassFlags), int32>);
 static_assert(std::is_same_v<__underlying_type(EClassCastFlags), uint64>);
 static_assert(std::is_same_v<__underlying_type(EStructFlags), int32>);
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZFieldDefinitionDto
 {
 	GENERATED_BODY()
@@ -29,7 +29,7 @@ struct FZFieldDefinitionDto
 	TMap<FName, FString> TransparentDataMap;
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZSimplePropertyDefinitionDto
 {
 	GENERATED_BODY()
@@ -44,12 +44,11 @@ struct FZSimplePropertyDefinitionDto
 	FName DescriptorFieldPath;
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZPropertyDefinitionDto : public FZFieldDefinitionDto
 {
 	GENERATED_BODY()
 
-	// USTRUCT forbids multiple inheritance so we copy fields from FZSimplePropertyDefinitionDto.
 	UPROPERTY()
 	uint8 Type = 0;
 
@@ -79,7 +78,7 @@ struct FZPropertyDefinitionDto : public FZFieldDefinitionDto
 	
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZStructDefinitionDto : public FZFieldDefinitionDto
 {
 	GENERATED_BODY()
@@ -91,7 +90,7 @@ struct FZStructDefinitionDto : public FZFieldDefinitionDto
 	TArray<FZPropertyDefinitionDto> Properties;
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZFunctionDefinitionDto : public FZStructDefinitionDto
 {
 	GENERATED_BODY()
@@ -118,7 +117,7 @@ struct FZFunctionDefinitionDto : public FZStructDefinitionDto
 	FName CustomThunkName;
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZEnumDefinitionDto : public FZFieldDefinitionDto
 {
 	GENERATED_BODY()
@@ -126,7 +125,7 @@ struct FZEnumDefinitionDto : public FZFieldDefinitionDto
 	// @TODO
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZScriptStructDefinitionDto : public FZStructDefinitionDto
 {
 	GENERATED_BODY()
@@ -134,7 +133,7 @@ struct FZScriptStructDefinitionDto : public FZStructDefinitionDto
 	// @TODO
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZClassDefinitionDto_PropertyDefault
 {
 	GENERATED_BODY()
@@ -146,7 +145,7 @@ struct FZClassDefinitionDto_PropertyDefault
 	FString Buffer;
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZClassDefinitionDto_DefaultSubobject
 {
 	GENERATED_BODY()
@@ -176,7 +175,7 @@ struct FZClassDefinitionDto_DefaultSubobject
 	FName AttachSocketName;
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZClassDefinitionDto_DefaultSubobjectOverride
 {
 	GENERATED_BODY()
@@ -188,7 +187,7 @@ struct FZClassDefinitionDto_DefaultSubobjectOverride
 	FName ClassPath;
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZClassDefinitionDto : public FZStructDefinitionDto
 {
 	GENERATED_BODY()
@@ -224,7 +223,7 @@ struct FZClassDefinitionDto : public FZStructDefinitionDto
 	TArray<FName> FieldNotifies;
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZInterfaceDefinitionDto : public FZStructDefinitionDto
 {
 	GENERATED_BODY()
@@ -232,7 +231,7 @@ struct FZInterfaceDefinitionDto : public FZStructDefinitionDto
 	// @TODO
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZDelegateDefinitionDto : public FZStructDefinitionDto
 {
 	GENERATED_BODY()
@@ -240,7 +239,7 @@ struct FZDelegateDefinitionDto : public FZStructDefinitionDto
 	// @TODO
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZUnrealFieldManifestDto
 {
 	GENERATED_BODY()

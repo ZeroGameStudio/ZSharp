@@ -14,6 +14,8 @@ UZSharpRuntimeSettings::UZSharpRuntimeSettings()
 
 	IntrinsicModuleMappings.Emplace("Engine", EngineAssemblyName, false);
 
+	IntrinsicModuleMappings.Emplace("ZSharpRuntime", EngineAssemblyName, false);
+
 	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Object", "UnrealObject");
 
 	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Field", "UnrealField");

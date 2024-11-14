@@ -5,7 +5,7 @@
 #include "Engine/DeveloperSettings.h"
 #include "ZSharpRuntimeSettings.generated.h"
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZModuleMappingContext
 {
 	GENERATED_BODY()
@@ -21,7 +21,7 @@ struct FZModuleMappingContext
 	
 };
 
-USTRUCT()
+USTRUCT(meta = (ZSharpNoExport))
 struct FZFieldNameRedirector
 {
 	GENERATED_BODY()
@@ -37,7 +37,7 @@ struct FZFieldNameRedirector
 /**
  * 
  */
-UCLASS(Config = ZSharp, DefaultConfig)
+UCLASS(Config = ZSharp, DefaultConfig, meta = (ZSharpNoExport))
 class ZSHARPRUNTIME_API UZSharpRuntimeSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()

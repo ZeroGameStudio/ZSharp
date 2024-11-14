@@ -294,6 +294,14 @@ bool ZSharp::FZExportHelper::IsFieldEditorOnly(FFieldVariant field)
 
 bool ZSharp::FZExportHelper::ShouldExportFieldBySettings(FFieldVariant field)
 {
+#if WITH_METADATA
+	// Compiled-in no export.
+	if (field.HasMetaData("ZSharpNoExport"))
+	{
+		return false;
+	}
+#endif
+	
 	const FString path = field.GetPathName();
 	const UZSharpExportSettings* settings = GetDefault<UZSharpExportSettings>();
 	if (settings->IsForceExportFieldPath(path))

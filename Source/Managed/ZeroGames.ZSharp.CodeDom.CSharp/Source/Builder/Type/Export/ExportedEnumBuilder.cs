@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class ExportedEnumBuilder(string namespaceName, string typeName, string? unrealFieldPath) : ExportedTypeBuilderBase<EnumDefinition>(namespaceName, typeName, unrealFieldPath)
+public class ExportedEnumBuilder(string namespaceName, string typeName, string? unrealFieldPath) : GeneratedTypeBuilderBase<EnumDefinition>(namespaceName, typeName, unrealFieldPath)
 {
 
 	public void AddMember(string name, string value = "", string comment = "") => _members.Add((name, value, comment));

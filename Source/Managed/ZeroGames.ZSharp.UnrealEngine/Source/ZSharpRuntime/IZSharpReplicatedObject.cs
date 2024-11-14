@@ -4,10 +4,13 @@ namespace ZeroGames.ZSharp.UnrealEngine.ZSharpRuntime;
 
 partial interface IZSharpReplicatedObject
 {
-
 	void MarkPropertyDirty(UnrealName propertyName) => NetPushModelHelpers.MarkPropertyDirty((UnrealObject)this, propertyName);
-	void MarkPropertyDirty(string propertyName) => MarkPropertyDirty(new UnrealName(propertyName));
+}
 
+public static class ZSharpReplicatedObjectExtensions
+{
+	public static void MarkPropertyDirty(this IZSharpReplicatedObject @this, UnrealName propertyName) => @this.MarkPropertyDirty(propertyName);
+	public static void MarkPropertyDirty(this IZSharpReplicatedObject @this, string propertyName) => @this.MarkPropertyDirty(new UnrealName(propertyName));
 }
 
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-internal static class StringExtensions
+public static class StringExtensions
 {
 	
 	public static string Indent(this string @this, int32 count = 1, string indentUnit = "\t")

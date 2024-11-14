@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public abstract class ExportedCompositeTypeBuilderBase<TDefinition>(string namespaceName, string typeName, string? unrealFieldPath) : ExportedTypeBuilderBase<TDefinition>(namespaceName, typeName, unrealFieldPath) where TDefinition : CompositeTypeDefinitionBase
+public abstract class GeneratedCompositeTypeBuilderBase<TDefinition>(string namespaceName, string typeName, string? unrealFieldPath) : GeneratedTypeBuilderBase<TDefinition>(namespaceName, typeName, unrealFieldPath) where TDefinition : CompositeTypeDefinitionBase
 {
 	
 	protected override void BuildTypeDefinition(TDefinition definition)

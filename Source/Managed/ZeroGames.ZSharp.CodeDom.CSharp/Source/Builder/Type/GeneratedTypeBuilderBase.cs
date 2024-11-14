@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public abstract class ExportedTypeBuilderBase<TDefinition>(string namespaceName, string typeName, string? unrealFieldPath) where TDefinition : TypeDefinitionBase
+public abstract class GeneratedTypeBuilderBase<TDefinition>(string namespaceName, string typeName, string? unrealFieldPath) where TDefinition : TypeDefinitionBase
 {
 
 	public CompilationUnit Build()
@@ -22,7 +22,7 @@ public abstract class ExportedTypeBuilderBase<TDefinition>(string namespaceName,
 			"ZeroGames.ZSharp.UnrealEngine",
 			.._usings
 		];
-		foreach (var ns in finalUsings.Where(n => !string.IsNullOrWhiteSpace(n)).Distinct().OrderBy(n => n))
+		foreach (var ns in finalUsings.Where(n => !string.IsNullOrWhiteSpace(n) && n != "System").Distinct().OrderBy(n => n))
 		{
 			compilationUnit.AddUsing(new(ns));
 		}

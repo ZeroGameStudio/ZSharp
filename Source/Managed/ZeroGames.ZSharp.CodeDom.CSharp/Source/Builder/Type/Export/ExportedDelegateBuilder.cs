@@ -9,7 +9,7 @@ public enum EExportedDelegateKind
 	Sparse,
 }
 
-public class ExportedDelegateBuilder(string namespaceName, string typeName, string? unrealFieldPath, EExportedDelegateKind kind) : ExportedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, unrealFieldPath)
+public class ExportedDelegateBuilder(string namespaceName, string typeName, string? unrealFieldPath, EExportedDelegateKind kind) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, unrealFieldPath)
 {
 	
 	public EExportedDelegateKind Kind { get; } = kind;

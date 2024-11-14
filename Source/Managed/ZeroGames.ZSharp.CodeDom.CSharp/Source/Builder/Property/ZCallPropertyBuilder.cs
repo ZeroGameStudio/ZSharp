@@ -10,11 +10,17 @@ public class ZCallPropertyBuilder(EMemberVisibility visibility, EMemberModifiers
 		Modifiers = Modifiers,
 		Getter = !abstraction ? new ZCallMethodBodyBuilder(ZCallName, Type, NeedsUnsafeBlock,
 			new ParameterDeclaration(EParameterKind.In, new("bool", null), string.Empty),
-			new ParameterDeclaration(EParameterKind.In, new(nameof(int32), null), Index != 0 ? Index.ToString() : string.Empty)).Build() : null,
+			new ParameterDeclaration(EParameterKind.In, new(nameof(int32), null), Index != 0 ? Index.ToString() : string.Empty))
+			{
+				BeforeReturnBlock = BeforeGetterReturnBlock,
+			}.Build() : null,
 		Setter = !abstraction && !IsReadOnly ? new ZCallMethodBodyBuilder(ZCallName, null, NeedsUnsafeBlock,
 			new ParameterDeclaration(EParameterKind.In, new("bool", null), "true"),
 			new ParameterDeclaration(EParameterKind.In, new(nameof(int32), null), Index != 0 ? Index.ToString() : string.Empty),
-			new ParameterDeclaration(EParameterKind.In, Type, "value")).Build() : null,
+			new ParameterDeclaration(EParameterKind.In, Type, "value"))
+			{
+				BeforeReturnBlock = BeforeSetterReturnBlock,
+			}.Build() : null,
 	};
 	
 	public EMemberVisibility Visibility { get; } = visibility;
@@ -25,6 +31,9 @@ public class ZCallPropertyBuilder(EMemberVisibility visibility, EMemberModifiers
 	public TypeReference Type { get; } = type;
 	public bool NeedsUnsafeBlock { get; } = needsUnsafeBlock;
 	public bool IsReadOnly { get; } = readOnly;
+	
+	public Block BeforeGetterReturnBlock { get; set; } = new();
+	public Block BeforeSetterReturnBlock { get; set; } = new();
 	
 }
 

@@ -27,8 +27,6 @@ public static class NamespaceHelper
 			LootNamespace(prop.Type, res);
 		}
 
-		res.RemoveWhere(string.IsNullOrWhiteSpace);
-		res.Remove("System");
 		return res;
 	}
 
@@ -40,8 +38,6 @@ public static class NamespaceHelper
 			LootNamespace(parameter.Type, res);
 		}
 
-		res.RemoveWhere(string.IsNullOrWhiteSpace);
-		res.Remove("System");
 		return res;
 	}
 

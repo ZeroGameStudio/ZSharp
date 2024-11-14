@@ -10,7 +10,7 @@ public enum EExportedClassKind
 	Plain,
 }
 
-public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, string namespaceName, string typeName, string? unrealFieldPath, string? baseType) : ExportedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, unrealFieldPath)
+public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, string namespaceName, string typeName, string? unrealFieldPath, string? baseType) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, unrealFieldPath)
 {
 	
 	public void AddInterface(string name) => AddBaseType(name);
@@ -63,6 +63,7 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 		return property;
 	}
 
+	// There may be multiple overloads of one ZCall so we add this interface.
 	public FieldDefinition AddStaticFieldIfNotExists(TypeReference type, string name)
 	{
 		if (_fields.Find(field => field.Name == name) is {} existingField)

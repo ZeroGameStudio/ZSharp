@@ -69,6 +69,8 @@ $@"unsafe
 	public bool IsStatic { get; set; }
 	public bool IsVirtual { get; set; }
 
+	public Block BeforeReturnBlock { get; set; } = new();
+
 	private string MakeSlots()
 	{
 		List<string> slots = new();
@@ -117,6 +119,12 @@ $@"unsafe
 		}
 		
 		result += string.Join(Environment.NewLine, copyOuts);
+		
+		if (BeforeReturnBlock.Content != string.Empty)
+		{
+			result += $"{Environment.NewLine}{Environment.NewLine}{BeforeReturnBlock}";
+		}
+		
 		if (ReturnType is not null)
 		{
 			result += $"{Environment.NewLine}{Environment.NewLine}";

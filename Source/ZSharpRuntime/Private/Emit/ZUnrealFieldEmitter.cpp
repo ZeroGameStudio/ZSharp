@@ -711,7 +711,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
         	defaultSubobject.ClassPath = defaultSubobjectDef.ClassPath;
         	defaultSubobject.bOptional = defaultSubobjectDef.bOptional;
         	defaultSubobject.bTransient = defaultSubobjectDef.bTransient;
-        	defaultSubobject.Property = CastFieldChecked<FObjectPropertyBase>(cls->FindPropertyByName(defaultSubobjectDef.PropertyName));
+        	defaultSubobject.PropertyName = defaultSubobjectDef.PropertyName;
         	defaultSubobject.bRootComponent = defaultSubobjectDef.bRootComponent;
         	defaultSubobject.AttachParentDefaultSubobjectName = defaultSubobjectDef.AttachParentDefaultSubobjectName;
         	defaultSubobject.AttachSocketName = defaultSubobjectDef.AttachSocketName;
@@ -951,6 +951,12 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 
 	// Compile Z# class.
 	FZSharpClass* zscls = FZSharpFieldRegistry::Get().GetMutableClass(cls);
+	// Cache DSO properties
+	for (auto& defaultSubobject : zscls->DefaultSubobjects)
+	{
+		defaultSubobject.Property = CastFieldChecked<FObjectPropertyBase>(cls->FindPropertyByName(defaultSubobject.PropertyName));
+	}
+	
 	// Super class and CDO should be ready to use at this point.
 	const UClass* superCls = cls->GetSuperClass();
 	const UObject* superCdo = superCls->GetDefaultObject(false);

@@ -16,12 +16,12 @@ public readonly struct EmittedPropertyDefinition(PropertyDefinition property, Fi
 	public FieldDefinition ZCallHandle { get; } = zcallHandle;
 }
 
-public class EmittedClassBuilder(string namespaceName, string typeName) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName}.{typeName}")
+public class EmittedClassBuilder(string namespaceName, string typeName) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName}")
 {
 	
 	public EmittedEventMethodDefinition AddEventMethod(EMemberVisibility visibility, string name, bool withValidation, bool isSealed, TypeReference? returnType, params ParameterDeclaration[]? parameters)
 	{
-		string zcallName = $"uf://Script/{_namespaceName}.{_typeName}:{name}";
+		string zcallName = $"uf://Script/{_namespaceName.Split('.').Last()}.{_typeName}:{name}";
 		MethodDefinition stub;
 		{
 			EMemberModifiers modifiers = EMemberModifiers.Partial;
@@ -64,7 +64,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName) : Genera
 	
 	public EmittedPropertyDefinition AddProperty(EMemberVisibility visibility, TypeReference type, string name, string[]? fieldNotifies, bool needsMarkDirty)
 	{
-		string zcallName = $"up://Script/{_namespaceName}.{_typeName}:{name}";
+		string zcallName = $"up://Script/{_namespaceName.Split('.').Last()}.{_typeName}:{name}";
 		PropertyDefinition property;
 		{
 			EMemberModifiers modifiers = EMemberModifiers.Partial;

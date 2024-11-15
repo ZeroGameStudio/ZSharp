@@ -20,7 +20,8 @@ namespace ZSharp
 			FName ClassPath;
 			bool bOptional = false;
 			bool bTransient = false;
-			
+
+			FName PropertyName;
 			FObjectPropertyBase* Property = nullptr;
 			
 			bool bRootComponent = false;

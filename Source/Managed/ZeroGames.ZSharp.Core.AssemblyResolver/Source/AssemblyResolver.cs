@@ -47,7 +47,7 @@ internal class AssemblyResolver : IAssemblyResolver
 
 		foreach (var dir in Directory.GetDirectories(baseDir))
 		{
-			if (baseDir == _cachedManagedDllDir && _sharedDirs.Contains(new DirectoryInfo(dir).Name))
+			if (baseDir == _cachedManagedDllDir && !_sharedDirs.Contains(new DirectoryInfo(dir).Name))
 			{
 				continue;
 			}

@@ -382,57 +382,77 @@ public class ProjectFileBuilder
 	{
 		XmlElement targetNode = doc.CreateElement("Target");
 		
-		if (_project.IsRoslynComponent)
+		if (!_project.IsRoslynComponent)
 		{
-			return targetNode;
-		}
+			void AddPostBuildCommand(string command)
+			{
+				XmlElement mkdirNode = doc.CreateElement("Exec");
+				mkdirNode.SetAttribute("Command", command);
+				targetNode.AppendChild(mkdirNode);
+			}
+		
+			void AddCopyTarget(string targetDir)
+			{
+				AddPostBuildCommand($"if not exist \"{targetDir}\" mkdir \"{targetDir}\"");
+				AddPostBuildCommand($"copy \"$(TargetPath)\" \"{targetDir}/$(TargetFileName)\"");
+			}
+		
+			targetNode.SetAttribute("Name", "PostBuild");
+			targetNode.SetAttribute("AfterTargets", "PostBuildEvent");
 
-		void AddPostBuildCommand(string command)
+			bool isPrecompiled = _project.IsPrecompiled;
+			string additionalPath = string.Empty;
+			if (_project.IsCore)
+			{
+				additionalPath = "/Core";
+				isPrecompiled = true;
+			}
+			else if (_project.IsForwardShared)
+			{
+				additionalPath = "/ForwardShared";
+				isPrecompiled = true;
+			}
+			else if (_project.IsDeferredShared)
+			{
+				additionalPath = "/DeferredShared";
+				isPrecompiled = true;
+			}
+		
+			AddCopyTarget($"$(UnrealProjectDir)/Binaries/Managed{additionalPath}");
+			if (isPrecompiled)
+			{
+				AddCopyTarget($"$(ZSharpDir)/Precompiled{additionalPath}");
+			}
+
+			foreach (var command in _project.PostBuildCommands)
+			{
+				AddPostBuildCommand(command);
+			}
+
+			projectNode.AppendChild(targetNode);
+		}
+		else if (_project.ProjectReferences.Count > 0)
 		{
-			XmlElement mkdirNode = doc.CreateElement("Exec");
-			mkdirNode.SetAttribute("Command", command);
-			targetNode.AppendChild(mkdirNode);
+			XmlElement propertyGroupNode = doc.CreateElement("PropertyGroup");
+			XmlElement getTargetPathDependsOnNode = doc.CreateElement("GetTargetPathDependsOn");
+			getTargetPathDependsOnNode.InnerText = "$(GetTargetPathDependsOn);GetDependencyTargetPaths";
+			propertyGroupNode.AppendChild(getTargetPathDependsOnNode);
+			projectNode.AppendChild(propertyGroupNode);
+				
+			targetNode.SetAttribute("Name", "GetDependencyTargetPaths");
+			XmlElement itemGroupNode = doc.CreateElement("ItemGroup");
+			foreach (var reference in _project.ProjectReferences)
+			{
+				XmlElement targetPathWithTargetPlatformMonikerNode = doc.CreateElement("TargetPathWithTargetPlatformMoniker");
+				targetPathWithTargetPlatformMonikerNode.SetAttribute("Include", $"$(TargetDir)/{reference}.dll");
+				targetPathWithTargetPlatformMonikerNode.SetAttribute("IncludeRuntimeDependency", "false");
+				itemGroupNode.AppendChild(targetPathWithTargetPlatformMonikerNode);
+			}
+			targetNode.AppendChild(itemGroupNode);
+			
+			projectNode.AppendChild(targetNode);
 		}
 		
-		void AddCopyTarget(string targetDir)
-		{
-			AddPostBuildCommand($"if not exist \"{targetDir}\" mkdir \"{targetDir}\"");
-			AddPostBuildCommand($"copy \"$(TargetPath)\" \"{targetDir}/$(TargetFileName)\"");
-		}
-		
-		targetNode.SetAttribute("Name", "PostBuild");
-		targetNode.SetAttribute("AfterTargets", "PostBuildEvent");
-
-		bool isPrecompiled = _project.IsPrecompiled;
-		string additionalPath = string.Empty;
-		if (_project.IsCore)
-		{
-			additionalPath = "/Core";
-			isPrecompiled = true;
-		}
-		else if (_project.IsForwardShared)
-		{
-			additionalPath = "/ForwardShared";
-			isPrecompiled = true;
-		}
-		else if (_project.IsDeferredShared)
-		{
-			additionalPath = "/DeferredShared";
-			isPrecompiled = true;
-		}
-		
-		AddCopyTarget($"$(UnrealProjectDir)/Binaries/Managed{additionalPath}");
-		if (isPrecompiled)
-		{
-			AddCopyTarget($"$(ZSharpDir)/Precompiled{additionalPath}");
-		}
-
-		foreach (var command in _project.PostBuildCommands)
-		{
-			AddPostBuildCommand(command);
-		}
-
-		projectNode.AppendChild(targetNode);
 		return targetNode;
 	}
 

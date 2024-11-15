@@ -78,7 +78,7 @@ public class ZSharpCore : ModuleRules
 		PublicDefinitions.Add($"ZSHARP_RUNTIME_CONFIG_FILE_NAME=\"{RUNTIME_CONFIG_JSON}\"");
 		
 		PublicDefinitions.Add($"ZSHARP_CORE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core\"");
-		PublicDefinitions.Add($"ZSHARP_RESOLVER_ASSEMBLY_NAME=\"ZeroGames.ZSharp.AssemblyResolver\"");
+		PublicDefinitions.Add($"ZSHARP_RESOLVER_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core.AssemblyResolver\"");
 		PublicDefinitions.Add($"ZSHARP_CORE_ASYNC_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core.Async\"");
 		PublicDefinitions.Add($"ZSHARP_CORE_ENGINE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core.UnrealEngine\"");
 	}

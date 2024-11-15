@@ -132,8 +132,7 @@ public abstract class ExportedObjectBase : IConjugate
     private void InternalDispose()
     {
         check(IsBlack);
-        check(!IsExpired);
-        
+
         if (!IsInGameThread)
         {
             MasterAlcCache.Instance.PushPendingDisposeConjugate(this);

@@ -33,7 +33,7 @@ public enum EPropertyType : uint8
 	Delegate, MulticastInlineDelegate, // MulticastSparseDelegate is not supported.
 	// Special types
 	FieldPath, // VerseValue is not supported.
-};
+}
 
 public interface ISimpleUnrealPropertyDefinition
 {
@@ -56,7 +56,9 @@ public class UnrealPropertyDefinition : UnrealFieldDefinition, ISimpleUnrealProp
 		return $"{Outer.GetDisplayName()}.{base.GetDisplayName()}";
 	}
 
-	[JsonIgnore] public UnrealStructDefinition Outer { get; init; } = null!; // Can't use required for JsonIgnore property...
+	[JsonIgnore]
+	public UnrealStructDefinition Outer { get; init; } = null!; // Can't use required for JsonIgnore property...
+	
 	public required EPropertyType Type { get; set; }
 	public EPropertyFlags PropertyFlags { get; set; }
 	public string? DescriptorFieldPath { get; set; }
@@ -83,7 +85,9 @@ public class UnrealFunctionDefinition : UnrealStructDefinition
 		return $"{Outer.GetDisplayName()}.{base.GetDisplayName()}";
 	}
 	
-	[JsonIgnore] public UnrealClassDefinition Outer { get; init; } = null!; // Can't use required for JsonIgnore property...
+	[JsonIgnore]
+	public UnrealClassDefinition Outer { get; init; } = null!; // Can't use required for JsonIgnore property...
+	
 	public bool IsEventOverride { get; set; }
 	public EFunctionFlags FunctionFlags { get; set; }
 	public required string ZCallName { get; set; }

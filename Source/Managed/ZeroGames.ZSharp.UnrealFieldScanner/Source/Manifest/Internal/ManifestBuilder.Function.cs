@@ -18,6 +18,7 @@ partial class ManifestBuilder
 		UnrealFunctionDefinition result = new()
 		{
 			Outer = classDef,
+			FunctionFlags = EFunctionFlags.FUNC_Native,
 			Name = functionModel.Name,
 			ZCallName = $"m://{functionModel.Outer.AssemblyName}:{functionModel.Outer.FullName}:{functionModel.Name}",
 		};

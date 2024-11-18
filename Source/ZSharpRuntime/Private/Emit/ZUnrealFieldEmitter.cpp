@@ -437,9 +437,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 	{
 		// Migrate from UECodeGen_Private::ConstructUFunction().
 		constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Transient | RF_MarkAsNative;
-		// Z# function must be native.
-		constexpr EFunctionFlags GCompiledInFunctionFlags = FUNC_Native;
-		
+
 		UFunction* function;
 		if (!def.IsEventOverride)
 		{
@@ -455,7 +453,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 	
 			function = static_cast<UFunction*>(StaticConstructObject_Internal(params));
 
-			function->FunctionFlags |= def.FunctionFlags | GCompiledInFunctionFlags;
+			function->FunctionFlags |= def.FunctionFlags;
 			function->RPCId = def.RpcId;
 			function->RPCResponseId = def.RpcResponseId;
 
@@ -480,7 +478,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			function = static_cast<UFunction*>(StaticDuplicateObjectEx(params));
 			check(function->IsSignatureCompatibleWith(superFunction));
 
-			function->FunctionFlags |= GCompiledInFunctionFlags;
+			function->FunctionFlags |= FUNC_Native;
 
 			// Migrate from FBlueprintCompilationManager::FastGenerateSkeletonClass().
 			function->SetSuperStruct(superFunction);
@@ -493,8 +491,11 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 		def.Function = function;
 
-		FNativeFuncPtr thunk = def.CustomThunkName.IsNone() ? ZSharpFunction_Private::execZCall : FZCustomThunkRegistry::Get().GetThunk(def.CustomThunkName);
-		outer->AddNativeFunction(*function->GetName(), thunk);
+		if (function->HasAllFunctionFlags(FUNC_Native))
+		{
+			FNativeFuncPtr thunk = def.CustomThunkName.IsNone() ? ZSharpFunction_Private::execZCall : FZCustomThunkRegistry::Get().GetThunk(def.CustomThunkName);
+			outer->AddNativeFunction(*function->GetName(), thunk);
+		}
 
 		function->Bind();
 		function->StaticLink(true);

@@ -2,10 +2,10 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public readonly struct EmittedEventMethodDefinition(MethodDefinition stub, MethodDefinition implementation, MethodDefinition? validation, FieldDefinition zcallHandle)
+public readonly struct EmittedEventMethodDefinition(MethodDefinition stub, MethodDefinition? implementation, MethodDefinition? validation, FieldDefinition zcallHandle)
 {
 	public MethodDefinition Stub { get; } = stub;
-	public MethodDefinition Implementation { get; } = implementation;
+	public MethodDefinition? Implementation { get; } = implementation;
 	public MethodDefinition? Validation { get; } = validation;
 	public FieldDefinition ZCallHandle { get; } = zcallHandle;
 }
@@ -19,7 +19,7 @@ public readonly struct EmittedPropertyDefinition(PropertyDefinition property, Fi
 public class EmittedClassBuilder(string namespaceName, string typeName) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName}")
 {
 	
-	public EmittedEventMethodDefinition AddEventMethod(EMemberVisibility visibility, string name, bool withValidation, bool isSealed, TypeReference? returnType, params ParameterDeclaration[]? parameters)
+	public EmittedEventMethodDefinition AddEventMethod(EMemberVisibility visibility, string name, bool withImplementation, bool withValidation, bool isSealed, TypeReference? returnType, params ParameterDeclaration[]? parameters)
 	{
 		string zcallName = $"uf://Script/{_namespaceName.Split('.').Last()}.{_typeName}:{name}";
 		MethodDefinition stub;
@@ -36,7 +36,8 @@ public class EmittedClassBuilder(string namespaceName, string typeName) : Genera
 			implModifiers |= EMemberModifiers.Virtual;
 		}
 		
-		MethodDefinition implementation;
+		MethodDefinition? implementation = null;
+		if (withImplementation)
 		{
 			implementation = new MethodDefinition(implVisibility, $"{name}_Implementation", returnType, parameters)
 			{

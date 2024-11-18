@@ -62,6 +62,7 @@ public class UClassGenerator : ISourceGenerator
 	{
 		INamedTypeSymbol ufunctionSpecifierSymbol = context.Compilation.GetTypeByMetadataName("ZeroGames.ZSharp.Emit.Specifier.UFunctionAttribute")!;
 		INamedTypeSymbol eventBaseSpecifierSymbol = context.Compilation.GetTypeByMetadataName("ZeroGames.ZSharp.Emit.Specifier.EventSpecifierBase")!;
+		INamedTypeSymbol blueprintImplementableEventSpecifierSymbol = context.Compilation.GetTypeByMetadataName("ZeroGames.ZSharp.Emit.Specifier.BlueprintImplementableEventAttribute")!;
 		INamedTypeSymbol withValidationSpecifierSymbol = context.Compilation.GetTypeByMetadataName("ZeroGames.ZSharp.Emit.Specifier.WithValidationAttribute")!;
 		INamedTypeSymbol sealedEventSpecifierSymbol = context.Compilation.GetTypeByMetadataName("ZeroGames.ZSharp.Emit.Specifier.SealedEventAttribute")!;
 		INamedTypeSymbol upropertySymbol = context.Compilation.GetTypeByMetadataName("ZeroGames.ZSharp.Emit.Specifier.UPropertyAttribute")!;
@@ -80,7 +81,7 @@ public class UClassGenerator : ISourceGenerator
 			{
 				ImmutableArray<AttributeData> attributes = method.GetAttributes();
 				bool isUFunction = attributes.Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, ufunctionSpecifierSymbol));
-				bool isEvent = attributes.Any(attr =>
+				bool isNativeEvent = attributes.Any(attr =>
 				{
 					INamedTypeSymbol? currentClass = attr.AttributeClass;
 					while (currentClass is not null)
@@ -96,7 +97,7 @@ public class UClassGenerator : ISourceGenerator
 					return false;
 				});
 
-				return isUFunction && isEvent;
+				return isUFunction && isNativeEvent;
 			});
 		
 		foreach (var method in methods)
@@ -119,6 +120,7 @@ public class UClassGenerator : ISourceGenerator
 			(
 				AccessibilityToMemberVisibility(method.DeclaredAccessibility),
 				method.Name,
+				!attributes.Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, blueprintImplementableEventSpecifierSymbol)),
 				attributes.Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, withValidationSpecifierSymbol)),
 				attributes.Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, sealedEventSpecifierSymbol)),
 				!method.ReturnsVoid ? GetTypeReference(method.ReturnType) : null,

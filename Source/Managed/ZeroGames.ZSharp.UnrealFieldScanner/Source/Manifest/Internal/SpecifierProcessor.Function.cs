@@ -37,7 +37,16 @@ partial class SpecifierProcessor
 	}
 	
 	[SpecifierProcessor]
-	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintEventAttribute specifier)
+	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintImplementableEventAttribute specifier)
+	{
+		check(model.Visibility != EMemberVisibility.Private);
+
+		def.FunctionFlags &= ~EFunctionFlags.FUNC_Native;
+		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_BlueprintEvent;
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintNativeEventAttribute specifier)
 	{
 		check(model.Visibility != EMemberVisibility.Private);
 

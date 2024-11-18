@@ -16,10 +16,7 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 		
 		Outer = outer;
 		Role = EPropertyRole.Member;
-		Type = new(registry, GetDecayedType(typeRef))
-		{
-			GenericArguments = ResolveGenericArguments(registry, typeRef),
-		};
+		Type = new(registry, typeRef);
 		
 		if (propertyDef.GetMethod is not null)
 		{
@@ -40,11 +37,10 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 
 		Outer = outer;
 		Role = EPropertyRole.Parameter;
-		Type = new(registry, GetDecayedType(typeRef))
+		Type = new(registry, typeRef)
 		{
 			IsByRef = typeRef.IsByReference,
 			IsOut = parameterDef.IsOut,
-			GenericArguments = ResolveGenericArguments(registry, typeRef),
 		};
 	}
 
@@ -57,10 +53,7 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 
 		Outer = outer;
 		Role = EPropertyRole.Return;
-		Type = new(registry, GetDecayedType(typeRef))
-		{
-			GenericArguments = ResolveGenericArguments(registry, typeRef),
-		};
+		Type = new(registry, typeRef);
 	}
 
 	public IUnrealStructModel Outer { get; }
@@ -87,59 +80,6 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 	
 	public IPropertyAccessorModel? Getter { get; }
 	public IPropertyAccessorModel? Setter { get; }
-
-	// Remove reference and generic arguments.
-	// Example:
-	// int32 -> int32
-	// int32& -> int32
-	// List<int32> -> List<T>
-	// List<int32>& -> List<T>
-	private TypeReference GetDecayedType(TypeReference type)
-	{
-		TypeReference result = type;
-		
-		/*
-		 * Remove reference.
-		 * TypeReference.GetElementType() returns wrong value for generic instance type
-		 * and we have to use ByReferenceType.ElementType to get the correct GenericInstanceType...
-		 */
-		if (result is ByReferenceType byRefType)
-		{
-			result = byRefType.ElementType;
-		}
-
-		/*
-		 * Remove generic arguments.
-		 * For generic instance type, TypeReference.GetElementType() returns the generic type of that instance.
-		 * For non generic instance type, TypeReference.GetElementType() just returns itself.
-		 */
-		return result.GetElementType();
-	}
-
-	private List<TypeModelReference>? ResolveGenericArguments(ModelRegistry registry, TypeReference typeRef)
-	{
-		if (typeRef is ByReferenceType byRefType)
-		{
-			typeRef = byRefType.ElementType;
-		}
-		
-		if (typeRef is GenericInstanceType genericInstanceType)
-		{
-			List<TypeModelReference> result = new();
-			
-			foreach (var genericArgument in genericInstanceType.GenericArguments)
-			{
-				result.Add(new(registry, genericArgument)
-				{
-					GenericArguments = ResolveGenericArguments(registry, genericArgument),
-				});
-			}
-
-			return result;
-		}
-
-		return null;
-	}
 
 	private bool IsAccessorPublic(IPropertyAccessorModel? accessor) => accessor is not null && accessor.Visibility == EMemberVisibility.Public;
 	private bool IsAccessorProtected(IPropertyAccessorModel? accessor) => accessor is not null && accessor.Visibility == EMemberVisibility.Protected;

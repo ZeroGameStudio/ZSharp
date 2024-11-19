@@ -5,11 +5,8 @@ namespace ZeroGames.ZSharp.Core;
 public static class CoreSettings
 {
 
-	public static bool TreatManagedFatalAsError { get; } = GConfig.GetBoolOrDefault(BaseIniName, Section, nameof(TreatManagedFatalAsError), false);
-	public static bool SuppressAlcUnloadedException { get; } = GConfig.GetBoolOrDefault(BaseIniName, Section, nameof(SuppressAlcUnloadedException), true);
-	
-	private const string BaseIniName = "ZSharp";
-	private const string Section = "Managed." + nameof(CoreSettings);
+	public static unsafe bool TreatManagedFatalAsError => CoreSettings_Interop.ShouldTreatManagedFatalAsError() > 0;
+	public static unsafe bool SuppressAlcUnloadedException => CoreSettings_Interop.ShouldSuppressAlcUnloadedException() > 0;
 
 }
 

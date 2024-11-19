@@ -7,8 +7,9 @@
 #include "ZSharpClr.h"
 #include "ZSharpCoreLogChannels.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
-#include "Interop/Misc/Console_Interop.h"
+#include "Interop/Engine/Console_Interop.h"
 #include "Interop/Misc/ZLog_Interop.h"
+#include "Interop/Core/ZCoreSettings_Interop.h"
 #include "Interop/Core/ZClr_Interop.h"
 #include "Interop/Core/ZGCHandle_Interop.h"
 #include "Interop/Misc/ZInteropString_Interop.h"
@@ -82,6 +83,7 @@ namespace ZSharp::ZGenericClr_Private
 	
 	static void LoadCoreAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
+		static const TCHAR* GCoreSettings_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.CoreSettings_Interop");
 		static const TCHAR* GInteropString_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropString_Interop");
 		static const TCHAR* GInteropStringArray_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropStringArray_Interop");
 		static const TCHAR* GMasterAssemblyLoadContext_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.MasterAssemblyLoadContext_Interop");
@@ -90,6 +92,9 @@ namespace ZSharp::ZGenericClr_Private
 		
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
         {
+			BUILD_UNMANAGED_FUNCTION(CoreSettings_Interop, ShouldTreatManagedFatalAsError),
+			BUILD_UNMANAGED_FUNCTION(CoreSettings_Interop, ShouldSuppressAlcUnloadedException),
+			
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Alloc),
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Free),
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, GetData),

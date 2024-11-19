@@ -2,7 +2,7 @@
 
 #include "Interop/ZGCHandle.h"
 
-#include "ZGCHandle_Interop.h"
+#include "Core/ZGCHandle_Interop.h"
 
 void ZSharp::FZGCHandle::Free()
 {

@@ -76,6 +76,9 @@ namespace ZSharp::ZGenericClr_Private
 			}
 		}
 	}
+
+#define BUILD_UNMANAGED_FUNCTION(ShortTypeName, FieldName) { G##ShortTypeName##TypeName, TEXT(#FieldName), FZ##ShortTypeName::FieldName }
+#define ADDRESS_OF(Pointer) reinterpret_cast<void**>(&Pointer)
 	
 	static void LoadCoreAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
@@ -84,12 +87,9 @@ namespace ZSharp::ZGenericClr_Private
 		static const TCHAR* GMasterAssemblyLoadContext_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.MasterAssemblyLoadContext_Interop");
 		static const TCHAR* GLog_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Log_Interop");
 		static const TCHAR* GConfig_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Config_Interop");
-		static const TCHAR* GConsole_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Console_Interop");
 		
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
         {
-#define BUILD_UNMANAGED_FUNCTION(ShortTypeName, FieldName) { G##ShortTypeName##TypeName, TEXT(#FieldName), FZ##ShortTypeName::FieldName }
-			
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Alloc),
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, Free),
 			BUILD_UNMANAGED_FUNCTION(InteropString_Interop, GetData),
@@ -116,23 +116,10 @@ namespace ZSharp::ZGenericClr_Private
 			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetSection),
 			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetArray),
 			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetString),
-
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryExecuteCommand),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryGetValue),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TrySetValue),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterOnChanged),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryUnregisterOnChanged),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterCommand),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterVariable),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryUnregisterObject),
-
-#undef BUILD_UNMANAGED_FUNCTION
         };
 
 		static void** GManagedFunctions[] =
 		{
-#define ADDRESS_OF(Pointer) reinterpret_cast<void**>(&Pointer)
-
 			ADDRESS_OF(FZClr_Interop::GCollectGarbage),
 			ADDRESS_OF(FZClr_Interop::GCreateMasterAlc),
 			ADDRESS_OF(FZClr_Interop::GCreateSlimAlc),
@@ -157,8 +144,6 @@ namespace ZSharp::ZGenericClr_Private
 
 			ADDRESS_OF(FZConsole_Interop::GHandleExecuteCommand),
 			ADDRESS_OF(FZConsole_Interop::GHandleVariableChanged),
-				
-#undef ADDRESS_OF
 		};
 
 		static const struct
@@ -210,11 +195,7 @@ namespace ZSharp::ZGenericClr_Private
 	{
 		static void** managedFunctions[] =
 		{
-#define ADDRESS_OF(Pointer) reinterpret_cast<void**>(&Pointer)
-
 			ADDRESS_OF(ZSharp::FZEventLoop_Interop::GNotifyEvent),
-				
-	#undef ADDRESS_OF
 		};
 		
 		static const struct
@@ -240,20 +221,37 @@ namespace ZSharp::ZGenericClr_Private
 
 	static void LoadCoreEngineAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
-		static const FString GBuildInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("Build_Interop"));
-		static const FString GPathInteropTypeName = FString::Printf(TEXT("%s.%s"), TEXT(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME), TEXT("Path_Interop"));;
+		static const TCHAR* GConsole_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Console_Interop");
+		static const TCHAR* GBuild_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Build_Interop");
+		static const TCHAR* GPath_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Path_Interop");
 		
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
 		{
-			{ *GBuildInteropTypeName, TEXT("WithEditor"), FZBuild_Interop::WithEditor },
-		
-			{ *GPathInteropTypeName, TEXT("GetProjectDir"), FZPath_Interop::GetProjectDir },
-			{ *GPathInteropTypeName, TEXT("GetPluginDir"), FZPath_Interop::GetPluginDir },
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryExecuteCommand),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryGetValue),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TrySetValue),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterOnChanged),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryUnregisterOnChanged),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterCommand),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterVariable),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryUnregisterObject),
+			
+			BUILD_UNMANAGED_FUNCTION(Build_Interop, WithEditor),
+			
+			BUILD_UNMANAGED_FUNCTION(Path_Interop, GetProjectDir),
+			BUILD_UNMANAGED_FUNCTION(Path_Interop, GetPluginDir),
+		};
+
+		static void** GManagedFunctions[] =
+		{
+			ADDRESS_OF(FZConsole_Interop::GHandleExecuteCommand),
+			ADDRESS_OF(FZConsole_Interop::GHandleVariableChanged),
 		};
 		
 		static const struct
         {
         	FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(GUnmanagedFunctions), GUnmanagedFunctions };
+			void*** ManagedFunctions = GManagedFunctions;
         } GArgs{};
 
 		void(*dllMain)(const decltype(GArgs)&) = nullptr;
@@ -271,6 +269,9 @@ namespace ZSharp::ZGenericClr_Private
 		check(dllMain);
 		dllMain(GArgs);
 	}
+
+#undef BUILD_UNMANAGED_FUNCTION
+#undef ADDRESS_OF
 }
 
 ZSharp::FZGenericClr& ZSharp::FZGenericClr::Get()

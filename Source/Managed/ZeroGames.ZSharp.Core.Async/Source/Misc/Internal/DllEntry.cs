@@ -22,7 +22,7 @@ internal static class DllEntry
     private static unsafe void DllMain(Args* args)
     {
         int32 offset = 0;
-        
+        // EventLoop interop functions
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<EEventLoopTickingGroup, float, float, double, double, IntPtr, void>)&EventLoop_Interop.NotifyEvent;
         
         // Trigger GameThreadScheduler static constructor.

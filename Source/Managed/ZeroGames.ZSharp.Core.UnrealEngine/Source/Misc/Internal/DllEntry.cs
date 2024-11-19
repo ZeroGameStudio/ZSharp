@@ -27,6 +27,7 @@ internal class DllEntry
     private struct Args
     {
         public UnmanagedFunctions UnmanagedFunctions;
+        public unsafe void*** ManagedFunctions;
     }
 
     [UnmanagedCallersOnly]
@@ -39,6 +40,11 @@ internal class DllEntry
             string fieldName = new(function->FieldName);
             InteropBindingHelper.GetStaticFunctionPointerField(typeName, fieldName).SetValue(null, (IntPtr)function->Address);
         }
+        
+        int32 offset = 0;
+        // Console interop functions
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, IntPtr, void>)&Console_Interop.HandleExecuteCommand;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, void>)&Console_Interop.HandleVariableChanged;
     }
 
 }

@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace ZeroGames.ZSharp.Core;
+namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
 internal static class ConsoleManager
 {

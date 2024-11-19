@@ -3,7 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-namespace ZeroGames.ZSharp.Core;
+namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
 public readonly struct ConsoleVariable : IEquatable<ConsoleVariable>
 {

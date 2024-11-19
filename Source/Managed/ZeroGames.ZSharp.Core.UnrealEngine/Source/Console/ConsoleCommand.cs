@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-namespace ZeroGames.ZSharp.Core;
+namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
 public readonly struct ConsoleCommand : IEquatable<ConsoleCommand>
 {

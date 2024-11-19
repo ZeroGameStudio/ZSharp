@@ -4,7 +4,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace ZeroGames.ZSharp.Core;
+namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
 internal static unsafe class Console_Interop
 {

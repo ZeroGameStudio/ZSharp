@@ -2,9 +2,6 @@
 
 #pragma once
 
-#include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveMulticastInlineScriptDelegate.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveMulticastSparseScriptDelegate.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptArray.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptSet.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptMap.h"

@@ -1,6 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Security;
@@ -15,10 +16,16 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 		{
 			StackFrame stack = new(1);
 			MethodBase? method = stack.GetMethod();
-			check(method is not null);
+			if (method is null)
+			{
+				throw new InvalidOperationException();
+			}
 			
 			Type? type = method.DeclaringType;
-			check(type is not null);
+			if (type is null)
+			{
+				throw new InvalidOperationException();
+			}
 
 			MasterAssemblyLoadContext? result = MasterAssemblyLoadContext.Instance;
 			AssemblyLoadContext? callerAlc = AssemblyLoadContext.GetLoadContext(type.Assembly);
@@ -31,6 +38,7 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 		}
 	}
 	
+	[Pure]
 	Type? GetType(ref readonly RuntimeTypeLocator locator);
 
 	ZCallHandle RegisterZCall(IZCallDispatcher dispatcher);

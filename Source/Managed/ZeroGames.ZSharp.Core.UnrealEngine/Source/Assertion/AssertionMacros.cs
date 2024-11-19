@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
 
-namespace ZeroGames.ZSharp.Core;
+namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
 public static class AssertionMacros
 {
@@ -193,7 +193,7 @@ public static class AssertionMacros
 		string finalMessage = $"Assertion [{expr}] failed: {message} at file {file} line {line} column {column}.";
 		if (Debugger.IsAttached || forceNoFatal)
 		{
-			CoreLog.Error(finalMessage);
+			UE_ERROR(LogZSharpScriptEngine, finalMessage);
 			Debugger.Break();
 		}
 		else

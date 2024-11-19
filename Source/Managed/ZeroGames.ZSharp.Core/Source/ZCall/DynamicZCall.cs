@@ -16,7 +16,11 @@ public readonly struct DynamicZCallResult(ZCallBufferSlot[] slots)
 				index = _slots.Length + index;
 			}
 			
-			check(index >= 0 && index < _slots.Length);
+			if (index < 0 || index >= NumSlots)
+			{
+				throw new IndexOutOfRangeException();
+			}
+			
 			return ref _slots[index];
 		}
 	}

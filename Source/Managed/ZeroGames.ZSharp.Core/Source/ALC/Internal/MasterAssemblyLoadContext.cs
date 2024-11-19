@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Collections.Concurrent;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -17,7 +16,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     }
 
     public static MasterAssemblyLoadContext? Instance { get; private set; }
-
+    
     public Type? GetType(ref readonly RuntimeTypeLocator locator)
     {
         this.GuardUnloaded();
@@ -40,7 +39,10 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             
             if (t.IsGenericType)
             {
-                check(locator.TypeParameters is not null);
+                if (locator.TypeParameters is null)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
 
                 Type[] tps = new Type[locator.TypeParameters.Length];
                 for (int32 i = 0; i < tps.Length; ++i)
@@ -65,8 +67,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public ZCallHandle RegisterZCall(IZCallDispatcher dispatcher)
     {
-        check(GameThreadScheduler.IsInGameThread);
-        this.GuardUnloaded();
+        GuardInvariant();
         
         ZCallHandle handle = ZCallHandle.Alloc();
         _zcallMap[handle] = dispatcher;
@@ -77,8 +78,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public void RegisterZCallResolver(IZCallResolver resolver, uint64 priority)
     {
-        check(GameThreadScheduler.IsInGameThread);
-        this.GuardUnloaded();
+        GuardInvariant();
         
         _zcallResolverLink.Add((resolver, priority));
         _zcallResolverLink.Sort((lhs, rhs) =>
@@ -94,32 +94,28 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public EZCallErrorCode ZCall(ZCallHandle handle, ZCallBuffer* buffer)
     {
-        check(GameThreadScheduler.IsInGameThread);
-        this.GuardUnloaded();
+        GuardInvariant();
         
         return ZCall_Black(handle, buffer);
     }
 
     public ZCallHandle GetZCallHandle(string name)
     {
-        check(GameThreadScheduler.IsInGameThread);
-        this.GuardUnloaded();
+        GuardInvariant();
         
         return GetZCallHandle_Black(name);
     }
 
     public IntPtr BuildConjugate(IConjugate managed, IntPtr userdata)
     {
-        check(GameThreadScheduler.IsInGameThread);
-        this.GuardUnloaded();
+        GuardInvariant();
         
         return BuildConjugate_Black(managed, userdata);
     }
 
     public void ReleaseConjugate(IConjugate conjugate)
     {
-        check(GameThreadScheduler.IsInGameThread);
-        this.GuardUnloaded();
+        GuardInvariant();
         
         ReleaseConjugate_Black(conjugate.Unmanaged);
     }
@@ -144,7 +140,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
     {
-        this.GuardUnloaded();
+        GuardInvariant();
         
         if (!_zcallMap.TryGetValue(handle, out var dispatcher))
         {
@@ -156,8 +152,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public ZCallHandle GetZCallHandle_Red(string name)
     {
-        check(GameThreadScheduler.IsInGameThread);
-        this.GuardUnloaded();
+        GuardInvariant();
         
         if (!_zcallName2Handle.TryGetValue(name, out var handle))
         {
@@ -177,7 +172,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public IntPtr BuildConjugate_Red(IntPtr unmanaged, Type type)
     {
-        this.GuardUnloaded();
+        GuardInvariant();
         
         Type conjugateType = typeof(IConjugate<>).MakeGenericType(type);
         if (type.IsAssignableTo(conjugateType))
@@ -192,24 +187,38 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public void ReleaseConjugate_Red(IntPtr unmanaged)
     {
-        this.GuardUnloaded();
-        
-        verify(_conjugateMap.Remove(unmanaged, out var rec));
-        verify(rec.WeakRef.TryGetTarget(out var conjugate));
+        GuardInvariant();
+
+        if (!_conjugateMap.Remove(unmanaged, out var rec))
+        {
+            CoreLog.Error($"Conjugate {unmanaged} doesn't exist!");
+            return;
+        }
+
+        if (!rec.WeakRef.TryGetTarget(out var conjugate))
+        {
+            CoreLog.Error($"Conjugate {unmanaged} is expired!");
+            return;
+        }
+
         conjugate.Release();
     }
 
     public IConjugate? Conjugate(IntPtr unmanaged)
     {
-        this.GuardUnloaded();
+        GuardInvariant();
         
         if (!_conjugateMap.TryGetValue(unmanaged, out var rec))
         {
             return null;
         }
 
-        // Recorded conjugate should always be alive.
-        verify(rec.WeakRef.TryGetTarget(out var conjugate));
+        if (!rec.WeakRef.TryGetTarget(out var conjugate))
+        {
+            CoreLog.Error($"Conjugate {unmanaged} is expired!");
+            return null;
+        }
+        
         return conjugate;
     }
     
@@ -219,18 +228,31 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     {
         try
         {
-            check(Instance == this);
-
-            // Dispose all conjugates to ensure that there is no resource leak.
-            foreach (var pair in _conjugateMap)
+            if (Instance != this)
             {
-                verify(pair.Value.WeakRef.TryGetTarget(out var conjugate));
-                check(conjugate.IsBlack); // All red conjugates should have been released at this point.
-                conjugate.Dispose();
+                CoreLog.Error("Current Master ALC is not this instance!");
+                return;
             }
 
-            // Now there should be nothing in conjugate map.
-            check(_conjugateMap.Count == 0);
+            // Dispose all conjugates to ensure that there is no resource leak.
+            Dictionary<IntPtr, ConjugateRec> temp = _conjugateMap.ToDictionary();
+            foreach (var pair in temp)
+            {
+                if (!pair.Value.WeakRef.TryGetTarget(out var conjugate))
+                {
+                    CoreLog.Error($"Conjugate {pair.Key} is expired!");
+                    continue;
+                }
+                
+                // All red conjugates should have been released at this point.
+                if (!conjugate.IsBlack)
+                {
+                    CoreLog.Error($"Conjugate {pair.Key} is not black!");
+                    continue;
+                }
+                
+                conjugate.Dispose();
+            }
 
             // Manually flush pending disposed conjugates before mark IsUnloaded.
             FlushPendingDisposedConjugates(this);
@@ -242,6 +264,27 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             base.HandleUnload();
         }
     }
+    
+    private static void FlushPendingDisposedConjugates(object? state)
+    {
+        MasterAssemblyLoadContext @this = Unsafe.As<MasterAssemblyLoadContext>(state!);
+        lock (@this._pendingDisposedConjugatesLock)
+        {
+            if (@this.IsUnloaded)
+            {
+                if (@this._pendingDisposedConjugates.Count != 0)
+                {
+                    CoreLog.Error("Master ALC is unloaded but conjugate map is not empty!");
+                }
+                return;
+            }
+
+            while (@this._pendingDisposedConjugates.TryDequeue(out var conjugate))
+            {
+                conjugate.Dispose();
+            }
+        }
+    }
 
     private MasterAssemblyLoadContext() : base(INSTANCE_NAME)
     {
@@ -250,6 +293,16 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         RegisterZCall(new ZCallDispatcher_Delegate());
         RegisterZCallResolver(new ZCallResolver_Method(this), 1);
         RegisterZCallResolver(new ZCallResolver_Property(this), 2);
+    }
+
+    private void GuardInvariant()
+    {
+        if (!GameThreadScheduler.IsInGameThread)
+        {
+            throw new InvalidOperationException("Access Master ALC in non-game thread.");
+        }
+        
+        this.GuardUnloaded();
     }
     
     private EZCallErrorCode ZCall_Black(ZCallHandle handle, ZCallBuffer* buffer)
@@ -268,10 +321,19 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private IntPtr BuildConjugate_Black(IConjugate managed, IntPtr userdata)
     {
         uint16 registryId = GetTypeConjugateRegistryId(managed.GetType());
-        check(registryId > 0, $"Type {managed.GetType().FullName} does not have a valid conjugate registry id");
+        if (registryId == 0)
+        {
+            CoreLog.Error($"Type {managed.GetType().FullName} does not have a valid conjugate registry id.");
+            return default;
+        }
 
         IntPtr unmanaged = MasterAssemblyLoadContext_Interop.BuildConjugate_Black(registryId, userdata);
-        check(unmanaged != default);
+        if (unmanaged == default)
+        {
+            CoreLog.Error($"Failed to build conjugate for type {managed.GetType().FullName}");
+            return default;
+        }
+        
         _conjugateMap[unmanaged] = new(registryId, new(managed, true));
 
         return unmanaged;
@@ -279,13 +341,13 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     private void ReleaseConjugate_Black(IntPtr unmanaged)
     {
-        verify(_conjugateMap.TryGetValue(unmanaged, out var rec));
+        if (!_conjugateMap.Remove(unmanaged, out var rec))
+        {
+            CoreLog.Error($"Conjugate {unmanaged} doesn't exist!");
+            return;
+        }
 
-        uint16 registryId = rec.RegistryId;
-        check(registryId > 0);
-
-        _conjugateMap.Remove(unmanaged);
-        MasterAssemblyLoadContext_Interop.ReleaseConjugate_Black(registryId, unmanaged);
+        MasterAssemblyLoadContext_Interop.ReleaseConjugate_Black(rec.RegistryId, unmanaged);
     }
 
     private uint16 GetTypeConjugateRegistryId(Type type)
@@ -302,24 +364,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         }
 
         return 0;
-    }
-    
-    private static void FlushPendingDisposedConjugates(object? state)
-    {
-        MasterAssemblyLoadContext @this = Unsafe.As<MasterAssemblyLoadContext>(state!);
-        lock (@this._pendingDisposedConjugatesLock)
-        {
-            if (@this.IsUnloaded)
-            {
-                check(@this._pendingDisposedConjugates.Count == 0);
-                return;
-            }
-
-            while (@this._pendingDisposedConjugates.TryDequeue(out var conjugate))
-            {
-                conjugate.Dispose();
-            }
-        }
     }
     
     private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 1 << 16;

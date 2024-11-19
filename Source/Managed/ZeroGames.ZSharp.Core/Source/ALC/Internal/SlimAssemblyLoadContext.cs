@@ -21,19 +21,18 @@ internal sealed class SlimAssemblyLoadContext : ZSharpAssemblyLoadContextBase, I
 
     protected override void HandleUnload()
     {
-        try
+        if (_instanceMap.TryGetValue(Name!, out var alc) && alc == this)
         {
-            if (ensure(_instanceMap.TryGetValue(Name!, out var alc) && alc == this))
-            {
-                _instanceMap.Remove(Name!);
-            }
+            _instanceMap.Remove(Name!);
+        }
+        else
+        {
+            CoreLog.Warning($"Slim ALC {Name} doesn't exist!");
+        }
+        
+        GCHandle.Free();
 
-            base.HandleUnload();
-        }
-        finally
-        {
-            GCHandle.Free();
-        }
+        base.HandleUnload();
     }
     
     private SlimAssemblyLoadContext(string name) : base(name)

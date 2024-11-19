@@ -223,169 +223,169 @@ public struct ZCallBufferSlot
 	
 	public readonly uint8 ReadUInt8()
 	{
-		check(_type == EZCallBufferSlotType.UInt8);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.UInt8);
 		return _value.UInt8;
 	}
 	
 	public readonly uint16 ReadUInt16()
 	{
-		check(_type == EZCallBufferSlotType.UInt16);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.UInt16);
 		return _value.UInt16;
 	}
 	
 	public readonly uint32 ReadUInt32()
 	{
-		check(_type == EZCallBufferSlotType.UInt32);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.UInt32);
 		return _value.UInt32;
 	}
 	
 	public readonly uint64 ReadUInt64()
 	{
-		check(_type == EZCallBufferSlotType.UInt64);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.UInt64);
 		return _value.UInt64;
 	}
 	
 	public readonly int8 ReadInt8()
 	{
-		check(_type == EZCallBufferSlotType.Int8);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Int8);
 		return _value.Int8;
 	}
 	
 	public readonly int16 ReadInt16()
 	{
-		check(_type == EZCallBufferSlotType.Int16);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Int16);
 		return _value.Int16;
 	}
 	
 	public readonly int32 ReadInt32()
 	{
-		check(_type == EZCallBufferSlotType.Int32);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Int32);
 		return _value.Int32;
 	}
 	
 	public readonly int64 ReadInt64()
 	{
-		check(_type == EZCallBufferSlotType.Int64);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Int64);
 		return _value.Int64;
 	}
 	
 	public readonly float ReadFloat()
 	{
-		check(_type == EZCallBufferSlotType.Float);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Float);
 		return _value.Float;
 	}
 	
 	public readonly double ReadDouble()
 	{
-		check(_type == EZCallBufferSlotType.Double);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Double);
 		return _value.Double;
 	}
 	
 	public readonly bool ReadBool()
 	{
-		check(_type == EZCallBufferSlotType.Bool);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Bool);
 		return _value.Bool > 0;
 	}
 	
 	public readonly IntPtr ReadPointer()
 	{
-		check(_type == EZCallBufferSlotType.Pointer);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Pointer);
 		return _value.Pointer;
 	}
 	
 	public readonly GCHandle ReadGCHandle()
 	{
-		check(_type == EZCallBufferSlotType.GCHandle);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.GCHandle);
 		return _value.GCHandle;
 	}
 	
 	public readonly ConjugateHandle ReadConjugate()
 	{
-		check(_type == EZCallBufferSlotType.Conjugate);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Conjugate);
 		return _value.Conjugate;
 	}
 	
 	public void WriteUInt8(uint8 value)
 	{
-		check(_type == EZCallBufferSlotType.UInt8);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.UInt8);
 		_value.UInt8 = value;
 	}
 	
 	public void WriteUInt16(uint16 value)
 	{
-		check(_type == EZCallBufferSlotType.UInt16);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.UInt16);
 		_value.UInt16 = value;
 	}
 	
 	public void WriteUInt32(uint32 value)
 	{
-		check(_type == EZCallBufferSlotType.UInt32);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.UInt32);
 		_value.UInt32 = value;
 	}
 	
 	public void WriteUInt64(uint64 value)
 	{
-		check(_type == EZCallBufferSlotType.UInt64);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.UInt64);
 		_value.UInt64 = value;
 	}
 	
 	public void WriteInt8(int8 value)
 	{
-		check(_type == EZCallBufferSlotType.Int8);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Int8);
 		_value.Int8 = value;
 	}
 	
 	public void WriteInt16(int16 value)
 	{
-		check(_type == EZCallBufferSlotType.Int16);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Int16);
 		_value.Int16 = value;
 	}
 	
 	public void WriteInt32(int32 value)
 	{
-		check(_type == EZCallBufferSlotType.Int32);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Int32);
 		_value.Int32 = value;
 	}
 	
 	public void WriteInt64(int64 value)
 	{
-		check(_type == EZCallBufferSlotType.Int64);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Int64);
 		_value.Int64 = value;
 	}
 	
 	public void WriteFloat(float value)
 	{
-		check(_type == EZCallBufferSlotType.Float);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Float);
 		_value.Float = value;
 	}
 	
 	public void WriteDouble(double value)
 	{
-		check(_type == EZCallBufferSlotType.Double);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Double);
 		_value.Double = value;
 	}
 	
 	public void WriteBool(bool value)
 	{
-		check(_type == EZCallBufferSlotType.Bool);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Bool);
 		_value.Bool = (uint8)(value ? 1 : 0);
 	}
 	
 	public void WritePointer(IntPtr value)
 	{
-		check(_type == EZCallBufferSlotType.Pointer);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Pointer);
 		_value.Pointer = value;
 	}
 	
 	public void WriteGCHandle(GCHandle value)
 	{
-		check(_type == EZCallBufferSlotType.GCHandle);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.GCHandle);
 		_value.GCHandle = value;
 	}
 	
 	public void WriteConjugate(ConjugateHandle value)
 	{
-		check(_type == EZCallBufferSlotType.Conjugate);
+		Thrower.FatalIf(_type != EZCallBufferSlotType.Conjugate);
 		_value.Conjugate = value;
 	}
 
@@ -605,8 +605,12 @@ public readonly unsafe struct ZCallBuffer(ZCallBufferSlot* slots, int32 numSlots
 			{
 				index = _numSlots + index;
 			}
-			
-			check(index >= 0 && index < _numSlots);
+
+			if (index < 0 || index >= _numSlots)
+			{
+				throw new IndexOutOfRangeException();
+			}
+
 			return ref _slots[index];
 		}
 	}

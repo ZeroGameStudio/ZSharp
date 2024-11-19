@@ -13,10 +13,18 @@ public interface IAssemblyResolver
 			.Select(asm => asm.GetCustomAttribute<AssemblyResolverAttribute>())
 			.Single(attr => attr is not null)!;
 		Type resolverType = attribute.ResolverType;
+		if (!resolverType.IsAssignableTo(typeof(IAssemblyResolver)))
+		{
+			throw new InvalidOperationException();
+		}
+
+		var resolver = Activator.CreateInstance(resolverType) as IAssemblyResolver;
+		if (resolver is null)
+		{
+			throw new InvalidOperationException();
+		}
 		
-		check(resolverType.IsAssignableTo(typeof(IAssemblyResolver)));
-		verify(Activator.CreateInstance(resolverType) is var resolver && resolver is not null);
-		return (IAssemblyResolver)resolver;
+		return resolver;
 	}
 	
 	string? Resolve(string name);

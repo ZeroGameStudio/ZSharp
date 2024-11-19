@@ -18,7 +18,7 @@
 #include "Interop/Core/ZMasterAssemblyLoadContext_Interop.h"
 #include "Interop/ZGCHandle.h"
 #include "ALC/ZSlimAssemblyLoadContext.h"
-#include "Interop/Misc/ZConfig_Interop.h"
+#include "Interop/Engine/ZConfig_Interop.h"
 #include "Interop/Core/ZDefaultAssemblyLoadContext_Interop.h"
 #include "Interop/Async/ZEventLoop_Interop.h"
 #include "Interop/Core/ZSlimAssemblyLoadContext_Interop.h"
@@ -88,8 +88,7 @@ namespace ZSharp::ZGenericClr_Private
 		static const TCHAR* GInteropStringArray_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropStringArray_Interop");
 		static const TCHAR* GMasterAssemblyLoadContext_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.MasterAssemblyLoadContext_Interop");
 		static const TCHAR* GLog_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Log_Interop");
-		static const TCHAR* GConfig_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Config_Interop");
-		
+
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
         {
 			BUILD_UNMANAGED_FUNCTION(CoreSettings_Interop, ShouldTreatManagedFatalAsError),
@@ -116,11 +115,6 @@ namespace ZSharp::ZGenericClr_Private
 			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ReleaseConjugate_Black),
 
 			BUILD_UNMANAGED_FUNCTION(Log_Interop, Log),
-
-			BUILD_UNMANAGED_FUNCTION(Config_Interop, GetFileName),
-			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetSection),
-			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetArray),
-			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetString),
         };
 
 		static void** GManagedFunctions[] =
@@ -154,18 +148,13 @@ namespace ZSharp::ZGenericClr_Private
 		static const struct
 		{
 			void* IsInGameThreadFuncPtr = &IsInGameThread;
-			bool* GIsServerPtr = &GIsServer;
-			bool* GIsClientPtr = &GIsClient;
-			bool* GIsEditorPtr = &GIsEditor;
-			uint64* GFrameCounterPtr = &GFrameCounter;
-			FConfigCacheIni* Config = GConfig;
 		} GUnmanagedProperties;
 		
 		static const struct
 		{
-			decltype(GUnmanagedProperties) UnmanagedProperties = GUnmanagedProperties;
 			FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(GUnmanagedFunctions), GUnmanagedFunctions };
 			void*** ManagedFunctions = GManagedFunctions;
+			decltype(GUnmanagedProperties) UnmanagedProperties = GUnmanagedProperties;
 		} GArgs{};
 
 		void(*dllMain)(const decltype(GArgs)&) = nullptr;
@@ -196,6 +185,74 @@ namespace ZSharp::ZGenericClr_Private
 		loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
 	}
 
+	static void LoadCoreEngineAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
+	{
+		static const TCHAR* GConfig_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Config_Interop");
+		static const TCHAR* GConsole_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Console_Interop");
+		static const TCHAR* GBuild_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Build_Interop");
+		static const TCHAR* GPath_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Path_Interop");
+		
+		static FZUnmanagedFunction GUnmanagedFunctions[] =
+		{
+			BUILD_UNMANAGED_FUNCTION(Config_Interop, GetFileName),
+			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetSection),
+			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetArray),
+			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetString),
+			
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryExecuteCommand),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryGetValue),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TrySetValue),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterOnChanged),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryUnregisterOnChanged),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterCommand),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterVariable),
+			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryUnregisterObject),
+			
+			BUILD_UNMANAGED_FUNCTION(Build_Interop, WithEditor),
+			
+			BUILD_UNMANAGED_FUNCTION(Path_Interop, GetProjectDir),
+			BUILD_UNMANAGED_FUNCTION(Path_Interop, GetPluginDir),
+		};
+
+		static void** GManagedFunctions[] =
+		{
+			ADDRESS_OF(FZConsole_Interop::GHandleExecuteCommand),
+			ADDRESS_OF(FZConsole_Interop::GHandleVariableChanged),
+		};
+		
+		static const struct
+		{
+			void* IsInGameThreadFuncPtr = &IsInGameThread;
+			bool* GIsServerPtr = &GIsServer;
+			bool* GIsClientPtr = &GIsClient;
+			bool* GIsEditorPtr = &GIsEditor;
+			uint64* GFrameCounterPtr = &GFrameCounter;
+			FConfigCacheIni* Config = GConfig;
+		} GUnmanagedProperties;
+		
+		static const struct
+        {
+        	FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(GUnmanagedFunctions), GUnmanagedFunctions };
+			void*** ManagedFunctions = GManagedFunctions;
+			decltype(GUnmanagedProperties) UnmanagedProperties = GUnmanagedProperties;
+        } GArgs{};
+
+		void(*dllMain)(const decltype(GArgs)&) = nullptr;
+
+		const FString assemblyName = ZSHARP_CORE_ENGINE_ASSEMBLY_NAME;
+		const FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Core", assemblyName + ".dll");
+		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
+		const FString entryMethodName = TEXT("DllMain");
+
+		TArray<uint8> content;
+		verify(FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent));
+		loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
+		getFunctionPointer(*entryTypeName, *entryMethodName, UNMANAGEDCALLERSONLY_METHOD, nullptr, nullptr, reinterpret_cast<void**>(&dllMain));
+
+		check(dllMain);
+		dllMain(GArgs);
+	}
+
 	static void LoadCoreAsyncAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
 		static void** managedFunctions[] =
@@ -220,57 +277,6 @@ namespace ZSharp::ZGenericClr_Private
 		loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
 		getFunctionPointer(*entryTypeName, *entryMethodName, UNMANAGEDCALLERSONLY_METHOD, nullptr, nullptr, reinterpret_cast<void**>(&dllMain));
 		
-		check(dllMain);
-		dllMain(GArgs);
-	}
-
-	static void LoadCoreEngineAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
-	{
-		static const TCHAR* GConsole_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Console_Interop");
-		static const TCHAR* GBuild_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Build_Interop");
-		static const TCHAR* GPath_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Path_Interop");
-		
-		static FZUnmanagedFunction GUnmanagedFunctions[] =
-		{
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryExecuteCommand),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryGetValue),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TrySetValue),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterOnChanged),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryUnregisterOnChanged),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterCommand),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryRegisterVariable),
-			BUILD_UNMANAGED_FUNCTION(Console_Interop, TryUnregisterObject),
-			
-			BUILD_UNMANAGED_FUNCTION(Build_Interop, WithEditor),
-			
-			BUILD_UNMANAGED_FUNCTION(Path_Interop, GetProjectDir),
-			BUILD_UNMANAGED_FUNCTION(Path_Interop, GetPluginDir),
-		};
-
-		static void** GManagedFunctions[] =
-		{
-			ADDRESS_OF(FZConsole_Interop::GHandleExecuteCommand),
-			ADDRESS_OF(FZConsole_Interop::GHandleVariableChanged),
-		};
-		
-		static const struct
-        {
-        	FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(GUnmanagedFunctions), GUnmanagedFunctions };
-			void*** ManagedFunctions = GManagedFunctions;
-        } GArgs{};
-
-		void(*dllMain)(const decltype(GArgs)&) = nullptr;
-
-		const FString assemblyName = ZSHARP_CORE_ENGINE_ASSEMBLY_NAME;
-		const FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Core", assemblyName + ".dll");
-		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
-		const FString entryMethodName = TEXT("DllMain");
-
-		TArray<uint8> content;
-		verify(FFileHelper::LoadFileToArray(content, *assemblyPath, FILEREAD_Silent));
-		loadAssembly(content.GetData(), content.Num(), nullptr, 0, nullptr, nullptr);
-		getFunctionPointer(*entryTypeName, *entryMethodName, UNMANAGEDCALLERSONLY_METHOD, nullptr, nullptr, reinterpret_cast<void**>(&dllMain));
-
 		check(dllMain);
 		dllMain(GArgs);
 	}
@@ -338,8 +344,8 @@ void ZSharp::FZGenericClr::Startup()
 	ZGenericClr_Private::LoadAssembliesUnderDirectory("ForwardShared", loadAssembly);
 	ZGenericClr_Private::LoadCoreAssembly(loadAssembly, getFunctionPointer);
 	ZGenericClr_Private::LoadResolverAssembly(loadAssembly);
-	ZGenericClr_Private::LoadCoreAsyncAssembly(loadAssembly, getFunctionPointer);
 	ZGenericClr_Private::LoadCoreEngineAssembly(loadAssembly, getFunctionPointer);
+	ZGenericClr_Private::LoadCoreAsyncAssembly(loadAssembly, getFunctionPointer);
 	ZGenericClr_Private::LoadAssembliesUnderDirectory("DeferredShared", loadAssembly);
 	
 	FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);

@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-namespace ZeroGames.ZSharp.Core;
+namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
 internal static unsafe class CoreGlobals_Interop
 {

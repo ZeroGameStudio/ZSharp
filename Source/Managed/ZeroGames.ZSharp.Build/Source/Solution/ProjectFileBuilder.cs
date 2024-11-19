@@ -196,10 +196,14 @@ public class ProjectFileBuilder
 		List<string> finalStaticUsings = [ .._project.StaticUsings ];
 		if (_project.Name == CORE_ASSEMBLY_NAME || _project.ProjectReferences.Contains(CORE_ASSEMBLY_NAME))
 		{
-			finalStaticUsings.Add("ZeroGames.ZSharp.Core.CoreGlobals");
 			finalStaticUsings.Add("ZeroGames.ZSharp.Core.AssertionMacros");
 			finalStaticUsings.Add("ZeroGames.ZSharp.Core.LogMacros");
 			finalStaticUsings.Add("ZeroGames.ZSharp.Core.ZSharpLogChannels");
+		}
+		
+		if (_project.Name == CORE_ENGINE_ASSEMBLY_NAME || _project.ProjectReferences.Contains(CORE_ENGINE_ASSEMBLY_NAME))
+		{
+			finalStaticUsings.Add("ZeroGames.ZSharp.Core.UnrealEngine.CoreGlobals");
 		}
 
 		if (_project.Name == ENGINE_ASSEMBLY_NAME || _project.ProjectReferences.Contains(ENGINE_ASSEMBLY_NAME))
@@ -457,6 +461,7 @@ public class ProjectFileBuilder
 	}
 
 	private const string CORE_ASSEMBLY_NAME = "ZeroGames.ZSharp.Core";
+	private const string CORE_ENGINE_ASSEMBLY_NAME = "ZeroGames.ZSharp.Core.UnrealEngine";
 	private const string ENGINE_ASSEMBLY_NAME = "ZeroGames.ZSharp.UnrealEngine";
 
 	private const string DEBUG_GAME_CONFIGURATION = "DebugGame";

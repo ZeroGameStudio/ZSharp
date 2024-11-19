@@ -65,7 +65,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public ZCallHandle RegisterZCall(IZCallDispatcher dispatcher)
     {
-        check(IsInGameThread);
+        check(GameThreadScheduler.IsInGameThread);
         this.GuardUnloaded();
         
         ZCallHandle handle = ZCallHandle.Alloc();
@@ -77,7 +77,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public void RegisterZCallResolver(IZCallResolver resolver, uint64 priority)
     {
-        check(IsInGameThread);
+        check(GameThreadScheduler.IsInGameThread);
         this.GuardUnloaded();
         
         _zcallResolverLink.Add((resolver, priority));
@@ -94,7 +94,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public EZCallErrorCode ZCall(ZCallHandle handle, ZCallBuffer* buffer)
     {
-        check(IsInGameThread);
+        check(GameThreadScheduler.IsInGameThread);
         this.GuardUnloaded();
         
         return ZCall_Black(handle, buffer);
@@ -102,7 +102,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public ZCallHandle GetZCallHandle(string name)
     {
-        check(IsInGameThread);
+        check(GameThreadScheduler.IsInGameThread);
         this.GuardUnloaded();
         
         return GetZCallHandle_Black(name);
@@ -110,7 +110,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public IntPtr BuildConjugate(IConjugate managed, IntPtr userdata)
     {
-        check(IsInGameThread);
+        check(GameThreadScheduler.IsInGameThread);
         this.GuardUnloaded();
         
         return BuildConjugate_Black(managed, userdata);
@@ -118,7 +118,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public void ReleaseConjugate(IConjugate conjugate)
     {
-        check(IsInGameThread);
+        check(GameThreadScheduler.IsInGameThread);
         this.GuardUnloaded();
         
         ReleaseConjugate_Black(conjugate.Unmanaged);
@@ -128,7 +128,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     {
         this.GuardUnloaded();
 
-        if (IsInGameThread)
+        if (GameThreadScheduler.IsInGameThread)
         {
             conjugate.Dispose();
         }
@@ -156,7 +156,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public ZCallHandle GetZCallHandle_Red(string name)
     {
-        check(IsInGameThread);
+        check(GameThreadScheduler.IsInGameThread);
         this.GuardUnloaded();
         
         if (!_zcallName2Handle.TryGetValue(name, out var handle))

@@ -24,7 +24,7 @@ public sealed class AutoConsoleCommand : IDisposable
 		GC.SuppressFinalize(this);
 	}
 
-	public void TryExecute(params string[]? args) => ConsoleCommand.FromName(Name).TryExecute(args);
+	public void TryExecute(params ReadOnlySpan<string?> args) => ConsoleCommand.FromName(Name).TryExecute(args);
 	
 	private void InternalDispose()
 	{

@@ -26,18 +26,15 @@ public abstract class UnrealObjectBase : UnrealExportedObjectBase
 
     public DynamicZCallResult WriteUnrealProperty<T>(string name, T value) => WriteUnrealProperty(name, 0, value);
 
-    public DynamicZCallResult CallUnrealFunctionEx<T>(string name, params object?[] parameters)
+    public DynamicZCallResult CallUnrealFunctionEx<T>(string name, params ReadOnlySpan<object?> parameters)
     {
         string zcallName = $"uf:/{_classPath}:{name}";
-        object?[] parametersRet = new object?[parameters.Length + 1];
-        parameters.CopyTo(parametersRet, 0);
-        parametersRet[^1] = typeof(T);
-        return this.ZCall(MasterAlcCache.Instance, zcallName, parametersRet);
+        return this.ZCall(MasterAlcCache.Instance, zcallName, [ ..parameters, typeof(T) ]);
     }
 
-    public T? CallUnrealFunction<T>(string name, params object?[] parameters) => (T?)CallUnrealFunctionEx<T>(name, parameters)[-1].Object;
+    public T? CallUnrealFunction<T>(string name, params ReadOnlySpan<object?> parameters) => (T?)CallUnrealFunctionEx<T>(name, parameters)[-1].Object;
 
-    public DynamicZCallResult CallUnrealFunction(string name, params object?[] parameters)
+    public DynamicZCallResult CallUnrealFunction(string name, params ReadOnlySpan<object?> parameters)
     {
         string zcallName = $"uf:/{_classPath}:{name}";
         return this.ZCall(MasterAlcCache.Instance, zcallName, parameters);

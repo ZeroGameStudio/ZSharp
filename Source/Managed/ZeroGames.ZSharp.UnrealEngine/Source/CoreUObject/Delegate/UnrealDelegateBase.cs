@@ -18,7 +18,7 @@ public abstract class UnrealDelegateBase : UnrealDynamicDelegateBase
 
 	public void Bind(UnrealObject obj, string name) => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.BindUFunction", obj, new UnrealName(name));
 	public void Unbind() => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.Unbind");
-	public DynamicZCallResult Execute(params object?[] parameters) => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.Execute", parameters);
+	public DynamicZCallResult Execute(params ReadOnlySpan<object?> parameters) => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.Execute", parameters);
 	public bool IsBoundToObject(UnrealObject obj) => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.IsBoundToObject", obj, false)[-1].Bool;
 	
 	public UnrealObject? Object => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.GetObject", [ null ])[-1].ReadConjugate<UnrealObject>();

@@ -22,7 +22,7 @@ public readonly struct ConsoleCommand : IEquatable<ConsoleCommand>
 		return Name == other.Name;
 	}
 
-	public bool TryExecute(params string[]? args) => ConsoleManager.TryExecuteCommand(Name, args);
+	public bool TryExecute(params ReadOnlySpan<string?> args) => ConsoleManager.TryExecuteCommand(Name, args);
 
 	public string Name { get; }
 	

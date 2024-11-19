@@ -7,21 +7,23 @@ namespace ZeroGames.ZSharp.Core.UnrealEngine;
 internal static class ConsoleManager
 {
 
-	public static unsafe bool TryExecuteCommand(string? name, string[]? args)
+	public static unsafe bool TryExecuteCommand(string? name, ReadOnlySpan<string?> args)
 	{
 		if (string.IsNullOrWhiteSpace(name))
 		{
 			return false;
 		}
+		
+		string[] trimmedArgs = args.ToArray().Where(arg => !string.IsNullOrWhiteSpace(arg)).ToArray()!;
 
 		// No need to interop with unmanaged side if this is a managed command.
 		if (_commandMap.TryGetValue(name, out var action))
 		{
-			action(args ?? []);
+			action(trimmedArgs);
 			return true;
 		}
 
-		string command = string.Join(' ', [ name, ..args ?? [] ]);
+		string command = string.Join(' ', [ name, ..trimmedArgs ]);
 		fixed (char* commandBuffer = command)
 		{
 			return Console_Interop.TryExecuteCommand(commandBuffer) > 0;

@@ -12,7 +12,7 @@ public abstract class UnrealMulticastInlineDelegateBase : UnrealDynamicDelegateB
 	public void Remove(UnrealObject obj, string name) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.RemoveUFunction", obj, new UnrealName(name));
 	public void RemoveAll(UnrealObject obj) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.RemoveAll", obj);
 	public void Clear() => this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.Clear");
-	public DynamicZCallResult Broadcast(params object?[] parameters) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.Broadcast", parameters);
+	public DynamicZCallResult Broadcast(params ReadOnlySpan<object?> parameters) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.Broadcast", parameters);
 	
 	public bool IsBound => this.ZCall(MasterAlcCache.Instance, "ex://MulticastInlineDelegate.IsBound", false)[-1].Bool;
 	

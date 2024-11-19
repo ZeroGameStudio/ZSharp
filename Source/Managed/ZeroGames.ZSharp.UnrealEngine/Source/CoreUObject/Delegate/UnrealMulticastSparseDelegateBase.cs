@@ -13,7 +13,7 @@ public abstract class UnrealMulticastSparseDelegateBase : UnrealDynamicDelegateB
 	public void Remove(UnrealObject obj, string name) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.RemoveUFunction", obj, new UnrealName(name));
 	public void RemoveAll(UnrealObject obj) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.RemoveAll", obj);
 	public void Clear() => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.Clear");
-	public DynamicZCallResult Broadcast(params object?[] parameters) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.Broadcast", parameters);
+	public DynamicZCallResult Broadcast(params ReadOnlySpan<object?> parameters) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.Broadcast", parameters);
 	
 	public bool IsBound => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.IsBound", false)[-1].Bool;
 	

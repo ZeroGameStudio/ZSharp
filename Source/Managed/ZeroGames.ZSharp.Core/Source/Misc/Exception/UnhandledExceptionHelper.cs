@@ -35,7 +35,7 @@ public static class UnhandledExceptionHelper
 		}
 		else
 		{
-			UE_ERROR(logCategory ?? LogZSharpScriptCore, string.Join(Environment.NewLine, messageHeader ?? "Unhandled exception detected.", fatalMessage, exception));
+			//UE_ERROR(logCategory ?? LogZSharpScriptCore, string.Join(Environment.NewLine, messageHeader ?? "Unhandled exception detected.", fatalMessage, exception));
 		}
 
 		Debugger.Break();

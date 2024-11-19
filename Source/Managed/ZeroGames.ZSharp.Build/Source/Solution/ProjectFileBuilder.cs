@@ -197,13 +197,13 @@ public class ProjectFileBuilder
 		if (_project.Name == CORE_ASSEMBLY_NAME || _project.ProjectReferences.Contains(CORE_ASSEMBLY_NAME))
 		{
 			finalStaticUsings.Add("ZeroGames.ZSharp.Core.AssertionMacros");
-			finalStaticUsings.Add("ZeroGames.ZSharp.Core.LogMacros");
-			finalStaticUsings.Add("ZeroGames.ZSharp.Core.ZSharpLogChannels");
 		}
 		
 		if (_project.Name == CORE_ENGINE_ASSEMBLY_NAME || _project.ProjectReferences.Contains(CORE_ENGINE_ASSEMBLY_NAME))
 		{
 			finalStaticUsings.Add("ZeroGames.ZSharp.Core.UnrealEngine.CoreGlobals");
+			finalStaticUsings.Add("ZeroGames.ZSharp.Core.UnrealEngine.LogMacros");
+			finalStaticUsings.Add("ZeroGames.ZSharp.Core.UnrealEngine.LogChannels");
 		}
 
 		if (_project.Name == ENGINE_ASSEMBLY_NAME || _project.ProjectReferences.Contains(ENGINE_ASSEMBLY_NAME))

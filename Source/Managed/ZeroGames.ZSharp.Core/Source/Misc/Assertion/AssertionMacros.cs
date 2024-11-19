@@ -193,7 +193,7 @@ public static class AssertionMacros
 		string finalMessage = $"Assertion [{expr}] failed: {message} at file {file} line {line} column {column}.";
 		if (Debugger.IsAttached || forceNoFatal)
 		{
-			UE_ERROR(LogZSharpScriptCore, finalMessage);
+			CoreLog.Error(finalMessage);
 			Debugger.Break();
 		}
 		else

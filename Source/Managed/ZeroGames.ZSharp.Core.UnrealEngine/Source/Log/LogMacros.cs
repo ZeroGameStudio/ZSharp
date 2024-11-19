@@ -3,7 +3,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace ZeroGames.ZSharp.Core;
+namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
 public static class LogMacros
 {

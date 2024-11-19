@@ -8,7 +8,8 @@
 #include "ZSharpCoreLogChannels.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
 #include "Interop/Engine/Console_Interop.h"
-#include "Interop/Misc/ZLog_Interop.h"
+#include "Interop/Core/ZCoreLog_Interop.h"
+#include "Interop/Engine/ZLog_Interop.h"
 #include "Interop/Core/ZCoreSettings_Interop.h"
 #include "Interop/Core/ZClr_Interop.h"
 #include "Interop/Core/ZGCHandle_Interop.h"
@@ -83,14 +84,16 @@ namespace ZSharp::ZGenericClr_Private
 	
 	static void LoadCoreAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
+		static const TCHAR* GCoreLog_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.CoreLog_Interop");
 		static const TCHAR* GCoreSettings_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.CoreSettings_Interop");
 		static const TCHAR* GInteropString_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropString_Interop");
 		static const TCHAR* GInteropStringArray_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.InteropStringArray_Interop");
 		static const TCHAR* GMasterAssemblyLoadContext_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.MasterAssemblyLoadContext_Interop");
-		static const TCHAR* GLog_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.Log_Interop");
 
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
         {
+			BUILD_UNMANAGED_FUNCTION(CoreLog_Interop, Log),
+			
 			BUILD_UNMANAGED_FUNCTION(CoreSettings_Interop, ShouldTreatManagedFatalAsError),
 			BUILD_UNMANAGED_FUNCTION(CoreSettings_Interop, ShouldSuppressAlcUnloadedException),
 			
@@ -113,8 +116,6 @@ namespace ZSharp::ZGenericClr_Private
 			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, GetZCallHandle_Black),
 			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, BuildConjugate_Black),
 			BUILD_UNMANAGED_FUNCTION(MasterAssemblyLoadContext_Interop, ReleaseConjugate_Black),
-
-			BUILD_UNMANAGED_FUNCTION(Log_Interop, Log),
         };
 
 		static void** GManagedFunctions[] =
@@ -187,6 +188,7 @@ namespace ZSharp::ZGenericClr_Private
 
 	static void LoadCoreEngineAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
+		static const TCHAR* GLog_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Log_Interop");
 		static const TCHAR* GConfig_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Config_Interop");
 		static const TCHAR* GConsole_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Console_Interop");
 		static const TCHAR* GBuild_InteropTypeName = TEXT("ZeroGames.ZSharp.Core.UnrealEngine.Build_Interop");
@@ -194,6 +196,8 @@ namespace ZSharp::ZGenericClr_Private
 		
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
 		{
+			BUILD_UNMANAGED_FUNCTION(Log_Interop, Log),
+			
 			BUILD_UNMANAGED_FUNCTION(Config_Interop, GetFileName),
 			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetSection),
 			BUILD_UNMANAGED_FUNCTION(Config_Interop, TryGetArray),

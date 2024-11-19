@@ -1,8 +1,8 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-namespace ZeroGames.ZSharp.Core;
+namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
-public static class ZSharpLogChannels
+public static class LogChannels
 {
 	public const string LogZSharpScript = nameof(LogZSharpScript);
 	public const string LogZSharpScriptEngine = nameof(LogZSharpScriptEngine);

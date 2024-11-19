@@ -6,6 +6,13 @@ DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptCore, Log, All)
 
 void ZSharp::FZCoreLog_Interop::Log(uint8 verbosity, const TCHAR* message)
 {
+	static const FString GEmpty;
+	
+	if (!message)
+	{
+		message = *GEmpty;
+	}
+	
 	switch (static_cast<ELogVerbosity::Type>(verbosity))
 	{
 #define LOG_CASE(Verbosity) case ELogVerbosity::Verbosity: { UE_LOG(LogZSharpScriptCore, Verbosity, TEXT("%s"), message); break; }

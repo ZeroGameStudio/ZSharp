@@ -16,6 +16,13 @@ ZSHARP_REGISTER_LOG_CATEGORY(LogTemp)
 
 void ZSharp::FZLog_Interop::Log(const TCHAR* category, ELogVerbosity::Type verbosity, const TCHAR* message)
 {
+	static const FString GEmpty;
+	
+	if (!message)
+	{
+		message = *GEmpty;
+	}
+	
 	const auto name = FName { category };
 	FLogCategoryBase* pLogCategory = FZLogCategoryRegistry::Get().GetCategory(name);
 	if (!pLogCategory)

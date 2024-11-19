@@ -2,7 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace ZeroGames.ZSharp.UnrealEngine.Core;
+namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 public sealed class UnrealMap<TKey, TValue> : UnrealMapBase, IConjugate<UnrealMap<TKey, TValue>>

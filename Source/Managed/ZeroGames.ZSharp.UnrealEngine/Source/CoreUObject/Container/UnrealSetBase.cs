@@ -3,7 +3,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace ZeroGames.ZSharp.UnrealEngine.Core;
+namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(32)]
 public abstract class UnrealSetBase : PlainExportedObjectBase

@@ -16,7 +16,6 @@
 		"ZeroGames.ZSharp.Core",
 		"ZeroGames.ZSharp.Core.UnrealEngine",
 		"ZeroGames.ZSharp.UnrealEngine",
-		"ZeroGames.ZSharp.UnrealEngine.Core",
 		"ZeroGames.ZSharp.UnrealEngine.CoreUObject",
 		"ZeroGames.ZSharp.UnrealEngine.Engine"
 	]

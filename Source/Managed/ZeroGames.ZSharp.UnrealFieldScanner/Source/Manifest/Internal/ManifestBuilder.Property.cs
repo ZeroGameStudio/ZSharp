@@ -194,13 +194,12 @@ partial class ManifestBuilder
 	// Namespaces
 	private const string ZSHARP_NAMESPACE = "ZeroGames.ZSharp.";
 	private const string ENGINE_NAMESPACE = ZSHARP_NAMESPACE + "UnrealEngine.";
-	private const string ENGINE_CORE_NAMESPACE = ENGINE_NAMESPACE + "Core.";
 	private const string ENGINE_CORE_UOBJECT_NAMESPACE = ENGINE_NAMESPACE + "CoreUObject.";
 	
 	// Strings
-	private const string UNREAL_STRING_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealString";
-	private const string UNREAL_NAME_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealName";
-	private const string UNREAL_TEXT_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealText";
+	private const string UNREAL_STRING_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealString";
+	private const string UNREAL_NAME_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealName";
+	private const string UNREAL_TEXT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealText";
 	
 	// Object wrappers
 	private const string SUBCLASS_OF_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "SubclassOf`1";
@@ -211,10 +210,10 @@ partial class ManifestBuilder
 	private const string SCRIPT_INTERFACE_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "ScriptInterface`1";
 	
 	// Containers
-	private const string UNREAL_ARRAY_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealArray`1";
-	private const string UNREAL_SET_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealSet`1";
-	private const string UNREAL_MAP_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealMap`2";
-	private const string UNREAL_OPTIONAL_TYPE_FULL_NAME = ENGINE_CORE_NAMESPACE + "UnrealOptional`1";
+	private const string UNREAL_ARRAY_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealArray`1";
+	private const string UNREAL_SET_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealSet`1";
+	private const string UNREAL_MAP_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealMap`2";
+	private const string UNREAL_OPTIONAL_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealOptional`1";
 	
 	// Special types
 	private const string FIELD_PATH_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "FieldPath";

@@ -2,7 +2,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace ZeroGames.ZSharp.UnrealEngine.Core;
+namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(42)]
 public abstract class UnrealMulticastInlineDelegateBase : UnrealDynamicDelegateBase

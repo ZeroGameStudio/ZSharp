@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-namespace ZeroGames.ZSharp.UnrealEngine.Core;
+namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 public abstract class UnrealDynamicDelegateBase : PlainExportedObjectBase, IUnrealFieldPath
 {

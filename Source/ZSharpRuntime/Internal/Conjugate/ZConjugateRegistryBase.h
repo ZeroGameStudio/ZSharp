@@ -18,17 +18,30 @@ namespace ZSharp
 		using ThisClass = TImpl;
 		using ConjugateType = TConjugate;
 		using ConjugateWrapperType = TConjugateWrapper;
+		using UnderlyingInstanceType = std::invoke_result_t<decltype(&ConjugateWrapperType::GetUnderlyingInstance), ConjugateWrapperType>;
 
 	public:
 		explicit TZConjugateRegistryBase(IZMasterAssemblyLoadContext& alc)
 			: Alc(alc){}
 
 	public:
+		ConjugateType* ConjugateUnsafe(FZConjugateHandle handle) const
+		{
+			if constexpr (std::is_same_v<UnderlyingInstanceType, ConjugateType>)
+			{
+				return static_cast<ConjugateType*>(handle.Handle);
+			}
+			else
+			{
+				return Conjugate(handle);
+			}
+		}
+		
 		ConjugateType* Conjugate(FZConjugateHandle handle) const
 		{
 			const void* unmanaged = handle.Handle;
 			const FZConjugateRec* rec = ConjugateMap.Find(unmanaged);
-			if (!rec)
+			if (!UNLIKELY(rec))
 			{
 				return nullptr;
 			}

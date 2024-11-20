@@ -15,8 +15,8 @@ namespace ZSharp
 		using ThisClass = TImpl;
 		using ConjugateType = TConjugate;
 		using ConjugateWrapperType = TConjugate;
-		using DescriptorType = typename TConjugate::DescriptorType;
-		using UnderlyingInstanceType = typename TConjugate::UnderlyingInstanceType;
+		using DescriptorType = typename ConjugateWrapperType::DescriptorType;
+		using UnderlyingInstanceType = typename ConjugateWrapperType::UnderlyingInstanceType;
 
 	public:
 		TZStrangeConjugateRegistryBase(IZMasterAssemblyLoadContext& alc) : Super(alc){}

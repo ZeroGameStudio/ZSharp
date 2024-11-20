@@ -19,9 +19,11 @@
 #include "Primitive/ZBoolPropertyVisitor.h"
 #include "Primitive/ZEnumPropertyVisitor.h"
 #include "Primitive/ZNumericPropertyVisitor.h"
+#include "String/ZAnsiStringPropertyVisitor.h"
 #include "String/ZNamePropertyVisitor.h"
 #include "String/ZStringPropertyVisitor.h"
 #include "String/ZTextPropertyVisitor.h"
+#include "String/ZUtf8StringPropertyVisitor.h"
 
 TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FProperty* prop)
 {
@@ -40,6 +42,14 @@ TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FP
 	else if (const auto strProp = CastField<FStrProperty>(prop))
 	{
 		return MakeUnique<FZStringPropertyVisitor>(strProp);
+	}
+	else if (const auto utf8StrProp = CastField<FUtf8StrProperty>(prop))
+	{
+		return MakeUnique<FZUtf8StringPropertyVisitor>(utf8StrProp);
+	}
+	else if (const auto ansiStrProp = CastField<FAnsiStrProperty>(prop))
+	{
+		return MakeUnique<FZAnsiStringPropertyVisitor>(ansiStrProp);
 	}
 	else if (const auto nameProp = CastField<FNameProperty>(prop))
 	{

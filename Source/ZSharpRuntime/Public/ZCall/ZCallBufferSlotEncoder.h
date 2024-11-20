@@ -58,12 +58,14 @@ namespace ZSharp
 		static DecodedType& Decode(const FZCallBufferSlot& slot)
 		{
 			const FZSelfDescriptiveScriptStruct* sdss = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(slot.ReadConjugate());
-			return *sdss->GetUnderlyingInstance<T>();
+			check(TBaseStructure<T>::Get() == sdss->GetDescriptor());
+			return static_cast<T*>(sdss->GetUnderlyingInstance());
 		}
 		static DecodedType* DecodePointer(const FZCallBufferSlot& slot)
 		{
 			const FZSelfDescriptiveScriptStruct* sdss = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(slot.ReadConjugate());
-			return sdss->GetUnderlyingInstance<T>();
+			check(TBaseStructure<T>::Get() == sdss->GetDescriptor());
+			return static_cast<T*>(sdss->GetUnderlyingInstance());
 		}
 	};
 
@@ -205,6 +207,8 @@ namespace ZSharp
 	};
 
 	IMPLEMENT_REGULAR_ENCODER(String)
+	IMPLEMENT_REGULAR_ENCODER(Utf8String)
+	IMPLEMENT_REGULAR_ENCODER(AnsiString)
 	IMPLEMENT_REGULAR_ENCODER(Name)
 	IMPLEMENT_REGULAR_ENCODER(Text)
 

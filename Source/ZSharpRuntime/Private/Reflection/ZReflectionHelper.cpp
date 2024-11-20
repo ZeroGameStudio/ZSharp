@@ -262,6 +262,8 @@ bool ZSharp::FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(const FFieldCl
 		{ FBoolProperty::StaticClass(), { TZManagedTypeInfo<bool>::GetAssemblyName(), TZManagedTypeInfo<bool>::GetFullName() } },
 
 		{ FStrProperty::StaticClass(), { TZManagedTypeInfo<FString>::GetAssemblyName(), TZManagedTypeInfo<FString>::GetFullName() } },
+		{ FUtf8StrProperty::StaticClass(), { TZManagedTypeInfo<FUtf8String>::GetAssemblyName(), TZManagedTypeInfo<FUtf8String>::GetFullName() } },
+		{ FAnsiStrProperty::StaticClass(), { TZManagedTypeInfo<FAnsiString>::GetAssemblyName(), TZManagedTypeInfo<FAnsiString>::GetFullName() } },
 		{ FNameProperty::StaticClass(), { TZManagedTypeInfo<FName>::GetAssemblyName(), TZManagedTypeInfo<FName>::GetFullName() } },
 		{ FTextProperty::StaticClass(), { TZManagedTypeInfo<FText>::GetAssemblyName(), TZManagedTypeInfo<FText>::GetFullName() } },
 

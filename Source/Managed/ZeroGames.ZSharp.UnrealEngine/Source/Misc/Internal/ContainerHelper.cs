@@ -43,6 +43,8 @@ internal static class ContainerHelper
 
 		// 3 strings
 		if (type == typeof(UnrealString)
+		    || type == typeof(UnrealUtf8String)
+		    || type == typeof(UnrealAnsiString)
 		    || type == typeof(UnrealName)
 		    || type == typeof(UnrealText))
 		{
@@ -177,17 +179,19 @@ internal static class ContainerHelper
 	private const IntPtr BOOL_TYPE_ID = 11;
 
 	private const IntPtr STRING_TYPE_ID = 12;
-	private const IntPtr NAME_TYPE_ID = 13;
-	private const IntPtr TEXT_TYPE_ID = 14;
+	private const IntPtr UTF8_STRING_TYPE_ID = 13;
+	private const IntPtr ANSI_STRING_TYPE_ID = 14;
+	private const IntPtr NAME_TYPE_ID = 15;
+	private const IntPtr TEXT_TYPE_ID = 16;
 
-	private const IntPtr SUBCLASS_OF_TYPE_ID = 15;
-	private const IntPtr SOFT_CLASS_PTR_TYPE_ID = 16;
-	private const IntPtr SOFT_OBJECT_PTR_TYPE_ID = 17;
-	private const IntPtr WEAK_OBJECT_PTR_TYPE_ID = 18;
-	private const IntPtr LAZY_OBJECT_PTR_TYPE_ID = 19;
-	private const IntPtr SCRIPT_INTERFACE_TYPE_ID = 20;
+	private const IntPtr SUBCLASS_OF_TYPE_ID = 17;
+	private const IntPtr SOFT_CLASS_PTR_TYPE_ID = 18;
+	private const IntPtr SOFT_OBJECT_PTR_TYPE_ID = 19;
+	private const IntPtr WEAK_OBJECT_PTR_TYPE_ID = 20;
+	private const IntPtr LAZY_OBJECT_PTR_TYPE_ID = 21;
+	private const IntPtr SCRIPT_INTERFACE_TYPE_ID = 22;
 
-	private const IntPtr FIELD_PATH_TYPE_ID = 21;
+	private const IntPtr FIELD_PATH_TYPE_ID = 23;
 
 	private static Dictionary<Type, IntPtr> _typeMap => new()
 	{
@@ -204,6 +208,8 @@ internal static class ContainerHelper
 		{ typeof(bool), BOOL_TYPE_ID },
 		
 		{ typeof(UnrealString), STRING_TYPE_ID },
+		{ typeof(UnrealUtf8String), STRING_TYPE_ID },
+		{ typeof(UnrealAnsiString), STRING_TYPE_ID },
 		{ typeof(UnrealName), NAME_TYPE_ID },
 		{ typeof(UnrealText), TEXT_TYPE_ID },
 		

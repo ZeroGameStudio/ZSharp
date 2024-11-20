@@ -19,17 +19,19 @@ namespace ZSharp::PropertyFactory_Private
 	static void* const GBoolTypeId = reinterpret_cast<void*>(11);
 
 	static void* const GStringTypeId = reinterpret_cast<void*>(12);
-	static void* const GNameTypeId = reinterpret_cast<void*>(13);
-	static void* const GTextTypeId = reinterpret_cast<void*>(14);
+	static void* const GUtf8StringTypeId = reinterpret_cast<void*>(13);
+	static void* const GAnsiStringTypeId = reinterpret_cast<void*>(14);
+	static void* const GNameTypeId = reinterpret_cast<void*>(15);
+	static void* const GTextTypeId = reinterpret_cast<void*>(16);
 
-	static void* const GSubclassOfTypeId = reinterpret_cast<void*>(15);
-	static void* const GSoftClassPtrTypeId = reinterpret_cast<void*>(16);
-	static void* const GSoftObjectPtrTypeId = reinterpret_cast<void*>(17);
-	static void* const GWeakObjectPtrTypeId = reinterpret_cast<void*>(18);
-	static void* const GLazyObjectPtrTypeId = reinterpret_cast<void*>(19);
-	static void* const GScriptInterfaceTypeId = reinterpret_cast<void*>(20);
+	static void* const GSubclassOfTypeId = reinterpret_cast<void*>(17);
+	static void* const GSoftClassPtrTypeId = reinterpret_cast<void*>(18);
+	static void* const GSoftObjectPtrTypeId = reinterpret_cast<void*>(19);
+	static void* const GWeakObjectPtrTypeId = reinterpret_cast<void*>(20);
+	static void* const GLazyObjectPtrTypeId = reinterpret_cast<void*>(21);
+	static void* const GScriptInterfaceTypeId = reinterpret_cast<void*>(22);
 	
-	static void* const GFieldPathTypeId = reinterpret_cast<void*>(21);
+	static void* const GFieldPathTypeId = reinterpret_cast<void*>(23);
 
 	template <std::derived_from<FProperty> T>
 	T* Create(TFunctionRef<void(T*)> initialize = [](T*){})
@@ -67,6 +69,8 @@ namespace ZSharp::PropertyFactory_Private
 		{ GBoolTypeId, [](const FZPropertyDesc&){ return Create<FBoolProperty>(); } },
 		
 		{ GStringTypeId, [](const FZPropertyDesc&){ return Create<FStrProperty>(); } },
+		{ GUtf8StringTypeId, [](const FZPropertyDesc&){ return Create<FUtf8StrProperty>(); } },
+		{ GAnsiStringTypeId, [](const FZPropertyDesc&){ return Create<FAnsiStrProperty>(); } },
 		{ GNameTypeId, [](const FZPropertyDesc&){ return Create<FNameProperty>(); } },
 		{ GTextTypeId, [](const FZPropertyDesc&){ return Create<FTextProperty>(); } },
 

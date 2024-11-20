@@ -188,6 +188,16 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				NEW_PROPERTY(Str);
 				break;
 			}
+		case EZPropertyType::Utf8String:
+			{
+				NEW_PROPERTY(Utf8Str);
+				break;
+			}
+		case EZPropertyType::AnsiString:
+			{
+				NEW_PROPERTY(AnsiStr);
+				break;
+			}
 		case EZPropertyType::Name:
 			{
 				NEW_PROPERTY(Name);

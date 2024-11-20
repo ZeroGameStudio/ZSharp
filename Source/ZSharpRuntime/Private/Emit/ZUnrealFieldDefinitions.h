@@ -22,7 +22,7 @@ namespace ZSharp
 		// Primitives
 		UInt8, UInt16, UInt32, UInt64, Int8, Int16, Int32, Int64, Float, Double, Bool, Enum,
 		// Strings
-		String, Name, Text,
+		String, Utf8String, AnsiString, Name, Text,
 		// Object wrappers
 		Object, Class, SoftClass, SoftObject, WeakObject, LazyObject, Interface,
 		// Containers

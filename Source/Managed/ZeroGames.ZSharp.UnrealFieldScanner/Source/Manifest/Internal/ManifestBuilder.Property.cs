@@ -198,6 +198,8 @@ partial class ManifestBuilder
 	
 	// Strings
 	private const string UNREAL_STRING_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealString";
+	private const string UNREAL_UTF8_STRING_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealUtf8String";
+	private const string UNREAL_ANSI_STRING_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealAnsiString";
 	private const string UNREAL_NAME_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealName";
 	private const string UNREAL_TEXT_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealText";
 	
@@ -239,6 +241,8 @@ partial class ManifestBuilder
 		{ typeof(bool).FullName!, EPropertyType.Bool },
 		
 		{ UNREAL_STRING_TYPE_FULL_NAME, EPropertyType.String },
+		{ UNREAL_UTF8_STRING_TYPE_FULL_NAME, EPropertyType.Utf8String },
+		{ UNREAL_ANSI_STRING_TYPE_FULL_NAME, EPropertyType.AnsiString },
 		{ UNREAL_NAME_TYPE_FULL_NAME, EPropertyType.Name },
 		{ UNREAL_TEXT_TYPE_FULL_NAME, EPropertyType.Text },
 		

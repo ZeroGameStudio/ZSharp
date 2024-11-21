@@ -30,6 +30,15 @@ public static class Thrower
 	}
 	
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static void ThrowIfNotInGameThread(string? message = "Operation occurs in non-game thread.", Exception? innerException = default)
+	{
+		if (!GameThreadScheduler.IsInGameThread)
+		{
+			throw new InvalidOperationException(message);
+		}
+	}
+	
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	[DoesNotReturn]
 	public static Exception NoEntry() => throw _noEntryException;
 	

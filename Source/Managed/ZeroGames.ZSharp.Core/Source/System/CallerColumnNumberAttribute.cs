@@ -5,8 +5,9 @@ namespace System.Runtime.CompilerServices;
 /// <summary>
 /// The C# compiler used to have a CallerColumnNumber service,
 /// but it's no longer found, may have been removed? (Thanks, Microsoft!)
+/// This makes no sense but improve readability.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
-internal sealed class CallerColumnNumberAttribute : Attribute;
+public sealed class CallerColumnNumberAttribute : Attribute;
 
 

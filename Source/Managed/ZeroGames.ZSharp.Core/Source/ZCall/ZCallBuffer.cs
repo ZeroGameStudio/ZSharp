@@ -61,7 +61,7 @@ public struct ZCallBufferSlot
 	public static ZCallBufferSlot FromConjugate(ConjugateHandle value) => new(EZCallBufferSlotType.Conjugate) { _value = new() { Conjugate = value } };
 	
 	public static unsafe ZCallBufferSlot FromPointer(void* value) => FromPointer(new IntPtr(value));
-	public static ZCallBufferSlot FromConjugate(IConjugate? value = default) => FromConjugate(new ConjugateHandle(value));
+	public static ZCallBufferSlot FromConjugate(IConjugate? value = default) => FromConjugate(ConjugateHandle.FromConjugate(value));
 
 	public static ZCallBufferSlot FromType(Type t)
 	{
@@ -391,7 +391,7 @@ public struct ZCallBufferSlot
 
 	public readonly T? ReadConjugate<T>() where T : class, IConjugate => ReadConjugate().GetTarget<T>();
 	public readonly T ReadConjugateChecked<T>() where T : class, IConjugate => ReadConjugate().GetTargetChecked<T>();
-	public void WriteConjugate<T>(T? value) where T : class, IConjugate => WriteConjugate(new ConjugateHandle(value));
+	public void WriteConjugate<T>(T? value) where T : class, IConjugate => WriteConjugate(ConjugateHandle.FromConjugate(value));
 
 	public readonly object? ReadObject()
 	{
@@ -426,7 +426,7 @@ public struct ZCallBufferSlot
 		Type t = value.GetType();
 		if (t.IsAssignableTo(typeof(IConjugate)))
 		{
-			Conjugate = new((IConjugate)value);
+			Conjugate = ConjugateHandle.FromConjugate((IConjugate)value);
 		}
 		else if (t == typeof(uint8))
 		{

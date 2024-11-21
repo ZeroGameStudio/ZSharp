@@ -3,8 +3,6 @@
 #include "ZSharpRuntimeModule.h"
 
 #include "ZSharpRuntimeLogChannels.h"
-#include "ZSharpRuntimeSettings.h"
-#include "ZStealInvocationList.h"
 #include "CLR/IZSharpClr.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ALC/ZCommonMethodArgs.h"
@@ -12,6 +10,8 @@
 #include "ZCall/ZCallResolver_Export.h"
 #include "ZCall/ZCallResolver_UFunction.h"
 #include "ZCall/ZCallResolver_UProperty.h"
+#include "Interop/ZUnmanagedFunctionInteropHelper.h"
+#include "Interop/ObjectWrapper/WeakObjectPtr_Interop.h"
 
 namespace ZSharp::ZSharpRuntimeModule_Private
 {
@@ -50,7 +50,33 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			UE_LOG(LogZSharpRuntime, Log, TEXT("Master ALC created."));
 		}
 	}
-	
+
+	static void LoadEngineAssembly(IZMasterAssemblyLoadContext* alc)
+	{
+		static FZUnmanagedFunction GUnmanagedFunctions[] =
+        {
+#define ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY ZeroGames.ZSharp.UnrealEngine
+			
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Copy),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Equals),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, GetHashCode),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Get),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Set),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, IsValid),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, IsNull),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, IsStale),
+
+#undef ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY
+        };
+
+		static const struct
+		{
+			FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(GUnmanagedFunctions), GUnmanagedFunctions };
+		} GArgs{};
+
+		alc->LoadAssembly(ZSHARP_ENGINE_ASSEMBLY_NAME, (void*)&GArgs);
+	}
+
 	static FAutoConsoleCommand GCmdReloadMasterAlc
 	{
 		TEXT("z#.reloadmasteralc"),
@@ -415,8 +441,7 @@ void FZSharpRuntimeModule::HandlePreMasterAlcStartup(ZSharp::IZMasterAssemblyLoa
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UFunction{}, 1);
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UProperty{}, 2);
 
-	// ZeroGames.ZSharp.UnrealEngine can be accessed via reflection, so we must load it as early as possible.
-	alc->LoadAssembly(ZSHARP_ENGINE_ASSEMBLY_NAME);
+	ZSharp::ZSharpRuntimeModule_Private::LoadEngineAssembly(alc);
 }
 
 void FZSharpRuntimeModule::HandleMasterAlcStartup(ZSharp::IZMasterAssemblyLoadContext* alc)

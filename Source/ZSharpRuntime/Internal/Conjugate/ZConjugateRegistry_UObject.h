@@ -24,6 +24,7 @@ namespace ZSharp
 		explicit FZConjugateRegistry_UObject(IZMasterAssemblyLoadContext& alc);
 
 	public:
+		UObject* ConjugateUnsafe(FZConjugateHandle handle) const;
 		UObject* Conjugate(FZConjugateHandle handle) const;
 		FZConjugateHandle Conjugate(const UObjectBase* unmanaged);
 

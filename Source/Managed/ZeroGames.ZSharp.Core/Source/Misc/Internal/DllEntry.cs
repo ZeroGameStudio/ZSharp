@@ -77,7 +77,7 @@ internal static class DllEntry
         
         GameThreadScheduler.IsInGameThreadFuncPtr = (delegate* unmanaged<uint8>)args->UnmanagedProperties.IsInGameThreadFuncPtr;
         
-        CoreLog.Log("===================== ZSharp Startup =====================");
+        CoreLog.Log("===================== Z# Startup =====================");
     }
 
 }

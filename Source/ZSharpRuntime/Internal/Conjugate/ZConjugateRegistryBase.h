@@ -7,6 +7,8 @@
 #include "Conjugate/ZConjugateHandle.h"
 #include "Trait/ZConjugateRegistryId.h"
 
+#define ZSHARP_ENABLE_CONJUGATE_UNSAFE 1
+
 namespace ZSharp
 {
 	template <typename TImpl, typename TConjugate, typename TConjugateWrapper = TConjugate>
@@ -27,7 +29,7 @@ namespace ZSharp
 	public:
 		ConjugateType* ConjugateUnsafe(FZConjugateHandle handle) const
 		{
-			if constexpr (std::is_same_v<UnderlyingInstanceType, ConjugateType>)
+			if constexpr (std::is_same_v<UnderlyingInstanceType, ConjugateType> && ZSHARP_ENABLE_CONJUGATE_UNSAFE)
 			{
 				return static_cast<ConjugateType*>(handle.Handle);
 			}

@@ -10,6 +10,9 @@
 #include "Conjugate/ZDeclareConjugateRegistryMacros.h"
 #include "Reflection/ZReflectionHelper.h"
 
+// IMPORTANT: We need this to get value of ZSHARP_ENABLE_CONJUGATE_UNSAFE.
+#include "Conjugate/ZConjugateRegistryBase.h"
+
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_UObject)
 
 ZSharp::FZConjugateRegistry_UObject::FZConjugateRegistry_UObject(IZMasterAssemblyLoadContext& alc)
@@ -17,6 +20,15 @@ ZSharp::FZConjugateRegistry_UObject::FZConjugateRegistry_UObject(IZMasterAssembl
 {
 	RegisterController(new FZUObjectConjugateController_GC);
 	RegisterController(new FZUObjectConjugateController_Actor);
+}
+
+UObject* ZSharp::FZConjugateRegistry_UObject::ConjugateUnsafe(FZConjugateHandle handle) const
+{
+#if ZSHARP_ENABLE_CONJUGATE_UNSAFE
+	return static_cast<UObject*>(handle.Handle);
+#else
+	return Conjugate(handle);
+#endif
 }
 
 UObject* ZSharp::FZConjugateRegistry_UObject::Conjugate(FZConjugateHandle handle) const

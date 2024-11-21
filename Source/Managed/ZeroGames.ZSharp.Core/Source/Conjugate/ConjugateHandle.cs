@@ -1,17 +1,14 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Runtime.InteropServices;
+
 namespace ZeroGames.ZSharp.Core;
 
+[StructLayout(LayoutKind.Sequential)]
 public readonly struct ConjugateHandle : IEquatable<ConjugateHandle>
 {
-
-    public ConjugateHandle(IConjugate? conjugate)
-    {
-        if (conjugate is not null)
-        {
-            _handle = conjugate.Unmanaged;
-        }
-    }
+    
+    public static ConjugateHandle FromConjugate(IConjugate? conjugate) => new(conjugate);
     
     public override bool Equals(object? obj)
     {
@@ -67,6 +64,14 @@ public readonly struct ConjugateHandle : IEquatable<ConjugateHandle>
     }
     
     public bool IsValid => _handle != IntPtr.Zero;
+    
+    private ConjugateHandle(IConjugate? conjugate)
+    {
+        if (conjugate is not null)
+        {
+            _handle = conjugate.Unmanaged;
+        }
+    }
 
     private readonly IntPtr _handle;
     

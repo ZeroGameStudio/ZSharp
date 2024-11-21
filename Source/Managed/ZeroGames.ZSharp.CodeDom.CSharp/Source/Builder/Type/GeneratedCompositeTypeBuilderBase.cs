@@ -35,7 +35,8 @@ public abstract class GeneratedCompositeTypeBuilderBase<TDefinition>(string name
 			string blackConstructor = HasBlackConstructor ? $"public {TypeName}(){blackConstructorCallBase}{GetBlackConstructorBody()}" : string.Empty;
 			
 			string redConstructorArguments = string.Join(", ", baseConstructorExtraArguments.Append("unmanaged"));
-			string redConstructor = HasRedConstructor ? $"public {TypeName}(IntPtr unmanaged) : base({redConstructorArguments}){{}}" : string.Empty;
+			string redConstructorVisibility = definition.Modifiers.HasFlag(EMemberModifiers.Sealed) ? "private" : "protected";
+			string redConstructor = HasRedConstructor ? $"{redConstructorVisibility} {TypeName}(IntPtr unmanaged) : base({redConstructorArguments}){{}}" : string.Empty;
 			
 			string unrealFieldPathConst = HasUnrealFieldPathConst ? $"private const string {UNREAL_FIELD_PATH_CONST} = {UnrealFieldPathLiteralText};" : string.Empty;
 

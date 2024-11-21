@@ -7,8 +7,16 @@ namespace ZeroGames.ZSharp.Core;
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct ConjugateHandle : IEquatable<ConjugateHandle>
 {
-    
-    public static ConjugateHandle FromConjugate(IConjugate? conjugate) => new(conjugate);
+
+    public static ConjugateHandle FromConjugate(IConjugate? conjugate)
+    {
+        if (conjugate is { IsExpired: true })
+        {
+            throw new InvalidOperationException("Access expired conjugate.");
+        }
+        
+        return new(conjugate);
+    }
     
     public override bool Equals(object? obj)
     {

@@ -11,7 +11,8 @@
 #include "ZCall/ZCallResolver_UFunction.h"
 #include "ZCall/ZCallResolver_UProperty.h"
 #include "Interop/ZUnmanagedFunctionInteropHelper.h"
-#include "Interop/ObjectWrapper/WeakObjectPtr_Interop.h"
+#include "Interop/ObjectWrapper/ZWeakObjectPtr_Interop.h"
+#include "Interop/String/ZUnrealString_Interop.h"
 
 namespace ZSharp::ZSharpRuntimeModule_Private
 {
@@ -58,13 +59,16 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 #define ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY ZeroGames.ZSharp.UnrealEngine
 			
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Copy),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Equals),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, GetHashCode),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Identical),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Hash),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Get),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Set),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, IsValid),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, IsNull),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, IsStale),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealString, GetData),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealString, SetData),
 
 #undef ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY
         };

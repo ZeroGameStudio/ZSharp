@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-#include "WeakObjectPtr_Interop.h"
+#include "ZWeakObjectPtr_Interop.h"
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
@@ -16,7 +16,7 @@ void ZSharp::FZWeakObjectPtr_Interop::Copy(FZConjugateHandle self, FZConjugateHa
 	*sdself->GetUnderlyingInstance() = sdother && sdother->GetDescriptor()->IsChildOf(sdself->GetDescriptor()) ? *sdother->GetUnderlyingInstance() : nullptr;
 }
 
-uint8 ZSharp::FZWeakObjectPtr_Interop::Equals(FZConjugateHandle self, FZConjugateHandle other)
+uint8 ZSharp::FZWeakObjectPtr_Interop::Identical(FZConjugateHandle self, FZConjugateHandle other)
 {
 	const auto& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_WeakObjectPtr>();
 	FZSelfDescriptiveWeakObjectPtr* sdself = registry.ConjugateUnsafe(self);
@@ -24,7 +24,7 @@ uint8 ZSharp::FZWeakObjectPtr_Interop::Equals(FZConjugateHandle self, FZConjugat
 	return sdself == sdother || *sdself->GetUnderlyingInstance() == *sdother->GetUnderlyingInstance();
 }
 
-int32 ZSharp::FZWeakObjectPtr_Interop::GetHashCode(FZConjugateHandle self)
+int32 ZSharp::FZWeakObjectPtr_Interop::Hash(FZConjugateHandle self)
 {
 	const auto& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_WeakObjectPtr>();
 	FZSelfDescriptiveWeakObjectPtr* sdself = registry.ConjugateUnsafe(self);

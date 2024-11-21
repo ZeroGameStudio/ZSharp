@@ -10,7 +10,7 @@ public abstract class WeakObjectPtrBase : PlainExportedObjectBase
 	, IEqualityOperators<WeakObjectPtrBase, WeakObjectPtrBase, bool>
 {
 	
-	public bool Equals(WeakObjectPtrBase? other) => other is not null && (ReferenceEquals(this, other) || InternalEquals(other));
+	public bool Equals(WeakObjectPtrBase? other) => ReferenceEquals(this, other) || InternalEquals(other);
 	public override bool Equals(object? obj) => obj is WeakObjectPtrBase other && Equals(other);
 	public override int32 GetHashCode() => InternalGetHashCode();
 	
@@ -26,16 +26,16 @@ public abstract class WeakObjectPtrBase : PlainExportedObjectBase
 	protected WeakObjectPtrBase() {}
 	protected WeakObjectPtrBase(IntPtr unmanaged) : base(unmanaged){}
 
-	private unsafe bool InternalEquals(WeakObjectPtrBase other)
+	private unsafe bool InternalEquals(WeakObjectPtrBase? other)
 	{
 		Thrower.ThrowIfNotInGameThread();
-		return WeakObjectPtr_Interop.Equals(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
+		return other is not null && WeakObjectPtr_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
 	}
 	
 	private unsafe int32 InternalGetHashCode()
 	{
 		Thrower.ThrowIfNotInGameThread();
-		return WeakObjectPtr_Interop.GetHashCode(ConjugateHandle.FromConjugate(this));
+		return WeakObjectPtr_Interop.Hash(ConjugateHandle.FromConjugate(this));
 	}
 	
 	private unsafe bool InternalIsValid(bool evenIfGarbage)

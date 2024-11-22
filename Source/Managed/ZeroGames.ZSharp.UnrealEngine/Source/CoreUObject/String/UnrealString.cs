@@ -21,7 +21,65 @@ public sealed class UnrealString : PlainExportedObjectBase
     , IEnumerable<char>
     , ISpanParsable<UnrealString>
     , IConvertible
+    , IUnrealString
 {
+    
+    public struct Enumerator : IEnumerator<char>
+    {
+        public bool MoveNext()
+        {
+            string data = GuardInvariant();
+            int32 index = _index + 1;
+            int length = data.Length;
+            _index = Math.Min(index, length);
+            return _index < length;
+        }
+        
+        public void Reset() => _index = -1;
+
+        public void Dispose() => _target = null;
+        
+        public char Current
+        {
+            get
+            {
+                string data = GuardInvariant();
+                return data[_index];
+            }
+        }
+        object IEnumerator.Current => Current;
+
+        internal Enumerator(UnrealString target)
+        {
+            _target = target;
+            _snapshot = target.Data;
+        }
+
+        private string GuardInvariant()
+        {
+            if (_target is null)
+            {
+                throw new InvalidOperationException("Access enumerator after disposal.");
+            }
+
+            if (_target.IsExpired)
+            {
+                throw new InvalidOperationException("Target enumerable has expired.");
+            }
+
+            string data = _target.Data;
+            if (data != _snapshot)
+            {
+                throw new InvalidOperationException("Target enumerable has changed.");
+            }
+
+            return data;
+        }
+        
+        private UnrealString? _target;
+        private readonly string _snapshot;
+        private int32 _index = -1;
+    }
     
     public static UnrealString BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
@@ -92,7 +150,8 @@ public sealed class UnrealString : PlainExportedObjectBase
         throw new ArgumentException();
     }
 
-    public IEnumerator<char> GetEnumerator() => Data.GetEnumerator();
+    public Enumerator GetEnumerator() => new(this);
+    IEnumerator<char> IEnumerable<char>.GetEnumerator() => GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     
     public ref readonly char GetPinnableReference() => ref Data.GetPinnableReference();

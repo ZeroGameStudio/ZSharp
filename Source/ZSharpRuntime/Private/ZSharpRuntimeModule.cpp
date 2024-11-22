@@ -13,6 +13,10 @@
 #include "Interop/ZUnmanagedFunctionInteropHelper.h"
 #include "Interop/ObjectWrapper/ZWeakObjectPtr_Interop.h"
 #include "Interop/String/ZUnrealString_Interop.h"
+#include "Interop/String/ZUnrealUtf8String_Interop.h"
+#include "Interop/String/ZUnrealAnsiString_Interop.h"
+#include "Interop/String/ZUnrealName_Interop.h"
+#include "Interop/String/ZUnrealText_Interop.h"
 
 namespace ZSharp::ZSharpRuntimeModule_Private
 {
@@ -69,6 +73,18 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealString, GetData),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealString, SetData),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealUtf8String, GetData),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealUtf8String, SetData),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealAnsiString, GetData),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealAnsiString, SetData),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealName, GetData),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealName, SetData),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealText, GetData),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealText, SetData),
 
 #undef ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY
         };

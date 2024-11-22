@@ -28,14 +28,15 @@ public static class UnhandledExceptionHelper
 			}
 		}
 
-		if (!CoreSettings.TreatManagedFatalAsError && fatalMessageBuffer != default)
+		string finalMessage = fatalMessage is not null ? $"Managed Fatal Error!!! {fatalMessage}{Environment.NewLine}{exception}" : $"Unhandled exception detected.{Environment.NewLine}{exception}";
+		if (fatalMessage is not null && !CoreSettings.TreatManagedFatalAsError && fatalMessageBuffer != default)
 		{
 			using InteropString message = new(fatalMessageBuffer);
-			message.Data = string.Join(Environment.NewLine, messageHeader ?? "Managed Fatal Error!!!", fatalMessage, exception);
+			message.Data = finalMessage;
 		}
 		else
 		{
-			UE_ERROR(logCategory ?? LogZSharpScript, string.Join(Environment.NewLine, messageHeader ?? "Unhandled exception detected.", fatalMessage, exception));
+			UE_ERROR(logCategory ?? LogZSharpScript, finalMessage);
 		}
 
 		Debugger.Break();

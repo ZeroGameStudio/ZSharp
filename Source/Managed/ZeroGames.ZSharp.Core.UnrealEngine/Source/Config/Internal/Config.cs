@@ -15,7 +15,7 @@ internal sealed class Config(IntPtr unmanaged) : IConfig
 			Config_Interop.GetFileName(_unmanaged, baseIniBuffer, fileName.Address);
 		}
 
-		return fileName.Data;
+		return fileName;
 	}
 
 	public unsafe bool TryGetSectionByFileName(string fileName, string section, [NotNullWhen(true)] out string[]? values)
@@ -74,7 +74,7 @@ internal sealed class Config(IntPtr unmanaged) : IConfig
 
 		if (suc)
 		{
-			value = valueString.Data;
+			value = valueString;
 		}
 		
 		return suc;

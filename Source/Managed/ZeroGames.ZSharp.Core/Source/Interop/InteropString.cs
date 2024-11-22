@@ -32,6 +32,8 @@ public readonly unsafe struct InteropString : IDisposable
     }
 
     public override string ToString() => Data;
+    
+    public static implicit operator string(InteropString value) => value.Data;
 
     [AllowNull]
     public string Data

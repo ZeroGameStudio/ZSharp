@@ -13,7 +13,7 @@ public static class UnrealPaths
 			Path_Interop.GetPluginDir(pluginNamePtr, dir.Address);
 		}
 
-		return dir.Data;
+		return dir;
 	}
 
 	public static unsafe string ProjectDir
@@ -22,7 +22,7 @@ public static class UnrealPaths
 		{
 			using InteropString dir = new();
 			Path_Interop.GetProjectDir(dir.Address);
-			return dir.Data;
+			return dir;
 		}
 	}
 	

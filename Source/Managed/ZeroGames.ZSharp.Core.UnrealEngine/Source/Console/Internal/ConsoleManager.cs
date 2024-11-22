@@ -44,7 +44,7 @@ internal static class ConsoleManager
 		{
 			if (Console_Interop.TryGetValue(nameBuffer, valueBuffer.Address) > 0)
 			{
-				value = valueBuffer.Data;
+				value = valueBuffer;
 				return true;
 			}
 		}

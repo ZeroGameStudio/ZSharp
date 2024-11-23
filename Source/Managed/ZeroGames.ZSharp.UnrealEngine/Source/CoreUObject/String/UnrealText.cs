@@ -213,7 +213,7 @@ public sealed class UnrealText : PlainExportedObjectBase
 
     private sealed class RelationalComparer : IComparer<UnrealText>
     {
-        public int32 Compare(UnrealText? x, UnrealText? y) => InternalCompare(x, y);
+        public int32 Compare(UnrealText? lhs, UnrealText? rhs) => InternalCompare(lhs, rhs);
     }
     
     private static int32 InternalCompare(string? lhs, string? rhs) => string.Compare(lhs, rhs, StringComparison.Ordinal);

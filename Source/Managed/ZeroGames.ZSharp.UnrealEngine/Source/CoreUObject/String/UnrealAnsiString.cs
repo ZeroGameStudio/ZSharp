@@ -214,7 +214,7 @@ public sealed class UnrealAnsiString : PlainExportedObjectBase
 
     private sealed class RelationalComparer : IComparer<UnrealAnsiString>
     {
-        public int32 Compare(UnrealAnsiString? x, UnrealAnsiString? y) => InternalCompare(x, y);
+        public int32 Compare(UnrealAnsiString? lhs, UnrealAnsiString? rhs) => InternalCompare(lhs, rhs);
     }
     
     private static int32 InternalCompare(string? lhs, string? rhs) => string.Compare(lhs, rhs, StringComparison.Ordinal);

@@ -215,7 +215,7 @@ public sealed class UnrealName : PlainExportedObjectBase
 
     private sealed class RelationalComparer : IComparer<UnrealName>
     {
-        public int32 Compare(UnrealName? x, UnrealName? y) => InternalCompare(x, y);
+        public int32 Compare(UnrealName? lhs, UnrealName? rhs) => InternalCompare(lhs, rhs);
     }
     
     private static int32 InternalCompare(string? lhs, string? rhs) => string.Compare(lhs, rhs, StringComparison.Ordinal);

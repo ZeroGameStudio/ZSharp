@@ -225,6 +225,7 @@ public sealed class UnrealName : PlainExportedObjectBase
     private unsafe string InternalGetData()
     {
         Thrower.ThrowIfNotInGameThread();
+        MasterAlcCache.Instance.GuardUnloaded();
         using InteropString buffer = new();
         UnrealName_Interop.GetData(ConjugateHandle.FromConjugate(this), buffer.Address);
         return buffer;
@@ -233,6 +234,7 @@ public sealed class UnrealName : PlainExportedObjectBase
     private unsafe void InternalSetData(string? value)
     {
         Thrower.ThrowIfNotInGameThread();
+        MasterAlcCache.Instance.GuardUnloaded();
         fixed (char* buffer = value)
         {
             UnrealName_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);
@@ -242,6 +244,7 @@ public sealed class UnrealName : PlainExportedObjectBase
     private unsafe bool InternalIsNone()
     {
         Thrower.ThrowIfNotInGameThread();
+        MasterAlcCache.Instance.GuardUnloaded();
         return UnrealName_Interop.IsNone(ConjugateHandle.FromConjugate(this)) > 0;
     }
     

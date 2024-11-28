@@ -224,6 +224,7 @@ public sealed class UnrealAnsiString : PlainExportedObjectBase
     private unsafe string InternalGetData()
     {
         Thrower.ThrowIfNotInGameThread();
+        MasterAlcCache.Instance.GuardUnloaded();
         using InteropString buffer = new();
         UnrealAnsiString_Interop.GetData(ConjugateHandle.FromConjugate(this), buffer.Address);
         return buffer;
@@ -232,6 +233,7 @@ public sealed class UnrealAnsiString : PlainExportedObjectBase
     private unsafe void InternalSetData(string? value)
     {
         Thrower.ThrowIfNotInGameThread();
+        MasterAlcCache.Instance.GuardUnloaded();
         fixed (char* buffer = value)
         {
             UnrealAnsiString_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);

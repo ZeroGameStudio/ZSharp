@@ -75,6 +75,7 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 	private unsafe void InternalCopy(SoftClassPtrBase? other)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		
 		if (other is not null)
 		{
@@ -89,12 +90,14 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 	private unsafe UnrealClass? InternalGet(bool evenIfGarbage)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return SoftClassPtr_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<UnrealClass>();
 	}
 
 	private unsafe void InternalSet(UnrealClass? target)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		if (target is not null && !target.IsChildOf<T>())
 		{
 			throw new ArgumentOutOfRangeException($"Target type {target.GetType().FullName} mismatch.");
@@ -106,24 +109,28 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 	private unsafe bool InternalIsValid(bool evenIfGarbage)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return SoftClassPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
 	}
 
 	private unsafe bool InternalIsNull()
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return SoftClassPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
 	}
 	
 	private unsafe bool InternalIsPending()
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return SoftClassPtr_Interop.IsPending(ConjugateHandle.FromConjugate(this)) > 0;
 	}
 
 	private unsafe bool InternalTryLoad([NotNullWhen(true)] out UnrealClass? target)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		target = SoftClassPtr_Interop.Load(ConjugateHandle.FromConjugate(this)).GetTarget<UnrealClass>();
 		return target is not null;
 	}

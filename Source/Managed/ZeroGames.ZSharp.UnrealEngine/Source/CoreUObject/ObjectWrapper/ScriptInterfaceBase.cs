@@ -22,12 +22,14 @@ public abstract class ScriptInterfaceBase : PlainExportedObjectBase
 	private unsafe bool InternalEquals(ScriptInterfaceBase? other)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return other is not null && ScriptInterface_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
 	}
 	
 	private unsafe int32 InternalGetHashCode()
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return ScriptInterface_Interop.Hash(ConjugateHandle.FromConjugate(this));
 	}
 	

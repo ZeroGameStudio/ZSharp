@@ -75,6 +75,7 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 	private unsafe void InternalCopy(SoftObjectPtrBase? other)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		
 		if (other is not null)
 		{
@@ -89,36 +90,42 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 	private unsafe T? InternalGet(bool evenIfGarbage)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return SoftObjectPtr_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<T>();
 	}
 
 	private unsafe void InternalSet(T? target)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		SoftObjectPtr_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
 	}
 	
 	private unsafe bool InternalIsValid(bool evenIfGarbage)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return SoftObjectPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
 	}
 
 	private unsafe bool InternalIsNull()
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return SoftObjectPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
 	}
 
 	private unsafe bool InternalIsPending()
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return SoftObjectPtr_Interop.IsPending(ConjugateHandle.FromConjugate(this)) > 0;
 	}
 
 	private unsafe bool InternalTryLoad([NotNullWhen(true)] out T? target)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		target = SoftObjectPtr_Interop.Load(ConjugateHandle.FromConjugate(this)).GetTarget<T>();
 		return target is not null;
 	}

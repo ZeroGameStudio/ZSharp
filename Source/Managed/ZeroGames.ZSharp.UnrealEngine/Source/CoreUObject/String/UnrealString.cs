@@ -223,12 +223,14 @@ public sealed class UnrealString : PlainExportedObjectBase
     private unsafe string InternalGetData()
     {
         Thrower.ThrowIfNotInGameThread();
+        MasterAlcCache.Instance.GuardUnloaded();
         return new(UnrealString_Interop.GetData(ConjugateHandle.FromConjugate(this)));
     }
     
     private unsafe void InternalSetData(string? value)
     {
         Thrower.ThrowIfNotInGameThread();
+        MasterAlcCache.Instance.GuardUnloaded();
         fixed (char* buffer = value)
         {
             UnrealString_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);

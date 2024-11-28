@@ -22,12 +22,14 @@ public abstract class LazyObjectPtrBase : PlainExportedObjectBase
 	private unsafe bool InternalEquals(LazyObjectPtrBase? other)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return other is not null && LazyObjectPtr_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
 	}
 	
 	private unsafe int32 InternalGetHashCode()
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return LazyObjectPtr_Interop.Hash(ConjugateHandle.FromConjugate(this));
 	}
 	

@@ -22,12 +22,14 @@ public abstract class SubclassOfBase : PlainExportedObjectBase
 	private unsafe bool InternalEquals(SubclassOfBase? other)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return other is not null && SubclassOf_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
 	}
 	
 	private unsafe int32 InternalGetHashCode()
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return SubclassOf_Interop.Hash(ConjugateHandle.FromConjugate(this));
 	}
 	

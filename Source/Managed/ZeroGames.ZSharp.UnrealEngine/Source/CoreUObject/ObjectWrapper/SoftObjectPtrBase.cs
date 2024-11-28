@@ -22,12 +22,14 @@ public abstract class SoftObjectPtrBase : PlainExportedObjectBase
 	private unsafe bool InternalEquals(SoftObjectPtrBase? other)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return other is not null && SoftObjectPtr_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
 	}
 	
 	private unsafe int32 InternalGetHashCode()
 	{
 		Thrower.ThrowIfNotInGameThread();
+		MasterAlcCache.Instance.GuardUnloaded();
 		return SoftObjectPtr_Interop.Hash(ConjugateHandle.FromConjugate(this));
 	}
 	

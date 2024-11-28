@@ -223,6 +223,7 @@ public sealed class UnrealUtf8String : PlainExportedObjectBase
     private unsafe string InternalGetData()
     {
         Thrower.ThrowIfNotInGameThread();
+        MasterAlcCache.Instance.GuardUnloaded();
         using InteropString buffer = new();
         UnrealUtf8String_Interop.GetData(ConjugateHandle.FromConjugate(this), buffer.Address);
         return buffer;
@@ -231,6 +232,7 @@ public sealed class UnrealUtf8String : PlainExportedObjectBase
     private unsafe void InternalSetData(string? value)
     {
         Thrower.ThrowIfNotInGameThread();
+        MasterAlcCache.Instance.GuardUnloaded();
         fixed (char* buffer = value)
         {
             UnrealUtf8String_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);

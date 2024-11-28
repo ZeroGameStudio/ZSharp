@@ -298,7 +298,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private void GuardInvariant()
     {
         Thrower.ThrowIfNotInGameThread("Access Master ALC in non-game thread.");
-        
         this.GuardUnloaded();
     }
     

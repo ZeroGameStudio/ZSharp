@@ -3,13 +3,14 @@
 #pragma once
 
 #include "ZObjectWrapperInteropBase.h"
+#include "Conjugate/ZConjugateHandle.h"
 #include "Conjugate/ZObjectWrapperConjugateRegisties.h"
 
 namespace ZSharp
 {
-	struct FZWeakObjectPtr_Interop : TZObjectWrapperInteropBase<FZConjugateRegistry_WeakObjectPtr>
+	struct FZLazyObjectPtr_Interop : TZObjectWrapperInteropBase<FZConjugateRegistry_LazyObjectPtr>
 	{
-		static uint8 IsStale(FZConjugateHandle self, uint8 includingGarbage);
+		static uint8 IsPending(FZConjugateHandle self);
 	};
 }
 

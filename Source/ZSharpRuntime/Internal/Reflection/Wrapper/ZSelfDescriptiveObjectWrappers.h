@@ -35,19 +35,54 @@ namespace ZSharp
 
 		const UClass* GetDescriptor() const { return Descriptor.Get(); }
 		T* GetUnderlyingInstance() const { return UnderlyingInstance; }
-		UObject* Get() const
+		ObjectType* Get(bool evenIfGarbage = false) const
 		{
+			ObjectType* result;
 			if constexpr (std::is_same_v<UnderlyingInstanceType, FScriptInterface>)
 			{
-				return UnderlyingInstance->GetObject();
+				result = UnderlyingInstance->GetObject();
 			}
 			else
 			{
-				return UnderlyingInstance->Get();
+				result = UnderlyingInstance->Get();
 			}
+
+			if (!result)
+			{
+				return nullptr;
+			}
+
+			if (result->HasAllFlags(RF_MirroredGarbage) && !evenIfGarbage)
+			{
+				return nullptr;
+			}
+
+			return result;
 		}
 		void Set(ObjectType* obj)
 		{
+			if constexpr (IsClass)
+			{
+				if (!ensure(obj->IsChildOf(GetDescriptor())))
+				{
+					return;
+				}
+			}
+			else if constexpr (std::is_same_v<UnderlyingInstanceType, FScriptInterface>)
+			{
+				if (!ensure(obj->GetClass()->ImplementsInterface(GetDescriptor())))
+				{
+					return;
+				}
+			}
+			else
+			{
+				if (!ensure(obj->IsA(GetDescriptor())))
+				{
+					return;
+				}
+			}
+			
 			if constexpr (std::is_same_v<UnderlyingInstanceType, FScriptInterface>)
 			{
 				*UnderlyingInstance = UnderlyingInstanceType { obj, obj->GetInterfaceAddress(const_cast<UClass*>(Descriptor.Get())) };
@@ -55,6 +90,47 @@ namespace ZSharp
 			else
 			{
 				*UnderlyingInstance = UnderlyingInstanceType { obj };
+			}
+		}
+		bool IsValid(bool evenIfGarbage = false) const
+		{
+			UObject* result;
+			if constexpr (std::is_same_v<UnderlyingInstanceType, FScriptInterface>)
+			{
+				result = UnderlyingInstance->GetObject();
+			}
+			else
+			{
+				result = UnderlyingInstance->Get();
+			}
+
+			if (!result)
+			{
+				return false;
+			}
+
+			if (result->HasAllFlags(RF_MirroredGarbage) && !evenIfGarbage)
+			{
+				return false;
+			}
+
+			return true;
+		}
+		bool IsNull() const
+		{
+			if constexpr (std::is_same_v<UnderlyingInstanceType, FWeakObjectPtr>)
+			{
+				return UnderlyingInstance->IsExplicitlyNull();
+			}
+			else if constexpr (std::is_same_v<UnderlyingInstanceType, TSoftClassPtr<UObject>> ||
+							   std::is_same_v<UnderlyingInstanceType, FSoftObjectPtr> ||
+							   std::is_same_v<UnderlyingInstanceType, FLazyObjectPtr>)
+			{
+				return UnderlyingInstance->IsNull();
+			}
+			else
+			{
+				return !Get(true);
 			}
 		}
 

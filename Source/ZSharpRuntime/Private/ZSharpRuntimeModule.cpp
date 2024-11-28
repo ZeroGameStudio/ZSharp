@@ -11,7 +11,13 @@
 #include "ZCall/ZCallResolver_UFunction.h"
 #include "ZCall/ZCallResolver_UProperty.h"
 #include "Interop/ZUnmanagedFunctionInteropHelper.h"
+#include "Interop/ObjectWrapper/ZSubclassOf_Interop.h"
+#include "Interop/ObjectWrapper/ZSoftClassPtr_Interop.h"
+#include "Interop/ObjectWrapper/ZSoftObjectPtr_Interop.h"
 #include "Interop/ObjectWrapper/ZWeakObjectPtr_Interop.h"
+#include "Interop/ObjectWrapper/ZLazyObjectPtr_Interop.h"
+#include "Interop/ObjectWrapper/ZScriptInterface_Interop.h"
+#include "Interop/ObjectWrapper/ZStrongObjectPtr_Interop.h"
 #include "Interop/String/ZUnrealString_Interop.h"
 #include "Interop/String/ZUnrealUtf8String_Interop.h"
 #include "Interop/String/ZUnrealAnsiString_Interop.h"
@@ -62,6 +68,34 @@ namespace ZSharp::ZSharpRuntimeModule_Private
         {
 #define ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY ZeroGames.ZSharp.UnrealEngine
 			
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SubclassOf, Copy),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SubclassOf, Identical),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SubclassOf, Hash),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SubclassOf, Get),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SubclassOf, Set),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SubclassOf, IsValid),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SubclassOf, IsNull),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftClassPtr, Copy),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftClassPtr, Identical),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftClassPtr, Hash),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftClassPtr, Get),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftClassPtr, Set),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftClassPtr, IsValid),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftClassPtr, IsNull),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftClassPtr, IsPending),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftClassPtr, Load),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftObjectPtr, Copy),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftObjectPtr, Identical),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftObjectPtr, Hash),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftObjectPtr, Get),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftObjectPtr, Set),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftObjectPtr, IsValid),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftObjectPtr, IsNull),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftObjectPtr, IsPending),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SoftObjectPtr, Load),
+			
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Copy),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Identical),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, Hash),
@@ -70,6 +104,31 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, IsValid),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, IsNull),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(WeakObjectPtr, IsStale),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(LazyObjectPtr, Copy),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(LazyObjectPtr, Identical),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(LazyObjectPtr, Hash),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(LazyObjectPtr, Get),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(LazyObjectPtr, Set),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(LazyObjectPtr, IsValid),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(LazyObjectPtr, IsNull),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(LazyObjectPtr, IsPending),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(ScriptInterface, Copy),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(ScriptInterface, Identical),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(ScriptInterface, Hash),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(ScriptInterface, Get),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(ScriptInterface, Set),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(ScriptInterface, IsValid),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(ScriptInterface, IsNull),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, Copy),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, Identical),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, Hash),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, Get),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, Set),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, IsValid),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, IsNull),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealString, GetData),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealString, SetData),

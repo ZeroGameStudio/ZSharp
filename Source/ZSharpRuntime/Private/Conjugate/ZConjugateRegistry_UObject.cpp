@@ -33,6 +33,11 @@ UObject* ZSharp::FZConjugateRegistry_UObject::ConjugateUnsafe(FZConjugateHandle 
 
 UObject* ZSharp::FZConjugateRegistry_UObject::Conjugate(FZConjugateHandle handle) const
 {
+	if (!handle)
+	{
+		return nullptr;
+	}
+	
 	void* unmanaged = handle.Handle;
 	const FObjectKey* rec = ConjugateMap.Find(unmanaged);
 	return rec ? rec->ResolveObjectPtrEvenIfGarbage() : nullptr;

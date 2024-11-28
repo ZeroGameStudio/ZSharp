@@ -5,11 +5,13 @@ using System.Numerics;
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
+[ConjugateRegistryId(24)]
 public sealed class WeakObjectPtr<T> : WeakObjectPtrBase
 	, IConjugate<WeakObjectPtr<T>>
 	, ICloneable<WeakObjectPtr<T>>
 	, IEquatable<WeakObjectPtr<T>>
-	, IEqualityOperators<WeakObjectPtr<T>, WeakObjectPtr<T>, bool>
+	, IEqualityOperators<WeakObjectPtr<T>?, WeakObjectPtr<T>?, bool>
+	, IWeakObjectWrapper<T>
 	where T : UnrealObject
 {
 
@@ -22,14 +24,14 @@ public sealed class WeakObjectPtr<T> : WeakObjectPtrBase
 		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, GetStaticClass(typeof(T)).Unmanaged);
 	}
 	
-	public WeakObjectPtr(T? obj) : this()
+	public WeakObjectPtr(T? target) : this()
 	{
-		if (obj is null)
+		if (target is null)
 		{
 			return;
 		}
 
-		Object = obj;
+		Target = target;
 	}
 	
 	public WeakObjectPtr<T> Clone() => new(this);
@@ -39,19 +41,25 @@ public sealed class WeakObjectPtr<T> : WeakObjectPtrBase
 	public override bool Equals(object? obj) => base.Equals(obj);
 	public override int32 GetHashCode() => base.GetHashCode();
 	
-	public static implicit operator WeakObjectPtr<T>(T? obj) => new(obj);
+	public static implicit operator WeakObjectPtr<T>(T? target) => new(target);
 	public static bool operator ==(WeakObjectPtr<T>? left, WeakObjectPtr<T>? right) => Equals(left, right);
 	public static bool operator !=(WeakObjectPtr<T>? left, WeakObjectPtr<T>? right) => !Equals(left, right);
 	
 	public static IEqualityComparer<WeakObjectPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
 
-	public T? Object
+	public T? Target
 	{
 		get => InternalGet(false);
 		set => InternalSet(value);
 	}
-	
-	public T? ObjectEvenIfGarbage => InternalGet(true);
+
+	public T? TargetEvenIfGarbage => InternalGet(true);
+
+	public bool IsValid => InternalIsValid(false);
+	public bool IsValidEventIfGarbage => InternalIsValid(true);
+	public bool IsNull => InternalIsNull();
+	public bool IsStale => InternalIsStale(true);
+	public bool IsStaleExcludingGarbage => InternalIsStale(false);
 	
 	private sealed class EqualityComparer : IEqualityComparer<WeakObjectPtr<T>>
 	{
@@ -72,7 +80,7 @@ public sealed class WeakObjectPtr<T> : WeakObjectPtrBase
 		}
 		else
 		{
-			Object = null;
+			Target = null;
 		}
 	}
 
@@ -82,10 +90,28 @@ public sealed class WeakObjectPtr<T> : WeakObjectPtrBase
 		return WeakObjectPtr_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<T>();
 	}
 
-	private unsafe void InternalSet(T? obj)
+	private unsafe void InternalSet(T? target)
 	{
 		Thrower.ThrowIfNotInGameThread();
-		WeakObjectPtr_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj));
+		WeakObjectPtr_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
+	}
+	
+	private unsafe bool InternalIsValid(bool evenIfGarbage)
+	{
+		Thrower.ThrowIfNotInGameThread();
+		return WeakObjectPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
+	}
+
+	private unsafe bool InternalIsNull()
+	{
+		Thrower.ThrowIfNotInGameThread();
+		return WeakObjectPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
+	}
+
+	private unsafe bool InternalIsStale(bool includingGarbage)
+	{
+		Thrower.ThrowIfNotInGameThread();
+		return WeakObjectPtr_Interop.IsStale(ConjugateHandle.FromConjugate(this), Convert.ToByte(includingGarbage)) > 0;
 	}
 	
 }

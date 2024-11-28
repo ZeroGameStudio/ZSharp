@@ -1,13 +1,34 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Numerics;
+
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-[ConjugateRegistryId(23)]
-public abstract class SoftObjectPtrBase : UnrealObjectWrapperBase
+public abstract class SoftObjectPtrBase : PlainExportedObjectBase
+	, IEquatable<SoftObjectPtrBase>
+	, IEqualityOperators<SoftObjectPtrBase?, SoftObjectPtrBase?, bool>
 {
-	protected SoftObjectPtrBase(Type objectType) : base(objectType, true, false){}
-	protected SoftObjectPtrBase(Type objectType, IntPtr unmanaged) : base(objectType, true, false, unmanaged){}
-	protected override string ZCallClassName => "SoftObject";
+	
+	public bool Equals(SoftObjectPtrBase? other) => ReferenceEquals(this, other) || InternalEquals(other);
+	public override bool Equals(object? obj) => obj is SoftObjectPtrBase other && Equals(other);
+	public override int32 GetHashCode() => InternalGetHashCode();
+	
+	public static bool operator ==(SoftObjectPtrBase? left, SoftObjectPtrBase? right) => Equals(left, right);
+	public static bool operator !=(SoftObjectPtrBase? left, SoftObjectPtrBase? right) => !Equals(left, right);
+	
+	protected SoftObjectPtrBase(){}
+	protected SoftObjectPtrBase(IntPtr unmanaged) : base(unmanaged){}
+
+	private unsafe bool InternalEquals(SoftObjectPtrBase? other)
+	{
+		Thrower.ThrowIfNotInGameThread();
+		return other is not null && SoftObjectPtr_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
+	}
+	
+	private unsafe int32 InternalGetHashCode()
+	{
+		Thrower.ThrowIfNotInGameThread();
+		return SoftObjectPtr_Interop.Hash(ConjugateHandle.FromConjugate(this));
+	}
+	
 }
-
-

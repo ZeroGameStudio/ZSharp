@@ -41,6 +41,11 @@ namespace ZSharp
 		
 		ConjugateType* Conjugate(FZConjugateHandle handle) const
 		{
+			if (!handle)
+			{
+				return nullptr;
+			}
+			
 			const void* unmanaged = handle.Handle;
 			const FZConjugateRec* rec = ConjugateMap.Find(unmanaged);
 			if (!UNLIKELY(rec))

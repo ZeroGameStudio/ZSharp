@@ -7,10 +7,7 @@
 
 namespace ZSharp
 {
-	struct FZWeakObjectPtr_Interop : TZObjectWrapperInteropBase<FZConjugateRegistry_WeakObjectPtr>
-	{
-		static uint8 IsStale(FZConjugateHandle self, uint8 includingGarbage);
-	};
+	struct FZScriptInterface_Interop : TZObjectWrapperInteropBase<FZConjugateRegistry_ScriptInterface>{};
 }
 
 

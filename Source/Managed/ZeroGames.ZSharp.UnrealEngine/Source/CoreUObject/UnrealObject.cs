@@ -8,7 +8,8 @@ public partial class UnrealObject : IUnrealObject
     public bool IsA(UnrealClass @class) => this.ZCall(MasterAlcCache.Instance, "ex://Object.IsA", @class, false)[-1].Bool;
     public bool IsA<T>() where T : UnrealObject => IsA(GetStaticClass<T>());
     public bool Implements(UnrealClass @interface) => this.ZCall(MasterAlcCache.Instance, "ex://Object.Implements", @interface, false)[-1].Bool;
-    public bool Implements<T>() where T : IUnrealInterface => Implements(GetStaticClass<T>());
+    public bool Implements(Type @interface) => Implements(GetStaticClass(@interface));
+    public bool Implements<T>() where T : IUnrealInterface => Implements(typeof(T));
 
     public void MarkAsGarbage() => this.ZCall(MasterAlcCache.Instance, "ex://Object.MarkAsGarbage", [ null ]);
     

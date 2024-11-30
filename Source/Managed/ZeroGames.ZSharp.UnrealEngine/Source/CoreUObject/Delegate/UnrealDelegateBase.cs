@@ -7,7 +7,7 @@ using ZeroGames.ZSharp.Core.UnrealEngine.Specifier;
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(41)]
-public abstract class UnrealDelegateBase : UnrealDynamicDelegateBase
+public abstract class UnrealDelegateBase : UnrealExportedObjectBase
 {
 
 	public static UnrealFunction GetUnrealDelegateSignature(Type t)

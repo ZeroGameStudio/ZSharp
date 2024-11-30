@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(43)]
-public abstract class UnrealMulticastSparseDelegateBase : UnrealDynamicDelegateBase
+public abstract class UnrealMulticastSparseDelegateBase : UnrealExportedObjectBase
 {
 	
 	public void Add(UnrealObject obj, string name) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.AddUFunction", obj, new UnrealName(name));

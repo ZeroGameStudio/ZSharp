@@ -3,6 +3,7 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
@@ -21,6 +22,7 @@ public sealed class UnrealString : PlainExportedObjectBase
     , IEnumerable<char>
     , ISpanParsable<UnrealString>
     , IConvertible
+    , IPinnable<char>
     , IUnrealString
 {
     
@@ -30,7 +32,7 @@ public sealed class UnrealString : PlainExportedObjectBase
         {
             string data = GuardInvariant();
             int32 index = _index + 1;
-            int length = data.Length;
+            int32 length = data.Length;
             _index = Math.Min(index, length);
             return _index < length;
         }

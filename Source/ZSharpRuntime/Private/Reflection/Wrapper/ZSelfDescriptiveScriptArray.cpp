@@ -31,16 +31,54 @@ ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(FZSelfDescrip
 	ElementPropertyVisitor = MoveTemp(other.ElementPropertyVisitor);
 }
 
+void ZSharp::FZSelfDescriptiveScriptArray::Insert(int32 index, const FZCallBufferSlot& src)
+{
+	FScriptArrayHelper helper = GetHelper();
+	helper.InsertValues(index);
+	void* dest = helper.GetElementPtr(index);
+	ElementPropertyVisitor->SetValue(dest, src);
+}
+
 void ZSharp::FZSelfDescriptiveScriptArray::InsertAt(int32 index)
 {
 	FScriptArrayHelper helper = GetHelper();
 	helper.InsertValues(index);
 }
 
+bool ZSharp::FZSelfDescriptiveScriptArray::Remove(const FZCallBufferSlot& src)
+{
+	if (int32 index = IndexOf(src); index >= 0)
+	{
+		RemoveAt(index);
+		return true;
+	}
+
+	return false;
+}
+
 void ZSharp::FZSelfDescriptiveScriptArray::RemoveAt(int32 index)
 {
 	FScriptArrayHelper helper = GetHelper();
 	helper.RemoveValues(index);
+}
+
+int32 ZSharp::FZSelfDescriptiveScriptArray::IndexOf(const FZCallBufferSlot& src)
+{
+	FScriptArrayHelper helper = GetHelper();
+	const uint32 stride = Descriptor->GetSize();
+	uint8* ptr = helper.GetElementPtr(0);
+	const int32 num = helper.Num();
+	void* value = FMemory_Alloca(stride);
+	ElementPropertyVisitor->SetValue(value, src);
+	for (int32 i = 0; i < num; ++i, ptr += stride)
+	{
+		if (Descriptor->Identical(ptr, value))
+		{
+			return i;
+		}
+	}
+
+	return INDEX_NONE;
 }
 
 void ZSharp::FZSelfDescriptiveScriptArray::Get(int32 index, FZCallBufferSlot& dest) const

@@ -79,6 +79,8 @@ public abstract class ExportedObjectBase : IConjugate
     public bool IsBlack { get; }
 
     public bool IsExpired => Unmanaged == DEAD_ADDR;
+    
+    internal const IntPtr DEAD_ADDR = 0xDEAD;
 
     private protected ExportedObjectBase()
     {
@@ -91,6 +93,8 @@ public abstract class ExportedObjectBase : IConjugate
         GCHandle = GCHandle.Alloc(this);
         Unmanaged = unmanaged;
         IsBlack = false;
+        
+        GC.SuppressFinalize(this);
     }
 
     ~ExportedObjectBase() => InternalDispose();
@@ -101,8 +105,6 @@ public abstract class ExportedObjectBase : IConjugate
         check(!IsExpired);
         
         MarkAsDead();
-        
-        GC.SuppressFinalize(this);
     }
     
     private void BroadcastOnExpired()
@@ -145,6 +147,11 @@ public abstract class ExportedObjectBase : IConjugate
         }
 
         _disposed = true;
+
+        if (IsExpired)
+        {
+            return;
+        }
         
         MasterAlcCache.Instance.ReleaseConjugate(this);
         MarkAsDead();
@@ -161,8 +168,6 @@ public abstract class ExportedObjectBase : IConjugate
     }
 
     private readonly record struct OnExpiredCallbackRec(Action<IExplicitLifecycle, object?> Callback, object? State);
-    
-    private const IntPtr DEAD_ADDR = 0xDEAD;
     
     private bool _disposed;
     

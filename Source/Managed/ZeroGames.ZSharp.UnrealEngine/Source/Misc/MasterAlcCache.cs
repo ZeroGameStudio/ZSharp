@@ -7,6 +7,12 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 
 public static class MasterAlcCache
 {
+	public static void GuardInvariant()
+	{
+		Thrower.ThrowIfNotInGameThread();
+		Instance.GuardUnloaded();
+	}
+	
 	public static IMasterAssemblyLoadContext Instance { get; }
 
 	static MasterAlcCache()

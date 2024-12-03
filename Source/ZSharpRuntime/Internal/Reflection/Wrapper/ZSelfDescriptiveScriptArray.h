@@ -21,8 +21,11 @@ namespace ZSharp
 		
 		FZSelfDescriptiveScriptArray(FZSelfDescriptiveScriptArray&& other) noexcept;
 
+		void Insert(int32 index, const FZCallBufferSlot& src);
 		void InsertAt(int32 index);
+		bool Remove(const FZCallBufferSlot& src);
 		void RemoveAt(int32 index);
+		int32 IndexOf(const FZCallBufferSlot& src);
 		void Get(int32 index, FZCallBufferSlot& dest) const;
 		void Set(int32 index, const FZCallBufferSlot& src);
 		void Clear();

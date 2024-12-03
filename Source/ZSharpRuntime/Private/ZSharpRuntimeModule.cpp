@@ -23,6 +23,7 @@
 #include "Interop/String/ZUnrealAnsiString_Interop.h"
 #include "Interop/String/ZUnrealName_Interop.h"
 #include "Interop/String/ZUnrealText_Interop.h"
+#include "Interop/Container/ZUnrealArray_Interop.h"
 
 namespace ZSharp::ZSharpRuntimeModule_Private
 {
@@ -144,6 +145,15 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealText, GetData),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealText, SetData),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, Insert),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, Remove),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, RemoveAt),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, Clear),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, IndexOf),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, Get),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, Set),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, Count),
 
 #undef ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY
         };

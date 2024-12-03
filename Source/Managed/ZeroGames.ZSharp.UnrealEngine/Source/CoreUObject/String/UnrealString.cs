@@ -203,8 +203,16 @@ public sealed class UnrealString : PlainExportedObjectBase
     [AllowNull]
     public string Data
     {
-        get => InternalGetData();
-        set => InternalSetData(value);
+        get
+        {
+            MasterAlcCache.GuardInvariant();
+            return InternalGetData();
+        }
+        set
+        {
+            MasterAlcCache.GuardInvariant();
+            InternalSetData(value);
+        }
     }
     
     private sealed class EqualityComparer : IEqualityComparer<UnrealString>
@@ -222,17 +230,10 @@ public sealed class UnrealString : PlainExportedObjectBase
     
     private UnrealString(IntPtr unmanaged) : base(unmanaged){}
 
-    private unsafe string InternalGetData()
-    {
-        Thrower.ThrowIfNotInGameThread();
-        MasterAlcCache.Instance.GuardUnloaded();
-        return new(UnrealString_Interop.GetData(ConjugateHandle.FromConjugate(this)));
-    }
+    private unsafe string InternalGetData() => new(UnrealString_Interop.GetData(ConjugateHandle.FromConjugate(this)));
     
     private unsafe void InternalSetData(string? value)
     {
-        Thrower.ThrowIfNotInGameThread();
-        MasterAlcCache.Instance.GuardUnloaded();
         fixed (char* buffer = value)
         {
             UnrealString_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);

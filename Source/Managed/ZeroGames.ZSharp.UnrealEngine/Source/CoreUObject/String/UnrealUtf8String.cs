@@ -203,8 +203,16 @@ public sealed class UnrealUtf8String : PlainExportedObjectBase
     [AllowNull]
     public string Data
     {
-        get => InternalGetData();
-        set => InternalSetData(value);
+        get
+        {
+            MasterAlcCache.GuardInvariant();
+            return InternalGetData();
+        }
+        set
+        {
+            MasterAlcCache.GuardInvariant();
+            InternalSetData(value);
+        }
     }
     
     private sealed class EqualityComparer : IEqualityComparer<UnrealUtf8String>
@@ -224,8 +232,6 @@ public sealed class UnrealUtf8String : PlainExportedObjectBase
 
     private unsafe string InternalGetData()
     {
-        Thrower.ThrowIfNotInGameThread();
-        MasterAlcCache.Instance.GuardUnloaded();
         using InteropString buffer = new();
         UnrealUtf8String_Interop.GetData(ConjugateHandle.FromConjugate(this), buffer.Address);
         return buffer;
@@ -233,8 +239,6 @@ public sealed class UnrealUtf8String : PlainExportedObjectBase
     
     private unsafe void InternalSetData(string? value)
     {
-        Thrower.ThrowIfNotInGameThread();
-        MasterAlcCache.Instance.GuardUnloaded();
         fixed (char* buffer = value)
         {
             UnrealUtf8String_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);

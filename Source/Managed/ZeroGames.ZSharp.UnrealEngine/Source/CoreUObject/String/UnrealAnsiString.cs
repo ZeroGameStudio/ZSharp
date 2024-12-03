@@ -204,8 +204,16 @@ public sealed class UnrealAnsiString : PlainExportedObjectBase
     [AllowNull]
     public string Data
     {
-        get => InternalGetData();
-        set => InternalSetData(value);
+        get
+        {
+            MasterAlcCache.GuardInvariant();
+            return InternalGetData();
+        }
+        set
+        {
+            MasterAlcCache.GuardInvariant();
+            InternalSetData(value);
+        }
     }
     
     private sealed class EqualityComparer : IEqualityComparer<UnrealAnsiString>
@@ -225,8 +233,6 @@ public sealed class UnrealAnsiString : PlainExportedObjectBase
 
     private unsafe string InternalGetData()
     {
-        Thrower.ThrowIfNotInGameThread();
-        MasterAlcCache.Instance.GuardUnloaded();
         using InteropString buffer = new();
         UnrealAnsiString_Interop.GetData(ConjugateHandle.FromConjugate(this), buffer.Address);
         return buffer;
@@ -234,8 +240,6 @@ public sealed class UnrealAnsiString : PlainExportedObjectBase
     
     private unsafe void InternalSetData(string? value)
     {
-        Thrower.ThrowIfNotInGameThread();
-        MasterAlcCache.Instance.GuardUnloaded();
         fixed (char* buffer = value)
         {
             UnrealAnsiString_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);

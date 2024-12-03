@@ -153,6 +153,7 @@ void ZSharp::IZPropertyVisitor::GetValue_InContainer(const void* src, FZCallBuff
 	{
 		check(underlyingProperty->ArrayDim == 1);
 		void* value = FMemory_Alloca(underlyingProperty->GetSize());
+		InitializeValue(value);
 		underlyingProperty->CallGetter(src, value);
 		GetValue(value, dest);
 	}
@@ -169,6 +170,7 @@ void ZSharp::IZPropertyVisitor::GetRef_InContainer(const void* src, FZCallBuffer
 		// We have no way but fallback to get a copy when get ref on a property with getter.
 		check(underlyingProperty->ArrayDim == 1);
 		void* value = FMemory_Alloca(underlyingProperty->GetSize());
+		InitializeValue(value);
 		underlyingProperty->CallGetter(src, value);
 		GetValue(ContainerPtrToValuePtr(src, index), dest);
 	}
@@ -184,6 +186,7 @@ void ZSharp::IZPropertyVisitor::SetValue_InContainer(void* dest, const FZCallBuf
 	{
 		check(underlyingProperty->ArrayDim == 1);
 		void* value = FMemory_Alloca(underlyingProperty->GetSize());
+		InitializeValue(value);
 		SetValue(value, src);
 		underlyingProperty->CallSetter(dest, value);
 	}

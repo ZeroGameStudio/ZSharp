@@ -41,7 +41,7 @@ internal static class ContainerHelper
 			return true;
 		}
 
-		// 3 strings
+		// 5 strings
 		if (type == typeof(UnrealString)
 		    || type == typeof(UnrealUtf8String)
 		    || type == typeof(UnrealAnsiString)
@@ -89,7 +89,7 @@ internal static class ContainerHelper
 	{
 		desc = default;
 		
-		// 8 integers + 2 floats + 1 boolean + 3 strings + special types
+		// 8 integers + 2 floats + 1 boolean + 5 strings + special types
 		IntPtr id;
 		if (_typeMap.TryGetValue(type, out id))
 		{
@@ -208,8 +208,8 @@ internal static class ContainerHelper
 		{ typeof(bool), BOOL_TYPE_ID },
 		
 		{ typeof(UnrealString), STRING_TYPE_ID },
-		{ typeof(UnrealUtf8String), STRING_TYPE_ID },
-		{ typeof(UnrealAnsiString), STRING_TYPE_ID },
+		{ typeof(UnrealUtf8String), UTF8_STRING_TYPE_ID },
+		{ typeof(UnrealAnsiString), ANSI_STRING_TYPE_ID },
 		{ typeof(UnrealName), NAME_TYPE_ID },
 		{ typeof(UnrealText), TEXT_TYPE_ID },
 		

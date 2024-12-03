@@ -21,20 +21,21 @@ namespace ZSharp
 		
 		FZSelfDescriptiveScriptSet(FZSelfDescriptiveScriptSet&& other) noexcept;
 		
-		void Add(const FZCallBufferSlot& src);
-		void Remove(const FZCallBufferSlot& src);
-		bool Contains(const FZCallBufferSlot& src) const;
+		bool Add(const FZCallBufferSlot& src);
+		bool Remove(const FZCallBufferSlot& src);
 		void Clear();
+		bool Contains(const FZCallBufferSlot& src) const;
 
 		int32 Num() const;
 
-		FZSelfDescriptiveScriptSet& operator=(FZSelfDescriptiveScriptSet&& other) noexcept;
-
-	private:
 		FScriptSetHelper GetHelper() const
 		{
 			return FScriptSetHelper::CreateHelperFormElementProperty(const_cast<FProperty*>(Descriptor), UnderlyingInstance);
 		}
+
+		void Get(FScriptSetHelper::FIterator it, FZCallBufferSlot& dest);
+
+		FZSelfDescriptiveScriptSet& operator=(FZSelfDescriptiveScriptSet&& other) noexcept;
 
 	private:
 		void DeleteUnderlyingInstance();

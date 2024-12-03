@@ -69,6 +69,7 @@ int32 ZSharp::FZSelfDescriptiveScriptArray::IndexOf(const FZCallBufferSlot& src)
 	uint8* ptr = helper.GetElementPtr(0);
 	const int32 num = helper.Num();
 	void* value = FMemory_Alloca(stride);
+	ElementPropertyVisitor->InitializeValue(value);
 	ElementPropertyVisitor->SetValue(value, src);
 	for (int32 i = 0; i < num; ++i, ptr += stride)
 	{

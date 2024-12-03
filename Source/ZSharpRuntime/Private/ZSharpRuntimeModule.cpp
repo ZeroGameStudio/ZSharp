@@ -24,6 +24,7 @@
 #include "Interop/String/ZUnrealName_Interop.h"
 #include "Interop/String/ZUnrealText_Interop.h"
 #include "Interop/Container/ZUnrealArray_Interop.h"
+#include "Interop/Container/ZUnrealSet_Interop.h"
 
 namespace ZSharp::ZSharpRuntimeModule_Private
 {
@@ -154,6 +155,17 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, Get),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, Set),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, Count),
+			
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, Add),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, Remove),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, Clear),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, Contains),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, Count),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, CreateEnumerator),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, ReleaseEnumerator),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, EnumeratorMoveNext),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, EnumeratorCurrent),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, EnumeratorIsValid),
 
 #undef ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY
         };

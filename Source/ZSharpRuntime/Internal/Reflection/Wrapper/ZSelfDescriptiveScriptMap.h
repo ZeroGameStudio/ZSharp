@@ -32,7 +32,6 @@ namespace ZSharp
 
 		FZSelfDescriptiveScriptMap& operator=(FZSelfDescriptiveScriptMap&& other) noexcept;
 
-	private:
 		FScriptMapHelper GetHelper() const
 		{
 			return FScriptMapHelper::CreateHelperFormInnerProperties(const_cast<FProperty*>(Descriptor->Key), const_cast<FProperty*>(Descriptor->Value), UnderlyingInstance);

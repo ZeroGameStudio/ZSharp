@@ -45,8 +45,10 @@ void ZSharp::FZSelfDescriptiveScriptMap::Add(const FZCallBufferSlot& key, const 
 {
 	FScriptMapHelper helper = GetHelper();
 	void* keyData = FMemory_Alloca_Aligned(Descriptor->Key->GetSize(), Descriptor->Key->GetMinAlignment());
+	KeyPropertyVisitor->InitializeValue(keyData);
 	KeyPropertyVisitor->SetValue(keyData, key);
 	void* valueData = FMemory_Alloca_Aligned(Descriptor->Value->GetSize(), Descriptor->Value->GetMinAlignment());
+	ValuePropertyVisitor->InitializeValue(valueData);
 	ValuePropertyVisitor->SetValue(valueData, value);
 	
 	helper.AddPair(keyData, valueData);
@@ -56,6 +58,7 @@ void ZSharp::FZSelfDescriptiveScriptMap::Remove(const FZCallBufferSlot& key)
 {
 	FScriptMapHelper helper = GetHelper();
 	void* keyData = FMemory_Alloca_Aligned(Descriptor->Key->GetSize(), Descriptor->Key->GetMinAlignment());
+	KeyPropertyVisitor->InitializeValue(keyData);
 	KeyPropertyVisitor->SetValue(keyData, key);
 	
 	helper.RemovePair(keyData);
@@ -65,6 +68,7 @@ bool ZSharp::FZSelfDescriptiveScriptMap::Find(const FZCallBufferSlot& key, FZCal
 {
 	FScriptMapHelper helper = GetHelper();
 	void* keyData = FMemory_Alloca_Aligned(Descriptor->Key->GetSize(), Descriptor->Key->GetMinAlignment());
+	KeyPropertyVisitor->InitializeValue(keyData);
 	KeyPropertyVisitor->SetValue(keyData, key);
 	
 	if (void* valueData = helper.FindValueFromHash(keyData))

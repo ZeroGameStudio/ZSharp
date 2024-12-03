@@ -34,7 +34,6 @@ namespace ZSharp
 
 		FZSelfDescriptiveScriptArray& operator=(FZSelfDescriptiveScriptArray&& other) noexcept;
 
-	private:
 		FScriptArrayHelper GetHelper() const
 		{
 			return FScriptArrayHelper::CreateHelperFormInnerProperty(Descriptor, UnderlyingInstance);

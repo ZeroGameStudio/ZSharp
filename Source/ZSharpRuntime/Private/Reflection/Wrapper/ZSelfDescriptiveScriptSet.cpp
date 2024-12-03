@@ -31,29 +31,28 @@ ZSharp::FZSelfDescriptiveScriptSet::FZSelfDescriptiveScriptSet(FZSelfDescriptive
 	ElementPropertyVisitor = MoveTemp(other.ElementPropertyVisitor);
 }
 
-void ZSharp::FZSelfDescriptiveScriptSet::Add(const FZCallBufferSlot& src)
+bool ZSharp::FZSelfDescriptiveScriptSet::Add(const FZCallBufferSlot& src)
 {
-	FScriptSetHelper helper = GetHelper();
-	void* data = FMemory_Alloca_Aligned(Descriptor->GetSize(), Descriptor->GetMinAlignment());
-	ElementPropertyVisitor->SetValue(data, src);
-	helper.AddElement(data);
+	const bool alreadyExists = Contains(src);
+	if (!alreadyExists)
+	{
+		FScriptSetHelper helper = GetHelper();
+		void* data = FMemory_Alloca(Descriptor->GetSize());
+		ElementPropertyVisitor->InitializeValue(data);
+		ElementPropertyVisitor->SetValue(data, src);
+		helper.AddElement(data);
+	}
+
+	return !alreadyExists;
 }
 
-void ZSharp::FZSelfDescriptiveScriptSet::Remove(const FZCallBufferSlot& src)
+bool ZSharp::FZSelfDescriptiveScriptSet::Remove(const FZCallBufferSlot& src)
 {
 	FScriptSetHelper helper = GetHelper();
-	void* data = FMemory_Alloca_Aligned(Descriptor->GetSize(), Descriptor->GetMinAlignment());
+	void* data = FMemory_Alloca(Descriptor->GetSize());
+	ElementPropertyVisitor->InitializeValue(data);
 	ElementPropertyVisitor->SetValue(data, src);
-	helper.RemoveElement(data);
-}
-
-bool ZSharp::FZSelfDescriptiveScriptSet::Contains(const FZCallBufferSlot& src) const
-{
-	FScriptSetHelper helper = GetHelper();
-	void* data = FMemory_Alloca_Aligned(Descriptor->GetSize(), Descriptor->GetMinAlignment());
-	ElementPropertyVisitor->SetValue(data, src);
-	
-	return helper.FindElementIndexFromHash(data) != INDEX_NONE;
+	return helper.RemoveElement(data);
 }
 
 void ZSharp::FZSelfDescriptiveScriptSet::Clear()
@@ -62,10 +61,26 @@ void ZSharp::FZSelfDescriptiveScriptSet::Clear()
 	helper.EmptyElements();
 }
 
+bool ZSharp::FZSelfDescriptiveScriptSet::Contains(const FZCallBufferSlot& src) const
+{
+	FScriptSetHelper helper = GetHelper();
+	void* data = FMemory_Alloca(Descriptor->GetSize());
+	ElementPropertyVisitor->InitializeValue(data);
+	ElementPropertyVisitor->SetValue(data, src);
+	return helper.FindElementIndexFromHash(data) != INDEX_NONE;
+}
+
 int32 ZSharp::FZSelfDescriptiveScriptSet::Num() const
 {
 	FScriptSetHelper helper = GetHelper();
 	return helper.Num();
+}
+
+void ZSharp::FZSelfDescriptiveScriptSet::Get(FScriptSetHelper::FIterator it, FZCallBufferSlot& dest)
+{
+	FScriptSetHelper helper = GetHelper();
+	void* src = helper.GetElementPtr(it);
+	ElementPropertyVisitor->GetValue(src, dest);
 }
 
 ZSharp::FZSelfDescriptiveScriptSet& ZSharp::FZSelfDescriptiveScriptSet::operator=(FZSelfDescriptiveScriptSet&& other) noexcept

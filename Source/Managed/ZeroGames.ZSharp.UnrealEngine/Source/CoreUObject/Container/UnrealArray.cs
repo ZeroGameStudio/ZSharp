@@ -237,7 +237,7 @@ public sealed class UnrealArray<T> : PlainExportedObjectBase
 	private unsafe T InternalGet(int32 index)
 	{
 		ZCallBufferSlot item = ZCallBufferSlot.FromType(typeof(T));
-		UnrealArray_Interop.Get(ConjugateHandle.FromConjugate(this), index, &item);
+		UnrealArray_Interop.Get(ConjugateHandle.FromConjugate(this), index, ref item);
 		return (T)item.Object!;
 	}
 	

@@ -180,56 +180,24 @@ public sealed class UnrealSet<T> : PlainExportedObjectBase
 		}
 	}
 
-	public void UnionWith(IEnumerable<T> other)
-	{
-		throw new NotImplementedException();
-	}
-
-	public void IntersectWith(IEnumerable<T> other)
-	{
-		throw new NotImplementedException();
-	}
-
-	public void ExceptWith(IEnumerable<T> other)
-	{
-		throw new NotImplementedException();
-	}
-
-	public void SymmetricExceptWith(IEnumerable<T> other)
-	{
-		throw new NotImplementedException();
-	}
-
-	public bool IsSupersetOf(IEnumerable<T> other)
-	{
-		throw new NotImplementedException();
-	}
-
-	public bool IsProperSupersetOf(IEnumerable<T> other)
-	{
-		throw new NotImplementedException();
-	}
-
-	public bool IsSubsetOf(IEnumerable<T> other)
-	{
-		throw new NotImplementedException();
-	}
-
-	public bool IsProperSubsetOf(IEnumerable<T> other)
-	{
-		throw new NotImplementedException();
-	}
-
-	public bool Overlaps(IEnumerable<T> other)
-	{
-		throw new NotImplementedException();
-	}
-
-	public bool SetEquals(IEnumerable<T> other)
-	{
-		throw new NotImplementedException();
-	}
-
+	// UnrealSet is for interop purpose, convert to HashSet if you need these.
+	void ISet<T>.UnionWith(IEnumerable<T> other) => throw new NotImplementedException();
+	void ISet<T>.IntersectWith(IEnumerable<T> other) => throw new NotImplementedException();
+	void ISet<T>.ExceptWith(IEnumerable<T> other) => throw new NotImplementedException();
+	void ISet<T>.SymmetricExceptWith(IEnumerable<T> other) => throw new NotImplementedException();
+	bool ISet<T>.IsSupersetOf(IEnumerable<T> other) => throw new NotImplementedException();
+	bool IReadOnlySet<T>.IsSupersetOf(IEnumerable<T> other) => throw new NotImplementedException();
+	bool ISet<T>.IsProperSupersetOf(IEnumerable<T> other) => throw new NotImplementedException();
+	bool IReadOnlySet<T>.IsProperSupersetOf(IEnumerable<T> other) => throw new NotImplementedException();
+	bool ISet<T>.IsSubsetOf(IEnumerable<T> other) => throw new NotImplementedException();
+	bool IReadOnlySet<T>.IsSubsetOf(IEnumerable<T> other) => throw new NotImplementedException();
+	bool ISet<T>.IsProperSubsetOf(IEnumerable<T> other) => throw new NotImplementedException();
+	bool IReadOnlySet<T>.IsProperSubsetOf(IEnumerable<T> other) => throw new NotImplementedException();
+	bool ISet<T>.Overlaps(IEnumerable<T> other) => throw new NotImplementedException();
+	bool IReadOnlySet<T>.Overlaps(IEnumerable<T> other) => throw new NotImplementedException();
+	bool ISet<T>.SetEquals(IEnumerable<T> other) => throw new NotImplementedException();
+	bool IReadOnlySet<T>.SetEquals(IEnumerable<T> other) => throw new NotImplementedException();
+	
 	public UnrealSet<T> Clone() => new(this);
 	object ICloneable.Clone() => Clone();
 

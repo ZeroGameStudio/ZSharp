@@ -8,7 +8,7 @@ public abstract class UnrealObjectBase : UnrealExportedObjectBase
 
     public DynamicZCallResult ReadUnrealPropertyEx<T>(string name, int32 index)
     {
-        string zcallName = $"up:/{_classPath}:{name}";
+        string zcallName = $"up:/{UnrealFieldPath}:{name}";
         return this.ZCall(MasterAlcCache.Instance, zcallName, false, index, typeof(T));
     }
 
@@ -20,7 +20,7 @@ public abstract class UnrealObjectBase : UnrealExportedObjectBase
 
     public DynamicZCallResult WriteUnrealProperty<T>(string name, int32 index, T value)
     {
-        string zcallName = $"up:/{_classPath}:{name}";
+        string zcallName = $"up:/{UnrealFieldPath}:{name}";
         return this.ZCall(MasterAlcCache.Instance, zcallName, true, index, value);
     }
 
@@ -28,7 +28,7 @@ public abstract class UnrealObjectBase : UnrealExportedObjectBase
 
     public DynamicZCallResult CallUnrealFunctionEx<T>(string name, params ReadOnlySpan<object?> parameters)
     {
-        string zcallName = $"uf:/{_classPath}:{name}";
+        string zcallName = $"uf:/{UnrealFieldPath}:{name}";
         return this.ZCall(MasterAlcCache.Instance, zcallName, [ ..parameters, typeof(T) ]);
     }
 
@@ -36,29 +36,12 @@ public abstract class UnrealObjectBase : UnrealExportedObjectBase
 
     public DynamicZCallResult CallUnrealFunction(string name, params ReadOnlySpan<object?> parameters)
     {
-        string zcallName = $"uf:/{_classPath}:{name}";
+        string zcallName = $"uf:/{UnrealFieldPath}:{name}";
         return this.ZCall(MasterAlcCache.Instance, zcallName, parameters);
     }
-    
-    public abstract UnrealClass __Class { get; }
-    
+
     protected UnrealObjectBase(IntPtr unmanaged) : base(unmanaged){}
 
-    private string _classPath
-    {
-        get
-        {
-            if (_cachedClassPath is null)
-            {
-                _cachedClassPath = __Class.__PathName.ToString();
-            }
-
-            return _cachedClassPath;
-        }
-    }
-
-    private string? _cachedClassPath;
-    
 }
 
 

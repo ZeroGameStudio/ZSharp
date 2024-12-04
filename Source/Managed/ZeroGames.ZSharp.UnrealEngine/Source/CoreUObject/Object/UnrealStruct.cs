@@ -33,12 +33,18 @@ public partial class UnrealStruct
 		
 		return (UnrealStruct)staticUnrealFieldProperty.GetValue(null)!;
 	}
-	public static UnrealStruct FromType<T>(Type type) => FromType(typeof(T));
+	public static UnrealStruct FromType<T>() => FromType(typeof(T));
 
-	public bool IsChildOf(UnrealStruct other) => this.ZCall(MasterAlcCache.Instance, "ex://Struct.IsChildOf", other, false)[-1].Bool;
+	public bool IsChildOf(UnrealStruct other)
+	{
+		MasterAlcCache.GuardInvariant();
+		return InternalIsChildOf(other);
+	}
 	public bool IsChildOf(Type other) => IsChildOf(FromType(other));
 	public bool IsChildOf<T>() => IsChildOf(typeof(T));
-	
+
+	private unsafe bool InternalIsChildOf(UnrealStruct other) => UnrealStruct_Interop.IsChildOf(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
+
 }
 
 

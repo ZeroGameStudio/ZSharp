@@ -21,7 +21,7 @@ public sealed class LazyObjectPtr<T> : LazyObjectPtrBase
 
 	public LazyObjectPtr()
 	{
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, GetStaticClass(typeof(T)).Unmanaged);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealClass.FromType<T>().Unmanaged);
 	}
 	
 	public LazyObjectPtr(T? target) : this()

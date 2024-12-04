@@ -100,7 +100,7 @@ internal static class ContainerHelper
 		// UClasses
 		if (type.IsAssignableTo(typeof(UnrealObjectBase)))
 		{
-			desc.Descriptor = GetStaticClass(type).Unmanaged;
+			desc.Descriptor = UnrealClass.FromType(type).Unmanaged;
 			return true;
 		}
 		
@@ -114,7 +114,7 @@ internal static class ContainerHelper
 		// UEnums
 		if (UnrealEnum.IsUnrealEnumType(type))
 		{
-			desc.Descriptor = UnrealEnum.GetUnrealEnum(type).Unmanaged;
+			desc.Descriptor = UnrealEnum.FromType(type).Unmanaged;
 			return true;
 		}
 		
@@ -122,44 +122,44 @@ internal static class ContainerHelper
 		if (type.IsAssignableTo(typeof(SubclassOfBase)))
 		{
 			desc.Descriptor = SUBCLASS_OF_TYPE_ID;
-			desc.Metadata = GetStaticClass(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = UnrealClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(SoftClassPtrBase)))
 		{
 			desc.Descriptor = SOFT_CLASS_PTR_TYPE_ID;
-			desc.Metadata = GetStaticClass(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = UnrealClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(SoftObjectPtrBase)))
 		{
 			desc.Descriptor = SOFT_OBJECT_PTR_TYPE_ID;
-			desc.Metadata = GetStaticClass(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = UnrealClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(WeakObjectPtrBase)))
 		{
 			desc.Descriptor = WEAK_OBJECT_PTR_TYPE_ID;
-			desc.Metadata = GetStaticClass(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = UnrealClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(LazyObjectPtrBase)))
 		{
 			desc.Descriptor = LAZY_OBJECT_PTR_TYPE_ID;
-			desc.Metadata = GetStaticClass(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = UnrealClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(ScriptInterfaceBase)))
 		{
 			desc.Descriptor = SCRIPT_INTERFACE_TYPE_ID;
-			desc.Metadata = GetStaticClass(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = UnrealClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		
 		// 2 delegates.
 		if (type.IsAssignableTo(typeof(UnrealDelegateBase)) || type.IsAssignableTo(typeof(UnrealMulticastInlineDelegateBase)))
 		{
-			desc.Descriptor = UnrealDelegateBase.GetUnrealDelegateSignature(type).Unmanaged;
+			desc.Descriptor = DelegateFunction.FromType(type).Unmanaged;
 		}
 		
 		return false;

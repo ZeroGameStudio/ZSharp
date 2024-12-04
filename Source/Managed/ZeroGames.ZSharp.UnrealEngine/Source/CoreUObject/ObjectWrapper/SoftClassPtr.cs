@@ -22,7 +22,7 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 
 	public SoftClassPtr()
 	{
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, GetStaticClass(typeof(T)).Unmanaged);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealClass.FromType<T>().Unmanaged);
 	}
 	
 	public SoftClassPtr(UnrealClass? target) : this()

@@ -28,6 +28,34 @@ namespace ZSharp
 		UObject* Conjugate(FZConjugateHandle handle) const;
 		FZConjugateHandle Conjugate(const UObjectBase* unmanaged);
 
+		template <typename T>
+		requires TZIsUClass_V<T>
+		T* ConjugateUnsafe(FZConjugateHandle handle) const
+		{
+			return Cast<T>(ConjugateUnsafe(handle));
+		}
+		
+		template <typename T>
+		requires TZIsUClass_V<T>
+		T* Conjugate(FZConjugateHandle handle) const
+		{
+			return Cast<T>(Conjugate(handle));
+		}
+
+		template <typename T>
+		requires TZIsUClass_V<T>
+		T* ConjugateUnsafeChecked(FZConjugateHandle handle) const
+		{
+			return CastChecked<T>(ConjugateUnsafe(handle));
+		}
+		
+		template <typename T>
+		requires TZIsUClass_V<T>
+		T* ConjugateChecked(FZConjugateHandle handle) const
+		{
+			return CastChecked<T>(Conjugate(handle));
+		}
+
 	public:
 		void RegisterController(IZUObjectConjugateController* controller);
 

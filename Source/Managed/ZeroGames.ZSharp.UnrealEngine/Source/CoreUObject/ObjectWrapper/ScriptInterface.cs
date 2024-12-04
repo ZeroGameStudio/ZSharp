@@ -21,7 +21,7 @@ public sealed class ScriptInterface<T> : ScriptInterfaceBase
 
 	public ScriptInterface()
 	{
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, GetStaticClass(typeof(T)).Unmanaged);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealClass.FromType<T>().Unmanaged);
 	}
 	
 	public ScriptInterface(UnrealObject? target) : this()

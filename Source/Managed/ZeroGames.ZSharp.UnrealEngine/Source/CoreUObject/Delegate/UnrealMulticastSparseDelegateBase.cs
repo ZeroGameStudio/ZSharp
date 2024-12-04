@@ -21,7 +21,7 @@ public abstract class UnrealMulticastSparseDelegateBase : UnrealExportedObjectBa
 	{
 		_delegateType = delegateType;
 		
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealDelegateBase.GetUnrealDelegateSignature(_delegateType).Unmanaged);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, DelegateFunction.FromType(_delegateType).Unmanaged);
 	}
 
 	protected UnrealMulticastSparseDelegateBase(Type delegateType, IntPtr unmanaged) : base(unmanaged)

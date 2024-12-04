@@ -21,7 +21,7 @@ public sealed class WeakObjectPtr<T> : WeakObjectPtrBase
 
 	public WeakObjectPtr()
 	{
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, GetStaticClass(typeof(T)).Unmanaged);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealClass.FromType<T>().Unmanaged);
 	}
 	
 	public WeakObjectPtr(T? target) : this()

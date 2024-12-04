@@ -26,6 +26,10 @@
 #include "Interop/Container/ZUnrealArray_Interop.h"
 #include "Interop/Container/ZUnrealSet_Interop.h"
 #include "Interop/Container/ZUnrealMap_Interop.h"
+#include "Interop/Object/ZUnrealObjectGlobals_Interop.h"
+#include "Interop/Object/ZUnrealObject_Interop.h"
+#include "Interop/Object/ZUnrealStruct_Interop.h"
+#include "Interop/Object/ZUnrealClass_Interop.h"
 
 namespace ZSharp::ZSharpRuntimeModule_Private
 {
@@ -179,6 +183,27 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, ReleaseEnumerator),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, EnumeratorMoveNext),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, EnumeratorCurrent),
+			
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, NewObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, LoadObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, DuplicateObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, FindObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, LowLevelFindObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, GetTransientPackage),
+			
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetClass),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetName),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetPathName),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetOuter),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, IsA),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, IsIn),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, Rename),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealStruct, IsChildOf),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, GetDefaultObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, IsInterface),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, ImplementsInterface),
 
 #undef ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY
         };

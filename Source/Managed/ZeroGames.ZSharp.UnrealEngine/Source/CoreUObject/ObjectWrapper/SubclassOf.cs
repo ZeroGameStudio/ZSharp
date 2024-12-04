@@ -21,7 +21,7 @@ public sealed class SubclassOf<T> : SubclassOfBase
 
 	public SubclassOf()
 	{
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, GetStaticClass(typeof(T)).Unmanaged);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealClass.FromType<T>().Unmanaged);
 	}
 	
 	public SubclassOf(UnrealClass? target) : this()

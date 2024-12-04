@@ -21,7 +21,7 @@ public sealed class StrongObjectPtr<T> : StrongObjectPtrBase
 
 	public StrongObjectPtr()
 	{
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, GetStaticClass(typeof(T)).Unmanaged);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealClass.FromType<T>().Unmanaged);
 	}
 	
 	public StrongObjectPtr(T? target) : this()

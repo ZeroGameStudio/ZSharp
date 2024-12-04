@@ -10,12 +10,6 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public abstract class UnrealDelegateBase : UnrealExportedObjectBase
 {
 
-	public static UnrealFunction GetUnrealDelegateSignature(Type t)
-	{
-		verify(t.GetCustomAttribute<UnrealFieldPathAttribute>() is var attr && attr is not null);
-		return LowLevelFindObject<UnrealFunction>(attr.Path)!;
-	}
-
 	public void Bind(UnrealObject obj, string name) => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.BindUFunction", obj, new UnrealName(name));
 	public void Unbind() => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.Unbind");
 	public DynamicZCallResult Execute(params ReadOnlySpan<object?> parameters) => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.Execute", parameters);
@@ -29,7 +23,7 @@ public abstract class UnrealDelegateBase : UnrealExportedObjectBase
 	{
 		_delegateType = delegateType;
 		
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, GetUnrealDelegateSignature(_delegateType).Unmanaged);
+		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, DelegateFunction.FromType(_delegateType).Unmanaged);
 	}
 
 	protected UnrealDelegateBase(Type delegateType, IntPtr unmanaged) : base(unmanaged)

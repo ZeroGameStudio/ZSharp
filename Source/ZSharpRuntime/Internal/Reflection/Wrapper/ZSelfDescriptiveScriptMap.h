@@ -23,20 +23,24 @@ namespace ZSharp
 		
 		FZSelfDescriptiveScriptMap(FZSelfDescriptiveScriptMap&& other) noexcept;
 		
-		void Add(const FZCallBufferSlot& key, const FZCallBufferSlot& value);
-		void Remove(const FZCallBufferSlot& key);
-		bool Find(const FZCallBufferSlot& key, FZCallBufferSlot& value) const;
+		bool TryAdd(const FZCallBufferSlot& key, const FZCallBufferSlot& value);
+		bool Remove(const FZCallBufferSlot& key);
 		void Clear();
+		bool Contains(const FZCallBufferSlot& key) const;
+		bool Find(const FZCallBufferSlot& key, FZCallBufferSlot& value) const;
+		void Set(const FZCallBufferSlot& key, const FZCallBufferSlot& value);
 
 		int32 Num() const;
-
-		FZSelfDescriptiveScriptMap& operator=(FZSelfDescriptiveScriptMap&& other) noexcept;
 
 		FScriptMapHelper GetHelper() const
 		{
 			return FScriptMapHelper::CreateHelperFormInnerProperties(const_cast<FProperty*>(Descriptor->Key), const_cast<FProperty*>(Descriptor->Value), UnderlyingInstance);
 		}
 
+		void Get(FScriptMapHelper::FIterator it, FZCallBufferSlot& key, FZCallBufferSlot& value) const;
+
+		FZSelfDescriptiveScriptMap& operator=(FZSelfDescriptiveScriptMap&& other) noexcept;
+	
 	private:
 		void DeleteUnderlyingInstance();
 		void DeleteDescriptor();

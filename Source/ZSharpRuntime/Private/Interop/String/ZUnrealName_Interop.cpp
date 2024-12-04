@@ -20,4 +20,11 @@ void ZSharp::FZUnrealName_Interop::SetData(FZConjugateHandle self, const TCHAR* 
 	*nameself = data;
 }
 
+uint8 ZSharp::FZUnrealName_Interop::IsNone(FZConjugateHandle self)
+{
+	const auto& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Name>();
+	FName* nameself = registry.ConjugateUnsafe(self);
+	return nameself->IsNone();
+}
+
 

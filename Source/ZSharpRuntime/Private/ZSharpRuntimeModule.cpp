@@ -25,6 +25,7 @@
 #include "Interop/String/ZUnrealText_Interop.h"
 #include "Interop/Container/ZUnrealArray_Interop.h"
 #include "Interop/Container/ZUnrealSet_Interop.h"
+#include "Interop/Container/ZUnrealMap_Interop.h"
 
 namespace ZSharp::ZSharpRuntimeModule_Private
 {
@@ -143,6 +144,7 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealName, GetData),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealName, SetData),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealName, IsNone),	
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealText, GetData),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealText, SetData),
@@ -165,7 +167,18 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, ReleaseEnumerator),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, EnumeratorMoveNext),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, EnumeratorCurrent),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealSet, EnumeratorIsValid),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, TryAdd),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, Remove),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, Clear),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, Contains),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, Get),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, Set),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, Count),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, CreateEnumerator),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, ReleaseEnumerator),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, EnumeratorMoveNext),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, EnumeratorCurrent),
 
 #undef ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY
         };

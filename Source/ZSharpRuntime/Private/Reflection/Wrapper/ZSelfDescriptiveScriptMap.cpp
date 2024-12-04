@@ -41,33 +41,47 @@ ZSharp::FZSelfDescriptiveScriptMap::FZSelfDescriptiveScriptMap(FZSelfDescriptive
 	ValuePropertyVisitor = MoveTemp(other.ValuePropertyVisitor);
 }
 
-void ZSharp::FZSelfDescriptiveScriptMap::Add(const FZCallBufferSlot& key, const FZCallBufferSlot& value)
+bool ZSharp::FZSelfDescriptiveScriptMap::TryAdd(const FZCallBufferSlot& key, const FZCallBufferSlot& value)
 {
-	FScriptMapHelper helper = GetHelper();
-	void* keyData = FMemory_Alloca_Aligned(Descriptor->Key->GetSize(), Descriptor->Key->GetMinAlignment());
-	KeyPropertyVisitor->InitializeValue(keyData);
-	KeyPropertyVisitor->SetValue(keyData, key);
-	void* valueData = FMemory_Alloca_Aligned(Descriptor->Value->GetSize(), Descriptor->Value->GetMinAlignment());
-	ValuePropertyVisitor->InitializeValue(valueData);
-	ValuePropertyVisitor->SetValue(valueData, value);
+	if (Contains(key))
+	{
+		return false;
+	}
 	
-	helper.AddPair(keyData, valueData);
+	Set(key, value);
+	return true;
 }
 
-void ZSharp::FZSelfDescriptiveScriptMap::Remove(const FZCallBufferSlot& key)
+bool ZSharp::FZSelfDescriptiveScriptMap::Remove(const FZCallBufferSlot& key)
 {
 	FScriptMapHelper helper = GetHelper();
-	void* keyData = FMemory_Alloca_Aligned(Descriptor->Key->GetSize(), Descriptor->Key->GetMinAlignment());
+	void* keyData = FMemory_Alloca(Descriptor->Key->GetSize());
 	KeyPropertyVisitor->InitializeValue(keyData);
 	KeyPropertyVisitor->SetValue(keyData, key);
 	
-	helper.RemovePair(keyData);
+	return helper.RemovePair(keyData);
+}
+
+void ZSharp::FZSelfDescriptiveScriptMap::Clear()
+{
+	FScriptMapHelper helper = GetHelper();
+	helper.EmptyValues();
+}
+
+bool ZSharp::FZSelfDescriptiveScriptMap::Contains(const FZCallBufferSlot& key) const
+{
+	FScriptMapHelper helper = GetHelper();
+	void* keyData = FMemory_Alloca(Descriptor->Key->GetSize());
+	KeyPropertyVisitor->InitializeValue(keyData);
+	KeyPropertyVisitor->SetValue(keyData, key);
+	
+	return !!helper.FindValueFromHash(keyData);
 }
 
 bool ZSharp::FZSelfDescriptiveScriptMap::Find(const FZCallBufferSlot& key, FZCallBufferSlot& value) const
 {
 	FScriptMapHelper helper = GetHelper();
-	void* keyData = FMemory_Alloca_Aligned(Descriptor->Key->GetSize(), Descriptor->Key->GetMinAlignment());
+	void* keyData = FMemory_Alloca(Descriptor->Key->GetSize());
 	KeyPropertyVisitor->InitializeValue(keyData);
 	KeyPropertyVisitor->SetValue(keyData, key);
 	
@@ -82,16 +96,31 @@ bool ZSharp::FZSelfDescriptiveScriptMap::Find(const FZCallBufferSlot& key, FZCal
 	}
 }
 
-void ZSharp::FZSelfDescriptiveScriptMap::Clear()
+void ZSharp::FZSelfDescriptiveScriptMap::Set(const FZCallBufferSlot& key, const FZCallBufferSlot& value)
 {
 	FScriptMapHelper helper = GetHelper();
-	helper.EmptyValues();
+	void* keyData = FMemory_Alloca(Descriptor->Key->GetSize());
+	KeyPropertyVisitor->InitializeValue(keyData);
+	KeyPropertyVisitor->SetValue(keyData, key);
+	void* valueData = FMemory_Alloca(Descriptor->Value->GetSize());
+	ValuePropertyVisitor->InitializeValue(valueData);
+	ValuePropertyVisitor->SetValue(valueData, value);
+
+	helper.AddPair(keyData, valueData);
 }
 
 int32 ZSharp::FZSelfDescriptiveScriptMap::Num() const
 {
 	FScriptMapHelper helper = GetHelper();
 	return helper.Num();
+}
+
+void ZSharp::FZSelfDescriptiveScriptMap::Get(FScriptMapHelper::FIterator it, FZCallBufferSlot& key, FZCallBufferSlot& value) const
+{
+	FScriptMapHelper helper = GetHelper();
+	void* src = helper.GetPairPtr(it);
+	KeyPropertyVisitor->GetValue_InContainer(src, key, 0);
+	ValuePropertyVisitor->GetValue_InContainer(src, value, 0);
 }
 
 ZSharp::FZSelfDescriptiveScriptMap& ZSharp::FZSelfDescriptiveScriptMap::operator=(FZSelfDescriptiveScriptMap&& other) noexcept

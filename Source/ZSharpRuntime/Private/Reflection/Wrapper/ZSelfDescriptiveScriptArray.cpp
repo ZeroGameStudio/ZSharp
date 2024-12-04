@@ -62,6 +62,12 @@ void ZSharp::FZSelfDescriptiveScriptArray::RemoveAt(int32 index)
 	helper.RemoveValues(index);
 }
 
+void ZSharp::FZSelfDescriptiveScriptArray::Clear()
+{
+	FScriptArrayHelper helper = GetHelper();
+	helper.EmptyValues();
+}
+
 int32 ZSharp::FZSelfDescriptiveScriptArray::IndexOf(const FZCallBufferSlot& src)
 {
 	FScriptArrayHelper helper = GetHelper();
@@ -94,12 +100,6 @@ void ZSharp::FZSelfDescriptiveScriptArray::Set(int32 index, const FZCallBufferSl
 	FScriptArrayHelper helper = GetHelper();
 	void* dest = helper.GetElementPtr(index);
 	ElementPropertyVisitor->SetValue(dest, src);
-}
-
-void ZSharp::FZSelfDescriptiveScriptArray::Clear()
-{
-	FScriptArrayHelper helper = GetHelper();
-	helper.EmptyValues();
 }
 
 int32 ZSharp::FZSelfDescriptiveScriptArray::Num() const

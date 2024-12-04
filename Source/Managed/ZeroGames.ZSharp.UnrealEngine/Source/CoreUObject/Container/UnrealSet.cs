@@ -20,34 +20,29 @@ public sealed class UnrealSet<T> : PlainExportedObjectBase
 	    {
 		    GuardInvariant();
 		    MasterAlcCache.GuardInvariant();
-		    
-		    if (_first)
+		    if (_unmanaged == default)
 		    {
-			    _first = false;
-			    return IsValid;
+			    return false;
 		    }
-		    
-		    return InternalMoveNext();
+
+		    bool first = _first;
+		    _first = false;
+		    return first || InternalMoveNext();
 	    }
 
 	    public void Reset()
 	    {
 		    GuardInvariant();
 		    MasterAlcCache.GuardInvariant();
-		    
-		    if (_unmanaged != default)
-		    {
-			    InternalRelease();
-		    }
 
+		    TryRelease();
 		    _first = true;
 		    _unmanaged = InternalCreate();
 	    }
 
 	    public void Dispose()
 	    {
-		    InternalRelease();
-		    _unmanaged = default;
+		    TryRelease();
 		    _target = null;
 	    }
         
@@ -57,6 +52,11 @@ public sealed class UnrealSet<T> : PlainExportedObjectBase
 		    {
 			    GuardInvariant();
 			    MasterAlcCache.GuardInvariant();
+			    if (_unmanaged == default)
+			    {
+				    throw new InvalidOperationException();
+			    }
+			    
 			    return InternalCurrent;
 		    }
 	    }
@@ -88,6 +88,15 @@ public sealed class UnrealSet<T> : PlainExportedObjectBase
 		    }
 	    }
 
+	    private void TryRelease()
+	    {
+		    if (_unmanaged != default)
+		    {
+			    InternalRelease();
+			    _unmanaged = default;
+		    }
+	    }
+
 	    private unsafe IntPtr InternalCreate() => UnrealSet_Interop.CreateEnumerator(ConjugateHandle.FromConjugate(_target));
 	    private unsafe void InternalRelease() => UnrealSet_Interop.ReleaseEnumerator(_unmanaged);
 	    private unsafe bool InternalMoveNext() => UnrealSet_Interop.EnumeratorMoveNext(_unmanaged) > 0;
@@ -101,8 +110,6 @@ public sealed class UnrealSet<T> : PlainExportedObjectBase
 			    return (T)current.Object!;
 		    }
 	    }
-
-	    private unsafe bool IsValid => UnrealSet_Interop.EnumeratorIsValid(_unmanaged) > 0;
 
 	    private UnrealSet<T>? _target;
 	    private readonly int32 _snapshot;
@@ -181,22 +188,22 @@ public sealed class UnrealSet<T> : PlainExportedObjectBase
 	}
 
 	// UnrealSet is for interop purpose, convert to HashSet if you need these.
-	void ISet<T>.UnionWith(IEnumerable<T> other) => throw new NotImplementedException();
-	void ISet<T>.IntersectWith(IEnumerable<T> other) => throw new NotImplementedException();
-	void ISet<T>.ExceptWith(IEnumerable<T> other) => throw new NotImplementedException();
-	void ISet<T>.SymmetricExceptWith(IEnumerable<T> other) => throw new NotImplementedException();
-	bool ISet<T>.IsSupersetOf(IEnumerable<T> other) => throw new NotImplementedException();
-	bool IReadOnlySet<T>.IsSupersetOf(IEnumerable<T> other) => throw new NotImplementedException();
-	bool ISet<T>.IsProperSupersetOf(IEnumerable<T> other) => throw new NotImplementedException();
-	bool IReadOnlySet<T>.IsProperSupersetOf(IEnumerable<T> other) => throw new NotImplementedException();
-	bool ISet<T>.IsSubsetOf(IEnumerable<T> other) => throw new NotImplementedException();
-	bool IReadOnlySet<T>.IsSubsetOf(IEnumerable<T> other) => throw new NotImplementedException();
-	bool ISet<T>.IsProperSubsetOf(IEnumerable<T> other) => throw new NotImplementedException();
-	bool IReadOnlySet<T>.IsProperSubsetOf(IEnumerable<T> other) => throw new NotImplementedException();
-	bool ISet<T>.Overlaps(IEnumerable<T> other) => throw new NotImplementedException();
-	bool IReadOnlySet<T>.Overlaps(IEnumerable<T> other) => throw new NotImplementedException();
-	bool ISet<T>.SetEquals(IEnumerable<T> other) => throw new NotImplementedException();
-	bool IReadOnlySet<T>.SetEquals(IEnumerable<T> other) => throw new NotImplementedException();
+	void ISet<T>.UnionWith(IEnumerable<T> other) => throw new NotSupportedException();
+	void ISet<T>.IntersectWith(IEnumerable<T> other) => throw new NotSupportedException();
+	void ISet<T>.ExceptWith(IEnumerable<T> other) => throw new NotSupportedException();
+	void ISet<T>.SymmetricExceptWith(IEnumerable<T> other) => throw new NotSupportedException();
+	bool ISet<T>.IsSupersetOf(IEnumerable<T> other) => throw new NotSupportedException();
+	bool IReadOnlySet<T>.IsSupersetOf(IEnumerable<T> other) => throw new NotSupportedException();
+	bool ISet<T>.IsProperSupersetOf(IEnumerable<T> other) => throw new NotSupportedException();
+	bool IReadOnlySet<T>.IsProperSupersetOf(IEnumerable<T> other) => throw new NotSupportedException();
+	bool ISet<T>.IsSubsetOf(IEnumerable<T> other) => throw new NotSupportedException();
+	bool IReadOnlySet<T>.IsSubsetOf(IEnumerable<T> other) => throw new NotSupportedException();
+	bool ISet<T>.IsProperSubsetOf(IEnumerable<T> other) => throw new NotSupportedException();
+	bool IReadOnlySet<T>.IsProperSubsetOf(IEnumerable<T> other) => throw new NotSupportedException();
+	bool ISet<T>.Overlaps(IEnumerable<T> other) => throw new NotSupportedException();
+	bool IReadOnlySet<T>.Overlaps(IEnumerable<T> other) => throw new NotSupportedException();
+	bool ISet<T>.SetEquals(IEnumerable<T> other) => throw new NotSupportedException();
+	bool IReadOnlySet<T>.SetEquals(IEnumerable<T> other) => throw new NotSupportedException();
 	
 	public UnrealSet<T> Clone() => new(this);
 	object ICloneable.Clone() => Clone();

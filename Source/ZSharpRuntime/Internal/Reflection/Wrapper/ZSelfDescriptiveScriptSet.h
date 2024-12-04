@@ -33,7 +33,7 @@ namespace ZSharp
 			return FScriptSetHelper::CreateHelperFormElementProperty(const_cast<FProperty*>(Descriptor), UnderlyingInstance);
 		}
 
-		void Get(FScriptSetHelper::FIterator it, FZCallBufferSlot& dest);
+		void Get(FScriptSetHelper::FIterator it, FZCallBufferSlot& dest) const;
 
 		FZSelfDescriptiveScriptSet& operator=(FZSelfDescriptiveScriptSet&& other) noexcept;
 

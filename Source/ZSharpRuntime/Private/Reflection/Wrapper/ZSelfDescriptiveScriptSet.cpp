@@ -76,7 +76,7 @@ int32 ZSharp::FZSelfDescriptiveScriptSet::Num() const
 	return helper.Num();
 }
 
-void ZSharp::FZSelfDescriptiveScriptSet::Get(FScriptSetHelper::FIterator it, FZCallBufferSlot& dest)
+void ZSharp::FZSelfDescriptiveScriptSet::Get(FScriptSetHelper::FIterator it, FZCallBufferSlot& dest) const
 {
 	FScriptSetHelper helper = GetHelper();
 	void* src = helper.GetElementPtr(it);

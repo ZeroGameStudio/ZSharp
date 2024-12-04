@@ -10,6 +10,7 @@ namespace ZSharp
 	{
 		static void GetData(FZConjugateHandle self, FString& result);
 		static void SetData(FZConjugateHandle self, const TCHAR* data);
+		static uint8 IsNone(FZConjugateHandle self);
 	};
 }
 

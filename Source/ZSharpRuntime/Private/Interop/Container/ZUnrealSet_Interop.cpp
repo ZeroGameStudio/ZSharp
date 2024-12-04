@@ -46,7 +46,19 @@ int32 ZSharp::FZUnrealSet_Interop::Count(FZConjugateHandle self)
 ZSharp::FZUnrealSet_Interop::FZIterator* ZSharp::FZUnrealSet_Interop::CreateEnumerator(FZConjugateHandle target)
 {
 	FZSelfDescriptiveScriptSet* sdtarget = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(target);
-	return new FZIterator { sdtarget->GetHelper() };
+	if (!sdtarget->Num())
+	{
+		return nullptr;
+	}
+	
+	auto* it = new FZIterator { sdtarget->GetHelper() };
+	if (!it)
+	{
+		delete it;
+		it = nullptr;
+	}
+
+	return it;
 }
 
 void ZSharp::FZUnrealSet_Interop::ReleaseEnumerator(FZIterator* self)
@@ -57,18 +69,13 @@ void ZSharp::FZUnrealSet_Interop::ReleaseEnumerator(FZIterator* self)
 uint8 ZSharp::FZUnrealSet_Interop::EnumeratorMoveNext(FZIterator* self)
 {
 	++*self->Iterator;
-	return EnumeratorIsValid(self);
+	return !!*self->Iterator;
 }
 
 void ZSharp::FZUnrealSet_Interop::EnumeratorCurrent(FZIterator* self, FZConjugateHandle target, FZCallBufferSlot& item)
 {
 	FZSelfDescriptiveScriptSet* sdtarget = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(target);
 	sdtarget->Get(*self->Iterator, item);
-}
-
-uint8 ZSharp::FZUnrealSet_Interop::EnumeratorIsValid(FZIterator* self)
-{
-	return !!*self->Iterator;
 }
 
 

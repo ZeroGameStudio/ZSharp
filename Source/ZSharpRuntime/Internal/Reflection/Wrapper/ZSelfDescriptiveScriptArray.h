@@ -25,10 +25,10 @@ namespace ZSharp
 		void InsertAt(int32 index);
 		bool Remove(const FZCallBufferSlot& src);
 		void RemoveAt(int32 index);
+		void Clear();
 		int32 IndexOf(const FZCallBufferSlot& src);
 		void Get(int32 index, FZCallBufferSlot& dest) const;
 		void Set(int32 index, const FZCallBufferSlot& src);
-		void Clear();
 
 		int32 Num() const;
 

@@ -13,7 +13,7 @@ namespace ZSharp::ExportMap
 	{
 		FZCallBuffer& buf = *buffer;
 		FZSelfDescriptiveScriptMap& sdsm = TZCallBufferSlotEncoder<FZSelfDescriptiveScriptMap>::Decode(buf[0]);
-		sdsm.Add(buf[1], buf[2]);
+		sdsm.TryAdd(buf[1], buf[2]);
 		
 		return EZCallErrorCode::Succeed;
 	}};

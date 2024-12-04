@@ -28,7 +28,6 @@ namespace ZSharp
 		static void ReleaseEnumerator(FZIterator* self);
 		static uint8 EnumeratorMoveNext(FZIterator* self);
 		static void EnumeratorCurrent(FZIterator* self, FZConjugateHandle target, FZCallBufferSlot& item);
-		static uint8 EnumeratorIsValid(FZIterator* self);
 	};
 }
 

@@ -175,7 +175,7 @@ public class ClassWriter
 
 			if (_exportedClass.IsStruct)
 			{
-				return "UnrealStructBase";
+				return "UnrealScriptStructBase";
 			}
 
 			if (_exportedClass.IsInterface)

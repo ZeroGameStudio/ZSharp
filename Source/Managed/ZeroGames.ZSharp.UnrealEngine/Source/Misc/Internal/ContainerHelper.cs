@@ -25,7 +25,7 @@ internal static class ContainerHelper
 		}
 		
 		bool res = CanBeValue(type);
-		if (type.IsAssignableTo(typeof(UnrealStructBase)))
+		if (type.IsAssignableTo(typeof(UnrealScriptStructBase)))
 		{
 			res &= type.GetCustomAttribute<HashableAttribute>() is not null;
 		}
@@ -53,7 +53,7 @@ internal static class ContainerHelper
         
 		// UClasses + UStructs + UEnums
 		if (type.IsAssignableTo(typeof(UnrealObjectBase))
-		    || type.IsAssignableTo(typeof(UnrealStructBase))
+		    || type.IsAssignableTo(typeof(UnrealScriptStructBase))
 		    || UnrealEnum.IsUnrealEnumType(type))
 		{
 			return true;
@@ -105,7 +105,7 @@ internal static class ContainerHelper
 		}
 		
 		// UStructs
-		if (type.IsAssignableTo(typeof(UnrealStructBase)))
+		if (type.IsAssignableTo(typeof(UnrealScriptStructBase)))
 		{
 			desc.Descriptor = ((UnrealScriptStruct)type.GetProperty(nameof(IStaticStruct.StaticStruct))!.GetValue(null)!).Unmanaged;
 			return true;

@@ -3,11 +3,11 @@
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(2)]
-public abstract class UnrealStructBase : UnrealExportedObjectBase
+public abstract class UnrealScriptStructBase : UnrealExportedObjectBase
 {
 	
-    public UnrealStructBase(){}
-    protected UnrealStructBase(IntPtr unmanaged) : base(unmanaged){}
+    public UnrealScriptStructBase(){}
+    protected UnrealScriptStructBase(IntPtr unmanaged) : base(unmanaged){}
 
     public DynamicZCallResult ReadUnrealPropertyEx<T>(string name, int32 index)
     {

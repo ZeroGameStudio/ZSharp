@@ -96,7 +96,19 @@ bool ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::IsBound() const
 	return UnderlyingInstance->IsBound();
 }
 
-FMulticastScriptDelegate* ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::GetDelegatePtr()
+bool ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::IsBoundToObject(const UObject* object) const
+{
+	FMulticastScriptDelegate* inner = GetDelegatePtr();
+	return inner && inner->GetAllObjects().Contains(object);
+}
+
+bool ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::Contains(const UObject* object, FName name) const
+{
+	FMulticastScriptDelegate* inner = GetDelegatePtr();
+	return inner && inner->Contains(object, name);
+}
+
+FMulticastScriptDelegate* ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::GetDelegatePtr() const
 {
 	if (UnderlyingInstance->IsBound())
 	{

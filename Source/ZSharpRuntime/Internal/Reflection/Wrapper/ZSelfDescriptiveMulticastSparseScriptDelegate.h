@@ -32,8 +32,10 @@ namespace ZSharp
 		EZCallErrorCode Broadcast(FZCallBuffer* buffer);
 
 		bool IsBound() const;
+		bool IsBoundToObject(const UObject* object) const;
+		bool Contains(const UObject* object, FName name) const;
 
-		FMulticastScriptDelegate* GetDelegatePtr();
+		FMulticastScriptDelegate* GetDelegatePtr() const;
 		
 		FZSelfDescriptiveMulticastSparseScriptDelegate& operator=(FZSelfDescriptiveMulticastSparseScriptDelegate&& other) noexcept;
 

@@ -90,6 +90,16 @@ bool ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::IsBound() const
 	return UnderlyingInstance->IsBound();
 }
 
+bool ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::IsBoundToObject(const UObject* object) const
+{
+	return UnderlyingInstance->GetAllObjects().Contains(object);
+}
+
+bool ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::Contains(const UObject* object, FName name) const
+{
+	return UnderlyingInstance->Contains(object, name);
+}
+
 ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate& ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::operator=(FZSelfDescriptiveMulticastInlineScriptDelegate&& other) noexcept
 {
 	Super::operator=(MoveTemp(other));

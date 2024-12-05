@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
@@ -9,13 +8,75 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public abstract class UnrealMulticastSparseDelegateBase : UnrealExportedObjectBase
 {
 	
-	public void Add(UnrealObject obj, string name) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.AddUFunction", obj, new UnrealName(name));
-	public void Remove(UnrealObject obj, string name) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.RemoveUFunction", obj, new UnrealName(name));
-	public void RemoveAll(UnrealObject obj) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.RemoveAll", obj);
-	public void Clear() => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.Clear");
-	public DynamicZCallResult Broadcast(params ReadOnlySpan<object?> parameters) => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.Broadcast", parameters);
-	
-	public bool IsBound => this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.IsBound", false)[-1].Bool;
+	public void Add(UnrealObject? obj, string? name)
+	{
+		if (obj is null || string.IsNullOrWhiteSpace(name))
+		{
+			return;
+		}
+		
+		MasterAlcCache.GuardInvariant();
+		InternalAdd(obj, name);
+	}
+
+	public void Remove(UnrealObject? obj, string? name)
+	{
+		if (obj is null || string.IsNullOrWhiteSpace(name))
+		{
+			return;
+		}
+		
+		MasterAlcCache.GuardInvariant();
+		InternalRemove(obj, name);
+	}
+
+	public void RemoveAll(UnrealObject? obj)
+	{
+		if (obj is null)
+		{
+			return;
+		}
+		
+		MasterAlcCache.GuardInvariant();
+		InternalRemoveAll(obj);
+	}
+
+	public void Clear()
+	{
+		MasterAlcCache.GuardInvariant();
+		InternalClear();
+	}
+
+	public bool IsBoundToObject(UnrealObject? obj)
+	{
+		if (obj is null)
+		{
+			return false;
+		}
+		
+		MasterAlcCache.GuardInvariant();
+		return InternalIsBoundToObject(obj);
+	}
+
+	public bool Contains(UnrealObject? obj, string? name)
+	{
+		if (obj is null || string.IsNullOrWhiteSpace(name))
+		{
+			return false;
+		}
+		
+		MasterAlcCache.GuardInvariant();
+		return InternalContains(obj, name);
+	}
+
+	public bool IsBound
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsBound;
+		}
+	}
 	
 	protected UnrealMulticastSparseDelegateBase(Type delegateType)
 	{
@@ -29,13 +90,36 @@ public abstract class UnrealMulticastSparseDelegateBase : UnrealExportedObjectBa
 		_delegateType = delegateType;
 	}
 	
-	protected UnrealObject Add(Delegate @delegate)
-	{
-		check(@delegate.GetType() == _delegateType);
+	protected unsafe UnrealObject Add(Delegate @delegate) => UnrealMulticastSparseDelegate_Interop.AddManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();
 
-		GCHandle handle = GCHandle.Alloc(@delegate);
-		return this.ZCall(MasterAlcCache.Instance, "ex://MulticastSparseDelegate.AddManaged", handle, null)[-1].ReadConjugateChecked<UnrealObject>();
+	private unsafe void InternalAdd(UnrealObject obj, string name)
+	{
+		fixed (char* nameBuffer = name)
+		{
+			UnrealMulticastSparseDelegate_Interop.AddUnrealFunction(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj), nameBuffer);
+		}
 	}
+
+	private unsafe void InternalRemove(UnrealObject obj, string name)
+	{
+		fixed (char* nameBuffer = name)
+		{
+			UnrealMulticastSparseDelegate_Interop.Remove(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj), nameBuffer);
+		}
+	}
+
+	private unsafe void InternalRemoveAll(UnrealObject obj) => UnrealMulticastSparseDelegate_Interop.RemoveAll(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj));
+	private unsafe void InternalClear() => UnrealMulticastSparseDelegate_Interop.Clear(ConjugateHandle.FromConjugate(this));
+	private unsafe bool InternalIsBoundToObject(UnrealObject obj) => UnrealMulticastSparseDelegate_Interop.IsBoundToObject(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj)) > 0;
+	private unsafe bool InternalContains(UnrealObject obj, string name)
+	{
+		fixed (char* nameBuffer = name)
+		{
+			return UnrealMulticastSparseDelegate_Interop.Contains(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj), nameBuffer) > 0;
+		}
+	}
+
+	private unsafe bool InternalIsBound => UnrealMulticastSparseDelegate_Interop.IsBound(ConjugateHandle.FromConjugate(this)) > 0;
 	
 	private readonly Type _delegateType;
 	

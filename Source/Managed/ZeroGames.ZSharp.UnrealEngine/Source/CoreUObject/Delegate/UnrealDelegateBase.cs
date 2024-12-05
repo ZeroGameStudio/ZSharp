@@ -1,8 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Reflection;
 using System.Runtime.InteropServices;
-using ZeroGames.ZSharp.Core.UnrealEngine.Specifier;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
@@ -10,14 +8,60 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public abstract class UnrealDelegateBase : UnrealExportedObjectBase
 {
 
-	public void Bind(UnrealObject obj, string name) => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.BindUFunction", obj, new UnrealName(name));
-	public void Unbind() => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.Unbind");
-	public DynamicZCallResult Execute(params ReadOnlySpan<object?> parameters) => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.Execute", parameters);
-	public bool IsBoundToObject(UnrealObject obj) => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.IsBoundToObject", obj, false)[-1].Bool;
-	
-	public UnrealObject? Object => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.GetObject", [ null ])[-1].ReadConjugate<UnrealObject>();
-	public string FunctionName => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.GetFunctionName", [null])[-1].ReadConjugateChecked<UnrealName>().ToString();
-	public bool IsBound => this.ZCall(MasterAlcCache.Instance, "ex://Delegate.IsBound", false)[-1].Bool;
+	public void Bind(UnrealObject? obj, string? name)
+	{
+		if (obj is null || string.IsNullOrWhiteSpace(name))
+		{
+			return;
+		}
+		
+		MasterAlcCache.GuardInvariant();
+		InternalBind(obj, name);
+	}
+
+	public void Unbind()
+	{
+		MasterAlcCache.GuardInvariant();
+		InternalUnbind();
+	}
+
+	public bool IsBoundToObject(UnrealObject? obj)
+	{
+		if (obj is null)
+		{
+			return false;
+		}
+		
+		MasterAlcCache.GuardInvariant();
+		return InternalIsBoundToObject(obj);
+	}
+
+	public UnrealObject? Object
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalObject;
+		}
+	}
+
+	public string FunctionName
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalFunctionName;
+		}
+	}
+
+	public bool IsBound
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsBound;
+		}
+	}
 	
 	protected UnrealDelegateBase(Type delegateType)
 	{
@@ -31,13 +75,32 @@ public abstract class UnrealDelegateBase : UnrealExportedObjectBase
 		_delegateType = delegateType;
 	}
 
-	protected UnrealObject Bind(Delegate @delegate)
-	{
-		check(@delegate.GetType() == _delegateType);
+	protected unsafe UnrealObject Bind(Delegate @delegate) => UnrealDelegate_Interop.BindManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();
 
-		GCHandle handle = GCHandle.Alloc(@delegate);
-		return this.ZCall(MasterAlcCache.Instance, "ex://Delegate.BindManaged", handle, null)[-1].ReadConjugateChecked<UnrealObject>();
+	private unsafe void InternalBind(UnrealObject obj, string name)
+	{
+		fixed (char* nameBuffer = name)
+		{
+			UnrealDelegate_Interop.BindUnrealFunction(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj), nameBuffer);
+		}
 	}
+
+	private unsafe void InternalUnbind() => UnrealDelegate_Interop.Unbind(ConjugateHandle.FromConjugate(this));
+	private unsafe bool InternalIsBoundToObject(UnrealObject obj) => UnrealDelegate_Interop.IsBoundToObject(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj)) > 0;
+	
+	private unsafe UnrealObject? InternalObject => UnrealDelegate_Interop.GetObject(ConjugateHandle.FromConjugate(this)).GetTarget<UnrealObject>();
+
+	private unsafe string InternalFunctionName
+	{
+		get
+		{
+			using InteropString buffer = new();
+			UnrealDelegate_Interop.GetFunctionName(ConjugateHandle.FromConjugate(this), buffer.Address);
+			return buffer;
+		}
+	}
+	
+	private unsafe bool InternalIsBound => UnrealDelegate_Interop.IsBound(ConjugateHandle.FromConjugate(this)) > 0;
 	
 	private readonly Type _delegateType;
 

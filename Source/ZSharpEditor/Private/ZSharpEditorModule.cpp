@@ -25,7 +25,7 @@ namespace ZSharpEditorModule_Private
 		}
 
 		static const FText GWelcomeTitle = LOCTEXT("WelcomeTitle", "Welcome to Z#");
-		static const FText GWelcomeMessage = LOCTEXT("WelcomeMessage", "This is the first time you run unreal editor with Z#. Do you need some example content?");
+		static const FText GWelcomeMessage = LOCTEXT("WelcomeMessage", "This is the first time you run unreal editor with Z#. Would you like to have some example content?");
 
 		if (FMessageDialog::Open(EAppMsgCategory::Success, EAppMsgType::YesNo, GWelcomeMessage, GWelcomeTitle) != EAppReturnType::Yes)
 		{

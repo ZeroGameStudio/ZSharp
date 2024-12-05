@@ -26,6 +26,7 @@
 #include "Interop/Container/ZUnrealArray_Interop.h"
 #include "Interop/Container/ZUnrealSet_Interop.h"
 #include "Interop/Container/ZUnrealMap_Interop.h"
+#include "Interop/Container/ZUnrealOptional_Interop.h"
 #include "Interop/Object/ZUnrealObjectGlobals_Interop.h"
 #include "Interop/Object/ZUnrealObject_Interop.h"
 #include "Interop/Object/ZUnrealStruct_Interop.h"
@@ -183,6 +184,11 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, ReleaseEnumerator),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, EnumeratorMoveNext),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMap, EnumeratorCurrent),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealOptional, Get),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealOptional, Set),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealOptional, Reset),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealOptional, IsSet),
 			
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, NewObject),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, LoadObject),

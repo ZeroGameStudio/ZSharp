@@ -4,7 +4,6 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 
 internal static unsafe class SoftObjectPtr_Interop
 {
-	
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle, void> Copy;
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle, uint8> Identical;
 	public static delegate* unmanaged<ConjugateHandle, int32> Hash;
@@ -15,7 +14,6 @@ internal static unsafe class SoftObjectPtr_Interop
 	public static delegate* unmanaged<ConjugateHandle, uint8> IsNull;
 	public static delegate* unmanaged<ConjugateHandle, uint8> IsPending;
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle> Load;
-	
 }
 
 

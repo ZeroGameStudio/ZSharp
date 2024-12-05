@@ -5,8 +5,76 @@ using ZeroGames.ZSharp.Core.UnrealEngine.Specifier;
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
-internal static class ContainerHelper
+internal static class PropertyHelper
 {
+
+	public static bool IsUnrealProperty(Type type)
+	{
+		// UClasses + UStructs + UEnums
+		if (type.IsAssignableTo(typeof(UnrealObjectBase))
+		    || type.IsAssignableTo(typeof(UnrealScriptStructBase))
+		    || UnrealEnum.IsUnrealEnumType(type))
+		{
+			return true;
+		}
+		
+		if (IsUnrealPrimitiveProperty(type))
+		{
+			return true;
+		}
+		
+		if (IsUnrealStringProperty(type))
+		{
+			return true;
+		}
+		
+		if (IsUnrealObjectWrapperProperty(type))
+		{
+			return true;
+		}
+		
+		if (IsUnrealContainerProperty(type))
+		{
+			return true;
+		}
+		
+		if (IsUnrealDelegateProperty(type))
+		{
+			return true;
+		}
+		
+		// Special types
+		if (type == typeof(FieldPath))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	public static bool IsUnrealPrimitiveProperty(Type type) => type.IsPrimitive;
+
+	public static bool IsUnrealStringProperty(Type type) => type == typeof(UnrealString)
+	                                                        || type == typeof(UnrealUtf8String)
+	                                                        || type == typeof(UnrealAnsiString)
+	                                                        || type == typeof(UnrealName)
+	                                                        || type == typeof(UnrealText);
+
+	public static bool IsUnrealObjectWrapperProperty(Type type) => type.IsAssignableTo(typeof(SubclassOfBase))
+	                                                               || type.IsAssignableTo(typeof(SoftClassPtrBase))
+	                                                               || type.IsAssignableTo(typeof(SoftObjectPtrBase))
+	                                                               || type.IsAssignableTo(typeof(WeakObjectPtrBase))
+	                                                               || type.IsAssignableTo(typeof(LazyObjectPtrBase))
+	                                                               || type.IsAssignableTo(typeof(ScriptInterfaceBase));
+
+	public static bool IsUnrealContainerProperty(Type type) => type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(UnrealArray<>)
+	                                                                                  || type.GetGenericTypeDefinition() == typeof(UnrealSet<>)
+	                                                                                  || type.GetGenericTypeDefinition() == typeof(UnrealMap<,>)
+	                                                                                  || type.GetGenericTypeDefinition() == typeof(UnrealOptional<>));
+
+	public static bool IsUnrealDelegateProperty(Type type) => type.IsAssignableTo(typeof(UnrealDelegateBase))
+	                                                          || type.IsAssignableTo(typeof(UnrealMulticastInlineDelegateBase))
+	                                                          || type.IsAssignableTo(typeof(UnrealMulticastSparseDelegateBase));
 
 	public static bool CanBeKey(Type type)
 	{
@@ -17,9 +85,7 @@ internal static class ContainerHelper
 		}
 		
 		// Delegates is hashable but not supported by unreal reflection system.
-		if (type.IsAssignableTo(typeof(UnrealDelegateBase))
-		    || type.IsAssignableTo(typeof(UnrealMulticastInlineDelegateBase))
-		    || type.IsAssignableTo(typeof(UnrealMulticastSparseDelegateBase)))
+		if (IsUnrealDelegateProperty(type))
 		{
 			return false;
 		}
@@ -32,57 +98,20 @@ internal static class ContainerHelper
 
 		return res;
 	}
-
+	
 	public static bool CanBeValue(Type type)
 	{
-		// 8 integers + 2 floats + 1 boolean
-		if (type.IsPrimitive)
+		if (IsUnrealContainerProperty(type))
 		{
-			return true;
+			return false;
+		}
+		
+		if (type.IsAssignableTo(typeof(UnrealMulticastSparseDelegateBase)))
+		{
+			return false;
 		}
 
-		// 5 strings
-		if (type == typeof(UnrealString)
-		    || type == typeof(UnrealUtf8String)
-		    || type == typeof(UnrealAnsiString)
-		    || type == typeof(UnrealName)
-		    || type == typeof(UnrealText))
-		{
-			return true;
-		}
-        
-		// UClasses + UStructs + UEnums
-		if (type.IsAssignableTo(typeof(UnrealObjectBase))
-		    || type.IsAssignableTo(typeof(UnrealScriptStructBase))
-		    || UnrealEnum.IsUnrealEnumType(type))
-		{
-			return true;
-		}
-		
-		// 6 UObject wrappers
-		if (type.IsAssignableTo(typeof(SubclassOfBase))
-		    || type.IsAssignableTo(typeof(SoftClassPtrBase))
-		    || type.IsAssignableTo(typeof(SoftObjectPtrBase))
-		    || type.IsAssignableTo(typeof(WeakObjectPtrBase))
-		    || type.IsAssignableTo(typeof(LazyObjectPtrBase))
-		    || type.IsAssignableTo(typeof(ScriptInterfaceBase)))
-		{
-			return true;
-		}
-		
-		// 2 delegates (sparse delegate is not supported)
-		if (type.IsAssignableTo(typeof(UnrealDelegateBase)) || type.IsAssignableTo(typeof(UnrealMulticastInlineDelegateBase)))
-		{
-			return true;
-		}
-		
-		// Special types
-		if (type == typeof(FieldPath))
-		{
-			return true;
-		}
-
-		return false;
+		return IsUnrealProperty(type);
 	}
 
 	public static bool TryGetPropertyDesc(Type type, out PropertyDesc desc)

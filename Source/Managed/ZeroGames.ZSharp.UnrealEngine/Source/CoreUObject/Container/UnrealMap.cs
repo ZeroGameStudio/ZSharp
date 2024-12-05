@@ -128,7 +128,7 @@ public sealed class UnrealMap<TKey, TValue> : PlainExportedObjectBase
 
 	public UnrealMap()
 	{
-		if (!ContainerHelper.CanBeValue(typeof(TKey)) || !ContainerHelper.CanBeValue(typeof(TValue)))
+		if (!PropertyHelper.CanBeValue(typeof(TKey)) || !PropertyHelper.CanBeValue(typeof(TValue)))
 		{
 			Unmanaged = DEAD_ADDR;
 			GC.SuppressFinalize(this);
@@ -188,7 +188,7 @@ public sealed class UnrealMap<TKey, TValue> : PlainExportedObjectBase
 	bool IDictionary.Contains(object key) => ContainsKey((TKey)key);
 	bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item) => ContainsKey(item.Key);
 
-	public bool TryGetValue(TKey key, [NotNullWhen(true)] out TValue value)
+	public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
 	{
 		MasterAlcCache.GuardInvariant();
 		return InternalGet(key, out value);
@@ -299,8 +299,8 @@ public sealed class UnrealMap<TKey, TValue> : PlainExportedObjectBase
 	{
 		Userdata userdata = new();
 		Userdata* pUserdata = &userdata;
-		ContainerHelper.TryGetPropertyDesc(typeof(TKey), out userdata.KeyProperty);
-		ContainerHelper.TryGetPropertyDesc(typeof(TValue), out userdata.ValueProperty);
+		PropertyHelper.TryGetPropertyDesc(typeof(TKey), out userdata.KeyProperty);
+		PropertyHelper.TryGetPropertyDesc(typeof(TValue), out userdata.ValueProperty);
 		
 		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, (IntPtr)pUserdata);
 	}
@@ -310,12 +310,17 @@ public sealed class UnrealMap<TKey, TValue> : PlainExportedObjectBase
 	private unsafe void InternalClear() => UnrealMap_Interop.Clear(ConjugateHandle.FromConjugate(this));
 	private unsafe bool InternalContainsKey(TKey key) => UnrealMap_Interop.Contains(ConjugateHandle.FromConjugate(this), ZCallBufferSlot.FromObject(key)) > 0;
 
-	private unsafe bool InternalGet(TKey key, [NotNullWhen(true)] out TValue value)
+	private unsafe bool InternalGet(TKey key, [MaybeNullWhen(false)] out TValue value)
 	{
 		ZCallBufferSlot result = ZCallBufferSlot.FromType(typeof(TValue));
-		bool suc = UnrealMap_Interop.Get(ConjugateHandle.FromConjugate(this), ZCallBufferSlot.FromObject(key), ref result) > 0;
-		value = (TValue)result.Object!;
-		return suc;
+		if (UnrealMap_Interop.Get(ConjugateHandle.FromConjugate(this), ZCallBufferSlot.FromObject(key), ref result) > 0)
+		{
+			value = (TValue)result.Object!;
+			return true;
+		}
+
+		value = default;
+		return false;
 	}
 	
 	private unsafe void InternalSet(TKey key, TValue value) => UnrealMap_Interop.Set(ConjugateHandle.FromConjugate(this), ZCallBufferSlot.FromObject(key), ZCallBufferSlot.FromObject(value));

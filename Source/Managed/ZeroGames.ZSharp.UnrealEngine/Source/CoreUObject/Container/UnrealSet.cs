@@ -121,7 +121,7 @@ public sealed class UnrealSet<T> : PlainExportedObjectBase
 
 	public UnrealSet()
 	{
-		if (!ContainerHelper.CanBeKey(typeof(T)) || !ContainerHelper.CanBeValue(typeof(T)))
+		if (!PropertyHelper.CanBeKey(typeof(T)) || !PropertyHelper.CanBeValue(typeof(T)))
 		{
 			Unmanaged = DEAD_ADDR;
 			GC.SuppressFinalize(this);
@@ -231,7 +231,7 @@ public sealed class UnrealSet<T> : PlainExportedObjectBase
 	{
 		Userdata userdata = new();
 		Userdata* pUserdata = &userdata;
-		ContainerHelper.TryGetPropertyDesc(typeof(T), out userdata.ElementProperty);
+		PropertyHelper.TryGetPropertyDesc(typeof(T), out userdata.ElementProperty);
 		
 		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, (IntPtr)pUserdata);
 	}

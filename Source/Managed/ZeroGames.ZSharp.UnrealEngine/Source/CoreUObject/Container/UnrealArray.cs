@@ -74,7 +74,7 @@ public sealed class UnrealArray<T> : PlainExportedObjectBase
 
 	public UnrealArray()
 	{
-		if (!ContainerHelper.CanBeValue(typeof(T)))
+		if (!PropertyHelper.CanBeValue(typeof(T)))
 		{
 			Unmanaged = DEAD_ADDR;
 			GC.SuppressFinalize(this);
@@ -223,7 +223,7 @@ public sealed class UnrealArray<T> : PlainExportedObjectBase
 	{
 		Userdata userdata = new();
 		Userdata* pUserdata = &userdata;
-		ContainerHelper.TryGetPropertyDesc(typeof(T), out userdata.ElementProperty);
+		PropertyHelper.TryGetPropertyDesc(typeof(T), out userdata.ElementProperty);
 		
 		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, (IntPtr)pUserdata);
 	}

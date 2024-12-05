@@ -106,8 +106,7 @@ void ZSharp::FZBuildEngine::GenerateExampleContent() const
 		FString content;
 		ensure(FFileHelper::LoadFileToString(content, *srcPath));
 		replaceWildcards(content);
-		UE_LOG(LogTemp, Log, TEXT("%s"), *content);
-		//ensure(FFileHelper::SaveStringToFile(content, *dstPath));
+		ensure(FFileHelper::SaveStringToFile(content, *dstPath));
 	}
 }
 

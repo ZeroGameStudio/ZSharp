@@ -21,7 +21,7 @@ namespace ZSharpEditorModule_Private
 		const FString DefaultZSharpIniPath = FPaths::ProjectConfigDir() / "DefaultZSharp.ini";
 		if (FPaths::DirectoryExists(ManagedSourceDir) || FPaths::FileExists(DefaultZSharpIniPath))
 		{
-			//return;
+			return;
 		}
 
 		static const FText GWelcomeTitle = LOCTEXT("WelcomeTitle", "Welcome to Z#");

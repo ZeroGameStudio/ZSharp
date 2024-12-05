@@ -1,0 +1,21 @@
+{
+	"HasGlue": true,
+	"ProjectReferences":
+	[
+		"ZeroGames.ZSharp.Core",
+		"ZeroGames.ZSharp.Core.UnrealEngine",
+		"ZeroGames.ZSharp.Core.Async",
+		"ZeroGames.ZSharp.UnrealEngine",
+		"ZeroGames.ZSharp.Emit"
+	],
+	"Usings":
+	[
+		"ZeroGames.ZSharp.Core",
+		"ZeroGames.ZSharp.Core.UnrealEngine",
+		"ZeroGames.ZSharp.Core.Async",
+		"ZeroGames.ZSharp.UnrealEngine",
+		"ZeroGames.ZSharp.UnrealEngine.CoreUObject",
+		"ZeroGames.ZSharp.UnrealEngine.Engine",
+		"ZeroGames.ZSharp.Emit.Specifier"
+	]
+}

@@ -77,6 +77,7 @@ public abstract class ExportedObjectBase : IConjugate
 
     public IntPtr Unmanaged { get; protected set; }
     public bool IsBlack { get; }
+    public bool IsRed => !IsBlack;
 
     public bool IsExpired => Unmanaged == DEAD_ADDR;
     

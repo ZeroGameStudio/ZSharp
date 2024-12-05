@@ -38,11 +38,13 @@ public class ZSharpEditor : ModuleRules
 				"Engine",
 				
 				"Projects",
+				"MainFrame",
 				
 				"ZSharpCore",
 				"ZSharpRuntime",
 				
 				"ZSharpExport",
+				"ZSharpBuild",
 			}
 		);
 		

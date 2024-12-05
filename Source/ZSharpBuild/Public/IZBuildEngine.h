@@ -11,6 +11,7 @@ namespace ZSharp
 	public:
 		virtual ~IZBuildEngine(){}
 	public:
+		virtual void GenerateExampleContent() const = 0;
 		virtual void GenerateSolution(const TArray<FString>& args) const = 0;
 		virtual void GenerateGlue(const TArray<FString>& args) const = 0;
 		virtual void BuildSolution(const TArray<FString>& args) const = 0;

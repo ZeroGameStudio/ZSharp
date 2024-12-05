@@ -34,9 +34,9 @@ public partial struct ZeroTask
 	{
 		check(IsInGameThread);
 		
-		if (delayTime <= TimeSpan.Zero)
+		if (delayTime < TimeSpan.FromMilliseconds(1))
 		{
-			return FromResult(TimeSpan.Zero);
+			delayTime = TimeSpan.FromMilliseconds(1);
 		}
 		
 		ZeroTask_Delay delay = ZeroTask_Delay.GetFromPool(delayType, delayTime, lifecycle, throwOnExpired);

@@ -63,6 +63,54 @@ ZSharp::FZBuildEngine& ZSharp::FZBuildEngine::Get()
 	return GInstance;
 }
 
+void ZSharp::FZBuildEngine::GenerateExampleContent() const
+{
+	FString gameModuleName;
+	TArray<FModuleStatus> statuses;
+	FModuleManager::Get().QueryModules(statuses);
+	for (const auto& status : statuses)
+	{
+		if (status.bIsGameModule)
+		{
+			gameModuleName = status.Name;
+			break;
+		}
+	}
+
+	if (!ensure(!gameModuleName.IsEmpty()))
+	{
+		return;
+	}
+
+	auto replaceWildcards = [gameModuleName](FString& text)
+	{
+		text.ReplaceInline(TEXT("${GameModuleName}"), *gameModuleName);
+	};
+
+	const TMap<FString, FString> templateTargetDirMap
+	{
+		{ "DefaultZSharp.ini", "Config" },
+		{ "Game.zsproj", "Source/Managed/Game" },
+		{ "DllEntry.cs", "Source/Managed/Game/Source" },
+		{ "MagicCube.cs", FString::Printf(TEXT("Source/Managed/Game/Source/%s"), *gameModuleName) },
+	};
+
+	const FString projectDir = ZBuildEngine_Private::GetProjectDir();
+	const FString pluginDir = ZBuildEngine_Private::GetPluginDir("ZSharp");
+	const FString pluginTemplateDir = pluginDir / "Template";
+
+	for (const auto& pair : templateTargetDirMap)
+	{
+		const FString srcPath = pluginTemplateDir / pair.Key;
+		const FString dstPath = projectDir / pair.Value / pair.Key;
+		FString content;
+		ensure(FFileHelper::LoadFileToString(content, *srcPath));
+		replaceWildcards(content);
+		UE_LOG(LogTemp, Log, TEXT("%s"), *content);
+		//ensure(FFileHelper::SaveStringToFile(content, *dstPath));
+	}
+}
+
 void ZSharp::FZBuildEngine::GenerateSolution(const TArray<FString>& args) const
 {
 	const FString projectDir = ZBuildEngine_Private::GetProjectDir();

@@ -20,6 +20,7 @@ internal class ZeroTask_Delay : UnderlyingZeroTaskBase<TimeSpan, ZeroTask_Delay>
 		ZeroTask_Delay task = Pool.Pop();
 		task._delayType = delayType;
 		task._delayTime = delayTime;
+		task._delayTimer = default;
 		task.Lifecycle = lifecycle;
 		task.ShouldThrowOnLifecycleExpired = throwOnExpired;
 		
@@ -40,8 +41,10 @@ internal class ZeroTask_Delay : UnderlyingZeroTaskBase<TimeSpan, ZeroTask_Delay>
 		_delayTimer = scheduler.Register(static (deltaTime, state) =>
 		{
 			ZeroTask_Delay @this = Unsafe.As<ZeroTask_Delay>(state!);
+			// This is to ensure the timer only triggers once.
+			// This must call before SetResult because it will return the task to pool.
+			@this._delayTimer.Unregister();
 			@this.Comp.SetResult(deltaTime);
-			@this._delayTimer.Unregister(); // Ensure only trigger once.
 		}, this, _delayTime, false, Lifecycle, static (ex, state) =>
 		{
 			ZeroTask_Delay @this = Unsafe.As<ZeroTask_Delay>(state!);

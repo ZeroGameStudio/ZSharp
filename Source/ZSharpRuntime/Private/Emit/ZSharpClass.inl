@@ -109,14 +109,17 @@ namespace ZSharp::ZSharpClass_Private
 					// Follow the container chain to resolve the actual container.
 					for (const auto& prop : propertyDefault.PropertyChain)
 					{
-						if (const auto objectProp = CastField<FObjectPropertyBase>(prop))
+						if (prop->IsA<FStructProperty>() || prop == tailProperty)
+						{
+							propertyAddr = prop->ContainerPtrToValuePtr<void>(propertyAddr);
+						}
+						else if (const auto objectProp = CastField<FObjectPropertyBase>(prop))
 						{
 							propertyAddr = objectProp->GetObjectPropertyValue_InContainer(propertyAddr);
 						}
 						else
 						{
-							check(prop->IsA<FStructProperty>() || prop == tailProperty);
-							propertyAddr = prop->ContainerPtrToValuePtr<void>(propertyAddr);
+							checkNoEntry();
 						}
 					}
 					

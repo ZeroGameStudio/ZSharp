@@ -5,7 +5,7 @@
  */
 namespace Game.${GameModuleName};
 
-/*
+/*+
  * Define a UClass that can be inherited by blueprint.
  * Place this class into map, play in editor, and you will see a rotating cube.
  * Behavior of [PropertyDefaultOverride] is same as directly set property value in C++ constructor, but only valid for UProperty.
@@ -13,7 +13,6 @@ namespace Game.${GameModuleName};
  * Bug: Directly set StaticMesh property will cause an ensure.
  */
 [UClass, Blueprintable]
-[PropertyDefaultOverride(Property = "StaticMesh.StaticMesh", Default = "/Engine/BasicShapes/Cube.Cube")]
 [PropertyDefaultOverride(Property = "PrimaryActorTick.bCanEverTick", Default = true)]
 public partial class MagicCube : Actor
 {
@@ -39,7 +38,12 @@ public partial class MagicCube : Actor
 	 */
 	[UFunction, BlueprintImplementableEvent, BlueprintCallable]
 	public partial void ChangeColor();
-	
+
+	protected override void UserConstructionScript_Implementation()
+	{
+		StaticMesh.SetStaticMesh(LoadObject<StaticMesh>("/Engine/BasicShapes/Cube.Cube"));
+	}
+
 	/*
 	 * Override an existing BlueprintImplementableEvent ReceiveBeginPlay.
 	 * Since it is an override other than a definition, you should not add [UFunction] attribute on it.
@@ -111,7 +115,7 @@ public partial class MagicCube : Actor
 
 	private void TickRotate(float deltaTime)
 	{
-		K2_AddActorWorldRotation(new(0, RotationSpeed * deltaTime, 0), false, out _, true);
+		K2_AddActorWorldRotation(new() { Yaw = RotationSpeed * deltaTime }, false, out _, true);
 	}
 	
 	/*

@@ -66,6 +66,9 @@ public abstract class UnrealDelegateBase : UnrealExportedObjectBase
 	protected UnrealDelegateBase(){}
 	protected UnrealDelegateBase(IntPtr unmanaged) : base(unmanaged){}
 
+	protected unsafe EZCallErrorCode Execute(ZCallBuffer* buffer) => UnrealDelegate_Interop.Execute(buffer);
+	protected unsafe UnrealObject Bind(Delegate @delegate) => UnrealDelegate_Interop.BindManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();
+
 	private unsafe void InternalBind(UnrealObject obj, string name)
 	{
 		fixed (char* nameBuffer = name)

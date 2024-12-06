@@ -23,8 +23,7 @@ public class DelegateWriter
 		{
 			builder.AddUsingNamespace(ns);
 		}
-		builder.AddUsingNamespace("System.Runtime.InteropServices");
-
+		
 		builder.ReturnType = _exportedDelegate.ReturnParameter?.Type.ToString() is {} typeName ? new(typeName, _exportedDelegate.ReturnParameter.UnderlyingType) : null;
 		
 		List<ParameterDeclaration> parameters = new();

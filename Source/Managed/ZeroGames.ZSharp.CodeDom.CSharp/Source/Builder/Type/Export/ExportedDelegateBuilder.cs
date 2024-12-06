@@ -36,8 +36,8 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 	{
 		base.BuildTypeDefinition(definition);
 		
-		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}(Signature @delegate) => {InteropClassPrefix}_Interop.{BindMethodName}ManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();"));
-		definition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, Parameters) { Modifiers = EMemberModifiers.Partial, Body = new StrangeZCallBodyBuilder($"{InteropClassPrefix}_Interop.{ExecuteMethodName}", ReturnType, false, Parameters).Build() });
+		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}(Signature @delegate) => base.{BindMethodName}(@delegate);"));
+		definition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, Parameters) { Modifiers = EMemberModifiers.Partial, Body = new StrangeZCallBodyBuilder($"base.{ExecuteMethodName}", ReturnType, false, Parameters).Build() });
 	}
 
 	protected override void PreAddMainType(CompilationUnit compilationUnit, ClassDefinition? outerClassDefinition)

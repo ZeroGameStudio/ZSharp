@@ -81,6 +81,9 @@ public abstract class UnrealMulticastInlineDelegateBase : UnrealExportedObjectBa
 	protected UnrealMulticastInlineDelegateBase(){}
 	protected UnrealMulticastInlineDelegateBase(IntPtr unmanaged) : base(unmanaged){}
 	
+	protected unsafe EZCallErrorCode Broadcast(ZCallBuffer* buffer) => UnrealMulticastInlineDelegate_Interop.Broadcast(buffer);
+	protected unsafe UnrealObject Add(Delegate @delegate) => UnrealMulticastInlineDelegate_Interop.AddManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();
+	
 	private unsafe void InternalAdd(UnrealObject obj, string name)
 	{
 		fixed (char* nameBuffer = name)

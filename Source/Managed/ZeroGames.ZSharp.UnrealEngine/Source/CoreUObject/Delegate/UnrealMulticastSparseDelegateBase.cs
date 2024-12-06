@@ -80,7 +80,10 @@ public abstract class UnrealMulticastSparseDelegateBase : UnrealExportedObjectBa
 	
 	protected UnrealMulticastSparseDelegateBase(){}
 	protected UnrealMulticastSparseDelegateBase(IntPtr unmanaged) : base(unmanaged){}
-	
+		
+	protected unsafe EZCallErrorCode Broadcast(ZCallBuffer* buffer) => UnrealMulticastSparseDelegate_Interop.Broadcast(buffer);
+	protected unsafe UnrealObject Add(Delegate @delegate) => UnrealMulticastSparseDelegate_Interop.AddManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();
+
 	private unsafe void InternalAdd(UnrealObject obj, string name)
 	{
 		fixed (char* nameBuffer = name)

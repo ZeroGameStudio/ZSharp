@@ -30,7 +30,7 @@ public class ClassWriter
 		{
 			builder.AddUsingNamespace(ns);
 		}
-		
+
 		// Attributes
 		if (abstraction && _exportedClass.IsHashableStruct)
 		{

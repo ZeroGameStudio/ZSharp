@@ -1,6 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
@@ -156,6 +157,11 @@ partial class ManifestBuilder
 					STATIC_SIGNATURE_INTERFACE_FULL_NAME => EPropertyType.Delegate,
 					_ => default,
 				};
+
+				if (result != default)
+				{
+					break;
+				}
 			}
 
 			// There is an exception for object property that TObjectPtr<UClass> is treated as TSubclassOf<UObject>.

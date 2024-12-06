@@ -96,6 +96,24 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 	{
 		base.BuildTypeDefinition(definition);
 
+		if (Kind == EExportedClassKind.Struct && GenerateIntrinsicContent)
+		{
+			AddInterface($"ICloneable<{TypeName}>");
+			AddInterface($"IEquatable<{TypeName}>");
+			AddInterface($"System.Numerics.IEqualityOperators<{TypeName}?, {TypeName}?, bool>");
+
+			string systemInterfaceBlock =
+$@"public {TypeName}({TypeName} other) : this() => Copy(other);
+public new {TypeName} Clone() => new(this);
+object ICloneable.Clone() => Clone();
+public bool Equals({TypeName}? other) => ReferenceEquals(this, other) || other is not null && other.GetType() == typeof({TypeName}) && Identical(other);
+public override bool Equals(object? obj) => obj is {TypeName} o && Equals(o);
+public override int32 GetHashCode() => throw new NotSupportedException();
+public static bool operator ==({TypeName}? left, {TypeName}? right) => Equals(left, right);
+public static bool operator !=({TypeName}? left, {TypeName}? right) => !Equals(left, right);";
+			definition.AddMember(new Block(systemInterfaceBlock));
+		}
+
 		if (!IsAbstraction)
 		{
 			definition.Modifiers |= EMemberModifiers.Unsafe;

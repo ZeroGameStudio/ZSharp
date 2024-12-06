@@ -62,8 +62,10 @@ public partial class MagicCube : Actor
 		 * By the way, in Z# interop system, a native object is either black or red.
 		 */
 		Vector startPos = K2_GetActorLocation();
-		_startPos = new(startPos.X, startPos.Y, startPos.Z);
-		ensure(startPos.IsRed && _startPos.IsBlack);
+		_startPos = startPos.Clone();
+		ensure(startPos.IsRed);
+		ensure(_startPos.IsBlack);
+		ensure(_startPos == startPos);
 		
 		/*
 		 * Register a timer to rotate the cube.

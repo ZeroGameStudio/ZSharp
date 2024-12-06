@@ -11,6 +11,17 @@
 #include "ZCall/ZCallResolver_UFunction.h"
 #include "ZCall/ZCallResolver_UProperty.h"
 #include "Interop/ZUnmanagedFunctionInteropHelper.h"
+
+#include "Interop/Object/ZUnrealObjectGlobals_Interop.h"
+#include "Interop/Object/ZUnrealObject_Interop.h"
+#include "Interop/Object/ZUnrealStruct_Interop.h"
+#include "Interop/Object/ZUnrealClass_Interop.h"
+#include "Interop/Struct/ZUnrealScriptStruct_Interop.h"
+#include "Interop/String/ZUnrealString_Interop.h"
+#include "Interop/String/ZUnrealUtf8String_Interop.h"
+#include "Interop/String/ZUnrealAnsiString_Interop.h"
+#include "Interop/String/ZUnrealName_Interop.h"
+#include "Interop/String/ZUnrealText_Interop.h"
 #include "Interop/ObjectWrapper/ZSubclassOf_Interop.h"
 #include "Interop/ObjectWrapper/ZSoftClassPtr_Interop.h"
 #include "Interop/ObjectWrapper/ZSoftObjectPtr_Interop.h"
@@ -18,19 +29,10 @@
 #include "Interop/ObjectWrapper/ZLazyObjectPtr_Interop.h"
 #include "Interop/ObjectWrapper/ZScriptInterface_Interop.h"
 #include "Interop/ObjectWrapper/ZStrongObjectPtr_Interop.h"
-#include "Interop/String/ZUnrealString_Interop.h"
-#include "Interop/String/ZUnrealUtf8String_Interop.h"
-#include "Interop/String/ZUnrealAnsiString_Interop.h"
-#include "Interop/String/ZUnrealName_Interop.h"
-#include "Interop/String/ZUnrealText_Interop.h"
 #include "Interop/Container/ZUnrealArray_Interop.h"
 #include "Interop/Container/ZUnrealSet_Interop.h"
 #include "Interop/Container/ZUnrealMap_Interop.h"
 #include "Interop/Container/ZUnrealOptional_Interop.h"
-#include "Interop/Object/ZUnrealObjectGlobals_Interop.h"
-#include "Interop/Object/ZUnrealObject_Interop.h"
-#include "Interop/Object/ZUnrealStruct_Interop.h"
-#include "Interop/Object/ZUnrealClass_Interop.h"
 #include "Interop/Delegate/ZUnrealDelegate_Interop.h"
 #include "Interop/Delegate/ZUnrealMulticastInlineDelegate_Interop.h"
 #include "Interop/Delegate/ZUnrealMulticastSparseDelegate_Interop.h"
@@ -78,6 +80,46 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
         {
 #define ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY ZeroGames.ZSharp.UnrealEngine
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, NewObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, LoadObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, DuplicateObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, FindObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, LowLevelFindObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, GetTransientPackage),
+			
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetClass),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetName),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetPathName),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetOuter),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, IsA),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, IsIn),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, Rename),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealStruct, IsChildOf),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, GetDefaultObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, IsInterface),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, ImplementsInterface),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealScriptStruct, Copy),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealScriptStruct, Identical),
+			
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealString, GetData),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealString, SetData),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealUtf8String, GetData),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealUtf8String, SetData),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealAnsiString, GetData),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealAnsiString, SetData),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealName, GetData),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealName, SetData),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealName, IsNone),	
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealText, GetData),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealText, SetData),
 			
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(SubclassOf, Copy),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(SubclassOf, Identical),
@@ -141,22 +183,6 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, IsValid),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, IsNull),
 
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealString, GetData),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealString, SetData),
-
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealUtf8String, GetData),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealUtf8String, SetData),
-
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealAnsiString, GetData),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealAnsiString, SetData),
-
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealName, GetData),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealName, SetData),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealName, IsNone),	
-
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealText, GetData),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealText, SetData),
-
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, Insert),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, Remove),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealArray, RemoveAt),
@@ -192,27 +218,6 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealOptional, Set),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealOptional, Reset),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealOptional, IsSet),
-			
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, NewObject),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, LoadObject),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, DuplicateObject),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, FindObject),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, LowLevelFindObject),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, GetTransientPackage),
-			
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetClass),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetName),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetPathName),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetOuter),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, IsA),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, IsIn),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, Rename),
-
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealStruct, IsChildOf),
-
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, GetDefaultObject),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, IsInterface),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, ImplementsInterface),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, Execute),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, BindManagedDelegate),

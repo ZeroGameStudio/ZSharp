@@ -5,8 +5,8 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 [ConjugateRegistryId(2)]
 public abstract class UnrealScriptStructBase : UnrealExportedObjectBase
 {
-	
-    public DynamicZCallResult ReadUnrealPropertyEx<T>(string name, int32 index)
+
+	public DynamicZCallResult ReadUnrealPropertyEx<T>(string name, int32 index)
     {
 	    string zcallName = $"up:/{UnrealFieldPath}:{name}";
 	    return this.ZCall(MasterAlcCache.Instance, zcallName, false, index, typeof(T));
@@ -29,6 +29,9 @@ public abstract class UnrealScriptStructBase : UnrealExportedObjectBase
     protected UnrealScriptStructBase(){}
     protected UnrealScriptStructBase(IntPtr unmanaged) : base(unmanaged){}
     
+    protected unsafe void Copy(UnrealScriptStructBase other) => UnrealScriptStruct_Interop.Copy(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other));
+    protected unsafe bool Identical(UnrealScriptStructBase other) => UnrealScriptStruct_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
+
 }
 
 

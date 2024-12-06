@@ -180,7 +180,14 @@ public static class AssertionMacros
 		CallerInfoHelper.Inject(ref column);
 		if (!condition)
 		{
-			Fail(message, expr, file, line, column, true);
+			try
+			{
+				Fail(message, expr, file, line, column, true);
+			}
+			catch (AssertionFailedException ex)
+			{
+				UE_ERROR(LogZSharpScriptEngine, ex);
+			}
 		}
 #endif
 		

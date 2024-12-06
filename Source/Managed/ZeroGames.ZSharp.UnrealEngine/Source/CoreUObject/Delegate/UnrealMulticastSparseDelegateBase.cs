@@ -78,20 +78,9 @@ public abstract class UnrealMulticastSparseDelegateBase : UnrealExportedObjectBa
 		}
 	}
 	
-	protected UnrealMulticastSparseDelegateBase(Type delegateType)
-	{
-		_delegateType = delegateType;
-		
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, DelegateFunction.FromType(_delegateType).Unmanaged);
-	}
-
-	protected UnrealMulticastSparseDelegateBase(Type delegateType, IntPtr unmanaged) : base(unmanaged)
-	{
-		_delegateType = delegateType;
-	}
+	protected UnrealMulticastSparseDelegateBase(){}
+	protected UnrealMulticastSparseDelegateBase(IntPtr unmanaged) : base(unmanaged){}
 	
-	protected unsafe UnrealObject Add(Delegate @delegate) => UnrealMulticastSparseDelegate_Interop.AddManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();
-
 	private unsafe void InternalAdd(UnrealObject obj, string name)
 	{
 		fixed (char* nameBuffer = name)
@@ -120,8 +109,6 @@ public abstract class UnrealMulticastSparseDelegateBase : UnrealExportedObjectBa
 	}
 
 	private unsafe bool InternalIsBound => UnrealMulticastSparseDelegate_Interop.IsBound(ConjugateHandle.FromConjugate(this)) > 0;
-	
-	private readonly Type _delegateType;
 	
 }
 

@@ -298,7 +298,7 @@ bool ZSharp::FZExportHelper::ShouldExportFieldBySettings(FFieldVariant field)
 	// Compiled-in no export.
 	if (field.HasMetaData("ZSharpNoExport"))
 	{
-		return false;
+		//return false;
 	}
 #endif
 	

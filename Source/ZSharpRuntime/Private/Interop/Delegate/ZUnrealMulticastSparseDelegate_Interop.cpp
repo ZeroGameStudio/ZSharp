@@ -16,16 +16,16 @@ ZSharp::EZCallErrorCode ZSharp::FZUnrealMulticastSparseDelegate_Interop::Broadca
 	return sdself->Broadcast(buffer);
 }
 
-void ZSharp::FZUnrealMulticastSparseDelegate_Interop::AddUnrealFunction(FZConjugateHandle self, FZConjugateHandle object, const TCHAR* functionName)
-{
-	FZSelfDescriptiveMulticastSparseScriptDelegate* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_MulticastSparseDelegate>().ConjugateUnsafe(self);
-	sdself->AddUFunction(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe(object), functionName);
-}
-
 ZSharp::FZConjugateHandle ZSharp::FZUnrealMulticastSparseDelegate_Interop::AddManagedDelegate(FZConjugateHandle self, FZGCHandle delegate)
 {
 	FZSelfDescriptiveMulticastSparseScriptDelegate* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_MulticastSparseDelegate>().ConjugateUnsafe(self);
 	return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(sdself->AddManaged(delegate));
+}
+
+void ZSharp::FZUnrealMulticastSparseDelegate_Interop::AddUnrealFunction(FZConjugateHandle self, FZConjugateHandle object, const TCHAR* functionName)
+{
+	FZSelfDescriptiveMulticastSparseScriptDelegate* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_MulticastSparseDelegate>().ConjugateUnsafe(self);
+	sdself->AddUFunction(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe(object), functionName);
 }
 
 void ZSharp::FZUnrealMulticastSparseDelegate_Interop::Remove(FZConjugateHandle self, FZConjugateHandle object, const TCHAR* functionName)

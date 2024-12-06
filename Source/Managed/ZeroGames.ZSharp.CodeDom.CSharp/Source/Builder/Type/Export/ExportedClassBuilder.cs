@@ -130,7 +130,7 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 		}
 		
 		string userdata = Kind == EExportedClassKind.Struct ? "StaticStruct.Unmanaged" : "IntPtr.Zero";
-		return $" {{ Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, {userdata}); }}";
+		return $" => Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, {userdata});";
 	}
 
 	protected override bool GenerateIntrinsicContent => !IsAbstraction;

@@ -63,19 +63,8 @@ public abstract class UnrealDelegateBase : UnrealExportedObjectBase
 		}
 	}
 	
-	protected UnrealDelegateBase(Type delegateType)
-	{
-		_delegateType = delegateType;
-		
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, DelegateFunction.FromType(_delegateType).Unmanaged);
-	}
-
-	protected UnrealDelegateBase(Type delegateType, IntPtr unmanaged) : base(unmanaged)
-	{
-		_delegateType = delegateType;
-	}
-
-	protected unsafe UnrealObject Bind(Delegate @delegate) => UnrealDelegate_Interop.BindManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();
+	protected UnrealDelegateBase(){}
+	protected UnrealDelegateBase(IntPtr unmanaged) : base(unmanaged){}
 
 	private unsafe void InternalBind(UnrealObject obj, string name)
 	{
@@ -101,8 +90,6 @@ public abstract class UnrealDelegateBase : UnrealExportedObjectBase
 	}
 	
 	private unsafe bool InternalIsBound => UnrealDelegate_Interop.IsBound(ConjugateHandle.FromConjugate(this)) > 0;
-	
-	private readonly Type _delegateType;
 
 }
 

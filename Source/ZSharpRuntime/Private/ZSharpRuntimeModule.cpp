@@ -31,6 +31,9 @@
 #include "Interop/Object/ZUnrealObject_Interop.h"
 #include "Interop/Object/ZUnrealStruct_Interop.h"
 #include "Interop/Object/ZUnrealClass_Interop.h"
+#include "Interop/Delegate/ZUnrealDelegate_Interop.h"
+#include "Interop/Delegate/ZUnrealMulticastInlineDelegate_Interop.h"
+#include "Interop/Delegate/ZUnrealMulticastSparseDelegate_Interop.h"
 
 namespace ZSharp::ZSharpRuntimeModule_Private
 {
@@ -210,6 +213,35 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, GetDefaultObject),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, IsInterface),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, ImplementsInterface),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, Execute),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, BindManagedDelegate),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, BindUnrealFunction),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, Unbind),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, IsBound),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, IsBoundToObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, GetObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, GetFunctionName),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, Broadcast),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, AddManagedDelegate),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, AddUnrealFunction),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, Remove),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, RemoveAll),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, Clear),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, IsBound),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, IsBoundToObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, Contains),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, Broadcast),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, AddManagedDelegate),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, AddUnrealFunction),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, Remove),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, RemoveAll),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, Clear),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, IsBound),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, IsBoundToObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, Contains),
 
 #undef ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY
         };

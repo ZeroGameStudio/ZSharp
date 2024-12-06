@@ -13,8 +13,8 @@ namespace ZSharp
 	struct FZUnrealMulticastInlineDelegate_Interop
 	{
 		static EZCallErrorCode Broadcast(FZCallBuffer* buffer);
-		static void AddUnrealFunction(FZConjugateHandle self, FZConjugateHandle object, const TCHAR* functionName);
 		static FZConjugateHandle AddManagedDelegate(FZConjugateHandle self, FZGCHandle delegate);
+		static void AddUnrealFunction(FZConjugateHandle self, FZConjugateHandle object, const TCHAR* functionName);
 		static void Remove(FZConjugateHandle self, FZConjugateHandle object, const TCHAR* functionName);
 		static void RemoveAll(FZConjugateHandle self, FZConjugateHandle object);
 		static void Clear(FZConjugateHandle self);

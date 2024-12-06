@@ -19,17 +19,11 @@ public static class InteropBindingHelper
 			Throw($"Binding failed, type not found. {typeName}");
 		}
             
-		FieldInfo? field = type.GetField(fieldName);
+		FieldInfo? field = type.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 		if (field is null)
 		{
 			Debugger.Break();
 			Throw($"Binding failed, field not found. {typeName}.{fieldName}");
-		}
-
-		if (!field.IsStatic)
-		{
-			Debugger.Break();
-			Throw($"Binding failed, field is not static. {typeName}.{fieldName}");
 		}
 
 		if (!field.FieldType.IsUnmanagedFunctionPointer)

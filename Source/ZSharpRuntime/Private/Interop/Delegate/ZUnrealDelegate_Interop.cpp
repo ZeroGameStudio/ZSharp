@@ -15,16 +15,16 @@ ZSharp::EZCallErrorCode ZSharp::FZUnrealDelegate_Interop::Execute(FZCallBuffer* 
 	return sdself->Execute(buffer);
 }
 
-void ZSharp::FZUnrealDelegate_Interop::BindUnrealFunction(FZConjugateHandle self, FZConjugateHandle object, const TCHAR* functionName)
-{
-	FZSelfDescriptiveScriptDelegate* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Delegate>().ConjugateUnsafe(self);
-	sdself->BindUFunction(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe(object), functionName);
-}
-
 ZSharp::FZConjugateHandle ZSharp::FZUnrealDelegate_Interop::BindManagedDelegate(FZConjugateHandle self, FZGCHandle delegate)
 {
 	FZSelfDescriptiveScriptDelegate* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Delegate>().ConjugateUnsafe(self);
 	return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(sdself->BindManaged(delegate));
+}
+
+void ZSharp::FZUnrealDelegate_Interop::BindUnrealFunction(FZConjugateHandle self, FZConjugateHandle object, const TCHAR* functionName)
+{
+	FZSelfDescriptiveScriptDelegate* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Delegate>().ConjugateUnsafe(self);
+	sdself->BindUFunction(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe(object), functionName);
 }
 
 void ZSharp::FZUnrealDelegate_Interop::Unbind(FZConjugateHandle self)
@@ -51,7 +51,7 @@ ZSharp::FZConjugateHandle ZSharp::FZUnrealDelegate_Interop::GetObject(FZConjugat
 	return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(sdself->GetObject());
 }
 
-void ZSharp::FZUnrealDelegate_Interop::GetFunctioName(FZConjugateHandle self, FString& functionName)
+void ZSharp::FZUnrealDelegate_Interop::GetFunctionName(FZConjugateHandle self, FString& functionName)
 {
 	FZSelfDescriptiveScriptDelegate* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Delegate>().ConjugateUnsafe(self);
 	functionName = sdself->GetFunctionName().ToString();

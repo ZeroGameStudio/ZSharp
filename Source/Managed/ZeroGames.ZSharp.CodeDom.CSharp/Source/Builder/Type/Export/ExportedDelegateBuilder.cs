@@ -30,7 +30,15 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 		return base.GetOuterClassDefinition();
 	}
 
-	protected override ClassDefinition AllocateTypeDefinition() => new(false, EMemberVisibility.Default, TypeName);
+	protected override ClassDefinition AllocateTypeDefinition() => new(false, EMemberVisibility.Public, TypeName) { Modifiers = EMemberModifiers.Unsafe };
+
+	protected override void BuildTypeDefinition(ClassDefinition definition)
+	{
+		base.BuildTypeDefinition(definition);
+		
+		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}(Signature @delegate) => {InteropClassPrefix}_Interop.{BindMethodName}ManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();"));
+		definition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, Parameters) { Modifiers = EMemberModifiers.Partial, Body = new StrangeZCallBodyBuilder($"{InteropClassPrefix}_Interop.{ExecuteMethodName}", ReturnType, false, Parameters).Build() });
+	}
 
 	protected override void PreAddMainType(CompilationUnit compilationUnit, ClassDefinition? outerClassDefinition)
 	{
@@ -68,9 +76,9 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 		delegateDecl.IsDelegate = true;
 		abstractionDefinition.AddMember(delegateDecl);
 
-		string bindMethodName = Kind == EExportedDelegateKind.Unicast ? "Bind" : "Add";
-		abstractionDefinition.AddMember(new Block($"public UnrealObject {bindMethodName}(Signature @delegate) => base.{bindMethodName}(@delegate);"));
-
+		abstractionDefinition.AddMember(new Block($"public partial UnrealObject {BindMethodName}(Signature @delegate);"));
+		abstractionDefinition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, Parameters) { Modifiers = EMemberModifiers.Partial });
+		
 		if (outerClassDefinition is null)
 		{
 			compilationUnit.AddType(abstractionDefinition);
@@ -81,13 +89,34 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 		}
 	}
 
-	protected override IReadOnlyList<string> GetBaseConstructorExtraArguments() => [ "typeof(Signature)" ];
+	protected override string GetBlackConstructorBody()
+	{
+		if (!HasBlackConstructor)
+		{
+			return base.GetBlackConstructorBody();
+		}
 
-	protected override bool BlackConstructorNeedsCallBase => true;
+		return " => Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, StaticSignature.Unmanaged);";
+	}
+
+	protected override bool HasBlackConstructor => Kind != EExportedDelegateKind.Sparse;
+	protected override string RedConstructorVisibility => "private";
 
 	protected override string StaticFieldInterfaceName => "IStaticSignature";
 	protected override string StaticFieldTypeName => "DelegateFunction";
 	protected override string StaticFieldPropertyName => "StaticSignature";
+	
+	private string BindMethodName => Kind == EExportedDelegateKind.Unicast ? "Bind" : "Add";
+	private string ExecuteMethodName => Kind == EExportedDelegateKind.Unicast ? "Execute" : "Broadcast";
+
+	private string InteropClassPrefix => Kind switch
+	{
+		EExportedDelegateKind.Unicast => "UnrealDelegate",
+		EExportedDelegateKind.Multicast => "UnrealMulticastInlineDelegate",
+		EExportedDelegateKind.Sparse => "UnrealMulticastSparseDelegate",
+		_ => throw new NotSupportedException()
+	};
+
 }
 
 

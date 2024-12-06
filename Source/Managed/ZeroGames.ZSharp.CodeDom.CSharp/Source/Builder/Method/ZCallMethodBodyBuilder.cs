@@ -71,7 +71,7 @@ $@"unsafe
 
 	public Block BeforeReturnBlock { get; set; } = new();
 
-	private string MakeSlots()
+	protected string MakeSlots()
 	{
 		List<string> slots = new();
 		if (!IsStatic)
@@ -97,7 +97,7 @@ $@"unsafe
 		return string.Join(Environment.NewLine, slots);
 	}
 
-	private string MakeCopyOutsAndReturn()
+	protected string MakeCopyOutsAndReturn()
 	{
 		string result = string.Empty;
 		if (Parameters?.Any(p => p.Kind != EParameterKind.In) ?? false)
@@ -134,7 +134,7 @@ $@"unsafe
 		return result;
 	}
 
-	private string MakeReturnValue(TypeReference parameterType, string index)
+	protected string MakeReturnValue(TypeReference parameterType, string index)
 	{
 		bool isEnum = !string.IsNullOrWhiteSpace(parameterType.UnderlyingType);
 		string cast = isEnum ? $"({parameterType.TypeName})" : string.Empty;
@@ -145,7 +145,7 @@ $@"unsafe
 		return $"{cast}slots[{index}].{slotType}{getTarget}";
 	}
 
-	private string GetSlotType(TypeReference parameterType) => (string.IsNullOrWhiteSpace(parameterType.UnderlyingType) ? parameterType.TypeName : parameterType.UnderlyingType) switch
+	protected string GetSlotType(TypeReference parameterType) => (string.IsNullOrWhiteSpace(parameterType.UnderlyingType) ? parameterType.TypeName : parameterType.UnderlyingType) switch
 	{
 		nameof(uint8) or nameof(Byte) or "byte" => "UInt8",
 		nameof(uint16) or nameof(UInt16) or "ushort" => "UInt16",

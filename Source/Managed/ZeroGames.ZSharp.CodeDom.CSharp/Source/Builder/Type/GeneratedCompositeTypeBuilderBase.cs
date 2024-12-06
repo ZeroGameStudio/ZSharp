@@ -35,8 +35,7 @@ public abstract class GeneratedCompositeTypeBuilderBase<TDefinition>(string name
 			string blackConstructor = HasBlackConstructor ? $"public {TypeName}(){blackConstructorCallBase}{GetBlackConstructorBody()}" : string.Empty;
 			
 			string redConstructorArguments = string.Join(", ", baseConstructorExtraArguments.Append("unmanaged"));
-			string redConstructorVisibility = definition.Modifiers.HasFlag(EMemberModifiers.Sealed) ? "private" : "protected";
-			string redConstructor = HasRedConstructor ? $"{redConstructorVisibility} {TypeName}(IntPtr unmanaged) : base({redConstructorArguments}){{}}" : string.Empty;
+			string redConstructor = HasRedConstructor ? $"{RedConstructorVisibility} {TypeName}(IntPtr unmanaged) : base({redConstructorArguments}){{}}" : string.Empty;
 			
 			string unrealFieldPathConst = HasUnrealFieldPathConst ? $"private const string {UNREAL_FIELD_PATH_CONST} = {UnrealFieldPathLiteralText};" : string.Empty;
 
@@ -57,6 +56,7 @@ public abstract class GeneratedCompositeTypeBuilderBase<TDefinition>(string name
 	protected virtual bool BlackConstructorNeedsCallBase => false;
 
 	protected virtual bool HasRedConstructor => true;
+	protected virtual string RedConstructorVisibility => "protected";
 	
 	protected abstract string StaticFieldInterfaceName { get; }
 	protected abstract string StaticFieldTypeName { get; }

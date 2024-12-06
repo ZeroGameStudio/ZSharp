@@ -355,7 +355,6 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{
 			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
-			visitor->InitializeValue_InContainer(params);
 			// We need to set Type for all slots, not only in params.
 			visitor->GetValue_InContainer(params, buffer[i + 1], 0);
 		}
@@ -363,7 +362,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		if (ReturnProperty)
 		{
 			// We need to set Type for all slots, not only in params.
-			ReturnProperty->InitializeValue_InContainer(params);
+			ReturnProperty->GetValue_InContainer(params, buffer[-1], 0);
 		}
 		
 		res = alc->ZCall(GetDelegateZCallHandle(), &buffer);

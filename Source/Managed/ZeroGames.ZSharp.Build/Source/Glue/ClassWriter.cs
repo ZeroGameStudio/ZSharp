@@ -24,7 +24,7 @@ public class ClassWriter
 	private void Write(bool abstraction)
 	{
 		EExportedClassKind classKind = _exportedClass.IsClass ? EExportedClassKind.Class : _exportedClass.IsInterface ? EExportedClassKind.Interface : _exportedClass.IsStruct ? EExportedClassKind.Struct : _exportedClass.IsPlain ? EExportedClassKind.Plain : throw new NotSupportedException();
-		ExportedClassBuilder builder = new(abstraction, classKind, _exportedClass.Namespace, _exportedClass.Name, _exportedClass.UnrealFieldPath, GetBaseType());
+		ExportedClassBuilder builder = new(abstraction, classKind, _exportedClass.Namespace, _exportedClass.Name, _exportedClass.UnrealFieldPath);
 		var usings = NamespaceHelper.LootNamespace(_exportedClass).Where(ns => ns != _exportedClass.Namespace);
 		foreach (var ns in usings)
 		{
@@ -40,6 +40,18 @@ public class ClassWriter
 		if (!abstraction && _exportedClass.ConjugateRegistryId > 0)
 		{
 			builder.AddAttributeAfter("ConjugateRegistryId", _exportedClass.ConjugateRegistryId.ToString());
+		}
+		
+		// Base type
+		if (GetBaseType() is { } baseType)
+		{
+			bool setBaseTypeInImpl = baseType == PLAIN_EXPORTED_OBJECT_BASE_TYPE_NAME
+			                         || baseType == UNREAL_OBJECT_BASE_TYPE_NAME
+			                         || baseType == UNREAL_SCRIPT_STRUCT_BASE_TYPE_NAME;
+			if (setBaseTypeInImpl == !abstraction)
+			{
+				builder.SetBaseType(baseType);
+			}
 		}
 		
 		// Interfaces
@@ -165,17 +177,17 @@ public class ClassWriter
 		{
 			if (_exportedClass.IsPlain)
 			{
-				return "PlainExportedObjectBase";
+				return PLAIN_EXPORTED_OBJECT_BASE_TYPE_NAME;
 			}
 
 			if (_exportedClass.IsClass)
 			{
-				return "UnrealObjectBase";
+				return UNREAL_OBJECT_BASE_TYPE_NAME;
 			}
 
 			if (_exportedClass.IsStruct)
 			{
-				return "UnrealScriptStructBase";
+				return UNREAL_SCRIPT_STRUCT_BASE_TYPE_NAME;
 			}
 
 			if (_exportedClass.IsInterface)
@@ -188,6 +200,10 @@ public class ClassWriter
 
 		return _exportedClass.BaseType.ToString(false);
 	}
+	
+	private const string PLAIN_EXPORTED_OBJECT_BASE_TYPE_NAME = "PlainExportedObjectBase";
+	private const string UNREAL_OBJECT_BASE_TYPE_NAME = "UnrealObjectBase";
+	private const string UNREAL_SCRIPT_STRUCT_BASE_TYPE_NAME = "UnrealScriptStructBase";
 	
 	private ExportedClass _exportedClass;
 	private string _abstractionFilePath;

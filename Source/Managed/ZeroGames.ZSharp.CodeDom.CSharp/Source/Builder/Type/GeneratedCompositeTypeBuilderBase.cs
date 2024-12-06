@@ -13,14 +13,14 @@ public abstract class GeneratedCompositeTypeBuilderBase<TDefinition>(string name
 		{
 			if (HasBuildConjugate)
 			{
-				definition.AddBaseType($"IConjugate<{TypeName}>");
+				AddBaseTypeAfter($"IConjugate<{TypeName}>");
 			}
 
 			bool isConcreteUnrealField = HasUnrealFieldPath && definition.Kind != ETypeKind.Interface;
 			if (isConcreteUnrealField)
 			{
-				definition.AddBaseType("IStaticUnrealFieldPath");
-				definition.AddBaseType(StaticFieldInterfaceName);
+				AddBaseTypeAfter("IStaticUnrealFieldPath");
+				AddBaseTypeAfter(StaticFieldInterfaceName);
 			}
 			
 			string buildConjugate = HasBuildConjugate ? $"public new static {TypeName} BuildConjugate(IntPtr unmanaged) => new(unmanaged);" : string.Empty;

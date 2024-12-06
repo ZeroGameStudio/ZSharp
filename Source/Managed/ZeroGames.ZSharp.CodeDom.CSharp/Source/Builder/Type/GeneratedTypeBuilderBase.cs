@@ -72,7 +72,8 @@ public abstract class GeneratedTypeBuilderBase<TDefinition>(string namespaceName
 
 	public void AddUsingNamespace(string ns) => _usings.Add(ns);
 
-	protected void AddBaseType(string baseType) => _baseTypes.Add(baseType);
+	protected void AddBaseTypeBefore(string baseType) => _baseTypes.Insert(0, baseType);
+	protected void AddBaseTypeAfter(string baseType) => _baseTypes.Add(baseType);
 	protected void AddAttributeBefore(string name, params string[]? arguments) => _attributeBefores.Add((name, arguments));
 	protected void AddAttributeAfter(string name, params string[]? arguments) => _attributeAfters.Add((name, arguments));
 

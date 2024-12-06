@@ -10,10 +10,11 @@ public enum EExportedClassKind
 	Plain,
 }
 
-public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, string namespaceName, string typeName, string? unrealFieldPath, string? baseType) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, unrealFieldPath)
+public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, string namespaceName, string typeName, string? unrealFieldPath) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, unrealFieldPath)
 {
-	
-	public void AddInterface(string name) => AddBaseType(name);
+
+	public void SetBaseType(string name) => AddBaseTypeBefore(name);
+	public void AddInterface(string name) => AddBaseTypeAfter(name);
 
 	public new void AddAttributeBefore(string name, params string[]? arguments) => base.AddAttributeBefore(name, arguments);
 	public new void AddAttributeAfter(string name, params string[]? arguments) => base.AddAttributeAfter(name, arguments);
@@ -88,7 +89,6 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 
 	public EExportedClassKind Kind { get; } = kind;
 	public bool IsAbstraction { get; } = isAbstraction;
-	public string? BaseType { get; } = baseType;
 
 	protected override ClassDefinition AllocateTypeDefinition() => new(Kind == EExportedClassKind.Interface, EMemberVisibility.Public, TypeName);
 
@@ -99,11 +99,6 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 		if (!IsAbstraction)
 		{
 			definition.Modifiers |= EMemberModifiers.Unsafe;
-		}
-
-		if (IsAbstraction && BaseType is not null)
-		{
-			definition.AddBaseType(BaseType);
 		}
 
 		foreach (var method in _methods)

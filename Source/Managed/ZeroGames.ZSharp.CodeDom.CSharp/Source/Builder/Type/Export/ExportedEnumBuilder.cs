@@ -14,7 +14,7 @@ public class ExportedEnumBuilder(string namespaceName, string typeName, string? 
 
 	protected override void BuildTypeDefinition(EnumDefinition definition)
 	{
-		AddBaseType(UnderlyingType);
+		AddBaseTypeAfter(UnderlyingType);
 		if (IsFlags)
 		{
 			AddAttributeBefore("Flags");

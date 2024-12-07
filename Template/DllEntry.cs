@@ -7,13 +7,13 @@
 
 namespace Game;
 
-public class DllEntry
+internal class DllEntry
 {
     /*
      * This tells Z# it is the entry point of this assembly.
      */
     [DllMain]
-    public static void DllMain(string[] args)
+    private static void DllMain(string[] args)
     {
         UE_LOG(LogTemp, $"============= Game Assembly Loaded! {string.Join("", args)} ===========");
     }

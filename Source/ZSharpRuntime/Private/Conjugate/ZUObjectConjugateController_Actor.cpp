@@ -44,7 +44,8 @@ void ZSharp::FZUObjectConjugateController_Actor::NotifyConjugated(UObject* unman
 	if (AActor* actor = Cast<AActor>(unmanaged))
 	{
 		Actors.Emplace(actor);
-		actor->OnDestroyed.AddDynamic(GetProxy(), &UZUObjectConjugateController_Actor_Proxy::HandleActorDestroyed);
+		// Reinstance copies this delegate to new instance before we remove.
+		actor->OnDestroyed.AddUniqueDynamic(GetProxy(), &UZUObjectConjugateController_Actor_Proxy::HandleActorDestroyed);
 	}
 }
 
@@ -81,6 +82,7 @@ void ZSharp::FZUObjectConjugateController_Actor::HandleActorDestroyed(AActor* ac
 	{
 		OnExpired(component);
 	});
+	actor->OnDestroyed.RemoveAll(Proxy.Get());
 	Actors.Remove(actor);
 }
 

@@ -95,6 +95,7 @@ public readonly partial struct ZeroTask : IZeroTask, IAwaitable<ZeroTask.Awaiter
 
 }
 
+[AsyncMethodBuilder(typeof(AsyncZeroTaskMethodBuilder<>))]
 public readonly partial struct ZeroTask<TResult> : IZeroTask<TResult>, IAwaitable<TResult, ZeroTask<TResult>.Awaiter>, IEquatable<ZeroTask<TResult>>
 {
 	

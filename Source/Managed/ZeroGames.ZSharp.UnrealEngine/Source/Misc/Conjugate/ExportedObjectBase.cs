@@ -72,14 +72,15 @@ public abstract class ExportedObjectBase : IConjugate
 
         return _onExpiredRegistry?.ContainsKey(registration) ?? false;
     }
+    
+    public bool IsExpired => Unmanaged == DEAD_ADDR;
+    public ReactiveLifecycle Lifecycle => ReactiveLifecycle.Explicit(this);
 
     public GCHandle GCHandle { get; }
 
     public IntPtr Unmanaged { get; protected set; }
     public bool IsBlack { get; }
     public bool IsRed => !IsBlack;
-
-    public bool IsExpired => Unmanaged == DEAD_ADDR;
     
     internal const IntPtr DEAD_ADDR = 0xDEAD;
 

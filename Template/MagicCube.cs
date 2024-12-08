@@ -75,19 +75,19 @@ public partial class MagicCube : Actor
 		GlobalTimerScheduler.Paused.Register((deltaTime, _) =>
 		{
 			TickRotate((float)deltaTime.Ticks / TimeSpan.TicksPerSecond);
-		}, null, TimeSpan.FromMilliseconds(10), true, ReactiveLifecycle.Explicit(this));
+		}, null, TimeSpan.FromMilliseconds(10), true, Lifecycle);
 
 		/*
 		 * This will suspend the function for 1s but won't block the game thread.
 		 */
-		await ZeroTask.Delay(1000);
+		await ZeroTask.Delay(1000, Lifecycle);
 		
 		/*
 		 * This log will appear after 1s.
 		 */
 		UE_LOG(LogTemp, $"{GetPathName()} Begin Play!");
 		
-		await ZeroTask.Delay(2000);
+		await ZeroTask.Delay(2000, Lifecycle);
 		
 		/*
 		 * This actor's lifespan is totally 1s + 2s + 2s = 5s.

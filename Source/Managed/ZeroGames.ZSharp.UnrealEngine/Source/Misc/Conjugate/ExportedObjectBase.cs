@@ -135,7 +135,10 @@ public abstract class ExportedObjectBase : IConjugate
 
     private void InternalDispose()
     {
-        check(IsBlack);
+        if (!IsBlack)
+        {
+            throw new InvalidOperationException("Dispose black conjugate.");
+        }
 
         if (!IsInGameThread)
         {

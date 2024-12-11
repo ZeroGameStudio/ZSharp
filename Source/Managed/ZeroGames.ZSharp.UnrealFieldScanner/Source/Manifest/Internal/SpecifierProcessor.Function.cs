@@ -50,7 +50,7 @@ partial class SpecifierProcessor
 	{
 		check(model.Visibility != EMemberVisibility.Private);
 
-		def.ZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{def.Name}_Implementation";
+		def.ZCallName = $"nm://{model.Outer.AssemblyName}:{model.Outer.FullName}:{def.Name}_Implementation";
 		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_BlueprintEvent;
 	}
 	
@@ -65,7 +65,7 @@ partial class SpecifierProcessor
 	{
 		check(!model.HasReturnValue());
 		
-		def.ZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{def.Name}_Implementation";
+		def.ZCallName = $"nm://{model.Outer.AssemblyName}:{model.Outer.FullName}:{def.Name}_Implementation";
 		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetServer;
 	}
 	
@@ -74,7 +74,7 @@ partial class SpecifierProcessor
 	{
 		check(!model.HasReturnValue());
 		
-		def.ZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{def.Name}_Implementation";
+		def.ZCallName = $"nm://{model.Outer.AssemblyName}:{model.Outer.FullName}:{def.Name}_Implementation";
 		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetClient;
 	}
 	
@@ -83,7 +83,7 @@ partial class SpecifierProcessor
 	{
 		check(!model.HasReturnValue());
 		
-		def.ZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{def.Name}_Implementation";
+		def.ZCallName = $"nm://{model.Outer.AssemblyName}:{model.Outer.FullName}:{def.Name}_Implementation";
 		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetMulticast;
 	}
 	
@@ -91,7 +91,7 @@ partial class SpecifierProcessor
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, WithValidationAttribute specifier)
 	{
 		string name = specifier.Implementation ?? $"{def.Name}_Validate";
-		def.ValidateZCallName = $"m://{model.Outer.AssemblyName}:{model.Outer.FullName}:{name}";
+		def.ValidateZCallName = $"nm://{model.Outer.AssemblyName}:{model.Outer.FullName}:{name}";
 		def.FunctionFlags |= EFunctionFlags.FUNC_NetValidate;
 	}
 	

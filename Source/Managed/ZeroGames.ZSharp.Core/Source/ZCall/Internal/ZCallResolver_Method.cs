@@ -9,12 +9,12 @@ internal sealed class ZCallResolver_Method(MasterAssemblyLoadContext alc) : IZCa
 	
 	public IZCallDispatcher? Resolve(string name)
 	{
-		if (!name.StartsWith("m://"))
+		if (!name.StartsWith("nm://"))
 		{
 			return null;
 		}
 
-		string[] paths = name.Substring(4).Split(':');
+		string[] paths = name.Substring(5).Split(':');
 		if (paths.Length != 3)
 		{
 			return null;

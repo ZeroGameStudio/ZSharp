@@ -7,7 +7,7 @@ internal sealed class ZCallResolver_Property(MasterAssemblyLoadContext alc) : IZ
 	
 	public IZCallDispatcher? Resolve(string name)
 	{
-		if (!name.StartsWith("p://"))
+		if (!name.StartsWith("np://"))
 		{
 			return null;
 		}

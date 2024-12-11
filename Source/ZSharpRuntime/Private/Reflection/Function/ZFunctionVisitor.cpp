@@ -413,7 +413,7 @@ ZSharp::FZCallHandle ZSharp::FZFunctionVisitor::GetDelegateZCallHandle()
     {
     	if (IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc())
     	{
-    		DelegateZCallHandle = alc->GetZCallHandle("d://");
+    		DelegateZCallHandle = alc->GetZCallHandle("nd://");
     	}
     }
     

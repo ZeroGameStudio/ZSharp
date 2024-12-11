@@ -45,7 +45,7 @@ internal sealed class ZCallDispatcher_Delegate : IZCallDispatcher
 
 	public string Name => ZCALL_NAME;
 	
-	private const string ZCALL_NAME = "d://";
+	private const string ZCALL_NAME = "nd://";
 
 }
 

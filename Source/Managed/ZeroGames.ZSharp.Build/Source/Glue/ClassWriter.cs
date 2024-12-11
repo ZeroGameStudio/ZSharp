@@ -151,7 +151,7 @@ public class ClassWriter
 				}
 			}
 		}
-			
+		
 		// Properties
 		foreach (var property in _exportedClass.Properties.OrderBy(prop => prop.IsPublic ? 1 : prop.IsProtected ? 2 : 3))
 		{

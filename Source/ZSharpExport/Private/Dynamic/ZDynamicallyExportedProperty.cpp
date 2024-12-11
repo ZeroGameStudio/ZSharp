@@ -84,7 +84,7 @@ ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(const FProp
 	}
 
 	Flags |= EZExportedPropertyFlags::Readable;
-	if (!property->IsA<FMulticastDelegateProperty>())
+	if (!property->IsA<FDelegateProperty>() && !property->HasAnyPropertyFlags(CPF_BlueprintReadOnly))
 	{
 		Flags |= EZExportedPropertyFlags::Writable;
 	}

@@ -3,8 +3,8 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
 
+#include "Reflection/Delegate/ZManagedDelegateProxyImpl.h"
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
-#include "ZCall/ZManagedDelegateProxyImpl.h"
 
 ZSharp::FZSelfDescriptiveScriptDelegate::FZSelfDescriptiveScriptDelegate(FZSelfDescriptiveScriptDelegate&& other) noexcept
 	: Super(MoveTemp(other))
@@ -40,10 +40,8 @@ UObject* ZSharp::FZSelfDescriptiveScriptDelegate::BindManaged(FZGCHandle delegat
 		return nullptr;
 	}
 
-	auto proxy = NewObject<UZManagedDelegateProxyImpl>();
-	proxy->Signature = TStrongObjectPtr { Descriptor };
-	proxy->Delegate = delegate;
-	UnderlyingInstance->BindUFunction(proxy, GET_FUNCTION_NAME_CHECKED(UZManagedDelegateProxyImpl, __ZStub));
+	auto proxy = UZManagedDelegateProxyImpl::Create(Descriptor, delegate);
+	UnderlyingInstance->BindUFunction(proxy, UZManagedDelegateProxyImpl::StubFunctionName);
 
 	return proxy;
 }

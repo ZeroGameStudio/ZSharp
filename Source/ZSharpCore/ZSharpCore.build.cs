@@ -83,3 +83,5 @@ public class ZSharpCore : ModuleRules
 		PublicDefinitions.Add($"ZSHARP_CORE_ASYNC_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core.Async\"");
 	}
 }
+
+

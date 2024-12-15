@@ -36,6 +36,8 @@
 #include "Interop/Delegate/ZUnrealDelegate_Interop.h"
 #include "Interop/Delegate/ZUnrealMulticastInlineDelegate_Interop.h"
 #include "Interop/Delegate/ZUnrealMulticastSparseDelegate_Interop.h"
+#include "Interop/EnhancedInput/ZEnhancedInputComponent_Interop.h"
+#include "Interop/EnhancedInput/ZInputActionValue_Interop.h"
 
 namespace ZSharp::ZSharpRuntimeModule_Private
 {
@@ -247,6 +249,11 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, IsBound),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, IsBoundToObject),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, Contains),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, BindAction),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, RemoveBinding),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(InputActionValue, Deconstruct),
 
 #undef ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY
         };

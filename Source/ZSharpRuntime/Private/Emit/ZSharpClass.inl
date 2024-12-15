@@ -123,7 +123,7 @@ namespace ZSharp::ZSharpClass_Private
 						}
 					}
 					
-					tailProperty->ImportText_Direct(*propertyDefault.Buffer, propertyAddr, nullptr, PPF_None);
+					ensure(tailProperty->ImportText_Direct(*propertyDefault.Buffer, propertyAddr, nullptr, PPF_None));
 				}
 			}
 		}

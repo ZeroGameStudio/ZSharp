@@ -7,7 +7,7 @@
 #include "Emit/IZSharpFieldRegistry.h"
 #include "Emit/ZSharpFieldRegistry.h"
 #include "ZCall/ZCallBufferSlotEncoder.h"
-#include "ZCall/ZManagedDelegateProxy.h"
+#include "Reflection/Delegate/ZManagedDelegateProxy.h"
 
 ZSharp::FZCallHandle ZSharp::FZFunctionVisitor::DelegateZCallHandle{};
 
@@ -69,7 +69,18 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 	check(finalFunction->IsSignatureCompatibleWith(proto));
 
 	check(self);
-	check(self->IsA(finalFunction->GetOuterUClass()));
+
+#if DO_CHECK
+	const UClass* outerClass = finalFunction->GetOuterUClass();
+	if (outerClass->HasAllClassFlags(CLASS_Interface))
+	{
+		check(self->GetClass()->ImplementsInterface(outerClass));
+	}
+	else
+	{
+		check(self->IsA(outerClass));
+	}
+#endif
 
 	return InternalInvokeUFunction(buffer, self, finalFunction);
 }

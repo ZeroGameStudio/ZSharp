@@ -12,13 +12,22 @@
 #include "ZManagedDelegateProxyImpl.generated.h"
 
 UCLASS(Transient, MinimalAPI, meta = (ZSharpNoExport))
-class UZManagedDelegateProxyImpl final : public UObject, public IZManagedDelegateProxy
+class UZManagedDelegateProxyImpl : public UObject, public IZManagedDelegateProxy
 {
 	GENERATED_BODY()
 
-	friend ZSharp::FZSelfDescriptiveScriptDelegate;
-	friend ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate;
-	friend ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate;
+public:
+	static const FName StubFunctionName;
+	
+	template <typename T = UZManagedDelegateProxyImpl>
+	requires TIsDerivedFrom<T, UZManagedDelegateProxyImpl>::Value
+	static T* Create(const UFunction* signature, ZSharp::FZGCHandle delegate)
+	{
+		auto result = NewObject<T>();
+		result->Signature = TStrongObjectPtr { signature };
+		result->Delegate = delegate;
+		return result;
+	}
 
 public:
 	virtual ZSharp::FZGCHandle ManagedDelegateProxy_GetDelegate() const override { return Delegate; }

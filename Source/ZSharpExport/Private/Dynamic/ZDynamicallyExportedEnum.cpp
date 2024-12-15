@@ -81,7 +81,7 @@ ZSharp::FZDynamicallyExportedEnum::FZDynamicallyExportedEnum(const UEnum* uenum)
 	: Enum(uenum)
 	, Flags(EZExportedEnumFlags::None)
 {
-	if (Enum->HasAnyEnumFlags(EEnumFlags::Flags))
+	if (Enum->HasAnyEnumFlags(EEnumFlags::Flags) || Enum->HasMetaData(TEXT("Bitflags")))
 	{
 		Flags |= EZExportedEnumFlags::Flags;
 	}

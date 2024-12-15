@@ -5,6 +5,8 @@
 
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
 
+const FName UZManagedDelegateProxyImpl::StubFunctionName = GET_FUNCTION_NAME_CHECKED(UZManagedDelegateProxyImpl, __ZStub);
+
 void UZManagedDelegateProxyImpl::BeginDestroy()
 {
 	Delegate.Free();

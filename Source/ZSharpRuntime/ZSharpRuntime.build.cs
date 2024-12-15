@@ -29,6 +29,7 @@ public class ZSharpRuntime : ModuleRules
 				"Core",
 				"FieldNotification",
 				"Engine",
+				"EnhancedInput",
 				
 				"DeveloperSettings",
 				
@@ -68,3 +69,5 @@ public class ZSharpRuntime : ModuleRules
 		PublicDefinitions.Add($"ZSHARP_SCANNER_ASSEMBLY_NAME=\"ZeroGames.ZSharp.UnrealFieldScanner\"");
 	}
 }
+
+

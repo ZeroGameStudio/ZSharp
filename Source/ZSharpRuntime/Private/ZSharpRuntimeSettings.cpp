@@ -13,6 +13,7 @@ UZSharpRuntimeSettings::UZSharpRuntimeSettings()
 	IntrinsicModuleMappings.Emplace("InputCore", EngineAssemblyName, false);
 
 	IntrinsicModuleMappings.Emplace("Engine", EngineAssemblyName, false);
+	IntrinsicModuleMappings.Emplace("EnhancedInput", EngineAssemblyName, false);
 
 	IntrinsicModuleMappings.Emplace("ZSharpRuntime", EngineAssemblyName, false);
 

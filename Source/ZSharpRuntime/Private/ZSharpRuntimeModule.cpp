@@ -36,6 +36,9 @@
 #include "Interop/Delegate/ZUnrealDelegate_Interop.h"
 #include "Interop/Delegate/ZUnrealMulticastInlineDelegate_Interop.h"
 #include "Interop/Delegate/ZUnrealMulticastSparseDelegate_Interop.h"
+#include "Interop/Engine/ZEngine_Interop.h"
+#include "Interop/AsyncLoading/ZStreamableManager_Interop.h"
+#include "Interop/AsyncLoading/ZStreamingTask_Interop.h"
 #include "Interop/EnhancedInput/ZEnhancedInputComponent_Interop.h"
 #include "Interop/EnhancedInput/ZInputActionValue_Interop.h"
 
@@ -250,6 +253,15 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, IsBoundToObject),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, Contains),
 
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Engine, GetEngine),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamableManager, GetGlobalStreamableManager),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamableManager, RequestAsyncLoading),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamingTask, GetResult),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamingTask, GetLoadedCount),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamingTask, Release),
+
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, BindAction),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, RemoveBinding),
 
@@ -258,9 +270,16 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 #undef ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY
         };
 
+		static void** GManagedFunctions[] =
+		{
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZStreamableManager_Interop::GUpdate),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZStreamableManager_Interop::GSignalCompletion),
+		};
+
 		static const struct
 		{
 			FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(GUnmanagedFunctions), GUnmanagedFunctions };
+			void*** ManagedFunctions = GManagedFunctions;
 		} GArgs{};
 
 		alc->LoadAssembly(ZSHARP_ENGINE_ASSEMBLY_NAME, (void*)&GArgs);

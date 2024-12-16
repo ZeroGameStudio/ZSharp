@@ -8,7 +8,7 @@ namespace ZeroGames.ZSharp.Core.Async;
 public readonly partial struct ZeroTask : IZeroTask, IAwaitable<ZeroTask.Awaiter>, IEquatable<ZeroTask>
 {
 	
-	public readonly struct Awaiter(ZeroTask task) : IAwaiter, IZeroTaskAwaiter
+	public readonly struct Awaiter : IAwaiter, IZeroTaskAwaiter
 	{
 		
 		public void OnCompleted(IAsyncStateMachine stateMachine)
@@ -37,8 +37,10 @@ public readonly partial struct ZeroTask : IZeroTask, IAwaitable<ZeroTask.Awaiter
 				return _task.IsCompleted;
 			}
 		}
+		
+		internal Awaiter(ZeroTask task) => _task = task;
 
-		private readonly ZeroTask _task = task;
+		private readonly ZeroTask _task;
 
 	}
 
@@ -99,7 +101,7 @@ public readonly partial struct ZeroTask : IZeroTask, IAwaitable<ZeroTask.Awaiter
 public readonly partial struct ZeroTask<TResult> : IZeroTask<TResult>, IAwaitable<TResult, ZeroTask<TResult>.Awaiter>, IEquatable<ZeroTask<TResult>>
 {
 	
-	public readonly struct Awaiter(ZeroTask<TResult> task) : IAwaiter<TResult>, IZeroTaskAwaiter
+	public readonly struct Awaiter : IAwaiter<TResult>, IZeroTaskAwaiter
 	{
 		
 		public void OnCompleted(IAsyncStateMachine stateMachine)
@@ -129,8 +131,11 @@ public readonly partial struct ZeroTask<TResult> : IZeroTask<TResult>, IAwaitabl
 				return _task.IsCompleted;
 			}
 		}
+		
+		
+		internal Awaiter(ZeroTask<TResult> task) => _task = task;
 
-		private readonly ZeroTask<TResult> _task = task;
+		private readonly ZeroTask<TResult> _task;
 
 	}
 

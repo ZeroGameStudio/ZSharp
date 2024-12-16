@@ -1,11 +1,8 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.CompilerServices;
+namespace System.Runtime.CompilerServices;
 
-namespace ZeroGames.ZSharp.Core.Async;
-
-// These exist only for ensuring that the implement class matches specific pattern.
-internal interface IAsyncMethodBuilder<out TImpl, out TTask, TTaskAwaiter> where TImpl : struct, IAsyncMethodBuilder<TImpl, TTask, TTaskAwaiter> where TTask : IAwaitable<TTaskAwaiter> where TTaskAwaiter : struct, IAwaiter
+public interface IAsyncMethodBuilder<out TImpl, out TTask, TTaskAwaiter> where TImpl : struct, IAsyncMethodBuilder<TImpl, TTask, TTaskAwaiter> where TTask : IAwaitable<TTaskAwaiter> where TTaskAwaiter : struct, IAwaiter
 {
 	static abstract TImpl Create();
 	void SetStateMachine(IAsyncStateMachine stateMachine);
@@ -17,7 +14,7 @@ internal interface IAsyncMethodBuilder<out TImpl, out TTask, TTaskAwaiter> where
 	TTask Task { get; }
 }
 
-internal interface IAsyncMethodBuilder<in TResult, out TImpl, out TTask, TTaskAwaiter> : IAsyncMethodBuilder<TImpl, TTask, TTaskAwaiter> where TImpl : struct, IAsyncMethodBuilder<TResult, TImpl, TTask, TTaskAwaiter> where TTask : IAwaitable<TResult, TTaskAwaiter> where TTaskAwaiter : struct, IAwaiter<TResult>
+public interface IAsyncMethodBuilder<in TResult, out TImpl, out TTask, TTaskAwaiter> : IAsyncMethodBuilder<TImpl, TTask, TTaskAwaiter> where TImpl : struct, IAsyncMethodBuilder<TResult, TImpl, TTask, TTaskAwaiter> where TTask : IAwaitable<TResult, TTaskAwaiter> where TTaskAwaiter : struct, IAwaiter<TResult>
 {
 	void SetResult(TResult result);
 }

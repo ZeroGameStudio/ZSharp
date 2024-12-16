@@ -67,8 +67,6 @@ namespace ZSharp::ZGenericClr_Private
 		}
 	}
 
-#define ADDRESS_OF(Pointer) reinterpret_cast<void**>(&Pointer)
-	
 	static void LoadCoreAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
 	{
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
@@ -105,30 +103,30 @@ namespace ZSharp::ZGenericClr_Private
 
 		static void** GManagedFunctions[] =
 		{
-			ADDRESS_OF(FZClr_Interop::GCollectGarbage),
-			ADDRESS_OF(FZClr_Interop::GCreateMasterAlc),
-			ADDRESS_OF(FZClr_Interop::GCreateSlimAlc),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZClr_Interop::GCollectGarbage),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZClr_Interop::GCreateMasterAlc),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZClr_Interop::GCreateSlimAlc),
 
-			ADDRESS_OF(FZGCHandle_Interop::GFree),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZGCHandle_Interop::GFree),
 
-			ADDRESS_OF(FZDefaultAssemblyLoadContext_Interop::GLoadAssembly),
-			ADDRESS_OF(FZDefaultAssemblyLoadContext_Interop::GInvokeMethod),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZDefaultAssemblyLoadContext_Interop::GLoadAssembly),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZDefaultAssemblyLoadContext_Interop::GInvokeMethod),
 
-			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GUnload),
-			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GLoadAssembly),
-			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GInvokeMethod),
-			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GGetType),
-			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GZCall_Red),
-			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GGetZCallHandle_Red),
-			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GBuildConjugate_Red),
-			ADDRESS_OF(FZMasterAssemblyLoadContext_Interop::GReleaseConjugate_Red),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GUnload),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GLoadAssembly),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GInvokeMethod),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GGetType),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GZCall_Red),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GGetZCallHandle_Red),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GBuildConjugate_Red),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GReleaseConjugate_Red),
 
-			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GUnload),
-			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GLoadAssembly),
-			ADDRESS_OF(FZSlimAssemblyLoadContext_Interop::GInvokeMethod),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZSlimAssemblyLoadContext_Interop::GUnload),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZSlimAssemblyLoadContext_Interop::GLoadAssembly),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZSlimAssemblyLoadContext_Interop::GInvokeMethod),
 
-			ADDRESS_OF(FZConsole_Interop::GHandleExecuteCommand),
-			ADDRESS_OF(FZConsole_Interop::GHandleVariableChanged),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZConsole_Interop::GHandleExecuteCommand),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZConsole_Interop::GHandleVariableChanged),
 		};
 
 		static const struct
@@ -203,8 +201,8 @@ namespace ZSharp::ZGenericClr_Private
 
 		static void** GManagedFunctions[] =
 		{
-			ADDRESS_OF(FZConsole_Interop::GHandleExecuteCommand),
-			ADDRESS_OF(FZConsole_Interop::GHandleVariableChanged),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZConsole_Interop::GHandleExecuteCommand),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZConsole_Interop::GHandleVariableChanged),
 		};
 		
 		static const struct
@@ -244,7 +242,7 @@ namespace ZSharp::ZGenericClr_Private
 	{
 		static void** managedFunctions[] =
 		{
-			ADDRESS_OF(ZSharp::FZEventLoop_Interop::GNotifyEvent),
+			ZSHARP_BUILD_MANAGED_FUNCTION(ZSharp::FZEventLoop_Interop::GNotifyEvent),
 		};
 		
 		static const struct
@@ -267,8 +265,6 @@ namespace ZSharp::ZGenericClr_Private
 		check(dllMain);
 		dllMain(GArgs);
 	}
-
-#undef ADDRESS_OF
 }
 
 ZSharp::FZGenericClr& ZSharp::FZGenericClr::Get()

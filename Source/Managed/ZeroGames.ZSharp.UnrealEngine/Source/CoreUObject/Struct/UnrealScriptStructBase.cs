@@ -21,7 +21,7 @@ public abstract class UnrealScriptStructBase : UnrealExportedObjectBase
     public DynamicZCallResult WriteUnrealProperty<T>(string name, int32 index, T value)
     {
 	    string zcallName = $"up:/{UnrealFieldPath}:{name}";
-	    return this.ZCall(MasterAlcCache.Instance, zcallName, true, index, value);
+	    return this.ZCall(MasterAlcCache.Instance, zcallName, [ true, index, value ]);
     }
 
     public DynamicZCallResult WriteUnrealProperty<T>(string name, T value) => WriteUnrealProperty(name, 0, value);

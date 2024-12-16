@@ -28,6 +28,7 @@ internal static class DllEntry
     private unsafe struct Args
     {
         public UnmanagedFunctions UnmanagedFunctions;
+        public void*** ManagedFunctions;
     }
 
     [DllMain]
@@ -40,6 +41,11 @@ internal static class DllEntry
             string fieldName = new(function->FieldName);
             InteropBindingHelper.GetStaticFunctionPointerField(typeName, fieldName).SetValue(null, (IntPtr)function->Address);
         }
+        
+        int32 offset = 0;
+        // StreamableManager interop functions
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, IntPtr, int32, void>)&StreamableManager_Interop.Update;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, IntPtr, void>)&StreamableManager_Interop.SignalCompletion;
 
         UE_LOG(LogZSharpScriptEngine, "===================== Z# Engine Startup =====================");
     }

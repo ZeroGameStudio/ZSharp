@@ -28,15 +28,12 @@ public static class UObjectGlobals
 	public static T? LoadObject<T>(string? name) where T : UnrealObject => LoadObject<T>(null, name);
 	public static T? LoadObject<T>(UnrealObject? outer, string? name) where T : UnrealObject => (T?)LoadObject(UnrealClass.FromType<T>(), outer, name);
 
-	public static async ZeroTask<UnrealObject?> LoadObjectAsync(UnrealClass @class, UnrealObject? outer, string? name)
+	public static StreamingTask<UnrealObject> LoadObjectAsync(UnrealClass @class, UnrealObject? outer, string? name)
 	{
-		// @FIXME: Async loading
-		UnrealObject? res = LoadObject(@class, outer, name);
-		await ZeroTask.Yield();
-		return res;
+		throw new NotImplementedException();
 	}
-	public static ZeroTask<T?> LoadObjectAsync<T>(string? name) where T : UnrealObject => LoadObjectAsync<T>(null, name);
-	public static async ZeroTask<T?> LoadObjectAsync<T>(UnrealObject? outer, string? name) where T : UnrealObject => (T?)await LoadObjectAsync(UnrealClass.FromType<T>(), outer, name);
+	public static StreamingTask<T> LoadObjectAsync<T>(string? name) where T : UnrealObject => LoadObjectAsync<T>(null, name);
+	public static StreamingTask<T> LoadObjectAsync<T>(UnrealObject? outer, string? name) where T : UnrealObject => throw new NotImplementedException();
 	
 	public static UnrealObject DuplicateObject(UnrealObject source, UnrealObject outer, string? name, UnrealClass? @class)
 	{

@@ -7,7 +7,7 @@ public readonly unsafe struct InteropStringArray : IDisposable
 	
 	public InteropStringArray() : this(null) {}
 
-	public InteropStringArray(string[]? strings)
+	public InteropStringArray(IEnumerable<string?>? strings)
 	{
 		_black = true;
 		_address = InteropStringArray_Interop.Alloc();
@@ -49,7 +49,7 @@ public readonly unsafe struct InteropStringArray : IDisposable
 		{
 			return;
 		}
-		
+
 		fixed (char* buffer = value)
 		{
 			InteropStringArray_Interop.InsertAt(_address, index, buffer);

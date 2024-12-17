@@ -44,14 +44,11 @@ internal class ZeroTask_Delay : UnderlyingZeroTaskBase<TimeSpan, ZeroTask_Delay>
 			// This is to ensure the timer only triggers once.
 			// This must call before SetResult because it will return the task to pool.
 			@this._delayTimer.Unregister();
-			@this.Comp.SetResult(deltaTime);
+			@this.SetResult(deltaTime);
 		}, this, _delayTime, false, Lifecycle, static (ex, state) =>
 		{
 			ZeroTask_Delay @this = Unsafe.As<ZeroTask_Delay>(state!);
-			if (@this.ShouldThrowOnLifecycleExpired)
-			{
-				throw ex;
-			}
+			@this.SetException(ex);
 		});
 	}
 	

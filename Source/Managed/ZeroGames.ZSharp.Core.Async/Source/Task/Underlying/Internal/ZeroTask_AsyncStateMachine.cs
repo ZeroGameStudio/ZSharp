@@ -7,9 +7,8 @@ internal class ZeroTask_AsyncStateMachine<TResult> : UnderlyingZeroTaskBase<TRes
 
 	public static ZeroTask_AsyncStateMachine<TResult> GetFromPool() => Pool.Pop();
 
-	public void SetResult(TResult result) => Comp.SetResult(result);
-
-	public void SetException(Exception exception) => Comp.SetException(exception);
+	public new void SetResult(TResult result) => base.SetResult(result);
+	public new void SetException(Exception exception) => base.SetException(exception);
 
 	public ZeroTask<TResult> Task => new(this);
 

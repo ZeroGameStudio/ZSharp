@@ -118,7 +118,7 @@ internal class EventLoop : IEventLoop
 					}
 					catch (Exception ex)
 					{
-						UnhandledExceptionHelper.Guard(ex, "Unhandled Exception Detected in Event Loop.", LogZSharpScriptAsync);
+						UnhandledExceptionHelper.Guard(ex, "Unhandled exception detected in Event Loop.", LogZSharpScriptAsync);
 					}
 				}
 					

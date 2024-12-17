@@ -16,6 +16,11 @@ public static class UnhandledExceptionHelper
 		string? fatalMessage = null;
 		for (Exception? currentEx = exception; currentEx is not null; currentEx = currentEx.InnerException)
 		{
+			if (currentEx is OperationCanceledException)
+			{
+				return;
+			}
+			
 			if (CoreSettings.SuppressAlcUnloadedException && currentEx is AlcUnloadedException)
 			{
 				return;

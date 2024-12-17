@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public class LifecycleExpiredException : Exception
+public class LifecycleExpiredException : OperationCanceledException
 {
 
 	public LifecycleExpiredException(){}

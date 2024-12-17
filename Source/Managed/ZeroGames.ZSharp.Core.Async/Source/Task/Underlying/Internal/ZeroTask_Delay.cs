@@ -15,15 +15,14 @@ public enum EZeroTaskDelayType
 internal class ZeroTask_Delay : UnderlyingZeroTaskBase<TimeSpan, ZeroTask_Delay>
 {
 
-	public static ZeroTask_Delay GetFromPool(EZeroTaskDelayType delayType, TimeSpan delayTime, Lifecycle lifecycle, bool throwOnExpired)
+	public static ZeroTask_Delay GetFromPool(EZeroTaskDelayType delayType, TimeSpan delayTime, Lifecycle lifecycle)
 	{
 		ZeroTask_Delay task = Pool.Pop();
 		task._delayType = delayType;
 		task._delayTime = delayTime;
 		task._delayTimer = default;
 		task.Lifecycle = lifecycle;
-		task.ShouldThrowOnLifecycleExpired = throwOnExpired;
-		
+
 		return task;
 	}
 

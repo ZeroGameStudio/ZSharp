@@ -14,7 +14,7 @@ internal sealed class GameThreadScheduler : IGameThreadScheduler
 	{
 		if (IsInGameThread)
 		{
-			d(state);
+			GuardedInvoke(d, state);
 		}
 		else
 		{
@@ -31,11 +31,23 @@ internal sealed class GameThreadScheduler : IGameThreadScheduler
 		IEventLoop.Instance.Register(EEventLoopTickingGroup.RealtimeTick, Tick, null);
 	}
 	
+	private static void GuardedInvoke(SendOrPostCallback d, object? state)
+	{
+		try
+		{
+			d(state);
+		}
+		catch (Exception ex)
+		{
+			UnhandledExceptionHelper.Guard(ex, "Unhandled exception detected in Game Thread Scheduler.");
+		}
+	}
+	
 	private static void Tick(in EventLoopArgs args, object? state)
 	{
 		while (Instance._recs.TryDequeue(out var rec))
 		{
-			rec.Callback(rec.State);
+			GuardedInvoke(rec.Callback, rec.State);
 		}
 	}
 

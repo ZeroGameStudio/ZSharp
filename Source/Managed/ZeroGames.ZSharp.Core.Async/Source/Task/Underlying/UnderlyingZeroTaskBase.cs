@@ -32,8 +32,6 @@ public abstract class UnderlyingZeroTaskBase<TResult, TImpl> : IPoolableUnderlyi
 
 	protected ref Lifecycle Lifecycle => ref _lifecycle;
 	
-	protected bool ShouldThrowOnLifecycleExpired { get; set; }
-
 	private static UnderlyingZeroTaskPool<TResult, TImpl> _pool;
 
 	private UnderlyingZeroTaskComponent<TResult> _comp;

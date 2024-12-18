@@ -17,7 +17,7 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 
 	public Timer Register(Action<TimeSpan, object?> callback, object? state, TimeSpan rate, bool looped = false, Lifecycle lifecycle = default, Action<LifecycleExpiredException, object?>? onExpired = null)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		if (looped && rate < _minLoopRate)
 		{
 			rate = _minLoopRate;
@@ -78,7 +78,7 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 
 	public void Unregister(Timer timer)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		if (timer.Owner != this)
 		{
 			return;
@@ -89,13 +89,13 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 
 	public void UnregisterAll(Lifecycle lifecycle)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		throw new NotImplementedException();
 	}
 	
 	public void Suspend(Timer timer)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		if (timer.Owner != this)
 		{
 			return;
@@ -106,13 +106,13 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 
 	public void SuspendAll(Lifecycle lifecycle)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		throw new NotImplementedException();
 	}
 
 	public void Resume(Timer timer)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		if (timer.Owner != this)
 		{
 			return;
@@ -123,20 +123,20 @@ public abstract class TimerSchedulerBase : ITimerScheduler
 
 	public void ResumeAll(Lifecycle lifecycle)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		throw new NotImplementedException();
 	}
 
 	public bool IsValidTimer(Timer timer)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		return InternalIsValidTimer(timer);
 	}
 
 	public void Tick(float deltaSeconds)
 	{
-		check(IsInGameThread);
-		check(deltaSeconds > 0);
+		Thrower.ThrowIfNotInGameThread();
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(deltaSeconds, nameof(deltaSeconds));
 
 		if (!ensure(!_ticking))
 		{

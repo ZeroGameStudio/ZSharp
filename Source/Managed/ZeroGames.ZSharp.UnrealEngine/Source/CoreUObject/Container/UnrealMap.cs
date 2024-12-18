@@ -8,7 +8,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(33)]
-public sealed class UnrealMap<TKey, TValue> : PlainExportedObjectBase
+public sealed class UnrealMap<TKey, TValue> : UnrealConjugateBase
 	, IConjugate<UnrealMap<TKey, TValue>>
 	, IDictionary
 	, IDictionary<TKey, TValue>

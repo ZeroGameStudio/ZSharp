@@ -45,7 +45,7 @@ public class ClassWriter
 		// Base type
 		if (GetBaseType() is { } baseType)
 		{
-			bool setBaseTypeInImpl = baseType == PLAIN_EXPORTED_OBJECT_BASE_TYPE_NAME
+			bool setBaseTypeInImpl = baseType == UNREAL_CONJUGATE_BASE_TYPE_NAME
 			                         || baseType == UNREAL_OBJECT_BASE_TYPE_NAME
 			                         || baseType == UNREAL_SCRIPT_STRUCT_BASE_TYPE_NAME;
 			if (setBaseTypeInImpl == !abstraction)
@@ -177,7 +177,7 @@ public class ClassWriter
 		{
 			if (_exportedClass.IsPlain)
 			{
-				return PLAIN_EXPORTED_OBJECT_BASE_TYPE_NAME;
+				return UNREAL_CONJUGATE_BASE_TYPE_NAME;
 			}
 
 			if (_exportedClass.IsClass)
@@ -201,7 +201,7 @@ public class ClassWriter
 		return _exportedClass.BaseType.ToString(false);
 	}
 	
-	private const string PLAIN_EXPORTED_OBJECT_BASE_TYPE_NAME = "PlainExportedObjectBase";
+	private const string UNREAL_CONJUGATE_BASE_TYPE_NAME = "UnrealConjugateBase";
 	private const string UNREAL_OBJECT_BASE_TYPE_NAME = "UnrealObjectBase";
 	private const string UNREAL_SCRIPT_STRUCT_BASE_TYPE_NAME = "UnrealScriptStructBase";
 	

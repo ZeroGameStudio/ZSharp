@@ -9,7 +9,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(12)]
-public sealed class UnrealUtf8String : PlainExportedObjectBase
+public sealed class UnrealUtf8String : UnrealConjugateBase
     , IConjugate<UnrealUtf8String>
     , ICloneable<UnrealUtf8String>
     , IEquatable<UnrealUtf8String>

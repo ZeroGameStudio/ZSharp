@@ -17,11 +17,12 @@ public class ZCallMethodBodyBuilder(string name, TypeReference? returnType, bool
 		int32 numSlots = (IsStatic ? 0 : 1) + (Parameters?.Count ?? 0) + (ReturnType is null ? 0 : 1);
 
 		string getHandle = 
-$@"const string ZCALL_NAME = ""{Name}"";
+$@"Thrower.ThrowIfNotInGameThread();
+
+const string ZCALL_NAME = ""{Name}"";
 IMasterAssemblyLoadContext alc = MasterAlcCache.Instance;
 {handleFieldName} ??= alc.GetZCallHandle(ZCALL_NAME);
-ZCallHandle handle = {handleFieldName}.Value;
-check(handle.IsBlack);";
+ZCallHandle handle = {handleFieldName}.Value;";
 
 		sb.Append(getHandle);
 
@@ -43,7 +44,13 @@ ZCallBuffer buffer = new(slots, NUM_SLOTS);";
 
 		sb.AppendLine();
 		sb.AppendLine();
-		sb.Append(needsBuffer ? "alc.ZCall(handle, &buffer);" : "alc.ZCall(handle, null);");
+
+		string bufferParameter = needsBuffer ? "&buffer" : "null";
+		sb.Append(
+$@"if (alc.ZCall(handle, {bufferParameter}) != EZCallErrorCode.Succeed)
+{{
+	throw new InvalidOperationException();
+}}");
 
 		if (needsBuffer)
 		{

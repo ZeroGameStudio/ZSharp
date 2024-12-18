@@ -3,7 +3,7 @@
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(1)]
-public abstract class UnrealObjectBase : UnrealExportedObjectBase
+public abstract class UnrealObjectBase : UnrealConjugateBase, IUnrealFieldPath
 {
 
     public DynamicZCallResult CallUnrealFunctionEx<T>(string name, params ReadOnlySpan<object?> parameters)
@@ -40,6 +40,8 @@ public abstract class UnrealObjectBase : UnrealExportedObjectBase
 
     public DynamicZCallResult WriteUnrealProperty<T>(string name, T value) => WriteUnrealProperty(name, 0, value);
 
+    public abstract string UnrealFieldPath { get; }
+    
     protected UnrealObjectBase(IntPtr unmanaged) : base(unmanaged){}
 
 }

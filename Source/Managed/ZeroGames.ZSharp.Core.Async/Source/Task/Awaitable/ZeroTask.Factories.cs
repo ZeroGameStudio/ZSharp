@@ -7,21 +7,21 @@ public partial struct ZeroTask
 
 	public static ZeroTask<T> FromResult<T>(T result)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 
 		return new(result);
 	}
 
 	public static ZeroTask FromUnderlyingTask(IUnderlyingZeroTask task)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 
 		return new(task);
 	}
 
 	public static ZeroTask<T> FromUnderlyingTask<T>(IUnderlyingZeroTask<T> task)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 
 		return new(task);
 	}
@@ -32,7 +32,7 @@ public partial struct ZeroTask
 
 	public static ZeroTask<TimeSpan> Delay(EZeroTaskDelayType delayType, TimeSpan delayTime, Lifecycle lifecycle = default)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		
 		if (delayTime < TimeSpan.FromMilliseconds(1))
 		{

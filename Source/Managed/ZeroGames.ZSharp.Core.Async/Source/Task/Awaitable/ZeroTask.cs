@@ -13,19 +13,19 @@ public readonly partial struct ZeroTask : IZeroTask, IAwaitable<ZeroTask.Awaiter
 		
 		public void OnCompleted(IAsyncStateMachine stateMachine)
 		{
-			check(IsInGameThread);
+			Thrower.ThrowIfNotInGameThread();
 			_task.SetStateMachine(stateMachine);
 		}
 
 		public void OnCompleted(Action continuation)
 		{
-			check(IsInGameThread);
+			Thrower.ThrowIfNotInGameThread();
 			_task.SetContinuation(continuation);
 		}
 
 		public void GetResult()
 		{
-			check(IsInGameThread);
+			Thrower.ThrowIfNotInGameThread();
 			_task.GetResult();
 		}
 
@@ -33,7 +33,7 @@ public readonly partial struct ZeroTask : IZeroTask, IAwaitable<ZeroTask.Awaiter
 		{
 			get
 			{
-				check(IsInGameThread);
+				Thrower.ThrowIfNotInGameThread();
 				return _task.IsCompleted;
 			}
 		}
@@ -106,20 +106,20 @@ public readonly partial struct ZeroTask<TResult> : IZeroTask<TResult>, IAwaitabl
 		
 		public void OnCompleted(IAsyncStateMachine stateMachine)
 		{
-			check(IsInGameThread);
+			Thrower.ThrowIfNotInGameThread();
 			_task.SetStateMachine(stateMachine);
 		}
 
 		public void OnCompleted(Action continuation)
 		{
-			check(IsInGameThread);
+			Thrower.ThrowIfNotInGameThread();
 			_task.SetContinuation(continuation);
 		}
 
 		void IAwaiter.GetResult() => GetResult();
 		public TResult GetResult()
 		{
-			check(IsInGameThread);
+			Thrower.ThrowIfNotInGameThread();
 			return _task.GetResult();
 		}
 
@@ -127,7 +127,7 @@ public readonly partial struct ZeroTask<TResult> : IZeroTask<TResult>, IAwaitabl
 		{
 			get
 			{
-				check(IsInGameThread);
+				Thrower.ThrowIfNotInGameThread();
 				return _task.IsCompleted;
 			}
 		}

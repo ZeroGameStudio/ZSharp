@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public abstract class SubclassOfBase : PlainExportedObjectBase
+public abstract class SubclassOfBase : UnrealConjugateBase
 	, IEquatable<SubclassOfBase>
 	, IEqualityOperators<SubclassOfBase?, SubclassOfBase?, bool>
 {

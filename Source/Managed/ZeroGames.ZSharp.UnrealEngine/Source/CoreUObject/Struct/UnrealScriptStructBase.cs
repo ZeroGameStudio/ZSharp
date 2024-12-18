@@ -3,7 +3,7 @@
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(2)]
-public abstract class UnrealScriptStructBase : UnrealExportedObjectBase
+public abstract class UnrealScriptStructBase : UnrealConjugateBase, IUnrealFieldPath
 {
 
 	public DynamicZCallResult ReadUnrealPropertyEx<T>(string name, int32 index)
@@ -25,6 +25,8 @@ public abstract class UnrealScriptStructBase : UnrealExportedObjectBase
     }
 
     public DynamicZCallResult WriteUnrealProperty<T>(string name, T value) => WriteUnrealProperty(name, 0, value);
+    
+    public abstract string UnrealFieldPath { get; }
     
     protected UnrealScriptStructBase(){}
     protected UnrealScriptStructBase(IntPtr unmanaged) : base(unmanaged){}

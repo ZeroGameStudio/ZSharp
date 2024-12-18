@@ -30,7 +30,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 	
 	public LifecycleExpiredRegistration RegisterOnExpired(Action<object, object?> callback, object? state)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 
 		if (IsExpired)
 		{
@@ -53,7 +53,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 
 	public void UnregisterOnExpired(in LifecycleExpiredRegistration registration)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 
 		if (IsExpired)
 		{
@@ -73,7 +73,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 
 	public bool IsValidRegistration(LifecycleExpiredRegistration registration)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 
 		if (IsExpired)
 		{
@@ -97,7 +97,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 	{
 		get
 		{
-			check(IsInGameThread);
+			Thrower.ThrowIfNotInGameThread();
 
 			if (_underlyingLifecycle is null)
 			{

@@ -95,6 +95,11 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     public EZCallErrorCode ZCall(ZCallHandle handle, ZCallBuffer* buffer)
     {
         GuardInvariant();
+
+        if (!handle.IsBlack)
+        {
+            return EZCallErrorCode.InvalidHandle;
+        }
         
         return ZCall_Black(handle, buffer);
     }

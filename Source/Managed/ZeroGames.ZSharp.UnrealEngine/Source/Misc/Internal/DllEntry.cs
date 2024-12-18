@@ -34,6 +34,8 @@ internal static class DllEntry
     [DllMain]
     private static unsafe void DllMain(Args* args)
     {
+        check(MasterAlcCache.Instance == IMasterAssemblyLoadContext.Instance);
+        
         for (int32 i = 0; i < args->UnmanagedFunctions.Count; ++i)
         {
             UnmanagedFunction* function = args->UnmanagedFunctions.Functions + i;

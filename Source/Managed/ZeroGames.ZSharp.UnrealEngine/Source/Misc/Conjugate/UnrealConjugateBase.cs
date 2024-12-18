@@ -5,30 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
-/**
- * Red Lifecycle:
- *     AllocUnmanagedResource (done by unmanaged code)
- *     -> ...
- *     -> ZCall
- *     -> AllocManagedObject & BuildConjugate (request by unmanaged code)
- *     -> ...
- *     -> ReleaseUnmanagedResource (done by unmanaged code somewhen)
- *     -> MarkAsDead (request by unmanaged code from ReleaseConjugate)
- *     -> SuppressFinalize (done by ReleaseConjugate)
- *     -> ...
- *     -> ReleaseManagedObject (done by GC)
- *
- * Black Lifecycle:
- *     AllocManagedObject (request by managed user code)
- *     -> AllocUnmanagedResource & BuildConjugate (request by managed code)
- *     -> ...
- *     -> Dispose or Finalize
- *     -> ReleaseUnmanagedResource
- *     -> MarkAsDead (request directly by finalizer)
- *     -> ...
- *     -> ReleaseManagedObject (done by GC)
- */
-public abstract class ExportedObjectBase : IConjugate
+public abstract class UnrealConjugateBase : IConjugate
 {
 
     public void Dispose()
@@ -84,13 +61,13 @@ public abstract class ExportedObjectBase : IConjugate
     
     internal const IntPtr DEAD_ADDR = 0xDEAD;
 
-    private protected ExportedObjectBase()
+    private protected UnrealConjugateBase()
     {
         GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);
         IsBlack = true;
     }
 
-    private protected ExportedObjectBase(IntPtr unmanaged)
+    private protected UnrealConjugateBase(IntPtr unmanaged)
     {
         GCHandle = GCHandle.Alloc(this);
         Unmanaged = unmanaged;
@@ -99,19 +76,18 @@ public abstract class ExportedObjectBase : IConjugate
         GC.SuppressFinalize(this);
     }
 
-    ~ExportedObjectBase() => InternalDispose();
+    ~UnrealConjugateBase() => InternalDispose();
     
     void IConjugate.Release()
     {
-        check(!IsBlack);
-        check(!IsExpired);
-        
+        ensure(IsRed);
+
         MarkAsDead();
     }
     
     private void BroadcastOnExpired()
     {
-        check(!_hasBroadcastOnExpired);
+        ensure(!_hasBroadcastOnExpired);
         
         _hasBroadcastOnExpired = true;
         if (_onExpiredRegistry is not null)
@@ -165,7 +141,7 @@ public abstract class ExportedObjectBase : IConjugate
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void MarkAsDead()
     {
-        check(!IsExpired);
+        ensure(!IsExpired);
         
         GCHandle.Free();
         Unmanaged = DEAD_ADDR;

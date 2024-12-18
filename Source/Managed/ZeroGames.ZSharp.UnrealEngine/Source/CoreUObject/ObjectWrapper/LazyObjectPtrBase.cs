@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public abstract class LazyObjectPtrBase : PlainExportedObjectBase
+public abstract class LazyObjectPtrBase : UnrealConjugateBase
 	, IEquatable<LazyObjectPtrBase>
 	, IEqualityOperators<LazyObjectPtrBase?, LazyObjectPtrBase?, bool>
 {

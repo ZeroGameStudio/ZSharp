@@ -111,7 +111,7 @@ public struct UnderlyingZeroTaskComponent<TResult>
 	private void SignalCompletion()
 	{
 		check(!_completed);
-
+		
 		_completed = true;
 
 		if (_stateMachine is not null)

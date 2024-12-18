@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 [ConjugateRegistryId(43)]
-public abstract class UnrealMulticastSparseDelegateBase : UnrealExportedObjectBase
+public abstract class UnrealMulticastSparseDelegateBase : UnrealConjugateBase, IUnrealFieldPath
 {
 	
 	public void Add(UnrealObject? obj, string? name)
@@ -77,6 +77,8 @@ public abstract class UnrealMulticastSparseDelegateBase : UnrealExportedObjectBa
 			return InternalIsBound;
 		}
 	}
+	
+	public abstract string UnrealFieldPath { get; }
 	
 	protected UnrealMulticastSparseDelegateBase(){}
 	protected UnrealMulticastSparseDelegateBase(IntPtr unmanaged) : base(unmanaged){}

@@ -19,11 +19,8 @@ public static class MasterAlcCache
 	{
 		Assembly asm = Assembly.GetExecutingAssembly();
 		AssemblyLoadContext? alc = AssemblyLoadContext.GetLoadContext(asm);
-		check(alc is not null);
-		check(alc is IMasterAssemblyLoadContext);
-		check(alc == IMasterAssemblyLoadContext.Instance);
-		
-		Instance = (IMasterAssemblyLoadContext)alc;
+
+		Instance = (IMasterAssemblyLoadContext)alc!;
 	}
 }
 

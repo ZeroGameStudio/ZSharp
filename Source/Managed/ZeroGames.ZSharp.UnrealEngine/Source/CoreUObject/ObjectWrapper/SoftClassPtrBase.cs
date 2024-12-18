@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public abstract class SoftClassPtrBase : PlainExportedObjectBase
+public abstract class SoftClassPtrBase : UnrealConjugateBase
 	, IEquatable<SoftClassPtrBase>
 	, IEqualityOperators<SoftClassPtrBase?, SoftClassPtrBase?, bool>
 	, IUnrealClassPath

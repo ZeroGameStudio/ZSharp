@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public abstract class ScriptInterfaceBase : PlainExportedObjectBase
+public abstract class ScriptInterfaceBase : UnrealConjugateBase
 	, IEquatable<ScriptInterfaceBase>
 	, IEqualityOperators<ScriptInterfaceBase?, ScriptInterfaceBase?, bool>
 {

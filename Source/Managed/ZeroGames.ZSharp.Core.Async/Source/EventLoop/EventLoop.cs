@@ -7,7 +7,7 @@ internal class EventLoop : IEventLoop
 
 	public EventLoopRegistration Register(EEventLoopTickingGroup group, EventLoopCallback callback, object? state, Lifecycle lifecycle = default, Action<LifecycleExpiredException>? onExpired = null)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		if (lifecycle.IsExpired)
 		{
 			return default;
@@ -18,7 +18,7 @@ internal class EventLoop : IEventLoop
 
 	public void Unregister(EventLoopRegistration registration)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		if (registration.Owner != this)
 		{
 			return;
@@ -29,13 +29,13 @@ internal class EventLoop : IEventLoop
 
 	public void UnregisterAll(Lifecycle lifecycle)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		InternalUnregisterAll(lifecycle);
 	}
 
 	public bool IsValidRegistration(EventLoopRegistration registration)
 	{
-		check(IsInGameThread);
+		Thrower.ThrowIfNotInGameThread();
 		return InternalIsValidRegistration(registration);
 	}
 

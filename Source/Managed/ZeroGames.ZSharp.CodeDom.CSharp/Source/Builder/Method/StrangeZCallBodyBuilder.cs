@@ -16,7 +16,9 @@ public class StrangeZCallBodyBuilder(string zcallReplace, TypeReference? returnT
 		if (needsBuffer)
 		{
 			string setupBuffer = 
-				$@"const int32 NUM_SLOTS = {numSlots};
+$@"Thrower.ThrowIfNotInGameThread();
+
+const int32 NUM_SLOTS = {numSlots};
 ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[NUM_SLOTS]
 {{
 {MakeSlots().Indent()}
@@ -28,8 +30,13 @@ ZCallBuffer buffer = new(slots, NUM_SLOTS);";
 
 		sb.AppendLine();
 		sb.AppendLine();
-		sb.Append(needsBuffer ? $"{ZCallReplace}(&buffer);" : $"{ZCallReplace}(null);");
-
+		string bufferParameter = needsBuffer ? "&buffer" : "null";
+		sb.Append(
+$@"if ({ZCallReplace}({bufferParameter}) != EZCallErrorCode.Succeed)
+{{
+	throw new InvalidOperationException();
+}}");
+	
 		if (needsBuffer)
 		{
 			sb.Append(MakeCopyOutsAndReturn());

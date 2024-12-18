@@ -10,6 +10,8 @@ public readonly struct ConjugateHandle : IEquatable<ConjugateHandle>
 
     public static ConjugateHandle FromConjugate(IConjugate? conjugate)
     {
+        Thrower.ThrowIfNotInGameThread();
+        
         if (conjugate is { IsExpired: true })
         {
             throw new InvalidOperationException("Access expired conjugate.");

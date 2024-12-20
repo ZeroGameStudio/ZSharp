@@ -13,10 +13,10 @@ internal class EventLoop : IEventLoop
 			return default;
 		}
 		
-		return InternalRegister(group, callback, null, null, lifecycle, onExpired);
+		return InternalRegister(group, callback, null, null, lifecycle, onExpired, null);
 	}
 
-	public EventLoopRegistration Register(EEventLoopTickingGroup group, StatefulEventLoopCallback callback, object? state, Lifecycle lifecycle = default, Action<LifecycleExpiredException>? onExpired = null)
+	public EventLoopRegistration Register(EEventLoopTickingGroup group, StatefulEventLoopCallback callback, object? state, Lifecycle lifecycle = default, Action<LifecycleExpiredException, object?>? onExpired = null)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		if (lifecycle.IsExpired)
@@ -24,7 +24,7 @@ internal class EventLoop : IEventLoop
 			return default;
 		}
 		
-		return InternalRegister(group, null, callback, state, lifecycle, onExpired);
+		return InternalRegister(group, null, callback, state, lifecycle, null, onExpired);
 	}
 
 	public void Unregister(EventLoopRegistration registration)
@@ -120,14 +120,8 @@ internal class EventLoop : IEventLoop
 						if (!IsExpiredRec(rec))
 						{
 							bool @continue = true;
-							if (rec.StatelessCallback is not null)
-							{
-								rec.StatelessCallback(args, ref @continue);
-							}
-							else
-							{
-								rec.StatefulCallback!(args, rec.State, ref @continue);
-							}
+							rec.StatelessCallback?.Invoke(args, ref @continue);
+							rec.StatefulCallback?.Invoke(args, rec.State, ref @continue);
 
 							if (!@continue)
 							{
@@ -137,7 +131,8 @@ internal class EventLoop : IEventLoop
 						else
 						{
 							registry[pair.Key] = default;
-							rec.OnExpired?.Invoke(new(rec.Lifecycle));
+							rec.StatelessOnExpired?.Invoke(new(rec.Lifecycle));
+							rec.StatefulOnExpired?.Invoke(new(rec.Lifecycle), rec.State);
 						}
 					}
 					catch (Exception ex)
@@ -192,12 +187,12 @@ internal class EventLoop : IEventLoop
 	private static bool IsValidRec(in Rec rec) => rec.StatelessCallback is not null || rec.StatefulCallback is not null;
 	private static bool IsExpiredRec(in Rec rec) => rec.Lifecycle.IsExpired;
 	
-	private EventLoopRegistration InternalRegister(EEventLoopTickingGroup group, StatelessEventLoopCallback? statelessCallback, StatefulEventLoopCallback? statefulCallback, object? state, Lifecycle lifecycle, Action<LifecycleExpiredException>? onExpired)
+	private EventLoopRegistration InternalRegister(EEventLoopTickingGroup group, StatelessEventLoopCallback? statelessCallback, StatefulEventLoopCallback? statefulCallback, object? state, Lifecycle lifecycle, Action<LifecycleExpiredException>? statelessOnExpired, Action<LifecycleExpiredException, object?>? statefulOnExpired)
 	{
-		return InternalRegisterTo(_notifing ? _pendingRegistry : _registry, group, statelessCallback, statefulCallback, state, lifecycle, onExpired);
+		return InternalRegisterTo(_notifing ? _pendingRegistry : _registry, group, statelessCallback, statefulCallback, state, lifecycle, statelessOnExpired, statefulOnExpired);
 	}
 
-	private EventLoopRegistration InternalRegisterTo(Dictionary<EEventLoopTickingGroup, Dictionary<EventLoopRegistration, Rec>> registry, EEventLoopTickingGroup group, StatelessEventLoopCallback? statelessCallback, StatefulEventLoopCallback? statefulCallback, object? state, Lifecycle lifecycle, Action<LifecycleExpiredException>? onExpired)
+	private EventLoopRegistration InternalRegisterTo(Dictionary<EEventLoopTickingGroup, Dictionary<EventLoopRegistration, Rec>> registry, EEventLoopTickingGroup group, StatelessEventLoopCallback? statelessCallback, StatefulEventLoopCallback? statefulCallback, object? state, Lifecycle lifecycle, Action<LifecycleExpiredException>? statelessOnExpired, Action<LifecycleExpiredException, object?>? statefulOnExpired)
 	{
 		if (!registry.TryGetValue(group, out var innerRegistry))
 		{
@@ -206,7 +201,7 @@ internal class EventLoop : IEventLoop
 		}
 
 		EventLoopRegistration reg = new(this, ++_handle);
-		innerRegistry[reg] = new(statelessCallback, statefulCallback, state, lifecycle, onExpired);
+		innerRegistry[reg] = new(statelessCallback, statefulCallback, state, lifecycle, statelessOnExpired, statefulOnExpired);
 
 		return reg;
 	}
@@ -265,7 +260,7 @@ internal class EventLoop : IEventLoop
 		innerRegistry[registration] = rec;
 	}
 	
-	private readonly record struct Rec(StatelessEventLoopCallback? StatelessCallback, StatefulEventLoopCallback? StatefulCallback, object? State, Lifecycle Lifecycle, Action<LifecycleExpiredException>? OnExpired);
+	private readonly record struct Rec(StatelessEventLoopCallback? StatelessCallback, StatefulEventLoopCallback? StatefulCallback, object? State, Lifecycle Lifecycle, Action<LifecycleExpiredException>? StatelessOnExpired, Action<LifecycleExpiredException, object?>? StatefulOnExpired);
 	
 	private AccumulatedSeconds _worldAccumulatedSeconds;
 	private AccumulatedSeconds _realAccumulatedSeconds;

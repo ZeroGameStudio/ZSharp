@@ -5,7 +5,8 @@ namespace ZeroGames.ZSharp.Core.Async;
 public partial struct Lifecycle
 {
 
-	public static Lifecycle ExpiredLifecycle => new(_inlineExpiredToken);
+	public static Lifecycle NeverExpired => default;
+	public static Lifecycle Expired => new(true);
 	
 }
 

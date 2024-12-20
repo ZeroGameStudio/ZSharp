@@ -4,9 +4,8 @@ namespace ZeroGames.ZSharp.Core.Async;
 
 public interface IReactiveUnderlyingLifecycle : IUnderlyingLifecycle
 {
-	LifecycleExpiredRegistration RegisterOnExpired(Action<IReactiveUnderlyingLifecycle, object?> callback, object? state, UnderlyingLifecycleToken token);
-	void UnregisterOnExpired(LifecycleExpiredRegistration registration, UnderlyingLifecycleToken token);
-	bool IsValidRegistration(LifecycleExpiredRegistration registration);
+	LifecycleExpiredRegistration RegisterOnExpired(Action callback, UnderlyingLifecycleToken token);
+	LifecycleExpiredRegistration RegisterOnExpired(Action<object?> callback, object? state, UnderlyingLifecycleToken token);
 }
 
 

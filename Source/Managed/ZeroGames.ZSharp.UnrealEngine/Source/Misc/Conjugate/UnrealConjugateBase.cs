@@ -2,10 +2,11 @@
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using InvalidOperationException = System.InvalidOperationException;
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
-public abstract class UnrealConjugateBase : IConjugate
+public abstract class UnrealConjugateBase : IConjugate, IReactiveUnderlyingLifecycle
 {
 
     public void Dispose()
@@ -13,51 +14,73 @@ public abstract class UnrealConjugateBase : IConjugate
         InternalDispose();
         GC.SuppressFinalize(this);
     }
-    
-    public ExplicitLifecycleExpiredRegistration RegisterOnExpired(Action<IExplicitLifecycle, object?> callback, object? state)
+
+    public LifecycleExpiredRegistration RegisterOnExpired(Action callback)
     {
+        Thrower.ThrowIfNotInGameThread();
+        
         if (IsExpired)
         {
-            callback(this, state);
+            callback();
 
             return default;
         }
         else
         {
             _onExpiredRegistry ??= new();
-            ExplicitLifecycleExpiredRegistration reg = new(this, ++_onExpiredRegistrationHandle);
-            _onExpiredRegistry[reg] = new(callback, state);
+            LifecycleExpiredRegistration reg = new(Lifecycle, ++_onExpiredRegistrationHandle);
+            _onExpiredRegistry[reg] = new(callback, null, null);
 
             return reg;
         }
     }
-
-    public void UnregisterOnExpired(ExplicitLifecycleExpiredRegistration registration)
+    LifecycleExpiredRegistration IReactiveUnderlyingLifecycle.RegisterOnExpired(Action callback, UnderlyingLifecycleToken token)
     {
-        if (!IsExpired)
-        {
-            _onExpiredRegistry?.Remove(registration);
-        }
+        ValidateToken(token);
+        return RegisterOnExpired(callback);
     }
 
-    public bool IsValidRegistration(ExplicitLifecycleExpiredRegistration registration)
+    public LifecycleExpiredRegistration RegisterOnExpired(Action<object?> callback, object? state)
     {
+        Thrower.ThrowIfNotInGameThread();
+        
         if (IsExpired)
         {
-            return false;
-        }
+            callback(state);
 
-        return _onExpiredRegistry?.ContainsKey(registration) ?? false;
+            return default;
+        }
+        else
+        {
+            _onExpiredRegistry ??= new();
+            LifecycleExpiredRegistration reg = new(Lifecycle, ++_onExpiredRegistrationHandle);
+            _onExpiredRegistry[reg] = new(null, callback, state);
+
+            return reg;
+        }
+    }
+    LifecycleExpiredRegistration IReactiveUnderlyingLifecycle.RegisterOnExpired(Action<object?> callback, object? state, UnderlyingLifecycleToken token)
+    {
+        ValidateToken(token);
+        return RegisterOnExpired(callback, state);
+    }
+
+    bool IUnderlyingLifecycle.IsExpired(UnderlyingLifecycleToken token)
+    {
+        ValidateToken(token);
+        return IsExpired;
     }
     
     public bool IsExpired => Unmanaged == DEAD_ADDR;
-    public ReactiveLifecycle Lifecycle => ReactiveLifecycle.Explicit(this);
+    public ReactiveLifecycle Lifecycle => ReactiveLifecycle.FromUnderlyingLifecycle(this);
 
     public GCHandle GCHandle { get; }
 
     public IntPtr Unmanaged { get; protected set; }
     public bool IsBlack { get; }
     public bool IsRed => !IsBlack;
+
+    UnderlyingLifecycleToken IUnderlyingLifecycle.Token { get; } = default(UnderlyingLifecycleToken).Next;
     
     internal const IntPtr DEAD_ADDR = 0xDEAD;
 
@@ -97,7 +120,8 @@ public abstract class UnrealConjugateBase : IConjugate
                 OnExpiredCallbackRec rec = pair.Value;
                 try
                 {
-                    rec.Callback(this, rec.State);
+                    rec.StatelessCallback?.Invoke();
+                    rec.StatefulCallback?.Invoke(rec.State);
                 }
                 catch (Exception ex)
                 {
@@ -148,14 +172,22 @@ public abstract class UnrealConjugateBase : IConjugate
         BroadcastOnExpired();
     }
 
-    private readonly record struct OnExpiredCallbackRec(Action<IExplicitLifecycle, object?> Callback, object? State);
+    private void ValidateToken(UnderlyingLifecycleToken token)
+    {
+        if (token != ((IReactiveUnderlyingLifecycle)this).Token)
+        {
+            throw new InvalidOperationException();
+        }
+    }
+
+    private readonly record struct OnExpiredCallbackRec(Action? StatelessCallback, Action<object?>? StatefulCallback, object? State);
     
     private bool _disposed;
-    
+
     private uint64 _onExpiredRegistrationHandle;
     private bool _hasBroadcastOnExpired;
-    private Dictionary<ExplicitLifecycleExpiredRegistration, OnExpiredCallbackRec>? _onExpiredRegistry;
-
+    private Dictionary<LifecycleExpiredRegistration, OnExpiredCallbackRec>? _onExpiredRegistry;
+    
 }
 
 

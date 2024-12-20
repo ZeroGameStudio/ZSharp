@@ -20,7 +20,7 @@ public interface ITimerScheduler
 
 public interface ITimerScheduler<T> : ITimerScheduler where T : struct, INumber<T>
 {
-	Timer Register(Action<T> callback, T rate, bool looped = false, bool fixedRate = true, Lifecycle lifecycle = default, Action<LifecycleExpiredException, object?>? onExpired = null);
+	Timer Register(Action<T> callback, T rate, bool looped = false, bool fixedRate = true, Lifecycle lifecycle = default, Action<LifecycleExpiredException>? onExpired = null);
 	Timer Register(Action<T, object?> callback, object? state, T rate, bool looped = false, bool fixedRate = true, Lifecycle lifecycle = default, Action<LifecycleExpiredException, object?>? onExpired = null);
 }
 

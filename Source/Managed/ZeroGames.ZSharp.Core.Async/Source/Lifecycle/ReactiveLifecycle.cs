@@ -1,6 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace ZeroGames.ZSharp.Core.Async;
 
@@ -12,85 +13,74 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 	public override int32 GetHashCode() => _underlyingLifecycle?.GetHashCode() ?? 0;
 	public static bool operator==(ReactiveLifecycle lhs, ReactiveLifecycle rhs) => lhs.Equals(rhs);
 	public static bool operator!=(ReactiveLifecycle lhs, ReactiveLifecycle rhs) => !lhs.Equals(rhs);
+	
+	public static implicit operator ReactiveLifecycle(CancellationToken cancellationToken) => new(cancellationToken);
 
 	public static implicit operator Lifecycle(ReactiveLifecycle @this)
 	{
+		Thrower.ThrowIfNotInGameThread();
+		
 		if (@this.IsExpired)
 		{
-			return Lifecycle.ExpiredLifecycle;
+			return Lifecycle.Expired;
 		}
 
 		if (@this._underlyingLifecycle is null)
 		{
-			return default;
+			return Lifecycle.NeverExpired;
 		}
 
 		return new(@this._underlyingLifecycle);
 	}
+
+	public Lifecycle ForceNonReactive() => new(this, true);
 	
-	public LifecycleExpiredRegistration RegisterOnExpired(Action<object, object?> callback, object? state)
+	public LifecycleExpiredRegistration RegisterOnExpired(Action callback)
 	{
 		Thrower.ThrowIfNotInGameThread();
 
 		if (IsExpired)
 		{
-			callback(_underlyingLifecycle ?? this, state);
+			callback();
 			return default;
 		}
 
-		if (_underlyingLifecycle is IExplicitLifecycle explicitLifecycle)
+		if (_underlyingLifecycle is IReactiveUnderlyingLifecycle reactiveUnderlyingLifecycle)
 		{
-			return new(this, explicitLifecycle.RegisterOnExpired(callback, state));
+			return reactiveUnderlyingLifecycle.RegisterOnExpired(callback, _tokenSnapshot);
 		}
-		else if (_underlyingLifecycle is not null)
+		else if (_underlyingLifecycle is CancellationTokenSource cts)
 		{
-			var reactiveUnderlyingLifecycle = Unsafe.As<IReactiveUnderlyingLifecycle>(_underlyingLifecycle);
+			return new(this, cts.Token.RegisterWithoutCaptureExecutionContext(callback));
+		}
+		else
+		{
+			return new(this, ((CancellationToken)_underlyingLifecycle!).RegisterWithoutCaptureExecutionContext(callback));
+		}
+	}
+	
+	public LifecycleExpiredRegistration RegisterOnExpired(Action<object?> callback, object? state)
+	{
+		Thrower.ThrowIfNotInGameThread();
+
+		if (IsExpired)
+		{
+			callback(state);
+			return default;
+		}
+
+		if (_underlyingLifecycle is IReactiveUnderlyingLifecycle reactiveUnderlyingLifecycle)
+		{
 			return reactiveUnderlyingLifecycle.RegisterOnExpired(callback, state, _tokenSnapshot);
 		}
-
-		return default;
-	}
-
-	public void UnregisterOnExpired(in LifecycleExpiredRegistration registration)
-	{
-		Thrower.ThrowIfNotInGameThread();
-
-		if (IsExpired)
+		else if (_underlyingLifecycle is CancellationTokenSource cts)
 		{
-			return;
+			return new(this, cts.Token.RegisterWithoutCaptureExecutionContext(callback, state));
 		}
-		
-		if (_underlyingLifecycle is IExplicitLifecycle explicitLifecycle)
+		else
 		{
-			explicitLifecycle.UnregisterOnExpired(registration.Explicit);
+			return new(this, ((CancellationToken)_underlyingLifecycle!).RegisterWithoutCaptureExecutionContext(callback, state));
 		}
-		else if (_underlyingLifecycle is not null)
-		{
-			var reactiveUnderlyingLifecycle = Unsafe.As<IReactiveUnderlyingLifecycle>(_underlyingLifecycle);
-			reactiveUnderlyingLifecycle.UnregisterOnExpired(registration, _tokenSnapshot);
-		}
-	}
-
-	public bool IsValidRegistration(LifecycleExpiredRegistration registration)
-	{
-		Thrower.ThrowIfNotInGameThread();
-
-		if (IsExpired)
-		{
-			return false;
-		}
-		
-		if (_underlyingLifecycle is IExplicitLifecycle explicitLifecycle)
-		{
-			return registration.Explicit.IsValid;
-		}
-		else if (_underlyingLifecycle is not null)
-		{
-			var reactiveUnderlyingLifecycle = Unsafe.As<IReactiveUnderlyingLifecycle>(_underlyingLifecycle);
-			return reactiveUnderlyingLifecycle.IsValidRegistration(registration);
-		}
-
-		return false;
 	}
 
 	public bool IsExpired
@@ -101,7 +91,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 
 			if (_underlyingLifecycle is null)
 			{
-				return _tokenSnapshot == _inlineExpiredToken;
+				return _tokenSnapshot.IsInlineExpired;
 			}
 
 			if (_tokenSnapshot.IsValid)
@@ -109,38 +99,64 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 				var interfaceUnderlyingLifecycle = Unsafe.As<IUnderlyingLifecycle>(_underlyingLifecycle);
 				return _tokenSnapshot != interfaceUnderlyingLifecycle.Token || interfaceUnderlyingLifecycle.IsExpired(_tokenSnapshot);
 			}
+			else if (_underlyingLifecycle is CancellationTokenSource cts)
+			{
+				return cts.IsCancellationRequested;
+			}
 			else
 			{
-				return Unsafe.As<IExplicitLifecycle>(_underlyingLifecycle).IsExpired;
+				return ((CancellationToken)_underlyingLifecycle!).IsCancellationRequested;
 			}
 		}
 	}
 	
-	internal ReactiveLifecycle(IReactiveUnderlyingLifecycle underlyingLifecycle)
+	internal ReactiveLifecycle(object underlyingLifecycle)
 	{
-		_underlyingLifecycle = underlyingLifecycle;
-		_tokenSnapshot = underlyingLifecycle.Token;
+		if (underlyingLifecycle is IReactiveUnderlyingLifecycle interfaceUnderlyingLifecycle)
+		{
+			if (interfaceUnderlyingLifecycle.IsExpired(interfaceUnderlyingLifecycle.Token))
+			{
+				_tokenSnapshot = UnderlyingLifecycleToken.InlineExpired;
+			}
+			else
+			{
+				_underlyingLifecycle = interfaceUnderlyingLifecycle;
+				_tokenSnapshot = interfaceUnderlyingLifecycle.Token;
+			}
+		}
+		else if (underlyingLifecycle is CancellationToken cancellationToken)
+		{
+			if (cancellationToken.IsCancellationRequested)
+			{
+				_tokenSnapshot = UnderlyingLifecycleToken.InlineExpired;
+			}
+			else if (cancellationToken.CanBeCanceled)
+			{
+				_underlyingLifecycle = cancellationToken;
+			}
+		}
+		else if (underlyingLifecycle is CancellationTokenSource cts)
+		{
+			if (cts.IsCancellationRequested)
+			{
+				_tokenSnapshot = UnderlyingLifecycleToken.InlineExpired;
+			}
+			else
+			{
+				_underlyingLifecycle = cts;
+			}
+		}
 	}
 
-	internal ReactiveLifecycle(IExplicitLifecycle underlyingLifecycle)
+	internal ReactiveLifecycle(bool inlineExpired)
 	{
-		if (underlyingLifecycle.IsExpired)
+		if (inlineExpired)
 		{
-			_tokenSnapshot = _inlineExpiredToken;
+			_tokenSnapshot = UnderlyingLifecycleToken.InlineExpired;
 		}
-		else
-		{
-			_underlyingLifecycle = underlyingLifecycle;
-		}
-	}
-	
-	private ReactiveLifecycle(in UnderlyingLifecycleToken inlineExpiredToken)
-	{
-		_tokenSnapshot = _inlineExpiredToken;
 	}
 
-	private static UnderlyingLifecycleToken _inlineExpiredToken = new(0xDEAD);
-	
+	// IReactiveUnderlyingLifecycle, CancellationToken or CancellationTokenSource
 	private readonly object? _underlyingLifecycle;
 	private readonly UnderlyingLifecycleToken _tokenSnapshot;
 	

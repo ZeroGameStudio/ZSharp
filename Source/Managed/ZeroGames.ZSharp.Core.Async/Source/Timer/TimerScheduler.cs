@@ -22,7 +22,7 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		ErrorHandler = errorHandler ?? DefaultErrorHandler;
 	}
 	
-	public Timer Register(Action<T> callback, T rate, bool looped = false, bool fixedRate = true, Lifecycle lifecycle = default, Action<LifecycleExpiredException, object?>? onExpired = null)
+	public Timer Register(Action<T> callback, T rate, bool looped = false, bool fixedRate = true, Lifecycle lifecycle = default, Action<LifecycleExpiredException>? onExpired = null)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		if (looped && rate < _minRate)
@@ -30,7 +30,7 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 			rate = _minRate;
 		}
 
-		return InternalRegister(callback, null, null, rate, looped, fixedRate, lifecycle, onExpired);
+		return InternalRegister(callback, null, null, rate, looped, fixedRate, lifecycle, onExpired, null);
 	}
 
 	public Timer Register(Action<T, object?> callback, object? state, T rate, bool looped = false, bool fixedRate = true, Lifecycle lifecycle = default, Action<LifecycleExpiredException, object?>? onExpired = null)
@@ -41,7 +41,7 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 			rate = _minRate;
 		}
 
-		return InternalRegister(null, callback, state, rate, looped, fixedRate, lifecycle, onExpired);
+		return InternalRegister(null, callback, state, rate, looped, fixedRate, lifecycle, null, onExpired);
 	}
 
 	public void Unregister(Timer timer)
@@ -255,7 +255,8 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		public bool IsLooped { get; set; }
 		public bool IsFixedRate { get; set; }
 		public Lifecycle Lifecycle { get; set; }
-		public Action<LifecycleExpiredException, object?>? OnExpired { get; set; }
+		public Action<LifecycleExpiredException>? StatelessOnExpired { get; set; }
+		public Action<LifecycleExpiredException, object?>? StatefulOnExpired { get; set; }
 		public uint64 SuspendVersion { get; set; }
 		
 		public T TriggerTime => StartTime + Rate;
@@ -301,7 +302,7 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 
 	private static void DefaultErrorHandler(Exception exception) => UnhandledExceptionHelper.Guard(exception, "Unhandled Exception Detected in Timer Scheduler.");
 
-	private Timer InternalRegister(Action<T>? statelessCallback, Action<T, object?>? statefulCallback, object? state, T rate, bool looped = false, bool fixedRate = true, Lifecycle lifecycle = default, Action<LifecycleExpiredException, object?>? onExpired = null)
+	private Timer InternalRegister(Action<T>? statelessCallback, Action<T, object?>? statefulCallback, object? state, T rate, bool looped, bool fixedRate, Lifecycle lifecycle, Action<LifecycleExpiredException>? statelessOnExpired, Action<LifecycleExpiredException, object?>? statefulOnExpired)
 	{
 		Timer timer = new(this, ++_handle);
 		TimerData data = TimerData.GetFromPool();
@@ -313,7 +314,8 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		data.IsLooped = looped;
 		data.IsFixedRate = fixedRate;
 		data.Lifecycle = lifecycle;
-		data.OnExpired = onExpired;
+		data.StatelessOnExpired = statelessOnExpired;
+		data.StatefulOnExpired = statefulOnExpired;
 		data.SuspendVersion = 0;
 		_registry[timer] = data;
 		TakeSnapshot(timer, data);
@@ -377,19 +379,14 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		{
 			if (!data.Lifecycle.IsExpired)
 			{
-				if (data.StatelessCallback is not null)
-				{
-					data.StatelessCallback(deltaTime);
-				}
-				else
-				{
-					data.StatefulCallback!(deltaTime, data.State);
-				}
+				data.StatelessCallback?.Invoke(deltaTime);
+				data.StatefulCallback?.Invoke(deltaTime, data.State);
 			}
 			else
 			{
 				expired = true;
-				data.OnExpired?.Invoke(new(data.Lifecycle), data.State);
+				data.StatelessOnExpired?.Invoke(new(data.Lifecycle));
+				data.StatefulOnExpired?.Invoke(new(data.Lifecycle), data.State);
 			}
 		}
 		catch (Exception ex)

@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public readonly struct UnderlyingLifecycleToken(uint64 version) : IEquatable<UnderlyingLifecycleToken>
+public readonly struct UnderlyingLifecycleToken : IEquatable<UnderlyingLifecycleToken>
 {
 
 	public bool Equals(UnderlyingLifecycleToken other) => _version == other._version;
@@ -11,11 +11,29 @@ public readonly struct UnderlyingLifecycleToken(uint64 version) : IEquatable<Und
 	public static bool operator==(UnderlyingLifecycleToken lhs, UnderlyingLifecycleToken rhs) => lhs.Equals(rhs);
 	public static bool operator!=(UnderlyingLifecycleToken lhs, UnderlyingLifecycleToken rhs) => !lhs.Equals(rhs);
 
-	public bool IsValid => _version > 0;
+	public static UnderlyingLifecycleToken InlineExpired => new(INLINE_EXPIRED);
 
-	public UnderlyingLifecycleToken Next => new(_version + 1);
+	public bool IsValid => _version > 0;
+	public bool IsInlineExpired => _version == INLINE_EXPIRED;
+
+	public UnderlyingLifecycleToken Next
+	{
+		get
+		{
+			if (IsInlineExpired)
+			{
+				return this;
+			}
+
+			return new(_version + 1 != INLINE_EXPIRED ? _version + 1 : _version + 2);
+		}
+	}
+
+	private const uint64 INLINE_EXPIRED = 0xDEAD;
+
+	private UnderlyingLifecycleToken(uint64 version) => _version = version;
 	
-	private readonly uint64 _version = version;
+	private readonly uint64 _version;
 	
 }
 

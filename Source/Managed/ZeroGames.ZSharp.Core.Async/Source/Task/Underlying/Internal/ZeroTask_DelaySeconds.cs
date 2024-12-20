@@ -7,20 +7,19 @@ namespace ZeroGames.ZSharp.Core.Async;
 public enum EZeroTaskDelayType
 {
 	WorldPaused,
-	WorldPausedUnreliable,
 	WorldUnpaused,
 	Realtime,
 }
 
-internal class ZeroTask_Delay : UnderlyingZeroTaskBase<float, ZeroTask_Delay>
+internal class ZeroTask_DelaySeconds : UnderlyingZeroTaskBase<float, ZeroTask_DelaySeconds>
 {
 
-	public static ZeroTask_Delay GetFromPool(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle)
+	public static ZeroTask_DelaySeconds GetFromPool(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle, IProgress<float>? progress)
 	{
-		ZeroTask_Delay task = Pool.Pop();
+		var task = Pool.Pop();
 		task._delayType = delayType;
 		task._delaySeconds = delaySeconds;
-		task._delayTimer = default;
+		task._timer = default;
 		task.Lifecycle = lifecycle;
 
 		return task;
@@ -31,19 +30,18 @@ internal class ZeroTask_Delay : UnderlyingZeroTaskBase<float, ZeroTask_Delay>
 		ITimerScheduler<float> scheduler = _delayType switch
 		{
 			EZeroTaskDelayType.WorldPaused => GlobalTimerSchedulers.WorldPaused,
-			EZeroTaskDelayType.WorldPausedUnreliable => GlobalTimerSchedulers.WorldPausedUnreliable,
 			EZeroTaskDelayType.WorldUnpaused => GlobalTimerSchedulers.WorldUnpaused,
 			EZeroTaskDelayType.Realtime => GlobalTimerSchedulers.Realtime,
 			_ => GlobalTimerSchedulers.WorldPaused,
 		};
 		
-		_delayTimer = scheduler.Register(static (deltaTime, state) =>
+		_timer = scheduler.Register(static (deltaTime, state) =>
 		{
-			ZeroTask_Delay @this = Unsafe.As<ZeroTask_Delay>(state!);
+			ZeroTask_DelaySeconds @this = Unsafe.As<ZeroTask_DelaySeconds>(state!);
 			@this.SetResult(deltaTime);
 		}, this, _delaySeconds, false, false, Lifecycle, static (ex, state) =>
 		{
-			ZeroTask_Delay @this = Unsafe.As<ZeroTask_Delay>(state!);
+			ZeroTask_DelaySeconds @this = Unsafe.As<ZeroTask_DelaySeconds>(state!);
 			@this.SetException(ex);
 		});
 	}
@@ -51,7 +49,7 @@ internal class ZeroTask_Delay : UnderlyingZeroTaskBase<float, ZeroTask_Delay>
 	private EZeroTaskDelayType _delayType;
 	private float _delaySeconds;
 	
-	private Timer _delayTimer;
+	private Timer _timer;
 
 }
 

@@ -66,28 +66,20 @@ public partial class MagicCube : Actor
 		ensure(startPos.IsRed);
 		ensure(_startPos.IsBlack);
 		ensure(_startPos == startPos);
-		
-		/*
-		 * Register a timer to rotate the cube.
-		 * ReactiveLifecycle.Explicit(this) binds the timer's lifecycle with us,
-		 * so once we are destroyed, the timer will automatically stop as well.
-		 */
-		GlobalTimerScheduler.Paused.Register((deltaTime, _) =>
-		{
-			TickRotate((float)deltaTime.Ticks / TimeSpan.TicksPerSecond);
-		}, null, TimeSpan.FromMilliseconds(10), true, Lifecycle);
+
+		RotateAsync();
 
 		/*
 		 * This will suspend the function for 1s but won't block the game thread.
 		 */
-		await ZeroTask.Delay(1000, Lifecycle);
+		await ZeroTask.DelaySeconds(1, Lifecycle);
 		
 		/*
 		 * This log will appear after 1s.
 		 */
 		UE_LOG(LogTemp, $"{GetPathName()} Begin Play!");
 		
-		await ZeroTask.Delay(2000, Lifecycle);
+		await ZeroTask.DelaySeconds(2, Lifecycle);
 		
 		/*
 		 * This actor's lifespan is totally 1s + 2s + 2s = 5s.
@@ -115,11 +107,15 @@ public partial class MagicCube : Actor
 		K2_SetActorLocation(new(_startPos.X, _startPos.Y, _startPos.Z + offsetZ), false, out _, true);
 	}
 
-	private void TickRotate(float deltaTime)
+	private async ZeroTask RotateAsync()
 	{
-		K2_AddActorWorldRotation(new() { Yaw = RotationSpeed * deltaTime }, false, out _, true);
+		await foreach (var deltaTime in ZeroStream.EveryTick(Lifecycle))
+		{
+			UE_LOG(LogTemp, deltaTime);
+			K2_AddActorWorldRotation(new() { Yaw = RotationSpeed * deltaTime }, false, out _, true);
+		}
 	}
-	
+
 	/*
 	 * Define a DSO as UProperty.
 	 * Behavior of [DefaultSubobject] is same as calling CreateDefaultSubobject() in C++ class constructor.

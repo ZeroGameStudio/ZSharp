@@ -6,20 +6,20 @@ namespace ZeroGames.ZSharp.Core.Async;
 
 public enum EZeroTaskDelayType
 {
-	Paused,
-	PausedUnreliable,
-	Unpaused,
+	WorldPaused,
+	WorldPausedUnreliable,
+	WorldUnpaused,
 	Realtime,
 }
 
-internal class ZeroTask_Delay : UnderlyingZeroTaskBase<TimeSpan, ZeroTask_Delay>
+internal class ZeroTask_Delay : UnderlyingZeroTaskBase<float, ZeroTask_Delay>
 {
 
-	public static ZeroTask_Delay GetFromPool(EZeroTaskDelayType delayType, TimeSpan delayTime, Lifecycle lifecycle)
+	public static ZeroTask_Delay GetFromPool(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle)
 	{
 		ZeroTask_Delay task = Pool.Pop();
 		task._delayType = delayType;
-		task._delayTime = delayTime;
+		task._delaySeconds = delaySeconds;
 		task._delayTimer = default;
 		task.Lifecycle = lifecycle;
 
@@ -28,23 +28,20 @@ internal class ZeroTask_Delay : UnderlyingZeroTaskBase<TimeSpan, ZeroTask_Delay>
 
 	public void Run()
 	{
-		ITimerScheduler scheduler = _delayType switch
+		ITimerScheduler<float> scheduler = _delayType switch
 		{
-			EZeroTaskDelayType.Paused => GlobalTimerScheduler.Paused,
-			EZeroTaskDelayType.PausedUnreliable => GlobalTimerScheduler.PausedUnreliable,
-			EZeroTaskDelayType.Unpaused => GlobalTimerScheduler.Unpaused,
-			EZeroTaskDelayType.Realtime => GlobalTimerScheduler.Realtime,
-			_ => GlobalTimerScheduler.Paused,
+			EZeroTaskDelayType.WorldPaused => GlobalTimerSchedulers.WorldPaused,
+			EZeroTaskDelayType.WorldPausedUnreliable => GlobalTimerSchedulers.WorldPausedUnreliable,
+			EZeroTaskDelayType.WorldUnpaused => GlobalTimerSchedulers.WorldUnpaused,
+			EZeroTaskDelayType.Realtime => GlobalTimerSchedulers.Realtime,
+			_ => GlobalTimerSchedulers.WorldPaused,
 		};
 		
 		_delayTimer = scheduler.Register(static (deltaTime, state) =>
 		{
 			ZeroTask_Delay @this = Unsafe.As<ZeroTask_Delay>(state!);
-			// This is to ensure the timer only triggers once.
-			// This must call before SetResult because it will return the task to pool.
-			@this._delayTimer.Unregister();
 			@this.SetResult(deltaTime);
-		}, this, _delayTime, false, Lifecycle, static (ex, state) =>
+		}, this, _delaySeconds, false, false, Lifecycle, static (ex, state) =>
 		{
 			ZeroTask_Delay @this = Unsafe.As<ZeroTask_Delay>(state!);
 			@this.SetException(ex);
@@ -52,7 +49,7 @@ internal class ZeroTask_Delay : UnderlyingZeroTaskBase<TimeSpan, ZeroTask_Delay>
 	}
 	
 	private EZeroTaskDelayType _delayType;
-	private TimeSpan _delayTime;
+	private float _delaySeconds;
 	
 	private Timer _delayTimer;
 

@@ -30,24 +30,19 @@ public partial struct ZeroTask
 	
 	public static ZeroTask<T> FromException<T>(Exception exception) => throw new NotImplementedException();
 
-	public static ZeroTask<TimeSpan> Delay(EZeroTaskDelayType delayType, TimeSpan delayTime, Lifecycle lifecycle = default)
+	public static ZeroTask<float> Delay(EZeroTaskDelayType delayType, TimeSpan delayTime, Lifecycle lifecycle = default)
 	{
 		Thrower.ThrowIfNotInGameThread();
-		
-		if (delayTime < TimeSpan.FromMilliseconds(1))
-		{
-			delayTime = TimeSpan.FromMilliseconds(1);
-		}
-		
-		ZeroTask_Delay delay = ZeroTask_Delay.GetFromPool(delayType, delayTime, lifecycle);
-		ZeroTask<TimeSpan> task = FromUnderlyingTask(delay);
+
+		ZeroTask_Delay delay = ZeroTask_Delay.GetFromPool(delayType, delayTime.Seconds, lifecycle);
+		ZeroTask<float> task = FromUnderlyingTask(delay);
 		delay.Run();
 		return task;
 	}
-	public static ZeroTask<TimeSpan> Delay(double delayTimeMs, Lifecycle lifecycle = default) => Delay(TimeSpan.FromMilliseconds(delayTimeMs), lifecycle);
-	public static ZeroTask<TimeSpan> Delay(TimeSpan delayTime, Lifecycle lifecycle = default) => Delay(EZeroTaskDelayType.Paused, delayTime, lifecycle);
-	public static ZeroTask<TimeSpan> UnpausedDelay(double delayTimeMs, Lifecycle lifecycle = default) => UnpausedDelay(TimeSpan.FromMilliseconds(delayTimeMs), lifecycle);
-	public static ZeroTask<TimeSpan> UnpausedDelay(TimeSpan delayTime, Lifecycle lifecycle = default) => Delay(EZeroTaskDelayType.Unpaused, delayTime, lifecycle);
+	public static ZeroTask<float> Delay(float delaySeconds, Lifecycle lifecycle = default) => Delay(TimeSpan.FromSeconds(delaySeconds), lifecycle);
+	public static ZeroTask<float> Delay(TimeSpan delayTime, Lifecycle lifecycle = default) => Delay(EZeroTaskDelayType.WorldPaused, delayTime, lifecycle);
+	public static ZeroTask<float> UnpausedDelay(float delaySeconds, Lifecycle lifecycle = default) => UnpausedDelay(TimeSpan.FromSeconds(delaySeconds), lifecycle);
+	public static ZeroTask<float> UnpausedDelay(TimeSpan delayTime, Lifecycle lifecycle = default) => Delay(EZeroTaskDelayType.WorldUnpaused, delayTime, lifecycle);
 
 	public static ZeroTask Yield() => throw new NotImplementedException();
 

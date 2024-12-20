@@ -28,7 +28,7 @@ internal sealed class GameThreadScheduler : IGameThreadScheduler
 	
 	static GameThreadScheduler()
 	{
-		IEventLoop.Instance.Register(EEventLoopTickingGroup.RealtimeTick, Tick, null);
+		IEventLoop.Instance.Register(EEventLoopTickingGroup.RealtimeTick, Tick);
 	}
 	
 	private static void GuardedInvoke(SendOrPostCallback d, object? state)
@@ -43,7 +43,7 @@ internal sealed class GameThreadScheduler : IGameThreadScheduler
 		}
 	}
 	
-	private static void Tick(in EventLoopArgs args, object? state)
+	private static void Tick(in EventLoopArgs args, ref bool _)
 	{
 		while (Instance._recs.TryDequeue(out var rec))
 		{

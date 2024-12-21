@@ -7,16 +7,9 @@ internal struct UnderlyingZeroTaskPool<TResult, TImpl> where TImpl : class, IPoo
 	
 	public TImpl Pop()
 	{
-		TImpl task;
-		if (_head is null)
-		{
-			task = new();
-		}
-		else
-		{
-			task = _head;
-			_head = task.PoolNext;
-		}
+		TImpl task = _head ?? new();
+		_head = task.PoolNext;
+		task.PoolNext = null;
 		
 		task.Initialize();
 		return task;
@@ -26,15 +19,8 @@ internal struct UnderlyingZeroTaskPool<TResult, TImpl> where TImpl : class, IPoo
 	{
 		task.Deinitialize();
 		
-		if (_head is null)
-		{
-			_head = task;
-		}
-		else
-		{
-			task.PoolNext = _head;
-			_head = task;
-		}
+		task.PoolNext = _head;
+		_head = task;
 	}
 
 	private TImpl? _head;

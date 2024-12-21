@@ -19,6 +19,7 @@ internal struct UnderlyingZeroTaskComponent<TResult>
 			Token = Token.Next;
 		}
 		
+		// Clear value type states just before next use.
 		_completed = false;
 	}
 

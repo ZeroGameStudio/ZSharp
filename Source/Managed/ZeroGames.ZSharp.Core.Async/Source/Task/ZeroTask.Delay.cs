@@ -9,22 +9,32 @@ public partial struct ZeroTask
 	{
 		Thrower.ThrowIfNotInGameThread();
 
+		if (lifecycle.IsExpired)
+		{
+			return FromExpired<float>(lifecycle);
+		}
+
 		var underlyingTask = ZeroTask_DelaySeconds.GetFromPool(delayType, delayTime.Seconds, lifecycle, progress);
 		ZeroTask<float> task = FromUnderlyingTask(underlyingTask);
 		underlyingTask.Run();
 		return task;
 	}
 	public static ZeroTask<float> Delay(TimeSpan delayTime, Lifecycle lifecycle = default, IProgress<float>? progress = null)
-		=> Delay(EZeroTaskDelayType.WorldPaused, delayTime, lifecycle);
+		=> Delay(EZeroTaskDelayType.WorldPaused, delayTime, lifecycle, progress);
 	
 	public static ZeroTask<float> DelaySeconds(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle = default, IProgress<float>? progress = null)
 		=> Delay(delayType, TimeSpan.FromSeconds(delaySeconds), lifecycle, progress);
 	public static ZeroTask<float> DelaySeconds(float delaySeconds, Lifecycle lifecycle = default, IProgress<float>? progress = null)
-		=> DelaySeconds(EZeroTaskDelayType.WorldPaused, delaySeconds, lifecycle);
+		=> DelaySeconds(EZeroTaskDelayType.WorldPaused, delaySeconds, lifecycle, progress);
 
 	public static ZeroTask<int32> DelayFrames(int32 delayFrames, Lifecycle lifecycle = default, IProgress<int32>? progress = null)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		
+		if (lifecycle.IsExpired)
+		{
+			return FromExpired<int32>(lifecycle);
+		}
 
 		var underlyingTask = ZeroTask_DelayFrames.GetFromPool(delayFrames, lifecycle, progress);
 		ZeroTask<int32> task = FromUnderlyingTask(underlyingTask);
@@ -35,6 +45,11 @@ public partial struct ZeroTask
 	public static ZeroTask<float> Yield(EEventLoopTickingGroup tickingGroup, Lifecycle lifecycle = default)
 	{
 		Thrower.ThrowIfNotInGameThread();
+		
+		if (lifecycle.IsExpired)
+		{
+			return FromExpired<float>(lifecycle);
+		}
 		
 		var underlyingTask = ZeroTask_Yield.GetFromPool(tickingGroup, lifecycle);
 		ZeroTask<float> task = FromUnderlyingTask(underlyingTask);

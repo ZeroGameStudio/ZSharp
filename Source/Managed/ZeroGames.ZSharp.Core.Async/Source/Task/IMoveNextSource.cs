@@ -2,14 +2,9 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public interface IZeroTask
+public interface IMoveNextSource
 {
-	
-}
-
-public interface IZeroTask<T> : IZeroTask
-{
-	
+	void MoveNext();
 }
 
 

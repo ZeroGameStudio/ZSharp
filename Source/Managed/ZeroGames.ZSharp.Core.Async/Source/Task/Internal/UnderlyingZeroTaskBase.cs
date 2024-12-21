@@ -1,17 +1,25 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.CompilerServices;
-
 namespace ZeroGames.ZSharp.Core.Async;
 
-public abstract class UnderlyingZeroTaskBase<TResult, TImpl> : IPoolableUnderlyingZeroTask<TResult, TImpl> where TImpl : UnderlyingZeroTaskBase<TResult, TImpl>, new()
+internal abstract class UnderlyingZeroTaskBase<TResult, TImpl> : IPoolableUnderlyingZeroTask<TResult, TImpl> where TImpl : UnderlyingZeroTaskBase<TResult, TImpl>, new()
 {
 
-	void IPoolableUnderlyingZeroTask<TResult, TImpl>.Initialize() => _comp.Initialize();
-	void IPoolableUnderlyingZeroTask<TResult, TImpl>.Deinitialize() => _comp.Deinitialize();
+	void IPoolableUnderlyingZeroTask<TResult, TImpl>.Initialize()
+	{
+		_comp.Initialize();
+		Initialize();
+	}
+
+	void IPoolableUnderlyingZeroTask<TResult, TImpl>.Deinitialize()
+	{
+		Deinitialize();
+		_comp.Deinitialize();
+	}
+	
 	public EUnderlyingZeroTaskStatus GetStatus(UnderlyingZeroTaskToken token) => _comp.GetStatus(token);
 	public void SetContinuation(Action continuation, UnderlyingZeroTaskToken token) => _comp.SetContinuation(continuation, token);
-	public void SetStateMachine(IAsyncStateMachine stateMachine, UnderlyingZeroTaskToken token) => _comp.SetStateMachine(stateMachine, token);
+	public void SetMoveNextSource(IMoveNextSource source, UnderlyingZeroTaskToken token) => _comp.SetMoveNextSource(source, token);
 	
 	public TResult GetResult(UnderlyingZeroTaskToken token)
 	{
@@ -21,12 +29,15 @@ public abstract class UnderlyingZeroTaskBase<TResult, TImpl> : IPoolableUnderlyi
 	}
 	void IUnderlyingZeroTask.GetResult(UnderlyingZeroTaskToken token) => GetResult(token);
 	
-	protected void SetResult(TResult result) => _comp.SetResult(result);
-	protected void SetException(Exception exception) => _comp.SetException(exception);
-
 	public UnderlyingZeroTaskToken Token => _comp.Token;
 
 	TImpl? IPoolableUnderlyingZeroTask<TResult, TImpl>.PoolNext { get; set; }
+	
+	protected virtual void Initialize(){}
+	protected virtual void Deinitialize(){}
+	
+	protected void SetResult(TResult result) => _comp.SetResult(result);
+	protected void SetException(Exception exception) => _comp.SetException(exception);
 
 	protected static ref UnderlyingZeroTaskPool<TResult, TImpl> Pool => ref _pool;
 

@@ -13,11 +13,19 @@ public partial struct ZeroTask
 	}
 	
 	public static ZeroTask FromException(Exception exception) => FromException<AsyncVoid>(exception);
-	public static ZeroTask<T> FromException<T>(Exception exception) => throw new NotImplementedException();
+
+	public static ZeroTask<T> FromException<T>(Exception exception)
+	{
+		Thrower.ThrowIfNotInGameThread();
+		
+		throw new NotImplementedException();
+	}
 
 	public static ZeroTask FromExpired(Lifecycle lifecycle) => FromExpired<AsyncVoid>(lifecycle);
 	public static ZeroTask<T> FromExpired<T>(Lifecycle lifecycle)
 	{
+		Thrower.ThrowIfNotInGameThread();
+		
 		if (!lifecycle.IsExpired)
 		{
 			throw new ArgumentOutOfRangeException(nameof(lifecycle));

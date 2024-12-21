@@ -1,7 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.CompilerServices;
-
 namespace ZeroGames.ZSharp.Core.Async;
 
 /// <summary>
@@ -13,7 +11,7 @@ public interface IUnderlyingZeroTask
 	EUnderlyingZeroTaskStatus GetStatus(UnderlyingZeroTaskToken token);
 	void GetResult(UnderlyingZeroTaskToken token);
 	void SetContinuation(Action continuation, UnderlyingZeroTaskToken token);
-	void SetStateMachine(IAsyncStateMachine stateMachine, UnderlyingZeroTaskToken token);
+	void SetMoveNextSource(IMoveNextSource source, UnderlyingZeroTaskToken token);
 	UnderlyingZeroTaskToken Token { get; }
 }
 

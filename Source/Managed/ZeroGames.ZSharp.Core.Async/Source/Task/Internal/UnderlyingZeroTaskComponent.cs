@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 
 namespace ZeroGames.ZSharp.Core.Async;
@@ -9,7 +8,7 @@ namespace ZeroGames.ZSharp.Core.Async;
 /// Encapsulates generic logic for underlying task.
 /// Similar to ManualResetValueTaskSourceCore.
 /// </summary>
-public struct UnderlyingZeroTaskComponent<TResult>
+internal struct UnderlyingZeroTaskComponent<TResult>
 {
 
 	public void Initialize()
@@ -29,8 +28,8 @@ public struct UnderlyingZeroTaskComponent<TResult>
 		Token = Token.Next;
 		
 		// Release reference to these so that they can get GCed earlier.
+		_moveNextSource = null;
 		_continuation = null;
-		_stateMachine = null;
 		_error = null;
 	}
 
@@ -38,7 +37,7 @@ public struct UnderlyingZeroTaskComponent<TResult>
 	{
 		ValidateToken(token);
 
-		if (!_completed || (_continuation is null && _stateMachine is null))
+		if (!_completed || (_moveNextSource is null && _continuation is null))
 		{
 			return EUnderlyingZeroTaskStatus.Pending;
 		}
@@ -64,11 +63,11 @@ public struct UnderlyingZeroTaskComponent<TResult>
 		return _result;
 	}
 	
-	public void SetStateMachine(IAsyncStateMachine stateMachine, UnderlyingZeroTaskToken token)
+	public void SetMoveNextSource(IMoveNextSource source, UnderlyingZeroTaskToken token)
 	{
 		ValidateToken(token);
 		ValidateContinuation();
-		_stateMachine = stateMachine;
+		_moveNextSource = source;
 	}
 
 	public void SetContinuation(Action continuation, UnderlyingZeroTaskToken token)
@@ -102,7 +101,7 @@ public struct UnderlyingZeroTaskComponent<TResult>
 
 	private void ValidateContinuation()
 	{
-		if (_continuation is not null || _stateMachine is not null)
+		if (_moveNextSource is not null || _continuation is not null)
 		{
 			throw new InvalidOperationException("Await one instance of ZeroTask more than once.");
 		}
@@ -114,9 +113,9 @@ public struct UnderlyingZeroTaskComponent<TResult>
 		
 		_completed = true;
 
-		if (_stateMachine is not null)
+		if (_moveNextSource is not null)
 		{
-			_stateMachine.MoveNext();
+			_moveNextSource.MoveNext();
 		}
 		else
 		{
@@ -125,7 +124,7 @@ public struct UnderlyingZeroTaskComponent<TResult>
 	}
 
 	private bool _completed;
-	private IAsyncStateMachine? _stateMachine;
+	private IMoveNextSource? _moveNextSource;
 	private Action? _continuation;
 	private TResult _result;
 	private ExceptionDispatchInfo? _error;

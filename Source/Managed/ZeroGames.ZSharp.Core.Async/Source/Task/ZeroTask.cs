@@ -5,16 +5,16 @@ using System.Runtime.CompilerServices;
 namespace ZeroGames.ZSharp.Core.Async;
 
 [AsyncMethodBuilder(typeof(AsyncZeroTaskMethodBuilderVoid))]
-public readonly partial struct ZeroTask : IZeroTask, IAwaitable<ZeroTask.Awaiter>, IEquatable<ZeroTask>
+public readonly partial struct ZeroTask : IAwaitable<ZeroTask.Awaiter>, IEquatable<ZeroTask>
 {
 	
-	public readonly struct Awaiter : IAwaiter, IZeroTaskAwaiter
+	public readonly struct Awaiter : IAwaiter, IMoveNextSourceAwaiter
 	{
 		
-		public void OnCompleted(IAsyncStateMachine stateMachine)
+		void IMoveNextSourceAwaiter.OnCompleted(IMoveNextSource source)
 		{
 			Thrower.ThrowIfNotInGameThread();
-			_task.SetStateMachine(stateMachine);
+			_task.SetMoveNextSource(source);
 		}
 
 		public void OnCompleted(Action continuation)
@@ -68,15 +68,15 @@ public readonly partial struct ZeroTask : IZeroTask, IAwaitable<ZeroTask.Awaiter
 		}
 	}
 	
-	private void SetStateMachine(IAsyncStateMachine stateMachine)
+	private void SetMoveNextSource(IMoveNextSource source)
 	{
 		if (_underlyingTask is null)
 		{
-			stateMachine.MoveNext();
+			source.MoveNext();
 		}
 		else
 		{
-			_underlyingTask.SetStateMachine(stateMachine, _tokenSnapshot);
+			_underlyingTask.SetMoveNextSource(source, _tokenSnapshot);
 		}
 	}
 
@@ -98,16 +98,16 @@ public readonly partial struct ZeroTask : IZeroTask, IAwaitable<ZeroTask.Awaiter
 }
 
 [AsyncMethodBuilder(typeof(AsyncZeroTaskMethodBuilder<>))]
-public readonly partial struct ZeroTask<TResult> : IZeroTask<TResult>, IAwaitable<TResult, ZeroTask<TResult>.Awaiter>, IEquatable<ZeroTask<TResult>>
+public readonly struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>.Awaiter>, IEquatable<ZeroTask<TResult>>
 {
 	
-	public readonly struct Awaiter : IAwaiter<TResult>, IZeroTaskAwaiter
+	public readonly struct Awaiter : IAwaiter<TResult>, IMoveNextSourceAwaiter
 	{
 		
-		public void OnCompleted(IAsyncStateMachine stateMachine)
+		void IMoveNextSourceAwaiter.OnCompleted(IMoveNextSource source)
 		{
 			Thrower.ThrowIfNotInGameThread();
-			_task.SetStateMachine(stateMachine);
+			_task.SetMoveNextSource(source);
 		}
 
 		public void OnCompleted(Action continuation)
@@ -180,15 +180,15 @@ public readonly partial struct ZeroTask<TResult> : IZeroTask<TResult>, IAwaitabl
 		return _inlineResult!;
 	}
 	
-	private void SetStateMachine(IAsyncStateMachine stateMachine)
+	private void SetMoveNextSource(IMoveNextSource source)
 	{
 		if (_underlyingTask is null)
 		{
-			stateMachine.MoveNext();
+			source.MoveNext();
 		}
 		else
 		{
-			_underlyingTask.SetStateMachine(stateMachine, _tokenSnapshot);
+			_underlyingTask.SetMoveNextSource(source, _tokenSnapshot);
 		}
 	}
 

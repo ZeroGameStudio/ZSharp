@@ -72,6 +72,13 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 		_progress?.Report(new(_loadedCount, _totalCount));
 	}
 
+	protected override void InternalSignalCompletion()
+	{
+		base.InternalSignalCompletion();
+		
+		InternalUpdate(_totalCount);
+	}
+
 	private unsafe void FetchLoadedCount() => _loadedCount = StreamingTask_Interop.GetLoadedCount(Unmanaged);
 
 	private unsafe T[] InternalResult

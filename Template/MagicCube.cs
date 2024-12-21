@@ -9,8 +9,6 @@ namespace Game.${GameModuleName};
  * Define a UClass that can be inherited by blueprint.
  * Place this class into map, play in editor, and you will see a rotating cube.
  * Behavior of [PropertyDefaultOverride] is same as directly set property value in C++ constructor, but only valid for UProperty.
- *
- * Bug: Directly set StaticMesh property will cause an ensure.
  */
 [UClass, Blueprintable]
 [PropertyDefaultOverride(Property = "PrimaryActorTick.bCanEverTick", Default = true)]

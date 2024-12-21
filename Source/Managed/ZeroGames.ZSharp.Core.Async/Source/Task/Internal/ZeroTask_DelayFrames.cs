@@ -11,7 +11,6 @@ internal class ZeroTask_DelayFrames : UnderlyingZeroTaskBase<int32, ZeroTask_Del
 	{
 		var task = Pool.Pop();
 		task._delayFrames = delayFrames;
-		task._timer = default;
 		task.Lifecycle = lifecycle;
 
 		return task;
@@ -29,7 +28,15 @@ internal class ZeroTask_DelayFrames : UnderlyingZeroTaskBase<int32, ZeroTask_Del
 			@this.SetException(ex);
 		});
 	}
-	
+
+	protected override void Deinitialize()
+	{
+		_delayFrames = 0;
+		_timer = default;
+		
+		base.Deinitialize();
+	}
+
 	private int32 _delayFrames;
 	
 	private Timer _timer;

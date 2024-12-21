@@ -19,7 +19,6 @@ internal class ZeroTask_DelaySeconds : UnderlyingZeroTaskBase<float, ZeroTask_De
 		var task = Pool.Pop();
 		task._delayType = delayType;
 		task._delaySeconds = delaySeconds;
-		task._timer = default;
 		task.Lifecycle = lifecycle;
 
 		return task;
@@ -44,6 +43,15 @@ internal class ZeroTask_DelaySeconds : UnderlyingZeroTaskBase<float, ZeroTask_De
 			ZeroTask_DelaySeconds @this = Unsafe.As<ZeroTask_DelaySeconds>(state!);
 			@this.SetException(ex);
 		});
+	}
+	
+	protected override void Deinitialize()
+	{
+		_delayType = default;
+		_delaySeconds = 0;
+		_timer = default;
+		
+		base.Deinitialize();
 	}
 	
 	private EZeroTaskDelayType _delayType;

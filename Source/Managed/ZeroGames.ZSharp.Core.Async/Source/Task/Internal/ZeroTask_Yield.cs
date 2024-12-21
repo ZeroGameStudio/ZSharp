@@ -11,7 +11,6 @@ internal class ZeroTask_Yield : UnderlyingZeroTaskBase<float, ZeroTask_Yield>
 	{
 		var task = Pool.Pop();
 		task._tickingGroup = tickingGroup;
-		task._registration = default;
 		task.Lifecycle = lifecycle;
 
 		return task;
@@ -30,7 +29,15 @@ internal class ZeroTask_Yield : UnderlyingZeroTaskBase<float, ZeroTask_Yield>
 			@this.SetException(ex);
 		});
 	}
-	
+
+	protected override void Deinitialize()
+	{
+		_tickingGroup = default;
+		_registration = default;
+		
+		base.Deinitialize();
+	}
+
 	private EEventLoopTickingGroup _tickingGroup;
 	
 	private EventLoopRegistration _registration;

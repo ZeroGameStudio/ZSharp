@@ -12,7 +12,12 @@ internal class ZeroTask_AsyncStateMachine<TResult, TStateMachine> : UnderlyingZe
 	public new void SetResult(TResult result) => base.SetResult(result);
 	public new void SetException(Exception exception) => base.SetException(exception);
 
-	public void MoveNext() => StateMachine!.MoveNext();
+	public void MoveNext()
+	{
+		ensure(CanMoveNext);
+		
+		StateMachine!.MoveNext();
+	}
 
 	public TStateMachine? StateMachine { get; set; }
 	
@@ -22,19 +27,21 @@ internal class ZeroTask_AsyncStateMachine<TResult, TStateMachine> : UnderlyingZe
 		{
 			_moveNextDelegate ??= () =>
 			{
-				if (IsInGameThread || !AsyncSettings.ForceAsyncZeroTaskMethodContinueOnGameThread)
+				if (CanMoveNext)
 				{
 					MoveNext();
 				}
 				else
 				{
-					GameThreadScheduler.Instance.Post(state => ((IMoveNextSource)state!).MoveNext(), this);
+					GameThreadScheduler.Instance.Post(static state => ((IMoveNextSource)state!).MoveNext(), this);
 				}
 			};
 			
 			return _moveNextDelegate;
 		}
 	}
+
+	private bool CanMoveNext => IsInGameThread || !AsyncSettings.ForceAsyncZeroTaskMethodContinueOnGameThread;
 
 	private Action? _moveNextDelegate;
 

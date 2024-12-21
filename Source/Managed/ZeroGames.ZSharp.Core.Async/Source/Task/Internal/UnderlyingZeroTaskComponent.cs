@@ -18,9 +18,6 @@ internal struct UnderlyingZeroTaskComponent<TResult>
 			// First instantiate, move to a valid token.
 			Token = Token.Next;
 		}
-		
-		// Clear value type states just before next use.
-		_completed = false;
 	}
 
 	public void Deinitialize()
@@ -28,10 +25,11 @@ internal struct UnderlyingZeroTaskComponent<TResult>
 		// Invalidate token immediately.
 		Token = Token.Next;
 		
-		// Release reference to these so that they can get GCed earlier.
+		_completed = false;
 		_moveNextSource = null;
 		_continuation = null;
 		_error = null;
+		ResultGot = false;
 	}
 
 	public EUnderlyingZeroTaskStatus GetStatus(UnderlyingZeroTaskToken token)
@@ -48,7 +46,7 @@ internal struct UnderlyingZeroTaskComponent<TResult>
 			return EUnderlyingZeroTaskStatus.Succeeded;
 		}
 
-		return _error.SourceException is LifecycleExpiredException || _error.SourceException is OperationCanceledException ? EUnderlyingZeroTaskStatus.Canceled : EUnderlyingZeroTaskStatus.Faulted;
+		return _error.SourceException is OperationCanceledException ? EUnderlyingZeroTaskStatus.Canceled : EUnderlyingZeroTaskStatus.Faulted;
 	}
 
 	public TResult GetResult(UnderlyingZeroTaskToken token)
@@ -59,7 +57,8 @@ internal struct UnderlyingZeroTaskComponent<TResult>
 		{
 			throw new InvalidOperationException("ZeroTask only supports await.");
 		}
-		
+
+		ResultGot = true;
 		_error?.Throw();
 		return _result;
 	}
@@ -91,6 +90,7 @@ internal struct UnderlyingZeroTaskComponent<TResult>
 	}
 	
 	public UnderlyingZeroTaskToken Token { get; private set; }
+	public bool ResultGot { get; private set; }
 
 	private void ValidateToken(UnderlyingZeroTaskToken token)
 	{

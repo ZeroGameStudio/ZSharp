@@ -221,29 +221,28 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		
 		public static TimerData GetFromPool()
 		{
-			if (_head is null)
-			{
-				return new();
-			}
-			else
-			{
-				TimerData data = _head;
-				_head = data._next;
-				return data;
-			}
+			TimerData data = _head ?? new();
+			_head = data._next;
+			data._next = null;
+			return data;
 		}
 
 		public void ReturnToPool()
 		{
-			if (_head is null)
-			{
-				_head = this;
-			}
-			else
-			{
-				_next = _head;
-				_head = this;
-			}
+			StartTime = T.Zero;
+			StatelessCallback = null;
+			StatefulCallback = null;
+			State = null;
+			Rate = T.Zero;
+			IsLooped = false;
+			IsFixedRate = false;
+			Lifecycle = default;
+			StatelessOnExpired = null;
+			StatefulOnExpired = null;
+			SuspendVersion = 0;
+			
+			_next = _head;
+			_head = this;
 		}
 		
 		// The following properties need to initialize manually.
@@ -316,7 +315,6 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		data.Lifecycle = lifecycle;
 		data.StatelessOnExpired = statelessOnExpired;
 		data.StatefulOnExpired = statefulOnExpired;
-		data.SuspendVersion = 0;
 		_registry[timer] = data;
 		TakeSnapshot(timer, data);
 

@@ -109,7 +109,6 @@ public partial class MagicCube : Actor
 	{
 		await foreach (var deltaTime in ZeroStream.EveryTick(Lifecycle))
 		{
-			UE_LOG(LogTemp, deltaTime);
 			K2_AddActorWorldRotation(new() { Yaw = RotationSpeed * deltaTime }, false, out _, true);
 		}
 	}

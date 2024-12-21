@@ -9,9 +9,9 @@ public readonly record struct BatchStreamingProgress(int32 LoadedCount, int32 To
 public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStreamingTask<T>.Awaiter> where T : UnrealObject
 {
 
-	public readonly struct Awaiter : IAwaiter<T[]>
+	public readonly struct Awaiter : IAwaiter<T[]>, IMoveNextSourceAwaiter
 	{
-
+		void IMoveNextSourceAwaiter.OnCompleted(IMoveNextSource source) => _task.ContinueWith(source);
 		public void OnCompleted(Action continuation) => _task.ContinueWith(continuation);
 
 		public T[] GetResult() => _task.Result;
@@ -22,7 +22,6 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 		internal Awaiter(BatchStreamingTask<T> task) => _task = task;
 		
 		private readonly BatchStreamingTask<T> _task;
-
 	}
 
 	public Awaiter GetAwaiter() => new(this);
@@ -73,7 +72,7 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 		_progress?.Report(new(_loadedCount, _totalCount));
 	}
 
-	private unsafe void FetchLoadedCount() => _loadedCount = StreamingTask_Interop.GetLoadedCount(_unmanaged);
+	private unsafe void FetchLoadedCount() => _loadedCount = StreamingTask_Interop.GetLoadedCount(Unmanaged);
 
 	private unsafe T[] InternalResult
 	{
@@ -88,7 +87,7 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 				if (_totalCount <= STACK_ALLOC_THRESHOLD)
 				{
 					ConjugateHandle* buffer = stackalloc ConjugateHandle[STACK_ALLOC_THRESHOLD];
-					int32 writeCount = StreamingTask_Interop.GetResult(_unmanaged, buffer, _totalCount);
+					int32 writeCount = StreamingTask_Interop.GetResult(Unmanaged, buffer, _totalCount);
 					ensure(writeCount == _totalCount);
 					List<T> list = new(writeCount);
 					for (int32 i = 0; i < writeCount; ++i)
@@ -107,7 +106,7 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 					int32 writeCount;
 					fixed (ConjugateHandle* fixedBuffer = buffer)
 					{
-						writeCount = StreamingTask_Interop.GetResult(_unmanaged, fixedBuffer, _totalCount);
+						writeCount = StreamingTask_Interop.GetResult(Unmanaged, fixedBuffer, _totalCount);
 					}
 					ensure(writeCount == _totalCount);
 					List<T> list = new(writeCount);

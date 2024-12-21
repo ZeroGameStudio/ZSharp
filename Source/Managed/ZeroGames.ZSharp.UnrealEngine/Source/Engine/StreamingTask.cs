@@ -7,9 +7,9 @@ namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 public class StreamingTask<T> : StreamingTaskBase, IAwaitable<T?, StreamingTask<T>.Awaiter> where T : UnrealObject
 {
 
-	public readonly struct Awaiter : IAwaiter<T?>
+	public readonly struct Awaiter : IAwaiter<T?>, IMoveNextSourceAwaiter
 	{
-
+		void IMoveNextSourceAwaiter.OnCompleted(IMoveNextSource source) => _task.ContinueWith(source);
 		public void OnCompleted(Action continuation) => _task.ContinueWith(continuation);
 
 		public T? GetResult() => _task.Result;
@@ -20,7 +20,6 @@ public class StreamingTask<T> : StreamingTaskBase, IAwaitable<T?, StreamingTask<
 		internal Awaiter(StreamingTask<T> task) => _task = task;
 		
 		private readonly StreamingTask<T> _task;
-
 	}
 
 	public Awaiter GetAwaiter() => new(this);
@@ -56,7 +55,7 @@ public class StreamingTask<T> : StreamingTaskBase, IAwaitable<T?, StreamingTask<
 			{
 				_cached = true;
 				ConjugateHandle handle = default;
-				ensure(StreamingTask_Interop.GetResult(_unmanaged, &handle, 1) == 1);
+				ensure(StreamingTask_Interop.GetResult(Unmanaged, &handle, 1) == 1);
 				_result = handle.GetTarget<T>();
 			}
 			

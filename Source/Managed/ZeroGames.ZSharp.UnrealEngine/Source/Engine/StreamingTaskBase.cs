@@ -48,17 +48,16 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 
 		ensure(_state == EState.Loading);
 		_state = EState.Loaded;
-		
-		if (_continuation is not null)
-		{
-			_continuation();
-		}
+
+		_continuation.MoveNextSource?.MoveNext();
+		_continuation.MoveNextDelegate?.Invoke();
 
 		if (_additionalContinuations is not null)
 		{
 			foreach (var continuation in _additionalContinuations)
 			{
-				continuation();
+				continuation.MoveNextSource?.MoveNext();
+				continuation.MoveNextDelegate?.Invoke();
 			}
 		}
 	}
@@ -67,14 +66,14 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 	{
 		GuardInvariant();
 		
-		if (_continuation is null)
+		if (_continuation == default)
 		{
-			_continuation = continuation;
+			_continuation = new(null, continuation);
 		}
 		else
 		{
 			_additionalContinuations ??= new();
-			_additionalContinuations.Add(continuation);
+			_additionalContinuations.Add(new(null, continuation));
 		}
 	}
 	
@@ -89,7 +88,7 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 
 	internal StreamingTaskBase(IntPtr unmanaged, Lifecycle lifecycle)
 	{
-		_unmanaged = unmanaged;
+		Unmanaged = unmanaged;
 		_lifecycle = lifecycle;
 	}
 	
@@ -97,7 +96,7 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 	{
 		Thrower.ThrowIfNotInGameThread();
 		
-		if (_unmanaged == default)
+		if (Unmanaged == IntPtr.Zero)
 		{
 			throw new InvalidOperationException();
 		}
@@ -115,10 +114,29 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 		_expiredException.Throw();
 	}
 	
+	protected void ContinueWith(IMoveNextSource source)
+	{
+		GuardInvariant();
+		
+		if (_continuation == default)
+		{
+			_continuation = new(source, null);
+		}
+		else
+		{
+			_additionalContinuations ??= new();
+			_additionalContinuations.Add(new(source, null));
+		}
+	}
+	
+	protected IntPtr Unmanaged { get; private set; }
+
+	private readonly record struct Continuation(IMoveNextSource? MoveNextSource, Action? MoveNextDelegate);
+	
 	~StreamingTaskBase() => InternalDispose();
 
 	private static unsafe void ReleaseUnmanaged(object? unmanaged) => StreamingTask_Interop.Release((IntPtr)unmanaged!);
-
+	
 	private void InternalCancel()
 	{
 		ensure(_state != EState.Loaded);
@@ -130,25 +148,24 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 	{
 		ensure(_state != EState.Loading);
 		
-		if (_unmanaged == default)
+		if (Unmanaged == IntPtr.Zero)
 		{
 			return;
 		}
 
-		IntPtr unmanaged = _unmanaged;
-		_unmanaged = default;
+		IntPtr unmanaged = Unmanaged;
+		Unmanaged = IntPtr.Zero;
 		
 		IGameThreadScheduler.Instance.Post(ReleaseUnmanaged, unmanaged);
 	}
 	
-	protected IntPtr _unmanaged;
-	private Lifecycle _lifecycle;
+	private readonly Lifecycle _lifecycle;
 	private ExceptionDispatchInfo? _expiredException;
 
 	private EState _state;
 
-	private Action? _continuation;
-	private List<Action>? _additionalContinuations;
+	private Continuation _continuation;
+	private List<Continuation>? _additionalContinuations;
 	
 }
 

@@ -34,7 +34,7 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 			
 			if (!IsCompleted)
 			{
-				throw new InvalidOperationException();
+				throw new InvalidOperationException("Operation incomplete.");
 			}
 			
 			TryGetException();

@@ -32,7 +32,7 @@ public class StreamingTask<T> : StreamingTaskBase, IAwaitable<T?, StreamingTask<
 			
 			if (!IsCompleted)
 			{
-				throw new InvalidOperationException();
+				throw new InvalidOperationException("Operation incomplete.");
 			}
 			
 			TryGetException();

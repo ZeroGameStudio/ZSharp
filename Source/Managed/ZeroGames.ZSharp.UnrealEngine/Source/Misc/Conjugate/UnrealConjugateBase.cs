@@ -18,7 +18,7 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
     public LifecycleExpiredRegistration RegisterOnExpired(Action callback)
     {
         Thrower.ThrowIfNotInGameThread();
-        
+
         if (IsExpired)
         {
             callback();
@@ -28,7 +28,7 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
         else
         {
             _onExpiredRegistry ??= new();
-            LifecycleExpiredRegistration reg = new(Lifecycle, ++_onExpiredRegistrationHandle);
+            LifecycleExpiredRegistration reg = new(this, ++_onExpiredRegistrationHandle);
             _onExpiredRegistry[reg] = new(callback, null, null);
 
             return reg;
@@ -53,7 +53,7 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
         else
         {
             _onExpiredRegistry ??= new();
-            LifecycleExpiredRegistration reg = new(Lifecycle, ++_onExpiredRegistrationHandle);
+            LifecycleExpiredRegistration reg = new(this, ++_onExpiredRegistrationHandle);
             _onExpiredRegistry[reg] = new(null, callback, state);
 
             return reg;
@@ -63,6 +63,21 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
     {
         ValidateToken(token);
         return RegisterOnExpired(callback, state);
+    }
+    
+    public void UnregisterOnExpired(LifecycleExpiredRegistration registration)
+    {
+        Thrower.ThrowIfNotInGameThread();
+        
+        if (!IsExpired)
+        {
+            _onExpiredRegistry?.Remove(registration);
+        }
+    }
+    void IReactiveLifecycleBackend.UnregisterOnExpired(LifecycleExpiredRegistration registration, LifecycleToken token)
+    {
+        ValidateToken(token);
+        UnregisterOnExpired(registration);
     }
 
     bool ILifecycleBackend.IsExpired(LifecycleToken token)
@@ -171,11 +186,12 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
         Unmanaged = DEAD_ADDR;
         BroadcastOnExpired();
     }
-
+    
     private void ValidateToken(LifecycleToken token)
     {
         if (token != ((IReactiveLifecycleBackend)this).Token)
         {
+            // Throw if token mismatch because this type is not reused and the token should be a constant.
             throw new InvalidOperationException();
         }
     }

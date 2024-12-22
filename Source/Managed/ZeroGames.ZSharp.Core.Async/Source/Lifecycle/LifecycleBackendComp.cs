@@ -24,7 +24,7 @@ public struct LifecycleBackendComp(ILifecycleBackend backend)
 		ValidateToken(token);
 		ValidateReactive();
 		_registry ??= new();
-		LifecycleExpiredRegistration reg = new(new(Unsafe.As<IReactiveLifecycleBackend>(_backend)), ++_handle);
+		LifecycleExpiredRegistration reg = new(Unsafe.As<IReactiveLifecycleBackend>(_backend), ++_handle);
 		_registry[reg] = new(callback, state);
 
 		return reg;

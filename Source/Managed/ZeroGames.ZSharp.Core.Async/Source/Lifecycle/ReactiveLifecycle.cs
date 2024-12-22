@@ -51,11 +51,11 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 		}
 		else if (_backend is CancellationTokenSource cts)
 		{
-			return new(this, cts.Token.RegisterWithoutCaptureExecutionContext(callback));
+			return new(cts.Token.RegisterWithoutCaptureExecutionContext(callback));
 		}
 		else
 		{
-			return new(this, ((CancellationToken)_backend!).RegisterWithoutCaptureExecutionContext(callback));
+			return new(((CancellationToken)_backend!).RegisterWithoutCaptureExecutionContext(callback));
 		}
 	}
 	
@@ -75,11 +75,11 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 		}
 		else if (_backend is CancellationTokenSource cts)
 		{
-			return new(this, cts.Token.RegisterWithoutCaptureExecutionContext(callback, state));
+			return new(cts.Token.RegisterWithoutCaptureExecutionContext(callback, state));
 		}
 		else
 		{
-			return new(this, ((CancellationToken)_backend!).RegisterWithoutCaptureExecutionContext(callback, state));
+			return new(((CancellationToken)_backend!).RegisterWithoutCaptureExecutionContext(callback, state));
 		}
 	}
 

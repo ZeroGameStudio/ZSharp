@@ -48,7 +48,7 @@ internal class StreamableManager : IStreamableManager
 	{
 		if (!_taskMap.TryGetValue(unmanagedTask, out var task))
 		{
-			UE_LOG(LogZSharpScriptEngine, $"Streaming task {unmanagedTask} not found.");
+			UE_WARNING(LogZSharpScriptEngine, $"Streaming task {unmanagedTask} not found.");
 			return;
 		}
 		
@@ -59,7 +59,7 @@ internal class StreamableManager : IStreamableManager
 	{
 		if (!_taskMap.Remove(unmanagedTask, out var task))
 		{
-			UE_LOG(LogZSharpScriptEngine, $"Streaming task {unmanagedTask} not found.");
+			UE_WARNING(LogZSharpScriptEngine, $"Streaming task {unmanagedTask} not found.");
 			return;
 		}
 		

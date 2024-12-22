@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public readonly struct Timer : IEquatable<Timer>
+public readonly struct Timer : IEquatable<Timer>, IDisposable
 {
 	
 	public bool Equals(Timer other) => _handle == other._handle;
@@ -11,7 +11,7 @@ public readonly struct Timer : IEquatable<Timer>
 	public static bool operator==(Timer lhs, Timer rhs) => lhs.Equals(rhs);
 	public static bool operator!=(Timer lhs, Timer rhs) => !lhs.Equals(rhs);
 
-	public void Unregister() => _owner?.Unregister(this);
+	public void Dispose() => _owner?.Unregister(this);
 	public void Suspend() => _owner?.Suspend(this);
 	public void Resume() => _owner?.Resume(this);
 	

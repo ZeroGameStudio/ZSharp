@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public readonly struct EventLoopRegistration : IEquatable<EventLoopRegistration>
+public readonly struct EventLoopRegistration : IEquatable<EventLoopRegistration>, IDisposable
 {
 
 	public bool Equals(EventLoopRegistration other) => _handle == other._handle;
@@ -11,7 +11,7 @@ public readonly struct EventLoopRegistration : IEquatable<EventLoopRegistration>
 	public static bool operator==(EventLoopRegistration lhs, EventLoopRegistration rhs) => lhs.Equals(rhs);
 	public static bool operator!=(EventLoopRegistration lhs, EventLoopRegistration rhs) => !lhs.Equals(rhs);
 
-	public void Unregister() => _owner?.Unregister(this);
+	public void Dispose() => _owner?.Unregister(this);
 
 	public IEventLoop? Owner => _owner;
 	public bool IsValid => _owner?.IsValidRegistration(this) ?? false;

@@ -13,12 +13,11 @@ public partial struct ZeroTask
 	}
 	
 	public static ZeroTask FromException(Exception exception) => FromException<AsyncVoid>(exception);
-
 	public static ZeroTask<T> FromException<T>(Exception exception)
 	{
 		Thrower.ThrowIfNotInGameThread();
-		
-		throw new NotImplementedException();
+
+		return FromBackend(new ZeroTaskBackend_Exception<T>(exception));
 	}
 
 	public static ZeroTask FromExpired(Lifecycle lifecycle) => FromExpired<AsyncVoid>(lifecycle);
@@ -47,7 +46,7 @@ public partial struct ZeroTask
 
 		return new(backend);
 	}
-
+	
 	public static ZeroTask CompletedTask
 	{
 		get

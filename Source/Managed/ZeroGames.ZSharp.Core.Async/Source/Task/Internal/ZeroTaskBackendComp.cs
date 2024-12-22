@@ -26,10 +26,11 @@ internal struct ZeroTaskBackendComp<TResult>
 		Token = Token.Next;
 		
 		_completed = false;
+		_resultGot = false;
+		
 		_moveNextSource = null;
 		_continuation = null;
 		_error = null;
-		ResultGot = false;
 	}
 
 	public EZeroTaskStatus GetStatus(ZeroTaskToken token)
@@ -58,7 +59,7 @@ internal struct ZeroTaskBackendComp<TResult>
 			throw new InvalidOperationException("ZeroTask only supports await.");
 		}
 
-		ResultGot = true;
+		_resultGot = true;
 		_error?.Throw();
 		return _result;
 	}
@@ -89,8 +90,19 @@ internal struct ZeroTaskBackendComp<TResult>
 		SignalCompletion();
 	}
 	
+	public void TryPublishUnobservedException()
+	{
+		if (_completed && !_resultGot)
+		{
+			_resultGot = true;
+			if (_error?.SourceException is { } ex)
+			{
+				UnhandledExceptionHelper.Guard(ex, "Unobserved exception detected in ZeroTask.");
+			}
+		}
+	}
+	
 	public ZeroTaskToken Token { get; private set; }
-	public bool ResultGot { get; private set; }
 
 	private void ValidateToken(ZeroTaskToken token)
 	{
@@ -125,6 +137,8 @@ internal struct ZeroTaskBackendComp<TResult>
 	}
 
 	private bool _completed;
+	private bool _resultGot;
+	
 	private IMoveNextSource? _moveNextSource;
 	private Action? _continuation;
 	private TResult _result;

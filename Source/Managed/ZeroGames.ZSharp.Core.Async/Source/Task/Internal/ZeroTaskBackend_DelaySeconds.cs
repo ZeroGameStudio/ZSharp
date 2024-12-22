@@ -11,7 +11,7 @@ public enum EZeroTaskDelayType
 	Realtime,
 }
 
-internal class ZeroTaskBackend_DelaySeconds : ZeroTaskBackendBase<float, ZeroTaskBackend_DelaySeconds>
+internal class ZeroTaskBackend_DelaySeconds : PoolableZeroTaskBackendBase<float, ZeroTaskBackend_DelaySeconds>
 {
 
 	public static ZeroTaskBackend_DelaySeconds GetFromPool(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle, IProgress<float>? progress)

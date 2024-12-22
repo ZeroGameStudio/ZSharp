@@ -2,84 +2,39 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-internal abstract class ZeroTaskBackendBase<TResult, TImpl> : IPoolableZeroTaskBackend<TResult, TImpl> where TImpl : ZeroTaskBackendBase<TResult, TImpl>, new()
+internal abstract class ZeroTaskBackendBase<TResult> : IZeroTaskBackend<TResult>
 {
 
-	void IPoolableZeroTaskBackend<TResult, TImpl>.Initialize()
+	public ZeroTaskBackendBase()
 	{
 		_comp.Initialize();
-		Initialize();
-	}
-
-	void IPoolableZeroTaskBackend<TResult, TImpl>.Deinitialize()
-	{
-		Deinitialize();
-		_lifecycle = default;
-		_comp.Deinitialize();
 	}
 	
 	public EZeroTaskStatus GetStatus(ZeroTaskToken token) => _comp.GetStatus(token);
 	public void SetContinuation(Action continuation, ZeroTaskToken token) => _comp.SetContinuation(continuation, token);
 	public void SetMoveNextSource(IMoveNextSource source, ZeroTaskToken token) => _comp.SetMoveNextSource(source, token);
-	
-	public TResult GetResult(ZeroTaskToken token) => _comp.GetResult(token);
+
+	public TResult GetResult(ZeroTaskToken token)
+	{
+		TResult result = _comp.GetResult(token);
+		GC.SuppressFinalize(this);
+		return result;
+	}
 	void IZeroTaskBackend.GetResult(ZeroTaskToken token) => GetResult(token);
 	
 	public ZeroTaskToken Token => _comp.Token;
-
-	TImpl? IPoolableZeroTaskBackend<TResult, TImpl>.PoolNext { get; set; }
 	
-	protected virtual void Initialize(){}
-	protected virtual void Deinitialize(){}
-
-	protected void SetResult(TResult result)
-	{
-		try
-		{
-			_comp.SetResult(result);
-		}
-		finally
-		{
-			ReturnToPool();
-		}
-	}
-
-	protected void SetException(Exception exception)
-	{
-		try
-		{
-			_comp.SetException(exception);
-		}
-		finally
-		{
-			ReturnToPool();
-		}
-	}
-
-	protected static ref ZeroTaskBackendPool<TResult, TImpl> Pool => ref _pool;
-
+	protected void SetResult(TResult result) => _comp.SetResult(result);
+	protected void SetException(Exception exception) => _comp.SetException(exception);
+	
 	protected ref Lifecycle Lifecycle => ref _lifecycle;
+	protected ref ZeroTaskBackendComp<TResult> Comp => ref _comp;
 
-	private void ReturnToPool()
-	{
-		if (!_comp.ResultGot)
-		{
-			try
-			{
-				_comp.GetResult(_comp.Token);
-			}
-			catch (Exception ex)
-			{
-				UnhandledExceptionHelper.Guard(ex, "Unobserved exception detected in ZeroTask.");
-			}
-		}
-			
-		_pool.Push((TImpl)this);
-	}
+	~ZeroTaskBackendBase() => Comp.TryPublishUnobservedException();
 	
-	private static ZeroTaskBackendPool<TResult, TImpl> _pool;
-
 	private ZeroTaskBackendComp<TResult> _comp;
 	private Lifecycle _lifecycle;
-
+	
 }
+
+

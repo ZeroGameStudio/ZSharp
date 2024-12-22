@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-internal class ZeroTaskBackend_Yield : ZeroTaskBackendBase<float, ZeroTaskBackend_Yield>
+internal class ZeroTaskBackend_Yield : PoolableZeroTaskBackendBase<float, ZeroTaskBackend_Yield>
 {
 	
 	public static ZeroTaskBackend_Yield GetFromPool(EEventLoopTickingGroup tickingGroup, Lifecycle lifecycle)

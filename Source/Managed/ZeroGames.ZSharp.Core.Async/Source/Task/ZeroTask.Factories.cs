@@ -34,18 +34,18 @@ public partial struct ZeroTask
 		return FromException<T>(new LifecycleExpiredException(lifecycle));
 	}
 	
-	public static ZeroTask FromUnderlyingTask(IUnderlyingZeroTask task)
+	public static ZeroTask FromBackend(IZeroTaskBackend backend)
 	{
 		Thrower.ThrowIfNotInGameThread();
 
-		return new(task);
+		return new(backend);
 	}
 
-	public static ZeroTask<T> FromUnderlyingTask<T>(IUnderlyingZeroTask<T> task)
+	public static ZeroTask<T> FromBackend<T>(IZeroTaskBackend<T> backend)
 	{
 		Thrower.ThrowIfNotInGameThread();
 
-		return new(task);
+		return new(backend);
 	}
 
 	public static ZeroTask CompletedTask

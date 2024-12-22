@@ -6,7 +6,7 @@ using InvalidOperationException = System.InvalidOperationException;
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
-public abstract class UnrealConjugateBase : IConjugate, IReactiveUnderlyingLifecycle
+public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBackend
 {
 
     public void Dispose()
@@ -34,7 +34,7 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveUnderlyingLifec
             return reg;
         }
     }
-    LifecycleExpiredRegistration IReactiveUnderlyingLifecycle.RegisterOnExpired(Action callback, UnderlyingLifecycleToken token)
+    LifecycleExpiredRegistration IReactiveLifecycleBackend.RegisterOnExpired(Action callback, LifecycleToken token)
     {
         ValidateToken(token);
         return RegisterOnExpired(callback);
@@ -59,20 +59,20 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveUnderlyingLifec
             return reg;
         }
     }
-    LifecycleExpiredRegistration IReactiveUnderlyingLifecycle.RegisterOnExpired(Action<object?> callback, object? state, UnderlyingLifecycleToken token)
+    LifecycleExpiredRegistration IReactiveLifecycleBackend.RegisterOnExpired(Action<object?> callback, object? state, LifecycleToken token)
     {
         ValidateToken(token);
         return RegisterOnExpired(callback, state);
     }
 
-    bool IUnderlyingLifecycle.IsExpired(UnderlyingLifecycleToken token)
+    bool ILifecycleBackend.IsExpired(LifecycleToken token)
     {
         ValidateToken(token);
         return IsExpired;
     }
     
     public bool IsExpired => Unmanaged == DEAD_ADDR;
-    public ReactiveLifecycle Lifecycle => ReactiveLifecycle.FromUnderlyingLifecycle(this);
+    public ReactiveLifecycle Lifecycle => ReactiveLifecycle.FromBackend(this);
 
     public GCHandle GCHandle { get; }
 
@@ -80,7 +80,7 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveUnderlyingLifec
     public bool IsBlack { get; }
     public bool IsRed => !IsBlack;
 
-    UnderlyingLifecycleToken IUnderlyingLifecycle.Token { get; } = default(UnderlyingLifecycleToken).Next;
+    LifecycleToken ILifecycleBackend.Token { get; } = default(LifecycleToken).Next;
     
     internal const IntPtr DEAD_ADDR = 0xDEAD;
 
@@ -172,9 +172,9 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveUnderlyingLifec
         BroadcastOnExpired();
     }
 
-    private void ValidateToken(UnderlyingLifecycleToken token)
+    private void ValidateToken(LifecycleToken token)
     {
-        if (token != ((IReactiveUnderlyingLifecycle)this).Token)
+        if (token != ((IReactiveLifecycleBackend)this).Token)
         {
             throw new InvalidOperationException();
         }

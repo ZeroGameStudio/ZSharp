@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public struct UnderlyingLifecycleComponent(IUnderlyingLifecycle lifecycle)
+public struct LifecycleBackendComp(ILifecycleBackend backend)
 {
 
 	public void Initialize()
@@ -19,25 +19,25 @@ public struct UnderlyingLifecycleComponent(IUnderlyingLifecycle lifecycle)
 		Token = Token.Next;
 	}
 	
-	public LifecycleExpiredRegistration RegisterOnExpired(Action<IReactiveUnderlyingLifecycle, object?> callback, object? state, UnderlyingLifecycleToken token)
+	public LifecycleExpiredRegistration RegisterOnExpired(Action<IReactiveLifecycleBackend, object?> callback, object? state, LifecycleToken token)
 	{
 		ValidateToken(token);
 		ValidateReactive();
 		_registry ??= new();
-		LifecycleExpiredRegistration reg = new(new(Unsafe.As<IReactiveUnderlyingLifecycle>(_lifecycle)), ++_handle);
+		LifecycleExpiredRegistration reg = new(new(Unsafe.As<IReactiveLifecycleBackend>(_backend)), ++_handle);
 		_registry[reg] = new(callback, state);
 
 		return reg;
 	}
 
-	public void UnregisterOnExpired(LifecycleExpiredRegistration registration, UnderlyingLifecycleToken token)
+	public void UnregisterOnExpired(LifecycleExpiredRegistration registration, LifecycleToken token)
 	{
 		ValidateToken(token);
 		ValidateReactive();
 		_registry?.Remove(registration);
 	}
 
-	public bool IsExpired(UnderlyingLifecycleToken token)
+	public bool IsExpired(LifecycleToken token)
 	{
 		ValidateToken(token);
 		return _expired;
@@ -50,18 +50,18 @@ public struct UnderlyingLifecycleComponent(IUnderlyingLifecycle lifecycle)
 		_expired = true;
 		if (_registry is not null)
 		{
-			var reactiveUnderlyingLifecycle = Unsafe.As<IReactiveUnderlyingLifecycle>(_lifecycle);
+			var reactiveBackend = Unsafe.As<IReactiveLifecycleBackend>(_backend);
 			foreach (var pair in _registry)
 			{
 				Rec rec = pair.Value;
-				rec.Callback(reactiveUnderlyingLifecycle, rec.State);
+				rec.Callback(reactiveBackend, rec.State);
 			}
 		}
 	}
 
-	public UnderlyingLifecycleToken Token { get; private set; }
+	public LifecycleToken Token { get; private set; }
 	
-	private void ValidateToken(UnderlyingLifecycleToken token)
+	private void ValidateToken(LifecycleToken token)
 	{
 		if (token != Token)
 		{
@@ -71,15 +71,15 @@ public struct UnderlyingLifecycleComponent(IUnderlyingLifecycle lifecycle)
 
 	private void ValidateReactive()
 	{
-		if (_lifecycle is not IReactiveUnderlyingLifecycle)
+		if (_backend is not IReactiveLifecycleBackend)
 		{
 			throw new InvalidOperationException("Lifecycle is not reactive.");
 		}
 	}
 	
-	private readonly record struct Rec(Action<IReactiveUnderlyingLifecycle, object?> Callback, object? State);
+	private readonly record struct Rec(Action<IReactiveLifecycleBackend, object?> Callback, object? State);
 
-	private IUnderlyingLifecycle _lifecycle = lifecycle;
+	private readonly ILifecycleBackend _backend = backend;
 	private uint64 _handle;
 	
 	private bool _expired;

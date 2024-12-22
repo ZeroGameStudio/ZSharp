@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public interface IPoolableUnderlyingLifecycle<TImpl> : IUnderlyingLifecycle where TImpl : class, IPoolableUnderlyingLifecycle<TImpl>
+public interface IPoolableLifecycleBackend<TImpl> : ILifecycleBackend where TImpl : class, IPoolableLifecycleBackend<TImpl>
 {
 	void Initialize();
 	void Deinitialize();

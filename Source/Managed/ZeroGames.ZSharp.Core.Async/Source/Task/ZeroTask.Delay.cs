@@ -14,9 +14,9 @@ public partial struct ZeroTask
 			return FromExpired<float>(lifecycle);
 		}
 
-		var underlyingTask = ZeroTask_DelaySeconds.GetFromPool(delayType, delayTime.Seconds, lifecycle, progress);
-		ZeroTask<float> task = FromUnderlyingTask(underlyingTask);
-		underlyingTask.Run();
+		var backend = ZeroTaskBackend_DelaySeconds.GetFromPool(delayType, delayTime.Seconds, lifecycle, progress);
+		ZeroTask<float> task = FromBackend(backend);
+		backend.Run();
 		return task;
 	}
 	public static ZeroTask<float> Delay(TimeSpan delayTime, Lifecycle lifecycle = default, IProgress<float>? progress = null)
@@ -36,9 +36,9 @@ public partial struct ZeroTask
 			return FromExpired<int32>(lifecycle);
 		}
 
-		var underlyingTask = ZeroTask_DelayFrames.GetFromPool(delayFrames, lifecycle, progress);
-		ZeroTask<int32> task = FromUnderlyingTask(underlyingTask);
-		underlyingTask.Run();
+		var backend = ZeroTaskBackend_DelayFrames.GetFromPool(delayFrames, lifecycle, progress);
+		ZeroTask<int32> task = FromBackend(backend);
+		backend.Run();
 		return task;
 	}
 
@@ -51,9 +51,9 @@ public partial struct ZeroTask
 			return FromExpired<float>(lifecycle);
 		}
 		
-		var underlyingTask = ZeroTask_Yield.GetFromPool(tickingGroup, lifecycle);
-		ZeroTask<float> task = FromUnderlyingTask(underlyingTask);
-		underlyingTask.Run();
+		var backend = ZeroTaskBackend_Yield.GetFromPool(tickingGroup, lifecycle);
+		ZeroTask<float> task = FromBackend(backend);
+		backend.Run();
 		return task;
 	}
 	

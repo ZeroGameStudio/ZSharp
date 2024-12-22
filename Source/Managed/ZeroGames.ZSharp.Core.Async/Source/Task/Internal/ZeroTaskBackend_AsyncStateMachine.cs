@@ -4,10 +4,10 @@ using System.Runtime.CompilerServices;
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-internal class ZeroTask_AsyncStateMachine<TResult, TStateMachine> : UnderlyingZeroTaskBase<TResult, ZeroTask_AsyncStateMachine<TResult, TStateMachine>>, IAsyncStateMachineTask<TResult> where TStateMachine : IAsyncStateMachine
+internal class ZeroTaskBackend_AsyncStateMachine<TResult, TStateMachine> : ZeroTaskBackendBase<TResult, ZeroTaskBackend_AsyncStateMachine<TResult, TStateMachine>>, IAsyncStateMachineTask<TResult> where TStateMachine : IAsyncStateMachine
 {
 
-	public static ZeroTask_AsyncStateMachine<TResult, TStateMachine> GetFromPool() => Pool.Pop();
+	public static ZeroTaskBackend_AsyncStateMachine<TResult, TStateMachine> GetFromPool() => Pool.Pop();
 
 	public new void SetResult(TResult result) => base.SetResult(result);
 	public new void SetException(Exception exception) => base.SetException(exception);

@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-internal struct UnderlyingZeroTaskPool<TResult, TImpl> where TImpl : class, IPoolableUnderlyingZeroTask<TResult, TImpl>, new()
+internal struct ZeroTaskBackendPool<TResult, TImpl> where TImpl : class, IPoolableZeroTaskBackend<TResult, TImpl>, new()
 {
 	
 	public TImpl Pop()

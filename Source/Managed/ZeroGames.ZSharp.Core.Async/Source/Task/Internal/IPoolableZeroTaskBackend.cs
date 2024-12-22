@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-internal interface IPoolableUnderlyingZeroTask<out TResult, TImpl> : IUnderlyingZeroTask<TResult> where TImpl : class, IPoolableUnderlyingZeroTask<TResult, TImpl>
+internal interface IPoolableZeroTaskBackend<out TResult, TImpl> : IZeroTaskBackend<TResult> where TImpl : class, IPoolableZeroTaskBackend<TResult, TImpl>
 {
 	void Initialize();
 	void Deinitialize();

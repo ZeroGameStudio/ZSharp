@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public enum EUnderlyingZeroTaskStatus
+public enum EZeroTaskStatus
 {
 	/// <summary>The operation has not yet completed.</summary>
 	Pending,

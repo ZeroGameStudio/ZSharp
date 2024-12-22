@@ -46,54 +46,54 @@ public readonly partial struct ZeroTask : IAwaitable<ZeroTask.Awaiter>, IEquatab
 
 	public Awaiter GetAwaiter() => new(this);
 
-	public bool Equals(ZeroTask other) => _underlyingTask == other._underlyingTask && _tokenSnapshot == other._tokenSnapshot;
+	public bool Equals(ZeroTask other) => _backend == other._backend && _tokenSnapshot == other._tokenSnapshot;
 	public override bool Equals(object? obj) => obj is ZeroTask other && Equals(other);
-	public override int32 GetHashCode() => _underlyingTask?.GetHashCode() ?? 0;
+	public override int32 GetHashCode() => _backend?.GetHashCode() ?? 0;
 	public static bool operator ==(ZeroTask lhs, ZeroTask rhs) => lhs.Equals(rhs);
 	public static bool operator !=(ZeroTask lhs, ZeroTask rhs) => !lhs.Equals(rhs);
 	
-	internal ZeroTask(IUnderlyingZeroTask underlyingTask)
+	internal ZeroTask(IZeroTaskBackend backend)
 	{
-		_underlyingTask = underlyingTask;
-		_tokenSnapshot = underlyingTask.Token;
+		_backend = backend;
+		_tokenSnapshot = backend.Token;
 	}
 
-	private bool IsCompleted => _underlyingTask is null || _underlyingTask.GetStatus(_tokenSnapshot) != EUnderlyingZeroTaskStatus.Pending;
+	private bool IsCompleted => _backend is null || _backend.GetStatus(_tokenSnapshot) != EZeroTaskStatus.Pending;
 
 	private void GetResult()
 	{
-		if (_underlyingTask is not null)
+		if (_backend is not null)
 		{
-			_underlyingTask.GetResult(_tokenSnapshot);
+			_backend.GetResult(_tokenSnapshot);
 		}
 	}
 	
 	private void SetMoveNextSource(IMoveNextSource source)
 	{
-		if (_underlyingTask is null)
+		if (_backend is null)
 		{
 			source.MoveNext();
 		}
 		else
 		{
-			_underlyingTask.SetMoveNextSource(source, _tokenSnapshot);
+			_backend.SetMoveNextSource(source, _tokenSnapshot);
 		}
 	}
 
 	private void SetContinuation(Action continuation)
 	{
-		if (_underlyingTask is null)
+		if (_backend is null)
 		{
 			continuation();
 		}
 		else
 		{
-			_underlyingTask.SetContinuation(continuation, _tokenSnapshot);
+			_backend.SetContinuation(continuation, _tokenSnapshot);
 		}
 	}
 	
-	private readonly IUnderlyingZeroTask? _underlyingTask;
-	private readonly UnderlyingZeroTaskToken _tokenSnapshot;
+	private readonly IZeroTaskBackend? _backend;
+	private readonly ZeroTaskToken _tokenSnapshot;
 
 }
 
@@ -141,20 +141,20 @@ public readonly struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>
 
 	public Awaiter GetAwaiter() => new(this);
 
-	public bool Equals(ZeroTask<TResult> other) => _underlyingTask == other._underlyingTask && _tokenSnapshot == other._tokenSnapshot;
+	public bool Equals(ZeroTask<TResult> other) => _backend == other._backend && _tokenSnapshot == other._tokenSnapshot;
 	public override bool Equals(object? obj) => obj is ZeroTask<TResult> other && Equals(other);
-	public override int32 GetHashCode() => _underlyingTask?.GetHashCode() ?? 0;
+	public override int32 GetHashCode() => _backend?.GetHashCode() ?? 0;
 	public static bool operator ==(ZeroTask<TResult> lhs, ZeroTask<TResult> rhs) => lhs.Equals(rhs);
 	public static bool operator !=(ZeroTask<TResult> lhs, ZeroTask<TResult> rhs) => !lhs.Equals(rhs);
 
 	public static implicit operator ZeroTask(ZeroTask<TResult> @this)
 	{
-		if (@this._underlyingTask is null)
+		if (@this._backend is null)
 		{
 			return ZeroTask.CompletedTask;
 		}
 
-		return new(@this._underlyingTask!);
+		return new(@this._backend!);
 	}
 	
 	internal ZeroTask(TResult inlineResult)
@@ -162,19 +162,19 @@ public readonly struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>
 		_inlineResult = inlineResult;
 	}
 
-	internal ZeroTask(IUnderlyingZeroTask<TResult> underlyingTask)
+	internal ZeroTask(IZeroTaskBackend<TResult> backend)
 	{
-		_underlyingTask = underlyingTask;
-		_tokenSnapshot = underlyingTask.Token;
+		_backend = backend;
+		_tokenSnapshot = backend.Token;
 	}
 
-	private bool IsCompleted => _underlyingTask is null || _underlyingTask.GetStatus(_tokenSnapshot) != EUnderlyingZeroTaskStatus.Pending;
+	private bool IsCompleted => _backend is null || _backend.GetStatus(_tokenSnapshot) != EZeroTaskStatus.Pending;
 
 	private TResult GetResult()
 	{
-		if (_underlyingTask is not null)
+		if (_backend is not null)
 		{
-			return _underlyingTask.GetResult(_tokenSnapshot);
+			return _backend.GetResult(_tokenSnapshot);
 		}
 
 		return _inlineResult!;
@@ -182,31 +182,31 @@ public readonly struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>
 	
 	private void SetMoveNextSource(IMoveNextSource source)
 	{
-		if (_underlyingTask is null)
+		if (_backend is null)
 		{
 			source.MoveNext();
 		}
 		else
 		{
-			_underlyingTask.SetMoveNextSource(source, _tokenSnapshot);
+			_backend.SetMoveNextSource(source, _tokenSnapshot);
 		}
 	}
 
 	private void SetContinuation(Action continuation)
 	{
-		if (_underlyingTask is null)
+		if (_backend is null)
 		{
 			continuation();
 		}
 		else
 		{
-			_underlyingTask.SetContinuation(continuation, _tokenSnapshot);
+			_backend.SetContinuation(continuation, _tokenSnapshot);
 		}
 	}
 
 	private readonly TResult? _inlineResult;
-	private readonly IUnderlyingZeroTask<TResult>? _underlyingTask;
-	private readonly UnderlyingZeroTaskToken _tokenSnapshot;
+	private readonly IZeroTaskBackend<TResult>? _backend;
+	private readonly ZeroTaskToken _tokenSnapshot;
 	
 }
 

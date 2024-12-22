@@ -5,10 +5,10 @@ using System.Runtime.ExceptionServices;
 namespace ZeroGames.ZSharp.Core.Async;
 
 /// <summary>
-/// Encapsulates generic logic for underlying task.
+/// Encapsulates generic logic for task backend.
 /// Similar to ManualResetValueTaskSourceCore.
 /// </summary>
-internal struct UnderlyingZeroTaskComponent<TResult>
+internal struct ZeroTaskBackendComp<TResult>
 {
 
 	public void Initialize()
@@ -32,24 +32,24 @@ internal struct UnderlyingZeroTaskComponent<TResult>
 		ResultGot = false;
 	}
 
-	public EUnderlyingZeroTaskStatus GetStatus(UnderlyingZeroTaskToken token)
+	public EZeroTaskStatus GetStatus(ZeroTaskToken token)
 	{
 		ValidateToken(token);
 
 		if (!_completed || (_moveNextSource is null && _continuation is null))
 		{
-			return EUnderlyingZeroTaskStatus.Pending;
+			return EZeroTaskStatus.Pending;
 		}
 
 		if (_error is null)
 		{
-			return EUnderlyingZeroTaskStatus.Succeeded;
+			return EZeroTaskStatus.Succeeded;
 		}
 
-		return _error.SourceException is OperationCanceledException ? EUnderlyingZeroTaskStatus.Canceled : EUnderlyingZeroTaskStatus.Faulted;
+		return _error.SourceException is OperationCanceledException ? EZeroTaskStatus.Canceled : EZeroTaskStatus.Faulted;
 	}
 
-	public TResult GetResult(UnderlyingZeroTaskToken token)
+	public TResult GetResult(ZeroTaskToken token)
 	{
 		ValidateToken(token);
 
@@ -63,14 +63,14 @@ internal struct UnderlyingZeroTaskComponent<TResult>
 		return _result;
 	}
 	
-	public void SetMoveNextSource(IMoveNextSource source, UnderlyingZeroTaskToken token)
+	public void SetMoveNextSource(IMoveNextSource source, ZeroTaskToken token)
 	{
 		ValidateToken(token);
 		ValidateContinuation();
 		_moveNextSource = source;
 	}
 
-	public void SetContinuation(Action continuation, UnderlyingZeroTaskToken token)
+	public void SetContinuation(Action continuation, ZeroTaskToken token)
 	{
 		ValidateToken(token);
 		ValidateContinuation();
@@ -89,10 +89,10 @@ internal struct UnderlyingZeroTaskComponent<TResult>
 		SignalCompletion();
 	}
 	
-	public UnderlyingZeroTaskToken Token { get; private set; }
+	public ZeroTaskToken Token { get; private set; }
 	public bool ResultGot { get; private set; }
 
-	private void ValidateToken(UnderlyingZeroTaskToken token)
+	private void ValidateToken(ZeroTaskToken token)
 	{
 		if (token != Token)
 		{

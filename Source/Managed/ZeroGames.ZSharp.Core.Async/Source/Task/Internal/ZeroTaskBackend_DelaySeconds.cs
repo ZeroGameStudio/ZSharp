@@ -11,10 +11,10 @@ public enum EZeroTaskDelayType
 	Realtime,
 }
 
-internal class ZeroTask_DelaySeconds : UnderlyingZeroTaskBase<float, ZeroTask_DelaySeconds>
+internal class ZeroTaskBackend_DelaySeconds : ZeroTaskBackendBase<float, ZeroTaskBackend_DelaySeconds>
 {
 
-	public static ZeroTask_DelaySeconds GetFromPool(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle, IProgress<float>? progress)
+	public static ZeroTaskBackend_DelaySeconds GetFromPool(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle, IProgress<float>? progress)
 	{
 		var task = Pool.Pop();
 		task._delayType = delayType;
@@ -36,11 +36,11 @@ internal class ZeroTask_DelaySeconds : UnderlyingZeroTaskBase<float, ZeroTask_De
 		
 		_timer = scheduler.Register(static (deltaTime, state) =>
 		{
-			ZeroTask_DelaySeconds @this = Unsafe.As<ZeroTask_DelaySeconds>(state!);
+			ZeroTaskBackend_DelaySeconds @this = Unsafe.As<ZeroTaskBackend_DelaySeconds>(state!);
 			@this.SetResult(deltaTime);
 		}, this, _delaySeconds, false, false, Lifecycle, static (ex, state) =>
 		{
-			ZeroTask_DelaySeconds @this = Unsafe.As<ZeroTask_DelaySeconds>(state!);
+			ZeroTaskBackend_DelaySeconds @this = Unsafe.As<ZeroTaskBackend_DelaySeconds>(state!);
 			@this.SetException(ex);
 		});
 	}

@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public struct UnderlyingLifecyclePool<T> where T : class, IPoolableUnderlyingLifecycle<T>, new()
+public struct LifecycleBackendPool<T> where T : class, IPoolableLifecycleBackend<T>, new()
 {
 	
 	public T Pop()

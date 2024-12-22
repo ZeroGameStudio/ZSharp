@@ -8,7 +8,7 @@ namespace ZeroGames.ZSharp.Core.Async;
 public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 {
 
-	public bool Equals(ReactiveLifecycle other) => _backend == other._backend && _tokenSnapshot == other._tokenSnapshot;
+	public bool Equals(ReactiveLifecycle other) => _backend == other._backend && _token == other._token;
 	public override bool Equals(object? obj) => obj is ReactiveLifecycle other && Equals(other);
 	public override int32 GetHashCode() => _backend?.GetHashCode() ?? 0;
 	public static bool operator==(ReactiveLifecycle lhs, ReactiveLifecycle rhs) => lhs.Equals(rhs);
@@ -47,7 +47,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 
 		if (_backend is IReactiveLifecycleBackend backend)
 		{
-			return backend.RegisterOnExpired(callback, _tokenSnapshot);
+			return backend.RegisterOnExpired(callback, _token);
 		}
 		else if (_backend is CancellationTokenSource cts)
 		{
@@ -71,7 +71,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 
 		if (_backend is IReactiveLifecycleBackend backend)
 		{
-			return backend.RegisterOnExpired(callback, state, _tokenSnapshot);
+			return backend.RegisterOnExpired(callback, state, _token);
 		}
 		else if (_backend is CancellationTokenSource cts)
 		{
@@ -91,13 +91,13 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 
 			if (_backend is null)
 			{
-				return _tokenSnapshot.IsInlineExpired;
+				return _token.IsInlineExpired;
 			}
 
-			if (_tokenSnapshot.IsValid)
+			if (_token.IsValid)
 			{
 				var backend = Unsafe.As<ILifecycleBackend>(_backend);
-				return _tokenSnapshot != backend.Token || backend.IsExpired(_tokenSnapshot);
+				return _token != backend.Token || backend.IsExpired(_token);
 			}
 			else if (_backend is CancellationTokenSource cts)
 			{
@@ -116,19 +116,19 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 		{
 			if (reactiveBackend.IsExpired(reactiveBackend.Token))
 			{
-				_tokenSnapshot = LifecycleToken.InlineExpired;
+				_token = LifecycleToken.InlineExpired;
 			}
 			else
 			{
 				_backend = reactiveBackend;
-				_tokenSnapshot = reactiveBackend.Token;
+				_token = reactiveBackend.Token;
 			}
 		}
 		else if (backend is CancellationToken cancellationToken)
 		{
 			if (cancellationToken.IsCancellationRequested)
 			{
-				_tokenSnapshot = LifecycleToken.InlineExpired;
+				_token = LifecycleToken.InlineExpired;
 			}
 			else if (cancellationToken.CanBeCanceled)
 			{
@@ -139,7 +139,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 		{
 			if (cts.IsCancellationRequested)
 			{
-				_tokenSnapshot = LifecycleToken.InlineExpired;
+				_token = LifecycleToken.InlineExpired;
 			}
 			else
 			{
@@ -152,13 +152,13 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 	{
 		if (inlineExpired)
 		{
-			_tokenSnapshot = LifecycleToken.InlineExpired;
+			_token = LifecycleToken.InlineExpired;
 		}
 	}
 
 	// IReactiveLifecycleBackend, CancellationToken or CancellationTokenSource
 	private readonly object? _backend;
-	private readonly LifecycleToken _tokenSnapshot;
+	private readonly LifecycleToken _token;
 	
 }
 

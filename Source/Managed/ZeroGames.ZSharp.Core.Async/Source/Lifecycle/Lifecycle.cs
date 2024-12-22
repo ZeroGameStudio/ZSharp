@@ -8,7 +8,7 @@ namespace ZeroGames.ZSharp.Core.Async;
 public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 {
 
-	public bool Equals(Lifecycle other) => _backend == other._backend && _tokenSnapshot == other._tokenSnapshot && _nonReactive == other._nonReactive;
+	public bool Equals(Lifecycle other) => _backend == other._backend && _token == other._token && _nonReactive == other._nonReactive;
 	public override bool Equals(object? obj) => obj is Lifecycle other && Equals(other);
 	public override int32 GetHashCode() => _backend?.GetHashCode() ?? 0;
 	public static bool operator==(Lifecycle lhs, Lifecycle rhs) => lhs.Equals(rhs);
@@ -30,7 +30,7 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 
 		if (_backend is null)
 		{
-			reactiveLifecycle = new(_tokenSnapshot.IsInlineExpired);
+			reactiveLifecycle = new(_token.IsInlineExpired);
 			return true;
 		}
 
@@ -40,7 +40,7 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 			return false;
 		}
 
-		if (_tokenSnapshot.IsValid)
+		if (_token.IsValid)
 		{
 			if (_backend is IReactiveLifecycleBackend reactiveBackend)
 			{
@@ -73,7 +73,7 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 
 			if (_backend is null)
 			{
-				return _tokenSnapshot.IsInlineExpired;
+				return _token.IsInlineExpired;
 			}
 
 			if (_backend is WeakReference wr)
@@ -81,10 +81,10 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 				return !wr.IsAlive;
 			}
 
-			if (_tokenSnapshot.IsValid)
+			if (_token.IsValid)
 			{
 				var backend = Unsafe.As<ILifecycleBackend>(_backend);
-				return _tokenSnapshot != backend.Token || backend.IsExpired(_tokenSnapshot);
+				return _token != backend.Token || backend.IsExpired(_token);
 			}
 			else if (_backend is CancellationTokenSource cts)
 			{
@@ -100,7 +100,7 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 	internal Lifecycle(in Lifecycle other, bool nonReactive)
 	{
 		_backend = other._backend;
-		_tokenSnapshot = other._tokenSnapshot;
+		_token = other._token;
 		_nonReactive = nonReactive;
 	}
 
@@ -110,19 +110,19 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 		{
 			if (iBackend.IsExpired(iBackend.Token))
 			{
-				_tokenSnapshot = LifecycleToken.InlineExpired;
+				_token = LifecycleToken.InlineExpired;
 			}
 			else
 			{
 				_backend = iBackend;
-				_tokenSnapshot = iBackend.Token;
+				_token = iBackend.Token;
 			}
 		}
 		else if (backend is CancellationToken cancellationToken)
 		{
 			if (cancellationToken.IsCancellationRequested)
 			{
-				_tokenSnapshot = LifecycleToken.InlineExpired;
+				_token = LifecycleToken.InlineExpired;
 			}
 			else if (cancellationToken.CanBeCanceled)
 			{
@@ -133,7 +133,7 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 		{
 			if (cts.IsCancellationRequested)
 			{
-				_tokenSnapshot = LifecycleToken.InlineExpired;
+				_token = LifecycleToken.InlineExpired;
 			}
 			else
 			{
@@ -151,13 +151,13 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 	{
 		if (inlineExpired)
 		{
-			_tokenSnapshot = LifecycleToken.InlineExpired;
+			_token = LifecycleToken.InlineExpired;
 		}
 	}
 
 	// ILifecycleBackend, CancellationToken, CancellationTokenSource or any other reference type.
 	private readonly object? _backend;
-	private readonly LifecycleToken _tokenSnapshot;
+	private readonly LifecycleToken _token;
 	private readonly bool _nonReactive;
 	
 }

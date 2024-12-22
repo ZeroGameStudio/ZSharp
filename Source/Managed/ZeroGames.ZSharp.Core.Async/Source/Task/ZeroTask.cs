@@ -46,7 +46,7 @@ public readonly partial struct ZeroTask : IAwaitable<ZeroTask.Awaiter>, IEquatab
 
 	public Awaiter GetAwaiter() => new(this);
 
-	public bool Equals(ZeroTask other) => _backend == other._backend && _tokenSnapshot == other._tokenSnapshot;
+	public bool Equals(ZeroTask other) => _backend == other._backend && _token == other._token;
 	public override bool Equals(object? obj) => obj is ZeroTask other && Equals(other);
 	public override int32 GetHashCode() => _backend?.GetHashCode() ?? 0;
 	public static bool operator ==(ZeroTask lhs, ZeroTask rhs) => lhs.Equals(rhs);
@@ -55,16 +55,16 @@ public readonly partial struct ZeroTask : IAwaitable<ZeroTask.Awaiter>, IEquatab
 	internal ZeroTask(IZeroTaskBackend backend)
 	{
 		_backend = backend;
-		_tokenSnapshot = backend.Token;
+		_token = backend.Token;
 	}
 
-	private bool IsCompleted => _backend is null || _backend.GetStatus(_tokenSnapshot) != EZeroTaskStatus.Pending;
+	private bool IsCompleted => _backend is null || _backend.GetStatus(_token) != EZeroTaskStatus.Pending;
 
 	private void GetResult()
 	{
 		if (_backend is not null)
 		{
-			_backend.GetResult(_tokenSnapshot);
+			_backend.GetResult(_token);
 		}
 	}
 	
@@ -76,7 +76,7 @@ public readonly partial struct ZeroTask : IAwaitable<ZeroTask.Awaiter>, IEquatab
 		}
 		else
 		{
-			_backend.SetMoveNextSource(source, _tokenSnapshot);
+			_backend.SetMoveNextSource(source, _token);
 		}
 	}
 
@@ -88,12 +88,12 @@ public readonly partial struct ZeroTask : IAwaitable<ZeroTask.Awaiter>, IEquatab
 		}
 		else
 		{
-			_backend.SetContinuation(continuation, _tokenSnapshot);
+			_backend.SetContinuation(continuation, _token);
 		}
 	}
 	
 	private readonly IZeroTaskBackend? _backend;
-	private readonly ZeroTaskToken _tokenSnapshot;
+	private readonly ZeroTaskToken _token;
 
 }
 
@@ -141,7 +141,7 @@ public readonly struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>
 
 	public Awaiter GetAwaiter() => new(this);
 
-	public bool Equals(ZeroTask<TResult> other) => _backend == other._backend && _tokenSnapshot == other._tokenSnapshot;
+	public bool Equals(ZeroTask<TResult> other) => _backend == other._backend && _token == other._token;
 	public override bool Equals(object? obj) => obj is ZeroTask<TResult> other && Equals(other);
 	public override int32 GetHashCode() => _backend?.GetHashCode() ?? 0;
 	public static bool operator ==(ZeroTask<TResult> lhs, ZeroTask<TResult> rhs) => lhs.Equals(rhs);
@@ -165,16 +165,16 @@ public readonly struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>
 	internal ZeroTask(IZeroTaskBackend<TResult> backend)
 	{
 		_backend = backend;
-		_tokenSnapshot = backend.Token;
+		_token = backend.Token;
 	}
 
-	private bool IsCompleted => _backend is null || _backend.GetStatus(_tokenSnapshot) != EZeroTaskStatus.Pending;
+	private bool IsCompleted => _backend is null || _backend.GetStatus(_token) != EZeroTaskStatus.Pending;
 
 	private TResult GetResult()
 	{
 		if (_backend is not null)
 		{
-			return _backend.GetResult(_tokenSnapshot);
+			return _backend.GetResult(_token);
 		}
 
 		return _inlineResult!;
@@ -188,7 +188,7 @@ public readonly struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>
 		}
 		else
 		{
-			_backend.SetMoveNextSource(source, _tokenSnapshot);
+			_backend.SetMoveNextSource(source, _token);
 		}
 	}
 
@@ -200,13 +200,13 @@ public readonly struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>
 		}
 		else
 		{
-			_backend.SetContinuation(continuation, _tokenSnapshot);
+			_backend.SetContinuation(continuation, _token);
 		}
 	}
 
 	private readonly TResult? _inlineResult;
 	private readonly IZeroTaskBackend<TResult>? _backend;
-	private readonly ZeroTaskToken _tokenSnapshot;
+	private readonly ZeroTaskToken _token;
 	
 }
 

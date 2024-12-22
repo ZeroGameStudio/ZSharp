@@ -13,10 +13,17 @@ FStreamableManager* ZSharp::FZStreamableManager_Interop::GetGlobalStreamableMana
 ZSharp::FZStreamingTask_Interop::FZStreamingTask* ZSharp::FZStreamableManager_Interop::RequestAsyncLoading(FStreamableManager* manager, TArray<FString>& paths, uint8 pushLoadedCount)
 {
 	auto task = new FZStreamingTask_Interop::FZStreamingTask;
-	TSharedPtr<FStreamableHandle> handle = manager->RequestAsyncLoad(paths, [task]
+
+	auto callback = [task, pushLoadedCount]
 	{
+		if (!!pushLoadedCount)
+		{
+			GUpdate(task->Handle->GetOwningManager(), task, FZStreamingTask_Interop::GetLoadedCount(task));
+		}
 		GSignalCompletion(task->Handle->GetOwningManager(), task);
-	});
+	};
+	
+	TSharedPtr<FStreamableHandle> handle = manager->RequestAsyncLoad(paths, callback);
 
 	if (!handle.IsValid())
 	{
@@ -36,10 +43,7 @@ ZSharp::FZStreamingTask_Interop::FZStreamingTask* ZSharp::FZStreamableManager_In
 			}));
 		}
 
-		handle->BindCancelDelegate(FStreamableDelegate::CreateLambda([task]
-		{
-			GSignalCompletion(task->Handle->GetOwningManager(), task);
-		}));
+		handle->BindCancelDelegate(FStreamableDelegate::CreateLambda(callback));
 	}
 
 	return task;

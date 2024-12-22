@@ -49,8 +49,6 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 		ensure(_state == EState.Loading);
 		_state = EState.Loaded;
 		
-		InternalSignalCompletion();
-
 		_continuation.MoveNextSource?.MoveNext();
 		_continuation.MoveNextDelegate?.Invoke();
 
@@ -105,7 +103,6 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 	}
 	
 	protected abstract void InternalUpdate(int32 loadedCount);
-	protected virtual void InternalSignalCompletion(){}
 
 	protected void TryGetException()
 	{
@@ -159,7 +156,7 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 		IntPtr unmanaged = Unmanaged;
 		Unmanaged = IntPtr.Zero;
 		
-		IGameThreadScheduler.Instance.Post(ReleaseUnmanaged, unmanaged);
+		IGameThreadScheduler.Instance.Send(ReleaseUnmanaged, unmanaged);
 	}
 	
 	private readonly Lifecycle _lifecycle;

@@ -57,6 +57,8 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 			return _loadedCount;
 		}
 	}
+	
+	public int32 TotalCount => _totalCount;
 
 	internal BatchStreamingTask(IntPtr unmanaged, int32 totalCount, Lifecycle lifecycle, IProgress<BatchStreamingProgress>? progress) : base(unmanaged, lifecycle)
 	{
@@ -68,18 +70,25 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 
 	protected override void InternalUpdate(int32 loadedCount)
 	{
+		if (_loadedCount == loadedCount)
+		{
+			return;
+		}
+		
 		_loadedCount = loadedCount;
 		_progress?.Report(new(_loadedCount, _totalCount));
 	}
 
-	protected override void InternalSignalCompletion()
+	private unsafe void FetchLoadedCount()
 	{
-		base.InternalSignalCompletion();
+		// Push mode is always up to date.
+		if (_progress is not null)
+		{
+			return;
+		}
 		
-		InternalUpdate(_totalCount);
+		_loadedCount = StreamingTask_Interop.GetLoadedCount(Unmanaged);
 	}
-
-	private unsafe void FetchLoadedCount() => _loadedCount = StreamingTask_Interop.GetLoadedCount(Unmanaged);
 
 	private unsafe T[] InternalResult
 	{

@@ -14,7 +14,25 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         return Instance ?? new();
     }
 
-    public static MasterAssemblyLoadContext? Instance { get; private set; }
+    public static MasterAlcUnloadingRegistration RegisterUnloading(Action callback, int64 priority)
+    {
+        MasterAlcUnloadingRegistration registration = new(++_unloadingHandle);
+        _unloadingCallbacks.Add(new(registration, callback, priority));
+        _unloadingCallbacks.Sort(static (lhs, rhs) => Math.Sign(lhs.Priority - rhs.Priority));
+        return registration;
+    }
+
+    public static void UnregisterUnloading(MasterAlcUnloadingRegistration registration)
+    {
+        for (int32 i = 0; i < _unloadingCallbacks.Count; ++i)
+        {
+            if (registration == _unloadingCallbacks[i].Registration)
+            {
+                _unloadingCallbacks.RemoveAt(i);
+                return;
+            }
+        }
+    }
     
     public Type? GetType(ref readonly RuntimeTypeLocator locator)
     {
@@ -75,20 +93,12 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         return handle;
     }
 
-    public void RegisterZCallResolver(IZCallResolver resolver, uint64 priority)
+    public void RegisterZCallResolver(IZCallResolver resolver, int64 priority)
     {
         GuardInvariant();
         
         _zcallResolverLink.Add((resolver, priority));
-        _zcallResolverLink.Sort((lhs, rhs) =>
-        {
-            if (lhs.Priority == rhs.Priority)
-            {
-                return 0;
-            }
-
-            return lhs.Priority < rhs.Priority ? -1 : 1;
-        });
+        _zcallResolverLink.Sort((lhs, rhs) => Math.Sign(lhs.Priority - rhs.Priority));
     }
 
     public EZCallErrorCode ZCall(ZCallHandle handle, ZCallBuffer* buffer)
@@ -227,6 +237,8 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     }
     
     public const string INSTANCE_NAME = "Master";
+    
+    public static MasterAssemblyLoadContext? Instance { get; private set; }
 
     protected override void HandleUnload()
     {
@@ -236,6 +248,18 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             {
                 CoreLog.Error("Current Master ALC is not this instance!");
                 return;
+            }
+
+            try
+            {
+                foreach (var rec in _unloadingCallbacks)
+                {
+                    rec.Callback();
+                }
+            }
+            catch (Exception ex)
+            {
+                CoreLog.Warning($"Unhandled exception detected in MasterALC unloading callback.\n{ex}");
             }
 
             // Dispose all conjugates to ensure that there is no resource leak.
@@ -365,12 +389,17 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
         return 0;
     }
-    
+
     private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 1 << 16;
+
+    private readonly record struct UnloadingRec(MasterAlcUnloadingRegistration Registration, Action Callback, int64 Priority);
+
+    private static readonly List<UnloadingRec> _unloadingCallbacks = new();
+    private static uint64 _unloadingHandle;
 
     private readonly Dictionary<ZCallHandle, IZCallDispatcher> _zcallMap = new();
     private readonly Dictionary<string, ZCallHandle> _zcallName2Handle = new();
-    private readonly List<(IZCallResolver Resolver, uint64 Priority)> _zcallResolverLink = new();
+    private readonly List<(IZCallResolver Resolver, int64 Priority)> _zcallResolverLink = new();
     private readonly Dictionary<IntPtr, ConjugateRec> _conjugateMap = new(DEFAULT_CONJUGATE_MAP_CAPACITY);
     private readonly Dictionary<Type, uint16> _conjugateRegistryIdLookup = new();
     private readonly Queue<IConjugate> _pendingDisposedConjugates = new();

@@ -59,7 +59,7 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 		}
 		else
 		{
-			reactiveLifecycle = (CancellationToken)_backend!;
+			reactiveLifecycle = (CancellationToken)_backend;
 			return true;
 		}
 	}
@@ -91,7 +91,7 @@ public readonly partial struct Lifecycle : IEquatable<Lifecycle>
 			}
 			else
 			{
-				return ((CancellationToken)_backend!).IsCancellationRequested;
+				return ((CancellationToken)_backend).IsCancellationRequested;
 			}
 		}
 	}

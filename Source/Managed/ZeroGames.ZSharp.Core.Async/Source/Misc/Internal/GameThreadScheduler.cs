@@ -28,6 +28,12 @@ internal sealed class GameThreadScheduler : IGameThreadScheduler
 	
 	static GameThreadScheduler()
 	{
+		IMasterAssemblyLoadContext.RegisterUnloading(Reinitialize, 1);
+		Reinitialize();
+	}
+
+	private static void Reinitialize()
+	{
 		IEventLoop.Instance.Register(EEventLoopTickingGroup.RealtimeTick, Tick);
 	}
 	

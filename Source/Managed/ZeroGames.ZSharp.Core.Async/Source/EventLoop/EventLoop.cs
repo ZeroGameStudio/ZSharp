@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace ZeroGames.ZSharp.Core.Async;
 
 internal class EventLoop : IEventLoop
@@ -84,9 +86,9 @@ internal class EventLoop : IEventLoop
 		return valid;
 	}
 
-	internal static EventLoop Instance { get; } = new();
+	public static EventLoop Instance { get; private set; }
 	
-	internal void NotifyEvent(EEventLoopTickingGroup group, float worldDeltaSeconds, float realDeltaSeconds, double worldElapsedSeconds, double realElapsedSeconds)
+	public void NotifyEvent(EEventLoopTickingGroup group, float worldDeltaSeconds, float realDeltaSeconds, double worldElapsedSeconds, double realElapsedSeconds)
 	{
 		_notifing = true;
 			
@@ -161,7 +163,7 @@ internal class EventLoop : IEventLoop
 		_notifing = false;
 	}
 	
-	internal void InternalUnregister(EventLoopRegistration registration)
+	public void InternalUnregister(EventLoopRegistration registration)
 	{
 		static bool Traverse(Dictionary<EEventLoopTickingGroup, Dictionary<EventLoopRegistration, Rec>> registry, EventLoopRegistration reg)
 		{
@@ -182,6 +184,18 @@ internal class EventLoop : IEventLoop
 		{
 			Traverse(_registry, registration);
 		}
+	}
+
+	static EventLoop()
+	{
+		IMasterAssemblyLoadContext.RegisterUnloading(Reinitialize, 0);
+		Reinitialize();
+	}
+
+	[MemberNotNull(nameof(Instance))]
+	private static void Reinitialize()
+	{
+		Instance = new();
 	}
 
 	private static bool IsValidRec(in Rec rec) => rec.StatelessCallback is not null || rec.StatefulCallback is not null;

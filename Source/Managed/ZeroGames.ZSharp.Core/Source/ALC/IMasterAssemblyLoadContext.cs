@@ -37,12 +37,15 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 			return result;
 		}
 	}
+
+	public static MasterAlcUnloadingRegistration RegisterUnloading(Action callback, int64 priority)
+		=> MasterAssemblyLoadContext.RegisterUnloading(callback, priority);
 	
 	[Pure]
 	Type? GetType(ref readonly RuntimeTypeLocator locator);
 
 	ZCallHandle RegisterZCall(IZCallDispatcher dispatcher);
-	void RegisterZCallResolver(IZCallResolver resolver, uint64 priority);
+	void RegisterZCallResolver(IZCallResolver resolver, int64 priority);
 	
 	EZCallErrorCode ZCall(ZCallHandle handle, ZCallBuffer* buffer);
 	ZCallHandle GetZCallHandle(string name);

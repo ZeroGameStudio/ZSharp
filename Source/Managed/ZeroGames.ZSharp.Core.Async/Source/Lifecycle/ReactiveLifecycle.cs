@@ -44,6 +44,11 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 			return default;
 		}
 
+		if (_backend is null)
+		{
+			return default;
+		}
+
 		if (_backend is IReactiveLifecycleBackend backend)
 		{
 			return backend.RegisterOnExpired(callback, _token);
@@ -54,7 +59,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 		}
 		else
 		{
-			return new(((CancellationToken)_backend!).RegisterWithoutCaptureExecutionContext(callback));
+			return new(((CancellationToken)_backend).RegisterWithoutCaptureExecutionContext(callback));
 		}
 	}
 	
@@ -65,6 +70,11 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 		if (IsExpired)
 		{
 			callback(state);
+			return default;
+		}
+		
+		if (_backend is null)
+		{
 			return default;
 		}
 
@@ -78,7 +88,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 		}
 		else
 		{
-			return new(((CancellationToken)_backend!).RegisterWithoutCaptureExecutionContext(callback, state));
+			return new(((CancellationToken)_backend).RegisterWithoutCaptureExecutionContext(callback, state));
 		}
 	}
 
@@ -104,7 +114,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 			}
 			else
 			{
-				return ((CancellationToken)_backend!).IsCancellationRequested;
+				return ((CancellationToken)_backend).IsCancellationRequested;
 			}
 		}
 	}

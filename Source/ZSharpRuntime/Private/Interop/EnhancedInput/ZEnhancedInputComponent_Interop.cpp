@@ -18,14 +18,27 @@ namespace ZEnhancedInputComponent_Interop_Private
 	}
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZEnhancedInputComponent_Interop::BindAction(FZConjugateHandle self, FZConjugateHandle inputAction, int64 triggerEvent, FZGCHandle delegate)
+ZSharp::FZConjugateHandle ZSharp::FZEnhancedInputComponent_Interop::BindStatelessAction(FZConjugateHandle self, FZConjugateHandle inputAction, int64 triggerEvent, FZGCHandle delegate)
 {
 	FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
 	const auto pSelf = registry.ConjugateUnsafeChecked<UEnhancedInputComponent>(self);
 	const auto pInputAction = registry.ConjugateUnsafeChecked<UInputAction>(inputAction);
 	ETriggerEvent eTriggerEvent = static_cast<ETriggerEvent>(triggerEvent);
 
-	auto proxy = UZManagedDelegateProxyImpl::Create<UZManagedDelegateProxy_EnhancedInput>(ZEnhancedInputComponent_Interop_Private::GetSignature(), delegate);
+	auto proxy = UZManagedDelegateProxyImpl::Create<UZManagedDelegateProxy_EnhancedInput>(ZEnhancedInputComponent_Interop_Private::GetSignature(), delegate, {});
+	proxy->Binding = pSelf->BindAction(pInputAction, eTriggerEvent, proxy, UZManagedDelegateProxyImpl::StubFunctionName).Clone();
+
+	return registry.Conjugate(proxy);
+}
+
+ZSharp::FZConjugateHandle ZSharp::FZEnhancedInputComponent_Interop::BindStatefulAction(FZConjugateHandle self, FZConjugateHandle inputAction, int64 triggerEvent, FZGCHandle delegate, FZGCHandle state)
+{
+	FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+	const auto pSelf = registry.ConjugateUnsafeChecked<UEnhancedInputComponent>(self);
+	const auto pInputAction = registry.ConjugateUnsafeChecked<UInputAction>(inputAction);
+	ETriggerEvent eTriggerEvent = static_cast<ETriggerEvent>(triggerEvent);
+
+	auto proxy = UZManagedDelegateProxyImpl::Create<UZManagedDelegateProxy_EnhancedInput>(ZEnhancedInputComponent_Interop_Private::GetSignature(), delegate, state);
 	proxy->Binding = pSelf->BindAction(pInputAction, eTriggerEvent, proxy, UZManagedDelegateProxyImpl::StubFunctionName).Clone();
 
 	return registry.Conjugate(proxy);

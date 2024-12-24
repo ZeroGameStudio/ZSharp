@@ -15,10 +15,16 @@ ZSharp::EZCallErrorCode ZSharp::FZUnrealDelegate_Interop::Execute(FZCallBuffer* 
 	return sdself->Execute(buffer);
 }
 
-ZSharp::FZConjugateHandle ZSharp::FZUnrealDelegate_Interop::BindManagedDelegate(FZConjugateHandle self, FZGCHandle delegate)
+ZSharp::FZConjugateHandle ZSharp::FZUnrealDelegate_Interop::BindStatelessManagedDelegate(FZConjugateHandle self, FZGCHandle delegate)
 {
 	FZSelfDescriptiveScriptDelegate* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Delegate>().ConjugateUnsafe(self);
 	return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(sdself->BindManaged(delegate));
+}
+
+ZSharp::FZConjugateHandle ZSharp::FZUnrealDelegate_Interop::BindStatefulManagedDelegate(FZConjugateHandle self, FZGCHandle delegate, FZGCHandle state)
+{
+	FZSelfDescriptiveScriptDelegate* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Delegate>().ConjugateUnsafe(self);
+	return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(sdself->BindManaged(delegate, state));
 }
 
 void ZSharp::FZUnrealDelegate_Interop::BindUnrealFunction(FZConjugateHandle self, FZConjugateHandle object, const TCHAR* functionName)

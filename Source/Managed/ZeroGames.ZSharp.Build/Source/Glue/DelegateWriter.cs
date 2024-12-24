@@ -24,8 +24,8 @@ public class DelegateWriter
 			builder.AddUsingNamespace(ns);
 		}
 		
-		builder.ReturnType = _exportedDelegate.ReturnParameter?.Type.ToString() is {} typeName ? new(typeName, _exportedDelegate.ReturnParameter.UnderlyingType) : null;
-		
+		builder.ReturnType = _exportedDelegate.ReturnParameter?.Type.ToString() is {} returnTypeName ? new(returnTypeName, _exportedDelegate.ReturnParameter.UnderlyingType, _exportedDelegate.ReturnParameter.IsNullInNotNullOut) : null;
+
 		List<ParameterDeclaration> parameters = new();
 		foreach (var parameter in _exportedDelegate.Parameters)
 		{

@@ -84,7 +84,8 @@ public abstract class UnrealMulticastSparseDelegateBase : UnrealConjugateBase, I
 	protected UnrealMulticastSparseDelegateBase(IntPtr unmanaged) : base(unmanaged){}
 		
 	protected unsafe EZCallErrorCode Broadcast(ZCallBuffer* buffer) => UnrealMulticastSparseDelegate_Interop.Broadcast(buffer);
-	protected unsafe UnrealObject Add(Delegate @delegate) => UnrealMulticastSparseDelegate_Interop.AddManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();
+	protected unsafe UnrealObject Add(Delegate @delegate) => UnrealMulticastSparseDelegate_Interop.AddStatelessManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();
+	protected unsafe UnrealObject Add(Delegate @delegate, object? state) => UnrealMulticastSparseDelegate_Interop.AddStatefulManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate), GCHandle.Alloc(state)).GetTargetChecked<UnrealObject>();
 
 	private unsafe void InternalAdd(UnrealObject obj, string name)
 	{

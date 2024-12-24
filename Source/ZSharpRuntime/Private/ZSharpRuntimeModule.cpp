@@ -225,7 +225,8 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealOptional, IsSet),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, Execute),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, BindManagedDelegate),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, BindStatelessManagedDelegate),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, BindStatefulManagedDelegate),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, BindUnrealFunction),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, Unbind),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, IsBound),
@@ -234,7 +235,8 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealDelegate, GetFunctionName),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, Broadcast),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, AddManagedDelegate),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, AddStatelessManagedDelegate),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, AddStatefulManagedDelegate),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, AddUnrealFunction),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, Remove),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, RemoveAll),
@@ -244,7 +246,8 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastInlineDelegate, Contains),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, Broadcast),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, AddManagedDelegate),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, AddStatelessManagedDelegate),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, AddStatefulManagedDelegate),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, AddUnrealFunction),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, Remove),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, RemoveAll),
@@ -262,7 +265,8 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamingTask, GetLoadedCount),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamingTask, Release),
 
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, BindAction),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, BindStatelessAction),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, BindStatefulAction),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, RemoveBinding),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(InputActionValue, Deconstruct),

@@ -25,6 +25,7 @@ namespace ZSharp
 		
 		void AddUFunction(UObject* object, FName name);
 		UObject* AddManaged(FZGCHandle delegate);
+		UObject* AddManaged(FZGCHandle delegate, FZGCHandle state);
 		void RemoveUFunction(const UObject* object, FName name);
 		void RemoveAll(const UObject* object);
 		void Clear();

@@ -13,7 +13,8 @@ namespace ZSharp
 	struct FZUnrealDelegate_Interop
 	{
 		static EZCallErrorCode Execute(FZCallBuffer* buffer);
-		static FZConjugateHandle BindManagedDelegate(FZConjugateHandle self, FZGCHandle delegate);
+		static FZConjugateHandle BindStatelessManagedDelegate(FZConjugateHandle self, FZGCHandle delegate);
+		static FZConjugateHandle BindStatefulManagedDelegate(FZConjugateHandle self, FZGCHandle delegate, FZGCHandle state);
 		static void BindUnrealFunction(FZConjugateHandle self, FZConjugateHandle object, const TCHAR* functionName);
 		static void Unbind(FZConjugateHandle self);
 		static uint8 IsBound(FZConjugateHandle self);

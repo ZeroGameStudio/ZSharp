@@ -10,6 +10,10 @@ const FName UZManagedDelegateProxyImpl::StubFunctionName = GET_FUNCTION_NAME_CHE
 void UZManagedDelegateProxyImpl::BeginDestroy()
 {
 	Delegate.Free();
+	if (State)
+	{
+		State->Free();
+	}
 	
 	UObject::BeginDestroy();
 }

@@ -2,11 +2,11 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public readonly struct TypeReference(string typeName, string? underlyingType, bool notNullOut = false)
+public readonly struct TypeReference(string typeName, string? underlyingType, bool nullInNotNullOut = false)
 {
 	public string TypeName { get; } = typeName;
 	public string? UnderlyingType { get; } = underlyingType;
-	public bool IsNotNullOut { get; } = notNullOut;
+	public bool IsNullInNotNullOut { get; } = nullInNotNullOut;
 }
 
 

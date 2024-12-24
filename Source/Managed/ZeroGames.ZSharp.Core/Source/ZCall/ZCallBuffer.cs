@@ -409,7 +409,7 @@ public struct ZCallBufferSlot
 			EZCallBufferSlotType.Double => Double,
 			EZCallBufferSlotType.Bool => Bool,
 			EZCallBufferSlotType.Pointer => Pointer,
-			EZCallBufferSlotType.GCHandle => GCHandle,
+			EZCallBufferSlotType.GCHandle => GCHandle.Target,
 			EZCallBufferSlotType.Conjugate => Conjugate.GetTarget<IConjugate>(),
 			_ => throw Thrower.NoEntry()
 		};

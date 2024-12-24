@@ -37,6 +37,8 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 		base.BuildTypeDefinition(definition);
 		
 		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}(Signature @delegate) => base.{BindMethodName}(@delegate);"));
+		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state) => base.{BindMethodName}(@delegate, state);"));
+		
 		definition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, Parameters) { Modifiers = EMemberModifiers.Partial, Body = new StrangeZCallBodyBuilder($"base.{ExecuteMethodName}", ReturnType, false, Parameters).Build() });
 	}
 
@@ -72,11 +74,26 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 			}
 		}
 
-		MethodDefinition delegateDecl = new(EMemberVisibility.Public, "Signature", ReturnType, Parameters);
-		delegateDecl.IsDelegate = true;
-		abstractionDefinition.AddMember(delegateDecl);
+		TypeReference? signatureReturnType = ReturnType is not null ? ToSignatureParameterDecl(new(EParameterKind.Out, ReturnType.Value, string.Empty)).Type : null;
+		ParameterDeclaration[]? signatureParameters = Parameters?.Select(ToSignatureParameterDecl).ToArray();
+
+		MethodDefinition statelessSignature = new(EMemberVisibility.Public, "Signature", signatureReturnType, signatureParameters)
+		{
+			IsDelegate = true,
+		};
+		abstractionDefinition.AddMember(statelessSignature);
+
+		ParameterDeclaration[] statefulSignatureParameters = [..signatureParameters ?? [], new(EParameterKind.In, new("TState", null), "state")];
+		
+		MethodDefinition statefulSignature = new(EMemberVisibility.Public, "Signature<TState>", signatureReturnType, statefulSignatureParameters)
+		{
+			IsDelegate = true,
+		};
+		abstractionDefinition.AddMember(statefulSignature);
 
 		abstractionDefinition.AddMember(new Block($"public partial UnrealObject {BindMethodName}(Signature @delegate);"));
+		abstractionDefinition.AddMember(new Block($"public partial UnrealObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state);"));
+		
 		abstractionDefinition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, Parameters) { Modifiers = EMemberModifiers.Partial });
 		
 		if (outerClassDefinition is null)
@@ -105,6 +122,42 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 	protected override string StaticFieldInterfaceName => "IStaticSignature";
 	protected override string StaticFieldTypeName => "DelegateFunction";
 	protected override string StaticFieldPropertyName => "StaticSignature";
+
+	private ParameterDeclaration ToSignatureParameterDecl(ParameterDeclaration source)
+	{
+		EParameterKind kind = source.Kind;
+		TypeReference sourceType = source.Type;
+		string targetTypeName = sourceType.TypeName;
+		if (kind == EParameterKind.In)
+		{
+			if (source.Type.IsNullInNotNullOut && targetTypeName.EndsWith("?"))
+			{
+				targetTypeName = targetTypeName.Substring(0, targetTypeName.Length - 1);
+			}
+		}
+		else if (kind == EParameterKind.Out)
+		{
+			if (source.Type.IsNullInNotNullOut && !targetTypeName.EndsWith("?"))
+			{
+				targetTypeName += "?";
+			}
+		}
+
+		AttributeDeclaration[]? targetAttributes = source.Attributes?.Declarations.ToArray();
+		if (targetAttributes is not null)
+		{
+			for (int32 i = 0; i < targetAttributes.Length; ++i)
+			{
+				if (targetAttributes[i].Name == "NotNull")
+				{
+					targetAttributes[i] = new("CanBeNull");
+				}
+			}
+		}
+
+		TypeReference targetType = new(targetTypeName, sourceType.UnderlyingType, sourceType.IsNullInNotNullOut);
+		return new(kind, targetType, source.Name, source.DefaultValue, targetAttributes);
+	}
 	
 	private string BindMethodName => Kind == EExportedDelegateKind.Unicast ? "Bind" : "Add";
 	private string ExecuteMethodName => Kind == EExportedDelegateKind.Unicast ? "Execute" : "Broadcast";

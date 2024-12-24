@@ -148,7 +148,7 @@ $@"unsafe
 		string slotType = GetSlotType(parameterType);
 		bool nullable = parameterType.TypeName.EndsWith("?");
 		string notnullType = parameterType.TypeName.TrimEnd('?');
-		string getTarget = slotType == "Conjugate" ? nullable && !parameterType.IsNotNullOut ? $".GetTarget<{notnullType}>()" : $".GetTargetChecked<{notnullType}>()" : string.Empty;
+		string getTarget = slotType == "Conjugate" ? nullable && !parameterType.IsNullInNotNullOut ? $".GetTarget<{notnullType}>()" : $".GetTargetChecked<{notnullType}>()" : string.Empty;
 		return $"{cast}slots[{index}].{slotType}{getTarget}";
 	}
 

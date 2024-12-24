@@ -347,7 +347,9 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		return EZCallErrorCode::AlcUnavailable;
 	}
 
-	const int32 numSlots = 1 + ParameterProperties.Num() + (ReturnProperty ? 1 : 0);
+	IZManagedDelegateProxy* proxy = CastChecked<IZManagedDelegateProxy>(object);
+	TOptional<FZGCHandle> state = proxy->ManagedDelegateProxy_GetState();
+	const int32 numSlots = 1 + ParameterProperties.Num() + (state ? 1 : 0) + (ReturnProperty ? 1 : 0);
 	EZCallErrorCode res;
 	FZRedFrameScope scope;
 	{
@@ -360,14 +362,19 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		{
 			buffer[i].Type = EZCallBufferSlotType::Uninitialized;
 		}
-
-		TZCallBufferSlotEncoder<FZGCHandle>::Encode(CastChecked<IZManagedDelegateProxy>(object)->ManagedDelegateProxy_GetDelegate(), buffer[0]);
+		
+		TZCallBufferSlotEncoder<FZGCHandle>::Encode(proxy->ManagedDelegateProxy_GetDelegate(), buffer[0]);
 
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{
 			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
 			// We need to set Type for all slots, not only in params.
 			visitor->GetValue_InContainer(params, buffer[i + 1], 0);
+		}
+
+		if (state)
+		{
+			TZCallBufferSlotEncoder<FZGCHandle>::Encode(*state, buffer[ReturnProperty ? -2 : -1]);
 		}
 
 		if (ReturnProperty)

@@ -19,6 +19,7 @@ namespace ZSharp
 		
 		void BindUFunction(UObject* object, FName name);
 		UObject* BindManaged(FZGCHandle delegate);
+		UObject* BindManaged(FZGCHandle delegate, FZGCHandle state);
 		void Unbind();
 
 		EZCallErrorCode Execute(FZCallBuffer* buffer);

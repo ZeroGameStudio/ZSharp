@@ -42,7 +42,22 @@ UObject* ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::AddManaged(FZGC
 		return nullptr;
 	}
 
-	auto proxy = UZManagedDelegateProxyImpl::Create(Descriptor, delegate);
+	auto proxy = UZManagedDelegateProxyImpl::Create(Descriptor, delegate, {});
+	FScriptDelegate unicast;
+	unicast.BindUFunction(proxy, UZManagedDelegateProxyImpl::StubFunctionName);
+	UnderlyingInstance->Add(unicast);
+
+	return proxy;
+}
+
+UObject* ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate::AddManaged(FZGCHandle delegate, FZGCHandle state)
+{
+	if (!delegate)
+	{
+		return nullptr;
+	}
+
+	auto proxy = UZManagedDelegateProxyImpl::Create(Descriptor, delegate, state);
 	FScriptDelegate unicast;
 	unicast.BindUFunction(proxy, UZManagedDelegateProxyImpl::StubFunctionName);
 	UnderlyingInstance->Add(unicast);

@@ -5,9 +5,6 @@
 #include "ZManagedDelegateProxy.h"
 #include "Interop/ZGCHandle.h"
 #include "Reflection/Function/ZFunctionVisitorHandle.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveMulticastInlineScriptDelegate.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveMulticastSparseScriptDelegate.h"
-#include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
 
 #include "ZManagedDelegateProxyImpl.generated.h"
 
@@ -21,16 +18,18 @@ public:
 	
 	template <typename T = UZManagedDelegateProxyImpl>
 	requires TIsDerivedFrom<T, UZManagedDelegateProxyImpl>::Value
-	static T* Create(const UFunction* signature, ZSharp::FZGCHandle delegate)
+	static T* Create(const UFunction* signature, ZSharp::FZGCHandle delegate, TOptional<ZSharp::FZGCHandle> state)
 	{
 		auto result = NewObject<T>();
 		result->Signature = TStrongObjectPtr { signature };
 		result->Delegate = delegate;
+		result->State = state;
 		return result;
 	}
 
 public:
 	virtual ZSharp::FZGCHandle ManagedDelegateProxy_GetDelegate() const override { return Delegate; }
+	virtual TOptional<ZSharp::FZGCHandle> ManagedDelegateProxy_GetState() const override { return State; }
 
 private:
 	virtual void BeginDestroy() override;
@@ -43,6 +42,7 @@ private:
 private:
 	TStrongObjectPtr<const UFunction> Signature;
 	ZSharp::FZGCHandle Delegate;
+	TOptional<ZSharp::FZGCHandle> State;
 	
 	ZSharp::FZFunctionVisitorHandle SignatureFunctionVisitor;
 	

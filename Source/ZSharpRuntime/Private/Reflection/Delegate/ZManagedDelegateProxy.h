@@ -18,6 +18,7 @@ class ZSHARPRUNTIME_API IZManagedDelegateProxy : public IInterface
 
 public:
 	virtual ZSharp::FZGCHandle ManagedDelegateProxy_GetDelegate() const = 0;
+	virtual TOptional<ZSharp::FZGCHandle> ManagedDelegateProxy_GetState() const = 0;
 	
 };
 

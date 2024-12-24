@@ -7,7 +7,8 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 internal static unsafe class UnrealMulticastInlineDelegate_Interop
 {
 	public static delegate* unmanaged<ZCallBuffer*, EZCallErrorCode> Broadcast;
-	public static delegate* unmanaged<ConjugateHandle, GCHandle, ConjugateHandle> AddManagedDelegate;
+	public static delegate* unmanaged<ConjugateHandle, GCHandle, ConjugateHandle> AddStatelessManagedDelegate;
+	public static delegate* unmanaged<ConjugateHandle, GCHandle, GCHandle, ConjugateHandle> AddStatefulManagedDelegate;
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle, char*, void> AddUnrealFunction;
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle, char*, void> Remove;
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle, void> RemoveAll;

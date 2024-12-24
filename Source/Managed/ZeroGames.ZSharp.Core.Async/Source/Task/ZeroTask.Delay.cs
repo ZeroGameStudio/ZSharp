@@ -22,12 +22,12 @@ public partial struct ZeroTask
 	public static ZeroTask<float> Delay(TimeSpan delayTime, Lifecycle lifecycle = default, IProgress<float>? progress = null)
 		=> Delay(EZeroTaskDelayType.WorldPaused, delayTime, lifecycle, progress);
 	
-	public static ZeroTask<float> DelaySeconds(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle = default, IProgress<float>? progress = null)
+	public static ZeroTask<float> Delay(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle = default, IProgress<float>? progress = null)
 		=> Delay(delayType, TimeSpan.FromSeconds(delaySeconds), lifecycle, progress);
-	public static ZeroTask<float> DelaySeconds(float delaySeconds, Lifecycle lifecycle = default, IProgress<float>? progress = null)
-		=> DelaySeconds(EZeroTaskDelayType.WorldPaused, delaySeconds, lifecycle, progress);
+	public static ZeroTask<float> Delay(float delaySeconds, Lifecycle lifecycle = default, IProgress<float>? progress = null)
+		=> Delay(EZeroTaskDelayType.WorldPaused, delaySeconds, lifecycle, progress);
 
-	public static ZeroTask<int32> DelayFrames(int32 delayFrames, Lifecycle lifecycle = default, IProgress<int32>? progress = null)
+	public static ZeroTask<int32> DelayFrame(int32 delayFrames, Lifecycle lifecycle = default, IProgress<int32>? progress = null)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		
@@ -56,7 +56,8 @@ public partial struct ZeroTask
 		backend.Run();
 		return task;
 	}
-	
+	public static ZeroTask<float> Yield(Lifecycle lifecycle = default) => Yield(EEventLoopTickingGroup.DuringWorldTimerTick, lifecycle);
+
 }
 
 

@@ -1,7 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace ZeroGames.ZSharp.Core;
@@ -272,7 +271,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     
     private static void FlushPendingDisposedConjugates(object? state)
     {
-        MasterAssemblyLoadContext @this = Unsafe.As<MasterAssemblyLoadContext>(state!);
+        MasterAssemblyLoadContext @this = (MasterAssemblyLoadContext)state!;
         lock (@this._pendingDisposedConjugatesLock)
         {
             if (@this.IsUnloaded)

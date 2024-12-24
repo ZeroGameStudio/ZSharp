@@ -1,7 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.CompilerServices;
-
 namespace ZeroGames.ZSharp.Core.Async;
 
 internal class ZeroTaskBackend_Yield : PoolableZeroTaskBackendBase<float, ZeroTaskBackend_Yield>
@@ -20,12 +18,12 @@ internal class ZeroTaskBackend_Yield : PoolableZeroTaskBackendBase<float, ZeroTa
 	{
 		_registration = IEventLoop.Instance.Register(_tickingGroup, static (in EventLoopArgs args, object? state, ref bool @continue) =>
 		{
-			var @this = Unsafe.As<ZeroTaskBackend_Yield>(state!);
+			var @this = (ZeroTaskBackend_Yield)state!;
 			@this.SetResult(args.WorldDeltaSeconds);
 			@continue = false;
 		}, this, Lifecycle, (ex, state) =>
 		{
-			var @this = Unsafe.As<ZeroTaskBackend_Yield>(state!);
+			var @this = (ZeroTaskBackend_Yield)state!;
 			@this.SetException(ex);
 		});
 	}

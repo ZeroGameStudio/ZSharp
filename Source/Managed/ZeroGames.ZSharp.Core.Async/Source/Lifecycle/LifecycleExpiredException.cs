@@ -5,7 +5,7 @@ namespace ZeroGames.ZSharp.Core.Async;
 public class LifecycleExpiredException : OperationCanceledException
 {
 
-	public LifecycleExpiredException(){}
+	public LifecycleExpiredException() : base("The operation was canceled - lifecycle expired."){}
 
 	public LifecycleExpiredException(string? message) : base(message){}
 

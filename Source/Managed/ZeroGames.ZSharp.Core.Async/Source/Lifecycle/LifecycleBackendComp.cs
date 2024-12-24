@@ -1,7 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.CompilerServices;
-
 namespace ZeroGames.ZSharp.Core.Async;
 
 public struct LifecycleBackendComp(ILifecycleBackend backend)
@@ -24,7 +22,7 @@ public struct LifecycleBackendComp(ILifecycleBackend backend)
 		ValidateToken(token);
 		ValidateReactive();
 		_registry ??= new();
-		LifecycleExpiredRegistration reg = new(Unsafe.As<IReactiveLifecycleBackend>(_backend), ++_handle);
+		LifecycleExpiredRegistration reg = new((IReactiveLifecycleBackend)_backend, ++_handle);
 		_registry[reg] = new(callback, state);
 
 		return reg;
@@ -50,7 +48,7 @@ public struct LifecycleBackendComp(ILifecycleBackend backend)
 		_expired = true;
 		if (_registry is not null)
 		{
-			var reactiveBackend = Unsafe.As<IReactiveLifecycleBackend>(_backend);
+			var reactiveBackend = (IReactiveLifecycleBackend)_backend;
 			foreach (var pair in _registry)
 			{
 				Rec rec = pair.Value;

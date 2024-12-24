@@ -87,7 +87,8 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
     }
     
     public bool IsExpired => Unmanaged == DEAD_ADDR;
-    public ReactiveLifecycle Lifecycle => ReactiveLifecycle.FromBackend(this);
+    public Lifecycle Lifecycle => ReactiveLifecycle.ForceNonReactive();
+    public ReactiveLifecycle ReactiveLifecycle => ReactiveLifecycle.FromBackend(this);
 
     public GCHandle GCHandle { get; }
 

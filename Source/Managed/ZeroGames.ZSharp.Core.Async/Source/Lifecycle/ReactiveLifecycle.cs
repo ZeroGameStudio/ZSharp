@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace ZeroGames.ZSharp.Core.Async;
@@ -96,7 +95,7 @@ public readonly partial struct ReactiveLifecycle : IEquatable<ReactiveLifecycle>
 
 			if (_token.IsValid)
 			{
-				var backend = Unsafe.As<ILifecycleBackend>(_backend);
+				var backend = (ILifecycleBackend)_backend;
 				return _token != backend.Token || backend.IsExpired(_token);
 			}
 			else if (_backend is CancellationTokenSource cts)

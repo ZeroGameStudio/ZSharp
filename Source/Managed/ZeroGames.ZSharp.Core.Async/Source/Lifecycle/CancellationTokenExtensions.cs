@@ -18,7 +18,7 @@ public static class CancellationTokenExtensions
 
 		try
 		{
-			return @this.Register(callback, false);
+			return @this.Register(() => IGameThreadScheduler.Instance.Send(static state => ((Action)state!)(), callback), false);
 		}
 		finally
 		{
@@ -40,7 +40,7 @@ public static class CancellationTokenExtensions
 
 		try
 		{
-			return @this.Register(callback, state, false);
+			return @this.Register(_ => IGameThreadScheduler.Instance.Send(_ => callback(state), null), null, false);
 		}
 		finally
 		{

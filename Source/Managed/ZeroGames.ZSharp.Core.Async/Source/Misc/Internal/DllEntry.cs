@@ -1,7 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Threading;
@@ -46,7 +45,7 @@ internal static class DllEntry
         {
             GameThreadScheduler.Instance.Send(static ex =>
             {
-                UnhandledExceptionHelper.Guard(Unsafe.As<Exception>(ex!), "Unobserved exception from TaskScheduler detected.");
+                UnhandledExceptionHelper.Guard((Exception)ex!, "Unobserved exception from TaskScheduler detected.");
             }, eventArgs.Exception);
         };
     }

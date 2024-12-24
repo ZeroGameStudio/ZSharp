@@ -11,30 +11,29 @@ internal sealed class ZeroStream_EveryTick : IZeroStream<float>
 		_lifecycle = lifecycle;
 	}
 
-	public IZeroStreamEnumerator<float> GetAsyncEnumerator() => new Enumerator(_tickingGroup, _lifecycle);
+	public IZeroStreamEnumerator<float> GetAsyncEnumerator()
+	{
+		Thrower.ThrowIfNotInGameThread();
+		return new Enumerator(_tickingGroup, _lifecycle);
+	}
 
 	private class Enumerator : IZeroStreamEnumerator<float>
 	{
 		public ZeroTask DisposeAsync()
 		{
-			InternalDispose();
-			GC.SuppressFinalize(this);
+			_disposed = true;
 			return ZeroTask.CompletedTask;
 		}
 
-		public ZeroTask<bool> MoveNextAsync()
+		public async ZeroTask<bool> MoveNextAsync()
 		{
 			if (_disposed)
 			{
 				throw new InvalidOperationException();
 			}
 
-			if (_lifecycle.IsExpired)
-			{
-				return ZeroTask.FromResult(false);
-			}
-
-			return InternalMoveNextAsync();
+			_current = await ZeroTask.Yield(_tickingGroup, _lifecycle);
+			return true;
 		}
 
 		public float Current
@@ -54,19 +53,6 @@ internal sealed class ZeroStream_EveryTick : IZeroStream<float>
 		{
 			_tickingGroup = tickingGroup;
 			_lifecycle = lifecycle;
-		}
-
-		~Enumerator() => InternalDispose();
-
-		private async ZeroTask<bool> InternalMoveNextAsync()
-		{
-			_current = await ZeroTask.Yield(_tickingGroup, _lifecycle);
-			return true;
-		}
-
-		private void InternalDispose()
-		{
-			_disposed = true;
 		}
 
 		private readonly EEventLoopTickingGroup _tickingGroup;

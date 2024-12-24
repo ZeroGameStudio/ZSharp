@@ -21,6 +21,11 @@ internal abstract class ZeroTaskBackendBase<TResult> : IZeroTaskBackend<TResult>
 		return result;
 	}
 	void IZeroTaskBackend.GetResult(ZeroTaskToken token) => GetResult(token);
+
+	public bool IsCompletedEvenIfRecycled(ZeroTaskToken token)
+	{
+		return Token != token || GetStatus(token) != EZeroTaskStatus.Pending;
+	}
 	
 	public ZeroTaskToken Token => _comp.Token;
 	

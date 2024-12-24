@@ -1,7 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.CompilerServices;
-
 namespace ZeroGames.ZSharp.Core.Async;
 
 internal class ZeroTaskBackend_DelayFrames : PoolableZeroTaskBackendBase<int32, ZeroTaskBackend_DelayFrames>
@@ -20,19 +18,39 @@ internal class ZeroTaskBackend_DelayFrames : PoolableZeroTaskBackendBase<int32, 
 	{
 		_timer = GlobalTimerSchedulers.Frame.Register(static (deltaTime, state) =>
 		{
-			var @this = Unsafe.As<ZeroTaskBackend_DelayFrames>(state!);
+			var @this = (ZeroTaskBackend_DelayFrames)state!;
+			@this._expiredRegistration.Dispose();
 			@this.SetResult(deltaTime);
 		}, this, _delayFrames, false, false, Lifecycle, static (ex, state) =>
 		{
-			var @this = Unsafe.As<ZeroTaskBackend_DelayFrames>(state!);
+			var @this = (ZeroTaskBackend_DelayFrames)state!;
+			@this._expiredRegistration.Dispose();
 			@this.SetException(ex);
 		});
+		
+		// Timer doesn't care whether the Lifecycle is reactive or not so we do here.
+		if (Lifecycle.TryToReactive(out var reactiveLifecycle))
+		{
+			reactiveLifecycle.RegisterOnExpired(static state =>
+			{
+				var (@this, token) = ((ZeroTaskBackend_DelayFrames, ZeroTaskToken))state!;
+				if (@this.IsCompletedEvenIfRecycled(token))
+				{
+					// Although we dispose expired registration in the timer callback,
+					// This callback can even get invoked if lifecycle is backed by a CancellationToken owned by another thread.
+					return;
+				}
+				@this._timer.Dispose();
+				@this.SetException(new LifecycleExpiredException(@this.Lifecycle));
+			}, (this, Token));
+		}
 	}
 
 	protected override void Deinitialize()
 	{
 		_delayFrames = 0;
 		_timer = default;
+		_expiredRegistration = default;
 		
 		base.Deinitialize();
 	}
@@ -40,6 +58,7 @@ internal class ZeroTaskBackend_DelayFrames : PoolableZeroTaskBackendBase<int32, 
 	private int32 _delayFrames;
 	
 	private Timer _timer;
+	private LifecycleExpiredRegistration _expiredRegistration;
 
 }
 

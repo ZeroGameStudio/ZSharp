@@ -1,7 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Runtime.CompilerServices;
-
 namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 
 public partial class Actor
@@ -19,7 +17,7 @@ public partial class Actor
 		var res = new T[count];
 		for (int32 i = 0; i < count; ++i)
 		{
-			var comp = Unsafe.As<T>(comps[i]!);
+			var comp = (T)comps[i]!;
 			res[i] = comp;
 		}
 

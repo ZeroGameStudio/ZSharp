@@ -150,7 +150,7 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 			{
 				if (targetAttributes[i].Name == "NotNull")
 				{
-					targetAttributes[i] = new("CanBeNull");
+					targetAttributes[i] = new("AllowNull");
 				}
 			}
 		}

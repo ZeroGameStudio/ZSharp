@@ -30,15 +30,9 @@ internal class MethodGenerator
 		string methodDecl = $"{declList}({parameterList})";
 		sb.Append(methodDecl);
 
-		if (definition.IsPureVirtual)
+		if (definition.Body is not null)
 		{
-			sb.Append(" => throw Thrower.NotImplemented();");
-		}
-		else if (definition.Body is not null)
-		{
-			string body = _bodyGenerator.Generate(definition.Body.Value);
-			sb.AppendLine();
-			sb.Append(body);
+			sb.Append(_bodyGenerator.Generate(definition.Body.Value, definition.IsSingleLine));
 		}
 		else
 		{

@@ -5,7 +5,7 @@ namespace ZeroGames.ZSharp.Build.Glue;
 public static class NamespaceHelper
 {
 
-	public static SortedSet<string> LootNamespace(ExportedClass cls)
+	public static SortedSet<string> LootNamespace(ExportedClass cls, bool includeMethodInterface)
 	{
 		SortedSet<string> res = [];
 		LootNamespace(cls.BaseType, res);
@@ -16,6 +16,11 @@ public static class NamespaceHelper
 		
 		foreach (var method in cls.Methods)
 		{
+			if (includeMethodInterface)
+			{
+				LootNamespace(method.OwnerInterface, res);
+			}
+			
 			foreach (var parameter in method.Parameters)
 			{
 				LootNamespace(parameter.Type, res);

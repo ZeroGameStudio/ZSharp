@@ -4,6 +4,7 @@
 #include "ZDynamicallyExportedMethod.h"
 
 #include "ZDynamicallyExportedParameter.h"
+#include "ZExportHelper.h"
 #include "Reflection/ZReflectionHelper.h"
 
 ZSharp::FZDynamicallyExportedMethod* ZSharp::FZDynamicallyExportedMethod::Create(const UFunction* function)
@@ -54,6 +55,17 @@ FString ZSharp::FZDynamicallyExportedMethod::GetZCallName() const
 	return FString::Printf(TEXT("%s%s"), isVirtual ? GVirtualZCallProtocol : GFinalZCallProtocol, *Function->GetPathName());
 }
 
+ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedMethod::GetOwnerInterface() const
+{
+	const UClass* owner = Function->GetOwnerClass();
+	if (owner->HasAllClassFlags(CLASS_Interface))
+	{
+		return FZExportHelper::GetUFieldFullyExportedName(owner);
+	}
+
+	return {};
+}
+
 void ZSharp::FZDynamicallyExportedMethod::ForeachParameter(TFunctionRef<void(const IZExportedParameter&)> action) const
 {
 	for (const auto& param : Parameters)
@@ -67,7 +79,9 @@ ZSharp::FZDynamicallyExportedMethod::FZDynamicallyExportedMethod(const UFunction
 	, Function(function)
 	, Flags(EZExportedMethodFlags::None)
 {
-	if (Function->HasAllFunctionFlags(FUNC_Public) || Function->GetBoolMetaData("AllowPrivateAccess"))
+	if (Function->GetOwnerClass()->HasAllClassFlags(CLASS_Interface) ||
+		Function->HasAllFunctionFlags(FUNC_Public) ||
+		Function->GetBoolMetaData("AllowPrivateAccess"))
 	{
 		Flags |= EZExportedMethodFlags::Public;
 	}

@@ -24,6 +24,7 @@ namespace ZSharp
 	public:
 		virtual EZExportedMethodFlags GetFlags() const = 0;
 		virtual FString GetZCallName() const = 0;
+		virtual FZFullyExportedTypeName GetOwnerInterface() const = 0;
 		virtual void ForeachParameter(TFunctionRef<void(const IZExportedParameter&)> action) const = 0;
 	public:
 		bool HasAnyFlags(EZExportedMethodFlags flags) const { return !!(GetFlags() & flags); }

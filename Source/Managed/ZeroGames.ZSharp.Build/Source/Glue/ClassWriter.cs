@@ -25,7 +25,7 @@ public class ClassWriter
 	{
 		EExportedClassKind classKind = _exportedClass.IsClass ? EExportedClassKind.Class : _exportedClass.IsInterface ? EExportedClassKind.Interface : _exportedClass.IsStruct ? EExportedClassKind.Struct : _exportedClass.IsPlain ? EExportedClassKind.Plain : throw new NotSupportedException();
 		ExportedClassBuilder builder = new(abstraction, classKind, _exportedClass.Namespace, _exportedClass.Name, _exportedClass.UnrealFieldPath);
-		var usings = NamespaceHelper.LootNamespace(_exportedClass).Where(ns => ns != _exportedClass.Namespace);
+		var usings = NamespaceHelper.LootNamespace(_exportedClass, !abstraction).Where(ns => ns != _exportedClass.Namespace);
 		foreach (var ns in usings)
 		{
 			builder.AddUsingNamespace(ns);
@@ -83,6 +83,7 @@ public class ClassWriter
 
 			bool hasOutParameter = method.Parameters.Any(p => p is { IsReturn: false, IsOut: true });
 			bool hasDefaultValue = false;
+			bool hasDefaultValueSignature = abstraction || !_exportedClass.IsInterface && method.IsInterfaceMethod;
 			foreach (var parameter in method.Parameters)
 			{
 				if (parameter.IsReturn)
@@ -95,7 +96,7 @@ public class ClassWriter
 				ParameterDefaultValue defaultValue = default;
 				if (!hasOutParameter)
 				{
-					defaultValue = abstraction ? new(new(parameter.DefaultValue.Signature.Text), new(parameter.DefaultValue.Body.Text)) : new(default, new(parameter.DefaultValue.Body.Text));
+					defaultValue = hasDefaultValueSignature ? new(new(parameter.DefaultValue.Signature.Text), new(parameter.DefaultValue.Body.Text)) : new(default, new(parameter.DefaultValue.Body.Text));
 					if (abstraction)
 					{
 						if (!string.IsNullOrWhiteSpace(defaultValue.Signature.Content))
@@ -115,13 +116,22 @@ public class ClassWriter
 
 			TypeReference? returnType = method.ReturnParameter?.Type.ToString() is {} returnTypeName ? new(returnTypeName, method.ReturnParameter.UnderlyingType) : null;
 			
+			if (!_exportedClass.IsInterface && method.IsInterfaceMethod)
+			{
+				if (!abstraction)
+				{
+					builder.AddInterfaceMethod(method.OwnerInterface.ToString(false), method.Name, returnType, parameters.ToArray());
+				}
+				continue;
+			}
+			
 			builder.AddMethod(visibility, false, @static, method.Name, method.ZCallName, returnType, parameters.ToArray());
 			if (!abstraction)
 			{
 				builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{method.ZCallName.Split(':').Last()}");
 			}
 
-			if (method.IsVirtual && !_exportedClass.IsInterface /* @FIXME: Interface event implementation */)
+			if (method is { IsVirtual: true, IsInterfaceMethod: false } /* @TODO: Interface event implementation */)
 			{
 				// Ignoring abstract allows to call parent on both virtual and abstract functions,
 				// providing a unified approach that reduces cognitive load, but would slightly decrease performance.
@@ -212,9 +222,9 @@ public class ClassWriter
 	private const string UNREAL_OBJECT_BASE_TYPE_NAME = "UnrealObjectBase";
 	private const string UNREAL_SCRIPT_STRUCT_BASE_TYPE_NAME = "UnrealScriptStructBase";
 	
-	private ExportedClass _exportedClass;
-	private string _abstractionFilePath;
-	private string _implementationFilePath;
+	private readonly ExportedClass _exportedClass;
+	private readonly string _abstractionFilePath;
+	private readonly string _implementationFilePath;
 
 }
 

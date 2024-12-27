@@ -53,7 +53,7 @@ public class DelegateWriter
 		sw.Write(content);
 	}
 
-	private ExportedDelegate _exportedDelegate;
-	private string _filePath;
+	private readonly ExportedDelegate _exportedDelegate;
+	private readonly string _filePath;
 
 }

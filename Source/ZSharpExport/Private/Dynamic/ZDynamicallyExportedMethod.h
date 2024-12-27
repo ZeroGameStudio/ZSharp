@@ -16,6 +16,7 @@ namespace ZSharp
 		virtual FString GetName() const override;
 		virtual EZExportedMethodFlags GetFlags() const override;
 		virtual FString GetZCallName() const override;
+		virtual FZFullyExportedTypeName GetOwnerInterface() const override;
 		virtual void ForeachParameter(TFunctionRef<void(const IZExportedParameter&)> action) const override;
 
 	private:

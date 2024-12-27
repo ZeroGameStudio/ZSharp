@@ -64,6 +64,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 		FZExportedMethodDto methodDto;
 		methodDto.Name = method.GetName();
 		methodDto.ZCallName = method.GetZCallName();
+		methodDto.OwnerInterface = method.GetOwnerInterface();
 		methodDto.Flags = static_cast<__underlying_type(EZExportedMethodFlags)>(method.GetFlags());
 		method.ForeachParameter([&methodDto](const IZExportedParameter& param)
 		{

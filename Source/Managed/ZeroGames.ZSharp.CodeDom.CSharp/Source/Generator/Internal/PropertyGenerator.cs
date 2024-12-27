@@ -45,12 +45,12 @@ internal class PropertyGenerator
 			List<string> accessors = new();
 			if (definition.HasGetter)
 			{
-				accessors.Add($"get{Environment.NewLine}{_bodyGenerator.Generate(definition.Getter!.Value)}");
+				accessors.Add($"get{_bodyGenerator.Generate(definition.Getter!.Value, false)}");
 			}
 			
 			if (definition.HasSetter)
 			{
-				accessors.Add($"set{Environment.NewLine}{_bodyGenerator.Generate(definition.Setter!.Value)}");
+				accessors.Add($"set{_bodyGenerator.Generate(definition.Setter!.Value, false)}");
 			}
 			
 			string accessorBody = string.Join(Environment.NewLine, accessors);

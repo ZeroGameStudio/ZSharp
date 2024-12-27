@@ -110,6 +110,7 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 		{
 			Flags |= EZExportedClassFlags::Class;
 
+			TSet<const UClass*> exportedInterfaces;
 			for (const auto& interface : uclass->Interfaces)
 			{
 				check(interface.Class->IsNative());
@@ -119,7 +120,7 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 					continue;
 				}
 
-				if (mappedInterface == UInterface::StaticClass())
+				if (mappedInterface == UInterface::StaticClass() || mappedInterface == UObject::StaticClass())
 				{
 					continue;
 				}
@@ -131,6 +132,63 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 				}
 
 				Interfaces.Emplace(name);
+
+				for (auto currentInterfaceClass = CastChecked<UClass>(mappedInterface); currentInterfaceClass != UInterface::StaticClass(); currentInterfaceClass = currentInterfaceClass->GetSuperClass())
+				{
+					if (!FZReflectionHelper::IsFieldModuleMapped(currentInterfaceClass))
+					{
+						continue;
+					}
+					
+					for (const UClass* super = uclass->GetSuperClass(); super; super = super->GetSuperClass())
+					{
+						if (super->ImplementsInterface(currentInterfaceClass))
+						{
+							// If some super class also implements this interface,
+							// then it should have already exported interface meth.
+							exportedInterfaces.Emplace(currentInterfaceClass);
+						}
+					}
+
+					if (exportedInterfaces.Contains(currentInterfaceClass))
+					{
+						continue;
+					}
+					exportedInterfaces.Emplace(currentInterfaceClass);
+					
+					for (TFieldIterator<UFunction> it(currentInterfaceClass, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+					{
+						const UFunction* function = *it;
+
+						// If we found a blueprint event,
+						// then this is a blueprint implementable interface,
+						// which means it doesn't have native UFunction.
+						if (function->HasAllFunctionFlags(FUNC_BlueprintEvent))
+						{
+							break;
+						}
+
+						// If implementation class itself has a UFunction with the same name with interface,
+						// then only export class version.
+						if (uclass->FindFunctionByName(function->GetFName(), EIncludeSuperFlag::ExcludeSuper))
+						{
+							continue;
+						}
+
+						if (!FZExportHelper::ShouldExportFieldBySettings(function))
+						{
+							continue;
+						}
+
+						FZDynamicallyExportedMethod* exportedMethod = FZDynamicallyExportedMethod::Create(function);
+						if (!exportedMethod)
+						{
+							continue;
+						}
+
+						Methods.Emplace(exportedMethod);
+					}
+				}
 			}
 		}
 	}

@@ -43,7 +43,20 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 		MethodDefinition method = new(visibility, name, returnType, parameters)
 		{
 			Modifiers = EMemberModifiers.Virtual,
-			IsPureVirtual = true,
+			Body = new("throw Thrower.NotImplemented();"),
+			IsSingleLine = true,
+		};
+		_methods.Add(method);
+
+		return method;
+	}
+
+	public MethodDefinition AddInterfaceMethod(string interfaceName, string name, TypeReference? returnType, params ParameterDeclaration[]? parameters)
+	{
+		MethodDefinition method = new(EMemberVisibility.Public, name, returnType, parameters)
+		{
+			Body = new InterfaceMethodBodyBuilder(interfaceName, name, returnType, parameters).Build(),
+			IsSingleLine = true,
 		};
 		_methods.Add(method);
 

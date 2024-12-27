@@ -36,6 +36,11 @@ public class ClassWriter
 		{
 			builder.AddAttributeBefore("Hashable");
 		}
+
+		if (abstraction && _exportedClass.IsImplementableInterface)
+		{
+			builder.AddAttributeBefore("Implementable");
+		}
 		
 		if (!abstraction && _exportedClass.ConjugateRegistryId > 0)
 		{
@@ -68,9 +73,11 @@ public class ClassWriter
 		{
 			EMemberVisibility visibility = method.IsPublic ? EMemberVisibility.Public : method.IsProtected ? EMemberVisibility.Protected : EMemberVisibility.Private;
 
+			bool @static = method.IsStatic;
 			List<ParameterDeclaration> parameters = new();
-			if (_exportedClass.IsInterface)
+			if (_exportedClass.IsImplementableInterface)
 			{
+				@static = true;
 				parameters.Add(new(EParameterKind.In, new("UnrealObject", null), "@this"));
 			}
 
@@ -108,13 +115,13 @@ public class ClassWriter
 
 			TypeReference? returnType = method.ReturnParameter?.Type.ToString() is {} returnTypeName ? new(returnTypeName, method.ReturnParameter.UnderlyingType) : null;
 			
-			builder.AddMethod(visibility, false, method.IsStatic, method.Name, method.ZCallName, returnType, parameters.ToArray());
+			builder.AddMethod(visibility, false, @static, method.Name, method.ZCallName, returnType, parameters.ToArray());
 			if (!abstraction)
 			{
 				builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{method.ZCallName.Split(':').Last()}");
 			}
 
-			if (method.IsVirtual)
+			if (method.IsVirtual && !_exportedClass.IsInterface /* @FIXME: Interface event implementation */)
 			{
 				// Ignoring abstract allows to call parent on both virtual and abstract functions,
 				// providing a unified approach that reduces cognitive load, but would slightly decrease performance.

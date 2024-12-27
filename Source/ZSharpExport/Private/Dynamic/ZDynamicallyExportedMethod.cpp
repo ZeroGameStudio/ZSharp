@@ -80,8 +80,7 @@ ZSharp::FZDynamicallyExportedMethod::FZDynamicallyExportedMethod(const UFunction
 		Flags |= EZExportedMethodFlags::Private;
 	}
 
-	const UClass* owner = Function->GetOwnerClass();
-	if (owner->HasAllClassFlags(CLASS_Interface) || Function->HasAllFunctionFlags(FUNC_Static))
+	if (Function->HasAllFunctionFlags(FUNC_Static))
 	{
 		Flags |= EZExportedMethodFlags::Static;
 	}

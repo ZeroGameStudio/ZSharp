@@ -12,6 +12,7 @@ public enum EExportedClassFlags : uint64
 	Interface = 1 << 3,
 	Abstract = 1 << 4,
 	Hashable = 1 << 5,
+	Implementable = 1 << 6,
 }
 
 public class ExportedClass : ExportedType
@@ -30,6 +31,7 @@ public class ExportedClass : ExportedType
 	public bool IsInterface => Flags.HasFlag(EExportedClassFlags.Interface);
 	public bool IsAbstract => Flags.HasFlag(EExportedClassFlags.Abstract);
 	public bool IsHashableStruct => IsStruct && Flags.HasFlag(EExportedClassFlags.Hashable);
+	public bool IsImplementableInterface => IsInterface && Flags.HasFlag(EExportedClassFlags.Implementable);
 }
 
 

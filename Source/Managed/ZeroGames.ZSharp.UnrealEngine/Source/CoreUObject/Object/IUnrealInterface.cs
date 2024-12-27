@@ -2,6 +2,6 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public partial interface IUnrealInterface : IUnrealObject;
+public partial interface IUnrealInterface : IUnrealObject, IConjugate;
 
 

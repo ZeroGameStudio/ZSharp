@@ -104,16 +104,11 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 	{
 		if (uclass->HasAnyClassFlags(CLASS_Interface))
 		{
-			Flags |= EZExportedClassFlags::Interface;
+			Flags |= EZExportedClassFlags::Interface | EZExportedClassFlags::Implementable;
 		}
 		else
 		{
 			Flags |= EZExportedClassFlags::Class;
-			// Force UObject to non-abstract because it is used as the fallback concrete type for those non-exported conjugates.
-			if (uclass->HasAnyClassFlags(CLASS_Abstract) && uclass != UObject::StaticClass())
-			{
-				Flags |= EZExportedClassFlags::Abstract;
-			}
 
 			for (const auto& interface : uclass->Interfaces)
 			{
@@ -155,12 +150,18 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 
 	for (TFieldIterator<UFunction> it(Struct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
 	{
-		if (!FZExportHelper::ShouldExportFieldBySettings(*it))
+		const UFunction* function = *it;
+		if ((Flags & EZExportedClassFlags::Implementable) != EZExportedClassFlags::None && !function->HasAnyFunctionFlags(FUNC_BlueprintEvent))
+		{
+			Flags &= ~EZExportedClassFlags::Implementable;
+		}
+		
+		if (!FZExportHelper::ShouldExportFieldBySettings(function))
 		{
 			continue;
 		}
 
-		FZDynamicallyExportedMethod* exportedMethod = FZDynamicallyExportedMethod::Create(*it);
+		FZDynamicallyExportedMethod* exportedMethod = FZDynamicallyExportedMethod::Create(function);
 		if (!exportedMethod)
 		{
 			continue;

@@ -11,6 +11,10 @@
 		"ZeroGames.ZSharp.Core",
 		"ZeroGames.ZSharp.Core.UnrealEngine"
 	],
+	"ExternalReferences":
+	[
+		"../../../Precompiled/ForwardShared/ZeroGames.Pooling.dll"
+	],
 	"Usings":
 	[
 		"ZeroGames.ZSharp.Core",

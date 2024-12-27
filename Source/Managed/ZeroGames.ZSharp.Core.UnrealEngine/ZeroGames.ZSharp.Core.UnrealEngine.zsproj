@@ -10,6 +10,10 @@
 	[
 		"ZeroGames.ZSharp.Core"
 	],
+	"ExternalReferences":
+	[
+		"../../../Precompiled/ForwardShared/ZeroGames.Pooling.dll"
+	],
 	"Usings":
 	[
 		"ZeroGames.ZSharp.Core"

@@ -2,12 +2,12 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-internal class ZeroTaskBackend_Yield : PoolableZeroTaskBackendBase<float, ZeroTaskBackend_Yield>
+internal class ZeroTaskBackend_Yield : PooledZeroTaskBackendBase<float, ZeroTaskBackend_Yield>
 {
 	
 	public static ZeroTaskBackend_Yield GetFromPool(EEventLoopTickingGroup tickingGroup, Lifecycle lifecycle)
 	{
-		var task = Pool.Pop();
+		var task = InternalGetFromPool();
 		task._tickingGroup = tickingGroup;
 		task.Lifecycle = lifecycle;
 

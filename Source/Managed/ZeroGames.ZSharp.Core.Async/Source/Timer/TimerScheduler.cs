@@ -2,6 +2,7 @@
 
 using System.Diagnostics;
 using System.Numerics;
+using ZeroGames.Pooling;
 
 namespace ZeroGames.ZSharp.Core.Async;
 
@@ -216,18 +217,15 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		}
 	}
 
-	private class TimerData
+	private class TimerData : IPooled
 	{
 		
-		public static TimerData GetFromPool()
-		{
-			TimerData data = _head ?? new();
-			_head = data._next;
-			data._next = null;
-			return data;
-		}
+		public static TimerData GetFromPool() => _pool.Get();
+		
+		public void ReturnToPool() => _pool.Return(this);
 
-		public void ReturnToPool()
+		void IPooled.PreGetFromPool(){}
+		void IPooled.PreReturnToPool()
 		{
 			StartTime = T.Zero;
 			StatelessCallback = null;
@@ -240,9 +238,6 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 			StatelessOnExpired = null;
 			StatefulOnExpired = null;
 			SuspendVersion = 0;
-			
-			_next = _head;
-			_head = this;
 		}
 		
 		// The following properties need to initialize manually.
@@ -260,10 +255,7 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		
 		public T TriggerTime => StartTime + Rate;
 
-		private static TimerData? _head;
-
-		private TimerData? _next;
-		
+		private static ObjectPool<TimerData> _pool = new(new PoolingConfigProvider<TimerData>());
 	}
 
 	private struct RoundedAccumulatedTime

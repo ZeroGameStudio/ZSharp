@@ -17,6 +17,7 @@ namespace ZSharp
 		virtual FString GetName() const override;
 		virtual FString GetModule() const override;
 		virtual FString GetUnrealFieldPath() const override;
+		virtual FString GetConjugateKey() const override;
 		virtual EZExportedDelegateFlags GetFlags() const override;
 		virtual void ForeachParameter(TFunctionRef<void(const IZExportedParameter&)> action) const override;
 

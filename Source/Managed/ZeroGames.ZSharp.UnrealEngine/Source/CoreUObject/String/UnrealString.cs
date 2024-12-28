@@ -9,6 +9,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(11)]
+[ConjugateKey("Unreal.String")]
 public sealed class UnrealString : UnrealConjugateBase
     , IConjugate<UnrealString>
     , ICloneable<UnrealString>

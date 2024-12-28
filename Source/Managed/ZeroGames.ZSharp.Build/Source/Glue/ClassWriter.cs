@@ -46,6 +46,11 @@ public class ClassWriter
 		{
 			builder.AddAttributeAfter("ConjugateRegistryId", _exportedClass.ConjugateRegistryId.ToString());
 		}
+
+		if (!abstraction && !_exportedClass.IsInterface)
+		{
+			builder.AddAttributeAfter("ConjugateKey", $"\"{_exportedClass.ConjugateKey}\"");
+		}
 		
 		// Base type
 		if (GetBaseType() is { } baseType)

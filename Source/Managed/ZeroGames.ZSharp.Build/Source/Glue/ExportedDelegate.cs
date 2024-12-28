@@ -12,6 +12,7 @@ public enum EExportedDelegateFlags : uint64
 
 public class ExportedDelegate : ExportedType
 {
+	public required string ConjugateKey { get; set; }
 	public required EExportedDelegateFlags Flags { get; set; }
 	public required List<ExportedParameter> Parameters { get; set; }
 

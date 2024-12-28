@@ -19,6 +19,7 @@ public class ExportedClass : ExportedType
 {
 	public ExportedClass() => SlotType = EZCallBufferSlotType.Conjugate;
 	public uint16 ConjugateRegistryId { get; set; }
+	public required string ConjugateKey { get; set; }
 	public required EExportedClassFlags Flags { get; set; }
 	public FullyExportedTypeName BaseType { get; set; }
 	public required List<FullyExportedTypeName> Interfaces { get; set; }

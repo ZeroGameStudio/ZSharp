@@ -6,6 +6,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(24)]
+[ConjugateKey("Unreal.WeakObjectPtr")]
 public sealed class WeakObjectPtr<T> : WeakObjectPtrBase
 	, IConjugate<WeakObjectPtr<T>>
 	, ICloneable<WeakObjectPtr<T>>

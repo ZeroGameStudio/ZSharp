@@ -5,8 +5,6 @@ namespace ZeroGames.ZSharp.Emit.Specifier;
 public class WithValidationAttribute : FunctionSpecifierBase
 {
 	public override IEnumerable<Type> HierarchicalRequirements => [ typeof(RemoteFunctionSpecifierBase) ];
-	
-	public string? Implementation { get; init; }
 }
 
 

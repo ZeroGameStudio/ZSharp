@@ -4,7 +4,6 @@
 
 #include "ALC/IZMasterAssemblyLoadContext.h"
 
-#include "Interop/ZGCHandle.h"
 #include "ZCall/IZCallDispatcher.h"
 #include "ZCall/IZCallResolver.h"
 #include "Conjugate/IZConjugateRegistry.h"
@@ -28,8 +27,8 @@ namespace ZSharp
 		virtual EZInvokeMethodErrorCode InvokeMethod(const FString& assemblyName, const FString& typeName, const FString& methodName, void* args) override;
 
 		// IZMasterAssemblyLoadContext
-		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeUri& uri) override;
-
+		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeUri& uri) const override;
+		
 		virtual IZConjugateRegistry& GetConjugateRegistry(uint16 id) const override;
 		virtual void* BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type) override;
 		virtual void ReleaseConjugate(void* unmanaged) override;

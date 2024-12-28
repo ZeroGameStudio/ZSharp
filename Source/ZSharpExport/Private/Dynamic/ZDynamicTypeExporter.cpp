@@ -7,7 +7,6 @@
 #include "ZDynamicallyExportedDelegate.h"
 #include "ZDynamicallyExportedEnum.h"
 #include "Emit/IZSharpFieldRegistry.h"
-#include "Reflection/ZReflectionHelper.h"
 #include "ZExportHelper.h"
 
 void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies)
@@ -21,7 +20,7 @@ void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies)
 			continue;
 		}
 		
-		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetFieldAssemblyName(*it)))
+		if (!assemblies.IsEmpty() && !assemblies.Contains(FZExportHelper::GetFieldAssemblyName(*it)))
 		{
 			continue;
 		}
@@ -36,7 +35,7 @@ void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies)
 			continue;
 		}
 		
-		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetFieldAssemblyName(*it)))
+		if (!assemblies.IsEmpty() && !assemblies.Contains(FZExportHelper::GetFieldAssemblyName(*it)))
 		{
 			continue;
 		}
@@ -56,7 +55,7 @@ void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies)
 			continue;
 		}
 		
-		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetFieldAssemblyName(*it)))
+		if (!assemblies.IsEmpty() && !assemblies.Contains(FZExportHelper::GetFieldAssemblyName(*it)))
 		{
 			continue;
 		}
@@ -71,7 +70,7 @@ void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies)
 			continue;
 		}
 		
-		if (!assemblies.IsEmpty() && !assemblies.Contains(FZReflectionHelper::GetFieldAssemblyName(*it)))
+		if (!assemblies.IsEmpty() && !assemblies.Contains(FZExportHelper::GetFieldAssemblyName(*it)))
 		{
 			continue;
 		}

@@ -6,6 +6,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(25)]
+[ConjugateKey("Unreal.LazyObjectPtr")]
 public sealed class LazyObjectPtr<T> : LazyObjectPtrBase
 	, IConjugate<LazyObjectPtr<T>>
 	, ICloneable<LazyObjectPtr<T>>

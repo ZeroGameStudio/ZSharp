@@ -20,7 +20,7 @@ partial class ManifestBuilder
 			Outer = classDef,
 			FunctionFlags = EFunctionFlags.FUNC_Native,
 			Name = functionModel.Name,
-			ZCallName = $"nm://{functionModel.Outer.AssemblyName}:{functionModel.Outer.FullName}:{functionModel.Name}",
+			ZCallName = functionModel.Name,
 		};
 		
 		// Early out for event override because what we need is only a flag.

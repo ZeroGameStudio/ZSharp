@@ -10,6 +10,15 @@ namespace ZSharp
 	struct ZSHARPEXPORT_API FZExportHelper
 	{
 
+		static FString GetFieldRedirectedName(FFieldVariant field);
+		static FString GetFieldRedirectedFullName(FFieldVariant field);
+
+		static FString GetFieldModuleName(FFieldVariant field);
+		static FString GetFieldAssemblyName(FFieldVariant field);
+
+		static bool IsFieldModuleMapped(FFieldVariant field);
+		static const UField* GetUFieldClosestMappedAncestor(const UField* field);
+
 		static FString GetUFieldExportKey(const UField* field);
 		static FZFullyExportedTypeName GetUFieldFullyExportedName(const UField* field);
 		static FZFullyExportedTypeName GetFPropertyFullyExportedTypeName(const FProperty* property);

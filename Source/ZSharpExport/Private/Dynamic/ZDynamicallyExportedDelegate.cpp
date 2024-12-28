@@ -5,6 +5,7 @@
 
 #include "ZExportedTypeRegistry.h"
 #include "ZDynamicallyExportedParameter.h"
+#include "ZExportHelper.h"
 #include "Reflection/ZReflectionHelper.h"
 
 ZSharp::FZDynamicallyExportedDelegate* ZSharp::FZDynamicallyExportedDelegate::Create(const UDelegateFunction* signature)
@@ -31,17 +32,22 @@ ZSharp::FZDynamicallyExportedDelegate* ZSharp::FZDynamicallyExportedDelegate::Cr
 
 FString ZSharp::FZDynamicallyExportedDelegate::GetName() const
 {
-	return FZReflectionHelper::GetFieldRedirectedFullName(Signature);
+	return FZExportHelper::GetFieldRedirectedFullName(Signature);
 }
 
 FString ZSharp::FZDynamicallyExportedDelegate::GetModule() const
 {
-	return FZReflectionHelper::GetFieldModuleName(Signature);
+	return FZExportHelper::GetFieldModuleName(Signature);
 }
 
 FString ZSharp::FZDynamicallyExportedDelegate::GetUnrealFieldPath() const
 {
 	return Signature->GetPathName();
+}
+
+FString ZSharp::FZDynamicallyExportedDelegate::GetConjugateKey() const
+{
+	return FZReflectionHelper::GetFieldConjugateKey(Signature);
 }
 
 ZSharp::EZExportedDelegateFlags ZSharp::FZDynamicallyExportedDelegate::GetFlags() const

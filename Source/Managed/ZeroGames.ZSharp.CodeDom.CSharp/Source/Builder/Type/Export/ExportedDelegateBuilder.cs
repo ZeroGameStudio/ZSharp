@@ -9,13 +9,14 @@ public enum EExportedDelegateKind
 	Sparse,
 }
 
-public class ExportedDelegateBuilder(string namespaceName, string typeName, string? unrealFieldPath, EExportedDelegateKind kind) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, unrealFieldPath)
+public class ExportedDelegateBuilder(string namespaceName, string typeName, string? unrealFieldPath, EExportedDelegateKind kind, string conjugateKey) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, unrealFieldPath)
 {
 	
 	public EExportedDelegateKind Kind { get; } = kind;
 	public TypeReference? ReturnType { get; set; }
 	public ParameterDeclaration[]? Parameters { get; set; }
 	public string? OuterClassName { get; set; }
+	public string ConjugateKey { get; set; } = conjugateKey;
 
 	protected override ClassDefinition? GetOuterClassDefinition()
 	{
@@ -35,6 +36,8 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 	protected override void BuildTypeDefinition(ClassDefinition definition)
 	{
 		base.BuildTypeDefinition(definition);
+		
+		AddAttributeAfter("ConjugateKey", $"\"{ConjugateKey}\"");
 		
 		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}(Signature @delegate) => base.{BindMethodName}(@delegate);"));
 		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state) => base.{BindMethodName}(@delegate, state);"));

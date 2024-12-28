@@ -61,45 +61,12 @@ ZSharp::EZInvokeMethodErrorCode ZSharp::FZMasterAssemblyLoadContext::InvokeMetho
 	return FZMasterAssemblyLoadContext_Interop::GInvokeMethod(*assemblyName, *typeName, *methodName, args);
 }
 
-ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const FZRuntimeTypeUri& uri)
+ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const FZRuntimeTypeUri& uri) const
 {
 	check(IsInGameThread());
 
-	TFunction<FZInteropRuntimeTypeUri(const FZRuntimeTypeUri&)> convert;
-	convert = [&convert](const FZRuntimeTypeUri& cur)
-	{
-		const int32 num = cur.TypeParameters.Num();
-		
-		FZInteropRuntimeTypeUri interopLocator;
-		interopLocator.AssemblyName = *cur.AssemblyName;
-		interopLocator.TypeName = *cur.TypeName;
-		interopLocator.TypeParameters = num ? new FZInteropRuntimeTypeUri[cur.TypeParameters.Num()] : nullptr;
-		interopLocator.NumTypeParameters = num;
-		for (int32 i = 0; i < num; ++i)
-		{
-			interopLocator.TypeParameters[i] = convert(cur.TypeParameters[i]);
-		}
-		
-		return interopLocator;
-	};
-
-	TFunction<void(const FZInteropRuntimeTypeUri&)> free;
-	free = [&free](const FZInteropRuntimeTypeUri& cur)
-	{
-		for (int32 i = cur.NumTypeParameters - 1; i >= 0; --i)
-		{
-			free(cur.TypeParameters[i]);
-		}
-		
-		delete[] cur.TypeParameters;
-	};
-
-	const FZInteropRuntimeTypeUri interopLocator = convert(uri);
-	
-	FZRuntimeTypeHandle handle = FZMasterAssemblyLoadContext_Interop::GGetType(interopLocator);
-
-	free(interopLocator);
-
+	FZInteropRuntimeTypeUri interopUri { *uri.Uri };
+	FZRuntimeTypeHandle handle = FZMasterAssemblyLoadContext_Interop::GGetType(interopUri);
 	return handle;
 }
 

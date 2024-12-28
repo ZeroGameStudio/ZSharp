@@ -6,7 +6,7 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ALC/ZRuntimeTypeUri.h"
 #include "Conjugate/ZConjugateHandle.h"
-#include "Trait/ZManagedTypeInfo.h"
+#include "Trait/ZConjugateKey.h"
 
 namespace ZSharp
 {
@@ -62,9 +62,7 @@ namespace ZSharp
 	private:
 		FZRuntimeTypeHandle GetManagedType() const
 		{
-			FZRuntimeTypeUri uri;
-			uri.AssemblyName = TZManagedTypeInfo<ConjugateType>::GetAssemblyName();
-			uri.TypeName = TZManagedTypeInfo<ConjugateType>::GetFullName();
+			FZRuntimeTypeUri uri { TZConjugateKey<ConjugateType>::Value };
 			return Super::Alc.GetType(uri);
 		}
 

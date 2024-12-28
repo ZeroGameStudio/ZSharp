@@ -51,6 +51,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 	classDto.Module = cls.GetModule();
 	classDto.UnrealFieldPath = cls.GetUnrealFieldPath();
 	classDto.ConjugateRegistryId = cls.GetConjugateRegistryId();
+	classDto.ConjugateKey = cls.GetConjugateKey();
 	classDto.Flags = static_cast<__underlying_type(EZExportedClassFlags)>(cls.GetFlags());
 	classDto.BaseType = cls.GetBaseType();
 	cls.ForeachInterface([&classDto](const FZFullyExportedTypeName& interface)
@@ -144,6 +145,7 @@ void ZSharp::FZGlueManifestWriter::WriteDelegate(const IZExportedDelegate& deleg
 	delegateDto.Name = delegate.GetName();
 	delegateDto.Module = delegate.GetModule();
 	delegateDto.UnrealFieldPath = delegate.GetUnrealFieldPath();
+	delegateDto.ConjugateKey = delegate.GetConjugateKey();
 	delegateDto.Flags = static_cast<__underlying_type(EZExportedDelegateFlags)>(delegate.GetFlags());
 	delegate.ForeachParameter([&delegateDto](const IZExportedParameter& param)
 	{

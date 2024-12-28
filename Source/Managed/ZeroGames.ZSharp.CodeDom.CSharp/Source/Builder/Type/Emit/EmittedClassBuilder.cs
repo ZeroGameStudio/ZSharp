@@ -102,6 +102,8 @@ public class EmittedClassBuilder(string namespaceName, string typeName) : Genera
 		base.BuildTypeDefinition(definition);
 
 		definition.Modifiers |= EMemberModifiers.Unsafe;
+		
+		AddAttributeAfter("ConjugateKey", $"\"{_unrealFieldPath}\"");
 
 		foreach (var method in _methods)
 		{
@@ -143,6 +145,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName) : Genera
 
 	private readonly string _namespaceName = namespaceName;
 	private readonly string _typeName = typeName;
+	private readonly string _unrealFieldPath = $"/Script/{namespaceName.Split('.').Last()}.{typeName}";
 
 }
 

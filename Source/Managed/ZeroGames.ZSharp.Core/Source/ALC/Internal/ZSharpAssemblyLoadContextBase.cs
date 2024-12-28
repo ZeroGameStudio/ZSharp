@@ -32,6 +32,8 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
         Unloading += _ => HandleUnload();
     }
 
+    protected virtual void HandleAssemblyLoaded(Assembly assembly){}
+
     protected virtual void HandleUnload()
     {
         IsUnloaded = true;
@@ -39,7 +41,13 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
     
     private unsafe ELoadAssemblyErrorCode InternalLoadAssembly(string name, void* args, out Assembly? assembly, bool implicitly)
     {
-        return AssemblyLoadContextHelper.LoadAssembly(this, _resolver, implicitly, name, args, out assembly);
+        ELoadAssemblyErrorCode err = AssemblyLoadContextHelper.LoadAssembly(this, _resolver, implicitly, name, args, out assembly);
+        if (err == ELoadAssemblyErrorCode.Succeed)
+        {
+            HandleAssemblyLoaded(assembly!);
+        }
+        
+        return err;
     }
 
     private unsafe Assembly? HandleResolve(AssemblyLoadContext alc, AssemblyName name)

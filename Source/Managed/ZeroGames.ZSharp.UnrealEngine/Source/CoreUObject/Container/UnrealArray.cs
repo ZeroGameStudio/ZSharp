@@ -8,6 +8,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(31)]
+[ConjugateKey("Unreal.Array")]
 public sealed class UnrealArray<T> : UnrealConjugateBase
 	, IConjugate<UnrealArray<T>>
 	, IList

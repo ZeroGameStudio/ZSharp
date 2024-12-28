@@ -7,6 +7,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(22)]
+[ConjugateKey("Unreal.SoftClassPtr")]
 public sealed class SoftClassPtr<T> : SoftClassPtrBase
 	, IConjugate<SoftClassPtr<T>>
 	, ICloneable<SoftClassPtr<T>>

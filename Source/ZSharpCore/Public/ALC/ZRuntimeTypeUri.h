@@ -4,14 +4,18 @@
 
 namespace ZSharp
 {
-	/**
-	 * See ZeroGames.ZSharp.Core.RuntimeTypeUri
-	 */
-	struct FZRuntimeTypeUri
+	struct ZSHARPCORE_API FZRuntimeTypeUri
 	{
-		FString AssemblyName;
-		FString TypeName;
-		TArray<FZRuntimeTypeUri> TypeParameters;
+		FZRuntimeTypeUri() = default;
+		explicit FZRuntimeTypeUri(const FString& rootKey);
+		FZRuntimeTypeUri(const FString& rootKey, const FZRuntimeTypeUri& inner);
+		FZRuntimeTypeUri(const FString& rootKey, const FZRuntimeTypeUri& inner, const FZRuntimeTypeUri& outer);
+
+		bool IsValid() const { return !Uri.IsEmpty(); }
+		operator bool() const { return IsValid(); }
+		FString operator*() const { return Uri;}
+		
+		FString Uri;
 	};
 }
 

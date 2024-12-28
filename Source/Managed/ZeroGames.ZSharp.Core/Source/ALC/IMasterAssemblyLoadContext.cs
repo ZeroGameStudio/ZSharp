@@ -41,8 +41,7 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 	public static MasterAlcUnloadingRegistration RegisterUnloading(Action callback, int64 priority)
 		=> MasterAssemblyLoadContext.RegisterUnloading(callback, priority);
 	
-	[Pure]
-	Type? GetType(ref readonly RuntimeTypeLocator locator);
+	Type? GetType(RuntimeTypeUri uri);
 
 	ZCallHandle RegisterZCall(IZCallDispatcher dispatcher);
 	void RegisterZCallResolver(IZCallResolver resolver, int64 priority);

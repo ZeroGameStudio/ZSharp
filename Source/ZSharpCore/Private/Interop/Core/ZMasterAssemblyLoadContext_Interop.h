@@ -10,7 +10,7 @@ namespace ZSharp
 {
 	struct FZCallBuffer;
 	struct FZInteropRuntimeTypeUri;
-	
+
 	struct FZMasterAssemblyLoadContext_Interop
 	{
 		static EZCallErrorCode ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer);
@@ -21,7 +21,7 @@ namespace ZSharp
 		inline static int32(*GUnload)() = nullptr;
 		inline static EZLoadAssemblyErrorCode(*GLoadAssembly)(const TCHAR*, void*) = nullptr;
 		inline static EZInvokeMethodErrorCode(*GInvokeMethod)(const TCHAR*, const TCHAR*, const TCHAR*, void*) = nullptr;
-		inline static FZRuntimeTypeHandle(*GGetType)(const FZInteropRuntimeTypeUri&) = nullptr;
+		inline static FZRuntimeTypeHandle(*GGetType)(FZInteropRuntimeTypeUri uri) = nullptr;
 
 		inline static EZCallErrorCode(*GZCall_Red)(FZCallHandle handle, FZCallBuffer* buffer, FString* fatalMessage);
 		inline static FZCallHandle(*GGetZCallHandle_Red)(const TCHAR*);

@@ -18,6 +18,9 @@ struct FZExportedClassDto : public FZExportedTypeDto
 	uint16 ConjugateRegistryId = 0;
 
 	UPROPERTY()
+	FString ConjugateKey;
+
+	UPROPERTY()
 	uint64 Flags = 0;
 
 	UPROPERTY()

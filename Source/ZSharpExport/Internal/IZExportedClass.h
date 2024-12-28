@@ -27,6 +27,7 @@ namespace ZSharp
 	{
 	public:
 		virtual uint16 GetConjugateRegistryId() const = 0;
+		virtual FString GetConjugateKey() const = 0;
 		virtual EZExportedClassFlags GetFlags() const = 0;
 		virtual FZFullyExportedTypeName GetBaseType() const = 0;
 		virtual void ForeachInterface(TFunctionRef<void(const FZFullyExportedTypeName&)> action) const = 0;

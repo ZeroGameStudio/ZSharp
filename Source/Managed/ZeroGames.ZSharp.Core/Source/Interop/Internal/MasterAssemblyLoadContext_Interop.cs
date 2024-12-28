@@ -51,12 +51,16 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
     }
 
     [UnmanagedCallersOnly]
-    public static InteropRuntimeTypeHandle GetType(InteropRuntimeTypeUri* locator)
+    public static InteropRuntimeTypeHandle GetType(InteropRuntimeTypeUri uri)
     {
+        if (uri._uri is null)
+        {
+            return default;
+        }
+        
         try
         {
-            RuntimeTypeLocator root = new(locator);
-            return new InteropRuntimeTypeHandle(MasterAssemblyLoadContext.Instance!.GetType(ref root));
+            return new InteropRuntimeTypeHandle(MasterAssemblyLoadContext.Instance!.GetType(new(uri)));
         }
         catch (Exception ex)
         {

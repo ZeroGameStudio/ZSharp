@@ -4,9 +4,223 @@
 #include "ZExportHelper.h"
 
 #include "ZSharpExportSettings.h"
+#include "ZSharpRuntimeSettings.h"
 #include "UObject/PropertyOptional.h"
-#include "Reflection/ZReflectionHelper.h"
 #include "Trait/ZExportedTypeName.h"
+
+namespace ZExportHelper_Private
+{
+	/**
+	 * Single word name -> Add 0.
+	 * Multiple word name -> Insert _.
+	 * Example:
+	 * Equals -> Equals0
+	 * GetType -> Get_Type
+	 */
+	static void DeconflictName(FString& name)
+	{
+		TArray<int32> newWordIndices;
+		for (int32 i = name.Len() - 1; i > 0; --i)
+		{
+			if (FChar::IsUpper(name[i]))
+			{
+				newWordIndices.Emplace(i);
+			}
+		}
+
+		if (!newWordIndices.IsEmpty())
+		{
+			for (const auto& newWordIndex : newWordIndices)
+			{
+				name.InsertAt(newWordIndex, "_");
+			}
+		}
+		else
+		{
+			name.AppendInt(0);
+		}
+	}
+}
+
+FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
+{
+	if (!field)
+	{
+		return {};
+	}
+
+	// Redirect.
+	FString name = field.GetName();
+	FString redirectedName = GetDefault<UZSharpRuntimeSettings>()->RedirectFieldName(field.GetPathName());
+	if (!redirectedName.IsEmpty())
+	{
+		name = redirectedName;
+	}
+
+	// Apply rules for specific field type.
+	if (const auto cls = field.Get<UClass>())
+	{
+		if (cls->HasAllClassFlags(CLASS_Interface))
+		{
+			name.InsertAt(0, 'I');
+		}
+
+		if (cls->HasAllClassFlags(CLASS_Deprecated) && !cls->GetName().ToUpper().EndsWith("_DEPRECATED"))
+		{
+			name.Append("_DEPRECATED");
+		}
+	}
+	else if (const auto enm = field.Get<UEnum>())
+	{
+		if (!name.StartsWith("E"))
+		{
+			name.InsertAt(0, "E");
+		}
+	}
+	else if (const auto delegate = field.Get<UDelegateFunction>())
+	{
+		static const FString GDelegatePostfix = "__DelegateSignature";
+		if (delegate->HasAllFunctionFlags(FUNC_Delegate) && name.EndsWith(GDelegatePostfix))
+		{
+			name.LeftChopInline(GDelegatePostfix.Len());
+		}
+	}
+	// IMPORTANT: This must be under delegate.
+	else if (const auto function = field.Get<UFunction>())
+	{
+		if (function->HasAllFunctionFlags(FUNC_EditorOnly))
+		{
+			name.Append("_EDITORONLY");
+		}
+	}
+	else if (const auto property = field.Get<FProperty>())
+	{
+		if (property->HasAllPropertyFlags(CPF_EditorOnly))
+		{
+			name.Append("_EDITORONLY");
+		}
+
+		if (property->HasAllPropertyFlags(CPF_Deprecated) && !property->GetName().ToUpper().EndsWith("_DEPRECATED"))
+		{
+			name.Append("_DEPRECATED");
+		}
+	}
+	
+	// Check conflict with owner if field is member property or member function.
+	bool conflicts = false;
+	if (field.IsA<UFunction>() && !field.IsA<UDelegateFunction>() || field.IsA<FProperty>())
+	{
+		// Owner should always exist.
+		const auto owner = field.GetOwnerVariant().Get<UStruct>();
+		TArray structsToCheck { owner };
+		for (TFieldIterator<UDelegateFunction> it(owner); it; ++it)
+		{
+			if (*it != field.Get<UDelegateFunction>())
+			{
+				structsToCheck.Emplace(*it);
+			}
+		}
+	
+		for (const auto structToCheck : structsToCheck)
+		{
+			if (name == GetFieldRedirectedName(structToCheck))
+			{
+				conflicts = true;
+				break;
+			}
+		}
+	}
+
+	// Finally check conflict with managed root class System.Object.
+	if (!conflicts)
+	{
+		static const TSet<FString> GManagedConflicts
+		{
+			"GetType",
+			"GetHashCode",
+			"ToString",
+			"MemberwiseClone",
+			"Equals",
+			"ReferenceEquals",
+			"Finalize"
+		};
+
+		if (GManagedConflicts.Contains(name))
+		{
+			conflicts = true;
+		}
+	}
+
+	if (conflicts)
+	{
+		ZExportHelper_Private::DeconflictName(name);
+	}
+
+	return name;
+}
+
+FString ZSharp::FZExportHelper::GetFieldRedirectedFullName(FFieldVariant field)
+{
+	FString name = GetFieldRedirectedName(field);
+	if (const auto ownerField = field.GetOwnerVariant().Get<UField>())
+	{
+		name = GetFieldRedirectedFullName(ownerField).Append(".").Append(name);
+	}
+
+	return name;
+}
+
+FString ZSharp::FZExportHelper::GetFieldModuleName(FFieldVariant field)
+{
+	if (!field)
+	{
+		return {};
+	}
+	
+	FString res;
+	const bool suc = field.GetOutermost()->GetName().Split("/", nullptr, &res, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+	check(suc);
+	return res;
+}
+
+FString ZSharp::FZExportHelper::GetFieldAssemblyName(FFieldVariant field)
+{
+	const FString moduleName = GetFieldModuleName(field);
+	const FZModuleMappingContext* ctx = GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(moduleName);
+	return ctx ? ctx->AssemblyName : "";
+}
+
+bool ZSharp::FZExportHelper::IsFieldModuleMapped(FFieldVariant field)
+{
+	return !!GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(GetFieldModuleName(field));
+}
+
+const UField* ZSharp::FZExportHelper::GetUFieldClosestMappedAncestor(const UField* field)
+{
+	if (!field)
+	{
+		return nullptr;
+	}
+	
+	if (IsFieldModuleMapped(field))
+	{
+		return field;
+	}
+	
+	auto strct = Cast<UStruct>(field);
+	if (strct)
+	{
+		for (const UStruct* current = strct->GetSuperStruct(); current; current = current->GetSuperStruct())
+		{
+			if (IsFieldModuleMapped(current))
+			{
+				return current;
+			}
+		}
+	}
+
+	return nullptr;
+}
 
 FString ZSharp::FZExportHelper::GetUFieldExportKey(const UField* field)
 {
@@ -15,8 +229,8 @@ FString ZSharp::FZExportHelper::GetUFieldExportKey(const UField* field)
 		return {};
 	}
 	
-	const FString name = FZReflectionHelper::GetFieldRedirectedFullName(field);
-	const FString module = FZReflectionHelper::GetFieldModuleName(field);
+	const FString name = GetFieldRedirectedFullName(field);
+	const FString module = GetFieldModuleName(field);
 	return FString::Printf(TEXT("%s.%s"), *module, *name);
 }
 
@@ -27,14 +241,14 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetUFieldFullyExportedNa
 		return {};
 	}
 	
-	const FString assemblyName = FZReflectionHelper::GetFieldAssemblyName(field);
-	const FString moduleName = FZReflectionHelper::GetFieldModuleName(field);
+	const FString assemblyName = GetFieldAssemblyName(field);
+	const FString moduleName = GetFieldModuleName(field);
 	if (!assemblyName.Len() || !moduleName.Len())
 	{
 		return {};
 	}
 
-	return { FString::Printf(TEXT("%s.%s"), *assemblyName, *moduleName), FZReflectionHelper::GetFieldRedirectedFullName(field), field->IsA<UClass>() };
+	return { FString::Printf(TEXT("%s.%s"), *assemblyName, *moduleName), GetFieldRedirectedFullName(field), field->IsA<UClass>() };
 }
 
 ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExportedTypeName(const FProperty* property)
@@ -375,7 +589,7 @@ ZSharp::FZExportedDefaultValue ZSharp::FZExportHelper::GetParameterDefaultValue(
 		{
 			value = defaultValueText;
 		}
-		signature = FString::Printf(TEXT("%s.%s"), *FZReflectionHelper::GetFieldRedirectedName(enm), *value);
+		signature = FString::Printf(TEXT("%s.%s"), *GetFieldRedirectedName(enm), *value);
 	}
 	else if (parameter->IsA<FNumericProperty>() || parameter->IsA<FBoolProperty>())
 	{

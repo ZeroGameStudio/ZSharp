@@ -6,6 +6,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(27)]
+[ConjugateKey("Unreal.StrongObjectPtr")]
 public sealed class StrongObjectPtr<T> : StrongObjectPtrBase
 	, IConjugate<StrongObjectPtr<T>>
 	, ICloneable<StrongObjectPtr<T>>

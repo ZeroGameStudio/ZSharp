@@ -5,7 +5,6 @@
 
 #include "ZDynamicallyExportedParameter.h"
 #include "ZExportHelper.h"
-#include "Reflection/ZReflectionHelper.h"
 
 ZSharp::FZDynamicallyExportedMethod* ZSharp::FZDynamicallyExportedMethod::Create(const UFunction* function)
 {
@@ -38,7 +37,7 @@ ZSharp::FZDynamicallyExportedMethod* ZSharp::FZDynamicallyExportedMethod::Create
 
 FString ZSharp::FZDynamicallyExportedMethod::GetName() const
 {
-	return FZReflectionHelper::GetFieldRedirectedName(Function);
+	return FZExportHelper::GetFieldRedirectedName(Function);
 }
 
 ZSharp::EZExportedMethodFlags ZSharp::FZDynamicallyExportedMethod::GetFlags() const

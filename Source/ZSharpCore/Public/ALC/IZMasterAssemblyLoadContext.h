@@ -32,7 +32,7 @@ namespace ZSharp
 		 * @param uri The URI identifies a unique System.Type object.
 		 * @return An opaque handle to the instance of System.Type.
 		 */
-		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeUri& uri) = 0;
+		virtual FZRuntimeTypeHandle GetType(const FZRuntimeTypeUri& uri) const = 0;
 
 	public:
 		/**

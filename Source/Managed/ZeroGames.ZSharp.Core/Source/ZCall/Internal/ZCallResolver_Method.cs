@@ -14,15 +14,14 @@ internal sealed class ZCallResolver_Method(MasterAssemblyLoadContext alc) : IZCa
 			return null;
 		}
 
-		string[] paths = name.Substring(5).Split(':');
-		if (paths.Length != 3)
+		string[] paths = name.Substring(4).Split(':');
+		if (paths.Length != 2)
 		{
 			return null;
 		}
 		
-		(string assemblyName, string typeName, string methodName) = (paths[0], paths[1], paths[2]);
-		RuntimeTypeLocator locator = new(assemblyName, typeName);
-		Type? type = _alc.GetType(ref locator);
+		(string runtimeTypeUri, string methodName) = (paths[0], paths[1]);
+		Type? type = _alc.GetType(new(runtimeTypeUri));
 		if (type is null)
 		{
 			return null;

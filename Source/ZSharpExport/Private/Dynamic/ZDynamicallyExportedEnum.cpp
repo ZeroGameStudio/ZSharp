@@ -5,7 +5,6 @@
 
 #include "ZExportedTypeRegistry.h"
 #include "ZSharpExportSettings.h"
-#include "Reflection/ZReflectionHelper.h"
 #include "ZExportHelper.h"
 
 ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(const UEnum* uenum)
@@ -15,7 +14,7 @@ ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(con
 		return nullptr;
 	}
 
-	if (!FZReflectionHelper::IsFieldModuleMapped(uenum))
+	if (!FZExportHelper::IsFieldModuleMapped(uenum))
 	{
 		return nullptr;
 	}
@@ -32,12 +31,12 @@ ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(con
 
 FString ZSharp::FZDynamicallyExportedEnum::GetName() const
 {
-	return FZReflectionHelper::GetFieldRedirectedFullName(Enum);
+	return FZExportHelper::GetFieldRedirectedFullName(Enum);
 }
 
 FString ZSharp::FZDynamicallyExportedEnum::GetModule() const
 {
-	return FZReflectionHelper::GetFieldModuleName(Enum);
+	return FZExportHelper::GetFieldModuleName(Enum);
 }
 
 FString ZSharp::FZDynamicallyExportedEnum::GetUnrealFieldPath() const

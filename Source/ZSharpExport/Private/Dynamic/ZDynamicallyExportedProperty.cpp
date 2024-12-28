@@ -3,7 +3,6 @@
 
 #include "ZDynamicallyExportedProperty.h"
 
-#include "Reflection/ZReflectionHelper.h"
 #include "ZExportHelper.h"
 
 ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Create(const FProperty* property, int32 index)
@@ -20,7 +19,7 @@ ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Cr
 
 FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 {
-	FString name = FZReflectionHelper::GetFieldRedirectedName(Property);
+	FString name = FZExportHelper::GetFieldRedirectedName(Property);
 	if (Index)
 	{
 		name.AppendInt(Index);

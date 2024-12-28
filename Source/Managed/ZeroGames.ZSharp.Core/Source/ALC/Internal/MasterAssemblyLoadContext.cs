@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading;
 
@@ -33,53 +34,17 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             }
         }
     }
-    
-    public Type? GetType(ref readonly RuntimeTypeLocator locator)
+
+    public Type? GetType(RuntimeTypeUri uri)
     {
         this.GuardUnloaded();
-        
-        Dictionary<string, Assembly> asmLookup = Assemblies.Concat(Default.Assemblies).ToDictionary(asm => asm.GetName().Name!);
 
-        Func<RuntimeTypeLocator, Type?> combine = null!;
-        combine = locator =>
+        if (string.IsNullOrWhiteSpace(uri.Uri))
         {
-            if (!asmLookup.TryGetValue(locator.AssemblyName, out var asm))
-            {
-                return null;
-            }
+            return null;
+        }
 
-            Type? t = asm.GetType(locator.TypeName);
-            if (t is null)
-            {
-                return null;
-            }
-            
-            if (t.IsGenericType)
-            {
-                if (locator.TypeParameters is null)
-                {
-                    throw new ArgumentOutOfRangeException();
-                }
-
-                Type[] tps = new Type[locator.TypeParameters.Length];
-                for (int32 i = 0; i < tps.Length; ++i)
-                {
-                    Type? tp = combine(locator.TypeParameters[i]);
-                    if (tp is null)
-                    {
-                        return null;
-                    }
-
-                    tps[i] = tp;
-                }
-
-                return t.MakeGenericType(tps);
-            }
-
-            return t;
-        };
-
-        return combine(locator);
+        return GetTypeForCompositeKey(uri.Uri);
     }
 
     public ZCallHandle RegisterZCall(IZCallDispatcher dispatcher)
@@ -240,6 +205,28 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     
     public static MasterAssemblyLoadContext? Instance { get; private set; }
 
+    protected override void HandleAssemblyLoaded(Assembly assembly)
+    {
+        base.HandleAssemblyLoaded(assembly);
+
+        foreach (var type in assembly.GetTypes())
+        {
+            if (!type.IsClass)
+            {
+                continue;
+            }
+
+            if (type.GetCustomAttribute<ConjugateKeyAttribute>() is { } attr)
+            {
+                string key = attr.Key;
+                if (!_conjugateKeyCache.TryAdd(key, type))
+                {
+                    CoreLog.Error($"Failed to cache conjugate key [{key}] with type [{type.FullName}] because it already exists [{_conjugateKeyCache[key].FullName}].");
+                }
+            }
+        }
+    }
+
     protected override void HandleUnload()
     {
         try
@@ -293,6 +280,9 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         }
     }
     
+    private readonly record struct ConjugateRec(uint16 RegistryId, WeakReference<IConjugate> WeakRef);
+    private readonly record struct UnloadingRec(MasterAlcUnloadingRegistration Registration, Action Callback, int64 Priority);
+    
     private static void FlushPendingDisposedConjugates(object? state)
     {
         MasterAssemblyLoadContext @this = (MasterAssemblyLoadContext)state!;
@@ -318,6 +308,18 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     {
         Instance = this;
 
+        _conjugateKeyCache.TryAdd($"@{typeof(uint8).FullName}", typeof(uint8));
+        _conjugateKeyCache.TryAdd($"@{typeof(uint16).FullName}", typeof(uint16));
+        _conjugateKeyCache.TryAdd($"@{typeof(uint32).FullName}", typeof(uint32));
+        _conjugateKeyCache.TryAdd($"@{typeof(uint64).FullName}", typeof(uint64));
+        _conjugateKeyCache.TryAdd($"@{typeof(int8).FullName}", typeof(int8));
+        _conjugateKeyCache.TryAdd($"@{typeof(int16).FullName}", typeof(int16));
+        _conjugateKeyCache.TryAdd($"@{typeof(int32).FullName}", typeof(int32));
+        _conjugateKeyCache.TryAdd($"@{typeof(int64).FullName}", typeof(int64));
+        _conjugateKeyCache.TryAdd($"@{typeof(float).FullName}", typeof(float));
+        _conjugateKeyCache.TryAdd($"@{typeof(double).FullName}", typeof(double));
+        _conjugateKeyCache.TryAdd($"@{typeof(bool).FullName}", typeof(bool));
+
         RegisterZCall(new ZCallDispatcher_Delegate());
         RegisterZCallResolver(new ZCallResolver_Method(this), 1);
         RegisterZCallResolver(new ZCallResolver_Property(this), 2);
@@ -327,6 +329,49 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     {
         Thrower.ThrowIfNotInGameThread("Access Master ALC in non-game thread.");
         this.GuardUnloaded();
+    }
+    
+    private Type? GetTypeForCompositeKey(string key)
+    {
+        int32 quoteIndex = key.IndexOf('<');
+        // Early out if this is a non-generic type.
+        if (quoteIndex == -1)
+        {
+            return GetTypeForSingleKey(key);
+        }
+        
+        // Recursively fill generic arguments.
+        string rootKey = key.Substring(0, quoteIndex);
+        string[] remainingKeys = key.Substring(rootKey.Length + 1, key.Length - rootKey.Length - 2).Split(',');
+        Type? type = GetTypeForSingleKey(rootKey);
+        if (type is null)
+        {
+            return null;
+        }
+        
+        if (remainingKeys.Length == 0 || !type.IsGenericType)
+        {
+            return null;
+        }
+        
+        Type[] genericArguments = new Type[remainingKeys.Length];
+        for (int32 i = 0; i < genericArguments.Length; ++i)
+        {
+            Type? innerType = GetTypeForCompositeKey(remainingKeys[i]);
+            if (innerType is null)
+            {
+                return null;
+            }
+            genericArguments[i] = innerType;
+        }
+        
+        return type.MakeGenericType(genericArguments);
+    }
+
+    private Type? GetTypeForSingleKey(string key)
+    {
+        _conjugateKeyCache.TryGetValue(key, out var type);
+        return type;
     }
     
     private EZCallErrorCode ZCall_Black(ZCallHandle handle, ZCallBuffer* buffer)
@@ -392,11 +437,10 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 1 << 16;
 
-    private readonly record struct UnloadingRec(MasterAlcUnloadingRegistration Registration, Action Callback, int64 Priority);
-
     private static readonly List<UnloadingRec> _unloadingCallbacks = new();
     private static uint64 _unloadingHandle;
 
+    private readonly ConcurrentDictionary<string, Type> _conjugateKeyCache = new();
     private readonly Dictionary<ZCallHandle, IZCallDispatcher> _zcallMap = new();
     private readonly Dictionary<string, ZCallHandle> _zcallName2Handle = new();
     private readonly List<(IZCallResolver Resolver, int64 Priority)> _zcallResolverLink = new();
@@ -404,8 +448,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private readonly Dictionary<Type, uint16> _conjugateRegistryIdLookup = new();
     private readonly Queue<IConjugate> _pendingDisposedConjugates = new();
     private readonly Lock _pendingDisposedConjugatesLock = new();
-
-    private readonly record struct ConjugateRec(uint16 RegistryId, WeakReference<IConjugate> WeakRef);
 
 }
 

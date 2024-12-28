@@ -6,8 +6,8 @@
 #include "ZExportedTypeRegistry.h"
 #include "ZDynamicallyExportedMethod.h"
 #include "ZDynamicallyExportedProperty.h"
-#include "Reflection/ZReflectionHelper.h"
 #include "ZExportHelper.h"
+#include "Reflection/ZReflectionHelper.h"
 
 ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(const UStruct* ustruct)
 {
@@ -16,7 +16,7 @@ ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(c
 		return nullptr;
 	}
 
-	if (!FZReflectionHelper::IsFieldModuleMapped(ustruct))
+	if (!FZExportHelper::IsFieldModuleMapped(ustruct))
 	{
 		return nullptr;
 	}
@@ -33,12 +33,12 @@ ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(c
 
 FString ZSharp::FZDynamicallyExportedClass::GetName() const
 {
-	return FZReflectionHelper::GetFieldRedirectedFullName(Struct);
+	return FZExportHelper::GetFieldRedirectedFullName(Struct);
 }
 
 FString ZSharp::FZDynamicallyExportedClass::GetModule() const
 {
-	return FZReflectionHelper::GetFieldModuleName(Struct);
+	return FZExportHelper::GetFieldModuleName(Struct);
 }
 
 FString ZSharp::FZDynamicallyExportedClass::GetUnrealFieldPath() const
@@ -49,6 +49,11 @@ FString ZSharp::FZDynamicallyExportedClass::GetUnrealFieldPath() const
 uint16 ZSharp::FZDynamicallyExportedClass::GetConjugateRegistryId() const
 {
 	return 0;
+}
+
+FString ZSharp::FZDynamicallyExportedClass::GetConjugateKey() const
+{
+	return FZReflectionHelper::GetFieldConjugateKey(Struct);
 }
 
 ZSharp::EZExportedClassFlags ZSharp::FZDynamicallyExportedClass::GetFlags() const
@@ -63,7 +68,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedClass::GetBaseType(
 		return {};
 	}
 	
-	const UField* super = FZReflectionHelper::GetUFieldClosestMappedAncestor(Struct->GetSuperStruct());
+	const UField* super = FZExportHelper::GetUFieldClosestMappedAncestor(Struct->GetSuperStruct());
 	if (!super)
 	{
 		return {};
@@ -114,7 +119,7 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 			for (const auto& interface : uclass->Interfaces)
 			{
 				check(interface.Class->IsNative());
-				const UField* mappedInterface = FZReflectionHelper::GetUFieldClosestMappedAncestor(interface.Class);
+				const UField* mappedInterface = FZExportHelper::GetUFieldClosestMappedAncestor(interface.Class);
 				if (!mappedInterface)
 				{
 					continue;
@@ -135,7 +140,7 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 
 				for (auto currentInterfaceClass = CastChecked<UClass>(mappedInterface); currentInterfaceClass != UInterface::StaticClass(); currentInterfaceClass = currentInterfaceClass->GetSuperClass())
 				{
-					if (!FZReflectionHelper::IsFieldModuleMapped(currentInterfaceClass))
+					if (!FZExportHelper::IsFieldModuleMapped(currentInterfaceClass))
 					{
 						continue;
 					}

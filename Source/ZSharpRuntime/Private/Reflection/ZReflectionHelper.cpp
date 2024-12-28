@@ -3,384 +3,142 @@
 
 #include "Reflection/ZReflectionHelper.h"
 
-#include "ZSharpRuntimeSettings.h"
-#include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ALC/ZRuntimeTypeUri.h"
-#include "Trait/ZManagedTypeInfo.h"
+#include "Trait/ZConjugateKey.h"
 #include "UObject/PropertyOptional.h"
 
-namespace ZReflectionHelper_Private
+FString ZSharp::FZReflectionHelper::GetFieldConjugateKey(const UField* field)
 {
-	/**
-	 * Single word name -> Add 0.
-	 * Multiple word name -> Insert _.
-	 * Example:
-	 * Equals -> Equals0
-	 * GetType -> Get_Type
-	 */
-	static void DeconflictName(FString& name)
-	{
-		TArray<int32> newWordIndices;
-		for (int32 i = name.Len() - 1; i > 0; --i)
-		{
-			if (FChar::IsUpper(name[i]))
-			{
-				newWordIndices.Emplace(i);
-			}
-		}
-
-		if (!newWordIndices.IsEmpty())
-		{
-			for (const auto& newWordIndex : newWordIndices)
-			{
-				name.InsertAt(newWordIndex, "_");
-			}
-		}
-		else
-		{
-			name.AppendInt(0);
-		}
-	}
+	return field->GetPathName();
 }
 
-FString ZSharp::FZReflectionHelper::GetFieldRedirectedName(FFieldVariant field)
+FString ZSharp::FZReflectionHelper::GetFieldClassConjugateKey(const FFieldClass* cls)
 {
-	if (!field)
+	static const TMap<FFieldClass*, FString> GProtoMap
 	{
-		return {};
-	}
+		{ FByteProperty::StaticClass(), TZConjugateKey<uint8>::Value },
+		{ FUInt16Property::StaticClass(), TZConjugateKey<uint16>::Value },
+		{ FUInt32Property::StaticClass(), TZConjugateKey<uint32>::Value },
+		{ FUInt64Property::StaticClass(), TZConjugateKey<uint64>::Value },
+		{ FInt8Property::StaticClass(), TZConjugateKey<int8>::Value },
+		{ FInt16Property::StaticClass(), TZConjugateKey<int16>::Value },
+		{ FIntProperty::StaticClass(), TZConjugateKey<int32>::Value },
+		{ FInt64Property::StaticClass(), TZConjugateKey<int64>::Value },
+		{ FFloatProperty::StaticClass(), TZConjugateKey<float>::Value },
+		{ FDoubleProperty::StaticClass(), TZConjugateKey<double>::Value },
+		{ FBoolProperty::StaticClass(), TZConjugateKey<bool>::Value },
 
-	// Redirect.
-	FString name = field.GetName();
-	FString redirectedName = GetDefault<UZSharpRuntimeSettings>()->RedirectFieldName(field.GetPathName());
-	if (!redirectedName.IsEmpty())
-	{
-		name = redirectedName;
-	}
+		{ FStrProperty::StaticClass(), TZConjugateKey<FString>::Value },
+		{ FUtf8StrProperty::StaticClass(), TZConjugateKey<FUtf8String>::Value },
+		{ FAnsiStrProperty::StaticClass(), TZConjugateKey<FAnsiString>::Value },
+		{ FNameProperty::StaticClass(), TZConjugateKey<FName>::Value },
+		{ FTextProperty::StaticClass(), TZConjugateKey<FText>::Value },
 
-	// Apply rules for specific field type.
-	if (const auto cls = field.Get<UClass>())
-	{
-		if (cls->HasAllClassFlags(CLASS_Interface))
-		{
-			name.InsertAt(0, 'I');
-		}
+		{ FArrayProperty::StaticClass(), TZConjugateKey<FZSelfDescriptiveScriptArray>::Value },
+		{ FSetProperty::StaticClass(), TZConjugateKey<FZSelfDescriptiveScriptSet>::Value },
+		{ FMapProperty::StaticClass(), TZConjugateKey<FZSelfDescriptiveScriptMap>::Value },
+		{ FOptionalProperty::StaticClass(), TZConjugateKey<FZSelfDescriptiveOptional>::Value },
 
-		if (cls->HasAllClassFlags(CLASS_Deprecated) && !cls->GetName().ToUpper().EndsWith("_DEPRECATED"))
-		{
-			name.Append("_DEPRECATED");
-		}
-	}
-	else if (const auto enm = field.Get<UEnum>())
-	{
-		if (!name.StartsWith("E"))
-		{
-			name.InsertAt(0, "E");
-		}
-	}
-	else if (const auto delegate = field.Get<UDelegateFunction>())
-	{
-		static const FString GDelegatePostfix = "__DelegateSignature";
-		if (delegate->HasAllFunctionFlags(FUNC_Delegate) && name.EndsWith(GDelegatePostfix))
-		{
-			name.LeftChopInline(GDelegatePostfix.Len());
-		}
-	}
-	// IMPORTANT: This must be under delegate.
-	else if (const auto function = field.Get<UFunction>())
-	{
-		if (function->HasAllFunctionFlags(FUNC_EditorOnly))
-		{
-			name.Append("_EDITORONLY");
-		}
-	}
-	else if (const auto property = field.Get<FProperty>())
-	{
-		if (property->HasAllPropertyFlags(CPF_EditorOnly))
-		{
-			name.Append("_EDITORONLY");
-		}
+		{ FClassProperty::StaticClass(), TZConjugateKey<FZSelfDescriptiveSubclassOf>::Value },
+		{ FSoftClassProperty::StaticClass(), TZConjugateKey<FZSelfDescriptiveSoftClassPtr>::Value },
+		{ FSoftObjectProperty::StaticClass(), TZConjugateKey<FZSelfDescriptiveSoftObjectPtr>::Value },
+		{ FWeakObjectProperty::StaticClass(), TZConjugateKey<FZSelfDescriptiveWeakObjectPtr>::Value },
+		{ FLazyObjectProperty::StaticClass(), TZConjugateKey<FZSelfDescriptiveLazyObjectPtr>::Value },
+		{ FInterfaceProperty::StaticClass(), TZConjugateKey<FZSelfDescriptiveScriptInterface>::Value },
 
-		if (property->HasAllPropertyFlags(CPF_Deprecated) && !property->GetName().ToUpper().EndsWith("_DEPRECATED"))
-		{
-			name.Append("_DEPRECATED");
-		}
-	}
-	
-	// Check conflict with owner if field is member property or member function.
-	bool conflicts = false;
-	if (field.IsA<UFunction>() && !field.IsA<UDelegateFunction>() || field.IsA<FProperty>())
-	{
-		// Owner should always exist.
-		const auto owner = field.GetOwnerVariant().Get<UStruct>();
-		TArray structsToCheck { owner };
-		for (TFieldIterator<UDelegateFunction> it(owner); it; ++it)
-		{
-			if (*it != field.Get<UDelegateFunction>())
-			{
-				structsToCheck.Emplace(*it);
-			}
-		}
-	
-		for (const auto structToCheck : structsToCheck)
-		{
-			if (name == GetFieldRedirectedName(structToCheck))
-			{
-				conflicts = true;
-				break;
-			}
-		}
-	}
-
-	// Finally check conflict with managed root class System.Object.
-	if (!conflicts)
-	{
-		static const TSet<FString> GManagedConflicts
-		{
-			"GetType",
-			"GetHashCode",
-			"ToString",
-			"MemberwiseClone",
-			"Equals",
-			"ReferenceEquals",
-			"Finalize"
-		};
-
-		if (GManagedConflicts.Contains(name))
-		{
-			conflicts = true;
-		}
-	}
-
-	if (conflicts)
-	{
-		ZReflectionHelper_Private::DeconflictName(name);
-	}
-
-	return name;
-}
-
-FString ZSharp::FZReflectionHelper::GetFieldRedirectedFullName(FFieldVariant field)
-{
-	FString name = GetFieldRedirectedName(field);
-	if (const auto ownerField = field.GetOwnerVariant().Get<UField>())
-	{
-		name = GetFieldRedirectedFullName(ownerField).Append(".").Append(name);
-	}
-
-	return name;
-}
-
-FString ZSharp::FZReflectionHelper::GetFieldAssemblyName(FFieldVariant field)
-{
-	const FString moduleName = GetFieldModuleName(field);
-	const FZModuleMappingContext* ctx = GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(moduleName);
-	return ctx ? ctx->AssemblyName : "";
-}
-
-FString ZSharp::FZReflectionHelper::GetFieldModuleName(FFieldVariant field)
-{
-	if (!field)
-	{
-		return {};
-	}
-	
-	FString res;
-	const bool suc = field.GetOutermost()->GetName().Split("/", nullptr, &res, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
-	check(suc);
-	return res;
-}
-
-bool ZSharp::FZReflectionHelper::IsFieldModuleMapped(FFieldVariant field)
-{
-	return !!GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(GetFieldModuleName(field));
-}
-
-const UField* ZSharp::FZReflectionHelper::GetUFieldClosestMappedAncestor(const UField* field)
-{
-	if (!field)
-	{
-		return nullptr;
-	}
-	
-	if (IsFieldModuleMapped(field))
-	{
-		return field;
-	}
-	
-	auto strct = Cast<UStruct>(field);
-	if (strct)
-	{
-		for (const UStruct* current = strct->GetSuperStruct(); current; current = current->GetSuperStruct())
-		{
-			if (IsFieldModuleMapped(current))
-			{
-				return current;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-bool ZSharp::FZReflectionHelper::GetUFieldRuntimeTypeLocator(const UField* field, FZRuntimeTypeUri& outLocator)
-{
-	const UField* ancestor = GetUFieldClosestMappedAncestor(field);
-	const FString moduleName = GetFieldModuleName(ancestor);
-	if (!moduleName.Len())
-	{
-		return false;
-	}
-	
-	outLocator.AssemblyName = GetFieldAssemblyName(ancestor);
-	if (!outLocator.AssemblyName.Len())
-	{
-		return false;
-	}
-
-	FString name = GetFieldRedirectedFullName(ancestor);
-	name.ReplaceCharInline('.', '+');
-	outLocator.TypeName = FString::Printf(TEXT("%s.%s.%s"), *outLocator.AssemblyName, *moduleName, *name);
-
-	return true;
-}
-
-bool ZSharp::FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(const FFieldClass* cls, FZRuntimeTypeUri& outLocator)
-{
-	static const TMap<FFieldClass*, FZRuntimeTypeUri> GProtoMap
-	{
-		{ FByteProperty::StaticClass(), { TZManagedTypeInfo<uint8>::GetAssemblyName(), TZManagedTypeInfo<uint8>::GetFullName() } },
-		{ FUInt16Property::StaticClass(), { TZManagedTypeInfo<uint16>::GetAssemblyName(), TZManagedTypeInfo<uint16>::GetFullName() } },
-		{ FUInt32Property::StaticClass(), { TZManagedTypeInfo<uint32>::GetAssemblyName(), TZManagedTypeInfo<uint32>::GetFullName() } },
-		{ FUInt64Property::StaticClass(), { TZManagedTypeInfo<uint64>::GetAssemblyName(), TZManagedTypeInfo<uint64>::GetFullName() } },
-		{ FInt8Property::StaticClass(), { TZManagedTypeInfo<int8>::GetAssemblyName(), TZManagedTypeInfo<int8>::GetFullName() } },
-		{ FInt16Property::StaticClass(), { TZManagedTypeInfo<int16>::GetAssemblyName(), TZManagedTypeInfo<int16>::GetFullName() } },
-		{ FIntProperty::StaticClass(), { TZManagedTypeInfo<int32>::GetAssemblyName(), TZManagedTypeInfo<int32>::GetFullName() } },
-		{ FInt64Property::StaticClass(), { TZManagedTypeInfo<int64>::GetAssemblyName(), TZManagedTypeInfo<int64>::GetFullName() } },
-		{ FFloatProperty::StaticClass(), { TZManagedTypeInfo<float>::GetAssemblyName(), TZManagedTypeInfo<float>::GetFullName() } },
-		{ FDoubleProperty::StaticClass(), { TZManagedTypeInfo<double>::GetAssemblyName(), TZManagedTypeInfo<double>::GetFullName() } },
-		{ FBoolProperty::StaticClass(), { TZManagedTypeInfo<bool>::GetAssemblyName(), TZManagedTypeInfo<bool>::GetFullName() } },
-
-		{ FStrProperty::StaticClass(), { TZManagedTypeInfo<FString>::GetAssemblyName(), TZManagedTypeInfo<FString>::GetFullName() } },
-		{ FUtf8StrProperty::StaticClass(), { TZManagedTypeInfo<FUtf8String>::GetAssemblyName(), TZManagedTypeInfo<FUtf8String>::GetFullName() } },
-		{ FAnsiStrProperty::StaticClass(), { TZManagedTypeInfo<FAnsiString>::GetAssemblyName(), TZManagedTypeInfo<FAnsiString>::GetFullName() } },
-		{ FNameProperty::StaticClass(), { TZManagedTypeInfo<FName>::GetAssemblyName(), TZManagedTypeInfo<FName>::GetFullName() } },
-		{ FTextProperty::StaticClass(), { TZManagedTypeInfo<FText>::GetAssemblyName(), TZManagedTypeInfo<FText>::GetFullName() } },
-
-		{ FArrayProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveScriptArray>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveScriptArray>::GetFullName() } },
-		{ FSetProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveScriptSet>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveScriptSet>::GetFullName() } },
-		{ FMapProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveScriptMap>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveScriptMap>::GetFullName() } },
-		{ FOptionalProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveOptional>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveOptional>::GetFullName() } },
-
-		{ FClassProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveSubclassOf>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveSubclassOf>::GetFullName() } },
-		{ FSoftClassProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveSoftClassPtr>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveSoftClassPtr>::GetFullName() } },
-		{ FSoftObjectProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveSoftObjectPtr>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveSoftObjectPtr>::GetFullName() } },
-		{ FWeakObjectProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveWeakObjectPtr>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveWeakObjectPtr>::GetFullName() } },
-		{ FLazyObjectProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveLazyObjectPtr>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveLazyObjectPtr>::GetFullName() } },
-		{ FInterfaceProperty::StaticClass(), { TZManagedTypeInfo<FZSelfDescriptiveScriptInterface>::GetAssemblyName(), TZManagedTypeInfo<FZSelfDescriptiveScriptInterface>::GetFullName() } },
-
-		{ FFieldPathProperty::StaticClass(), { TZManagedTypeInfo<FFieldPath>::GetAssemblyName(), TZManagedTypeInfo<FFieldPath>::GetFullName() } },
+		{ FFieldPathProperty::StaticClass(), TZConjugateKey<FFieldPath>::Value },
 	};
 
-	const FZRuntimeTypeUri* proto = GProtoMap.Find(cls);
-	if (!proto)
-	{
-		checkNoEntry()
-		return false;
-	}
-
-	outLocator = *proto;
-	return true;
+	const FString* key = GProtoMap.Find(cls);
+	return key ? *key : FString{};
 }
 
-bool ZSharp::FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(const FProperty* property, FZRuntimeTypeUri& outLocator)
+ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeTypeUriFromProperty(const FProperty* property)
 {
 	if (!ensure(!property->IsA<FArrayProperty>() && !property->IsA<FSetProperty>() && !property->IsA<FMapProperty>() && !property->IsA<FOptionalProperty>()))
 	{
-		return false;
+		return {};
 	}
 	
 	if (const auto classProp = CastField<FClassProperty>(property))
 	{
 		if (classProp->MetaClass == UObject::StaticClass())
 		{
-			return GetUFieldRuntimeTypeLocator(UClass::StaticClass(), outLocator);
+			return FZRuntimeTypeUri { GetFieldConjugateKey(UClass::StaticClass()) };
 		}
 	}
 	else if (const auto objectProp = CastField<FObjectProperty>(property))
 	{
-		return GetUFieldRuntimeTypeLocator(objectProp->PropertyClass, outLocator);
+		return FZRuntimeTypeUri { GetFieldConjugateKey(objectProp->PropertyClass) };
 	}
 	else if (const auto structProp = CastField<FStructProperty>(property))
 	{
-		return GetUFieldRuntimeTypeLocator(structProp->Struct, outLocator);
+		return FZRuntimeTypeUri { GetFieldConjugateKey(structProp->Struct) };
 	}
 	else if (const auto enumProp = CastField<FEnumProperty>(property))
 	{
-		return GetUFieldRuntimeTypeLocator(enumProp->GetEnum(), outLocator);
+		return FZRuntimeTypeUri { GetFieldConjugateKey(enumProp->GetEnum()) };
 	}
 	else if (const auto delegateProp = CastField<FDelegateProperty>(property))
 	{
-		return GetUFieldRuntimeTypeLocator(delegateProp->SignatureFunction, outLocator);
+		return FZRuntimeTypeUri { GetFieldConjugateKey(delegateProp->SignatureFunction) };
 	}
 	else if (const auto multicastInlineDelegateProp = CastField<FMulticastInlineDelegateProperty>(property))
 	{
-		return GetUFieldRuntimeTypeLocator(multicastInlineDelegateProp->SignatureFunction, outLocator);
+		return FZRuntimeTypeUri { GetFieldConjugateKey(multicastInlineDelegateProp->SignatureFunction) };
 	}
 	else if (const auto multicastSparseDelegateProp = CastField<FMulticastSparseDelegateProperty>(property))
 	{
-		return GetUFieldRuntimeTypeLocator(multicastSparseDelegateProp->SignatureFunction, outLocator);
+		return FZRuntimeTypeUri { GetFieldConjugateKey(multicastSparseDelegateProp->SignatureFunction) };
 	}
 	else if (const auto numericProp = CastField<FNumericProperty>(property))
 	{
 		if (const UEnum* underlyingEnum = numericProp->GetIntPropertyEnum())
 		{
-			return GetUFieldRuntimeTypeLocator(underlyingEnum, outLocator);
+			return FZRuntimeTypeUri { GetFieldConjugateKey(underlyingEnum) };
 		}
-	}
-	
-	if (!GetFFieldClassRuntimeTypeLocator(property->GetClass(), outLocator))
-	{
-		return false;
 	}
 
-	if (outLocator.TypeName.Contains("`"))
+	FString rootKey = GetFieldClassConjugateKey(property->GetClass());
+	if (rootKey.IsEmpty())
 	{
-		ensure(outLocator.TypeName.EndsWith("1"));
-		ensure(property->IsA<FObjectPropertyBase>() && !property->IsA<FObjectProperty>());
-		
-		FZRuntimeTypeUri& inner = outLocator.TypeParameters.Emplace_GetRef();
-		if (const auto classProp = CastField<FClassProperty>(property))
-		{
-			return GetUFieldRuntimeTypeLocator(classProp->MetaClass, inner);
-		}
-		else if (const auto softClassProp = CastField<FSoftClassProperty>(property))
-		{
-			return GetUFieldRuntimeTypeLocator(softClassProp->MetaClass, inner);
-		}
-		else if (const auto softObjectProperty = CastField<FSoftObjectProperty>(property))
-		{
-			return GetUFieldRuntimeTypeLocator(softObjectProperty->PropertyClass, inner);
-		}
-		else if (const auto weakObjectProperty = CastField<FWeakObjectProperty>(property))
-		{
-			return GetUFieldRuntimeTypeLocator(weakObjectProperty->PropertyClass, inner);
-		}
-		else if (const auto lazyObjectProperty = CastField<FLazyObjectProperty>(property))
-		{
-			return GetUFieldRuntimeTypeLocator(lazyObjectProperty->PropertyClass, inner);
-		}
-		else if (const auto interfaceProperty = CastField<FInterfaceProperty>(property))
-		{
-			return GetUFieldRuntimeTypeLocator(interfaceProperty->InterfaceClass, inner);
-		}
-		else
-		{
-			checkNoEntry();
-		}
+		return {};
 	}
-	
-	checkNoEntry();
-	return false;
+
+	// Fill generic parameter, here it is ObjectWrapper, not Container.
+	ensure(property->IsA<FObjectPropertyBase>() && !property->IsA<FObjectProperty>());
+		
+	FZRuntimeTypeUri inner;
+	if (const auto classProp = CastField<FClassProperty>(property))
+	{
+		inner = FZRuntimeTypeUri { GetFieldConjugateKey(classProp->MetaClass) };
+	}
+	else if (const auto softClassProp = CastField<FSoftClassProperty>(property))
+	{
+		inner = FZRuntimeTypeUri { GetFieldConjugateKey(softClassProp->MetaClass) };
+	}
+	else if (const auto softObjectProperty = CastField<FSoftObjectProperty>(property))
+	{
+		inner = FZRuntimeTypeUri { GetFieldConjugateKey(softObjectProperty->PropertyClass) };
+	}
+	else if (const auto weakObjectProperty = CastField<FWeakObjectProperty>(property))
+	{
+		inner = FZRuntimeTypeUri { GetFieldConjugateKey(weakObjectProperty->PropertyClass) };
+	}
+	else if (const auto lazyObjectProperty = CastField<FLazyObjectProperty>(property))
+	{
+		inner = FZRuntimeTypeUri { GetFieldConjugateKey(lazyObjectProperty->PropertyClass) };
+	}
+	else if (const auto interfaceProperty = CastField<FInterfaceProperty>(property))
+	{
+		inner = FZRuntimeTypeUri { GetFieldConjugateKey(interfaceProperty->InterfaceClass) };
+	}
+	else
+	{
+		checkNoEntry();
+	}
+
+	return { rootKey, inner };
 }
+
 

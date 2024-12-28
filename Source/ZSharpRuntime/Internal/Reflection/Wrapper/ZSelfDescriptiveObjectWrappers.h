@@ -158,7 +158,6 @@ struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper> \
 	FZSelfDescriptive##Name(const UClass* descriptor) : TZSelfDescriptiveObjectWrapperBase(descriptor){} \
 	FZSelfDescriptive##Name(const UClass* descriptor, UnderlyingInstanceType* underlyingInstance) : TZSelfDescriptiveObjectWrapperBase(descriptor, underlyingInstance){} \
 	FZSelfDescriptive##Name(FZSelfDescriptive##Name&& other) noexcept : TZSelfDescriptiveObjectWrapperBase(MoveTemp(other)){} \
-	static FString GetExportTypeName() { return #Name; } \
 };
 
 #define DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT(Name, Wrapper, GetReferencedObject, ReferencerName) \
@@ -167,7 +166,6 @@ struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper>, pu
 	FZSelfDescriptive##Name(const UClass* descriptor) : TZSelfDescriptiveObjectWrapperBase(descriptor){} \
 	FZSelfDescriptive##Name(const UClass* descriptor, UnderlyingInstanceType* underlyingInstance) : TZSelfDescriptiveObjectWrapperBase(descriptor, underlyingInstance){} \
 	FZSelfDescriptive##Name(FZSelfDescriptive##Name&& other) noexcept : TZSelfDescriptiveObjectWrapperBase(MoveTemp(other)){} \
-	static FString GetExportTypeName() { return #Name; } \
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override \
 	{ \
 		Collector.AddReferencedObject(GetUnderlyingInstance()->GetReferencedObject()); \

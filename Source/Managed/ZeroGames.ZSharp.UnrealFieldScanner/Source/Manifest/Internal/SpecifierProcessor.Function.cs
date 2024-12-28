@@ -50,7 +50,7 @@ partial class SpecifierProcessor
 	{
 		check(model.Visibility != EMemberVisibility.Private);
 
-		def.ZCallName = $"nm://{model.Outer.AssemblyName}:{model.Outer.FullName}:{def.Name}_Implementation";
+		def.ZCallName = $"{def.Name}_Implementation";
 		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_BlueprintEvent;
 	}
 	
@@ -65,7 +65,7 @@ partial class SpecifierProcessor
 	{
 		check(!model.HasReturnValue());
 		
-		def.ZCallName = $"nm://{model.Outer.AssemblyName}:{model.Outer.FullName}:{def.Name}_Implementation";
+		def.ZCallName = $"{def.Name}_Implementation";
 		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetServer;
 	}
 	
@@ -74,7 +74,7 @@ partial class SpecifierProcessor
 	{
 		check(!model.HasReturnValue());
 		
-		def.ZCallName = $"nm://{model.Outer.AssemblyName}:{model.Outer.FullName}:{def.Name}_Implementation";
+		def.ZCallName = $"{def.Name}_Implementation";
 		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetClient;
 	}
 	
@@ -83,15 +83,14 @@ partial class SpecifierProcessor
 	{
 		check(!model.HasReturnValue());
 		
-		def.ZCallName = $"nm://{model.Outer.AssemblyName}:{model.Outer.FullName}:{def.Name}_Implementation";
+		def.ZCallName = $"{def.Name}_Implementation";
 		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetMulticast;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, WithValidationAttribute specifier)
 	{
-		string name = specifier.Implementation ?? $"{def.Name}_Validate";
-		def.ValidateZCallName = $"nm://{model.Outer.AssemblyName}:{model.Outer.FullName}:{name}";
+		def.ValidateZCallName = $"{def.Name}_Validate";
 		def.FunctionFlags |= EFunctionFlags.FUNC_NetValidate;
 	}
 	

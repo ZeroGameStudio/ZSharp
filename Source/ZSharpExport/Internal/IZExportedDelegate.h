@@ -19,6 +19,7 @@ namespace ZSharp
 	class ZSHARPEXPORT_API IZExportedDelegate : public IZExportedType
 	{
 	public:
+		virtual FString GetConjugateKey() const = 0;
 		virtual EZExportedDelegateFlags GetFlags() const = 0;
 		virtual void ForeachParameter(TFunctionRef<void(const IZExportedParameter&)> action) const = 0;
 	public:

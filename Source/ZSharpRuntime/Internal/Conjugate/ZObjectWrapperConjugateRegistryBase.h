@@ -3,11 +3,11 @@
 #pragma once
 
 #include "ZConjugateRegistryBase.h"
-#include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ALC/ZRuntimeTypeUri.h"
 #include "Interop/ZRuntimeTypeHandle.h"
 #include "Conjugate/ZConjugateHandle.h"
 #include "Reflection/ZReflectionHelper.h"
+#include "Trait/ZConjugateKey.h"
 
 namespace ZSharp
 {
@@ -54,11 +54,9 @@ namespace ZSharp
 	private:
 		FZRuntimeTypeHandle GetManagedType(const UClass* cls) const
 		{
-			FZRuntimeTypeUri uri;
-			uri.AssemblyName = ZSHARP_ENGINE_ASSEMBLY_NAME;
-			uri.TypeName = FString::Printf(TEXT("%s.CoreUObject.%s`1"), *uri.AssemblyName, *ConjugateType::GetExportTypeName());
-			FZRuntimeTypeUri& inner = uri.TypeParameters.Emplace_GetRef();
-			FZReflectionHelper::GetUFieldRuntimeTypeLocator(cls, inner);
+			FString rootKey = TZConjugateKey<ConjugateType>::Value;
+			FZRuntimeTypeUri inner { FZReflectionHelper::GetFieldConjugateKey(cls) };
+			FZRuntimeTypeUri uri { rootKey, inner };
 	
 			return Super::Alc.GetType(uri);
 		}

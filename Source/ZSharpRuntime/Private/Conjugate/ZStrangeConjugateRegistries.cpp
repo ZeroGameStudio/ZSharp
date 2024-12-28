@@ -35,18 +35,9 @@ void ZSharp::FZConjugateRegistry_Array::ValidateConjugateWrapper(const FProperty
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Array::GetManagedType(const FProperty* elementProperty) const
 {
-	FZRuntimeTypeUri uri;
-	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FArrayProperty::StaticClass(), uri))
-	{
-		return {};
-	}
-	
-	FZRuntimeTypeUri& inner = uri.TypeParameters.AddDefaulted_GetRef();
-	if (!FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(elementProperty, inner))
-	{
-		return {};
-	}
-	
+	FString rootKey = FZReflectionHelper::GetFieldClassConjugateKey(FArrayProperty::StaticClass());
+	FZRuntimeTypeUri inner = FZReflectionHelper::GetContainerElementRuntimeTypeUriFromProperty(elementProperty);
+	FZRuntimeTypeUri uri { rootKey, inner };
 	return Alc.GetType(uri);
 }
 
@@ -67,18 +58,9 @@ void ZSharp::FZConjugateRegistry_Set::ValidateConjugateWrapper(const FProperty* 
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Set::GetManagedType(const FProperty* elementProperty) const
 {
-	FZRuntimeTypeUri uri;
-	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FSetProperty::StaticClass(), uri))
-	{
-		return {};
-	}
-	
-	FZRuntimeTypeUri& inner = uri.TypeParameters.AddDefaulted_GetRef();
-	if (!FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(elementProperty, inner))
-	{
-		return {};
-	}
-	
+	FString rootKey = FZReflectionHelper::GetFieldClassConjugateKey(FSetProperty::StaticClass());
+	FZRuntimeTypeUri inner = FZReflectionHelper::GetContainerElementRuntimeTypeUriFromProperty(elementProperty);
+	FZRuntimeTypeUri uri { rootKey, inner };
 	return Alc.GetType(uri);
 }
 
@@ -114,27 +96,10 @@ void ZSharp::FZConjugateRegistry_Map::ValidateConjugateWrapper(const TPair<const
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Map::GetManagedType(const TPair<const FProperty*, const FProperty*>* descriptor) const
 {
-	const FProperty* keyProperty = descriptor->Key;
-	const FProperty* valueProperty = descriptor->Value;
-	
-	FZRuntimeTypeUri uri;
-	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FMapProperty::StaticClass(), uri))
-	{
-		return {};
-	}
-	
-	FZRuntimeTypeUri& inner = uri.TypeParameters.AddDefaulted_GetRef();
-	if (!FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(keyProperty, inner))
-	{
-		return {};
-	}
-
-	FZRuntimeTypeUri& outer = uri.TypeParameters.AddDefaulted_GetRef();
-	if (!FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(valueProperty, outer))
-	{
-		return {};
-	}
-	
+	FString rootKey = FZReflectionHelper::GetFieldClassConjugateKey(FMapProperty::StaticClass());
+	FZRuntimeTypeUri inner = FZReflectionHelper::GetContainerElementRuntimeTypeUriFromProperty(descriptor->Key);
+	FZRuntimeTypeUri outer = FZReflectionHelper::GetContainerElementRuntimeTypeUriFromProperty(descriptor->Value);
+	FZRuntimeTypeUri uri { rootKey, inner, outer };
 	return Alc.GetType(uri);
 }
 
@@ -155,18 +120,9 @@ void ZSharp::FZConjugateRegistry_Optional::ValidateConjugateWrapper(const FPrope
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Optional::GetManagedType(const FProperty* elementProperty) const
 {
-	FZRuntimeTypeUri uri;
-	if (!FZReflectionHelper::GetFFieldClassRuntimeTypeLocator(FOptionalProperty::StaticClass(), uri))
-	{
-		return {};
-	}
-	
-	FZRuntimeTypeUri& inner = uri.TypeParameters.AddDefaulted_GetRef();
-	if (!FZReflectionHelper::GetNonContainerFPropertyRuntimeTypeLocator(elementProperty, inner))
-	{
-		return {};
-	}
-	
+	FString rootKey = FZReflectionHelper::GetFieldClassConjugateKey(FOptionalProperty::StaticClass());
+	FZRuntimeTypeUri inner = FZReflectionHelper::GetContainerElementRuntimeTypeUriFromProperty(elementProperty);
+	FZRuntimeTypeUri uri { rootKey, inner };
 	return Alc.GetType(uri);
 }
 
@@ -183,12 +139,7 @@ void ZSharp::FZConjugateRegistry_UScriptStruct::ValidateConjugateWrapper(const U
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UScriptStruct::GetManagedType(const UScriptStruct* scriptStruct) const
 {
-	FZRuntimeTypeUri uri;
-	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(scriptStruct, uri))
-	{
-		return {};
-	}
-	
+	FZRuntimeTypeUri uri { FZReflectionHelper::GetFieldConjugateKey(scriptStruct) };
 	return Alc.GetType(uri);
 }
 
@@ -205,12 +156,7 @@ void ZSharp::FZConjugateRegistry_Delegate::ValidateConjugateWrapper(const UDeleg
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Delegate::GetManagedType(const UDelegateFunction* signature) const
 {
-	FZRuntimeTypeUri uri;
-	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(signature, uri))
-	{
-		return {};
-	}
-	
+	FZRuntimeTypeUri uri { FZReflectionHelper::GetFieldConjugateKey(signature) };
 	return Alc.GetType(uri);
 }
 
@@ -227,12 +173,7 @@ void ZSharp::FZConjugateRegistry_MulticastInlineDelegate::ValidateConjugateWrapp
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_MulticastInlineDelegate::GetManagedType(const UDelegateFunction* signature) const
 {
-	FZRuntimeTypeUri uri;
-	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(signature, uri))
-	{
-		return {};
-	}
-	
+	FZRuntimeTypeUri uri { FZReflectionHelper::GetFieldConjugateKey(signature) };
 	return Alc.GetType(uri);
 }
 
@@ -250,12 +191,7 @@ void ZSharp::FZConjugateRegistry_MulticastSparseDelegate::ValidateConjugateWrapp
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_MulticastSparseDelegate::GetManagedType(const USparseDelegateFunction* signature) const
 {
-	FZRuntimeTypeUri uri;
-	if (!FZReflectionHelper::GetUFieldRuntimeTypeLocator(signature, uri))
-	{
-		return {};
-	}
-	
+	FZRuntimeTypeUri uri { FZReflectionHelper::GetFieldConjugateKey(signature) };
 	return Alc.GetType(uri);
 }
 

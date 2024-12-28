@@ -16,6 +16,16 @@
 
 namespace ZSharp::ZUnrealFieldEmitter_Private
 {
+	static FString MakeNMZCallName(const UClass* outer, const FString& lastName)
+	{
+		if (lastName.IsEmpty())
+		{
+			return {};
+		}
+		
+		return FString::Printf(TEXT("nm:/%s:%s"), *outer->GetPathName(), *lastName);
+	}
+	
 	/*
 	 * WARNING: This behaves differently from UHT.
 	 *   - STRUCT_HasInstancedReference is shallow scan so struct won't have this flag even if it has a struct property with instanced reference. (@see: UhtScriptStruct.cs)
@@ -517,8 +527,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 		{ // Finally setup proxy.
 			FZSharpFunction& zsfunction = FZSharpFieldRegistry::Get().RegisterFunction(function);
-			zsfunction.ZCallName = def.ZCallName;
-			zsfunction.ValidateZCallName = def.ValidateZCallName;
+			zsfunction.ZCallName = MakeNMZCallName(outer, def.ZCallName);
+			zsfunction.ValidateZCallName = MakeNMZCallName(outer, def.ValidateZCallName);
 		}
 	}
 

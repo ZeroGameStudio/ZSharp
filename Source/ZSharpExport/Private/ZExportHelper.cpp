@@ -3,6 +3,7 @@
 #include "ZExportHelper.h"
 
 #include "ZSharpExportSettings.h"
+#include "Emit/IZSharpFieldRegistry.h"
 #include "UObject/PropertyOptional.h"
 #include "Trait/ZExportedTypeName.h"
 
@@ -223,9 +224,24 @@ bool ZSharp::FZExportHelper::ShouldExportField(FFieldVariant field)
 				return false;
 			}
 
-			// Emitted field is not exportable.
-
+			// Emitted type is not exportable.
+			const UObject* object = field.ToUObject();
+			if (const auto cls = Cast<UClass>(object))
+			{
+				if (IZSharpFieldRegistry::Get().IsZSharpClass(cls))
+				{
+					return false;
+				}
+			}
+			
 			// Override version of UFunction is not exportable.
+			if (const auto function = Cast<UFunction>(object))
+			{
+				if (function->GetSuperFunction())
+				{
+					return false;
+				}
+			}
 		}
 	}
 
@@ -236,13 +252,13 @@ bool ZSharp::FZExportHelper::ShouldExportField(FFieldVariant field)
 			return true;
 		}
 
-		// Skip export by Deprecated tag.
+		// Skip export by Deprecated flag.
 		if (!settings->ShouldExportDeprecatedFields() && IsFieldDeprecated(field))
 		{
 			return false;
 		}
 
-		// Skip export by Editor-Only tag.
+		// Skip export by Editor-Only flag.
 		if (!settings->ShouldExportEditorOnlyFields() && IsFieldEditorOnly(field))
 		{
 			return false;

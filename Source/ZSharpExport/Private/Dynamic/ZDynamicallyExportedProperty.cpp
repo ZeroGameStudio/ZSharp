@@ -7,6 +7,11 @@
 
 ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Create(const FProperty* property, int32 index)
 {
+	if (!FZExportHelper::ShouldExportField(property))
+	{
+		return nullptr;
+	}
+	
 	auto exportedProperty = new FZDynamicallyExportedProperty { property, index };
 	if (!exportedProperty->IsValid())
 	{
@@ -35,7 +40,7 @@ FString ZSharp::FZDynamicallyExportedProperty::GetZCallName() const
 
 ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedProperty::GetType() const
 {
-	return FZExportHelper::GetFPropertyFullyExportedTypeName(Property);
+	return FZExportHelper::GetFieldFullyExportedTypeName(Property);
 }
 
 FString ZSharp::FZDynamicallyExportedProperty::GetUnderlyingType() const

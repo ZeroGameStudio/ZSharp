@@ -6,7 +6,7 @@
 
 #include "ZSharpEventLoopEngineSubsystem.generated.h"
 
-UCLASS(MinimalAPI, Transient)
+UCLASS(MinimalAPI, Transient, meta = (ZSharpNoExport))
 class UZSharpEventLoopEngineSubsystem final : public UEngineSubsystem
 {
 	GENERATED_BODY()

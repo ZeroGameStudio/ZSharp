@@ -9,12 +9,7 @@
 
 ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(const UEnum* uenum)
 {
-	if (!uenum->IsNative())
-	{
-		return nullptr;
-	}
-
-	if (!FZExportHelper::IsFieldModuleMapped(uenum))
+	if (!FZExportHelper::ShouldExportField(uenum))
 	{
 		return nullptr;
 	}

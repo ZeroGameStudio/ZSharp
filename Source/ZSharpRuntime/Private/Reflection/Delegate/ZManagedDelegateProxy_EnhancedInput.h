@@ -11,7 +11,7 @@ namespace ZSharp
 	struct FZEnhancedInputComponent_Interop;
 }
 
-UCLASS(Transient, MinimalAPI)
+UCLASS(Transient, MinimalAPI, meta = (ZSharpNoExport))
 class UZManagedDelegateProxy_EnhancedInput final : public UZManagedDelegateProxyImpl
 {
 	GENERATED_BODY()

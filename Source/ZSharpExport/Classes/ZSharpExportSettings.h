@@ -49,8 +49,8 @@ public:
 	bool ShouldExportDeprecatedFields() const { return bExportDeprecatedFields; }
 	bool ShouldTreatDeprecatedPostfixAsDeprecated() const { return bTreatDeprecatedPostfixAsDeprecated; }
 	bool ShouldExportEditorOnlyFields() const { return bExportEditorOnlyFields; }
-	bool IsForceExportFieldPath(const FString& path) const { return ForceExportFieldPathsHash.Contains(path); }
-	bool IsForceNotExportFieldPath(const FString& path) const { return ForceNotExportFieldPathsHash.Contains(path); }
+	bool IsForceExportFieldPath(const FString& path) const { return ForceExportFieldPathsLookup.Contains(path); }
+	bool IsForceNotExportFieldPath(const FString& path) const { return ForceNotExportFieldPathsLookup.Contains(path); }
 
 	bool ShouldUseLooseDefaultParameterName() const { return bUseLooseDefaultParameterName; }
 
@@ -111,10 +111,10 @@ private:
 	bool bUseLooseDefaultParameterName = false;
 
 private:
-	TMap<FName, FZModuleMappingContext> ModuleMappingHash;
-	TMap<FName, FZFieldNameRedirector> FieldNameRedirectorHash;
-	TSet<FString> ForceExportFieldPathsHash;
-	TSet<FString> ForceNotExportFieldPathsHash;
+	TMap<FName, FZModuleMappingContext> ModuleMappingLookup;
+	TMap<FName, FZFieldNameRedirector> FieldNameRedirectorLookup;
+	TSet<FString> ForceExportFieldPathsLookup;
+	TSet<FString> ForceNotExportFieldPathsLookup;
 	
 };
 

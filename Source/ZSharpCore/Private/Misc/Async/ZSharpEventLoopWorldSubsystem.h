@@ -34,7 +34,7 @@ private:
 	
 };
 
-UCLASS(MinimalAPI, Transient)
+UCLASS(MinimalAPI, Transient, meta = (ZSharpNoExport))
 class UZSharpEventLoopWorldSubsystem : public UWorldSubsystem, public FTickableGameObject
 {
 	GENERATED_BODY()

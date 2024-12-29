@@ -11,12 +11,7 @@
 
 ZSharp::FZDynamicallyExportedClass* ZSharp::FZDynamicallyExportedClass::Create(const UStruct* ustruct)
 {
-	if (!ustruct->IsNative())
-	{
-		return nullptr;
-	}
-
-	if (!FZExportHelper::IsFieldModuleMapped(ustruct))
+	if (!FZExportHelper::ShouldExportField(ustruct))
 	{
 		return nullptr;
 	}
@@ -68,13 +63,13 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedClass::GetBaseType(
 		return {};
 	}
 	
-	const UField* super = FZExportHelper::GetUFieldClosestMappedAncestor(Struct->GetSuperStruct());
+	const UField* super = FZExportHelper::GetUFieldClosestExportedAncestor(Struct->GetSuperStruct());
 	if (!super)
 	{
 		return {};
 	}
 
-	return FZExportHelper::GetUFieldFullyExportedName(super);
+	return FZExportHelper::GetFieldFullyExportedTypeName(super);
 }
 
 void ZSharp::FZDynamicallyExportedClass::ForeachInterface(TFunctionRef<void(const FZFullyExportedTypeName&)> action) const
@@ -119,18 +114,18 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 			for (const auto& interface : uclass->Interfaces)
 			{
 				check(interface.Class->IsNative());
-				const UField* mappedInterface = FZExportHelper::GetUFieldClosestMappedAncestor(interface.Class);
-				if (!mappedInterface)
+				const UField* exportedInterface = FZExportHelper::GetUFieldClosestExportedAncestor(interface.Class);
+				if (!exportedInterface)
 				{
 					continue;
 				}
 
-				if (mappedInterface == UInterface::StaticClass() || mappedInterface == UObject::StaticClass())
+				if (exportedInterface == UInterface::StaticClass() || exportedInterface == UObject::StaticClass())
 				{
 					continue;
 				}
 
-				FZFullyExportedTypeName name = FZExportHelper::GetUFieldFullyExportedName(mappedInterface);
+				FZFullyExportedTypeName name = FZExportHelper::GetFieldFullyExportedTypeName(exportedInterface);
 				if (Interfaces.ContainsByPredicate([&name](const FZFullyExportedTypeName& interface){ return interface.Name == name.Name; }))
 				{
 					continue;
@@ -138,9 +133,10 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 
 				Interfaces.Emplace(name);
 
-				for (auto currentInterfaceClass = CastChecked<UClass>(mappedInterface); currentInterfaceClass != UInterface::StaticClass(); currentInterfaceClass = currentInterfaceClass->GetSuperClass())
+				for (auto currentInterfaceClass = CastChecked<UClass>(exportedInterface); currentInterfaceClass != UInterface::StaticClass(); currentInterfaceClass = currentInterfaceClass->GetSuperClass())
 				{
-					if (!FZExportHelper::IsFieldModuleMapped(currentInterfaceClass))
+					// Early out if this interface is not exported.
+					if (!FZExportHelper::ShouldExportField(currentInterfaceClass))
 					{
 						continue;
 					}
@@ -180,11 +176,6 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 							continue;
 						}
 
-						if (!FZExportHelper::ShouldExportFieldBySettings(function))
-						{
-							continue;
-						}
-
 						FZDynamicallyExportedMethod* exportedMethod = FZDynamicallyExportedMethod::Create(function);
 						if (!exportedMethod)
 						{
@@ -219,11 +210,6 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 			Flags &= ~EZExportedClassFlags::Implementable;
 		}
 		
-		if (!FZExportHelper::ShouldExportFieldBySettings(function))
-		{
-			continue;
-		}
-
 		FZDynamicallyExportedMethod* exportedMethod = FZDynamicallyExportedMethod::Create(function);
 		if (!exportedMethod)
 		{
@@ -236,11 +222,6 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 	for (TFieldIterator<FProperty> it(Struct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
 	{
 		FProperty* property = *it;
-		if (!FZExportHelper::ShouldExportFieldBySettings(property))
-		{
-			continue;
-		}
-		
 		for (int32 i = 0; i < property->ArrayDim; ++i)
 		{
 			FZDynamicallyExportedProperty* exportedProperty = FZDynamicallyExportedProperty::Create(property, i);

@@ -15,22 +15,21 @@ namespace ZSharp
 		static FString GetFieldModuleName(FFieldVariant field);
 		static FString GetFieldAssemblyName(FFieldVariant field);
 
-		static bool IsFieldModuleMapped(FFieldVariant field);
-		static const UField* GetUFieldClosestMappedAncestor(const UField* field);
+		static bool ShouldExportField(FFieldVariant field);
+		static const UField* GetUFieldClosestExportedAncestor(const UField* field);
 
-		static FString GetUFieldExportKey(const UField* field);
-		static FZFullyExportedTypeName GetUFieldFullyExportedName(const UField* field);
-		static FZFullyExportedTypeName GetFPropertyFullyExportedTypeName(const FProperty* property);
+		static FZFullyExportedTypeName GetFieldFullyExportedTypeName(FFieldVariant field);
 		static const UEnum* GetUEnumFromProperty(const FProperty* property);
 		static bool CanFPropertyBeNullInNotNullOut(const FProperty* property);
+		static FZExportedDefaultValue GetParameterDefaultValue(const FProperty* parameter);
 
 		static bool IsNameDeprecated(const FString& name);
 
-		static bool ShouldExportFieldBySettings(FFieldVariant field);
-
-		static FZExportedDefaultValue GetParameterDefaultValue(const FProperty* parameter);
-
 	private:
+		static FZFullyExportedTypeName GetUFieldFullyExportedTypeName(const UField* field);
+		static FZFullyExportedTypeName GetFPropertyFullyExportedTypeName(const FProperty* property);
+		
+		static bool IsFieldModuleMapped(FFieldVariant field);
 		static bool IsFieldDeprecated(FFieldVariant field);
 		static bool IsFieldEditorOnly(FFieldVariant field);
 	};

@@ -6,76 +6,45 @@
 #include "ZDynamicallyExportedClass.h"
 #include "ZDynamicallyExportedDelegate.h"
 #include "ZDynamicallyExportedEnum.h"
-#include "Emit/IZSharpFieldRegistry.h"
 #include "ZExportHelper.h"
 
 void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies)
 {
-	IZSharpFieldRegistry& registry = IZSharpFieldRegistry::Get();
-
+	auto shouldExportAssembly = [&](const UField* field)
+	{
+		return assemblies.IsEmpty() || assemblies.Contains(FZExportHelper::GetFieldAssemblyName(field));
+	};
+	
 	for (TObjectIterator<UEnum> it; it; ++it)
 	{
-		if (!FZExportHelper::ShouldExportFieldBySettings(*it))
+		if (shouldExportAssembly(*it))
 		{
-			continue;
+			FZDynamicallyExportedEnum::Create(*it);
 		}
-		
-		if (!assemblies.IsEmpty() && !assemblies.Contains(FZExportHelper::GetFieldAssemblyName(*it)))
-		{
-			continue;
-		}
-		
-		FZDynamicallyExportedEnum::Create(*it);
 	}
 
 	for (TObjectIterator<UScriptStruct> it; it; ++it)
 	{
-		if (!FZExportHelper::ShouldExportFieldBySettings(*it))
+		if (shouldExportAssembly(*it))
 		{
-			continue;
+			FZDynamicallyExportedClass::Create(*it);
 		}
-		
-		if (!assemblies.IsEmpty() && !assemblies.Contains(FZExportHelper::GetFieldAssemblyName(*it)))
-		{
-			continue;
-		}
-		
-		FZDynamicallyExportedClass::Create(*it);
 	}
 
 	for (TObjectIterator<UClass> it; it; ++it)
 	{
-		if (!FZExportHelper::ShouldExportFieldBySettings(*it))
+		if (shouldExportAssembly(*it))
 		{
-			continue;
+			FZDynamicallyExportedClass::Create(*it);
 		}
-		
-		if (registry.IsZSharpClass(*it))
-		{
-			continue;
-		}
-		
-		if (!assemblies.IsEmpty() && !assemblies.Contains(FZExportHelper::GetFieldAssemblyName(*it)))
-		{
-			continue;
-		}
-		
-		FZDynamicallyExportedClass::Create(*it);
 	}
 
 	for (TObjectIterator<UDelegateFunction> it; it; ++it)
 	{
-		if (!FZExportHelper::ShouldExportFieldBySettings(*it))
+		if (shouldExportAssembly(*it))
 		{
-			continue;
+			FZDynamicallyExportedDelegate::Create(*it);
 		}
-		
-		if (!assemblies.IsEmpty() && !assemblies.Contains(FZExportHelper::GetFieldAssemblyName(*it)))
-		{
-			continue;
-		}
-		
-		FZDynamicallyExportedDelegate::Create(*it);
 	}
 }
 

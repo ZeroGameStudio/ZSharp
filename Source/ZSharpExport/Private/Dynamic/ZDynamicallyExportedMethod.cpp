@@ -8,19 +8,13 @@
 
 ZSharp::FZDynamicallyExportedMethod* ZSharp::FZDynamicallyExportedMethod::Create(const UFunction* function)
 {
-	if (!function->IsNative())
+	if (!FZExportHelper::ShouldExportField(function))
 	{
 		return nullptr;
 	}
 
 	// Skip delegate signatures.
 	if (function->HasAnyFunctionFlags(FUNC_Delegate))
-	{
-		return nullptr;
-	}
-
-	// ZCallDispatcher will handle polymorphism so skip override functions.
-	if (function->GetSuperFunction())
 	{
 		return nullptr;
 	}
@@ -59,7 +53,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedMethod::GetOwnerInt
 	const UClass* owner = Function->GetOwnerClass();
 	if (owner->HasAllClassFlags(CLASS_Interface))
 	{
-		return FZExportHelper::GetUFieldFullyExportedName(owner);
+		return FZExportHelper::GetFieldFullyExportedTypeName(owner);
 	}
 
 	return {};

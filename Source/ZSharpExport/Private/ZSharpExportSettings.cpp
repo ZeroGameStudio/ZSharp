@@ -35,12 +35,12 @@ UZSharpExportSettings::UZSharpExportSettings()
 
 const FZModuleMappingContext* UZSharpExportSettings::GetModuleMappingContext(const FString& module) const
 {
-	return ModuleMappingHash.Find(FName { module });
+	return ModuleMappingLookup.Find(FName { module });
 }
 
 void UZSharpExportSettings::ForeachMappedModule(TFunctionRef<void(const FString&, const FZModuleMappingContext&)> action) const
 {
-	for (const auto& pair : ModuleMappingHash)
+	for (const auto& pair : ModuleMappingLookup)
 	{
 		action(pair.Key.ToString(), pair.Value);
 	}
@@ -48,7 +48,7 @@ void UZSharpExportSettings::ForeachMappedModule(TFunctionRef<void(const FString&
 
 FString UZSharpExportSettings::RedirectFieldName(const FString& sourcePath) const
 {
-	const FZFieldNameRedirector* redirector = FieldNameRedirectorHash.Find(FName { sourcePath });
+	const FZFieldNameRedirector* redirector = FieldNameRedirectorLookup.Find(FName { sourcePath });
 	return redirector ? redirector->TargetName : FString{};
 }
 
@@ -102,38 +102,38 @@ void UZSharpExportSettings::PostEditChangeProperty(FPropertyChangedEvent& event)
 
 void UZSharpExportSettings::InvalidateCache()
 {
-	ModuleMappingHash.Reset();
+	ModuleMappingLookup.Reset();
 	for (const auto& ctx : ModuleMappings)
 	{
-		ModuleMappingHash.Emplace(FName { ctx.ModuleName }, ctx);
+		ModuleMappingLookup.Emplace(FName { ctx.ModuleName }, ctx);
 	}
 
 	for (const auto& ctx : IntrinsicModuleMappings)
 	{
-		ModuleMappingHash.Emplace(FName { ctx.ModuleName }, ctx);
+		ModuleMappingLookup.Emplace(FName { ctx.ModuleName }, ctx);
 	}
 
-	FieldNameRedirectorHash.Reset();
+	FieldNameRedirectorLookup.Reset();
 	for (const auto& redirector : FieldNameRedirectors)
 	{
-		FieldNameRedirectorHash.Emplace(FName { redirector.SourcePath }, redirector);
+		FieldNameRedirectorLookup.Emplace(FName { redirector.SourcePath }, redirector);
 	}
 
 	for (const auto& redirector : IntrinsicFieldNameRedirectors)
 	{
-		FieldNameRedirectorHash.Emplace(FName { redirector.SourcePath }, redirector);
+		FieldNameRedirectorLookup.Emplace(FName { redirector.SourcePath }, redirector);
 	}
 	
-	ForceExportFieldPathsHash.Reset();
+	ForceExportFieldPathsLookup.Reset();
 	for (const auto& path : ForceExportFieldPaths)
 	{
-		ForceExportFieldPathsHash.Add(path);
+		ForceExportFieldPathsLookup.Add(path);
 	}
 	
-	ForceNotExportFieldPathsHash.Reset();
+	ForceNotExportFieldPathsLookup.Reset();
 	for (const auto& path : ForceNotExportFieldPaths)
 	{
-		ForceNotExportFieldPathsHash.Add(path);
+		ForceNotExportFieldPathsLookup.Add(path);
 	}
 }
 

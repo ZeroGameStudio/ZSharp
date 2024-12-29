@@ -10,16 +10,11 @@
 
 ZSharp::FZDynamicallyExportedDelegate* ZSharp::FZDynamicallyExportedDelegate::Create(const UDelegateFunction* signature)
 {
-	if (!signature->IsNative())
+	if (!FZExportHelper::ShouldExportField(signature))
 	{
 		return nullptr;
 	}
-	
-	if (!signature->HasAnyFunctionFlags(FUNC_Delegate))
-	{
-		return nullptr;
-	}
-	
+
 	auto delegate = new FZDynamicallyExportedDelegate { signature };
 	if (!delegate->IsValid() || !FZExportedTypeRegistry::Get().RegisterDelegate(delegate))
 	{

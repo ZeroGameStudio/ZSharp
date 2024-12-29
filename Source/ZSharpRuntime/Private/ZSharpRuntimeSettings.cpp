@@ -33,6 +33,14 @@ UZSharpRuntimeSettings::UZSharpRuntimeSettings()
 	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.DateTime", "UnrealDateTime");
 }
 
+int32 UZSharpRuntimeSettings::GetModuleEmitMetadataSource(const FString& moduleName, TArray<FZModuleEmitMetadataSource>& result) const
+{
+	result.Reset();
+	ModuleEmitMetadataSourceLookup.MultiFind(FName { moduleName }, result, true);
+	
+	return result.Num();
+}
+
 const FZModuleMappingContext* UZSharpRuntimeSettings::GetModuleMappingContext(const FString& module) const
 {
 	return ModuleMappingHash.Find(FName { module });
@@ -106,6 +114,15 @@ void UZSharpRuntimeSettings::PostEditChangeProperty(FPropertyChangedEvent& event
 
 void UZSharpRuntimeSettings::InvalidateCache()
 {
+	ModuleEmitMetadataSourceLookup.Reset();
+	for (const auto& source : ModuleEmitMetadataSources)
+	{
+		ModuleEmitMetadataSourceLookup.Emplace(FName { source.ModuleName }, source);
+	}
+
+
+	
+	
 	ModuleMappingHash.Reset();
 	for (const auto& ctx : ModuleMappings)
 	{

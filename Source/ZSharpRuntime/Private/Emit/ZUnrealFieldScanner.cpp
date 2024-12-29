@@ -250,53 +250,50 @@ void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, b
 
 	FlushDeferredModules();
 
-	const FZModuleMappingContext* ctx = GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(moduleName.ToString());
-	if (!ctx)
+	TArray<FZModuleEmitMetadataSource> sources;
+	if (!GetDefault<UZSharpRuntimeSettings>()->GetModuleEmitMetadataSource(moduleName.ToString(), sources))
 	{
 		UE_LOG(LogZSharpEmit, Verbose, TEXT("[UnrealFieldScanner] Skip unmapped module [%s]."), *moduleName.ToString());
 		return;
 	}
 
-	if (!ctx->bHasDynamicFields)
-	{
-		UE_LOG(LogZSharpEmit, Verbose, TEXT("[UnrealFieldScanner] Skip module without dynamic fields [%s]."), *moduleName.ToString());
-		return;
-	}
-
 	UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Scan dynamic fields for module [%s]."), *moduleName.ToString());
-	
-	const FString assembly = ctx->AssemblyName;
-	const FString moduleNameStr = moduleName.ToString();
-	FString outManifest;
-	struct
+
+	for (const auto& source : sources)
 	{
-		const TCHAR* AssemblyName;
-		const TCHAR* ModuleName;
-		FString* OutManifest;
-		uint8 bWithMetadata;
-		FString* FatalMessageBuffer;
-	} args { *assembly, *moduleNameStr, &outManifest, WITH_METADATA };
+		const FString assembly = source.AssemblyName;
+		const FString moduleNameStr = source.ModuleName;
+		FString manifest;
+		struct
+		{
+			const TCHAR* AssemblyName;
+			const TCHAR* ModuleName;
+			FString* OutManifest;
+			uint8 bWithMetadata;
+			FString* FatalMessageBuffer;
+		} args { *assembly, *moduleNameStr, &manifest, WITH_METADATA };
 
 #if !UE_BUILD_SHIPPING
-	FString fatalMessage;
-	args.FatalMessageBuffer = &fatalMessage;
-	IZSharpClr::Get().GetDefaultAlc().InvokeMethod(ZSHARP_SCANNER_ASSEMBLY_NAME, "ZeroGames.ZSharp.UnrealFieldScanner.UnrealFieldScanner_Interop", "Scan", &args);
-	if (!fatalMessage.IsEmpty())
-	{
-		UE_LOG(LogZSharpEmit, Fatal, TEXT("%s"), *fatalMessage);
-	}
+		FString fatalMessage;
+		args.FatalMessageBuffer = &fatalMessage;
+		IZSharpClr::Get().GetDefaultAlc().InvokeMethod(ZSHARP_SCANNER_ASSEMBLY_NAME, "ZeroGames.ZSharp.UnrealFieldScanner.UnrealFieldScanner_Interop", "Scan", &args);
+		if (!fatalMessage.IsEmpty())
+		{
+			UE_LOG(LogZSharpEmit, Fatal, TEXT("%s"), *fatalMessage);
+		}
 #else
-	IZSharpClr::Get().GetDefaultAlc().InvokeMethod(ZSHARP_SCANNER_ASSEMBLY_NAME, "ZeroGames.ZSharp.UnrealFieldScanner.UnrealFieldScanner_Interop", "Scan", &args);
+		IZSharpClr::Get().GetDefaultAlc().InvokeMethod(ZSHARP_SCANNER_ASSEMBLY_NAME, "ZeroGames.ZSharp.UnrealFieldScanner.UnrealFieldScanner_Interop", "Scan", &args);
 #endif
 
-	UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Dynamic field manifest for module [%s]: [%s]"), *moduleName.ToString(), *outManifest);
+		UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Dynamic field manifest for module [%s]: [%s]"), *moduleName.ToString(), *manifest);
 	
-	if (outManifest.IsEmpty())
-	{
-		return;
-	}
+		if (manifest.IsEmpty())
+		{
+			return;
+		}
 
-	ZUnrealFieldScanner_Private::EmitUnrealFieldsForModule(moduleNameStr, outManifest);
+		ZUnrealFieldScanner_Private::EmitUnrealFieldsForModule(moduleNameStr, manifest);
+	}
 }
 
 

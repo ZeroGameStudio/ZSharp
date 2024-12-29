@@ -6,6 +6,18 @@
 #include "ZSharpRuntimeSettings.generated.h"
 
 USTRUCT(meta = (ZSharpNoExport))
+struct FZModuleEmitMetadataSource
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, meta = (GetOptions = "ZSharpRuntime.ZSharpRuntimeSettings.GetModuleOptions"))
+	FString ModuleName;
+
+	UPROPERTY(EditAnywhere)
+	FString AssemblyName;
+};
+
+USTRUCT(meta = (ZSharpNoExport))
 struct FZModuleMappingContext
 {
 	GENERATED_BODY()
@@ -18,7 +30,6 @@ struct FZModuleMappingContext
 
 	UPROPERTY(EditAnywhere, meta = (ConfigRestartRequired = true))
 	bool bHasDynamicFields = false;
-	
 };
 
 USTRUCT(meta = (ZSharpNoExport))
@@ -31,7 +42,6 @@ struct FZFieldNameRedirector
 
 	UPROPERTY(EditAnywhere)
 	FString TargetName;
-	
 };
 
 /**
@@ -49,6 +59,9 @@ public:
 	virtual FName GetCategoryName() const override { return TEXT("ZSharp"); }
 	
 public:
+	int32 GetModuleEmitMetadataSource(const FString& moduleName, TArray<FZModuleEmitMetadataSource>& result) const;
+
+	
 	const FZModuleMappingContext* GetModuleMappingContext(const FString& module) const;
 	void ForeachMappedModule(TFunctionRef<void(const FString&, const FZModuleMappingContext&)> action) const;
 
@@ -69,6 +82,20 @@ private:
 
 private:
 	void InvalidateCache();
+
+private:
+	UPROPERTY(Config, EditAnywhere, Category = "Emit", meta = (ConfigRestartRequired = true))
+	TArray<FZModuleEmitMetadataSource> ModuleEmitMetadataSources;
+
+private:
+	TMultiMap<FName, FZModuleEmitMetadataSource> ModuleEmitMetadataSourceLookup;
+
+
+
+
+
+
+	
 
 private:
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Assembly")

@@ -2,6 +2,7 @@
 
 #include "ZStreamableManager_Interop.h"
 
+#include "ALC/ZRedFrameScope.h"
 #include "Engine/AssetManager.h"
 #include "Engine/StreamableManager.h"
 
@@ -16,11 +17,14 @@ ZSharp::FZStreamingTask_Interop::FZStreamingTask* ZSharp::FZStreamableManager_In
 
 	auto callback = [task, pushLoadedCount]
 	{
-		if (!!pushLoadedCount)
+		FZRedFrameScope scope;
 		{
-			GUpdate(task->Handle->GetOwningManager(), task, FZStreamingTask_Interop::GetLoadedCount(task));
+			if (!!pushLoadedCount)
+			{
+				GUpdate(task->Handle->GetOwningManager(), task, FZStreamingTask_Interop::GetLoadedCount(task));
+			}
+			GSignalCompletion(task->Handle->GetOwningManager(), task);
 		}
-		GSignalCompletion(task->Handle->GetOwningManager(), task);
 	};
 	
 	TSharedPtr<FStreamableHandle> handle = manager->RequestAsyncLoad(paths, callback);
@@ -39,7 +43,10 @@ ZSharp::FZStreamingTask_Interop::FZStreamingTask* ZSharp::FZStreamableManager_In
 		{
 			handle->BindUpdateDelegate(FStreamableUpdateDelegate::CreateLambda([task](TSharedPtr<FStreamableHandle> handle)
 			{
-				GUpdate(handle->GetOwningManager(), task, FZStreamingTask_Interop::GetLoadedCount(task));
+				FZRedFrameScope scope;
+				{
+					GUpdate(handle->GetOwningManager(), task, FZStreamingTask_Interop::GetLoadedCount(task));
+				}
 			}));
 		}
 

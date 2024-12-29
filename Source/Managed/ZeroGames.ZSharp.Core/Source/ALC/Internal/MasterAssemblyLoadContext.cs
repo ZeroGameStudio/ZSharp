@@ -376,7 +376,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     
     private EZCallErrorCode ZCall_Black(ZCallHandle handle, ZCallBuffer* buffer)
     {
-        return (EZCallErrorCode)MasterAssemblyLoadContext_Interop.ZCall_Black(handle, buffer);
+        return MasterAssemblyLoadContext_Interop.ZCall_Black(handle, buffer);
     }
 
     private ZCallHandle GetZCallHandle_Black(string name)

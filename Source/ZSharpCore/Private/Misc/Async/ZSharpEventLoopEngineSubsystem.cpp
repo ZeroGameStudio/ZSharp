@@ -48,7 +48,7 @@ void UZSharpEventLoopEngineSubsystem::NotifyEvent(ZSharp::EZEventLoopTickingGrou
 		return;
 	}
 
-	const auto notify = [=]
+	ZSharp::FZRedFrameScope scope;
 	{
 #if !UE_BUILD_SHIPPING
 		FString fatalMessage;
@@ -60,18 +60,6 @@ void UZSharpEventLoopEngineSubsystem::NotifyEvent(ZSharp::EZEventLoopTickingGrou
 #else
 		ZSharp::FZEventLoop_Interop::GNotifyEvent(group, worldDeltaSeconds, readDeltaSeconds, worldElapsedSeconds, realElapsedSeconds, nullptr);
 #endif
-	};
-
-	ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::FZSharpClr::Get().GetMasterAlc();
-	if (!alc)
-	{
-		notify();
-		return;
-	}
-
-	ZSharp::FZRedFrameScope scope;
-	{
-		notify();
 	}
 }
 

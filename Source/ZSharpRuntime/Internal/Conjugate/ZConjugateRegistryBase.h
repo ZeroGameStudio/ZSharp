@@ -172,6 +172,7 @@ namespace ZSharp
 
 		void CaptureConjugate(void* unmanaged)
 		{
+			check(!RedStack.IsEmpty());
 			RedStack.Top().CapturedConjugates.Emplace(unmanaged);
 		}
 

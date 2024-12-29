@@ -17,7 +17,7 @@ public class InterfaceMethodBodyBuilder(string interfaceName, string name, TypeR
 			};
 			return $"{kind}{p.Name}";
 		}) ?? []);
-		string body = $"(({InterfaceName})this).{name}({parameterList});";
+		string body = $"(({InterfaceName})this).{Name}({parameterList});";
 		return new(body);
 	}
 

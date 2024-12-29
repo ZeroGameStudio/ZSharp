@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZGlueManifestWriter.h"
 
 #include "IZExportedEnum.h"
@@ -10,9 +9,9 @@
 #include "IZExportedProperty.h"
 #include "IZExportedParameter.h"
 #include "IZExportedTypeRegistry.h"
-#include "ZSharpRuntimeSettings.h"
 #include "DTO/ZExportedClassDto.h"
 #include "JsonObjectConverter.h"
+#include "ZSharpExportSettings.h"
 #include "DTO/ZExportedDelegateDto.h"
 
 void ZSharp::FZGlueManifestWriter::Write(const TArray<FString>& assemblies)
@@ -167,7 +166,7 @@ void ZSharp::FZGlueManifestWriter::WriteDelegate(const IZExportedDelegate& deleg
 
 TUniquePtr<FZExportedAssemblyDto>* ZSharp::FZGlueManifestWriter::GetAssemblyDto(const IZExportedType& type)
 {
-	const UZSharpRuntimeSettings* settings = GetDefault<UZSharpRuntimeSettings>();
+	const auto settings = GetDefault<UZSharpExportSettings>();
 	const FString module = type.GetModule();
 	const FZModuleMappingContext* ctx = settings->GetModuleMappingContext(module);
 	if (!ctx)

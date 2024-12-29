@@ -1,10 +1,8 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZExportHelper.h"
 
 #include "ZSharpExportSettings.h"
-#include "ZSharpRuntimeSettings.h"
 #include "UObject/PropertyOptional.h"
 #include "Trait/ZExportedTypeName.h"
 
@@ -51,7 +49,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 
 	// Redirect.
 	FString name = field.GetName();
-	FString redirectedName = GetDefault<UZSharpRuntimeSettings>()->RedirectFieldName(field.GetPathName());
+	FString redirectedName = GetDefault<UZSharpExportSettings>()->RedirectFieldName(field.GetPathName());
 	if (!redirectedName.IsEmpty())
 	{
 		name = redirectedName;
@@ -186,13 +184,13 @@ FString ZSharp::FZExportHelper::GetFieldModuleName(FFieldVariant field)
 FString ZSharp::FZExportHelper::GetFieldAssemblyName(FFieldVariant field)
 {
 	const FString moduleName = GetFieldModuleName(field);
-	const FZModuleMappingContext* ctx = GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(moduleName);
+	const FZModuleMappingContext* ctx = GetDefault<UZSharpExportSettings>()->GetModuleMappingContext(moduleName);
 	return ctx ? ctx->AssemblyName : "";
 }
 
 bool ZSharp::FZExportHelper::IsFieldModuleMapped(FFieldVariant field)
 {
-	return !!GetDefault<UZSharpRuntimeSettings>()->GetModuleMappingContext(GetFieldModuleName(field));
+	return !!GetDefault<UZSharpExportSettings>()->GetModuleMappingContext(GetFieldModuleName(field));
 }
 
 const UField* ZSharp::FZExportHelper::GetUFieldClosestMappedAncestor(const UField* field)

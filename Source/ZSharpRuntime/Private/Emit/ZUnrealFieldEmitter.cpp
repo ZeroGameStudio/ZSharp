@@ -661,10 +661,20 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 		FinishEmitDelegate(pak, def);
 	}
 
+	// Compile class but don't create CDO.
+	// Because the constructor of a CDO might trigger the creation of other CDOs,
+	// we should at least guarantee that all classes have been compiled before creating any CDO.
 	for (auto& cls : topologicallySortedClasses)
 	{
 		FZClassDefinition* def = class2def.FindChecked(cls);
-		PostEmitClass(pak, *def);
+		PostEmitClass_I(pak, *def);
+	}
+
+	// Create CDO and do some initialization.
+	for (auto& cls : topologicallySortedClasses)
+	{
+		FZClassDefinition* def = class2def.FindChecked(cls);
+		PostEmitClass_II(pak, *def);
 	}
 }
 
@@ -859,7 +869,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitDelegate(UPackage* pak, FZDelegateD
 	// @TODO
 }
 
-void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinition& def) const
+void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinition& def) const
 {
 	UClass* cls = def.Class;
 
@@ -1050,7 +1060,14 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass(UPackage* pak, FZClassDefinitio
 		cls->GetFName().ToString(ClassName);
 		NotifyRegistrationEvent(PackageName, ClassName, ENotifyRegistrationType::NRT_Class, ENotifyRegistrationPhase::NRP_Finished, nullptr, false, cls);
 	}
+}
 
+void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefinition& def) const
+{
+	UClass* cls = def.Class;
+	FZSharpClass* zscls = FZSharpFieldRegistry::Get().GetMutableClass(cls);
+	const UClass* superCls = cls->GetSuperClass();
+	
 	// Create CDO.
 	const UObject* cdo = def.Class->GetDefaultObject();
 

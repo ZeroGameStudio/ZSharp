@@ -35,7 +35,8 @@ namespace ZSharp
 		void FinishEmitInterface(UPackage* pak, FZInterfaceDefinition& def) const;
 		void FinishEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const;
 
-		void PostEmitClass(UPackage* pak, FZClassDefinition& def) const;
+		void PostEmitClass_I(UPackage* pak, FZClassDefinition& def) const;
+		void PostEmitClass_II(UPackage* pak, FZClassDefinition& def) const;
 
 	private:
 		FZUnrealFieldEmitter() = default;

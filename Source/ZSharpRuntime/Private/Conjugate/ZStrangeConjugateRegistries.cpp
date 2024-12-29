@@ -8,8 +8,10 @@
 #include "Conjugate/ZDeclareConjugateRegistryMacros.h"
 #include "Reflection/ZReflectionHelper.h"
 #include "Reflection/Property/ZPropertyFactory.h"
+#include "Trait/ZConjugateKey.h"
 
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_Array)
+
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_Set)
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_Map)
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_Optional)
@@ -139,8 +141,22 @@ void ZSharp::FZConjugateRegistry_UScriptStruct::ValidateConjugateWrapper(const U
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UScriptStruct::GetManagedType(const UScriptStruct* scriptStruct) const
 {
-	FZRuntimeTypeUri uri { FZReflectionHelper::GetFieldConjugateKey(scriptStruct) };
-	return Alc.GetType(uri);
+	const UScriptStruct* currentStruct = scriptStruct;
+	while (currentStruct)
+	{
+		if (currentStruct->IsNative())
+		{
+			FZRuntimeTypeUri uri { FZReflectionHelper::GetFieldConjugateKey(currentStruct) };
+			if (FZRuntimeTypeHandle type = Alc.GetType(uri))
+			{
+				return type;
+			}
+		}
+
+		currentStruct = CastChecked<UScriptStruct>(currentStruct->GetSuperStruct(), ECastCheckedType::NullAllowed);
+	}
+
+	return Alc.GetType(FZRuntimeTypeUri { TZConjugateKey<FZDynamicScriptStruct>::Value });
 }
 
 ZSharp::FZSelfDescriptiveScriptDelegate* ZSharp::FZConjugateRegistry_Delegate::BuildConjugateWrapper(void* userdata)
@@ -174,7 +190,8 @@ void ZSharp::FZConjugateRegistry_MulticastInlineDelegate::ValidateConjugateWrapp
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_MulticastInlineDelegate::GetManagedType(const UDelegateFunction* signature) const
 {
 	FZRuntimeTypeUri uri { FZReflectionHelper::GetFieldConjugateKey(signature) };
-	return Alc.GetType(uri);
+	FZRuntimeTypeHandle type = Alc.GetType(uri);
+	return type ? type : Alc.GetType(FZRuntimeTypeUri { TZConjugateKey<FZDynamicMulticastInlineDelegate>::Value });
 }
 
 ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate* ZSharp::FZConjugateRegistry_MulticastSparseDelegate::BuildConjugateWrapper(void* userdata)

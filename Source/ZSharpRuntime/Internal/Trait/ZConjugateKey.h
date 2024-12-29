@@ -11,6 +11,10 @@
 
 namespace ZSharp
 {
+	// These two dummy structs are designed to represent blueprint structs and events on managed side.
+	struct FZDynamicScriptStruct;
+	struct FZDynamicMulticastInlineDelegate;
+	
 	template <typename>
 	struct TZConjugateKey;
 }
@@ -51,6 +55,9 @@ CONJUGATE_KEY(ZSharp::FZSelfDescriptiveScriptInterface, Unreal.ScriptInterface)
 CONJUGATE_KEY(ZSharp::FZSelfDescriptiveStrongObjectPtr, Unreal.StrongObjectPtr)
 
 CONJUGATE_KEY(FFieldPath, Unreal.FieldPath)
+
+CONJUGATE_KEY(ZSharp::FZDynamicScriptStruct, Unreal.DynamicScriptStruct)
+CONJUGATE_KEY(ZSharp::FZDynamicMulticastInlineDelegate, Unreal.DynamicMulticastInlineDelegate)
 
 #undef CONJUGATE_KEY
 

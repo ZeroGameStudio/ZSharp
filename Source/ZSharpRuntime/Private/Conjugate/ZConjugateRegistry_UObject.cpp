@@ -160,19 +160,19 @@ void ZSharp::FZConjugateRegistry_UObject::NotifyLifecycleExpired(UObject* unmana
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UObject::GetManagedType(const UObject* unmanaged) const
 {
-	const UClass* cls = unmanaged->GetClass();
-	while (cls)
+	const UClass* currentClass = unmanaged->GetClass();
+	while (currentClass)
 	{
-		if (cls->IsNative())
+		if (currentClass->IsNative())
 		{
-			FZRuntimeTypeUri uri { FZReflectionHelper::GetFieldConjugateKey(cls) };
+			FZRuntimeTypeUri uri { FZReflectionHelper::GetFieldConjugateKey(currentClass) };
 			if (FZRuntimeTypeHandle type = Alc.GetType(uri))
 			{
 				return type;
 			}
 		}
 
-		cls = cls->GetSuperClass();
+		currentClass = currentClass->GetSuperClass();
 	}
 
 	checkNoEntry();

@@ -9,7 +9,6 @@ namespace ZSharp
 {
 	struct ZSHARPEXPORT_API FZExportHelper
 	{
-
 		static FString GetFieldRedirectedName(FFieldVariant field);
 		static FString GetFieldRedirectedFullName(FFieldVariant field);
 
@@ -26,13 +25,14 @@ namespace ZSharp
 		static bool CanFPropertyBeNullInNotNullOut(const FProperty* property);
 
 		static bool IsNameDeprecated(const FString& name);
-		static bool IsFieldDeprecated(FFieldVariant field);
-		static bool IsFieldEditorOnly(FFieldVariant field);
 
 		static bool ShouldExportFieldBySettings(FFieldVariant field);
 
 		static FZExportedDefaultValue GetParameterDefaultValue(const FProperty* parameter);
-		
+
+	private:
+		static bool IsFieldDeprecated(FFieldVariant field);
+		static bool IsFieldEditorOnly(FFieldVariant field);
 	};
 }
 

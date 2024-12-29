@@ -177,7 +177,7 @@ FString ZSharp::FZExportHelper::GetFieldModuleName(FFieldVariant field)
 	
 	FString res;
 	const bool suc = field.GetOutermost()->GetName().Split("/", nullptr, &res, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
-	check(suc);
+	ensure(suc);
 	return res;
 }
 
@@ -454,63 +454,13 @@ bool ZSharp::FZExportHelper::IsNameDeprecated(const FString& name)
 	return upperName.StartsWith("DEPRECATED_") || upperName.EndsWith("_DEPRECATED");
 }
 
-bool ZSharp::FZExportHelper::IsFieldDeprecated(FFieldVariant field)
-{
-	if (GetDefault<UZSharpExportSettings>()->ShouldTreatDeprecatedPostfixAsDeprecated())
-	{
-		if (IsNameDeprecated(field.GetName()))
-		{
-			return true;
-		}
-	}
-
-	if (const auto cls = field.Get<UClass>())
-	{
-		if (cls->HasAllClassFlags(CLASS_Deprecated))
-		{
-			return true;
-		}
-	}
-
-	if (const auto property = field.Get<FProperty>())
-	{
-		if (property->HasAllPropertyFlags(CPF_Deprecated))
-		{
-			return true;
-		}
-	}
-	
-	return false;
-}
-
-bool ZSharp::FZExportHelper::IsFieldEditorOnly(FFieldVariant field)
-{
-	if (const auto function = field.Get<UFunction>())
-	{
-		if (function->HasAllFunctionFlags(FUNC_EditorOnly))
-		{
-			return true;
-		}
-	}
-
-	if (const auto property = field.Get<FProperty>())
-	{
-		if (property->HasAllPropertyFlags(CPF_EditorOnly))
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
 bool ZSharp::FZExportHelper::ShouldExportFieldBySettings(FFieldVariant field)
 {
 #if WITH_METADATA
 	// Compiled-in no export.
 	if (field.HasMetaData("ZSharpNoExport"))
 	{
-		//return false;
+		return false;
 	}
 #endif
 	
@@ -670,6 +620,56 @@ ZSharp::FZExportedDefaultValue ZSharp::FZExportHelper::GetParameterDefaultValue(
 	
 	// @FIXME: This is now C# expressions, but it was supposed to be language-agnostic.
 	return { { signature }, { body } };
+}
+
+bool ZSharp::FZExportHelper::IsFieldDeprecated(FFieldVariant field)
+{
+	if (GetDefault<UZSharpExportSettings>()->ShouldTreatDeprecatedPostfixAsDeprecated())
+	{
+		if (IsNameDeprecated(field.GetName()))
+		{
+			return true;
+		}
+	}
+
+	if (const auto cls = field.Get<UClass>())
+	{
+		if (cls->HasAllClassFlags(CLASS_Deprecated))
+		{
+			return true;
+		}
+	}
+
+	if (const auto property = field.Get<FProperty>())
+	{
+		if (property->HasAllPropertyFlags(CPF_Deprecated))
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+bool ZSharp::FZExportHelper::IsFieldEditorOnly(FFieldVariant field)
+{
+	if (const auto function = field.Get<UFunction>())
+	{
+		if (function->HasAllFunctionFlags(FUNC_EditorOnly))
+		{
+			return true;
+		}
+	}
+
+	if (const auto property = field.Get<FProperty>())
+	{
+		if (property->HasAllPropertyFlags(CPF_EditorOnly))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 

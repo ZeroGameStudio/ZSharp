@@ -10,7 +10,7 @@ namespace ZSharp
 	{
 		static FString GetFieldConjugateKey(const UField* field);
 		static FString GetFieldClassConjugateKey(const FFieldClass* cls);
-		static FZRuntimeTypeUri GetContainerElementRuntimeTypeUriFromProperty(const FProperty* property);
+		static FZRuntimeTypeUri GetContainerElementRuntimeTypeUriFromProperty(const FProperty* elementProperty);
 	};
 }
 

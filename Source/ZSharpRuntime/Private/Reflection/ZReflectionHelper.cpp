@@ -53,45 +53,50 @@ FString ZSharp::FZReflectionHelper::GetFieldClassConjugateKey(const FFieldClass*
 	return key ? *key : FString{};
 }
 
-ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeTypeUriFromProperty(const FProperty* property)
+ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeTypeUriFromProperty(const FProperty* elementProperty)
 {
-	if (!ensure(!property->IsA<FArrayProperty>() && !property->IsA<FSetProperty>() && !property->IsA<FMapProperty>() && !property->IsA<FOptionalProperty>()))
+	if (!ensure(!elementProperty->IsA<FArrayProperty>() &&
+		!elementProperty->IsA<FSetProperty>() &&
+		!elementProperty->IsA<FMapProperty>() &&
+		!elementProperty->IsA<FOptionalProperty>() &&
+		!elementProperty->IsA<FDelegateProperty>() &&
+		!elementProperty->IsA<FMulticastDelegateProperty>()))
 	{
 		return {};
 	}
 	
-	if (const auto classProp = CastField<FClassProperty>(property))
+	if (const auto classProp = CastField<FClassProperty>(elementProperty))
 	{
 		if (classProp->MetaClass == UObject::StaticClass())
 		{
 			return FZRuntimeTypeUri { GetFieldConjugateKey(UClass::StaticClass()) };
 		}
 	}
-	else if (const auto objectProp = CastField<FObjectProperty>(property))
+	else if (const auto objectProp = CastField<FObjectProperty>(elementProperty))
 	{
 		return FZRuntimeTypeUri { GetFieldConjugateKey(objectProp->PropertyClass) };
 	}
-	else if (const auto structProp = CastField<FStructProperty>(property))
+	else if (const auto structProp = CastField<FStructProperty>(elementProperty))
 	{
 		return FZRuntimeTypeUri { GetFieldConjugateKey(structProp->Struct) };
 	}
-	else if (const auto enumProp = CastField<FEnumProperty>(property))
+	else if (const auto enumProp = CastField<FEnumProperty>(elementProperty))
 	{
 		return FZRuntimeTypeUri { GetFieldConjugateKey(enumProp->GetEnum()) };
 	}
-	else if (const auto delegateProp = CastField<FDelegateProperty>(property))
+	else if (const auto delegateProp = CastField<FDelegateProperty>(elementProperty))
 	{
 		return FZRuntimeTypeUri { GetFieldConjugateKey(delegateProp->SignatureFunction) };
 	}
-	else if (const auto multicastInlineDelegateProp = CastField<FMulticastInlineDelegateProperty>(property))
+	else if (const auto multicastInlineDelegateProp = CastField<FMulticastInlineDelegateProperty>(elementProperty))
 	{
 		return FZRuntimeTypeUri { GetFieldConjugateKey(multicastInlineDelegateProp->SignatureFunction) };
 	}
-	else if (const auto multicastSparseDelegateProp = CastField<FMulticastSparseDelegateProperty>(property))
+	else if (const auto multicastSparseDelegateProp = CastField<FMulticastSparseDelegateProperty>(elementProperty))
 	{
 		return FZRuntimeTypeUri { GetFieldConjugateKey(multicastSparseDelegateProp->SignatureFunction) };
 	}
-	else if (const auto numericProp = CastField<FNumericProperty>(property))
+	else if (const auto numericProp = CastField<FNumericProperty>(elementProperty))
 	{
 		if (const UEnum* underlyingEnum = numericProp->GetIntPropertyEnum())
 		{
@@ -99,37 +104,37 @@ ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeT
 		}
 	}
 
-	FString rootKey = GetFieldClassConjugateKey(property->GetClass());
+	FString rootKey = GetFieldClassConjugateKey(elementProperty->GetClass());
 	if (rootKey.IsEmpty())
 	{
 		return {};
 	}
 
 	// Fill generic parameter, here it is ObjectWrapper, not Container.
-	ensure(property->IsA<FObjectPropertyBase>() && !property->IsA<FObjectProperty>());
+	ensure(elementProperty->IsA<FObjectPropertyBase>() && !elementProperty->IsA<FObjectProperty>());
 		
 	FZRuntimeTypeUri inner;
-	if (const auto classProp = CastField<FClassProperty>(property))
+	if (const auto classProp = CastField<FClassProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(classProp->MetaClass) };
 	}
-	else if (const auto softClassProp = CastField<FSoftClassProperty>(property))
+	else if (const auto softClassProp = CastField<FSoftClassProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(softClassProp->MetaClass) };
 	}
-	else if (const auto softObjectProperty = CastField<FSoftObjectProperty>(property))
+	else if (const auto softObjectProperty = CastField<FSoftObjectProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(softObjectProperty->PropertyClass) };
 	}
-	else if (const auto weakObjectProperty = CastField<FWeakObjectProperty>(property))
+	else if (const auto weakObjectProperty = CastField<FWeakObjectProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(weakObjectProperty->PropertyClass) };
 	}
-	else if (const auto lazyObjectProperty = CastField<FLazyObjectProperty>(property))
+	else if (const auto lazyObjectProperty = CastField<FLazyObjectProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(lazyObjectProperty->PropertyClass) };
 	}
-	else if (const auto interfaceProperty = CastField<FInterfaceProperty>(property))
+	else if (const auto interfaceProperty = CastField<FInterfaceProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(interfaceProperty->InterfaceClass) };
 	}

@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Loader;
 using Mono.Cecil;
@@ -129,7 +130,7 @@ internal static class SpecifierResolver
 			verify(assembly.GetType(elementTypeRef.FullName) is var elementType && elementType is not null);
 			
 			var args = (CustomAttributeArgument[])arg.Value;
-			Array arr = Array.CreateInstance(elementType.MakeArrayType(), args.Length);
+			Array arr = Array.CreateInstance(elementType, args.Length);
 			for (int32 i = 0; i < arr.Length; ++i)
 			{
 				arr.SetValue(GetAttributeArgumentValue(args[i]), i);

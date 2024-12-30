@@ -29,6 +29,7 @@ public class ZSharpRuntime : ModuleRules
 				"Core",
 				"FieldNotification",
 				"Engine",
+				"GameplayTags",
 				"EnhancedInput",
 				
 				"DeveloperSettings",

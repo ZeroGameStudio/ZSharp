@@ -51,6 +51,22 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 	// Redirect.
 	FString name = field.GetName();
 	FString redirectedName = GetDefault<UZSharpExportSettings>()->RedirectFieldName(field.GetPathName());
+#if WITH_METADATA
+	if (redirectedName.IsEmpty())
+	{
+		static const FName GExportNameRedirect = "ZSharpExportNameRedirect";
+	
+		if (field.IsUObject())
+		{
+			redirectedName = CastChecked<UField>(field.ToUObjectUnsafe())->GetMetaData(GExportNameRedirect);
+		}
+		else
+		{
+			redirectedName = field.ToFieldUnsafe()->GetMetaData(GExportNameRedirect);
+		}
+	}
+#endif
+
 	if (!redirectedName.IsEmpty())
 	{
 		name = redirectedName;

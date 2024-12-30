@@ -39,6 +39,7 @@
 #include "Interop/Engine/ZEngine_Interop.h"
 #include "Interop/AsyncLoading/ZStreamableManager_Interop.h"
 #include "Interop/AsyncLoading/ZStreamingTask_Interop.h"
+#include "Interop/GameplayTags/ZGameplayTag_Interop.h"
 #include "Interop/EnhancedInput/ZEnhancedInputComponent_Interop.h"
 #include "Interop/EnhancedInput/ZInputActionValue_Interop.h"
 
@@ -264,6 +265,8 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamingTask, GetResult),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamingTask, GetLoadedCount),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamingTask, Release),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(GameplayTag, Request),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, BindStatelessAction),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, BindStatefulAction),

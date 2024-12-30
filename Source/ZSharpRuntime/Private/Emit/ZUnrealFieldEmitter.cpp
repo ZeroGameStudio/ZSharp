@@ -182,6 +182,11 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				NEW_PROPERTY(Double);
 				break;
 			}
+		case EZPropertyType::Bool:
+			{
+				NEW_PROPERTY(Bool);
+				break;
+			}
 		case EZPropertyType::Enum:
 			{
 				NEW_PROPERTY(Enum);

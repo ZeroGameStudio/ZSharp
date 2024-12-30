@@ -153,7 +153,8 @@ public class ProjectFileBuilder
 				DEVELOPMENT_CONFIGURATION => "DEBUG;UE_LOG;ASSERTION_CHECK",
 				SHIPPING_CONFIGURATION => "RELEASE",
 				_ => throw new InvalidOperationException()
-			}
+			},
+			.._project.Constants,
 		];
 		IEnumerable<string> finalConstants = constants.Concat(config switch
 		{
@@ -164,14 +165,18 @@ public class ProjectFileBuilder
 		});
 		Append("DefineConstants", string.Join(';', finalConstants));
 
-		Dictionary<string, string> propertyMap = config switch
+		foreach (var pair in _project.PropertyMap)
+		{
+			Append(pair.Key, pair.Value);
+		}
+		Dictionary<string, string> propertyMapByConfiguration = config switch
 		{
 			DEBUG_GAME_CONFIGURATION => _project.DebugGamePropertyMap,
 			DEVELOPMENT_CONFIGURATION => _project.DevelopmentPropertyMap,
 			SHIPPING_CONFIGURATION => _project.ShippingPropertyMap,
 			_ => throw new InvalidOperationException()
 		};
-		foreach (var pair in propertyMap)
+		foreach (var pair in propertyMapByConfiguration)
 		{
 			Append(pair.Key, pair.Value);
 		}

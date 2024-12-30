@@ -4,10 +4,13 @@
 #include "ZBuildEngine.h"
 
 #include "IZExportedTypeRegistry.h"
+#include "JsonObjectConverter.h"
+#include "ZSharpExportSettings.h"
 #include "ALC/ZCommonMethodArgs.h"
 #include "CLR/IZSharpClr.h"
 #include "Glue/ZGlueManifestWriter.h"
 #include "Interfaces/IPluginManager.h"
+#include "Solution/DTO/ZModuleMappingInfoDto.h"
 
 namespace ZSharp::ZBuildEngine_Private
 {
@@ -119,6 +122,15 @@ void ZSharp::FZBuildEngine::GenerateSolution(const TArray<FString>& args) const
 	const FString projectDirArg = ZBuildEngine_Private::BuildArgument("projectdir", projectDir);
 	const FString zsharpDirArg = ZBuildEngine_Private::BuildArgument("zsharpdir", pluginDir);
 
+	FZModuleMappingInfoDto moduleMappingInfoDto;
+	GetDefault<UZSharpExportSettings>()->ForeachMappedModule([&moduleMappingInfoDto](const FString& moduleName, const FZModuleMappingContext& ctx)
+	{
+		moduleMappingInfoDto.Mapping.Emplace(ctx.ModuleName, ctx.AssemblyName);
+	});
+	FString moduleMappingInfo;
+	FJsonObjectConverter::UStructToJsonObjectString(moduleMappingInfoDto, moduleMappingInfo);
+	const FString moduleMappingInfoArg = ZBuildEngine_Private::BuildArgument("modulemappinginfo", moduleMappingInfo);
+
 	TArray<FString> sourceDirs = { ZBuildEngine_Private::AppendSourceManagedDir(projectDir), ZBuildEngine_Private::AppendSourceManagedDir(pluginDir) };
 #if WITH_EDITOR
 	for (const auto& plugin : IPluginManager::Get().GetEnabledPlugins())
@@ -143,6 +155,7 @@ void ZSharp::FZBuildEngine::GenerateSolution(const TArray<FString>& args) const
 		*projectDirArg,
 		*zsharpDirArg,
 		*sourceArg,
+		*moduleMappingInfoArg,
 	};
 	FZCommonMethodArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
 	IZSharpClr::Get().Run(ZSHARP_BUILD_ASSEMBLY_NAME, &commonArgs);

@@ -13,7 +13,6 @@ UZSharpExportSettings::UZSharpExportSettings()
 	IntrinsicModuleMappings.Emplace("InputCore", EngineAssemblyName);
 
 	IntrinsicModuleMappings.Emplace("Engine", EngineAssemblyName);
-	IntrinsicModuleMappings.Emplace("EnhancedInput", EngineAssemblyName);
 
 	IntrinsicModuleMappings.Emplace("ZSharpRuntime", EngineAssemblyName);
 

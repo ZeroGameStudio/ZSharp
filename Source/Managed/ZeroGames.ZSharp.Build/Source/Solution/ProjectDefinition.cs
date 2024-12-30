@@ -50,10 +50,12 @@ public class ProjectDefinition
 	public List<string> StaticUsings { get; init; } = new();
 	public Dictionary<string, string> Aliases { get; init; } = new();
 
+	public List<string> Constants { get; init; } = new();
 	public List<string> DebugGameConstants { get; init; } = new();
 	public List<string> DevelopmentConstants { get; init; } = new();
 	public List<string> ShippingConstants { get; init; } = new();
 	
+	public Dictionary<string, string> PropertyMap { get; init; } = new();
 	public Dictionary<string, string> DebugGamePropertyMap { get; init; } = new();
 	public Dictionary<string, string> DevelopmentPropertyMap { get; init; } = new();
 	public Dictionary<string, string> ShippingPropertyMap { get; init; } = new();

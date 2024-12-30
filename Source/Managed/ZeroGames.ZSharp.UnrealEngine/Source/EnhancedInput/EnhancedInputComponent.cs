@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+#if UE_MODULE_ENHANCEDINPUT
+
 using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.UnrealEngine.EnhancedInput;
@@ -34,5 +36,7 @@ public partial class EnhancedInputComponent
 	private unsafe bool InternalRemoveBinding(UnrealObject handle) => EnhancedInputComponent_Interop.RemoveBinding(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(handle)) > 0;
 
 }
+
+#endif
 
 

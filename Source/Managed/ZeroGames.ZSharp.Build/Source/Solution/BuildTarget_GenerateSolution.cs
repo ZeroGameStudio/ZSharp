@@ -26,9 +26,18 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
     
     public string UnrealProjectDir { get; }
     public string ZSharpPluginDir { get; }
+
+    private class ModuleMappingInfo
+    {
+        public required Dictionary<string, string> Mapping { get; set; }
+    }
     
     [FactoryConstructor]
-    private BuildTarget_GenerateSolution(IBuildEngine engine, [Argument("projectdir")] string projectDir, [Argument("zsharpdir")] string zsharpDir, [Argument("source")] string source) : base(engine)
+    private BuildTarget_GenerateSolution(IBuildEngine engine
+        , [Argument("projectdir")] string projectDir
+        , [Argument("zsharpdir")] string zsharpDir
+        , [Argument("source")] string source
+        , [Argument("modulemappinginfo")] string moduleMappingInfo) : base(engine)
     {
         UnrealProjectDir = projectDir.TrimEnd('/', '\\');
         ZSharpPluginDir = zsharpDir.TrimEnd('/', '\\');
@@ -38,6 +47,29 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
         }
         _sourcePaths = source.Split(';').ToList();
         
+        JsonSerializerOptions options = new()
+        {
+            PropertyNameCaseInsensitive = true,
+        };
+        var moduleMappingInfoDto = JsonSerializer.Deserialize<ModuleMappingInfo>(moduleMappingInfo, options);
+        if (moduleMappingInfoDto is null)
+        {
+            throw new ArgumentException($"Invalid argument modulemappinginfo={moduleMappingInfo}.");
+        }
+
+        Dictionary<string, List<string>> assembly2ModuleLookup = new();
+        foreach (var pair in moduleMappingInfoDto.Mapping)
+        {
+            if (!assembly2ModuleLookup.TryGetValue(pair.Value, out var list))
+            {
+                list = new();
+                assembly2ModuleLookup[pair.Value] = list;
+            }
+            
+            list.Add(pair.Key);
+        }
+        _assembly2ModuleLookup = assembly2ModuleLookup;
+
         _projectMap = GatherProjectDefinitions();
         if (_projectMap.Count > 0)
         {
@@ -110,6 +142,10 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
                 {
                     project.Name = Path.GetFileNameWithoutExtension(projectFilePaths[i]);
                     project.SourceDir = Path.GetDirectoryName(projectFilePaths[i])?.Replace('\\', '/') ?? string.Empty;
+                    if (_assembly2ModuleLookup.TryGetValue(project.Name, out var modules))
+                    {
+                        project.Constants.AddRange(modules.Select(module => $"UE_MODULE_{module.ToUpper()}"));
+                    }
                     projects.Add(project);
                 }
             }
@@ -184,6 +220,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
     }
 
     private List<string> _sourcePaths;
+    private IReadOnlyDictionary<string, List<string>> _assembly2ModuleLookup;
     private IReadOnlyDictionary<string, ProjectDefinition> _projectMap;
 }
 

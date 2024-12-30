@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+#if UE_MODULE_ENHANCEDINPUT
+
 namespace ZeroGames.ZSharp.UnrealEngine.EnhancedInput;
 
 public partial class InputActionValue
@@ -22,7 +24,9 @@ public partial class InputActionValue
 	private unsafe void InternalDeconstruct(out double x, out double y, out double z) => InputActionValue_Interop.Deconstruct(ConjugateHandle.FromConjugate(this), out x, out y, out z);
 
 	private const double ZERO_TOLERANCE = 1e-2;
-
+	
 }
+
+#endif
 
 

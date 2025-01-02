@@ -135,8 +135,6 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 	
 	~StreamingTaskBase() => InternalDispose();
 
-	private static unsafe void ReleaseUnmanaged(object? unmanaged) => StreamingTask_Interop.Release((IntPtr)unmanaged!);
-	
 	private void InternalCancel()
 	{
 		ensure(_state != EState.Loaded);
@@ -144,7 +142,7 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 		_expiredException = ExceptionDispatchInfo.Capture(new LifecycleExpiredException(_lifecycle));
 	}
 	
-	private void InternalDispose()
+	private unsafe void InternalDispose()
 	{
 		ensure(_state != EState.Loading);
 		
@@ -155,8 +153,15 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 
 		IntPtr unmanaged = Unmanaged;
 		Unmanaged = IntPtr.Zero;
-		
-		IGameThreadScheduler.Instance.Send(ReleaseUnmanaged, unmanaged);
+
+		if (IsInGameThread)
+		{
+			StreamingTask_Interop.Release(unmanaged);
+		}
+		else
+		{
+			IGameThreadScheduler.Instance.Post(state => StreamingTask_Interop.Release((IntPtr)state!), unmanaged);
+		}
 	}
 	
 	private readonly Lifecycle _lifecycle;

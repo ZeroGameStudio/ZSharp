@@ -52,7 +52,6 @@ CONJUGATE_KEY(ZSharp::FZSelfDescriptiveSoftObjectPtr, Unreal.SoftObjectPtr)
 CONJUGATE_KEY(ZSharp::FZSelfDescriptiveWeakObjectPtr, Unreal.WeakObjectPtr)
 CONJUGATE_KEY(ZSharp::FZSelfDescriptiveLazyObjectPtr, Unreal.LazyObjectPtr)
 CONJUGATE_KEY(ZSharp::FZSelfDescriptiveScriptInterface, Unreal.ScriptInterface)
-CONJUGATE_KEY(ZSharp::FZSelfDescriptiveStrongObjectPtr, Unreal.StrongObjectPtr)
 
 CONJUGATE_KEY(FFieldPath, Unreal.FieldPath)
 

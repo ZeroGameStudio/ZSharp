@@ -4,11 +4,7 @@ using System.Numerics;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-// IMPORTANT: Type name and namespace is used by magic, DO NOT change!
-[ConjugateRegistryId(27)]
-[ConjugateKey("Unreal.StrongObjectPtr")]
 public sealed class StrongObjectPtr<T> : StrongObjectPtrBase
-	, IConjugate<StrongObjectPtr<T>>
 	, ICloneable<StrongObjectPtr<T>>
 	, IEquatable<StrongObjectPtr<T>>
 	, IEqualityOperators<StrongObjectPtr<T>?, StrongObjectPtr<T>?, bool>
@@ -16,26 +12,12 @@ public sealed class StrongObjectPtr<T> : StrongObjectPtrBase
 	where T : UnrealObject
 {
 
-	public static StrongObjectPtr<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
-	
-	public static StrongObjectPtr<T> From<TSource>(StrongObjectPtr<TSource> other) where TSource : T => new(other);
+	public static StrongObjectPtr<T> From<TSource>(StrongObjectPtr<TSource> other) where TSource : T => new(other.Target);
 
-	public StrongObjectPtr()
-	{
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealClass.FromType<T>().Unmanaged);
-	}
-	
-	public StrongObjectPtr(T? target) : this()
-	{
-		if (target is null)
-		{
-			return;
-		}
+	public StrongObjectPtr() : this(null){}
+	public StrongObjectPtr(T? target) : base(target){}
 
-		Target = target;
-	}
-	
-	public StrongObjectPtr<T> Clone() => new(this);
+	public StrongObjectPtr<T> Clone() => new(Target);
 	object ICloneable.Clone() => Clone();
 
 	public bool Equals(StrongObjectPtr<T>? other) => base.Equals(other);
@@ -66,50 +48,32 @@ public sealed class StrongObjectPtr<T> : StrongObjectPtrBase
 		public int32 GetHashCode(StrongObjectPtr<T> obj) => obj.GetHashCode();
 	}
 
-	private StrongObjectPtr(IntPtr unmanaged) : base(unmanaged){}
-	private StrongObjectPtr(StrongObjectPtrBase? other) : this() => InternalCopy(other);
-
-	private unsafe void InternalCopy(StrongObjectPtrBase? other)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		
-		if (other is not null)
-		{
-			StrongObjectPtr_Interop.Copy(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other));
-		}
-		else
-		{
-			Target = null;
-		}
-	}
-
 	private unsafe T? InternalGet(bool evenIfGarbage)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		MasterAlcCache.Instance.GuardUnloaded();
-		return StrongObjectPtr_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<T>();
+		return StrongObjectPtr_Interop.Get(Unmanaged, Convert.ToByte(evenIfGarbage)).GetTarget<T>();
 	}
 
 	private unsafe void InternalSet(T? target)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		MasterAlcCache.Instance.GuardUnloaded();
-		StrongObjectPtr_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
+		StrongObjectPtr_Interop.Set(Unmanaged, ConjugateHandle.FromConjugate(target));
 	}
 	
 	private unsafe bool InternalIsValid(bool evenIfGarbage)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		MasterAlcCache.Instance.GuardUnloaded();
-		return StrongObjectPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
+		return StrongObjectPtr_Interop.IsValid(Unmanaged, Convert.ToByte(evenIfGarbage)) > 0;
 	}
 
 	private unsafe bool InternalIsNull()
 	{
 		Thrower.ThrowIfNotInGameThread();
 		MasterAlcCache.Instance.GuardUnloaded();
-		return StrongObjectPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
+		return StrongObjectPtr_Interop.IsNull(Unmanaged) > 0;
 	}
 	
 }

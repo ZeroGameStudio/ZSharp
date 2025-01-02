@@ -27,8 +27,7 @@ private: \
 	DECLARE_REGISTRY(WeakObjectPtr)
 	DECLARE_REGISTRY(LazyObjectPtr)
 	DECLARE_REGISTRY(ScriptInterface)
-	DECLARE_REGISTRY(StrongObjectPtr)
-	
+
 #undef DECLARE_REGISTRY
 }
 

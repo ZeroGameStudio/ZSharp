@@ -181,7 +181,8 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(ScriptInterface, IsValid),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(ScriptInterface, IsNull),
 
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, Copy),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, Alloc),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, Free),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, Identical),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, Hash),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StrongObjectPtr, Get),

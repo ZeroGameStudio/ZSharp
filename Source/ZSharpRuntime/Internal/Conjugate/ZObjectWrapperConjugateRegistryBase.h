@@ -29,6 +29,8 @@ namespace ZSharp
 		FZConjugateHandle Conjugate(const UClass* descriptor) { return Conjugate(descriptor, [](const ConjugateWrapperType&){}); }
 		FZConjugateHandle Conjugate(const UClass* descriptor, TFunctionRef<void(const ConjugateWrapperType&)> initialize)
 		{
+			check(IsInGameThread());
+			
 			auto wrapper = new ConjugateWrapperType { descriptor };
 			initialize(*wrapper);
 			const FZRuntimeTypeHandle type = GetManagedType(descriptor);
@@ -37,6 +39,8 @@ namespace ZSharp
 		
 		FZConjugateHandle Conjugate(const UClass* descriptor, const UnderlyingInstanceType* unmanaged)
 		{
+			check(IsInGameThread());
+			
 			auto mutableUnmanaged = const_cast<UnderlyingInstanceType*>(unmanaged);
 			if (const ConjugateWrapperType* wrapper = Super::FindConjugateWrapper(unmanaged))
 			{

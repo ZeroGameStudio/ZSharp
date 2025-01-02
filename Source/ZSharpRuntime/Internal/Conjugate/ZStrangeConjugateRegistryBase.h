@@ -24,6 +24,8 @@ namespace ZSharp
 	public:
 		FZConjugateHandle Conjugate(const DescriptorType* descriptor, TFunctionRef<void(const ConjugateType&)> initialize = [](const ConjugateType&){})
 		{
+			check(IsInGameThread());
+			
 			ConjugateType* wrapper;
 			if constexpr (TConjugate::IsUObjectDescriptor)
 			{
@@ -41,6 +43,8 @@ namespace ZSharp
 		
         FZConjugateHandle Conjugate(const DescriptorType* descriptor, const UnderlyingInstanceType* unmanaged)
 		{
+			check(IsInGameThread());
+			
 			const auto mutableUnmanaged = const_cast<UnderlyingInstanceType*>(unmanaged);
 			if (const ConjugateWrapperType* wrapper = Super::FindConjugateWrapper(mutableUnmanaged))
 			{

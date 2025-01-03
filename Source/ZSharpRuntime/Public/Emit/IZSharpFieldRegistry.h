@@ -6,15 +6,15 @@
 
 namespace ZSharp
 {
-	struct FZSharpClass
+	struct ZSHARPRUNTIME_API FZSharpClass
 	{
-		struct FPropertyDefault
+		struct ZSHARPRUNTIME_API FPropertyDefault
 		{
 			TArray<FProperty*> PropertyChain;
 			FString Buffer;
 		};
 
-		struct FDefaultSubobject
+		struct ZSHARPRUNTIME_API FDefaultSubobject
 		{
 			FName Name;
 			FName ClassPath;
@@ -29,13 +29,13 @@ namespace ZSharp
 			FName AttachSocketName;
 		};
 
-		struct FDefaultSubobjectOverride
+		struct ZSHARPRUNTIME_API FDefaultSubobjectOverride
 		{
 			FName Name;
 			FName ClassPath;
 		};
 
-		struct FReplicatedProperty
+		struct ZSHARPRUNTIME_API FReplicatedProperty
 		{
 			FProperty* Property;
 			ELifetimeCondition Condition;
@@ -53,7 +53,7 @@ namespace ZSharp
 		TArray<FReplicatedProperty> ReplicatedProperties;
 	};
 
-	struct FZSharpFunction
+	struct ZSHARPRUNTIME_API FZSharpFunction
 	{
 
 		friend class FZSharpFieldRegistry;

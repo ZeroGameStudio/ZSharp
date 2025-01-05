@@ -209,7 +209,7 @@ public class ProjectFileBuilder
 
 		if (_project.Name == ENGINE_ASSEMBLY_NAME || _project.ProjectReferences.Contains(ENGINE_ASSEMBLY_NAME))
 		{
-			finalStaticUsings.Add("ZeroGames.ZSharp.UnrealEngine.CoreUObject.UObjectGlobals");
+			finalStaticUsings.Add("ZeroGames.ZSharp.UnrealEngine.CoreUObject.UnrealObjectGlobals");
 		}
 
 		foreach (var us in finalStaticUsings.Distinct())
@@ -287,7 +287,6 @@ public class ProjectFileBuilder
 				string analyzerProjectName = _project.ProjectType switch
 				{
 					EProjectType.CSharp => "ZeroGames.ZSharp.Analyzer.CSharp",
-					EProjectType.VisualBasic => throw new NotImplementedException(),
 					_ => throw new InvalidOperationException()
 				};
 				finalProjectAnalyzerReferences.Add(analyzerProjectName);
@@ -298,7 +297,6 @@ public class ProjectFileBuilder
 				string sourceGeneratorProjectName = _project.ProjectType switch
 				{
 					EProjectType.CSharp => "ZeroGames.ZSharp.Emit.SourceGenerator.CSharp",
-					EProjectType.VisualBasic => throw new NotImplementedException(),
 					_ => throw new InvalidOperationException()
 				};
 				finalProjectAnalyzerReferences.Add(sourceGeneratorProjectName);

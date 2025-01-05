@@ -39,6 +39,8 @@
 #include "Interop/Engine/ZEngine_Interop.h"
 #include "Interop/Engine/ZStreamableManager_Interop.h"
 #include "Interop/Engine/ZStreamingTask_Interop.h"
+#include "Interop/Engine/ZActor_Interop.h"
+#include "Interop/Engine/ZWorld_Interop.h"
 #include "Interop/GameplayTags/ZGameplayTag_Interop.h"
 #include "Interop/EnhancedInput/ZEnhancedInputComponent_Interop.h"
 #include "Interop/EnhancedInput/ZInputActionValue_Interop.h"
@@ -98,6 +100,7 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetName),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetPathName),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetOuter),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, GetWorld),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, IsA),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, IsIn),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, Rename),
@@ -266,6 +269,10 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamingTask, GetResult),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamingTask, GetLoadedCount),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamingTask, Release),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, FinishSpawning),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(World, SpawnActor),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(GameplayTag, Request),
 

@@ -65,8 +65,8 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 		_totalCount = totalCount;
 		_progress = progress;
 	}
-	
-	internal static BatchStreamingTask<T> EmptyTask => throw new NotImplementedException();
+
+	internal static BatchStreamingTask<T> EmptyTask => new(default(EEmptyConstructor));
 
 	protected override void InternalUpdate(int32 loadedCount)
 	{
@@ -77,6 +77,11 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 		
 		_loadedCount = loadedCount;
 		_progress?.Report(new(_loadedCount, _totalCount));
+	}
+	
+	private BatchStreamingTask(EEmptyConstructor _) : base(_)
+	{
+		_cached = true;
 	}
 
 	private unsafe void FetchLoadedCount()
@@ -138,7 +143,7 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 				}
 			}
 			
-			return _result ?? [];
+			return _result;
 		}
 	}
 
@@ -148,7 +153,7 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 	private IProgress<BatchStreamingProgress>? _progress;
 
 	private bool _cached;
-	private T[]? _result;
+	private T[] _result = [];
 	
 }
 

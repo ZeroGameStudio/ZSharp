@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
@@ -25,7 +26,7 @@ public partial class UnrealClass
 	}
 	public new static UnrealClass FromType<T>() where T : IUnrealObject => FromType(typeof(T));
 
-	public UnrealObject GetDefaultObject(bool createIfNeeded)
+	public bool TryGetDefaultObject([NotNullWhen(true)] out UnrealObject? result)
 	{
 		MasterAlcCache.GuardInvariant();
 		if (IsInterface)
@@ -33,7 +34,19 @@ public partial class UnrealClass
 			throw new InvalidOperationException();
 		}
 		
-		return InternalGetDefaultObject(createIfNeeded);
+		result = InternalGetDefaultObject(false);
+		return result is not null;
+	}
+
+	public UnrealObject GetDefaultObject()
+	{
+		MasterAlcCache.GuardInvariant();
+		if (IsInterface)
+		{
+			throw new InvalidOperationException();
+		}
+		
+		return InternalGetDefaultObject(true)!;
 	}
 
 	public bool ImplementsInterface(UnrealClass @interface)
@@ -58,7 +71,7 @@ public partial class UnrealClass
 		}
 	}
 	
-	private unsafe UnrealObject InternalGetDefaultObject(bool createIfNeeded) => UnrealClass_Interop.GetDefaultObject(ConjugateHandle.FromConjugate(this), Convert.ToByte(createIfNeeded)).GetTargetChecked<UnrealObject>();
+	private unsafe UnrealObject? InternalGetDefaultObject(bool createIfNeeded) => UnrealClass_Interop.GetDefaultObject(ConjugateHandle.FromConjugate(this), Convert.ToByte(createIfNeeded)).GetTarget<UnrealObject>();
 	private unsafe bool InternalImplementsInterface(UnrealClass other) => UnrealClass_Interop.ImplementsInterface(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
 
 	private unsafe bool InternalIsInterface => UnrealClass_Interop.IsInterface(ConjugateHandle.FromConjugate(this)) > 0;

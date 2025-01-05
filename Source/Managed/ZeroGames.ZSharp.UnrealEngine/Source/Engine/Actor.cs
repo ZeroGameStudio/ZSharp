@@ -23,6 +23,15 @@ public partial class Actor
 
 		return res;
 	}
+
+	internal void FinishSpawning()
+	{
+		MasterAlcCache.GuardInvariant();
+		InternalFinishSpawning();
+	}
+	
+	private unsafe void InternalFinishSpawning()
+		=> Actor_Interop.FinishSpawning(ConjugateHandle.FromConjugate(this));
 	
 }
 

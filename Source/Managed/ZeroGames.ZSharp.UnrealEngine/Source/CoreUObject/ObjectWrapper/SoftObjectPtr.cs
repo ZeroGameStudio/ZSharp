@@ -14,6 +14,7 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 	, IEquatable<SoftObjectPtr<T>>
 	, IEqualityOperators<SoftObjectPtr<T>?, SoftObjectPtr<T>?, bool>
 	, ISoftObjectWrapper<T>
+	, IUnrealObjectPath
 	where T : UnrealObject
 {
 
@@ -51,6 +52,8 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 	
 	public static IEqualityComparer<SoftObjectPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
 
+	public string Path => Target?.GetPathName() ?? string.Empty;
+	
 	public T? Target
 	{
 		get => InternalGet(false);

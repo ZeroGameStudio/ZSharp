@@ -10,7 +10,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.FieldNotification;
 /// </summary>
 partial interface INotifyFieldValueChanged
 {
-	void BroadcastFieldValueChanged(string fieldName) => throw new NotImplementedException();
+	void BroadcastFieldValueChanged(string fieldName) => Thrower.NotImplemented();
 }
 
 

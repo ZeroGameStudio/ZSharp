@@ -8,6 +8,7 @@ internal static unsafe class UnrealObject_Interop
 	public static delegate* unmanaged<ConjugateHandle, IntPtr, void> GetName;
 	public static delegate* unmanaged<ConjugateHandle, IntPtr, void> GetPathName;
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle> GetOuter;
+	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle> GetWorld;
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle, uint8> IsA;
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle, uint8> Implements;
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle, uint8> IsIn;

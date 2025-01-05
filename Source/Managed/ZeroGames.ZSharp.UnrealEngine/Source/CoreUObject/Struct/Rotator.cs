@@ -16,6 +16,8 @@ public partial class Rotator
 	{
 		return $"Rotator {{ Pitch={Pitch}, Yaw={Yaw}, Roll={Roll} }}";
 	}
-	
+
+	public Quat ToQuat() => KismetMathLibrary.Conv_RotatorToQuaternion(this);
+
 }
 

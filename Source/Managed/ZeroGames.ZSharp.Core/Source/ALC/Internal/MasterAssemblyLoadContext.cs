@@ -322,7 +322,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
         RegisterZCall(new ZCallDispatcher_Delegate());
         RegisterZCallResolver(new ZCallResolver_Method(this), 1);
-        RegisterZCallResolver(new ZCallResolver_Property(this), 2);
     }
 
     private void GuardInvariant()

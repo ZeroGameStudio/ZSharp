@@ -7,14 +7,8 @@ namespace ZeroGames.ZSharp.Core.Async;
 public interface ITimerScheduler
 {
 	void Unregister(Timer timer);
-	void UnregisterAll(Lifecycle lifecycle);
-	
 	void Suspend(Timer timer);
-	void SuspendAll(Lifecycle lifecycle);
-	
 	void Resume(Timer timer);
-	void ResumeAll(Lifecycle lifecycle);
-
 	bool IsValidTimer(Timer timer);
 }
 

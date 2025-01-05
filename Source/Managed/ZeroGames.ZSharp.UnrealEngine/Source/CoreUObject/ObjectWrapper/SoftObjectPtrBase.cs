@@ -7,7 +7,6 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public abstract class SoftObjectPtrBase : UnrealConjugateBase
 	, IEquatable<SoftObjectPtrBase>
 	, IEqualityOperators<SoftObjectPtrBase?, SoftObjectPtrBase?, bool>
-	, IUnrealObjectPath
 {
 	
 	public bool Equals(SoftObjectPtrBase? other) => ReferenceEquals(this, other) || InternalEquals(other);
@@ -16,8 +15,6 @@ public abstract class SoftObjectPtrBase : UnrealConjugateBase
 	
 	public static bool operator ==(SoftObjectPtrBase? left, SoftObjectPtrBase? right) => Equals(left, right);
 	public static bool operator !=(SoftObjectPtrBase? left, SoftObjectPtrBase? right) => !Equals(left, right);
-	
-	public string Path => throw new NotImplementedException();
 	
 	protected SoftObjectPtrBase(){}
 	protected SoftObjectPtrBase(IntPtr unmanaged) : base(unmanaged){}

@@ -34,6 +34,17 @@ ZSharp::FZConjugateHandle ZSharp::FZUnrealObject_Interop::GetOuter(FZConjugateHa
 	return registry.Conjugate(pSelf->GetOuter());
 }
 
+ZSharp::FZConjugateHandle ZSharp::FZUnrealObject_Interop::GetWorld(FZConjugateHandle self)
+{
+#if WITH_ENGINE
+	FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+	const auto pSelf = registry.ConjugateUnsafeChecked<UObject>(self);
+	return registry.Conjugate(pSelf->GetWorld());
+#else
+	return {};
+#endif
+}
+
 uint8 ZSharp::FZUnrealObject_Interop::IsA(FZConjugateHandle self, FZConjugateHandle cls)
 {
 	const FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();

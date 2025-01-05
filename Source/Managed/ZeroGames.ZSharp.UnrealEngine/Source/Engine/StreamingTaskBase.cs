@@ -65,6 +65,12 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 	public void ContinueWith(Action continuation)
 	{
 		GuardInvariant();
+
+		if (IsCompleted)
+		{
+			continuation();
+			return;
+		}
 		
 		if (_continuation == default)
 		{
@@ -90,6 +96,13 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 	{
 		Unmanaged = unmanaged;
 		_lifecycle = lifecycle;
+	}
+
+	private protected enum EEmptyConstructor;
+
+	private protected StreamingTaskBase(EEmptyConstructor _)
+	{
+		_state = EState.Loaded;
 	}
 	
 	protected void GuardInvariant()
@@ -117,6 +130,12 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 	protected void ContinueWith(IMoveNextSource source)
 	{
 		GuardInvariant();
+		
+		if (IsCompleted)
+		{
+			source.MoveNext();
+			return;
+		}
 		
 		if (_continuation == default)
 		{

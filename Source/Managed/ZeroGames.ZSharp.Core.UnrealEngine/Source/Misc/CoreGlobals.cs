@@ -34,6 +34,8 @@ public static class CoreGlobals
 	public const string GCompatIni = Compat;
 	public const string GLightmassIni = Lightmass;
 	
+	public const string GZSharpIni = ZSharp;
+	
 	// Migrate from FConfigCacheIni::InitializeConfigSystem().
 	private const string Engine = nameof(Engine);
 	private const string Game = nameof(Game);
@@ -54,6 +56,8 @@ public static class CoreGlobals
 	private const string EditorLayout = nameof(EditorLayout);
 	private const string Compat = nameof(Compat);
 	private const string Lightmass = nameof(Lightmass);
+
+	private const string ZSharp = nameof(ZSharp);
 
 }
 

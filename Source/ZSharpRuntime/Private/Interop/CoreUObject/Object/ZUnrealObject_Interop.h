@@ -12,6 +12,7 @@ namespace ZSharp
 		static void GetName(FZConjugateHandle self, FString& result);
 		static void GetPathName(FZConjugateHandle self, FString& result);
 		static FZConjugateHandle GetOuter(FZConjugateHandle self);
+		static FZConjugateHandle GetWorld(FZConjugateHandle self);
 		static uint8 IsA(FZConjugateHandle self, FZConjugateHandle cls);
 		static uint8 IsIn(FZConjugateHandle self, FZConjugateHandle outer);
 		static uint8 Rename(FZConjugateHandle self, const TCHAR* newName, FZConjugateHandle newOuter);

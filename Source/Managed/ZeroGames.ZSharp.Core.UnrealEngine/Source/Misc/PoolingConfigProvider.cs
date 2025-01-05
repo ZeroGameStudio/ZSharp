@@ -11,9 +11,9 @@ public class PoolingConfigProvider<T> : IConfigProvider<T> where T : class, new(
 
 	private static int32 GetFromIniConfig(string prefix, string name, int32 fallback)
 	{
-		if (!GConfig.TryGetInt32(BASE_INI_NAME, SECTION, $"{prefix}.{name}", out var result))
+		if (!GConfig.TryGetInt32(GZSharpIni, SECTION, $"{prefix}.{name}", out var result))
 		{
-			result = GConfig.GetInt32OrDefault(BASE_INI_NAME, SECTION, name, fallback);
+			result = GConfig.GetInt32OrDefault(GZSharpIni, SECTION, name, fallback);
 		}
 		
 		return result;
@@ -31,7 +31,6 @@ public class PoolingConfigProvider<T> : IConfigProvider<T> where T : class, new(
 		};
 	}
 
-	private const string BASE_INI_NAME = "ZSharp";
 	private const string SECTION = "Managed.Pooling";
 	
 	private const int32 FALLBACK_PRECACHE_COUNT = 0;

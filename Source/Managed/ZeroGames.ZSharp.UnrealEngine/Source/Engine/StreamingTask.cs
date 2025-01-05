@@ -43,10 +43,15 @@ public class StreamingTask<T> : StreamingTaskBase, IAwaitable<T?, StreamingTask<
 	
 	internal StreamingTask(IntPtr unmanaged, Lifecycle lifecycle) : base(unmanaged, lifecycle){}
 
-	internal static StreamingTask<T> EmptyTask => throw new NotImplementedException();
+	internal static StreamingTask<T> EmptyTask { get; } = new(default(EEmptyConstructor));
 
 	protected override void InternalUpdate(int32 loadedCount) => throw new NotSupportedException();
 
+	private StreamingTask(EEmptyConstructor _) : base(_)
+	{
+		_cached = true;
+	}
+	
 	private unsafe T? InternalResult
 	{
 		get

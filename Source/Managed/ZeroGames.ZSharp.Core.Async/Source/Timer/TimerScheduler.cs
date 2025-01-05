@@ -55,12 +55,6 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		
 		InternalUnregister(timer);
 	}
-
-	public void UnregisterAll(Lifecycle lifecycle)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		throw new NotImplementedException();
-	}
 	
 	public void Suspend(Timer timer)
 	{
@@ -73,12 +67,6 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		InternalSuspend(timer);
 	}
 
-	public void SuspendAll(Lifecycle lifecycle)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		throw new NotImplementedException();
-	}
-
 	public void Resume(Timer timer)
 	{
 		Thrower.ThrowIfNotInGameThread();
@@ -88,12 +76,6 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		}
 		
 		InternalResume(timer);
-	}
-
-	public void ResumeAll(Lifecycle lifecycle)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		throw new NotImplementedException();
 	}
 
 	public bool IsValidTimer(Timer timer)

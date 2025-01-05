@@ -7,7 +7,6 @@ namespace ZeroGames.ZSharp.Build.Solution;
 public enum EProjectType
 {
 	CSharp,
-	VisualBasic,
 }
 
 public class ProjectDefinition
@@ -67,14 +66,12 @@ public class ProjectDefinition
 	public EProjectType ProjectType => Language?.ToLower() switch
 	{
 		null or "c#" or "cs" or "csharp" => EProjectType.CSharp,
-		"vb" or "visualbasic" => EProjectType.VisualBasic,
 		_ => throw new ArgumentException($"Unknown language: {Language}")
 	};
 
 	public string ProjectFileExtension => ProjectType switch
 	{
 		EProjectType.CSharp => ".csproj",
-		EProjectType.VisualBasic => ".vbproj",
 		_ => throw new ArgumentException($"Unknown project type: {ProjectType}")
 	};
 

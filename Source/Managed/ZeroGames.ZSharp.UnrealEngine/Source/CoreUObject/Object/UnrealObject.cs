@@ -34,6 +34,12 @@ public partial class UnrealObject : IUnrealObject
         verify(GetOuter() is var outer && outer is not null);
         return outer;
     }
+    
+    public World? GetWorld()
+    {
+        MasterAlcCache.GuardInvariant();
+        return InternalGetWorld();
+    }
 
     public bool IsA(UnrealClass @class)
     {
@@ -77,9 +83,17 @@ public partial class UnrealObject : IUnrealObject
         return buffer;
     }
     
-    private unsafe UnrealObject? InternalGetOuter() => UnrealObject_Interop.GetOuter(ConjugateHandle.FromConjugate(this)).GetTarget<UnrealObject>();
-    private unsafe bool InternalIsA(UnrealClass @class) => UnrealObject_Interop.IsA(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(@class)) > 0;
-    private unsafe bool InternalIsIn(UnrealObject outer) => UnrealObject_Interop.IsIn(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(outer)) > 0;
+    private unsafe World? InternalGetWorld()
+        => UnrealObject_Interop.GetWorld(ConjugateHandle.FromConjugate(this)).GetTarget<World>();
+    
+    private unsafe UnrealObject? InternalGetOuter()
+        => UnrealObject_Interop.GetOuter(ConjugateHandle.FromConjugate(this)).GetTarget<UnrealObject>();
+    
+    private unsafe bool InternalIsA(UnrealClass @class)
+        => UnrealObject_Interop.IsA(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(@class)) > 0;
+    
+    private unsafe bool InternalIsIn(UnrealObject outer)
+        => UnrealObject_Interop.IsIn(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(outer)) > 0;
 
     private unsafe bool InternalRename(string? newName, UnrealObject? newOuter)
     {
@@ -88,7 +102,7 @@ public partial class UnrealObject : IUnrealObject
             return UnrealObject_Interop.Rename(ConjugateHandle.FromConjugate(this), newNameBuffer, ConjugateHandle.FromConjugate(newOuter)) > 0;
         }
     }
-    
+
 }
 
 

@@ -12,7 +12,7 @@ class UZManagedDelegateProxy : public UInterface
 	GENERATED_BODY()
 };
 
-class ZSHARPRUNTIME_API IZManagedDelegateProxy : public IInterface
+class IZManagedDelegateProxy : public IInterface
 {
 	GENERATED_BODY()
 

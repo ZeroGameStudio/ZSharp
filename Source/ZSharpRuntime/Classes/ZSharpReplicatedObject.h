@@ -4,7 +4,7 @@
 
 #include "ZSharpReplicatedObject.generated.h"
 
-UINTERFACE(meta = (CannotImplementInterfaceInBlueprint))
+UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
 class UZSharpReplicatedObject : public UInterface
 {
 	GENERATED_BODY()

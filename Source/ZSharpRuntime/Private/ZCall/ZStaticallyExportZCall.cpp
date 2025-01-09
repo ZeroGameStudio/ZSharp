@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZCall/ZStaticallyExportZCall.h"
 
 #include "ZCallResolver_Export.h"

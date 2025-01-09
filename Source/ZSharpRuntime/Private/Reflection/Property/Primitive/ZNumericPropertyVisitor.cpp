@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZNumericPropertyVisitor.h"
 
 #include "ZSharpRuntimeLogChannels.h"

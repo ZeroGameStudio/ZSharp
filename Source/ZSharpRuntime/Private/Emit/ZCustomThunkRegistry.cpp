@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZCustomThunkRegistry.h"
 
 ZSharp::FZCustomThunkRegistry& ZSharp::FZCustomThunkRegistry::Get()

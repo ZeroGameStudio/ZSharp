@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZFieldPathPropertyVisitor.h"
 
 #include "ZCall/ZCallBufferSlotEncoder.h"

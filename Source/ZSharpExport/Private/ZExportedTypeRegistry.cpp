@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZExportedTypeRegistry.h"
 
 ZSharp::FZExportedTypeRegistry& ZSharp::FZExportedTypeRegistry::Get()

@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZDynamicallyExportedDelegate.h"
 
 #include "ZExportedTypeRegistry.h"

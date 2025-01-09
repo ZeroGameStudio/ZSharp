@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZSharpFunctionFailureDelegate.h"
 
 ZSharp::FZSharpFunctionFailureDelegate& ZSharp::FZSharpFunctionFailureDelegate::Get()

@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZSharpReplicatedObject.h"
 
 #include "Emit/IZSharpFieldRegistry.h"

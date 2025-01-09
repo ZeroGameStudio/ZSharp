@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
 
 #include "CLR/IZSharpClr.h"

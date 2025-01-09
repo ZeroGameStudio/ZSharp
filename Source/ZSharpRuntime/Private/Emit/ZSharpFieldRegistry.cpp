@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZSharpFieldRegistry.h"
 
 #include "CLR/IZSharpClr.h"

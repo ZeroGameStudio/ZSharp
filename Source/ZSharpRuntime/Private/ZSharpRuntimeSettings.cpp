@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZSharpRuntimeSettings.h"
 
 int32 UZSharpRuntimeSettings::GetModuleEmitMetadataSource(const FString& moduleName, TArray<FZModuleEmitMetadataSource>& result) const

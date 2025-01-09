@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZManagedDelegateProxyImpl.h"
 
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"

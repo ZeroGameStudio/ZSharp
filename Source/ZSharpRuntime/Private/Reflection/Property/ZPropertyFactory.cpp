@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZPropertyFactory.h"
 
 namespace ZSharp::PropertyFactory_Private

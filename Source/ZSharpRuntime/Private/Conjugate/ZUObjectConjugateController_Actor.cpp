@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZUObjectConjugateController_Actor.h"
 
 ZSharp::FZUObjectConjugateController_Actor::FZUObjectConjugateController_Actor()

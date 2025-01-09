@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZNamePropertyVisitor.h"
 
 #include "ZCall/ZCallBufferSlotEncoder.h"

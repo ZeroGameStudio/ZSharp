@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptArray.h"
 
 #include "NativePropertyDescriptorCheckMacros.h"

@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZSetPropertyVisitor.h"
 
 #include "ALC/IZMasterAssemblyLoadContext.h"

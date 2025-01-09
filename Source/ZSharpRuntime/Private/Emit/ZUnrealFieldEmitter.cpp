@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZUnrealFieldEmitter.h"
 
 #include "ZCustomThunkRegistry.h"

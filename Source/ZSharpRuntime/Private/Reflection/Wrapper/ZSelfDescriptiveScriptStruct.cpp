@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptStruct.h"
 
 ZSharp::FZSelfDescriptiveScriptStruct::UnderlyingInstanceType* ZSharp::FZSelfDescriptiveScriptStruct::NewUnderlyingInstance(const DescriptorType* descriptor)

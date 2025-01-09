@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 
 #include "ZUObjectConjugateController_Actor.h"

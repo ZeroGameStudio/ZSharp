@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZBoolPropertyVisitor.h"
 
 #include "ZCall/ZCallBuffer.h"

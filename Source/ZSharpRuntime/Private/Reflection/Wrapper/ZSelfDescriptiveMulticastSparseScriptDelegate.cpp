@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "Reflection/Wrapper/ZSelfDescriptiveMulticastSparseScriptDelegate.h"
 
 #include "Reflection/Delegate/ZManagedDelegateProxyImpl.h"

@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-
 #include "ZUObjectConjugateController_GC.h"
 
 ZSharp::FZUObjectConjugateController_GC::FZUObjectConjugateController_GC()

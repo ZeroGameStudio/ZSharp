@@ -436,6 +436,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			}
 		}
 
+		AddMetadata(def.Property, def.MetadataMap);
+
 		if (needsFinishSimple)
 		{
 			FinishEmitSimpleProperty(def);

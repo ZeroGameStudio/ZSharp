@@ -714,21 +714,19 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 	def.Class = cls;
 
 	// Migrate from UClass(EStaticConstructor).
-	// UZSharpClass has no ClassVTableHelperCtorCaller and CppClassStaticFunctions so will directly copy from super in Bind().
 	cls->ClassConstructor = ZSharpClass_Private::ClassConstructor;
+	// UZSharpClass has no ClassVTableHelperCtorCaller and CppClassStaticFunctions so they will automatically copy from super in Bind().
 	cls->ClassUnique = 0;
 	cls->bCooked = false;
 	cls->bLayoutChanging = false;
 	cls->ClassFlags = def.ClassFlags | GCompiledInClassFlags;
 	cls->ClassCastFlags = def.CastFlags;
+	// ClassWithin, CDO, NetFields, SparseClassData will be set later.
 #if WITH_EDITORONLY_DATA
 	cls->ClassGeneratedBy = nullptr; // UZSharpClass doesn't depend on blueprint.
 	cls->PropertiesPendingDestruction = nullptr;
 #endif
-	// @TODO: UZSharpClass is not support NetFields yet.
-	cls->ClassDefaultObject = nullptr;
-	cls->SetSparseClassDataStruct(nullptr);
-	
+
 	// Migrate from UECodeGen_Private::ConstructUClass().
 	FCppClassTypeInfoStatic typeInfo;
 	typeInfo.bIsAbstract = cls->HasAllClassFlags(CLASS_Abstract);

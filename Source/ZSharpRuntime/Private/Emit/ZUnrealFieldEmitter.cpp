@@ -1078,6 +1078,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefini
 	const UObject* cdo = def.Class->GetDefaultObject();
 
 	// Precache replicated properties, then setup runtime replication data.
+	// This must be done after create CDO. (see UClass::SetUpRuntimeReplicationData() and UClass::ValidateRuntimeReplicationData())
 	{
 		TMap<FName, const FZPropertyDefinition*> netPropertyName2Def;
 		for (const auto& propertyDef : def.Properties)

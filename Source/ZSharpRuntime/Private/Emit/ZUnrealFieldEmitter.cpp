@@ -38,7 +38,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		}
 		
 		const auto structProperty = CastField<FStructProperty>(property);
-		return structProperty && (structProperty->Struct->StructFlags & STRUCT_HasInstancedReference);
+		return structProperty && EnumHasAllFlags(structProperty->Struct->StructFlags, STRUCT_HasInstancedReference);
 	}
 	
 	static FString MergeNames(const FString& lhs, const FString& rhs, const FString& subtract1, const FString& subtract2)

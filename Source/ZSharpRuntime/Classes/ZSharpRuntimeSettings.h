@@ -17,9 +17,6 @@ struct FZModuleEmitMetadataSource
 	FString AssemblyName;
 };
 
-/**
- * 
- */
 UCLASS(Config = ZSharp, DefaultConfig, meta = (ZSharpNoExport))
 class ZSHARPRUNTIME_API UZSharpRuntimeSettings : public UDeveloperSettings
 {

@@ -15,7 +15,6 @@ public sealed class UnrealMap<TKey, TValue> : UnrealConjugateBase
 	, IDictionary<TKey, TValue>
 	, IReadOnlyDictionary<TKey, TValue>
 	, ICloneable<UnrealMap<TKey, TValue>>
-	where TKey : notnull
 {
 	
 	public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDictionaryEnumerator

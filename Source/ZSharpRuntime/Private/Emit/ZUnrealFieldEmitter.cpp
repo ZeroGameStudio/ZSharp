@@ -992,10 +992,6 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 		defaultSubobject.Property = CastFieldChecked<FObjectPropertyBase>(cls->FindPropertyByName(defaultSubobject.PropertyName));
 	}
 	
-	// Super class and CDO should be ready to use at this point.
-	const UClass* superCls = cls->GetSuperClass();
-	const UObject* superCdo = superCls->GetDefaultObject(false);
-	check(superCdo);
 	{ // Construct property defaults.
 		zscls->PropertyDefaults.Reserve(def.PropertyDefaults.Num());
 		for (const auto& propertyDefaultDef : def.PropertyDefaults)
@@ -1027,32 +1023,6 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 			}
 			
 			propertyDefault.Buffer = propertyDefaultDef.Buffer;
-		}
-	}
-
-	// Construct field notifies.
-	if (!def.FieldNotifies.IsEmpty())
-	{
-		const INotifyFieldValueChanged* superInterface = Cast<INotifyFieldValueChanged>(superCdo);
-		int32 currentFieldNotifyIndex;
-		if (superInterface)
-		{
-			superInterface->GetFieldNotificationDescriptor().ForEachField(superCls, [&currentFieldNotifyIndex](UE::FieldNotification::FFieldId)
-			{
-				++currentFieldNotifyIndex;
-				return true;
-			});
-		}
-		else
-		{
-			check(cls->ImplementsInterface(UNotifyFieldValueChanged::StaticClass()));
-			
-			currentFieldNotifyIndex = 0;
-		}
-
-		for (const auto& field : def.FieldNotifies)
-		{
-			zscls->FieldNotifies.Emplace(UE::FieldNotification::FFieldId { field, currentFieldNotifyIndex++ });
 		}
 	}
 
@@ -1113,6 +1083,35 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefini
 
 		checkf(lifetimeProps.Num() == cls->ClassReps.Num(), TEXT("Some replicated properties don't get registered."));
 #endif
+	}
+
+	// Construct field notifies.
+	if (!def.FieldNotifies.IsEmpty())
+	{
+		const UObject* superCdo = superCls->GetDefaultObject(false);
+		check(superCdo);
+		
+		const INotifyFieldValueChanged* superInterface = Cast<INotifyFieldValueChanged>(superCdo);
+		int32 currentFieldNotifyIndex;
+		if (superInterface)
+		{
+			superInterface->GetFieldNotificationDescriptor().ForEachField(superCls, [&currentFieldNotifyIndex](UE::FieldNotification::FFieldId)
+			{
+				++currentFieldNotifyIndex;
+				return true;
+			});
+		}
+		else
+		{
+			check(cls->ImplementsInterface(UNotifyFieldValueChanged::StaticClass()));
+			
+			currentFieldNotifyIndex = 0;
+		}
+
+		for (const auto& field : def.FieldNotifies)
+		{
+			zscls->FieldNotifies.Emplace(UE::FieldNotification::FFieldId { field, currentFieldNotifyIndex++ });
+		}
 	}
 
 	UE_LOG(LogZSharpEmit, Log, TEXT("Successfully emit Z# class [%s]!"), *cls->GetPathName());

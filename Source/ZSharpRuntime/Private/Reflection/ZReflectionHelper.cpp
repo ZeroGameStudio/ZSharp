@@ -64,38 +64,38 @@ ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeT
 		return {};
 	}
 	
-	if (const auto classProp = CastField<FClassProperty>(elementProperty))
+	if (auto classProp = CastField<const FClassProperty>(elementProperty))
 	{
 		if (classProp->MetaClass == UObject::StaticClass())
 		{
 			return FZRuntimeTypeUri { GetFieldConjugateKey(UClass::StaticClass()) };
 		}
 	}
-	else if (const auto objectProp = CastField<FObjectProperty>(elementProperty))
+	else if (auto objectProp = CastField<const FObjectProperty>(elementProperty))
 	{
 		return FZRuntimeTypeUri { GetFieldConjugateKey(objectProp->PropertyClass) };
 	}
-	else if (const auto structProp = CastField<FStructProperty>(elementProperty))
+	else if (auto structProp = CastField<const FStructProperty>(elementProperty))
 	{
 		return FZRuntimeTypeUri { GetFieldConjugateKey(structProp->Struct) };
 	}
-	else if (const auto enumProp = CastField<FEnumProperty>(elementProperty))
+	else if (auto enumProp = CastField<const FEnumProperty>(elementProperty))
 	{
 		return FZRuntimeTypeUri { GetFieldConjugateKey(enumProp->GetEnum()) };
 	}
-	else if (const auto delegateProp = CastField<FDelegateProperty>(elementProperty))
+	else if (auto delegateProp = CastField<const FDelegateProperty>(elementProperty))
 	{
 		return FZRuntimeTypeUri { GetFieldConjugateKey(delegateProp->SignatureFunction) };
 	}
-	else if (const auto multicastInlineDelegateProp = CastField<FMulticastInlineDelegateProperty>(elementProperty))
+	else if (auto multicastInlineDelegateProp = CastField<const FMulticastInlineDelegateProperty>(elementProperty))
 	{
 		return FZRuntimeTypeUri { GetFieldConjugateKey(multicastInlineDelegateProp->SignatureFunction) };
 	}
-	else if (const auto multicastSparseDelegateProp = CastField<FMulticastSparseDelegateProperty>(elementProperty))
+	else if (auto multicastSparseDelegateProp = CastField<const FMulticastSparseDelegateProperty>(elementProperty))
 	{
 		return FZRuntimeTypeUri { GetFieldConjugateKey(multicastSparseDelegateProp->SignatureFunction) };
 	}
-	else if (const auto numericProp = CastField<FNumericProperty>(elementProperty))
+	else if (auto numericProp = CastField<const FNumericProperty>(elementProperty))
 	{
 		if (const UEnum* underlyingEnum = numericProp->GetIntPropertyEnum())
 		{
@@ -113,27 +113,27 @@ ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeT
 	ensure(elementProperty->IsA<FObjectPropertyBase>() && !elementProperty->IsA<FObjectProperty>());
 		
 	FZRuntimeTypeUri inner;
-	if (const auto classProp = CastField<FClassProperty>(elementProperty))
+	if (auto classProp = CastField<const FClassProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(classProp->MetaClass) };
 	}
-	else if (const auto softClassProp = CastField<FSoftClassProperty>(elementProperty))
+	else if (auto softClassProp = CastField<const FSoftClassProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(softClassProp->MetaClass) };
 	}
-	else if (const auto softObjectProperty = CastField<FSoftObjectProperty>(elementProperty))
+	else if (auto softObjectProperty = CastField<const FSoftObjectProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(softObjectProperty->PropertyClass) };
 	}
-	else if (const auto weakObjectProperty = CastField<FWeakObjectProperty>(elementProperty))
+	else if (auto weakObjectProperty = CastField<const FWeakObjectProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(weakObjectProperty->PropertyClass) };
 	}
-	else if (const auto lazyObjectProperty = CastField<FLazyObjectProperty>(elementProperty))
+	else if (auto lazyObjectProperty = CastField<const FLazyObjectProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(lazyObjectProperty->PropertyClass) };
 	}
-	else if (const auto interfaceProperty = CastField<FInterfaceProperty>(elementProperty))
+	else if (auto interfaceProperty = CastField<const FInterfaceProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(interfaceProperty->InterfaceClass) };
 	}

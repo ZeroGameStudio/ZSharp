@@ -409,7 +409,7 @@ ZSharp::IZSlimAssemblyLoadContext* ZSharp::FZGenericClr::CreateSlimAlc(const FSt
 {
 	FWriteScopeLock _(SlimAlcMapLock);
 	
-	if (const auto pAlc = SlimAlcMap.Find(name))
+	if (const TUniquePtr<FZSlimAssemblyLoadContext>* pAlc = SlimAlcMap.Find(name))
 	{
 		UE_LOG(LogZSharpCore, Warning, TEXT("Slim ALC [%s] already exists!"), *name);
 		return pAlc->Get();

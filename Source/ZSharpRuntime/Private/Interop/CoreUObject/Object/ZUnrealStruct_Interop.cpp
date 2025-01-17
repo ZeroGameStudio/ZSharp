@@ -9,8 +9,8 @@
 uint8 ZSharp::FZUnrealStruct_Interop::IsChildOf(FZConjugateHandle self, FZConjugateHandle other)
 {
 	const FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-	const auto pSelf = registry.ConjugateUnsafeChecked<UStruct>(self);
-	const auto pOther = registry.ConjugateUnsafeChecked<UStruct>(other);
+	auto pSelf = registry.ConjugateUnsafeChecked<const UStruct>(self);
+	auto pOther = registry.ConjugateUnsafeChecked<const UStruct>(other);
 	return pSelf->IsChildOf(pOther);
 }
 

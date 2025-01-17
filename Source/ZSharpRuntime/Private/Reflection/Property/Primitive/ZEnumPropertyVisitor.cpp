@@ -7,43 +7,43 @@
 
 void ZSharp::FZEnumPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const
 {
-	if (const auto uint8Prop = CastField<FByteProperty>(UnderlyingNumericProperty))
+	if (auto uint8Prop = CastField<const FByteProperty>(UnderlyingNumericProperty))
 	{
 		const uint8 value = uint8Prop->GetPropertyValue(src);
 		dest.WriteInt64(value);
 	}
-	else if (const auto uint16Prop = CastField<FUInt16Property>(UnderlyingNumericProperty))
+	else if (auto uint16Prop = CastField<const FUInt16Property>(UnderlyingNumericProperty))
 	{
 		const uint16 value = uint16Prop->GetPropertyValue(src);
 		dest.WriteInt64(value);
 	}
-	else if (const auto uint32Prop = CastField<FUInt32Property>(UnderlyingNumericProperty))
+	else if (auto uint32Prop = CastField<const FUInt32Property>(UnderlyingNumericProperty))
 	{
 		const uint32 value = uint32Prop->GetPropertyValue(src);
 		dest.WriteInt64(value);
 	}
-	else if (const auto uint64Prop = CastField<FUInt64Property>(UnderlyingNumericProperty))
+	else if (auto uint64Prop = CastField<const FUInt64Property>(UnderlyingNumericProperty))
 	{
 		const uint64 value = uint64Prop->GetPropertyValue(src);
 		check(value <= MAX_int64);
 		dest.WriteInt64(value);
 	}
-	else if (const auto int8Prop = CastField<FInt8Property>(UnderlyingNumericProperty))
+	else if (auto int8Prop = CastField<const FInt8Property>(UnderlyingNumericProperty))
 	{
 		const int8 value = int8Prop->GetPropertyValue(src);
 		dest.WriteInt64(value);
 	}
-	else if (const auto int16Prop = CastField<FInt16Property>(UnderlyingNumericProperty))
+	else if (auto int16Prop = CastField<const FInt16Property>(UnderlyingNumericProperty))
 	{
 		const int16 value = int16Prop->GetPropertyValue(src);
 		dest.WriteInt64(value);
 	}
-	else if (const auto int32Prop = CastField<FIntProperty>(UnderlyingNumericProperty))
+	else if (auto int32Prop = CastField<const FIntProperty>(UnderlyingNumericProperty))
 	{
 		const int32 value = int32Prop->GetPropertyValue(src);
 		dest.WriteInt64(value);
 	}
-	else if (const auto int64Prop = CastField<FInt64Property>(UnderlyingNumericProperty))
+	else if (auto int64Prop = CastField<const FInt64Property>(UnderlyingNumericProperty))
 	{
 		const int64 value = int64Prop->GetPropertyValue(src);
 		dest.WriteInt64(value);
@@ -59,44 +59,44 @@ void ZSharp::FZEnumPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot&
 {
 	if (UnderlyingNumericProperty->IsA<FByteProperty>())
 	{
-		const auto value = static_cast<uint8>(src.ReadInt64());
+		auto value = static_cast<const uint8>(src.ReadInt64());
 		UnderlyingNumericProperty->CopySingleValue(dest, &value);
 	}
 	else if (UnderlyingNumericProperty->IsA<FUInt16Property>())
 	{
-		const auto value = static_cast<uint16>(src.ReadInt64());
+		auto value = static_cast<const uint16>(src.ReadInt64());
 		UnderlyingNumericProperty->CopySingleValue(dest, &value);
 	}
 	else if (UnderlyingNumericProperty->IsA<FUInt32Property>())
 	{
-		const auto value = static_cast<uint32>(src.ReadInt64());
+		auto value = static_cast<const uint32>(src.ReadInt64());
 		UnderlyingNumericProperty->CopySingleValue(dest, &value);
 	}
 	else if (UnderlyingNumericProperty->IsA<FUInt64Property>())
 	{
 		const int64 raw = src.ReadInt64();
 		check(raw >= 0);
-		const auto value = static_cast<uint64>(raw);
+		auto value = static_cast<const uint64>(raw);
 		UnderlyingNumericProperty->CopySingleValue(dest, &value);
 	}
 	else if (UnderlyingNumericProperty->IsA<FInt8Property>())
 	{
-		const auto value = static_cast<int8>(src.ReadInt64());
+		auto value = static_cast<const int8>(src.ReadInt64());
 		UnderlyingNumericProperty->CopySingleValue(dest, &value);
 	}
 	else if (UnderlyingNumericProperty->IsA<FInt16Property>())
 	{
-		const auto value = static_cast<int16>(src.ReadInt64());
+		auto value = static_cast<const int16>(src.ReadInt64());
 		UnderlyingNumericProperty->CopySingleValue(dest, &value);
 	}
 	else if (UnderlyingNumericProperty->IsA<FIntProperty>())
 	{
-		const auto value = static_cast<int32>(src.ReadInt64());
+		auto value = static_cast<const int32>(src.ReadInt64());
 		UnderlyingNumericProperty->CopySingleValue(dest, &value);
 	}
 	else if (UnderlyingNumericProperty->IsA<FInt64Property>())
 	{
-		const auto value = src.ReadInt64();
+		auto value = src.ReadInt64();
 		UnderlyingNumericProperty->CopySingleValue(dest, &value);
 	}
 	else

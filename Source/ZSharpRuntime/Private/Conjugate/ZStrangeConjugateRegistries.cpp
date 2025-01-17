@@ -160,7 +160,7 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UScriptStruct::GetManage
 
 ZSharp::FZSelfDescriptiveScriptDelegate* ZSharp::FZConjugateRegistry_Delegate::BuildConjugateWrapper(void* userdata)
 {
-	const auto signature = static_cast<UDelegateFunction*>(userdata);
+	auto signature = static_cast<const UDelegateFunction*>(userdata);
 	return new FZSelfDescriptiveScriptDelegate { signature };
 }
 
@@ -177,7 +177,7 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_Delegate::GetManagedType
 
 ZSharp::FZSelfDescriptiveMulticastInlineScriptDelegate* ZSharp::FZConjugateRegistry_MulticastInlineDelegate::BuildConjugateWrapper(void* userdata)
 {
-	const auto signature = static_cast<UDelegateFunction*>(userdata);
+	auto signature = static_cast<const UDelegateFunction*>(userdata);
 	return new FZSelfDescriptiveMulticastInlineScriptDelegate { signature };
 }
 

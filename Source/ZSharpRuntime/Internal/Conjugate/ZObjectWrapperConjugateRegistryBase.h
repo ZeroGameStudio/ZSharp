@@ -48,7 +48,7 @@ namespace ZSharp
 				return { mutableUnmanaged };
 			}
 
-			const auto wrapper = new ConjugateWrapperType { descriptor, mutableUnmanaged };
+			auto wrapper = new ConjugateWrapperType { descriptor, mutableUnmanaged };
 			const FZRuntimeTypeHandle type = GetManagedType(descriptor);
 			return Super::BuildConjugate_Red(wrapper, type);
 		}

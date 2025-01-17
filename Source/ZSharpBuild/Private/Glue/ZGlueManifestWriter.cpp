@@ -166,7 +166,7 @@ void ZSharp::FZGlueManifestWriter::WriteDelegate(const IZExportedDelegate& deleg
 
 TUniquePtr<FZExportedAssemblyDto>* ZSharp::FZGlueManifestWriter::GetAssemblyDto(const IZExportedType& type)
 {
-	const auto settings = GetDefault<UZSharpExportSettings>();
+	auto settings = GetDefault<UZSharpExportSettings>();
 	const FString module = type.GetModule();
 	const FZModuleMappingContext* ctx = settings->GetModuleMappingContext(module);
 	if (!ctx)

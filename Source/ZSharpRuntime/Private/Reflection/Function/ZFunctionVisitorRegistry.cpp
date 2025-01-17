@@ -39,8 +39,8 @@ ZSharp::FZFunctionVisitorRegistry::~FZFunctionVisitorRegistry()
 
 const ZSharp::FZFunctionVisitor* ZSharp::FZFunctionVisitorRegistry::Get(FZFunctionVisitorHandle handle) const
 {
-	const auto pVisitor = FunctionMap.Find(handle);
-	const auto func = Cast<UFunction>(handle.Key.ResolveObjectPtrEvenIfGarbage());
+	const TUniquePtr<FZFunctionVisitor>* pVisitor = FunctionMap.Find(handle);
+	auto func = Cast<UFunction>(handle.Key.ResolveObjectPtrEvenIfGarbage());
 	if (!func)
 	{
 		if (pVisitor)
@@ -54,7 +54,7 @@ const ZSharp::FZFunctionVisitor* ZSharp::FZFunctionVisitorRegistry::Get(FZFuncti
 
 	if (!pVisitor)
 	{
-		const auto visitor = new FZFunctionVisitor { func };
+		auto visitor = new FZFunctionVisitor { func };
 		if (!visitor->IsAvailable())
 		{
 			return nullptr;

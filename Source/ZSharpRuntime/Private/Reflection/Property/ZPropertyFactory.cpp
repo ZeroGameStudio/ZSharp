@@ -121,7 +121,7 @@ FProperty* ZSharp::FZPropertyFactory::Create(const FZPropertyDesc& desc)
 	{
 		return PropertyFactory_Private::Create<FEnumProperty>([&](FEnumProperty* prop)
 		{
-			const auto underlyingProperty = new FInt64Property(prop, NAME_None, RF_NoFlags);
+			auto underlyingProperty = new FInt64Property { prop, NAME_None, RF_NoFlags };
 			prop->SetEnum(enm);
 			prop->AddCppProperty(underlyingProperty);
 		});

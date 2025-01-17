@@ -96,7 +96,7 @@ void ZSharp::FZConjugateRegistry_UObject::Release()
 		reds.Emplace(pair.Key);
 	}
 
-	for (const auto red : reds)
+	for (const auto& red : reds)
 	{
 		ReleaseConjugate_Red(red);
 	}

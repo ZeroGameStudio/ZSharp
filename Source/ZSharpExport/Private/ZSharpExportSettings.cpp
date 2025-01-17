@@ -52,7 +52,7 @@ FString UZSharpExportSettings::RedirectFieldName(const FString& sourcePath) cons
 
 TArray<FString> UZSharpExportSettings::GetModuleOptions()
 {
-	const auto cdo = GetDefault<UZSharpExportSettings>();
+	auto cdo = GetDefault<UZSharpExportSettings>();
 	
 	TArray<FModuleStatus> statuses;
 	FModuleManager::Get().QueryModules(statuses);

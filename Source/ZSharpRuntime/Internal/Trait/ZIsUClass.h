@@ -12,7 +12,7 @@ namespace ZSharp
 	};
 	
 	template <typename T>
-	struct TZIsUClass<T, std::enable_if_t<std::is_same_v<decltype(T::StaticClass()), UClass*> && TPointerIsConvertibleFromTo<T, UObject>::Value>>
+	struct TZIsUClass<T, std::enable_if_t<std::is_same_v<decltype(T::StaticClass()), UClass*> && TPointerIsConvertibleFromTo<std::decay_t<T>, UObject>::Value>>
 	{
 		static constexpr bool Value = true;
 	};

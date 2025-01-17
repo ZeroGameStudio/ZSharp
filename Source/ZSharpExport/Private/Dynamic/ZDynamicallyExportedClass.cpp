@@ -99,7 +99,7 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 	: Struct(ustruct)
 	, Flags(EZExportedClassFlags::None)
 {
-	if (const auto uclass = Cast<UClass>(ustruct))
+	if (auto uclass = Cast<const UClass>(ustruct))
 	{
 		if (uclass->HasAnyClassFlags(CLASS_Interface))
 		{
@@ -187,7 +187,7 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 			}
 		}
 	}
-	else if (const auto ustrct = Cast<UScriptStruct>(ustruct))
+	else if (auto ustrct = Cast<const UScriptStruct>(ustruct))
 	{
 		Flags |= EZExportedClassFlags::Struct;
 		UScriptStruct::ICppStructOps* ops = ustrct->GetCppStructOps();

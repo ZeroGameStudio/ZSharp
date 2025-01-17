@@ -229,7 +229,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 
 				if (OutParamIndices.Contains(i))
 				{
-					const auto out = static_cast<FOutParmRec*>(FMemory_Alloca(sizeof(FOutParmRec)));
+					auto out = static_cast<FOutParmRec*>(FMemory_Alloca(sizeof(FOutParmRec)));
 					check(stack.MostRecentPropertyAddress);
 					out->PropAddr = stack.MostRecentPropertyAddress;
 					out->Property = const_cast<FProperty*>(visitor->GetUnderlyingProperty());

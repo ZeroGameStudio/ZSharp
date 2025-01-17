@@ -17,7 +17,7 @@ ZSharp::EZCallErrorCode ZSharp::FZCallDispatcher_FinalUFunction::Dispatch(FZCall
 bool ZSharp::FZCallDispatcher_FinalUFunction::InvalidateCache() const
 {
 	// @FIXME: Can we just find this function since it must have already loaded?
-	const auto func = LoadObject<UFunction>(nullptr, *Path);
+	auto func = LoadObject<UFunction>(nullptr, *Path);
 	if (!func)
 	{
 		return false;

@@ -11,7 +11,7 @@ ZSharp::FZLogCategoryRegistry& ZSharp::FZLogCategoryRegistry::Get()
 
 FLogCategoryBase* ZSharp::FZLogCategoryRegistry::GetCategory(FName name)
 {
-	const auto category = CategoryMap.Find(name);
+	FLogCategoryBase** category = CategoryMap.Find(name);
 	return category ? *category : nullptr;
 }
 

@@ -22,7 +22,7 @@ namespace ZSharp::ZSharpClass_Private
 					{
 						objectInitializer.DoNotCreateDefaultSubobject(defaultSubobjectOverride.Name);
 					}
-					else if (const auto overrideClass = LoadClass<UObject>(nullptr, *defaultSubobjectOverride.ClassPath.ToString()))
+					else if (auto overrideClass = LoadClass<const UObject>(nullptr, *defaultSubobjectOverride.ClassPath.ToString()))
 					{
 						objectInitializer.SetDefaultSubobjectClass(defaultSubobjectOverride.Name, overrideClass);
 					}
@@ -55,7 +55,7 @@ namespace ZSharp::ZSharpClass_Private
 			{ // Setup default subobjects.
 				for (const auto& defaultSubobject : zscls->DefaultSubobjects)
 				{
-					if (const auto defaultSubobjectClass = LoadClass<UObject>(nullptr, *defaultSubobject.ClassPath.ToString()))
+					if (auto defaultSubobjectClass = LoadClass<const UObject>(nullptr, *defaultSubobject.ClassPath.ToString()))
 					{
 						// Subclass may not allow us to create so subobject can be null.
 						if (UObject* subobject = obj->CreateDefaultSubobject(defaultSubobject.Name, defaultSubobjectClass, defaultSubobjectClass, !defaultSubobject.bOptional, defaultSubobject.bTransient))
@@ -69,8 +69,8 @@ namespace ZSharp::ZSharpClass_Private
 							// Setup scene info.
 							if (defaultSubobject.bRootComponent)
 							{
-								const auto actor = Cast<AActor>(obj);
-								const auto root = Cast<USceneComponent>(subobject);
+								auto actor = Cast<AActor>(obj);
+								auto root = Cast<USceneComponent>(subobject);
 								if (ensureAlways(actor) && ensureAlways(root))
 								{
 									USceneComponent* prevRoot = actor->GetRootComponent();
@@ -85,8 +85,8 @@ namespace ZSharp::ZSharpClass_Private
 							{
 								ensureAlways(!defaultSubobject.bRootComponent);
 
-								const auto child = Cast<USceneComponent>(subobject);
-								const auto parent = Cast<USceneComponent>(obj->GetDefaultSubobjectByName(defaultSubobject.AttachParentDefaultSubobjectName));
+								auto child = Cast<USceneComponent>(subobject);
+								auto parent = Cast<USceneComponent>(obj->GetDefaultSubobjectByName(defaultSubobject.AttachParentDefaultSubobjectName));
 								if (ensureAlways(child) && ensureAlways(parent))
 								{
 									child->SetupAttachment(parent, defaultSubobject.AttachSocketName);
@@ -113,7 +113,7 @@ namespace ZSharp::ZSharpClass_Private
 						{
 							propertyAddr = prop->ContainerPtrToValuePtr<void>(propertyAddr);
 						}
-						else if (const auto objectProp = CastField<FObjectPropertyBase>(prop))
+						else if (auto objectProp = CastField<const FObjectPropertyBase>(prop))
 						{
 							propertyAddr = objectProp->GetObjectPropertyValue_InContainer(propertyAddr);
 						}

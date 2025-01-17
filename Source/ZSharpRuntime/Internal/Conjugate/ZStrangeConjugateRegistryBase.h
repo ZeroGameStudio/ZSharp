@@ -45,14 +45,14 @@ namespace ZSharp
 		{
 			check(IsInGameThread());
 			
-			const auto mutableUnmanaged = const_cast<UnderlyingInstanceType*>(unmanaged);
+			auto mutableUnmanaged = const_cast<UnderlyingInstanceType*>(unmanaged);
 			if (const ConjugateWrapperType* wrapper = Super::FindConjugateWrapper(mutableUnmanaged))
 			{
 				ThisClass::ValidateConjugateWrapper(descriptor, wrapper);
 				return { mutableUnmanaged };
 			}
 
-			const auto wrapper = new ConjugateType { descriptor, mutableUnmanaged };
+			auto wrapper = new ConjugateType { descriptor, mutableUnmanaged };
 			const FZRuntimeTypeHandle type = AsImpl().GetManagedType(descriptor);
 			return Super::BuildConjugate_Red(wrapper, type);
 		}

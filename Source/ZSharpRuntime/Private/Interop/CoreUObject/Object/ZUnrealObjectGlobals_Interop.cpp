@@ -9,7 +9,7 @@
 ZSharp::FZConjugateHandle ZSharp::FZUnrealObjectGlobals_Interop::NewObject(FZConjugateHandle cls, FZConjugateHandle outer, const TCHAR* name)
 {
 	FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-	const auto pCls = registry.ConjugateUnsafeChecked<UClass>(cls);
+	auto pCls = registry.ConjugateUnsafeChecked<const UClass>(cls);
 	auto pOuter = registry.ConjugateUnsafe<UObject>(outer);
 	if (!pOuter)
 	{
@@ -24,7 +24,7 @@ ZSharp::FZConjugateHandle ZSharp::FZUnrealObjectGlobals_Interop::NewObject(FZCon
 ZSharp::FZConjugateHandle ZSharp::FZUnrealObjectGlobals_Interop::LoadObject(FZConjugateHandle cls, FZConjugateHandle outer, const TCHAR* name)
 {
 	FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-	const auto pCls = registry.ConjugateUnsafeChecked<UClass>(cls);
+	auto pCls = registry.ConjugateUnsafeChecked<UClass>(cls);
 	auto pOuter = registry.ConjugateUnsafe<UObject>(outer);
 	return registry.Conjugate(StaticLoadObject(pCls, pOuter, name));
 }
@@ -32,16 +32,16 @@ ZSharp::FZConjugateHandle ZSharp::FZUnrealObjectGlobals_Interop::LoadObject(FZCo
 ZSharp::FZConjugateHandle ZSharp::FZUnrealObjectGlobals_Interop::DuplicateObject(FZConjugateHandle source, FZConjugateHandle outer, const TCHAR* name, FZConjugateHandle cls)
 {
 	FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-	const auto pSource = registry.ConjugateUnsafeChecked<UObject>(source);
+	auto pSource = registry.ConjugateUnsafeChecked<const UObject>(source);
 	auto pOuter = registry.ConjugateUnsafeChecked<UObject>(outer);
-	const auto pCls = registry.ConjugateUnsafe<UClass>(cls);
+	auto pCls = registry.ConjugateUnsafe<UClass>(cls);
 	return registry.Conjugate(StaticDuplicateObject(pSource, pOuter, name, RF_AllFlags, pCls));
 }
 
 ZSharp::FZConjugateHandle ZSharp::FZUnrealObjectGlobals_Interop::FindObject(FZConjugateHandle cls, FZConjugateHandle outer, const TCHAR* name, uint8 exactClass)
 {
 	FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-	const auto pCls = registry.ConjugateUnsafeChecked<UClass>(cls);
+	auto pCls = registry.ConjugateUnsafeChecked<UClass>(cls);
 	auto pOuter = registry.ConjugateUnsafe<UObject>(outer);
 	return registry.Conjugate(StaticFindObject(pCls, pOuter, name, !!exactClass));
 }

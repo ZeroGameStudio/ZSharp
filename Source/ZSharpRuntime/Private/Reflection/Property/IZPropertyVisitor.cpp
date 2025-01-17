@@ -26,43 +26,43 @@
 
 TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FProperty* prop)
 {
-	if (const auto numericProp = CastField<FNumericProperty>(prop))
+	if (auto numericProp = CastField<const FNumericProperty>(prop))
 	{
 		return MakeUnique<FZNumericPropertyVisitor>(numericProp);
 	}
-	else if (const auto boolProp = CastField<FBoolProperty>(prop))
+	else if (auto boolProp = CastField<const FBoolProperty>(prop))
 	{
 		return MakeUnique<FZBoolPropertyVisitor>(boolProp);
 	}
-	else if (const auto enumProp = CastField<FEnumProperty>(prop))
+	else if (auto enumProp = CastField<const FEnumProperty>(prop))
 	{
 		return MakeUnique<FZEnumPropertyVisitor>(enumProp);
 	}
-	else if (const auto strProp = CastField<FStrProperty>(prop))
+	else if (auto strProp = CastField<const FStrProperty>(prop))
 	{
 		return MakeUnique<FZStringPropertyVisitor>(strProp);
 	}
-	else if (const auto utf8StrProp = CastField<FUtf8StrProperty>(prop))
+	else if (auto utf8StrProp = CastField<const FUtf8StrProperty>(prop))
 	{
 		return MakeUnique<FZUtf8StringPropertyVisitor>(utf8StrProp);
 	}
-	else if (const auto ansiStrProp = CastField<FAnsiStrProperty>(prop))
+	else if (auto ansiStrProp = CastField<const FAnsiStrProperty>(prop))
 	{
 		return MakeUnique<FZAnsiStringPropertyVisitor>(ansiStrProp);
 	}
-	else if (const auto nameProp = CastField<FNameProperty>(prop))
+	else if (auto nameProp = CastField<const FNameProperty>(prop))
 	{
 		return MakeUnique<FZNamePropertyVisitor>(nameProp);
 	}
-	else if (const auto textProp = CastField<FTextProperty>(prop))
+	else if (auto textProp = CastField<const FTextProperty>(prop))
 	{
 		return MakeUnique<FZTextPropertyVisitor>(textProp);
 	}
 	else if (prop->IsA<FObjectPropertyBase>())
 	{
-		if (const auto objectProp = CastField<FObjectProperty>(prop))
+		if (auto objectProp = CastField<const FObjectProperty>(prop))
 		{
-			if (const auto classProp = CastField<FClassProperty>(prop))
+			if (auto classProp = CastField<const FClassProperty>(prop))
 			{
 				return MakeUnique<FZClassPropertyVisitor>(classProp);
 			}
@@ -71,9 +71,9 @@ TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FP
 				return MakeUnique<FZObjectPropertyVisitor>(objectProp);
 			}
 		}
-		else if (const auto softObjectProp = CastField<FSoftObjectProperty>(prop))
+		else if (auto softObjectProp = CastField<const FSoftObjectProperty>(prop))
 		{
-			if (const auto softClassProp = CastField<FSoftClassProperty>(prop))
+			if (auto softClassProp = CastField<const FSoftClassProperty>(prop))
 			{
 				return MakeUnique<FZSoftClassPropertyVisitor>(softClassProp);
 			}
@@ -82,52 +82,52 @@ TUniquePtr<ZSharp::IZPropertyVisitor> ZSharp::IZPropertyVisitor::Create(const FP
 				return MakeUnique<FZSoftObjectPropertyVisitor>(softObjectProp);
 			}
 		}
-		else if (const auto weakObjectProp = CastField<FWeakObjectProperty>(prop))
+		else if (auto weakObjectProp = CastField<const FWeakObjectProperty>(prop))
 		{
 			return MakeUnique<FZWeakObjectPropertyVisitor>(weakObjectProp);
 		}
-		else if (const auto lazyObjectProp = CastField<FLazyObjectProperty>(prop))
+		else if (auto lazyObjectProp = CastField<const FLazyObjectProperty>(prop))
         {
 			return MakeUnique<FZLazyObjectPropertyVisitor>(lazyObjectProp);
         }
 	}
-	else if (const auto structProp = CastField<FStructProperty>(prop))
+	else if (auto structProp = CastField<const FStructProperty>(prop))
 	{
 		return MakeUnique<FZStructPropertyVisitor>(structProp);
 	}
-	else if (const auto interfaceProp = CastField<FInterfaceProperty>(prop))
+	else if (auto interfaceProp = CastField<const FInterfaceProperty>(prop))
 	{
 		return MakeUnique<FZInterfacePropertyVisitor>(interfaceProp);
 	}
-	else if (const auto fieldProp = CastField<FFieldPathProperty>(prop))
+	else if (auto fieldProp = CastField<const FFieldPathProperty>(prop))
 	{
 		return MakeUnique<FZFieldPathPropertyVisitor>(fieldProp);
 	}
-	else if (const auto arrayProp = CastField<FArrayProperty>(prop))
+	else if (auto arrayProp = CastField<const FArrayProperty>(prop))
 	{
 		return MakeUnique<FZArrayPropertyVisitor>(arrayProp);
 	}
-	else if (const auto setProp = CastField<FSetProperty>(prop))
+	else if (auto setProp = CastField<const FSetProperty>(prop))
 	{
 		return MakeUnique<FZSetPropertyVisitor>(setProp);
 	}
-	else if (const auto mapProp = CastField<FMapProperty>(prop))
+	else if (auto mapProp = CastField<const FMapProperty>(prop))
 	{
 		return MakeUnique<FZMapPropertyVisitor>(mapProp);
 	}
-	else if (const auto optionalProp = CastField<FOptionalProperty>(prop))
+	else if (auto optionalProp = CastField<const FOptionalProperty>(prop))
 	{
 		return MakeUnique<FZOptionalPropertyVisitor>(optionalProp);
 	}
-	else if (const auto delegateProp = CastField<FDelegateProperty>(prop))
+	else if (auto delegateProp = CastField<const FDelegateProperty>(prop))
 	{
 		return MakeUnique<FZDelegatePropertyVisitor>(delegateProp);
 	}
-	else if (const auto multicastInlineDelegateProp = CastField<FMulticastInlineDelegateProperty>(prop))
+	else if (auto multicastInlineDelegateProp = CastField<const FMulticastInlineDelegateProperty>(prop))
 	{
 		return MakeUnique<FZMulticastInlineDelegatePropertyVisitor>(multicastInlineDelegateProp);
 	}
-	else if (const auto multicastSparseDelegateProp = CastField<FMulticastSparseDelegateProperty>(prop))
+	else if (auto multicastSparseDelegateProp = CastField<const FMulticastSparseDelegateProperty>(prop))
 	{
 		return MakeUnique<FZMulticastSparseDelegatePropertyVisitor>(multicastSparseDelegateProp);
 	}

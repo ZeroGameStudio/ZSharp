@@ -73,7 +73,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 	}
 
 	// Apply rules for specific field type.
-	if (const auto cls = field.Get<UClass>())
+	if (auto cls = field.Get<const UClass>())
 	{
 		if (cls->HasAllClassFlags(CLASS_Interface))
 		{
@@ -85,14 +85,14 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 			name.Append("_DEPRECATED");
 		}
 	}
-	else if (const auto enm = field.Get<UEnum>())
+	else if (auto enm = field.Get<const UEnum>())
 	{
 		if (!name.StartsWith("E"))
 		{
 			name.InsertAt(0, "E");
 		}
 	}
-	else if (const auto delegate = field.Get<UDelegateFunction>())
+	else if (auto delegate = field.Get<const UDelegateFunction>())
 	{
 		static const FString GDelegatePostfix = "__DelegateSignature";
 		if (delegate->HasAllFunctionFlags(FUNC_Delegate) && name.EndsWith(GDelegatePostfix))
@@ -101,14 +101,14 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 		}
 	}
 	// IMPORTANT: This must be under delegate.
-	else if (const auto function = field.Get<UFunction>())
+	else if (auto function = field.Get<const UFunction>())
 	{
 		if (function->HasAllFunctionFlags(FUNC_EditorOnly))
 		{
 			name.Append("_EDITORONLY");
 		}
 	}
-	else if (const auto property = field.Get<FProperty>())
+	else if (auto property = field.Get<const FProperty>())
 	{
 		if (property->HasAllPropertyFlags(CPF_EditorOnly))
 		{
@@ -126,7 +126,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 	if (field.IsA<UFunction>() && !field.IsA<UDelegateFunction>() || field.IsA<FProperty>())
 	{
 		// Owner should always exist.
-		const auto owner = field.GetOwnerVariant().Get<UStruct>();
+		auto owner = field.GetOwnerVariant().Get<const UStruct>();
 		TArray structsToCheck { owner };
 		for (TFieldIterator<UDelegateFunction> it(owner); it; ++it)
 		{
@@ -136,7 +136,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 			}
 		}
 	
-		for (const auto structToCheck : structsToCheck)
+		for (const auto& structToCheck : structsToCheck)
 		{
 			if (name == GetFieldRedirectedName(structToCheck))
 			{
@@ -177,7 +177,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 FString ZSharp::FZExportHelper::GetFieldRedirectedFullName(FFieldVariant field)
 {
 	FString name = GetFieldRedirectedName(field);
-	if (const auto ownerField = field.GetOwnerVariant().Get<UField>())
+	if (auto ownerField = field.GetOwnerVariant().Get<const UField>())
 	{
 		name = GetFieldRedirectedFullName(ownerField).Append(".").Append(name);
 	}
@@ -242,7 +242,7 @@ bool ZSharp::FZExportHelper::ShouldExportField(FFieldVariant field)
 
 			// Emitted type is not exportable.
 			const UObject* object = field.ToUObject();
-			if (const auto cls = Cast<UClass>(object))
+			if (auto cls = Cast<const UClass>(object))
 			{
 				if (IZSharpFieldRegistry::Get().IsZSharpClass(cls))
 				{
@@ -251,7 +251,7 @@ bool ZSharp::FZExportHelper::ShouldExportField(FFieldVariant field)
 			}
 			
 			// Override version of UFunction is not exportable.
-			if (const auto function = Cast<UFunction>(object))
+			if (auto function = Cast<const UFunction>(object))
 			{
 				if (function->GetSuperFunction())
 				{
@@ -326,12 +326,12 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFieldFullyExportedTyp
 
 const UEnum* ZSharp::FZExportHelper::GetUEnumFromProperty(const FProperty* property)
 {
-	if (const auto enumProperty = CastField<FEnumProperty>(property))
+	if (auto enumProperty = CastField<const FEnumProperty>(property))
 	{
 		return enumProperty->GetEnum();
 	}
 
-	if (const auto numericProperty = CastField<FNumericProperty>(property))
+	if (auto numericProperty = CastField<const FNumericProperty>(property))
 	{
 		return numericProperty->GetIntPropertyEnum();
 	}
@@ -351,7 +351,7 @@ bool ZSharp::FZExportHelper::CanFPropertyBeNullInNotNullOut(const FProperty* pro
 	}
 
 	// Subclassof is null-in-not-null-out.
-	if (const auto classProperty = CastField<FClassProperty>(property))
+	if (auto classProperty = CastField<const FClassProperty>(property))
 	{
 		if (classProperty->MetaClass != UObject::StaticClass())
 		{
@@ -373,7 +373,7 @@ ZSharp::FZExportedDefaultValue ZSharp::FZExportHelper::GetParameterDefaultValue(
 {
 	ensure(parameter->HasAllPropertyFlags(CPF_Parm));
 	
-	const auto function = Cast<UFunction>(parameter->GetOwnerStruct());
+	auto function = Cast<const UFunction>(parameter->GetOwnerStruct());
 	if (!ensure(function))
 	{
 		return {};
@@ -450,7 +450,7 @@ ZSharp::FZExportedDefaultValue ZSharp::FZExportHelper::GetParameterDefaultValue(
 	{
 		signature = "null";
 	}
-	else if (const auto structParameter = CastField<FStructProperty>(parameter))
+	else if (auto structParameter = CastField<const FStructProperty>(parameter))
 	{
 		signature = "null";
 		// Migrates from [UhtStructDefaultValue].
@@ -548,7 +548,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 	TFunction<FZFullyExportedTypeName(const FProperty*, bool)> recurse;
 	recurse = [&recurse](const FProperty* property, bool allowContainer)->FZFullyExportedTypeName
 	{
-		if (const auto numericProp = CastField<FNumericProperty>(property))
+		if (auto numericProp = CastField<const FNumericProperty>(property))
 		{
 			if (const UEnum* underlyingEnum = numericProp->GetIntPropertyEnum())
 			{
@@ -561,7 +561,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 			return *name;
 		}
 
-		if (const auto classProp = CastField<FClassProperty>(property))
+		if (auto classProp = CastField<const FClassProperty>(property))
 		{
 			if (classProp->MetaClass == UObject::StaticClass())
 			{
@@ -573,66 +573,66 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 			name.Inner.bNullable = false;
 			return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 		}
-		else if (const auto objectProp = CastField<FObjectProperty>(property))
+		else if (auto objectProp = CastField<const FObjectProperty>(property))
 		{
 			return GetUFieldFullyExportedTypeName(objectProp->PropertyClass);
 		}
-		else if (const auto interfaceProp = CastField<FInterfaceProperty>(property))
+		else if (auto interfaceProp = CastField<const FInterfaceProperty>(property))
 		{
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveScriptInterface>::Get();
 			name.Inner = GetUFieldFullyExportedTypeName(interfaceProp->InterfaceClass).ToSimple();
 			name.Inner.bNullable = false;
 			return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 		}
-		else if (const auto structProp = CastField<FStructProperty>(property))
+		else if (auto structProp = CastField<const FStructProperty>(property))
 		{
 			return GetUFieldFullyExportedTypeName(structProp->Struct);
 		}
-		else if (const auto enumProp = CastField<FEnumProperty>(property))
+		else if (auto enumProp = CastField<const FEnumProperty>(property))
 		{
 			return GetUFieldFullyExportedTypeName(enumProp->GetEnum());
 		}
-		else if (const auto softClassProp = CastField<FSoftClassProperty>(property))
+		else if (auto softClassProp = CastField<const FSoftClassProperty>(property))
 		{
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveSoftClassPtr>::Get();
 			name.Inner = GetUFieldFullyExportedTypeName(softClassProp->MetaClass).ToSimple();
 			name.Inner.bNullable = false;
 			return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 		}
-		else if (const auto softObjectProp = CastField<FSoftObjectProperty>(property))
+		else if (auto softObjectProp = CastField<const FSoftObjectProperty>(property))
 		{
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveSoftObjectPtr>::Get();
 			name.Inner = GetUFieldFullyExportedTypeName(softObjectProp->PropertyClass).ToSimple();
 			name.Inner.bNullable = false;
 			return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 		}
-		else if (const auto weakObjectProp = CastField<FWeakObjectProperty>(property))
+		else if (auto weakObjectProp = CastField<const FWeakObjectProperty>(property))
 		{
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveWeakObjectPtr>::Get();
 			name.Inner = GetUFieldFullyExportedTypeName(weakObjectProp->PropertyClass).ToSimple();
 			name.Inner.bNullable = false;
 			return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 		}
-		else if (const auto lazyObjectProp = CastField<FLazyObjectProperty>(property))
+		else if (auto lazyObjectProp = CastField<const FLazyObjectProperty>(property))
 		{
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveLazyObjectPtr>::Get();
 			name.Inner = GetUFieldFullyExportedTypeName(lazyObjectProp->PropertyClass).ToSimple();
 			name.Inner.bNullable = false;
 			return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 		}
-		else if (const auto delegateProp = CastField<FDelegateProperty>(property))
+		else if (auto delegateProp = CastField<const FDelegateProperty>(property))
 		{
 			return GetUFieldFullyExportedTypeName(delegateProp->SignatureFunction);
 		}
-		else if (const auto multicastInlineDelegateProp = CastField<FMulticastInlineDelegateProperty>(property))
+		else if (auto multicastInlineDelegateProp = CastField<const FMulticastInlineDelegateProperty>(property))
 		{
 			return GetUFieldFullyExportedTypeName(multicastInlineDelegateProp->SignatureFunction);
 		}
-		else if (const auto multicastSparseDelegateProp = CastField<FMulticastSparseDelegateProperty>(property))
+		else if (auto multicastSparseDelegateProp = CastField<const FMulticastSparseDelegateProperty>(property))
 		{
 			return GetUFieldFullyExportedTypeName(multicastSparseDelegateProp->SignatureFunction);
 		}
-		else if (const auto arrayProp = CastField<FArrayProperty>(property))
+		else if (auto arrayProp = CastField<const FArrayProperty>(property))
 		{
 			if (allowContainer)
 			{
@@ -641,7 +641,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 				return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 			}
 		}
-		else if (const auto setProp = CastField<FSetProperty>(property))
+		else if (auto setProp = CastField<const FSetProperty>(property))
 		{
 			if (allowContainer)
 			{
@@ -650,7 +650,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 				return name.Inner.IsValid() ? name : FZFullyExportedTypeName{};
 			}
 		}
-		else if (const auto mapProp = CastField<FMapProperty>(property))
+		else if (auto mapProp = CastField<const FMapProperty>(property))
 		{
 			if (allowContainer)
 			{
@@ -660,7 +660,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 				return name.Inner.IsValid() && name.Outer.IsValid() ? name : FZFullyExportedTypeName{};
 			}
 		}
-		else if (const auto optionalProp = CastField<FOptionalProperty>(property))
+		else if (auto optionalProp = CastField<const FOptionalProperty>(property))
 		{
 			if (allowContainer)
 			{
@@ -691,7 +691,7 @@ bool ZSharp::FZExportHelper::IsFieldDeprecated(FFieldVariant field)
 		}
 	}
 
-	if (const auto cls = field.Get<UClass>())
+	if (auto cls = field.Get<const UClass>())
 	{
 		if (cls->HasAllClassFlags(CLASS_Deprecated))
 		{
@@ -699,7 +699,7 @@ bool ZSharp::FZExportHelper::IsFieldDeprecated(FFieldVariant field)
 		}
 	}
 
-	if (const auto property = field.Get<FProperty>())
+	if (auto property = field.Get<const FProperty>())
 	{
 		if (property->HasAllPropertyFlags(CPF_Deprecated))
 		{
@@ -712,7 +712,7 @@ bool ZSharp::FZExportHelper::IsFieldDeprecated(FFieldVariant field)
 
 bool ZSharp::FZExportHelper::IsFieldEditorOnly(FFieldVariant field)
 {
-	if (const auto function = field.Get<UFunction>())
+	if (auto function = field.Get<const UFunction>())
 	{
 		if (function->HasAllFunctionFlags(FUNC_EditorOnly))
 		{
@@ -720,7 +720,7 @@ bool ZSharp::FZExportHelper::IsFieldEditorOnly(FFieldVariant field)
 		}
 	}
 
-	if (const auto property = field.Get<FProperty>())
+	if (auto property = field.Get<const FProperty>())
 	{
 		if (property->HasAllPropertyFlags(CPF_EditorOnly))
 		{

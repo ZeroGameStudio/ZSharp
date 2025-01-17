@@ -37,7 +37,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			return true;
 		}
 		
-		const auto structProperty = CastField<FStructProperty>(property);
+		auto structProperty = CastField<const FStructProperty>(property);
 		return structProperty && EnumHasAllFlags(structProperty->Struct->StructFlags, STRUCT_HasInstancedReference);
 	}
 	
@@ -110,12 +110,12 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		// Migrate from FProperty::Init().
 		if (property->GetOwner<UObject>())
 		{
-			const auto owner = property->GetOwnerChecked<UField>();
+			auto owner = property->GetOwnerChecked<UField>();
 			owner->AddCppProperty(property);
 		}
 		else
 		{
-			const auto owner = property->GetOwnerChecked<FField>();
+			auto owner = property->GetOwnerChecked<FField>();
 			owner->AddCppProperty(property);
 		}
 	}
@@ -190,7 +190,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(Enum);
 
-				const auto underlyingProperty = new FInt64Property(property, NAME_None, GCompiledInPropertyObjectFlags);
+				auto underlyingProperty = new FInt64Property { property, NAME_None, GCompiledInPropertyObjectFlags };
 				property->SetEnum(FindObjectChecked<UEnum>(nullptr, *def.DescriptorFieldPath.ToString()));
 				property->AddCppProperty(underlyingProperty);
 				
@@ -356,7 +356,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		const EObjectFlags flags = def.Flags;
 
 #if DO_CHECK
-		if (const auto ownerStruct = owner.Get<UStruct>())
+		if (auto ownerStruct = owner.Get<const UStruct>())
 		{
 			const FProperty* existingProperty = ownerStruct->FindPropertyByName(name);
 			check(!existingProperty);
@@ -632,16 +632,16 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 		Algo::TopologicalSort(topologicallySortedClasses, [&class2def](const UClass* cls)
 		{
 			const FZClassDefinition* classDef = class2def.FindChecked(cls);
-			TArray<UClass*, TInlineAllocator<2>> dependencies;
+			TArray<const UClass*, TInlineAllocator<2>> dependencies;
 			
-			if (const auto superClass = FindObjectChecked<UClass>(nullptr, *classDef->SuperPath.ToString()); FZSharpFieldRegistry::Get().IsZSharpClass(superClass))
+			if (auto superClass = FindObjectChecked<const UClass>(nullptr, *classDef->SuperPath.ToString()); FZSharpFieldRegistry::Get().IsZSharpClass(superClass))
 			{
 				dependencies.Emplace(superClass);
 			}
 			
 			if (!classDef->WithinPath.IsNone())
 			{
-				if (const auto withinClass = FindObjectChecked<UClass>(nullptr, *classDef->WithinPath.ToString()); FZSharpFieldRegistry::Get().IsZSharpClass(withinClass))
+				if (auto withinClass = FindObjectChecked<const UClass>(nullptr, *classDef->WithinPath.ToString()); FZSharpFieldRegistry::Get().IsZSharpClass(withinClass))
 				{
 					dependencies.Emplace(withinClass);
 				}
@@ -710,7 +710,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 	params.Name = *def.Name.ToString();
 	params.SetFlags = def.Flags | GCompiledInFlags;
 	
-	const auto cls = static_cast<UClass*>(StaticConstructObject_Internal(params));
+	auto cls = static_cast<UClass*>(StaticConstructObject_Internal(params));
 	def.Class = cls;
 
 	// Migrate from UClass(EStaticConstructor).
@@ -786,12 +786,12 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 	// Migrate from InitializePrivateStaticClass().
 	// UZSharpClass must have super class.
 	check(!def.SuperPath.IsNone());
-	const auto superClass = FindObjectChecked<UClass>(nullptr, *def.SuperPath.ToString());
+	auto superClass = FindObjectChecked<UClass>(nullptr, *def.SuperPath.ToString());
 	check(superClass->IsNative());
 	cls->SetSuperStruct(superClass);
 	cls->ClassFlags |= superClass->ClassFlags & CLASS_ScriptInherit;
 
-	const auto withinClass = !def.WithinPath.IsNone() ? FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString()) : UObject::StaticClass();
+	auto withinClass = !def.WithinPath.IsNone() ? FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString()) : UObject::StaticClass();
 	check(withinClass->IsNative());
 	check(withinClass->IsChildOf(UObject::StaticClass()));
 	cls->ClassWithin = withinClass;
@@ -840,12 +840,12 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 
 #define MERGE_METADATA(LhsKey, SubtractKey1, SubtractKey2) \
 	{ \
-		const auto pLhsName = def.TransparentDataMap.Find(#LhsKey); \
+		const FString* pLhsName = def.TransparentDataMap.Find(#LhsKey); \
 		const FString lhsName = pLhsName ? *pLhsName : FString{}; \
 		const FString rhsName = cls->GetSuperClass()->GetMetaData(#LhsKey); \
-		const auto pSubtractName1 = def.TransparentDataMap.Find(#SubtractKey1); \
+		const FString* pSubtractName1 = def.TransparentDataMap.Find(#SubtractKey1); \
 		const FString subtractName1 = pSubtractName1 ? *pSubtractName1 : FString{}; \
-		const auto pSubtractName2 = def.TransparentDataMap.Find(#SubtractKey2); \
+		const FString* pSubtractName2 = def.TransparentDataMap.Find(#SubtractKey2); \
 		const FString subtractName2 = pSubtractName2 ? *pSubtractName2 : FString{}; \
 		cls->SetMetaData(#LhsKey, *ZUnrealFieldEmitter_Private::MergeNames(lhsName, rhsName, subtractName1, subtractName2)); \
 	}
@@ -889,7 +889,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 			FProperty* property = *it;
 			
 			// First fixup CPF_InstancedReference for object/interface properties whose class has CLASS_DefaultToInstanced.
-			if (const auto objectProperty = CastField<FObjectPropertyBase>(property))
+			if (auto objectProperty = CastField<const FObjectPropertyBase>(property))
 			{
 				if (objectProperty->PropertyClass->HasAllClassFlags(CLASS_DefaultToInstanced))
 				{
@@ -897,7 +897,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 				}
 			}
 
-			if (const auto interfaceProperty = CastField<FInterfaceProperty>(property))
+			if (auto interfaceProperty = CastField<const FInterfaceProperty>(property))
 			{
 				if (interfaceProperty->InterfaceClass->HasAllClassFlags(CLASS_DefaultToInstanced))
 				{
@@ -922,7 +922,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 				containsInstancedRef = true;
 			}
 
-			if (const auto arrayProperty = CastField<FArrayProperty>(property))
+			if (auto arrayProperty = CastField<FArrayProperty>(property))
 			{
 				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(arrayProperty->Inner))
 				{
@@ -932,7 +932,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 				}
 			}
 
-			if (const auto setProperty = CastField<FSetProperty>(property))
+			if (auto setProperty = CastField<FSetProperty>(property))
 			{
 				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(setProperty->ElementProp))
 				{
@@ -942,7 +942,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 				}
 			}
 
-			if (const auto mapProperty = CastField<FMapProperty>(property))
+			if (auto mapProperty = CastField<FMapProperty>(property))
 			{
 				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(mapProperty->KeyProp))
 				{
@@ -959,7 +959,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 				}
 			}
 
-			if (const auto optionalProperty = CastField<FOptionalProperty>(property))
+			if (auto optionalProperty = CastField<FOptionalProperty>(property))
 			{
 				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(optionalProperty->GetValueProperty()))
 				{
@@ -1008,15 +1008,15 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 			UStruct* cur = cls;
 			for (int32 i = 0; i < segments.Num(); ++i)
 			{
-				const auto containerPropertyName = FName(segments[i]);
+				auto containerPropertyName = FName { segments[i] };
 				FProperty* containerProperty = cur->FindPropertyByName(containerPropertyName);
 				propertyDefault.PropertyChain.Emplace(containerProperty);
 
-				if (const auto objectProp = CastField<FObjectPropertyBase>(containerProperty))
+				if (auto objectProp = CastField<const FObjectPropertyBase>(containerProperty))
 				{
 					cur = objectProp->PropertyClass;
 				}
-				else if (const auto structProp = CastField<FStructProperty>(containerProperty))
+				else if (auto structProp = CastField<const FStructProperty>(containerProperty))
 				{
 					cur = structProp->Struct;
 				}
@@ -1094,7 +1094,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefini
 			FProperty* property = *it;
 			if (property->HasAllPropertyFlags(CPF_Net))
 			{
-				const auto pPropertyDef = netPropertyName2Def.Find(property->GetFName());
+				const FZPropertyDefinition** pPropertyDef = netPropertyName2Def.Find(property->GetFName());
 				check(pPropertyDef && *pPropertyDef);
 				const FZPropertyDefinition& propertyDef = **pPropertyDef;
 				check(property->RepIndex == 0);

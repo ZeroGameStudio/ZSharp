@@ -23,7 +23,7 @@ void ZSharp::FZLog_Interop::Log(const TCHAR* category, ELogVerbosity::Type verbo
 		message = *GEmpty;
 	}
 	
-	const auto name = FName { category };
+	auto name = FName { category };
 	FLogCategoryBase* pLogCategory = FZLogCategoryRegistry::Get().GetCategory(name);
 	if (!pLogCategory)
 	{

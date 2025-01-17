@@ -16,7 +16,7 @@ public: \
 private: \
 	static ConjugateWrapperType* BuildConjugateWrapper(void* userdata) \
 	{ \
-		const auto descriptor = static_cast<UClass*>(userdata); \
+		auto descriptor = static_cast<const UClass*>(userdata); \
 		return new ConjugateWrapperType { descriptor }; \
 	} \
 };

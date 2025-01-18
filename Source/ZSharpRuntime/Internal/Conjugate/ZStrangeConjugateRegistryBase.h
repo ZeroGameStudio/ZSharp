@@ -22,6 +22,8 @@ namespace ZSharp
 		TZStrangeConjugateRegistryBase(IZMasterAssemblyLoadContext& alc) : Super(alc){}
 
 	public:
+		using Super::Conjugate;
+		
 		FZConjugateHandle Conjugate(const DescriptorType* descriptor, TFunctionRef<void(const ConjugateType&)> initialize = [](const ConjugateType&){})
 		{
 			check(IsInGameThread());
@@ -56,8 +58,6 @@ namespace ZSharp
 			const FZRuntimeTypeHandle type = AsImpl().GetManagedType(descriptor);
 			return Super::BuildConjugate_Red(wrapper, type);
 		}
-
-		ConjugateType* Conjugate(FZConjugateHandle handle) const { return Super::Conjugate(handle); }
 
 	public:
 		static constexpr uint16 RegistryId = TZConjugateRegistryId_V<ConjugateType>;

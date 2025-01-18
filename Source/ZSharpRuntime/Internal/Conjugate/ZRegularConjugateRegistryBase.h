@@ -42,6 +42,8 @@ namespace ZSharp
 		explicit TZRegularConjugateRegistryBase(IZMasterAssemblyLoadContext& alc) : Super(alc){}
 		
 	public:
+		using Super::Conjugate;
+		
 		FZConjugateHandle Conjugate(const TConjugate* unmanaged, bool owning)
 		{
 			check(IsInGameThread());
@@ -58,8 +60,6 @@ namespace ZSharp
 			const FZRuntimeTypeHandle type = GetManagedType();
 			return Super::BuildConjugate_Red(wrapper, type);
 		}
-
-		ConjugateType* Conjugate(FZConjugateHandle handle) const { return Super::Conjugate(handle); }
 
 	private:
 		FZRuntimeTypeHandle GetManagedType() const

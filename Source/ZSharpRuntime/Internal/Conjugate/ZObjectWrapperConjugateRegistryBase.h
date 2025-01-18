@@ -26,6 +26,8 @@ namespace ZSharp
 		explicit TZObjectWrapperConjugateRegistryBase(IZMasterAssemblyLoadContext& alc) : Super(alc){}
 
 	public:
+		using Super::Conjugate;
+		
 		FZConjugateHandle Conjugate(const UClass* descriptor) { return Conjugate(descriptor, [](const ConjugateWrapperType&){}); }
 		FZConjugateHandle Conjugate(const UClass* descriptor, TFunctionRef<void(const ConjugateWrapperType&)> initialize)
 		{
@@ -52,8 +54,6 @@ namespace ZSharp
 			const FZRuntimeTypeHandle type = GetManagedType(descriptor);
 			return Super::BuildConjugate_Red(wrapper, type);
 		}
-		
-		ConjugateType* Conjugate(FZConjugateHandle handle) const { return Super::Conjugate(handle); }
 
 	private:
 		FZRuntimeTypeHandle GetManagedType(const UClass* cls) const

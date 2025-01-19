@@ -35,4 +35,16 @@ ZSharp::FZConjugateHandle ZSharp::FZWorld_Interop::SpawnActor(FZConjugateHandle 
 	return registry.Conjugate(absolute ? pSelf->SpawnActorAbsolute(pCls, spawnTransform, params) : pSelf->SpawnActor(pCls, &spawnTransform, params));
 }
 
+EWorldType::Type ZSharp::FZWorld_Interop::GetWorldType(FZConjugateHandle self)
+{
+	auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<UWorld>(self);
+	return pSelf->WorldType;
+}
+
+ENetMode ZSharp::FZWorld_Interop::GetNetMode(FZConjugateHandle self)
+{
+	auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<UWorld>(self);
+	return pSelf->GetNetMode();
+}
+
 

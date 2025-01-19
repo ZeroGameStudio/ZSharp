@@ -24,11 +24,20 @@ public partial class Actor
 		return res;
 	}
 
+	public ENetMode GetNetMode()
+	{
+		MasterAlcCache.GuardInvariant();
+		return InternalGetNetMode();
+	}
+
 	internal void FinishSpawning()
 	{
 		MasterAlcCache.GuardInvariant();
 		InternalFinishSpawning();
 	}
+
+	private unsafe ENetMode InternalGetNetMode()
+		=> Actor_Interop.GetNetMode(ConjugateHandle.FromConjugate(this));
 	
 	private unsafe void InternalFinishSpawning()
 		=> Actor_Interop.FinishSpawning(ConjugateHandle.FromConjugate(this));

@@ -4,9 +4,8 @@
 
 #include "Static/ZStaticallyExportedClass.h"
 
-#define ZSHARP_DECLARE_EXPORTED_CLASS(Class, Name, Module, RegistryId) \
-ZSHARP_EXPORT_TYPE_NAME_EX(Class, Name) \
-ZSHARP_EXPORT_TYPE_MODULE(Class, Module) \
+#define ZSHARP_DECLARE_EXPORTED_CLASS(Class, Module, Name, RegistryId) \
+ZSHARP_DECLARE_ENGINE_MANAGED_TYPE_INFO(Class, Module, Name) \
 ZSHARP_EXPORT_CONJUGATE_REGISTRY_ID(Class, RegistryId)
 
 #define ZSHARP_BEGIN_EXPORT_CLASS(Class) \

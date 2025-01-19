@@ -6,9 +6,8 @@
 
 namespace ZSharp
 {
-	struct FZActor_Interop
+	struct FZActorComponent_Interop
 	{
-		static void FinishSpawning(FZConjugateHandle self);
 		static ENetMode GetNetMode(FZConjugateHandle self);
 	};
 }

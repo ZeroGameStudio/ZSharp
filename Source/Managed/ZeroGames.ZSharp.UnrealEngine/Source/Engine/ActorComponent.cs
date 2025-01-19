@@ -10,6 +10,15 @@ public partial class ActorComponent
 		return GetOwner() as T;
 	}
 	
+	public ENetMode GetNetMode()
+	{
+		MasterAlcCache.GuardInvariant();
+		return InternalGetNetMode();
+	}
+	
+	private unsafe ENetMode InternalGetNetMode()
+		=> ActorComponent_Interop.GetNetMode(ConjugateHandle.FromConjugate(this));
+	
 }
 
 

@@ -219,6 +219,18 @@ public partial class World
 
 	#endregion
 
+	public EWorldType GetWorldType()
+	{
+		MasterAlcCache.GuardInvariant();
+		return InternalGetWorldType();
+	}
+
+	public ENetMode GetNetMode()
+	{
+		MasterAlcCache.GuardInvariant();
+		return InternalGetNetMode();
+	}
+
 	private unsafe Actor? InternalSpawnActor(UnrealClass @class, Transform? transform, in ActorSpawnParameters spawnParameters, bool absolute, bool deferred)
 	{
 		fixed (char* nameBuffer = spawnParameters.Name)
@@ -277,6 +289,12 @@ public partial class World
 			
 		return actor;
 	}
+	
+	private unsafe EWorldType InternalGetWorldType()
+		=> World_Interop.GetWorldType(ConjugateHandle.FromConjugate(this));
+	
+	private unsafe ENetMode InternalGetNetMode()
+		=> World_Interop.GetNetMode(ConjugateHandle.FromConjugate(this));
 	
 }
 

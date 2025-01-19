@@ -145,7 +145,7 @@ public static class AssertionMacros
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool ensure
 	(
-		[DoesNotReturnIf(false)] bool condition,
+		bool condition,
 		string? message = default,
 		AssemblyLoadContext? context = default,
 		[CallerArgumentExpression(nameof(condition))] string? expr = default,
@@ -168,7 +168,7 @@ public static class AssertionMacros
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool ensureAlways
 	(
-		[DoesNotReturnIf(false)] bool condition,
+		bool condition,
 		string? message = default,
 		[CallerArgumentExpression(nameof(condition))] string? expr = default,
 		[CallerFilePath] string? file = default,

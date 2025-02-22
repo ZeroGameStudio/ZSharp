@@ -11,6 +11,11 @@ public readonly struct ConjugateHandle : IEquatable<ConjugateHandle>
     public static ConjugateHandle FromConjugate(IConjugate? conjugate)
     {
         Thrower.ThrowIfNotInGameThread();
+
+        if (conjugate is { Unmanaged: 0 })
+        {
+            throw new InvalidOperationException("Access uninitialized conjugate.");
+        }
         
         if (conjugate is { IsExpired: true })
         {

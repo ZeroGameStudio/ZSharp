@@ -31,7 +31,7 @@
 
 #include "mono/jit/jit.h"
 
-#if !ZSHARP_WITH_JIT
+#if ZSHARP_WITH_INTERPRETER
 #include "mono/metadata/loader.h"
 #endif
 
@@ -281,11 +281,11 @@ namespace ZSharp::ZGenericClr_Private
 		false,
 		TEXT("If enabled, perform a full managed GC after unmanaged GC.")
 	};
-
-#if !ZSHARP_WITH_JIT
-	extern void* GMonoAotModuleSystemPrivateCoreLibInfo;
-#endif
 }
+
+#if ZSHARP_WITH_INTERPRETER
+extern void* mono_aot_module_System_Private_CoreLib_info;
+#endif
 
 ZSharp::FZGenericClr& ZSharp::FZGenericClr::Get()
 {
@@ -317,17 +317,14 @@ void ZSharp::FZGenericClr::Startup()
 	auto Function = (decltype(&::Function))FPlatformProcess::GetDllExport(runtime, TEXT(#Function)); \
 	check(Function);
 
+#if ZSHARP_WITH_INTERPRETER
 	IMPORT_DLL_FUNCTION(mono_jit_set_aot_mode);
-	IMPORT_DLL_FUNCTION(mono_jit_parse_options);
-	IMPORT_DLL_FUNCTION(mono_debug_init);
-
-#if !ZSHARP_WITH_JIT
 	IMPORT_DLL_FUNCTION(mono_aot_register_module);
 	IMPORT_DLL_FUNCTION(mono_dllmap_insert);
 	
 	mono_jit_set_aot_mode(MONO_AOT_MODE_INTERP);
 
-	mono_aot_register_module(static_cast<void**>(ZGenericClr_Private::GMonoAotModuleSystemPrivateCoreLibInfo));
+	mono_aot_register_module(static_cast<void**>(mono_aot_module_System_Private_CoreLib_info));
 
 	mono_dllmap_insert(NULL, "System.Native", NULL, "__Internal", NULL);
 
@@ -340,14 +337,15 @@ void ZSharp::FZGenericClr::Startup()
 	mono_dllmap_insert(NULL, "System.Globalization.Native", NULL, "__Internal", NULL);
 
 	FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_SYSTEM_GLOBALIZATION_INVARIANT"), TEXT("1"));
-#else
-	mono_jit_set_aot_mode(MONO_AOT_MODE_NONE);
 #endif
 
 	int32 debuggerPort;
 	GConfig->GetInt(TEXT("Debugger"), TEXT("Port"), debuggerPort, GConfig->GetConfigFilename(TEXT("ZSharp")));
 	if (debuggerPort > 0 && debuggerPort <= MAX_uint16)
 	{
+		IMPORT_DLL_FUNCTION(mono_jit_parse_options);
+		IMPORT_DLL_FUNCTION(mono_debug_init);
+		
 		const FString debuggerConfig = FString::Printf(TEXT("--debugger-agent=address=127.0.0.1:%d,server=y,suspend=n,transport=dt_socket"), debuggerPort);
 		const auto& option1 = StringCast<char>(TEXT("--soft-breakpoints"));
 		const auto& option2 = StringCast<char>(*debuggerConfig);

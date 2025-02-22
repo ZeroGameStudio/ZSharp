@@ -75,8 +75,8 @@ public class ZSharpCore : ModuleRules
 			PrivateDefinitions.Add("ZSHARP_WITH_MONO=1");
 		}
 		
-		int withJit = Target.Platform == UnrealTargetPlatform.IOS ? 0 : 1;
-		PrivateDefinitions.Add($"ZSHARP_WITH_JIT={withJit}");
+		int interp = Target.Platform == UnrealTargetPlatform.IOS ? 1 : 0;
+		PrivateDefinitions.Add($"ZSHARP_WITH_INTERPRETER={interp}");
 		
 		PublicDefinitions.Add($"ZSHARP_PLATFORM=\"{Target.Platform}\"");
 		

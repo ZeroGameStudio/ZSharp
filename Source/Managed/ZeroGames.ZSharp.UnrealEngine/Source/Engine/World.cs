@@ -35,8 +35,13 @@ public partial class World
 		{
 			throw new ArgumentOutOfRangeException(nameof(@class));
 		}
-		
-		return (T?)SpawnActor(@class, transform, spawnParameters);
+
+		if (InternalSpawnActor(@class, transform, spawnParameters, false, false) is T actor)
+		{
+			return actor;
+		}
+
+		return null;
 	}
 	
 	public Actor? SpawnActor(UnrealClass @class, Transform? transform, in ActorSpawnParameters spawnParameters = default)

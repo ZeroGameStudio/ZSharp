@@ -19,7 +19,9 @@ public readonly struct ConjugateHandle : IEquatable<ConjugateHandle>
         
         return new(conjugate);
     }
-    
+
+    public override string ToString() => $"ConjugateHandle {{{_handle}}}";
+
     public override bool Equals(object? obj)
     {
         return obj is ConjugateHandle other && Equals(other);

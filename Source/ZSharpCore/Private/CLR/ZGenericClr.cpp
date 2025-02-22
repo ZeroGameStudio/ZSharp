@@ -27,23 +27,20 @@
 #include "Interop/Engine/ZPath_Interop.h"
 #include "Interop/ZUnmanagedFunctionInteropHelper.h"
 
+#if ZSHARP_WITH_MONO
+
+#include "mono/jit/jit.h"
+
+#if !ZSHARP_WITH_JIT
+#include "mono/metadata/loader.h"
+#endif
+
+#include "mono/metadata/mono-debug.h"
+
+#endif
+
 namespace ZSharp::ZGenericClr_Private
 {
-	static FAutoConsoleCommand GCmdFullGC
-	{
-		TEXT("z#.gc"),
-		TEXT("Perform a full managed GC."),
-		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>&){ FZSharpClr::Get().CollectGarbage(); }),
-		ECVF_Default
-	};
-	
-	static TAutoConsoleVariable<bool> GCVarPerformManagedGCAfterUnmanagedGC
-	{
-		TEXT("z#.PerformManagedGCAfterUnmanagedGC"),
-		false,
-		TEXT("If enabled, perform a full managed GC after unmanaged GC.")
-	};
-
 	static void HandleError(const TCHAR* error)
 	{
 		UE_LOG(LogZSharpCore, Error, TEXT("%s"), error);
@@ -265,6 +262,25 @@ namespace ZSharp::ZGenericClr_Private
 		check(dllMain);
 		dllMain(GArgs);
 	}
+
+	static FAutoConsoleCommand GCmdFullGC
+	{
+		TEXT("z#.gc"),
+		TEXT("Perform a full managed GC."),
+		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>&){ FZSharpClr::Get().CollectGarbage(); }),
+		ECVF_Default
+	};
+	
+	static TAutoConsoleVariable<bool> GCVarPerformManagedGCAfterUnmanagedGC
+	{
+		TEXT("z#.PerformManagedGCAfterUnmanagedGC"),
+		false,
+		TEXT("If enabled, perform a full managed GC after unmanaged GC.")
+	};
+
+#if !ZSHARP_WITH_JIT
+	extern void* GMonoAotModuleSystemPrivateCoreLibInfo;
+#endif
 }
 
 ZSharp::FZGenericClr& ZSharp::FZGenericClr::Get()
@@ -286,6 +302,56 @@ void ZSharp::FZGenericClr::Startup()
 	bInitialized = true;
 
 	const FString dotnetRoot = FPaths::Combine(FPaths::ProjectDir(), ZSHARP_DOTNET_PATH_TO_PROJECT);
+
+#if ZSHARP_WITH_MONO
+
+	const FString runtimePath = FPaths::Combine(dotnetRoot, ZSHARP_RUNTIME_PATH_TO_DOTNET);
+	void* runtime = FPlatformProcess::GetDllHandle(*runtimePath);
+	check(runtime);
+
+#define IMPORT_DLL_FUNCTION(Function) \
+	auto Function = (decltype(&::Function))FPlatformProcess::GetDllExport(runtime, TEXT(#Function)); \
+	check(Function);
+
+	IMPORT_DLL_FUNCTION(mono_jit_set_aot_mode);
+	IMPORT_DLL_FUNCTION(mono_jit_parse_options);
+	IMPORT_DLL_FUNCTION(mono_debug_init);
+
+#if !ZSHARP_WITH_JIT
+	IMPORT_DLL_FUNCTION(mono_aot_register_module);
+	IMPORT_DLL_FUNCTION(mono_dllmap_insert);
+	
+	mono_jit_set_aot_mode(MONO_AOT_MODE_INTERP);
+
+	mono_aot_register_module(static_cast<void**>(ZGenericClr_Private::GMonoAotModuleSystemPrivateCoreLibInfo));
+
+	mono_dllmap_insert(NULL, "System.Native", NULL, "__Internal", NULL);
+
+	mono_dllmap_insert(NULL, "System.Net.Security.Native", NULL, "__Internal", NULL);
+
+	mono_dllmap_insert(NULL, "System.IO.Compression.Native", NULL, "__Internal", NULL);
+
+	mono_dllmap_insert(NULL, "System.Security.Cryptography.Native.Apple", NULL, "__Internal", NULL);
+
+	mono_dllmap_insert(NULL, "System.Globalization.Native", NULL, "__Internal", NULL);
+
+	FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_SYSTEM_GLOBALIZATION_INVARIANT"), TEXT("1"));
+#else
+	mono_jit_set_aot_mode(MONO_AOT_MODE_NONE);
+#endif
+
+	const FString debuggerConfig = "--debugger-agent=address=127.0.0.1:50000,server=y,transport=dt_socket";
+	const auto& option1 = StringCast<char>(TEXT("--soft-breakpoints"));
+	const auto& option2 = StringCast<char>(*debuggerConfig);
+	char* options[] = { (char*)option1.Get(), (char*)option2.Get() };
+
+	mono_jit_parse_options(sizeof(options) / sizeof(char*), options);
+
+	mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+
+#undef IMPORT_DLL_FUNCTION
+	
+#endif
 
 	const FString hostFxrPath = FPaths::Combine(dotnetRoot, ZSHARP_HOSTFXR_PATH_TO_DOTNET);
 	void* hostFxr = FPlatformProcess::GetDllHandle(*hostFxrPath);

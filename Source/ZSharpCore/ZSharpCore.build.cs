@@ -48,10 +48,23 @@ public class ZSharpCore : ModuleRules
 			{
 			}
 		);
+
+		// Z# constants
+		// IMPORTANT: KEEP SYNC WITH Dotnet.build.cs
+		const string RUNTIME_CONFIG_JSON = "ZSharp.runtimeconfig.json";
 		
-		if (Target.Platform == UnrealTargetPlatform.Win64
-		    || Target.Platform == UnrealTargetPlatform.Linux
-		    || Target.Platform == UnrealTargetPlatform.Mac)
+		// Z# configurations
+		// IMPORTANT: KEEP SYNC WITH Dotnet.build.cs
+		const bool useMonoForEditorBuild = true;
+		const string dotnetVersion = "9.0.0";
+		string platformName = Target.Platform.ToString();
+		string runtimeImpl = Target.bBuildEditor && useMonoForEditorBuild ? "mono" : platformName switch
+		{
+			"Win64" or "Linux" or "LinuxArm64" => "coreclr",
+			_ => "mono",
+		};
+		
+		if (runtimeImpl is "coreclr")
 		{
 			PrivateDefinitions.Add("ZSHARP_WITH_CORECLR=1");
 			PrivateDefinitions.Add("ZSHARP_WITH_MONO=0");
@@ -61,20 +74,16 @@ public class ZSharpCore : ModuleRules
 			PrivateDefinitions.Add("ZSHARP_WITH_CORECLR=0");
 			PrivateDefinitions.Add("ZSHARP_WITH_MONO=1");
 		}
-
-		// Z# constants
-		// IMPORTANT: KEEP SYNC WITH Dotnet.build.cs
-		const string RUNTIME_CONFIG_JSON = "ZSharp.runtimeconfig.json";
 		
-		// Z# configurations
-		// IMPORTANT: KEEP SYNC WITH Dotnet.build.cs
-		string dotnetVersion = "9.0.0";
+		int withJit = Target.Platform == UnrealTargetPlatform.IOS ? 0 : 1;
+		PrivateDefinitions.Add($"ZSHARP_WITH_JIT={withJit}");
 		
 		PublicDefinitions.Add($"ZSHARP_PLATFORM=\"{Target.Platform}\"");
 		
 		PublicDefinitions.Add($"ZSHARP_DOTNET_VERSION=\"{dotnetVersion}\"");
 		PublicDefinitions.Add($"ZSHARP_DOTNET_PATH_TO_PROJECT=\"Binaries/{Target.Platform}/dotnet\"");
 		PublicDefinitions.Add($"ZSHARP_HOSTFXR_PATH_TO_DOTNET=\"host/fxr/{dotnetVersion}/hostfxr.dll\"");
+		PublicDefinitions.Add($"ZSHARP_RUNTIME_PATH_TO_DOTNET=\"shared/Microsoft.NETCore.App/{dotnetVersion}/coreclr.dll\"");
 		PublicDefinitions.Add($"ZSHARP_RUNTIME_CONFIG_FILE_NAME=\"{RUNTIME_CONFIG_JSON}\"");
 		
 		PublicDefinitions.Add($"ZSHARP_CORE_ASSEMBLY_NAME=\"ZeroGames.ZSharp.Core\"");

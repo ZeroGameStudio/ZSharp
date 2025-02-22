@@ -32,7 +32,7 @@ public class Dotnet : ModuleRules
 		
 		// Z# configurations
 		// IMPORTANT: KEEP SYNC WITH ZSharpCore.build.cs
-		const bool useMonoForEditorBuild = false;
+		const bool useMonoForEditorBuild = true;
 		const string dotnetVersion = "9.0.0";
 		string runtimeImpl = Target.bBuildEditor && useMonoForEditorBuild ? "mono" : platformName switch
 		{

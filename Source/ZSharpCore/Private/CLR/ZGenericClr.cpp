@@ -131,11 +131,15 @@ namespace ZSharp::ZGenericClr_Private
 			void* IsInGameThreadFuncPtr = &IsInGameThread;
 		} GUnmanagedProperties;
 		
+		bool suspend;
+		GConfig->GetBool(TEXT("Debugger"), TEXT("Suspend"), suspend, GConfig->GetConfigFilename(TEXT("ZSharp")));
+		
 		static const struct
 		{
 			FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(GUnmanagedFunctions), GUnmanagedFunctions };
 			void*** ManagedFunctions = GManagedFunctions;
 			decltype(GUnmanagedProperties) UnmanagedProperties = GUnmanagedProperties;
+			uint8 WaitForDebugger = suspend;
 		} GArgs{};
 
 		void(*dllMain)(const decltype(GArgs)&) = nullptr;
@@ -341,13 +345,10 @@ void ZSharp::FZGenericClr::Startup()
 #endif
 
 	int32 debuggerPort;
-	GConfig->GetInt(TEXT("Mono"), TEXT("Debugger.Port"), debuggerPort, GConfig->GetConfigFilename(TEXT("ZSharp")));
+	GConfig->GetInt(TEXT("Debugger"), TEXT("Port"), debuggerPort, GConfig->GetConfigFilename(TEXT("ZSharp")));
 	if (debuggerPort > 0 && debuggerPort <= MAX_uint16)
 	{
-		bool suspend;
-		GConfig->GetBool(TEXT("Mono"), TEXT("Debugger.Suspend"), suspend, GConfig->GetConfigFilename(TEXT("ZSharp")));
-		
-		const FString debuggerConfig = FString::Printf(TEXT("--debugger-agent=address=127.0.0.1:%d,server=y,suspend=%s,transport=dt_socket"), debuggerPort, suspend ? TEXT("y") : TEXT("n"));
+		const FString debuggerConfig = FString::Printf(TEXT("--debugger-agent=address=127.0.0.1:%d,server=y,suspend=n,transport=dt_socket"), debuggerPort);
 		const auto& option1 = StringCast<char>(TEXT("--soft-breakpoints"));
 		const auto& option2 = StringCast<char>(*debuggerConfig);
 		char* options[] = { (char*)option1.Get(), (char*)option2.Get() };

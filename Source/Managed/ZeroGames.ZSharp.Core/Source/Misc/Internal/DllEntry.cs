@@ -1,6 +1,8 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace ZeroGames.ZSharp.Core;
 
@@ -34,6 +36,7 @@ internal static class DllEntry
         public UnmanagedFunctions UnmanagedFunctions;
         public void*** ManagedFunctions;
         public UnmanagedProperties UnmanagedProperties;
+        public uint8 WaitForDebugger;
     }
 
     [UnmanagedCallersOnly]
@@ -76,6 +79,15 @@ internal static class DllEntry
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, char*, char*, void*, EInvokeMethodErrorCode>)&SlimAssemblyLoadContext_Interop.InvokeMethod;
         
         GameThreadScheduler.IsInGameThreadFuncPtr = (delegate* unmanaged<uint8>)args->UnmanagedProperties.IsInGameThreadFuncPtr;
+
+        if (args->WaitForDebugger != 0)
+        {
+            while (!Debugger.IsAttached)
+            {
+                CoreLog.Log("Waiting for debugger...");
+                Thread.Sleep(TimeSpan.FromMilliseconds(1000));
+            }
+        }
         
         CoreLog.Log("===================== Z# Startup =====================");
     }

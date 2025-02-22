@@ -64,7 +64,7 @@ namespace ZSharp::ZGenericClr_Private
 		}
 	}
 
-	static void LoadCoreAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer)
+	static void LoadCoreAssembly(load_assembly_bytes_fn loadAssembly, get_function_pointer_fn getFunctionPointer, bool debugger)
 	{
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
         {
@@ -139,7 +139,7 @@ namespace ZSharp::ZGenericClr_Private
 			FZUnmanagedFunctions UnmanagedFunctions { UE_ARRAY_COUNT(GUnmanagedFunctions), GUnmanagedFunctions };
 			void*** ManagedFunctions = GManagedFunctions;
 			decltype(GUnmanagedProperties) UnmanagedProperties = GUnmanagedProperties;
-			uint8 WaitForDebugger = suspend;
+			uint8 WaitForDebugger = debugger && suspend;
 		} GArgs{};
 
 		void(*dllMain)(const decltype(GArgs)&) = nullptr;
@@ -307,6 +307,8 @@ void ZSharp::FZGenericClr::Startup()
 
 	const FString dotnetRoot = FPaths::Combine(FPaths::ProjectDir(), ZSHARP_DOTNET_PATH_TO_PROJECT);
 
+	bool debugger = true;
+
 #if ZSHARP_WITH_MONO
 
 	const FString runtimePath = FPaths::Combine(dotnetRoot, ZSHARP_RUNTIME_PATH_TO_DOTNET);
@@ -358,6 +360,7 @@ void ZSharp::FZGenericClr::Startup()
 	else
 	{
 		ensure(!debuggerPort);
+		debugger = false;
 	}
 
 #undef IMPORT_DLL_FUNCTION
@@ -401,7 +404,7 @@ void ZSharp::FZGenericClr::Startup()
 	closeHostFXR(handle);
 
 	ZGenericClr_Private::LoadAssembliesUnderDirectory("ForwardShared", loadAssembly);
-	ZGenericClr_Private::LoadCoreAssembly(loadAssembly, getFunctionPointer);
+	ZGenericClr_Private::LoadCoreAssembly(loadAssembly, getFunctionPointer, debugger);
 	ZGenericClr_Private::LoadResolverAssembly(loadAssembly);
 	ZGenericClr_Private::LoadCoreEngineAssembly(loadAssembly, getFunctionPointer);
 	ZGenericClr_Private::LoadCoreAsyncAssembly(loadAssembly, getFunctionPointer);

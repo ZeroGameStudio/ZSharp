@@ -340,14 +340,26 @@ void ZSharp::FZGenericClr::Startup()
 	mono_jit_set_aot_mode(MONO_AOT_MODE_NONE);
 #endif
 
-	const FString debuggerConfig = "--debugger-agent=address=127.0.0.1:50000,server=y,transport=dt_socket";
-	const auto& option1 = StringCast<char>(TEXT("--soft-breakpoints"));
-	const auto& option2 = StringCast<char>(*debuggerConfig);
-	char* options[] = { (char*)option1.Get(), (char*)option2.Get() };
+	int32 debuggerPort;
+	GConfig->GetInt(TEXT("Mono"), TEXT("Debugger.Port"), debuggerPort, GConfig->GetConfigFilename(TEXT("ZSharp")));
+	if (debuggerPort > 0 && debuggerPort <= MAX_uint16)
+	{
+		bool suspend;
+		GConfig->GetBool(TEXT("Mono"), TEXT("Debugger.Suspend"), suspend, GConfig->GetConfigFilename(TEXT("ZSharp")));
+		
+		const FString debuggerConfig = FString::Printf(TEXT("--debugger-agent=address=127.0.0.1:%d,server=y,suspend=%s,transport=dt_socket"), debuggerPort, suspend ? TEXT("y") : TEXT("n"));
+		const auto& option1 = StringCast<char>(TEXT("--soft-breakpoints"));
+		const auto& option2 = StringCast<char>(*debuggerConfig);
+		char* options[] = { (char*)option1.Get(), (char*)option2.Get() };
 
-	mono_jit_parse_options(sizeof(options) / sizeof(char*), options);
+		mono_jit_parse_options(sizeof(options) / sizeof(char*), options);
 
-	mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+		mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+	}
+	else
+	{
+		ensure(!debuggerPort);
+	}
 
 #undef IMPORT_DLL_FUNCTION
 	

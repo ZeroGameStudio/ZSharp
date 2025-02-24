@@ -52,6 +52,7 @@ public:
 	bool IsForceExportFieldPath(const FString& path) const { return ForceExportFieldPathsLookup.Contains(path); }
 	bool IsForceNotExportFieldPath(const FString& path) const { return ForceNotExportFieldPathsLookup.Contains(path); }
 
+	bool ShouldUseEnumValueScriptName() const { return bUseEnumValueScriptName; }
 	bool ShouldUseLooseDefaultParameterName() const { return bUseLooseDefaultParameterName; }
 
 #if WITH_EDITOR
@@ -106,6 +107,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = "Export")
 	TArray<FString> ForceNotExportFieldPaths;
+
+	UPROPERTY(Config, EditAnywhere, Category = "Export|Enum")
+	bool bUseEnumValueScriptName = true;
 
 	UPROPERTY(Config, EditAnywhere, Category = "Export|Function")
 	bool bUseLooseDefaultParameterName = false;

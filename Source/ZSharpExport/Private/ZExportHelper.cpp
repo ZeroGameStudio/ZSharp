@@ -39,6 +39,22 @@ namespace ZExportHelper_Private
 			name.AppendInt(0);
 		}
 	}
+
+	static void ToCamelCase(FString& name)
+	{
+		if (name.IsEmpty())
+		{
+			return;
+		}
+
+		for (int32 i = 0; i < name.Len() - 1; ++i)
+		{
+			if (i == 0 || FChar::IsUpper(name[i + 1]))
+			{
+				name[i] = FChar::ToLower(name[i]);
+			}
+		}
+	}
 }
 
 FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
@@ -119,8 +135,19 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 		{
 			name.Append("_DEPRECATED");
 		}
+
+		// Convert parameter name to camel case: Xxx -> xxx, bYyy -> yyy (Assume there is no conflict).
+		if (property->HasAllPropertyFlags(CPF_Parm))
+		{
+			if (field.IsA<FBoolProperty>() && name.StartsWith("b"))
+			{
+				name.RemoveAt(0);
+			}
+
+			ZExportHelper_Private::ToCamelCase(name);
+		}
 	}
-	
+
 	// Check conflict with owner if field is member property or member function.
 	bool conflicts = false;
 	if (field.IsA<UFunction>() && !field.IsA<UDelegateFunction>() || field.IsA<FProperty>())

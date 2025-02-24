@@ -18,7 +18,7 @@ ZSharp::FZDynamicallyExportedParameter* ZSharp::FZDynamicallyExportedParameter::
 
 FString ZSharp::FZDynamicallyExportedParameter::GetName() const
 {
-	return Property->GetName();
+	return FZExportHelper::GetFieldRedirectedName(Property);
 }
 
 ZSharp::FZFullyExportedTypeName ZSharp::FZDynamicallyExportedParameter::GetType() const

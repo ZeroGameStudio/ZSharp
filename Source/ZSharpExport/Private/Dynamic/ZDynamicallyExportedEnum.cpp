@@ -55,11 +55,13 @@ FString ZSharp::FZDynamicallyExportedEnum::GetUnderlyingType() const
 
 void ZSharp::FZDynamicallyExportedEnum::ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const
 {
-	const bool exportDeprecated = GetDefault<UZSharpExportSettings>()->ShouldExportDeprecatedFields();
+	const auto settings = GetDefault<UZSharpExportSettings>();
+	const bool useScriptName = WITH_METADATA && settings->ShouldUseEnumValueScriptName();
+	const bool exportDeprecated = settings->ShouldExportDeprecatedFields();
 
 	for (int32 i = 0; i < Enum->NumEnums(); ++i)
 	{
-		const FString name = Enum->GetNameStringByIndex(i);
+		const FString name = useScriptName && Enum->HasMetaData(TEXT("ScriptName"), i) ? Enum->GetMetaData(TEXT("ScriptName"), i) : Enum->GetNameStringByIndex(i);
 		if (!exportDeprecated && FZExportHelper::IsNameDeprecated(name))
 		{
 			continue;

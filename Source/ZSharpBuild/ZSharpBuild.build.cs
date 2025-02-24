@@ -6,7 +6,7 @@ public class ZSharpBuild : ModuleRules
 {
 	public ZSharpBuild(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 		
 		PublicIncludePaths.AddRange
 		(

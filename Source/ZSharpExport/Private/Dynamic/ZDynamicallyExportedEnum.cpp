@@ -55,13 +55,22 @@ FString ZSharp::FZDynamicallyExportedEnum::GetUnderlyingType() const
 
 void ZSharp::FZDynamicallyExportedEnum::ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const
 {
+	static const FRegexPattern GIdentifierRegex { "^[A-Za-z_][A-Za-z0-9_]*$" };
+	
 	const auto settings = GetDefault<UZSharpExportSettings>();
-	const bool useScriptName = WITH_METADATA && settings->ShouldUseEnumValueScriptName();
+	const bool preferScriptName = WITH_METADATA && settings->ShouldUseEnumValueScriptName();
 	const bool exportDeprecated = settings->ShouldExportDeprecatedFields();
 
 	for (int32 i = 0; i < Enum->NumEnums(); ++i)
 	{
-		const FString name = useScriptName && Enum->HasMetaData(TEXT("ScriptName"), i) ? Enum->GetMetaData(TEXT("ScriptName"), i) : Enum->GetNameStringByIndex(i);
+		FString name = Enum->GetNameStringByIndex(i);
+		const FString scriptName = preferScriptName ? Enum->GetMetaData(TEXT("ScriptName"), i) : "";
+		FRegexMatcher matcher { GIdentifierRegex, name };
+		if (!scriptName.IsEmpty() && ensureAlways(matcher.FindNext()))
+		{
+			name = scriptName;
+		}
+		
 		if (!exportDeprecated && FZExportHelper::IsNameDeprecated(name))
 		{
 			continue;

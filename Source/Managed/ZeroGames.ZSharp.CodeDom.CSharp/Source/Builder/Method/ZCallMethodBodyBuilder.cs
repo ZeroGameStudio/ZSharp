@@ -20,9 +20,9 @@ public class ZCallMethodBodyBuilder(string name, TypeReference? returnType, bool
 $@"Thrower.ThrowIfNotInGameThread();
 
 const string ZCALL_NAME = ""{Name}"";
-IMasterAssemblyLoadContext alc = MasterAlcCache.Instance;
-{handleFieldName} ??= alc.GetZCallHandle(ZCALL_NAME);
-ZCallHandle handle = {handleFieldName}.Value;";
+IMasterAssemblyLoadContext __alc__ = MasterAlcCache.Instance;
+{handleFieldName} ??= __alc__.GetZCallHandle(ZCALL_NAME);
+ZCallHandle __handle__ = {handleFieldName}.Value;";
 
 		sb.Append(getHandle);
 
@@ -31,11 +31,11 @@ ZCallHandle handle = {handleFieldName}.Value;";
 		{
 			string setupBuffer = 
 $@"const int32 NUM_SLOTS = {numSlots};
-ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[NUM_SLOTS]
+ZCallBufferSlot* __slots__ = stackalloc ZCallBufferSlot[NUM_SLOTS]
 {{
 {MakeSlots().Indent()}
 }};
-ZCallBuffer buffer = new(slots, NUM_SLOTS);";
+ZCallBuffer __buffer__ = new(__slots__, NUM_SLOTS);";
 
 			sb.AppendLine();
 			sb.AppendLine();
@@ -45,9 +45,9 @@ ZCallBuffer buffer = new(slots, NUM_SLOTS);";
 		sb.AppendLine();
 		sb.AppendLine();
 
-		string bufferParameter = needsBuffer ? "&buffer" : "null";
+		string bufferParameter = needsBuffer ? "&__buffer__" : "null";
 		sb.Append(
-$@"if (alc.ZCall(handle, {bufferParameter}) != EZCallErrorCode.Succeed)
+$@"if (__alc__.ZCall(__handle__, {bufferParameter}) != EZCallErrorCode.Succeed)
 {{
 	throw new InvalidOperationException();
 }}");
@@ -149,7 +149,7 @@ $@"unsafe
 		bool nullable = parameterType.TypeName.EndsWith("?");
 		string notnullType = parameterType.TypeName.TrimEnd('?');
 		string getTarget = slotType == "Conjugate" ? nullable && !parameterType.IsNullInNotNullOut ? $".GetTarget<{notnullType}>()" : $".GetTargetChecked<{notnullType}>()" : string.Empty;
-		return $"{cast}slots[{index}].{slotType}{getTarget}";
+		return $"{cast}__slots__[{index}].{slotType}{getTarget}";
 	}
 
 	protected string GetSlotType(TypeReference parameterType) => (string.IsNullOrWhiteSpace(parameterType.UnderlyingType) ? parameterType.TypeName : parameterType.UnderlyingType) switch

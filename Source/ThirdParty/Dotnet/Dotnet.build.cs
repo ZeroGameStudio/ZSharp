@@ -21,7 +21,6 @@ public class Dotnet : ModuleRules
 		string projectDir = DirectoryReference.FromFile(Target.ProjectFile)!.FullName;
 		
 		// Z# constants
-		// IMPORTANT: KEEP SYNC WITH ZSharpCore.build.cs
 		const string BINARIES_DIR = "Binaries";
 		const string CONFIG_DIR = "Config";
 		const string PRE_COMPILED_DIR = "Precompiled";
@@ -31,29 +30,31 @@ public class Dotnet : ModuleRules
 		const string NETCOREAPP = "Microsoft.NETCore.App";
 		
 		// Z# configurations
-		// IMPORTANT: KEEP SYNC WITH ZSharpCore.build.cs
-		const bool useMonoForEditorBuild = true;
-		const string dotnetVersion = "9.0.0";
-		string runtimeImpl = Target.bBuildEditor && useMonoForEditorBuild ? "mono" : platformName switch
+		const bool FORCE_USE_MONO = false;
+		const bool USE_MONO_FOR_EDITOR_BUILD = true; // false;
+		const string DOTNET_VERSION = "9.0.0";
+		
+		// Select runtime implementation
+		string runtimeImpl = FORCE_USE_MONO || Target.bBuildEditor && USE_MONO_FOR_EDITOR_BUILD ? "mono" : platformName switch
 		{
 			"Win64" or "Linux" or "LinuxArm64" => "coreclr",
 			_ => "mono",
 		};
 
 		// Copy runtime
-		string dotnetRoot = Path.Combine(moduleDir, "runtime", dotnetVersion);
+		string dotnetRoot = Path.Combine(moduleDir, "runtime", DOTNET_VERSION);
 		string nativeSrcDir = Path.Combine(dotnetRoot, "native", platformName);
 		string dotnetDstDir = Path.Combine(projectDir, BINARIES_DIR, platformName, DOTNET_ROOT_DIR);
 		
 		{ // hostfxr
 			string hostfxrSrcPath = Path.Combine(nativeSrcDir, HOSTFXR_DLL);
-			string hostfxrDstPath = Path.Combine(dotnetDstDir, "host", "fxr", dotnetVersion, HOSTFXR_DLL);
+			string hostfxrDstPath = Path.Combine(dotnetDstDir, "host", "fxr", DOTNET_VERSION, HOSTFXR_DLL);
 			RuntimeDependencies.Add(hostfxrDstPath, hostfxrSrcPath);
 		}
 		
 		{ // native
 			string runtimeSrcDir = Path.Combine(nativeSrcDir, runtimeImpl);
-			string runtimeDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, dotnetVersion);
+			string runtimeDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, DOTNET_VERSION);
 			
 			IEnumerable<string> libs = GetFiles(runtimeSrcDir);
 			foreach (var lib in libs)
@@ -65,7 +66,7 @@ public class Dotnet : ModuleRules
 		
 		{ // lib
 			string libSrcDir = Path.Combine(dotnetRoot, "lib");
-			string libDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, dotnetVersion);
+			string libDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, DOTNET_VERSION);
 			
             IEnumerable<string> libs = GetFiles(libSrcDir);
             foreach (var lib in libs)
@@ -124,6 +125,26 @@ public class Dotnet : ModuleRules
 				RuntimeDependencies.Add(dstPath);
 			}
 		}
+		
+		// Predefined macros.
+		if (runtimeImpl is "coreclr")
+		{
+			PublicDefinitions.Add("ZSHARP_WITH_CORECLR=1");
+			PublicDefinitions.Add("ZSHARP_WITH_MONO=0");
+		}
+		else
+		{
+			PublicDefinitions.Add("ZSHARP_WITH_CORECLR=0");
+			PublicDefinitions.Add("ZSHARP_WITH_MONO=1");
+		}
+		
+		int interp = Target.Platform == UnrealTargetPlatform.IOS ? 1 : 0;
+		PublicDefinitions.Add($"ZSHARP_WITH_INTERPRETER={interp}");
+		
+		PublicDefinitions.Add($"ZSHARP_DOTNET_PATH_TO_PROJECT=\"Binaries/{Target.Platform}/dotnet\"");
+		PublicDefinitions.Add($"ZSHARP_HOSTFXR_PATH_TO_DOTNET=\"host/fxr/{DOTNET_VERSION}/hostfxr.dll\"");
+		PublicDefinitions.Add($"ZSHARP_RUNTIME_PATH_TO_DOTNET=\"shared/Microsoft.NETCore.App/{DOTNET_VERSION}/coreclr.dll\"");
+		PublicDefinitions.Add($"ZSHARP_RUNTIME_CONFIG_FILE_NAME=\"{RUNTIME_CONFIG_JSON}\"");
 	}
 
 	private static IEnumerable<string> GetFiles(string directory, string pattern = "*.*")

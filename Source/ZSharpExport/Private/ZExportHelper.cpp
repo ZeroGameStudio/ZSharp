@@ -31,7 +31,7 @@ namespace ZExportHelper_Private
 		{
 			for (const auto& newWordIndex : newWordIndices)
 			{
-				name.InsertAt(newWordIndex, "_");
+				name.InsertAt(newWordIndex, '_');
 			}
 		}
 		else
@@ -47,9 +47,10 @@ namespace ZExportHelper_Private
 			return;
 		}
 
-		for (int32 i = 0; i < name.Len() - 1; ++i)
+		int32 len = name.Len();
+		for (int32 i = 0; i < len; ++i)
 		{
-			if (i == 0 || FChar::IsUpper(name[i + 1]))
+			if (i == 0 || i < len - 1 && FChar::IsUpper(name[i + 1]))
 			{
 				name[i] = FChar::ToLower(name[i]);
 			}
@@ -105,7 +106,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 	{
 		if (!name.StartsWith("E"))
 		{
-			name.InsertAt(0, "E");
+			name.InsertAt(0, 'E');
 		}
 	}
 	else if (auto delegate = field.Get<const UDelegateFunction>())
@@ -139,7 +140,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 		// Convert parameter name to camel case: Xxx -> xxx, bYyy -> yyy (Assume there is no conflict).
 		if (property->HasAllPropertyFlags(CPF_Parm))
 		{
-			if (field.IsA<FBoolProperty>() && name.StartsWith("b"))
+			if (field.IsA<FBoolProperty>() && name[0] == 'b' && name.Len() > 1 && (!FChar::IsLower(name[1]) && !FChar::IsDigit(name[1])))
 			{
 				name.RemoveAt(0);
 			}
@@ -173,7 +174,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 		}
 	}
 
-	// Finally check conflict with managed root class System.Object.
+	// Check conflict with managed root class System.Object.
 	if (!conflicts)
 	{
 		static const TSet<FString> GManagedConflicts
@@ -184,7 +185,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 			"MemberwiseClone",
 			"Equals",
 			"ReferenceEquals",
-			"Finalize"
+			"Finalize",
 		};
 
 		if (GManagedConflicts.Contains(name))
@@ -196,6 +197,25 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 	if (conflicts)
 	{
 		ZExportHelper_Private::DeconflictName(name);
+	}
+	else
+	{
+		// Check conflict with reserved keywords.
+		static const TSet<FString> GReservedKeywords
+		{
+			"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked", "class", "const", "continue",
+			"decimal", "default", "delegate", "do", "double", "else", "enum", "event", "explicit", "extern", "false", "finally", 
+			"fixed", "float", "for", "foreach", "goto", "if", "implicit", "in", "int", "interface", "internal", "is", "lock",
+			"long", "namespace", "new", "null", "object", "operator", "out", "override", "params", "private", "protected", 
+			"public", "readonly", "ref", "return", "sbyte", "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct",
+			"switch", "this", "throw", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "virtual",
+			"void", "volatile", "while",
+		};
+
+		if (GReservedKeywords.Contains(name))
+		{
+			name.InsertAt(0, '@');
+		}
 	}
 
 	return name;

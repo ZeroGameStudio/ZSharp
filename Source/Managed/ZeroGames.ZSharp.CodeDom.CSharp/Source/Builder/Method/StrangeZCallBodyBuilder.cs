@@ -19,18 +19,18 @@ public class StrangeZCallBodyBuilder(string zcallReplace, TypeReference? returnT
 $@"Thrower.ThrowIfNotInGameThread();
 
 const int32 NUM_SLOTS = {numSlots};
-ZCallBufferSlot* slots = stackalloc ZCallBufferSlot[NUM_SLOTS]
+ZCallBufferSlot* __slots__ = stackalloc ZCallBufferSlot[NUM_SLOTS]
 {{
 {MakeSlots().Indent()}
 }};
-ZCallBuffer buffer = new(slots, NUM_SLOTS);";
+ZCallBuffer __buffer__ = new(__slots__, NUM_SLOTS);";
 
 			sb.Append(setupBuffer);
 		}
 
 		sb.AppendLine();
 		sb.AppendLine();
-		string bufferParameter = needsBuffer ? "&buffer" : "null";
+		string bufferParameter = needsBuffer ? "&__buffer__" : "null";
 		sb.Append(
 $@"if ({ZCallReplace}({bufferParameter}) != EZCallErrorCode.Succeed)
 {{

@@ -62,13 +62,11 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 			case EExportedDelegateKind.Multicast:
 			{
 				abstractionDefinition.AddBaseType("UnrealMulticastInlineDelegateBase");
-				abstractionDefinition.AddAttributeListAfter(new AttributeDeclaration("Multicast"));
 				break;
 			}
 			case EExportedDelegateKind.Sparse:
 			{
 				abstractionDefinition.AddBaseType("UnrealMulticastSparseDelegateBase");
-				abstractionDefinition.AddAttributeListAfter(new AttributeDeclaration("Sparse"));
 				break;
 			}
 			default:

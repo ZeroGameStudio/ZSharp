@@ -28,7 +28,7 @@ namespace ZSharp
 		// Containers
 		Struct, Array, Set, Map, Optional,
 		// Delegates
-		Delegate, MulticastInlineDelegate, // MulticastSparseDelegate is not supported.
+		Delegate, MulticastInlineDelegate, MulticastSparseDelegate,
 		// Special types
 		FieldPath, // VerseValue is not supported.
 	};

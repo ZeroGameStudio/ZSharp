@@ -333,6 +333,16 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				
 				break;
 			}
+		case EZPropertyType::MulticastSparseDelegate:
+			{
+				NEW_PROPERTY(MulticastSparseDelegate);
+
+				property->PropertyFlags |= CPF_InstancedReference; // Migrate from UHT.
+				
+				property->SignatureFunction = FindObjectChecked<USparseDelegateFunction>(nullptr, *def.DescriptorFieldPath.ToString());
+				
+				break;
+			}
 			// Special types
 		case EZPropertyType::FieldPath:
 			{

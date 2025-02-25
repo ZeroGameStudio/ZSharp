@@ -30,7 +30,7 @@ public enum EPropertyType : uint8
 	// Containers
 	Struct, Array, Set, Map, Optional,
 	// Delegates
-	Delegate, MulticastInlineDelegate, // MulticastSparseDelegate is not supported.
+	Delegate, MulticastInlineDelegate, MulticastSparseDelegate,
 	// Special types
 	FieldPath, // VerseValue is not supported.
 }

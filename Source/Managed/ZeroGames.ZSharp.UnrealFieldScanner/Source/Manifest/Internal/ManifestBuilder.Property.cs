@@ -172,19 +172,16 @@ partial class ManifestBuilder
 					result = EPropertyType.Class;
 				}
 			}
-			// For delegate property, we also need to check whether there is a [Multicast] or [Sparse] specifier on them.
+			// For delegate property, we need a further check.
 			else if (result == EPropertyType.Delegate)
 			{
-				foreach (var specifier in propertyTypeModel.Specifiers)
+				result = propertyTypeModel.BaseType!.Value.FullName switch
 				{
-					check(specifier is not SparseAttribute);
-					
-					if (specifier is MulticastAttribute)
-					{
-						result = EPropertyType.MulticastInlineDelegate;
-						break;
-					}
-				}
+					UNREAL_DELEGATE_BASE_TYPE_FULL_NAME => EPropertyType.Delegate,
+					UNREAL_MULTICAST_INLINE_DELEGATE_BASE_TYPE_FULL_NAME => EPropertyType.MulticastInlineDelegate,
+					UNREAL_MULTICAST_SPARSE_DELEGATE_BASE_TYPE_FULL_NAME => EPropertyType.MulticastSparseDelegate,
+					_ => default,
+				};
 			}
 
 			if (result != default)
@@ -222,6 +219,11 @@ partial class ManifestBuilder
 	private const string UNREAL_SET_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealSet`1";
 	private const string UNREAL_MAP_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealMap`2";
 	private const string UNREAL_OPTIONAL_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealOptional`1";
+	
+	// Delegates
+	private const string UNREAL_DELEGATE_BASE_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealDelegateBase";
+	private const string UNREAL_MULTICAST_INLINE_DELEGATE_BASE_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealMulticastInlineDelegateBase";
+	private const string UNREAL_MULTICAST_SPARSE_DELEGATE_BASE_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "UnrealMulticastSparseDelegateBase";
 	
 	// Special types
 	private const string FIELD_PATH_TYPE_FULL_NAME = ENGINE_CORE_UOBJECT_NAMESPACE + "FieldPath";

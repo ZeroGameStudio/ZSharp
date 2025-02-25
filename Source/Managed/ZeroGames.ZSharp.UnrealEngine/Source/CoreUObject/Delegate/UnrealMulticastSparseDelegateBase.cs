@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
+// IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(43)]
 public abstract class UnrealMulticastSparseDelegateBase : UnrealConjugateBase, IUnrealFieldPath
 {

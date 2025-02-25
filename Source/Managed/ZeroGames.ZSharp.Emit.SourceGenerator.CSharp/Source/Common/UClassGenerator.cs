@@ -229,7 +229,7 @@ public class UClassGenerator : ISourceGenerator
 
 	private string GetTypeNamespace(ITypeSymbol type) => type.ContainingNamespace.ToString();
 
-	private TypeReference GetTypeReference(ITypeSymbol type) => new(GetNormalizedTypeName(type), type.TypeKind == TypeKind.Enum ? "uint64" : null);
+	private TypeReference GetTypeReference(ITypeSymbol type) => new(GetNormalizedTypeName(type), type.TypeKind == TypeKind.Enum ? "int64" : null);
 	
 }
 

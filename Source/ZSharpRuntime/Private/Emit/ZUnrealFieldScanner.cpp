@@ -57,7 +57,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 		{
 			FZFunctionDefinition& def = defs.Emplace_GetRef();
 			def.Name = dto.Name;
-			def.IsEventOverride = dto.IsEventOverride;
+			def.bIsEventOverride = dto.bIsEventOverride;
 			def.Flags = static_cast<EObjectFlags>(dto.Flags);
 			def.MetadataMap = MoveTemp(dto.MetadataMap);
 			def.TransparentDataMap = MoveTemp(dto.TransparentDataMap);

@@ -465,7 +465,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Transient | RF_MarkAsNative;
 
 		UFunction* function;
-		if (!def.IsEventOverride)
+		if (!def.bIsEventOverride)
 		{
 #if DO_CHECK
 			const UFunction* existingFunction = outer->FindFunctionByName(def.Name);

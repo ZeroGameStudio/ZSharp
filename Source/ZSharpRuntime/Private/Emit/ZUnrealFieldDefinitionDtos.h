@@ -96,7 +96,7 @@ struct FZFunctionDefinitionDto : public FZStructDefinitionDto
 	GENERATED_BODY()
 
 	UPROPERTY()
-	bool IsEventOverride = false;
+	bool bIsEventOverride = false;
 
 	UPROPERTY()
 	uint32 FunctionFlags = 0;

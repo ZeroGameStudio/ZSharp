@@ -65,7 +65,7 @@ namespace ZSharp
 	{
 		UFunction* Function = nullptr;
 
-		bool IsEventOverride = false;
+		bool bIsEventOverride = false;
 		EFunctionFlags FunctionFlags = FUNC_None;
 
 		FString ZCallName;

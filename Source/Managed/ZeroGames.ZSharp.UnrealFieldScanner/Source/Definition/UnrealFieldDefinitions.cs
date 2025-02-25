@@ -97,10 +97,15 @@ public class UnrealFunctionDefinition : UnrealStructDefinition
 	public string? CustomThunkName { get; set; }
 }
 
+public class UnrealEnumFieldDefinition : UnrealFieldDefinition
+{
+	public int64 Value { get; set; }
+}
+
 public class UnrealEnumDefinition : UnrealFieldDefinition
 {
 	public EEnumFlags EnumFlags { get; set; }
-	public Dictionary<string, int64> ValueMap { get; set; } = [];
+	public List<UnrealEnumFieldDefinition> Fields { get; set; } = [];
 }
 
 public class UnrealScriptStructDefinition : UnrealStructDefinition

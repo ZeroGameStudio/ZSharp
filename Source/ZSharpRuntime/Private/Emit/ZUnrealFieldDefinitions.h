@@ -76,6 +76,11 @@ namespace ZSharp
 
 		FName CustomThunkName;
 	};
+
+	struct FZEnumFieldDefinition : public FZFieldDefinition
+	{
+		int64 Value = 0;
+	};
 	
 	struct FZEnumDefinition : public FZFieldDefinition
 	{
@@ -83,7 +88,7 @@ namespace ZSharp
 
 		EEnumFlags EnumFlags = EEnumFlags::None;
 
-		TMap<FString, int64> ValueMap;
+		TArray<FZEnumFieldDefinition> Fields;
 	};
 	
 	struct FZScriptStructDefinition : public FZStructDefinition

@@ -81,14 +81,15 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 	static void AddMetadata(UField* field, const TMap<FName, FString>& metadata)
 	{
 #if WITH_METADATA
+		UMetaData* target = field->GetOutermost()->GetMetaData();
 		if (!metadata.IsEmpty())
 		{
-			UMetaData* target = field->GetOutermost()->GetMetaData();
 			for (const auto& pair : metadata)
 			{
 				target->SetValue(field, pair.Key, *pair.Value);
 			}
 		}
+		target->SetValue(field, "ZSharpEmittedField", TEXT("true"));
 #endif
 	}
 
@@ -99,6 +100,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		{
 			field->SetMetaData(pair.Key, *pair.Value);
 		}
+		field->SetMetaData("ZSharpEmittedField", TEXT("true"));
 #endif
 	}
 
@@ -702,11 +704,11 @@ void ZSharp::FZUnrealFieldEmitter::EmitEnum(UPackage* pak, FZEnumDefinition& def
 
 	// Migrate from UECodeGen_Private::ConstructUEnum().
 	TArray<TPair<FName, int64>> EnumNames;
-	EnumNames.Reserve(def.ValueMap.Num());
-	for (const auto& pair : def.ValueMap)
+	EnumNames.Reserve(def.Fields.Num());
+	for (const auto& enumFieldDef : def.Fields)
 	{
 		// Migrate from UEnum::GenerateFullEnumName(), ECppForm::EnumClass case.
-		EnumNames.Emplace(FString::Printf(TEXT("%s::%s"), *enm->GetName(), *pair.Key), pair.Value);
+		EnumNames.Emplace(FString::Printf(TEXT("%s::%s"), *enm->GetName(), *enumFieldDef.Name.ToString()), enumFieldDef.Value);
 	}
 
 	enm->SetEnums(EnumNames, UEnum::ECppForm::EnumClass, def.EnumFlags, true);
@@ -714,6 +716,22 @@ void ZSharp::FZUnrealFieldEmitter::EmitEnum(UPackage* pak, FZEnumDefinition& def
 	enm->SetEnumDisplayNameFn(nullptr);
 
 	ZUnrealFieldEmitter_Private::AddMetadata(enm, def.MetadataMap);
+
+	// Special metadata process for UEnum.
+#if WITH_METADATA
+	for (const auto& enumFieldDef : def.Fields)
+	{
+		const TMap<FName, FString>& metadata = enumFieldDef.MetadataMap;
+		if (!metadata.IsEmpty())
+		{
+			UMetaData* target = enm->GetOutermost()->GetMetaData();
+			for (const auto& pair : metadata)
+			{
+				target->SetValue(enm, FName { FString::Printf(TEXT("%s.%s"), *enumFieldDef.Name.ToString(), *pair.Key.ToString()) }, *pair.Value);
+			}
+		}
+	}
+#endif
 
 	// Migrate from GetStaticEnum().
 	NotifyRegistrationEvent(*enm->GetOutermost()->GetName(), *enm->GetName(), ENotifyRegistrationType::NRT_Enum, ENotifyRegistrationPhase::NRP_Finished, nullptr, false, enm);

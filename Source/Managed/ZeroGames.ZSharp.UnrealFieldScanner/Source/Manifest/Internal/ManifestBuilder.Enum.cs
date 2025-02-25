@@ -13,11 +13,24 @@ partial class ManifestBuilder
 			EnumFlags = enumModel.IsFlags ? EEnumFlags.Flags : EEnumFlags.None,
 		};
 
-		foreach (var (name, value) in enumModel.Values)
+		foreach (var field in enumModel.Fields)
 		{
-			result.ValueMap[name] = value;
+			result.Fields.Add(MakeEnumFieldDefinition(field));
 		}
 		
+		return result;
+	}
+
+	private UnrealEnumFieldDefinition MakeEnumFieldDefinition(IUnrealEnumFieldModel enumFieldModel)
+	{
+		UnrealEnumFieldDefinition result = new()
+		{
+			Name = enumFieldModel.Name,
+			Value = enumFieldModel.Value,
+		};
+		
+		ProcessSpecifiers(result, enumFieldModel);
+
 		return result;
 	}
 	

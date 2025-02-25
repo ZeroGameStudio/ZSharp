@@ -288,17 +288,13 @@ bool ZSharp::FZExportHelper::ShouldExportField(FFieldVariant field)
 			}
 
 			// Emitted type is not exportable.
-			const UObject* object = field.ToUObject();
-			if (auto cls = Cast<const UClass>(object))
+			if (field.HasMetaData("ZSharpEmittedField"))
 			{
-				if (IZSharpFieldRegistry::Get().IsZSharpClass(cls))
-				{
-					return false;
-				}
+				return false;
 			}
 			
 			// Override version of UFunction is not exportable.
-			if (auto function = Cast<const UFunction>(object))
+			if (auto function = field.Get<const UFunction>())
 			{
 				if (function->GetSuperFunction())
 				{

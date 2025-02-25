@@ -16,7 +16,7 @@ internal class UnrealEnumModel : UnrealFieldModel, IUnrealEnumModel
 		BaseType = new(registry, typeDef.BaseType);
 
 		IsFlags = typeDef.CustomAttributes.Any(attr => attr.AttributeType.FullName == typeof(FlagsAttribute).FullName);
-		_values = typeDef.Fields.Where(field => field.Constant is not null).Select(field => (field.Name, Convert.ToInt64(field.Constant))).ToArray();
+		Fields = typeDef.Fields.Where(field => field.Constant is not null).Select(field => new UnrealEnumFieldModel(registry, field)).ToArray();
 	}
 
 	public string AssemblyName { get; }
@@ -27,9 +27,7 @@ internal class UnrealEnumModel : UnrealFieldModel, IUnrealEnumModel
 	public IReadOnlyList<InterfaceTypeUri> Interfaces { get; } = [];
 	
 	public bool IsFlags { get; }
-	public IEnumerable<(string, int64)> Values => _values;
-
-	private readonly (string, int64)[] _values;
+	public IReadOnlyList<IUnrealEnumFieldModel> Fields { get; }
 
 }
 

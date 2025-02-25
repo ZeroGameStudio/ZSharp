@@ -118,6 +118,15 @@ struct FZFunctionDefinitionDto : public FZStructDefinitionDto
 };
 
 USTRUCT(meta = (ZSharpNoExport))
+struct FZEnumFieldDefinitionDto : public FZFieldDefinitionDto
+{
+	GENERATED_BODY()
+	
+	UPROPERTY()
+	int64 Value = 0;
+};
+
+USTRUCT(meta = (ZSharpNoExport))
 struct FZEnumDefinitionDto : public FZFieldDefinitionDto
 {
 	GENERATED_BODY()
@@ -126,7 +135,7 @@ struct FZEnumDefinitionDto : public FZFieldDefinitionDto
 	uint8 EnumFlags = 0;
 
 	UPROPERTY()
-	TMap<FString, int64> ValueMap;
+	TArray<FZEnumFieldDefinitionDto> Fields;
 };
 
 USTRUCT(meta = (ZSharpNoExport))

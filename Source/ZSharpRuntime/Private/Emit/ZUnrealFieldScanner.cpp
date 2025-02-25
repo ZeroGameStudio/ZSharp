@@ -88,7 +88,15 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 				enumDef.MetadataMap = MoveTemp(enumDto.MetadataMap);
 				enumDef.TransparentDataMap = MoveTemp(enumDto.TransparentDataMap);
 				enumDef.EnumFlags = static_cast<EEnumFlags>(enumDto.EnumFlags);
-				enumDef.ValueMap = MoveTemp(enumDto.ValueMap);
+				for (auto& enumFieldDto : enumDto.Fields)
+				{
+					FZEnumFieldDefinition& enumFieldDef = enumDef.Fields.Emplace_GetRef();
+					enumFieldDef.Name = enumFieldDto.Name;
+					enumFieldDef.Flags = static_cast<EObjectFlags>(enumFieldDto.Flags);
+					enumFieldDef.MetadataMap = MoveTemp(enumFieldDto.MetadataMap);
+					enumFieldDef.TransparentDataMap = MoveTemp(enumFieldDto.TransparentDataMap);
+					enumFieldDef.Value = enumFieldDto.Value;
+				}
 			}
 		}
 

@@ -79,7 +79,11 @@ namespace ZSharp
 	
 	struct FZEnumDefinition : public FZFieldDefinition
 	{
-		// @TODO
+		UEnum* Enum = nullptr;
+
+		EEnumFlags EnumFlags = EEnumFlags::None;
+
+		TMap<FString, int64> ValueMap;
 	};
 	
 	struct FZScriptStructDefinition : public FZStructDefinition

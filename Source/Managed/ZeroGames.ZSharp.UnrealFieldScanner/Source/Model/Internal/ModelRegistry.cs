@@ -158,6 +158,10 @@ internal sealed partial class ModelRegistry : IModelRegistry
 		{
 			model = new UnrealClassModel(this, typeDef);
 		}
+		else if (typeDef.HasCustomAttribute<UEnumAttribute>())
+		{
+			model = new UnrealEnumModel(this, typeDef);
+		}
 
 		if (model is not null)
 		{

@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace ZeroGames.ZSharp.Analyzer.CSharp;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class CommonAnalyzer : DiagnosticAnalyzer
+public class UClassAnalyzer : DiagnosticAnalyzer
 {
     
     public const string DIAGNOSTIC_ID = "ZS0001";
@@ -27,14 +27,14 @@ public class CommonAnalyzer : DiagnosticAnalyzer
     {
         var classDeclaration = (ClassDeclarationSyntax)context.Node;
 
-        var semanticModel = context.SemanticModel;
-        
         var hasUClassAttribute = classDeclaration.AttributeLists
             .SelectMany(a => a.Attributes)
             .Any(a => a.Name.ToString() == "UClass" || a.Name.ToString() == "UClassAttribute");
 
         if (!hasUClassAttribute)
+        {
             return;
+        }
 
         var isPartial = classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword);
         if (!isPartial)

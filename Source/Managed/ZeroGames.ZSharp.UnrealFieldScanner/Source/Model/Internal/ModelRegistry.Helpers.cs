@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Diagnostics;
 using System.Threading;
 using Mono.Cecil;
 
@@ -36,17 +35,6 @@ partial class ModelRegistry
 	{
 		AssemblyDefinition assembly = LoadAssemblyDefinition(assemblyName);
 		return assembly.Modules.SelectMany(module => module.Types).Single(t => t.FullName == typeFullName);
-	}
-
-	[Conditional("DEBUG")]
-	private void BlockUntilDebuggerAttached()
-	{
-		while (!Debugger.IsAttached)
-		{
-			Thread.Sleep(1000);
-			UE_WARNING(LogTemp, "Waiting for debugger...");
-		}
-		Debugger.Break();
 	}
 
     private readonly AssemblyContainer _referencedAssemblyMap = new();

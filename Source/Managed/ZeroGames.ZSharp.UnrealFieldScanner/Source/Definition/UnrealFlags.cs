@@ -386,4 +386,13 @@ public enum EStructFlags : uint32
 	STRUCT_ComputedFlags		= STRUCT_NetDeltaSerializeNative | STRUCT_NetSerializeNative | STRUCT_SerializeNative | STRUCT_PostSerializeNative | STRUCT_CopyNative | STRUCT_IsPlainOldData | STRUCT_NoDestructor | STRUCT_ZeroConstructor | STRUCT_IdenticalNative | STRUCT_AddStructReferencedObjects | STRUCT_ExportTextItemNative | STRUCT_ImportTextItemNative | STRUCT_SerializeFromMismatchedTag | STRUCT_PostScriptConstruct | STRUCT_NetSharedSerialization
 }
 
+[Flags]
+public enum EEnumFlags : uint8
+{
+	None,
+
+	Flags = 0x00000001, // Whether the UEnum represents a set of flags
+	NewerVersionExists = 0x00000002, // If set, this UEnum has been replaced by a newer version
+};
+
 

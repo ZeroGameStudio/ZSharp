@@ -75,7 +75,7 @@ public class UnrealPropertyDefinition : UnrealFieldDefinition, ISimpleUnrealProp
 public abstract class UnrealStructDefinition : UnrealFieldDefinition
 {
 	public string? SuperPath { get; set; }
-	public List<UnrealPropertyDefinition> Properties { get; set; } = new();
+	public List<UnrealPropertyDefinition> Properties { get; set; } = [];
 }
 
 public class UnrealFunctionDefinition : UnrealStructDefinition
@@ -99,7 +99,8 @@ public class UnrealFunctionDefinition : UnrealStructDefinition
 
 public class UnrealEnumDefinition : UnrealFieldDefinition
 {
-	// @TODO
+	public EEnumFlags EnumFlags { get; set; }
+	public Dictionary<string, int64> ValueMap { get; set; } = [];
 }
 
 public class UnrealScriptStructDefinition : UnrealStructDefinition
@@ -137,12 +138,12 @@ public class UnrealClassDefinition : UnrealStructDefinition
 	public string? WithinPath { get; set; }
 	public EClassFlags ClassFlags { get; set; }
 	public EClassCastFlags CastFlags { get; set; }
-	public List<string> ImplementedInterfacePaths { get; set; } = new();
-	public List<UnrealFunctionDefinition> Functions { get; set; } = new();
-	public List<PropertyDefault> PropertyDefaults { get; set; } = new();
-	public List<DefaultSubobject> DefaultSubobjects { get; set; } = new();
-	public List<DefaultSubobjectOverride> DefaultSubobjectOverrides { get; set; } = new();
-	public List<string> FieldNotifies { get; set; } = new();
+	public List<string> ImplementedInterfacePaths { get; set; } = [];
+	public List<UnrealFunctionDefinition> Functions { get; set; } = [];
+	public List<PropertyDefault> PropertyDefaults { get; set; } = [];
+	public List<DefaultSubobject> DefaultSubobjects { get; set; } = [];
+	public List<DefaultSubobjectOverride> DefaultSubobjectOverrides { get; set; } = [];
+	public List<string> FieldNotifies { get; set; } = [];
 }
 
 public class UnrealInterfaceDefinition : UnrealStructDefinition
@@ -158,11 +159,11 @@ public class UnrealDelegateDefinition : UnrealStructDefinition
 public class UnrealFieldManifest
 {
 	public required string ModuleName { get; set; }
-	public List<UnrealEnumDefinition> Enums { get; set; } = new();
-	public List<UnrealScriptStructDefinition> Structs { get; set; } = new();
-	public List<UnrealClassDefinition> Classes { get; set; } = new();
-	public List<UnrealInterfaceDefinition> Interfaces { get; set; } = new();
-	public List<UnrealDelegateDefinition> Delegates { get; set; } = new();
+	public List<UnrealEnumDefinition> Enums { get; set; } = [];
+	public List<UnrealScriptStructDefinition> Structs { get; set; } = [];
+	public List<UnrealClassDefinition> Classes { get; set; } = [];
+	public List<UnrealInterfaceDefinition> Interfaces { get; set; } = [];
+	public List<UnrealDelegateDefinition> Delegates { get; set; } = [];
 
 	[JsonIgnore]
 	public bool IsEmpty => Enums.Count + Structs.Count + Classes.Count + Interfaces.Count + Delegates.Count == 0;

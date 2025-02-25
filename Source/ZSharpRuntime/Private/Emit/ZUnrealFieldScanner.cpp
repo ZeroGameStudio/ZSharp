@@ -79,8 +79,17 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 		FZUnrealFieldManifest def;
 		def.ModuleName = dto.ModuleName;
 
-		{ // @TODO Enums
-			
+		{ // Enums
+			for (auto& enumDto : dto.Enums)
+			{
+				FZEnumDefinition& enumDef = def.Enums.Emplace_GetRef();
+				enumDef.Name = enumDto.Name;
+				enumDef.Flags = static_cast<EObjectFlags>(enumDto.Flags);
+				enumDef.MetadataMap = MoveTemp(enumDto.MetadataMap);
+				enumDef.TransparentDataMap = MoveTemp(enumDto.TransparentDataMap);
+				enumDef.EnumFlags = static_cast<EEnumFlags>(enumDto.EnumFlags);
+				enumDef.ValueMap = MoveTemp(enumDto.ValueMap);
+			}
 		}
 
 		{ // @TODO Structs

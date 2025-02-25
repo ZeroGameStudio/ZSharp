@@ -34,6 +34,14 @@ internal sealed partial class ManifestBuilder
 				manifest.Classes.Add(classDef);
 			}
 		}
+		else if (typeModel is IUnrealEnumModel enumModel)
+		{
+			UnrealEnumDefinition enumDef = ScanEnumModel(enumModel);
+			lock (_manifestLock)
+			{
+				manifest.Enums.Add(enumDef);
+			}
+		}
 		else
 		{
 			Thrower.NoEntry();

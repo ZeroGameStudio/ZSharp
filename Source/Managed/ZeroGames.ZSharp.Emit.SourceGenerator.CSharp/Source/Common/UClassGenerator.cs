@@ -227,24 +227,7 @@ public class UClassGenerator : ISourceGenerator
 		return name;
 	}
 
-	private string GetTypeNamespace(ITypeSymbol type)
-	{
-		List<string> namespaces = new();
-		INamespaceSymbol? curNamespace = type.ContainingNamespace;
-		while (curNamespace is not null)
-		{
-			if (string.IsNullOrWhiteSpace(curNamespace.Name))
-			{
-				break;
-			}
-			
-			namespaces.Add(curNamespace.Name);
-			curNamespace = curNamespace.ContainingNamespace;
-		}
-
-		namespaces.Reverse();
-		return string.Join(".", namespaces);
-	}
+	private string GetTypeNamespace(ITypeSymbol type) => type.ContainingNamespace.ToString();
 
 	private TypeReference GetTypeReference(ITypeSymbol type) => new(GetNormalizedTypeName(type), type.TypeKind == TypeKind.Enum ? "uint64" : null);
 	

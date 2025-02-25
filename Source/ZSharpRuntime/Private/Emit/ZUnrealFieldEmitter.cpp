@@ -686,8 +686,37 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 
 void ZSharp::FZUnrealFieldEmitter::EmitEnum(UPackage* pak, FZEnumDefinition& def) const
 {
+	// UEnum only has RF_Public | RF_Transient | RF_MarkAsNative set in UHT generated code,
+	// but I think it's okay to keep sync with UClass.
+	constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Standalone | RF_Transient | RF_MarkAsNative | RF_MarkAsRootSet;
+	
 	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
-	// @TODO
+
+	FStaticConstructObjectParameters params { UEnum::StaticClass() };
+	params.Outer = pak;
+	params.Name = *def.Name.ToString();
+	params.SetFlags = def.Flags | GCompiledInFlags;
+	
+	auto enm = static_cast<UEnum*>(StaticConstructObject_Internal(params));
+	def.Enum = enm;
+
+	// Migrate from UECodeGen_Private::ConstructUEnum().
+	TArray<TPair<FName, int64>> EnumNames;
+	EnumNames.Reserve(def.ValueMap.Num());
+	for (const auto& pair : def.ValueMap)
+	{
+		// Migrate from UEnum::GenerateFullEnumName(), ECppForm::EnumClass case.
+		EnumNames.Emplace(FString::Printf(TEXT("%s::%s"), *enm->GetName(), *pair.Key), pair.Value);
+	}
+
+	enm->SetEnums(EnumNames, UEnum::ECppForm::EnumClass, def.EnumFlags, true);
+	enm->CppType = enm->GetName();
+	enm->SetEnumDisplayNameFn(nullptr);
+
+	ZUnrealFieldEmitter_Private::AddMetadata(enm, def.MetadataMap);
+
+	// Migrate from GetStaticEnum().
+	NotifyRegistrationEvent(*enm->GetOutermost()->GetName(), *enm->GetName(), ENotifyRegistrationType::NRT_Enum, ENotifyRegistrationPhase::NRP_Finished, nullptr, false, enm);
 }
 
 void ZSharp::FZUnrealFieldEmitter::EmitStructSkeleton(UPackage* pak, FZScriptStructDefinition& def) const

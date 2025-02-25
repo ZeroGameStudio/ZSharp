@@ -122,7 +122,11 @@ struct FZEnumDefinitionDto : public FZFieldDefinitionDto
 {
 	GENERATED_BODY()
 	
-	// @TODO
+	UPROPERTY()
+	uint8 EnumFlags = 0;
+
+	UPROPERTY()
+	TMap<FString, int64> ValueMap;
 };
 
 USTRUCT(meta = (ZSharpNoExport))

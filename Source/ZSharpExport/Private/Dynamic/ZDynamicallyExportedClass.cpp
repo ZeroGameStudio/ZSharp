@@ -145,7 +145,7 @@ ZSharp::FZDynamicallyExportedClass::FZDynamicallyExportedClass(const UStruct* us
 						if (super->ImplementsInterface(currentInterfaceClass))
 						{
 							// If some super class also implements this interface,
-							// then it should have already exported interface meth.
+							// then it should have already exported interface methods.
 							exportedInterfaces.Emplace(currentInterfaceClass);
 						}
 					}

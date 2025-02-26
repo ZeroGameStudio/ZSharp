@@ -33,12 +33,25 @@ namespace ZSharp
 		FieldPath, // VerseValue is not supported.
 	};
 
+	enum class EZEnumUnderlyingType : uint8
+	{
+		None,
+		UInt8,
+		UInt16,
+		UInt32,
+		UInt64,
+		Int8,
+		Int16,
+		Int32,
+		Int64,
+	};
+
 	struct FZSimplePropertyDefinition
 	{
 		FProperty* Property = nullptr;
 		
 		EZPropertyType Type = EZPropertyType::None;
-
+		EZEnumUnderlyingType EnumUnderlyingType = EZEnumUnderlyingType::None;
 		EPropertyFlags PropertyFlags = CPF_None;
 
 		FName DescriptorFieldPath;
@@ -86,6 +99,7 @@ namespace ZSharp
 	{
 		UEnum* Enum = nullptr;
 
+		EZEnumUnderlyingType UnderlyingType = EZEnumUnderlyingType::None;
 		EEnumFlags EnumFlags = EEnumFlags::None;
 
 		TArray<FZEnumFieldDefinition> Fields;

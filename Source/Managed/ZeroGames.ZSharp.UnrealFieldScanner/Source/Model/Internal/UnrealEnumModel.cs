@@ -14,7 +14,8 @@ internal class UnrealEnumModel : UnrealFieldModel, IUnrealEnumModel
 		
 		Registry = registry;
 		BaseType = new(registry, typeDef.BaseType);
-
+		
+		EnumUnderlyingType = new(registry, typeDef.Fields.Single(f => f.Name == "value__").FieldType);
 		IsFlags = typeDef.CustomAttributes.Any(attr => attr.AttributeType.FullName == typeof(FlagsAttribute).FullName);
 		Fields = typeDef.Fields.Where(field => field.Constant is not null).Select(field => new UnrealEnumFieldModel(registry, field)).ToArray();
 	}
@@ -25,7 +26,8 @@ internal class UnrealEnumModel : UnrealFieldModel, IUnrealEnumModel
 	public IModelRegistry Registry { get; }
 	public TypeModelReference? BaseType { get; }
 	public IReadOnlyList<InterfaceTypeUri> Interfaces { get; } = [];
-	
+
+	public TypeModelReference EnumUnderlyingType { get; }
 	public bool IsFlags { get; }
 	public IReadOnlyList<IUnrealEnumFieldModel> Fields { get; }
 

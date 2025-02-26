@@ -287,8 +287,58 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(Enum);
 
-				auto underlyingProperty = new FInt64Property { property, NAME_None, GCompiledInPropertyObjectFlags };
 				property->SetEnum(FindObjectChecked<UEnum>(nullptr, *def.DescriptorFieldPath.ToString()));
+
+				FProperty* underlyingProperty = nullptr;
+				switch (def.EnumUnderlyingType)
+				{
+				case EZEnumUnderlyingType::UInt8:
+					{
+						underlyingProperty = new FByteProperty { property, NAME_None, GCompiledInPropertyObjectFlags };
+						break;
+					}
+				case EZEnumUnderlyingType::UInt16:
+					{
+						underlyingProperty = new FUInt16Property { property, NAME_None, GCompiledInPropertyObjectFlags };
+						break;
+					}
+				case EZEnumUnderlyingType::UInt32:
+					{
+						underlyingProperty = new FUInt32Property { property, NAME_None, GCompiledInPropertyObjectFlags };
+						break;
+					}
+				case EZEnumUnderlyingType::UInt64:
+					{
+						underlyingProperty = new FUInt64Property { property, NAME_None, GCompiledInPropertyObjectFlags };
+						break;
+					}
+				case EZEnumUnderlyingType::Int8:
+					{
+						underlyingProperty = new FInt8Property { property, NAME_None, GCompiledInPropertyObjectFlags };
+						break;
+					}
+
+				case EZEnumUnderlyingType::Int16:
+					{
+						underlyingProperty = new FInt16Property { property, NAME_None, GCompiledInPropertyObjectFlags };
+						break;
+					}
+				case EZEnumUnderlyingType::Int32:
+					{
+						underlyingProperty = new FIntProperty { property, NAME_None, GCompiledInPropertyObjectFlags };
+						break;
+					}
+				case EZEnumUnderlyingType::Int64:
+					{
+						underlyingProperty = new FInt64Property { property, NAME_None, GCompiledInPropertyObjectFlags };
+						break;
+					}
+				default:
+					{
+						break;
+					}
+				}
+				UE_CLOG(!underlyingProperty, LogZSharpEmit, Fatal, TEXT("Enum property with unknown underlying type!!! Property: %s.%s"), *owner.GetName(), *name.ToString());
 				property->AddCppProperty(underlyingProperty);
 				
 				break;

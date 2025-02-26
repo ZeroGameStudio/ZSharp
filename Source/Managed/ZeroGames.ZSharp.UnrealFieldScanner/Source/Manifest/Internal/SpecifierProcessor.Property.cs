@@ -314,6 +314,17 @@ partial class SpecifierProcessor
 	{
 		// Do nothing because DefaultSubobject/OptionalDefaultSubobject specifier will deal with us.
 	}
+
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EnumAsByteAttribute specifier)
+	{
+		if (def.EnumUnderlyingType == EEnumUnderlyingType.None)
+		{
+			throw new InvalidOperationException();
+		}
+		
+		def.EnumUnderlyingType = EEnumUnderlyingType.UInt8;
+	}
 	
 	// Parameter
 	[SpecifierProcessor]

@@ -35,9 +35,23 @@ public enum EPropertyType : uint8
 	FieldPath, // VerseValue is not supported.
 }
 
+public enum EEnumUnderlyingType : uint8
+{
+	None,
+	UInt8,
+	UInt16,
+	UInt32,
+	UInt64,
+	Int8,
+	Int16,
+	Int32,
+	Int64,
+};
+
 public interface ISimpleUnrealPropertyDefinition
 {
 	EPropertyType Type { get; set; }
+	public EEnumUnderlyingType EnumUnderlyingType { get; set; }
 	EPropertyFlags PropertyFlags { get; set; }
 	string? DescriptorFieldPath { get; set; }
 }
@@ -45,6 +59,7 @@ public interface ISimpleUnrealPropertyDefinition
 public class SimpleUnrealPropertyDefinition : ISimpleUnrealPropertyDefinition
 {
 	public required EPropertyType Type { get; set; }
+	public EEnumUnderlyingType EnumUnderlyingType { get; set; }
 	public EPropertyFlags PropertyFlags { get; set; }
 	public string? DescriptorFieldPath { get; set; }
 }
@@ -60,6 +75,7 @@ public class UnrealPropertyDefinition : UnrealFieldDefinition, ISimpleUnrealProp
 	public UnrealStructDefinition Outer { get; init; } = null!; // Can't use required for JsonIgnore property...
 	
 	public required EPropertyType Type { get; set; }
+	public EEnumUnderlyingType EnumUnderlyingType { get; set; }
 	public EPropertyFlags PropertyFlags { get; set; }
 	public string? DescriptorFieldPath { get; set; }
 	
@@ -104,6 +120,7 @@ public class UnrealEnumFieldDefinition : UnrealFieldDefinition
 
 public class UnrealEnumDefinition : UnrealFieldDefinition
 {
+	public EEnumUnderlyingType UnderlyingType { get; set; }
 	public EEnumFlags EnumFlags { get; set; }
 	public List<UnrealEnumFieldDefinition> Fields { get; set; } = [];
 }

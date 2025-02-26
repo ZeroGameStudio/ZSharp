@@ -10,6 +10,7 @@ partial class ManifestBuilder
 		UnrealEnumDefinition result = new()
 		{
 			Name = enumModel.Name,
+			UnderlyingType = TypeUriToEnumUnderlyingType(enumModel.EnumUnderlyingType),
 			EnumFlags = enumModel.IsFlags ? EEnumFlags.Flags : EEnumFlags.None,
 		};
 
@@ -33,7 +34,7 @@ partial class ManifestBuilder
 
 		return result;
 	}
-	
+
 }
 
 

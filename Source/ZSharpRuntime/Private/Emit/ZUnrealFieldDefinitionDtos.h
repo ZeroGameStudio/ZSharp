@@ -38,6 +38,9 @@ struct FZSimplePropertyDefinitionDto
 	uint8 Type = 0;
 
 	UPROPERTY()
+	uint8 EnumUnderlyingType = 0;
+
+	UPROPERTY()
 	uint64 PropertyFlags = 0;
 
 	UPROPERTY()
@@ -51,6 +54,9 @@ struct FZPropertyDefinitionDto : public FZFieldDefinitionDto
 
 	UPROPERTY()
 	uint8 Type = 0;
+	
+	UPROPERTY()
+	uint8 EnumUnderlyingType = 0;
 
 	UPROPERTY()
 	uint64 PropertyFlags = 0;
@@ -130,6 +136,9 @@ USTRUCT(meta = (ZSharpNoExport))
 struct FZEnumDefinitionDto : public FZFieldDefinitionDto
 {
 	GENERATED_BODY()
+
+	UPROPERTY()
+	uint8 UnderlyingType = 0;
 	
 	UPROPERTY()
 	uint8 EnumFlags = 0;

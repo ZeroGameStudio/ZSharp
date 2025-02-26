@@ -6,6 +6,7 @@ public interface ITypeModel : ITypeUri, ISpecifierProvider, IScanTimeType
 {
 	IModelRegistry Registry { get; }
 	TypeModelReference? BaseType { get; }
+	TypeModelReference EnumUnderlyingType => throw new NotSupportedException();
 	IReadOnlyList<InterfaceTypeUri> Interfaces { get; }
 }
 

@@ -1,7 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
@@ -23,7 +22,8 @@ partial class ManifestBuilder
 		{
 			Outer = structDef,
 			Name = propertyModel.Name,
-			Type = GetPropertyType(propertyModelType, out var descriptorFieldPath),
+			Type = GetPropertyType(propertyModelType, out var enumUnderlyingType, out var descriptorFieldPath),
+			EnumUnderlyingType = enumUnderlyingType,
 			DescriptorFieldPath = descriptorFieldPath,
 		};
 		
@@ -60,7 +60,8 @@ partial class ManifestBuilder
 	{
 		SimpleUnrealPropertyDefinition result = new()
 		{
-			Type = GetPropertyType(elementTypeModel, out var descriptorFieldPath),
+			Type = GetPropertyType(elementTypeModel, out var enumUnderlyingType, out var descriptorFieldPath),
+			EnumUnderlyingType = enumUnderlyingType,
 			DescriptorFieldPath = descriptorFieldPath,
 		};
 		
@@ -117,8 +118,10 @@ partial class ManifestBuilder
 		}
 	}
 	
-	private EPropertyType GetPropertyType(TypeModelReference propertyTypeModel, out string? descriptorFieldPath)
+	private EPropertyType GetPropertyType(TypeModelReference propertyTypeModel, out EEnumUnderlyingType enumUnderlyingType, out string? descriptorFieldPath)
 	{
+		enumUnderlyingType = EEnumUnderlyingType.None;
+		
 		string fullName = propertyTypeModel.FullName;
 		
 		// Sealed types without descriptor can be resolved directly using FullName so we first do this.
@@ -144,6 +147,7 @@ partial class ManifestBuilder
 		{
 			if (propertyTypeModel.IsEnum())
 			{
+				enumUnderlyingType = TypeUriToEnumUnderlyingType(propertyTypeModel.Type.EnumUnderlyingType);
 				result = EPropertyType.Enum;
 			}
 			

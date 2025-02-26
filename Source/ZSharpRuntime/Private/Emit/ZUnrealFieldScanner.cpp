@@ -35,6 +35,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 
 #define COPY_SIMPLE_PROPERTY(DefName, DtoName) \
 			DefName.Type = static_cast<EZPropertyType>(DtoName.Type); \
+			DefName.EnumUnderlyingType = static_cast<EZEnumUnderlyingType>(DtoName.EnumUnderlyingType); \
 			DefName.PropertyFlags = static_cast<EPropertyFlags>(DtoName.PropertyFlags); \
 			DefName.DescriptorFieldPath = DtoName.DescriptorFieldPath;
 
@@ -87,6 +88,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 				enumDef.Flags = static_cast<EObjectFlags>(enumDto.Flags);
 				enumDef.MetadataMap = MoveTemp(enumDto.MetadataMap);
 				enumDef.TransparentDataMap = MoveTemp(enumDto.TransparentDataMap);
+				enumDef.UnderlyingType = static_cast<EZEnumUnderlyingType>(enumDto.UnderlyingType);
 				enumDef.EnumFlags = static_cast<EEnumFlags>(enumDto.EnumFlags);
 				for (auto& enumFieldDto : enumDto.Fields)
 				{

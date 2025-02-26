@@ -2,20 +2,6 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public readonly struct EmittedEventMethodDefinition(MethodDefinition stub, MethodDefinition? implementation, MethodDefinition? validation, FieldDefinition zcallHandle)
-{
-	public MethodDefinition Stub { get; } = stub;
-	public MethodDefinition? Implementation { get; } = implementation;
-	public MethodDefinition? Validation { get; } = validation;
-	public FieldDefinition ZCallHandle { get; } = zcallHandle;
-}
-
-public readonly struct EmittedPropertyDefinition(PropertyDefinition property, FieldDefinition zcallHandle)
-{
-	public PropertyDefinition Property { get; } = property;
-	public FieldDefinition ZCallHandle { get; } = zcallHandle;
-}
-
 public class EmittedClassBuilder(string namespaceName, string typeName) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName}")
 {
 	

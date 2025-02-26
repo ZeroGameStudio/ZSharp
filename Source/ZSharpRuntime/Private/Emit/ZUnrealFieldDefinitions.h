@@ -93,7 +93,9 @@ namespace ZSharp
 	
 	struct FZScriptStructDefinition : public FZStructDefinition
 	{
-		// @TODO
+		UScriptStruct* ScriptStruct = nullptr;
+		
+		EStructFlags StructFlags = STRUCT_NoFlags;
 	};
 
 	struct FZClassDefinition : public FZStructDefinition

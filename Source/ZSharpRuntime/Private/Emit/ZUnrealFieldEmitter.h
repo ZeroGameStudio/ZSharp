@@ -33,15 +33,16 @@ namespace ZSharp
 		void EmitEnum(UPackage* pak, FZEnumDefinition& def) const;
 		
 		void EmitStructSkeleton(UPackage* pak, FZScriptStructDefinition& def) const;
-		void EmitClassSkeleton(UPackage* pak, FZClassDefinition& def) const;
-		void EmitInterfaceSkeleton(UPackage* pak, FZInterfaceDefinition& def) const;
 		void EmitDelegateSkeleton(UPackage* pak, FZDelegateDefinition& def) const;
+		void EmitInterfaceSkeleton(UPackage* pak, FZInterfaceDefinition& def) const;
+		void EmitClassSkeleton(UPackage* pak, FZClassDefinition& def) const;
 		
 		void FinishEmitStruct(UPackage* pak, FZScriptStructDefinition& def) const;
-		void FinishEmitClass(UPackage* pak, FZClassDefinition& def) const;
-		void FinishEmitInterface(UPackage* pak, FZInterfaceDefinition& def) const;
 		void FinishEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const;
+		void FinishEmitInterface(UPackage* pak, FZInterfaceDefinition& def) const;
+		void FinishEmitClass(UPackage* pak, FZClassDefinition& def) const;
 
+		void PostEmitStruct(UPackage* pak, FZScriptStructDefinition& def) const;
 		void PostEmitClass_I(UPackage* pak, FZClassDefinition& def) const;
 		void PostEmitClass_II(UPackage* pak, FZClassDefinition& def) const;
 

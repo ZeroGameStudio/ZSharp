@@ -1,6 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Diagnostics;
 using Mono.Cecil;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
@@ -18,7 +17,7 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 		IsInternal = typeDef.IsNotPublic;
 	}
 
-	public void BaseInitialize()
+	void IDeferredTypeModel.BaseInitialize()
 	{
 		if (IsBaseInitialized)
 		{
@@ -33,7 +32,7 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 		IsBaseInitialized = true;
 	}
 
-	public void FullyInitialize()
+	void IDeferredTypeModel.FullyInitialize()
 	{
 		if (IsFullyInitialized)
 		{

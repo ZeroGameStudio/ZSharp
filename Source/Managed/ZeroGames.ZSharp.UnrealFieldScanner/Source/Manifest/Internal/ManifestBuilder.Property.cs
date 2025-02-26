@@ -137,7 +137,7 @@ partial class ManifestBuilder
 			descriptorFieldPath = propertyTypeModel.GenericArguments[0].GetUnrealFieldPath();
 			return result;
 		}
-		
+
 		// Finally deal with polymorphism types (UObjects, UStructs, UEnums, UDelegates)
 		// and these types must have [UnrealFieldPath] specifier on them.
 		if (propertyTypeModel.GetSpecifier<UnrealFieldPathAttribute>() is { } unrealFieldPathSpecifier)

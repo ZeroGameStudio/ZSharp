@@ -110,7 +110,7 @@ public class UnrealEnumDefinition : UnrealFieldDefinition
 
 public class UnrealScriptStructDefinition : UnrealStructDefinition
 {
-	// @TODO
+	public EStructFlags StructFlags { get; set; }
 }
 
 public class UnrealClassDefinition : UnrealStructDefinition

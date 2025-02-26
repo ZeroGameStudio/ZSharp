@@ -10,7 +10,9 @@
 #include "ZUnrealFieldDefinitions.h"
 #include "UObject/PropertyOptional.h"
 
+#include "ZSharpScriptStruct.inl"
 #include "ZSharpClass.inl"
+
 #include "ZSharpFunction.inl"
 
 namespace ZSharp::ZUnrealFieldEmitter_Private
@@ -39,6 +41,99 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		
 		auto structProperty = CastField<const FStructProperty>(property);
 		return structProperty && EnumHasAllFlags(structProperty->Struct->StructFlags, STRUCT_HasInstancedReference);
+	}
+
+	static bool FixupInstancedFlags(UStruct* strct)
+	{
+		// @FIXME: Currently, instanced container properties may be wrong.
+		bool containsInstancedRef = false;
+		for (TFieldIterator<FProperty> it(strct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+		{
+			FProperty* property = *it;
+			
+			// First fixup CPF_InstancedReference for object/interface properties whose class has CLASS_DefaultToInstanced.
+			if (auto objectProperty = CastField<const FObjectPropertyBase>(property))
+			{
+				if (objectProperty->PropertyClass->HasAllClassFlags(CLASS_DefaultToInstanced))
+				{
+					property->PropertyFlags |= CPF_InstancedReference | CPF_ExportObject;
+				}
+			}
+
+			if (auto interfaceProperty = CastField<const FInterfaceProperty>(property))
+			{
+				if (interfaceProperty->InterfaceClass->HasAllClassFlags(CLASS_DefaultToInstanced))
+				{
+					property->PropertyFlags |= CPF_InstancedReference | CPF_ExportObject;
+				}
+			}
+			
+			/* Then fixup CPF_ContainsInstancedReference.
+			 * There are three cases we should care about:
+			 *   I: property has CPF_InstancedReference regardless of whether it's class has CLASS_HasInstancedReference.
+			 *  II: property is a struct with instanced reference. (All structs should be ready to use at this point)
+			 * III: property is a container with struct element with instanced reference.
+			 */
+			if (property->HasAllPropertyFlags(CPF_InstancedReference))
+			{
+				containsInstancedRef = true;
+			}
+
+			if (IsInstancedProperty(property))
+			{
+				property->PropertyFlags |= CPF_ContainsInstancedReference;
+				containsInstancedRef = true;
+			}
+
+			if (auto arrayProperty = CastField<FArrayProperty>(property))
+			{
+				if (IsInstancedProperty(arrayProperty->Inner))
+				{
+					arrayProperty->Inner->PropertyFlags |= CPF_ContainsInstancedReference;
+					arrayProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+					containsInstancedRef = true;
+				}
+			}
+
+			if (auto setProperty = CastField<FSetProperty>(property))
+			{
+				if (IsInstancedProperty(setProperty->ElementProp))
+				{
+					setProperty->ElementProp->PropertyFlags |= CPF_ContainsInstancedReference;
+					setProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+					containsInstancedRef = true;
+				}
+			}
+
+			if (auto mapProperty = CastField<FMapProperty>(property))
+			{
+				if (IsInstancedProperty(mapProperty->KeyProp))
+				{
+					mapProperty->KeyProp->PropertyFlags |= CPF_ContainsInstancedReference;
+					mapProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+					containsInstancedRef = true;
+				}
+
+				if (IsInstancedProperty(mapProperty->ValueProp))
+				{
+					mapProperty->ValueProp->PropertyFlags |= CPF_ContainsInstancedReference;
+					mapProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+					containsInstancedRef = true;
+				}
+			}
+
+			if (auto optionalProperty = CastField<FOptionalProperty>(property))
+			{
+				if (IsInstancedProperty(optionalProperty->GetValueProperty()))
+				{
+					optionalProperty->GetValueProperty()->PropertyFlags |= CPF_ContainsInstancedReference;
+					optionalProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+					containsInstancedRef = true;
+				}
+			}
+		}
+
+		return containsInstancedRef;
 	}
 	
 	static FString MergeNames(const FString& lhs, const FString& rhs, const FString& subtract1, const FString& subtract2)
@@ -299,8 +394,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				break;
 			}
 			/* Containers (Struct)
-			 * Note: If struct has instanced reference, then the property should set CPF_ContainsInstancedReference. (@see:
-			 * UhtStructProperty.cs)
+			 * Note: If struct has instanced reference, then the property should set CPF_ContainsInstancedReference. (@see: UhtStructProperty.cs)
 			 * This could not get done here because we need globally complete reflection data.
 			 * So this flag is deferred to PostEmitXXX().
 			 */
@@ -335,6 +429,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			}
 		case EZPropertyType::MulticastSparseDelegate:
 			{
+				UE_CLOG(!owner.IsA<UClass>(), LogZSharpEmit, Fatal, TEXT("Sparse delegate property must be in class!!! Property: %s.%s"), *owner.GetName(), *name.ToString());
+				
 				NEW_PROPERTY(MulticastSparseDelegate);
 
 				property->PropertyFlags |= CPF_InstancedReference; // Migrate from UHT.
@@ -594,66 +690,128 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 
 	pak->SetPackageFlags(PKG_CompiledIn);
 
-	// Enums have no dependency so we can emit them just one step.
-	for (auto& def : manifest.Enums)
-	{
-		EmitEnum(pak, def);
-	}
-	
-	// Other fields have dependency so we emit skeleton (placeholder) first.
-	for (auto& def : manifest.Structs)
-	{
-		EmitStructSkeleton(pak, def);
+	{ // Stage I: Emit enums because they are not struct, which means they have no dependency.
+		for (auto& def : manifest.Enums)
+		{
+			EmitEnum(pak, def);
+		}
 	}
 
-	for (auto& def : manifest.Classes)
-	{
-		EmitClassSkeleton(pak, def);
+	{ // Stage II: Emit skeleton for all structs (Allocated but not get dependencies set up).
+		for (auto& def : manifest.Structs)
+		{
+			EmitStructSkeleton(pak, def);
+		}
+
+		for (auto& def : manifest.Delegates)
+		{
+			EmitDelegateSkeleton(pak, def);
+		}
+		
+		for (auto& def : manifest.Interfaces)
+		{
+			EmitInterfaceSkeleton(pak, def);
+		}
+
+		for (auto& def : manifest.Classes)
+		{
+			EmitClassSkeleton(pak, def);
+		}
 	}
 
-	for (auto& def : manifest.Interfaces)
-	{
-		EmitInterfaceSkeleton(pak, def);
+	// Now that all fields are in memory (but not fully initialized) and we can set up dependency.
+
+	TArray<const UScriptStruct*> topologicallySortedScriptStructs;
+	TMap<const UScriptStruct*, FZScriptStructDefinition*> scriptStruct2def;
+	{ // Stage III: Set up dependencies for script structs first because we need it's size almost all the time.
+		// Script structs may depend on each other (reference or inherit),
+		// but fortunately there is no loop because script structs are referenced by value,
+		// so we sort script structs to ensure referenced structs get constructed before referencing structs.
+		for (auto& def : manifest.Structs)
+		{
+			topologicallySortedScriptStructs.Emplace(def.ScriptStruct);
+			scriptStruct2def.Emplace(def.ScriptStruct, &def);
+		}
+		
+		bool suc = Algo::TopologicalSort(topologicallySortedScriptStructs, [&scriptStruct2def](const UScriptStruct* scriptStruct)
+		{
+			const FZScriptStructDefinition* scriptStructDef = scriptStruct2def.FindChecked(scriptStruct);
+			TArray<const UScriptStruct*> dependencies;
+
+			if (!scriptStructDef->SuperPath.IsNone())
+			{
+				if (auto superStruct = FindObjectChecked<const UScriptStruct>(nullptr, *scriptStructDef->SuperPath.ToString()); scriptStruct2def.Contains(superStruct))
+				{
+					dependencies.Emplace(superStruct);
+				}
+			}
+
+			for (const auto& propertyDef : scriptStructDef->Properties)
+			{
+				// The only thing we need to consider is direct references -
+				// other forms of references (containers, delegates) do not require calculating the size of the referenced structure in place.
+				if (propertyDef.Type == EZPropertyType::Struct)
+				{
+					if (auto referencedStruct = FindObjectChecked<const UScriptStruct>(nullptr, *propertyDef.DescriptorFieldPath.ToString()); scriptStruct2def.Contains(referencedStruct))
+					{
+						dependencies.Emplace(referencedStruct);
+					}
+				}
+			}
+		
+			return dependencies;
+		});
+
+		if (!suc)
+		{
+			UE_LOG(LogZSharpEmit, Fatal, TEXT("Cycle detected in script struct dependency graph!!!"));
+		}
+
+		for (auto scriptStruct : topologicallySortedScriptStructs)
+		{
+			FZScriptStructDefinition* scriptStructDef = scriptStruct2def.FindChecked(scriptStruct);
+			FinishEmitStruct(pak, *scriptStructDef);
+		}
 	}
 
-	for (auto& def : manifest.Delegates)
-	{
-		EmitDelegateSkeleton(pak, def);
+	{ // Stage IV: Set up dependencies for delegates.
+		for (auto& def : manifest.Delegates)
+		{
+			FinishEmitDelegate(pak, def);
+		}
 	}
 
-	// Now that all fields are in memory (but not fully initialized) and we can setup dependency.
-	// IMPORTANT: Structs must finish before others because properties depend on structs need to calculate size.
-	// @TODO: Sort structs by reference.
-	for (auto& def : manifest.Structs)
-	{
-		FinishEmitStruct(pak, def);
+	{ // Stage V: Set up dependencies for interfaces before classes because classes can implement interfaces.
+		for (auto& def : manifest.Interfaces)
+		{
+			FinishEmitInterface(pak, def);
+		}
 	}
 
-	// Subclass may depend on super/within class's data i.e. ClassConfigName, SparseClassDataStruct.
-	// So we sort classes to ensure super/within class get constructed before subclass.
-	// Algo::TopologicalSort doesn't support projection or custom hash, so we manually make a projection.
 	TArray<const UClass*> topologicallySortedClasses;
 	TMap<const UClass*, FZClassDefinition*> class2def;
-	{
+	{ // Stage VI: Set up dependencies for classes.
+		// Subclass may depend on super/within class's data i.e. ClassConfigName, SparseClassDataStruct,
+		// so we sort classes to ensure super/within classes get constructed before subclasses.
 		for (auto& def : manifest.Classes)
 		{
 			topologicallySortedClasses.Emplace(def.Class);
 			class2def.Emplace(def.Class, &def);
 		}
 		
-		Algo::TopologicalSort(topologicallySortedClasses, [&class2def](const UClass* cls)
+		bool suc = Algo::TopologicalSort(topologicallySortedClasses, [&class2def](const UClass* cls)
 		{
 			const FZClassDefinition* classDef = class2def.FindChecked(cls);
 			TArray<const UClass*, TInlineAllocator<2>> dependencies;
 			
-			if (auto superClass = FindObjectChecked<const UClass>(nullptr, *classDef->SuperPath.ToString()); FZSharpFieldRegistry::Get().IsZSharpClass(superClass))
+			if (auto superClass = FindObjectChecked<const UClass>(nullptr, *classDef->SuperPath.ToString()); class2def.Contains(superClass))
 			{
 				dependencies.Emplace(superClass);
 			}
 			
 			if (!classDef->WithinPath.IsNone())
 			{
-				if (auto withinClass = FindObjectChecked<const UClass>(nullptr, *classDef->WithinPath.ToString()); FZSharpFieldRegistry::Get().IsZSharpClass(withinClass))
+				if (auto withinClass = FindObjectChecked<const UClass>(nullptr, *classDef->WithinPath.ToString()); class2def.Contains(withinClass))
 				{
 					dependencies.Emplace(withinClass);
 				}
@@ -662,6 +820,11 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 			return dependencies;
 		});
 		
+		if (!suc)
+		{
+			UE_LOG(LogZSharpEmit, Fatal, TEXT("Cycle detected in class dependency graph!!!"));
+		}
+		
 		for (auto cls : topologicallySortedClasses)
 		{
 			FZClassDefinition* def = class2def.FindChecked(cls);
@@ -669,30 +832,28 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 		}
 	}
 
-	for (auto& def : manifest.Interfaces)
-	{
-		FinishEmitInterface(pak, def);
-	}
+	{ // Stage VII: Finalize compilation.
+		for (auto& scriptStruct : topologicallySortedScriptStructs)
+		{
+			FZScriptStructDefinition* scriptStructDef = scriptStruct2def.FindChecked(scriptStruct);
+			PostEmitStruct(pak, *scriptStructDef);
+		}
+		
+		// Compile class but don't create CDO.
+		// Because the constructor of a CDO might trigger the creation of other CDOs,
+		// we should at least guarantee that all classes have been compiled before creating any CDO.
+		for (auto& cls : topologicallySortedClasses)
+		{
+			FZClassDefinition* def = class2def.FindChecked(cls);
+			PostEmitClass_I(pak, *def);
+		}
 
-	for (auto& def : manifest.Delegates)
-	{
-		FinishEmitDelegate(pak, def);
-	}
-
-	// Compile class but don't create CDO.
-	// Because the constructor of a CDO might trigger the creation of other CDOs,
-	// we should at least guarantee that all classes have been compiled before creating any CDO.
-	for (auto& cls : topologicallySortedClasses)
-	{
-		FZClassDefinition* def = class2def.FindChecked(cls);
-		PostEmitClass_I(pak, *def);
-	}
-
-	// Create CDO and do some initialization.
-	for (auto& cls : topologicallySortedClasses)
-	{
-		FZClassDefinition* def = class2def.FindChecked(cls);
-		PostEmitClass_II(pak, *def);
+		// Create CDO and do some initialization.
+		for (auto& cls : topologicallySortedClasses)
+		{
+			FZClassDefinition* def = class2def.FindChecked(cls);
+			PostEmitClass_II(pak, *def);
+		}
 	}
 }
 
@@ -743,11 +904,38 @@ void ZSharp::FZUnrealFieldEmitter::EmitEnum(UPackage* pak, FZEnumDefinition& def
 	}
 #endif
 
+	FZSharpFieldRegistry::Get().RegisterEnum(enm);
+	
 	// Migrate from GetStaticEnum().
 	NotifyRegistrationEvent(*enm->GetOutermost()->GetName(), *enm->GetName(), ENotifyRegistrationType::NRT_Enum, ENotifyRegistrationPhase::NRP_Finished, nullptr, false, enm);
 }
 
 void ZSharp::FZUnrealFieldEmitter::EmitStructSkeleton(UPackage* pak, FZScriptStructDefinition& def) const
+{
+	// UScriptStruct only has RF_Public | RF_Transient | RF_MarkAsNative set in UHT generated code,
+	// but I think it's okay to keep sync with UClass.
+	constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Standalone | RF_Transient | RF_MarkAsNative | RF_MarkAsRootSet;
+
+	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
+	
+	FStaticConstructObjectParameters params { UScriptStruct::StaticClass() };
+	params.Outer = pak;
+	params.Name = *def.Name.ToString();
+	params.SetFlags = def.Flags | GCompiledInFlags;
+	
+	auto scriptStruct = static_cast<UScriptStruct*>(StaticConstructObject_Internal(params));
+	def.ScriptStruct = scriptStruct;
+
+	FZSharpFieldRegistry::Get().RegisterStruct(scriptStruct);
+}
+
+void ZSharp::FZUnrealFieldEmitter::EmitDelegateSkeleton(UPackage* pak, FZDelegateDefinition& def) const
+{
+	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
+	// @TODO
+}
+
+void ZSharp::FZUnrealFieldEmitter::EmitInterfaceSkeleton(UPackage* pak, FZInterfaceDefinition& def) const
 {
 	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
 	// @TODO
@@ -819,19 +1007,104 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 	}
 }
 
-void ZSharp::FZUnrealFieldEmitter::EmitInterfaceSkeleton(UPackage* pak, FZInterfaceDefinition& def) const
-{
-	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
-	// @TODO
-}
-
-void ZSharp::FZUnrealFieldEmitter::EmitDelegateSkeleton(UPackage* pak, FZDelegateDefinition& def) const
-{
-	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
-	// @TODO
-}
-
 void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStructDefinition& def) const
+{
+	UScriptStruct* scriptStruct = def.ScriptStruct;
+
+	// We didn't use static constructor before so we need to manually set up super.
+	UScriptStruct* superScriptStruct = nullptr;
+	if (!def.SuperPath.IsNone())
+	{
+		superScriptStruct = FindObjectChecked<UScriptStruct>(nullptr, *def.SuperPath.ToString());
+		check(superScriptStruct->IsNative());
+		scriptStruct->SetSuperStruct(superScriptStruct);
+		// Migrate from UHT. (@see: UhtScriptStruct.cs)
+		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | superScriptStruct->StructFlags & STRUCT_Inherit);
+	}
+
+	// There is no RegisterDependencies() call for script struct.
+
+	// Migrate from UECodeGen_Private::ConstructUScriptStruct().
+	ZUnrealFieldEmitter_Private::EmitProperties(scriptStruct, def.Properties);
+	
+	ZUnrealFieldEmitter_Private::AddMetadata(scriptStruct, def.MetadataMap);
+
+	// We have no way but calculate size and align like this... (Link() is idempotent, hopefully...)
+	class : public FArchive
+	{
+		virtual FArchive& operator<<(struct FObjectPtr& Value) override
+		{
+			return *this;
+		}
+	} ar;
+	scriptStruct->SetPropertiesSize(superScriptStruct ? superScriptStruct->GetPropertiesSize() : 0);
+	scriptStruct->MinAlignment = superScriptStruct ? superScriptStruct->GetMinAlignment() : 1;
+	// ChildProperties has been set up during EmitProperties(). (@see: UStruct::AddCppProperty())
+	for (FField* field = scriptStruct->ChildProperties; field; field = field->Next)
+	{
+		if (field->GetOwner<UObject>() != scriptStruct)
+		{
+			break;
+		}
+
+		if (FProperty* Property = CastField<FProperty>(field))
+		{
+			scriptStruct->SetPropertiesSize(Property->Link(ar));
+			scriptStruct->MinAlignment = FMath::Max(scriptStruct->GetMinAlignment(), Property->GetMinAlignment());
+		}
+	}
+	// Make sure the last property is aligned.
+	scriptStruct->SetPropertiesSize(scriptStruct->GetStructureSize());
+	auto ops = new ZSharpScriptStruct_Private::FZSharpStructOps { def, scriptStruct->GetPropertiesSize(), scriptStruct->GetMinAlignment() };
+	scriptStruct->DeferCppStructOps(FTopLevelAssetPath { pak->GetFName(), scriptStruct->GetFName() }, ops);
+
+	// Compile script struct.
+	// All referenced script structs should be initialized so struct properties can link properly.
+	scriptStruct->StaticLink(true);
+	// Migrate from UScriptStruct::Link().
+	// We have ICppStructOps, but it is 'fake',
+	// so we need to manually deal with some problem that should have done by C++ compiler.
+	scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | STRUCT_ZeroConstructor | STRUCT_NoDestructor | STRUCT_IsPlainOldData);
+	for (FProperty* property = scriptStruct->PropertyLink; property; property = property->PropertyLinkNext)
+	{
+		if (!property->HasAnyPropertyFlags(CPF_ZeroConstructor))
+		{
+			scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags & ~STRUCT_ZeroConstructor);
+		}
+		if (!property->HasAnyPropertyFlags(CPF_NoDestructor))
+		{
+			scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags & ~STRUCT_NoDestructor);
+		}
+		if (!property->HasAnyPropertyFlags(CPF_IsPlainOldData))
+		{
+			scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags & ~STRUCT_IsPlainOldData);
+		}
+	}
+	if (scriptStruct->StructFlags & STRUCT_IsPlainOldData)
+	{
+		UE_LOG(LogZSharpEmit, Verbose, TEXT("Z# struct %s is plain old data."), *scriptStruct->GetName());
+	}
+	if (scriptStruct->StructFlags & STRUCT_NoDestructor)
+	{
+		UE_LOG(LogZSharpEmit, Verbose, TEXT("Z# struct %s has no destructor."), *scriptStruct->GetName());
+	}
+	if (scriptStruct->StructFlags & STRUCT_ZeroConstructor)
+	{
+		UE_LOG(LogZSharpEmit, Verbose, TEXT("Z# struct %s has zero construction."), *scriptStruct->GetName());
+	}
+	ops->Fixup();
+
+	// Compile Z# struct.
+	FZSharpStruct* zsstruct = FZSharpFieldRegistry::Get().GetMutableStruct(scriptStruct);
+	zsstruct->CppStructOps = TUniquePtr<UScriptStruct::ICppStructOps> { ops };
+}
+
+void ZSharp::FZUnrealFieldEmitter::FinishEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const
+{
+	// @TODO
+}
+
+void ZSharp::FZUnrealFieldEmitter::FinishEmitInterface(UPackage* pak, FZInterfaceDefinition& def) const
 {
 	// @TODO
 }
@@ -920,14 +1193,17 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 #endif
 }
 
-void ZSharp::FZUnrealFieldEmitter::FinishEmitInterface(UPackage* pak, FZInterfaceDefinition& def) const
+void ZSharp::FZUnrealFieldEmitter::PostEmitStruct(UPackage* pak, FZScriptStructDefinition& def) const
 {
-	// @TODO
-}
+	UScriptStruct* scriptStruct = def.ScriptStruct;
 
-void ZSharp::FZUnrealFieldEmitter::FinishEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const
-{
-	// @TODO
+	/* Fixup STRUCT_HasInstancedReference for ourselves and CPF_InstancedReference | CPF_ContainsInstancedReference for our own properties.
+	 * This must be deferred here because we need globally complete reflection data. (After compilation, hopefully not too late...)
+	 */
+	if (ZUnrealFieldEmitter_Private::FixupInstancedFlags(scriptStruct))
+	{
+		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | STRUCT_HasInstancedReference);
+	}
 }
 
 void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinition& def) const
@@ -936,102 +1212,10 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 
 	/* Fixup CLASS_HasInstancedReference for ourselves and CPF_InstancedReference | CPF_ContainsInstancedReference for our own properties.
 	 * This must be deferred here because we need globally complete reflection data.
-	 *
-	 * @FIXME: Currently, instanced container properties may be wrong.
 	 */
+	if (ZUnrealFieldEmitter_Private::FixupInstancedFlags(cls))
 	{
-		bool containsInstancedRef = false;
-		for (TFieldIterator<FProperty> it(cls, EFieldIteratorFlags::ExcludeSuper); it; ++it)
-		{
-			FProperty* property = *it;
-			
-			// First fixup CPF_InstancedReference for object/interface properties whose class has CLASS_DefaultToInstanced.
-			if (auto objectProperty = CastField<const FObjectPropertyBase>(property))
-			{
-				if (objectProperty->PropertyClass->HasAllClassFlags(CLASS_DefaultToInstanced))
-				{
-					property->PropertyFlags |= CPF_InstancedReference | CPF_ExportObject;
-				}
-			}
-
-			if (auto interfaceProperty = CastField<const FInterfaceProperty>(property))
-			{
-				if (interfaceProperty->InterfaceClass->HasAllClassFlags(CLASS_DefaultToInstanced))
-				{
-					property->PropertyFlags |= CPF_InstancedReference | CPF_ExportObject;
-				}
-			}
-			
-			/* Then fixup CPF_ContainsInstancedReference.
-			 * There are three cases we should care about:
-			 *   I: property has CPF_InstancedReference regardless of whether it's class has CLASS_HasInstancedReference.
-			 *  II: property is a struct with instanced reference. (All structs should be ready to use at this point)
-			 * III: property is a container with struct element with instanced reference.
-			 */
-			if (property->HasAllPropertyFlags(CPF_InstancedReference))
-			{
-				containsInstancedRef = true;
-			}
-
-			if (ZUnrealFieldEmitter_Private::IsInstancedProperty(property))
-			{
-				property->PropertyFlags |= CPF_ContainsInstancedReference;
-				containsInstancedRef = true;
-			}
-
-			if (auto arrayProperty = CastField<FArrayProperty>(property))
-			{
-				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(arrayProperty->Inner))
-				{
-					arrayProperty->Inner->PropertyFlags |= CPF_ContainsInstancedReference;
-					arrayProperty->PropertyFlags |= CPF_ContainsInstancedReference;
-					containsInstancedRef = true;
-				}
-			}
-
-			if (auto setProperty = CastField<FSetProperty>(property))
-			{
-				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(setProperty->ElementProp))
-				{
-					setProperty->ElementProp->PropertyFlags |= CPF_ContainsInstancedReference;
-					setProperty->PropertyFlags |= CPF_ContainsInstancedReference;
-					containsInstancedRef = true;
-				}
-			}
-
-			if (auto mapProperty = CastField<FMapProperty>(property))
-			{
-				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(mapProperty->KeyProp))
-				{
-					mapProperty->KeyProp->PropertyFlags |= CPF_ContainsInstancedReference;
-					mapProperty->PropertyFlags |= CPF_ContainsInstancedReference;
-					containsInstancedRef = true;
-				}
-
-				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(mapProperty->ValueProp))
-				{
-					mapProperty->ValueProp->PropertyFlags |= CPF_ContainsInstancedReference;
-					mapProperty->PropertyFlags |= CPF_ContainsInstancedReference;
-					containsInstancedRef = true;
-				}
-			}
-
-			if (auto optionalProperty = CastField<FOptionalProperty>(property))
-			{
-				if (ZUnrealFieldEmitter_Private::IsInstancedProperty(optionalProperty->GetValueProperty()))
-				{
-					optionalProperty->GetValueProperty()->PropertyFlags |= CPF_ContainsInstancedReference;
-					optionalProperty->PropertyFlags |= CPF_ContainsInstancedReference;
-					containsInstancedRef = true;
-				}
-			}
-		}
-
-		// Finally fixup CLASS_HasInstancedReference.
-		if (containsInstancedRef)
-		{
-			cls->ClassFlags |= CLASS_HasInstancedReference;
-		}
+		cls->ClassFlags |= CLASS_HasInstancedReference;
 	}
 
 	// Compile unreal class.
@@ -1084,13 +1268,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 	}
 
 	// Notify registration. Migrate from UObjectLoadAllCompiledInDefaultProperties().
-	{
-		TCHAR PackageName[FName::StringBufferSize];
-		TCHAR ClassName[FName::StringBufferSize];
-		cls->GetOutermost()->GetFName().ToString(PackageName);
-		cls->GetFName().ToString(ClassName);
-		NotifyRegistrationEvent(PackageName, ClassName, ENotifyRegistrationType::NRT_Class, ENotifyRegistrationPhase::NRP_Finished, nullptr, false, cls);
-	}
+	NotifyRegistrationEvent(*cls->GetOutermost()->GetName(), *cls->GetName(), ENotifyRegistrationType::NRT_Class, ENotifyRegistrationPhase::NRP_Finished, nullptr, false, cls);
 }
 
 void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefinition& def) const
@@ -1100,6 +1278,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefini
 	const UClass* superCls = cls->GetSuperClass();
 	
 	// Create CDO.
+	// No need to call NotifyRegistrationEvent(), UClass::CreateDefaultObject() does.
 	const UObject* cdo = def.Class->GetDefaultObject();
 
 	// Precache replicated properties, then setup runtime replication data.

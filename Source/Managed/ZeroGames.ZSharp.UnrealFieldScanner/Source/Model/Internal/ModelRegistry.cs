@@ -154,13 +154,17 @@ internal sealed partial class ModelRegistry : IModelRegistry
 		}
 
 		ITypeModel? model = null;
-		if (typeDef.HasCustomAttribute<UClassAttribute>())
-		{
-			model = new UnrealClassModel(this, typeDef);
-		}
-		else if (typeDef.HasCustomAttribute<UEnumAttribute>())
+		if (typeDef.HasCustomAttribute<UEnumAttribute>())
 		{
 			model = new UnrealEnumModel(this, typeDef);
+		}
+		else if (typeDef.HasCustomAttribute<UStructAttribute>())
+		{
+			model = new UnrealScriptStructModel(this, typeDef);
+		}
+		else if (typeDef.HasCustomAttribute<UClassAttribute>())
+		{
+			model = new UnrealClassModel(this, typeDef);
 		}
 
 		if (model is not null)

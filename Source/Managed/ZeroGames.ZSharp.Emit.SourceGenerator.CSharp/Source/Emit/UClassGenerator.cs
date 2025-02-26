@@ -20,7 +20,7 @@ public class UClassSyntaxReceiver : ISyntaxContextReceiver
 		if (context.Node is ClassDeclarationSyntax { AttributeLists.Count: > 0 } classDeclarationSyntax)
 		{
 			var typeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax) as ITypeSymbol;
-			if (typeSymbol?.GetAttributes().Any(attr => attr.AttributeClass?.ToDisplayString() == "ZeroGames.ZSharp.Emit.Specifier.UClassAttribute") ?? false)
+			if (typeSymbol?.GetAttributes().Any(attr => attr.AttributeClass?.ToDisplayString() is "ZeroGames.ZSharp.Emit.Specifier.UClassAttribute") ?? false)
 			{
 				if (!_uclassSymbols.Contains(typeSymbol))
 				{
@@ -32,7 +32,7 @@ public class UClassSyntaxReceiver : ISyntaxContextReceiver
 	
 	public IReadOnlyList<ITypeSymbol> UClassSymbols => _uclassSymbols;
 
-	private List<ITypeSymbol> _uclassSymbols = new();
+	private readonly List<ITypeSymbol> _uclassSymbols = [];
 	
 }
 
@@ -70,7 +70,7 @@ public class UClassGenerator : ISourceGenerator
 		INamedTypeSymbol fieldNotifySpecifierSymbol = context.Compilation.GetTypeByMetadataName("ZeroGames.ZSharp.Emit.Specifier.FieldNotifyAttribute")!;
 		
 		string className = uclassSymbol.Name;
-		string namespaceName = GetTypeNamespace(uclassSymbol);
+		string namespaceName = EmitGeneratorHelper.GetTypeNamespace(uclassSymbol);
 
 		EmittedClassBuilder builder = new(namespaceName, className);
 		List<string> usings = new();
@@ -104,26 +104,26 @@ public class UClassGenerator : ISourceGenerator
 		{
 			if (!method.ReturnsVoid)
 			{
-				usings.Add(GetTypeNamespace(method.ReturnType));
+				usings.Add(EmitGeneratorHelper.GetTypeNamespace(method.ReturnType));
 			}
 			
 			List<ParameterDeclaration> parameters = new();
 			foreach (var parameter in method.Parameters)
 			{
-				usings.Add(GetTypeNamespace(parameter.Type));
+				usings.Add(EmitGeneratorHelper.GetTypeNamespace(parameter.Type));
 				
-				parameters.Add(new(RefKindToParameterKind(parameter.RefKind), GetTypeReference(parameter.Type), parameter.Name));
+				parameters.Add(new(EmitGeneratorHelper.RefKindToParameterKind(parameter.RefKind), EmitGeneratorHelper.GetTypeReference(parameter.Type), parameter.Name));
 			}
 			
 			ImmutableArray<AttributeData> attributes = method.GetAttributes();
 			builder.AddEventMethod
 			(
-				AccessibilityToMemberVisibility(method.DeclaredAccessibility),
+				EmitGeneratorHelper.AccessibilityToMemberVisibility(method.DeclaredAccessibility),
 				method.Name,
 				!attributes.Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, blueprintImplementableEventSpecifierSymbol)),
 				attributes.Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, withValidationSpecifierSymbol)),
 				attributes.Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, sealedEventSpecifierSymbol)),
-				!method.ReturnsVoid ? GetTypeReference(method.ReturnType) : null,
+				!method.ReturnsVoid ? EmitGeneratorHelper.GetTypeReference(method.ReturnType) : null,
 				parameters.ToArray()
 			);
 		}
@@ -134,7 +134,7 @@ public class UClassGenerator : ISourceGenerator
 
 		foreach (var property in properties)
 		{
-			usings.Add(GetTypeNamespace(property.Type));
+			usings.Add(EmitGeneratorHelper.GetTypeNamespace(property.Type));
 			
 			ImmutableArray<AttributeData> attributes = property.GetAttributes();
 			AttributeData? fieldNotify = attributes.SingleOrDefault(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, fieldNotifySpecifierSymbol));
@@ -161,8 +161,8 @@ public class UClassGenerator : ISourceGenerator
 			
 			builder.AddProperty
 			(
-				AccessibilityToMemberVisibility(property.DeclaredAccessibility),
-				GetTypeReference(property.Type),
+				EmitGeneratorHelper.AccessibilityToMemberVisibility(property.DeclaredAccessibility),
+				EmitGeneratorHelper.GetTypeReference(property.Type),
 				property.Name,
 				fieldNotifies?.ToArray(),
 				needsMarkDirty
@@ -182,55 +182,6 @@ public class UClassGenerator : ISourceGenerator
 		context.AddSource($"{className}.g.cs", SourceText.From(content, Encoding.UTF8));
 	}
 
-	private EParameterKind RefKindToParameterKind(RefKind refKind) => refKind switch
-	{
-		RefKind.None or RefKind.In => EParameterKind.In,
-		RefKind.Out => EParameterKind.Out,
-		RefKind.Ref or RefKind.RefReadOnlyParameter => EParameterKind.Ref,
-		_ => throw new NotSupportedException()
-	};
-
-	private EMemberVisibility AccessibilityToMemberVisibility(Accessibility accessibility) => accessibility switch
-	{
-		Accessibility.Public => EMemberVisibility.Public,
-		Accessibility.Protected => EMemberVisibility.Protected,
-		_ => EMemberVisibility.Private
-	};
-
-	private string GetNormalizedTypeName(ITypeSymbol type)
-	{
-		string name = type.Name switch
-		{
-			nameof(Byte) => nameof(uint8),
-			nameof(UInt16) => nameof(uint16),
-			nameof(UInt32) => nameof(uint32),
-			nameof(UInt64) => nameof(uint64),
-			nameof(SByte) => nameof(int8),
-			nameof(Int16) => nameof(int16),
-			nameof(Int32) => nameof(int32),
-			nameof(Int64) => nameof(int64),
-			nameof(Single) => "float",
-			nameof(Double) => "double",
-			nameof(Boolean) => "bool",
-			_ => string.Empty
-		};
-
-		if (name == string.Empty)
-		{
-			name = type.Name + (type.NullableAnnotation == NullableAnnotation.Annotated ? "?" : string.Empty);
-			if (type is INamedTypeSymbol namedType && namedType.IsGenericType)
-			{
-				name += $"<{string.Join(", ", namedType.TypeArguments.Select(GetNormalizedTypeName))}>";
-			}
-		}
-
-		return name;
-	}
-
-	private string GetTypeNamespace(ITypeSymbol type) => type.ContainingNamespace.ToString();
-
-	private TypeReference GetTypeReference(ITypeSymbol type) => new(GetNormalizedTypeName(type), type.TypeKind == TypeKind.Enum ? "int64" : null);
-	
 }
 
 

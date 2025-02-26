@@ -26,20 +26,28 @@ internal sealed partial class ManifestBuilder
 
 	private void ScanTypeModel(UnrealFieldManifest manifest, ITypeModel typeModel)
 	{
-		if (typeModel is IUnrealClassModel classModel)
-		{
-			UnrealClassDefinition classDef = ScanClassModel(classModel);
-			lock (_manifestLock)
-			{
-				manifest.Classes.Add(classDef);
-			}
-		}
-		else if (typeModel is IUnrealEnumModel enumModel)
+		if (typeModel is IUnrealEnumModel enumModel)
 		{
 			UnrealEnumDefinition enumDef = ScanEnumModel(enumModel);
 			lock (_manifestLock)
 			{
 				manifest.Enums.Add(enumDef);
+			}
+		}
+		else if (typeModel is IUnrealScriptStructModel scriptStructModel)
+		{
+			UnrealScriptStructDefinition scriptStructDef = ScanScriptStructModel(scriptStructModel);
+			lock (_manifestLock)
+			{
+				manifest.Structs.Add(scriptStructDef);
+			}
+		}
+		else if (typeModel is IUnrealClassModel classModel)
+		{
+			UnrealClassDefinition classDef = ScanClassModel(classModel);
+			lock (_manifestLock)
+			{
+				manifest.Classes.Add(classDef);
 			}
 		}
 		else

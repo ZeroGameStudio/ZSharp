@@ -6,6 +6,23 @@
 
 namespace ZSharp
 {
+	struct ZSHARPRUNTIME_API FZSharpEnum
+	{
+		const UEnum* Enum = nullptr;
+	};
+
+	struct ZSHARPRUNTIME_API FZSharpStruct
+	{
+		const UScriptStruct* Struct = nullptr;
+
+		TUniquePtr<UScriptStruct::ICppStructOps> CppStructOps;
+	};
+
+	struct ZSHARPRUNTIME_API FZSharpDelegate
+	{
+		const UDelegateFunction* Delegate = nullptr;
+	};
+	
 	struct ZSHARPRUNTIME_API FZSharpClass
 	{
 		struct ZSHARPRUNTIME_API FPropertyDefault
@@ -81,9 +98,15 @@ namespace ZSharp
 	public:
 		virtual ~IZSharpFieldRegistry(){}
 	public:
+		virtual const FZSharpEnum* GetEnum(const UEnum* enm) const = 0;
+		virtual const FZSharpStruct* GetStruct(const UScriptStruct* scriptStruct) const = 0;
+		virtual const FZSharpDelegate* GetDelegate(const UDelegateFunction* delegate) const = 0;
 		virtual const FZSharpClass* GetClass(const UClass* cls) const = 0;
 		virtual const FZSharpFunction* GetFunction(const UFunction* function) const = 0;
 	public:
+		bool IsZSharpEnum(const UEnum* enm) const { return !!GetEnum(enm); }
+		bool IsZSharpStruct(const UScriptStruct* scriptStruct) const { return !!GetStruct(scriptStruct); }
+		bool IsZSharpDelegate(const UDelegateFunction* delegate) const { return !!GetDelegate(delegate); }
 		bool IsZSharpClass(const UClass* cls) const { return !!GetClass(cls); }
 		bool IsZSharpFunction(const UFunction* function) const { return !!GetFunction(function); }
 	};

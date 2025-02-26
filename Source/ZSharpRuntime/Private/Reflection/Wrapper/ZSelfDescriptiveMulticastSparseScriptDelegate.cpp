@@ -75,8 +75,10 @@ void ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::RemoveAll(const UOb
 {
 	if (IsBound())
 	{
-		struct { bool bIsBound; }* hack = reinterpret_cast<decltype(hack)>(UnderlyingInstance);
-		hack->bIsBound = FSparseDelegateStorage::RemoveAll(GetOwner(), Descriptor->DelegateName, object);
+		// FSparseDelegate has only a bool and this won't change in the future,
+		// so we just reinterpret it as a bool.
+		auto isBound = reinterpret_cast<bool*>(UnderlyingInstance);
+		*isBound = FSparseDelegateStorage::RemoveAll(GetOwner(), Descriptor->DelegateName, object);
 	}
 }
 

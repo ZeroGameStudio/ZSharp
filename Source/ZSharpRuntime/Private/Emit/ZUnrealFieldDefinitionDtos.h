@@ -143,7 +143,8 @@ struct FZScriptStructDefinitionDto : public FZStructDefinitionDto
 {
 	GENERATED_BODY()
 	
-	// @TODO
+	UPROPERTY()
+	int32 StructFlags = 0;
 };
 
 USTRUCT(meta = (ZSharpNoExport))

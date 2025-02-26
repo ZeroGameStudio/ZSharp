@@ -100,8 +100,18 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 			}
 		}
 
-		{ // @TODO Structs
-			
+		{ // Structs
+			for (auto& scriptStructDto : dto.Structs)
+			{
+				FZScriptStructDefinition& scriptStructDef = def.Structs.Emplace_GetRef();
+				scriptStructDef.Name = scriptStructDto.Name;
+				scriptStructDef.Flags = static_cast<EObjectFlags>(scriptStructDto.Flags);
+				scriptStructDef.MetadataMap = MoveTemp(scriptStructDto.MetadataMap);
+				scriptStructDef.TransparentDataMap = MoveTemp(scriptStructDto.TransparentDataMap);
+				scriptStructDef.SuperPath = scriptStructDto.SuperPath;
+				scriptStructDef.Properties = PropertyDtos2Defs(MoveTemp(scriptStructDto.Properties));
+				scriptStructDef.StructFlags = static_cast<EStructFlags>(scriptStructDto.StructFlags);
+			}
 		}
 
 		{ // Classes

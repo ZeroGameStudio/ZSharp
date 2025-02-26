@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
+// Big integer may lose precision when serialize to json (especially flags),
+// but fortunately UE's json serializer can serialize string to number,
+// so we serialize number to string.
 internal class NumberToStringConverter : JsonConverter<object>
 {
 	

@@ -11,6 +11,24 @@ ZSharp::FZSharpFieldRegistry& ZSharp::FZSharpFieldRegistry::Get()
 	return GInstance;
 }
 
+const ZSharp::FZSharpEnum* ZSharp::FZSharpFieldRegistry::GetEnum(const UEnum* enm) const
+{
+	const TUniquePtr<FZSharpEnum>* pEnm = EnumRegistry.Find(enm);
+	return pEnm ? pEnm->Get() : nullptr;
+}
+
+const ZSharp::FZSharpStruct* ZSharp::FZSharpFieldRegistry::GetStruct(const UScriptStruct* scriptStruct) const
+{
+	const TUniquePtr<FZSharpStruct>* pStruct = StructRegistry.Find(scriptStruct);
+	return pStruct ? pStruct->Get() : nullptr;
+}
+
+const ZSharp::FZSharpDelegate* ZSharp::FZSharpFieldRegistry::GetDelegate(const UDelegateFunction* delegate) const
+{
+	const TUniquePtr<FZSharpDelegate>* pDelegate = DelegateRegistry.Find(delegate);
+	return pDelegate ? pDelegate->Get() : nullptr;
+}
+
 const ZSharp::FZSharpClass* ZSharp::FZSharpFieldRegistry::GetClass(const UClass* cls) const
 {
 	const TUniquePtr<FZSharpClass>* pCls = ClassRegistry.Find(cls);
@@ -23,15 +41,33 @@ const ZSharp::FZSharpFunction* ZSharp::FZSharpFieldRegistry::GetFunction(const U
 	return pFunction ? pFunction->Get() : nullptr;
 }
 
+ZSharp::FZSharpEnum& ZSharp::FZSharpFieldRegistry::RegisterEnum(const UEnum* enm)
+{
+	auto zsenm = new FZSharpEnum { enm };
+	return *EnumRegistry.Emplace(enm, zsenm);
+}
+
+ZSharp::FZSharpStruct& ZSharp::FZSharpFieldRegistry::RegisterStruct(const UScriptStruct* scriptStruct)
+{
+	auto zsstruct = new FZSharpStruct { scriptStruct };
+	return *StructRegistry.Emplace(scriptStruct, zsstruct);
+}
+
+ZSharp::FZSharpDelegate& ZSharp::FZSharpFieldRegistry::RegisterDelegate(const UDelegateFunction* delegate)
+{
+	auto zsdelegate = new FZSharpDelegate { delegate };
+	return *DelegateRegistry.Emplace(delegate, zsdelegate);
+}
+
 ZSharp::FZSharpClass& ZSharp::FZSharpFieldRegistry::RegisterClass(const UClass* cls)
 {
-	FZSharpClass* zscls = new FZSharpClass { cls };
+	auto zscls = new FZSharpClass { cls };
 	return *ClassRegistry.Emplace(cls, zscls);
 }
 
 ZSharp::FZSharpFunction& ZSharp::FZSharpFieldRegistry::RegisterFunction(const UFunction* function)
 {
-	FZSharpFunction* zsfunction = new FZSharpFunction;
+	auto zsfunction = new FZSharpFunction;
 	zsfunction->Function = function;
 	return *FunctionRegistry.Emplace(function, zsfunction);
 }

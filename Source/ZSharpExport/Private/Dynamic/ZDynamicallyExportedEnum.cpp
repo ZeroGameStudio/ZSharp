@@ -5,6 +5,7 @@
 #include "ZExportedTypeRegistry.h"
 #include "ZSharpExportSettings.h"
 #include "ZExportHelper.h"
+#include "ZUEnumUnderlyingTypeLookup.h"
 
 ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(const UEnum* uenum)
 {
@@ -50,7 +51,7 @@ ZSharp::EZExportedEnumFlags ZSharp::FZDynamicallyExportedEnum::GetFlags() const
 
 FString ZSharp::FZDynamicallyExportedEnum::GetUnderlyingType() const
 {
-	return "int64";
+	return FZUEnumUnderlyingTypeLookup::Get().GetEnumUnderlyingTypeName(Enum);
 }
 
 void ZSharp::FZDynamicallyExportedEnum::ForeachEnumValue(TFunctionRef<void(const FString&, const FString&)> action) const
@@ -60,6 +61,7 @@ void ZSharp::FZDynamicallyExportedEnum::ForeachEnumValue(TFunctionRef<void(const
 	const auto settings = GetDefault<UZSharpExportSettings>();
 	const bool preferScriptName = WITH_METADATA && settings->ShouldUseEnumValueScriptName();
 	const bool exportDeprecated = settings->ShouldExportDeprecatedFields();
+	const bool exportMax = settings->ShouldExportEnumMaxValue();
 
 	for (int32 i = 0; i < Enum->NumEnums(); ++i)
 	{
@@ -72,6 +74,11 @@ void ZSharp::FZDynamicallyExportedEnum::ForeachEnumValue(TFunctionRef<void(const
 		}
 		
 		if (!exportDeprecated && FZExportHelper::IsNameDeprecated(name))
+		{
+			continue;
+		}
+
+		if (!exportMax && name == FString::Printf(TEXT("%s_MAX"), *Enum->GetName()))
 		{
 			continue;
 		}

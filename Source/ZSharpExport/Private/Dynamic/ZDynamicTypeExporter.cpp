@@ -6,6 +6,7 @@
 #include "ZDynamicallyExportedDelegate.h"
 #include "ZDynamicallyExportedEnum.h"
 #include "ZExportHelper.h"
+#include "ZUEnumUnderlyingTypeLookup.h"
 
 void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies)
 {
@@ -13,6 +14,8 @@ void ZSharp::FZDynamicTypeExporter::Export(const TArray<FString>& assemblies)
 	{
 		return assemblies.IsEmpty() || assemblies.Contains(FZExportHelper::GetFieldAssemblyName(field));
 	};
+
+	FZUEnumUnderlyingTypeLookup::Get().InvalidateCache();
 	
 	for (TObjectIterator<UEnum> it; it; ++it)
 	{

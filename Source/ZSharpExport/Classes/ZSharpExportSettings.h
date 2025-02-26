@@ -53,6 +53,8 @@ public:
 	bool IsForceNotExportFieldPath(const FString& path) const { return ForceNotExportFieldPathsLookup.Contains(path); }
 
 	bool ShouldUseEnumValueScriptName() const { return bUseEnumValueScriptName; }
+	bool ShouldExportEnumMaxValue() const { return bExportEnumMaxValue; }
+	bool ShouldLootEnumUnderlyingTypeFromTEnumAsByte() const { return bLootEnumUnderlyingTypeFromTEnumAsByte; }
 	bool ShouldUseLooseDefaultParameterName() const { return bUseLooseDefaultParameterName; }
 
 #if WITH_EDITOR
@@ -110,6 +112,12 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = "Export|Enum")
 	bool bUseEnumValueScriptName = true;
+	
+	UPROPERTY(Config, EditAnywhere, Category = "Export|Enum")
+	bool bExportEnumMaxValue = false;
+
+	UPROPERTY(Config, EditAnywhere, Category = "Export|Enum")
+	bool bLootEnumUnderlyingTypeFromTEnumAsByte = false;
 
 	UPROPERTY(Config, EditAnywhere, Category = "Export|Function")
 	bool bUseLooseDefaultParameterName = false;

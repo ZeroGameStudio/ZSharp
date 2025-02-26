@@ -213,6 +213,7 @@ public struct ZCallBufferSlot
 		}
 		else if (t.IsEnum)
 		{
+			// @FIXME
 			return FromObject(Convert.ChangeType(value, t.GetEnumUnderlyingType()));
 		}
 		else
@@ -486,6 +487,7 @@ public struct ZCallBufferSlot
 		}
 		else if (t.IsEnum)
 		{
+			// @FIXME
 			Object = Convert.ChangeType(value, t.GetEnumUnderlyingType());
 		}
 		else

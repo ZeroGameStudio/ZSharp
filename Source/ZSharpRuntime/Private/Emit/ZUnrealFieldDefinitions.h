@@ -46,6 +46,14 @@ namespace ZSharp
 		Int64,
 	};
 
+	enum class EZDelegateType : uint8
+	{
+		None,
+		Unicast,
+		Multicast,
+		Sparse,
+	};
+
 	struct FZSimplePropertyDefinition
 	{
 		FProperty* Property = nullptr;
@@ -112,6 +120,19 @@ namespace ZSharp
 		EStructFlags StructFlags = STRUCT_NoFlags;
 	};
 
+	struct FZDelegateDefinition : public FZStructDefinition
+	{
+		UDelegateFunction* Delegate = nullptr;
+		
+		EZDelegateType DelegateType = EZDelegateType::None;
+		FName OuterClassName;
+	};
+
+	struct FZInterfaceDefinition : public FZStructDefinition
+	{
+		// @TODO
+	};
+
 	struct FZClassDefinition : public FZStructDefinition
 	{
 		struct FPropertyDefault
@@ -159,16 +180,6 @@ namespace ZSharp
 		TArray<FName> FieldNotifies;
 	};
 	
-	struct FZInterfaceDefinition : public FZStructDefinition
-	{
-		// @TODO
-	};
-	
-	struct FZDelegateDefinition : public FZStructDefinition
-	{
-		// @TODO
-	};
-	
 	struct FZUnrealFieldManifest
 	{
 		UPackage* Package = nullptr;
@@ -177,9 +188,9 @@ namespace ZSharp
 		
 		TArray<FZEnumDefinition> Enums;
 		TArray<FZScriptStructDefinition> Structs;
-		TArray<FZClassDefinition> Classes;
-		TArray<FZInterfaceDefinition> Interfaces;
 		TArray<FZDelegateDefinition> Delegates;
+		TArray<FZInterfaceDefinition> Interfaces;
+		TArray<FZClassDefinition> Classes;
 	};
 }
 

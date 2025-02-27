@@ -116,6 +116,25 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 			}
 		}
 
+		{ // Delegates
+			for (auto& delegateDto : dto.Delegates)
+			{
+				FZDelegateDefinition& delegateDef = def.Delegates.Emplace_GetRef();
+				delegateDef.Name = delegateDto.Name;
+				delegateDef.Flags = static_cast<EObjectFlags>(delegateDto.Flags);
+				delegateDef.MetadataMap = MoveTemp(delegateDto.MetadataMap);
+				delegateDef.TransparentDataMap = MoveTemp(delegateDto.TransparentDataMap);
+				delegateDef.SuperPath = delegateDto.SuperPath;
+				delegateDef.Properties = PropertyDtos2Defs(MoveTemp(delegateDto.Properties));
+				delegateDef.DelegateType = static_cast<EZDelegateType>(delegateDto.DelegateType);
+				delegateDef.OuterClassName = delegateDto.OuterClassName;
+			}
+		}
+
+		{ // @TODO Interfaces
+			
+		}
+
 		{ // Classes
 			for (auto& classDto : dto.Classes)
 			{
@@ -165,14 +184,6 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 
 				classDef.FieldNotifies = MoveTemp(classDto.FieldNotifies);
 			}
-		}
-
-		{ // @TODO Interfaces
-			
-		}
-
-		{ // @TODO Delegates
-			
 		}
 
 		return def;

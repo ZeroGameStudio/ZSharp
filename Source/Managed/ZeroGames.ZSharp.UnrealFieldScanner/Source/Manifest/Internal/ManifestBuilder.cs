@@ -42,6 +42,14 @@ internal sealed partial class ManifestBuilder
 				manifest.Structs.Add(scriptStructDef);
 			}
 		}
+		else if (typeModel is IUnrealDelegateModel delegateModel)
+		{
+			UnrealDelegateDefinition delegateDef = ScanDelegateModel(delegateModel);
+			lock (_manifestLock)
+			{
+				manifest.Delegates.Add(delegateDef);
+			}
+		}
 		else if (typeModel is IUnrealClassModel classModel)
 		{
 			UnrealClassDefinition classDef = ScanClassModel(classModel);

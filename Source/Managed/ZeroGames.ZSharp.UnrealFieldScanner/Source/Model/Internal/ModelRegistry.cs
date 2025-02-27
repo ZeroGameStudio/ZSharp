@@ -153,21 +153,31 @@ internal sealed partial class ModelRegistry : IModelRegistry
 			return;
 		}
 
-		ITypeModel? model = null;
+		List<ITypeModel> models = [];
 		if (typeDef.HasCustomAttribute<UEnumAttribute>())
 		{
-			model = new UnrealEnumModel(this, typeDef);
+			models.Add(new UnrealEnumModel(this, typeDef));
 		}
 		else if (typeDef.HasCustomAttribute<UStructAttribute>())
 		{
-			model = new UnrealScriptStructModel(this, typeDef);
+			models.Add(new UnrealScriptStructModel(this, typeDef));
+		}
+		else if (typeDef.HasCustomAttribute<UDelegateAttribute>())
+		{
+			models.Add(new UnrealDelegateModel(this, typeDef));
 		}
 		else if (typeDef.HasCustomAttribute<UClassAttribute>())
 		{
-			model = new UnrealClassModel(this, typeDef);
+			UnrealClassModel model = new(this, typeDef);
+			models.Add(model);
+			// UClass may have nested UDelegate in it.
+			foreach (var delegateTypeDef in typeDef.NestedTypes.Where(t => t.HasCustomAttribute<UDelegateAttribute>()))
+			{
+				models.Add(new UnrealDelegateModel(this, delegateTypeDef, model));
+			}
 		}
 
-		if (model is not null)
+		foreach (var model in models)
 		{
 			lock (_containerLock)
 			{

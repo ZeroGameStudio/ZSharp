@@ -2,14 +2,13 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class ExportedDelegateBuilder(string namespaceName, string typeName, string? unrealFieldPath, EDelegateKind kind, string conjugateKey) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, unrealFieldPath)
+public class EmittedDelegateBuilder(string namespaceName, string typeName, string? outerClassName, EDelegateKind kind) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, EmittedDelegateBuilder.StaticGetUnrealFieldPath(namespaceName, typeName, outerClassName))
 {
 	
 	public EDelegateKind Kind { get; } = kind;
 	public TypeReference? ReturnType { get; set; }
 	public ParameterDeclaration[]? Parameters { get; set; }
-	public string? OuterClassName { get; set; }
-	public string ConjugateKey { get; set; } = conjugateKey;
+	public string? OuterClassName { get; } = outerClassName;
 
 	protected override ClassDefinition? GetOuterClassDefinition()
 	{
@@ -32,28 +31,10 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 		
 		AddAttributeAfter("ConjugateKey", $"\"{ConjugateKey}\"");
 		
-		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}(Signature @delegate) => base.{BindMethodName}(@delegate);"));
-		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state) => base.{BindMethodName}(@delegate, state);"));
-		
-		definition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, Parameters) { Modifiers = EMemberModifiers.Partial, Body = new StrangeZCallBodyBuilder($"base.{ExecuteMethodName}", ReturnType, false, Parameters).Build() });
-	}
-
-	protected override void PreAddMainType(CompilationUnit compilationUnit, ClassDefinition? outerClassDefinition)
-	{
-		base.PreAddMainType(compilationUnit, outerClassDefinition);
-
-		ClassDefinition abstractionDefinition = new(false, EMemberVisibility.Public, TypeName);
-		abstractionDefinition.Modifiers |= EMemberModifiers.Sealed | EMemberModifiers.Partial;
-		abstractionDefinition.AddBaseType(BaseType);
+		definition.Modifiers |= EMemberModifiers.Sealed | EMemberModifiers.Partial;
 
 		TypeReference? signatureReturnType = ReturnType is not null ? ToSignatureParameterDecl(new(EParameterKind.Out, ReturnType.Value, string.Empty)).Type : null;
 		ParameterDeclaration[]? signatureParameters = Parameters?.Select(ToSignatureParameterDecl).ToArray();
-
-		MethodDefinition statelessSignature = new(EMemberVisibility.Public, "Signature", signatureReturnType, signatureParameters)
-		{
-			IsDelegate = true,
-		};
-		abstractionDefinition.AddMember(statelessSignature);
 
 		string stateParameterName = signatureParameters is not null && signatureParameters.Any(p => p.Name is "state") ? "userState" : "state";
 		ParameterDeclaration[] statefulSignatureParameters = [..signatureParameters ?? [], new(EParameterKind.In, new("TState", null), stateParameterName)];
@@ -62,21 +43,12 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 		{
 			IsDelegate = true,
 		};
-		abstractionDefinition.AddMember(statefulSignature);
+		definition.AddMember(statefulSignature);
 
-		abstractionDefinition.AddMember(new Block($"public partial UnrealObject {BindMethodName}(Signature @delegate);"));
-		abstractionDefinition.AddMember(new Block($"public partial UnrealObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state);"));
+		definition.AddMember(new Block($"public UnrealObject {BindMethodName}(Signature @delegate) => base.{BindMethodName}(@delegate);"));
+		definition.AddMember(new Block($"public UnrealObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state) => base.{BindMethodName}(@delegate, state);"));
 		
-		abstractionDefinition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, Parameters) { Modifiers = EMemberModifiers.Partial });
-		
-		if (outerClassDefinition is null)
-		{
-			compilationUnit.AddType(abstractionDefinition);
-		}
-		else
-		{
-			outerClassDefinition.AddMember(abstractionDefinition);
-		}
+		definition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, Parameters) { Body = new StrangeZCallBodyBuilder($"base.{ExecuteMethodName}", ReturnType, false, Parameters).Build() });
 	}
 
 	protected override string GetBlackConstructorBody()
@@ -95,6 +67,12 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 	protected override string StaticFieldInterfaceName => "IStaticSignature";
 	protected override string StaticFieldTypeName => "DelegateFunction";
 	protected override string StaticFieldPropertyName => "StaticSignature";
+
+	private static string StaticGetUnrealFieldPath(string namespaceName, string typeName, string? outerClassName)
+	{
+		string typeSegment = outerClassName is null ? typeName : $"{outerClassName}:{typeName}";
+		return $"/Script/{namespaceName.Split('.').Last()}.{typeSegment}__DelegateSignature";
+	}
 
 	private ParameterDeclaration ToSignatureParameterDecl(ParameterDeclaration source)
 	{
@@ -135,13 +113,7 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 	private string BindMethodName => Kind == EDelegateKind.Unicast ? "Bind" : "Add";
 	private string ExecuteMethodName => Kind == EDelegateKind.Unicast ? "Execute" : "Broadcast";
 
-	private string BaseType => Kind switch
-	{
-		EDelegateKind.Unicast => "UnrealDelegateBase",
-		EDelegateKind.Multicast => "UnrealMulticastInlineDelegateBase",
-		EDelegateKind.Sparse => "UnrealMulticastSparseDelegateBase",
-		_ => throw new NotSupportedException()
-	};
+	private string ConjugateKey => StaticGetUnrealFieldPath(Namespace, TypeName, OuterClassName);
 
 }
 

@@ -17,7 +17,7 @@ public class DelegateWriter
 	public void Write()
 	{
 		string delegateName = _exportedDelegate.Name.Split('.')[^1];
-		ExportedDelegateBuilder builder = new(_exportedDelegate.Namespace, delegateName, _exportedDelegate.UnrealFieldPath, _exportedDelegate.IsSparse ? EExportedDelegateKind.Sparse : _exportedDelegate.IsMulticast ? EExportedDelegateKind.Multicast : EExportedDelegateKind.Unicast, _exportedDelegate.ConjugateKey);
+		ExportedDelegateBuilder builder = new(_exportedDelegate.Namespace, delegateName, _exportedDelegate.UnrealFieldPath, _exportedDelegate.IsSparse ? EDelegateKind.Sparse : _exportedDelegate.IsMulticast ? EDelegateKind.Multicast : EDelegateKind.Unicast, _exportedDelegate.ConjugateKey);
 		var usings = NamespaceHelper.LootNamespace(_exportedDelegate).Where(ns => ns != _exportedDelegate.Namespace);
 		foreach (var ns in usings)
 		{

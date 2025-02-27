@@ -752,11 +752,6 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 		{
 			EmitStructSkeleton(pak, def);
 		}
-
-		for (auto& def : manifest.Delegates)
-		{
-			EmitDelegateSkeleton(pak, def);
-		}
 		
 		for (auto& def : manifest.Interfaces)
 		{
@@ -767,6 +762,12 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 		{
 			EmitClassSkeleton(pak, def);
 		}
+
+		// Emit delegate skeleton after class because it may be nested in class.
+		for (auto& def : manifest.Delegates)
+		{
+			EmitDelegateSkeleton(pak, def);
+		}
 	}
 
 	// Now that all fields are in memory (but not fully initialized) and we can set up dependency.
@@ -775,7 +776,7 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 	TMap<const UScriptStruct*, FZScriptStructDefinition*> scriptStruct2def;
 	{ // Stage III: Set up dependencies for script structs first because we need it's size almost all the time.
 		// Script structs may depend on each other (reference or inherit),
-		// but fortunately there is no loop because script structs are referenced by value,
+		// but fortunately there is no loop because script struct acts as a value type,
 		// so we sort script structs to ensure referenced structs get constructed before referencing structs.
 		for (auto& def : manifest.Structs)
 		{
@@ -824,7 +825,10 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 		}
 	}
 
+	// Now that all value types have known their size thus we can link up everything include reference types.
+
 	{ // Stage IV: Set up dependencies for delegates.
+		// For those delegates nested in UClass, we only use UClass object as outer so skeleton is enough.
 		for (auto& def : manifest.Delegates)
 		{
 			FinishEmitDelegate(pak, def);
@@ -981,14 +985,43 @@ void ZSharp::FZUnrealFieldEmitter::EmitStructSkeleton(UPackage* pak, FZScriptStr
 
 void ZSharp::FZUnrealFieldEmitter::EmitDelegateSkeleton(UPackage* pak, FZDelegateDefinition& def) const
 {
+	// UDelegateFunction only has RF_Public | RF_Transient | RF_MarkAsNative set in UHT generated code,
+	// but I think it's okay to keep sync with UClass.
+	constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Standalone | RF_Transient | RF_MarkAsNative | RF_MarkAsRootSet;
+	constexpr EFunctionFlags GCompiledInFunctionFlags = FUNC_Delegate;
+
 	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
-	// @TODO
+
+	// @TODO: Support sparse delegate.
+	check(def.DelegateType != EZDelegateType::Sparse);
+
+	FStaticConstructObjectParameters params { def.DelegateType == EZDelegateType::Sparse ? USparseDelegateFunction::StaticClass() : UDelegateFunction::StaticClass() };
+	params.Outer = def.OuterClassName.IsNone() ? static_cast<UObject*>(pak) : static_cast<UObject*>(FindObjectChecked<UClass>(pak, *def.OuterClassName.ToString()));
+	params.Name = *def.Name.ToString();
+	params.SetFlags = def.Flags | GCompiledInFlags;
+	
+	auto delegate = static_cast<UDelegateFunction*>(StaticConstructObject_Internal(params));
+	def.Delegate = delegate;
+
+	delegate->FunctionFlags |= GCompiledInFunctionFlags;
+	if (def.DelegateType != EZDelegateType::Unicast)
+	{
+		delegate->FunctionFlags |= FUNC_MulticastDelegate;
+	}
+
+	if (def.DelegateType == EZDelegateType::Sparse)
+	{
+		auto sparseDelegate = CastChecked<USparseDelegateFunction>(delegate);
+		sparseDelegate->OwningClassName = def.OuterClassName;
+		sparseDelegate->DelegateName = "";
+	}
+
+	FZSharpFieldRegistry::Get().RegisterDelegate(delegate);
 }
 
 void ZSharp::FZUnrealFieldEmitter::EmitInterfaceSkeleton(UPackage* pak, FZInterfaceDefinition& def) const
 {
 	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
-	// @TODO
 }
 
 void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefinition& def) const
@@ -1151,7 +1184,24 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 
 void ZSharp::FZUnrealFieldEmitter::FinishEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const
 {
-	// @TODO
+	UDelegateFunction* delegate = def.Delegate;
+
+	// Migrate from UECodeGen_Private::ConstructUFunctionInternal().
+	ZUnrealFieldEmitter_Private::EmitProperties(delegate, def.Properties);
+	
+	ZUnrealFieldEmitter_Private::AddMetadata(delegate, def.MetadataMap);
+
+	delegate->Bind();
+	delegate->StaticLink(true);
+
+	// For nested delegate, we need to add it to outer class child link.
+	if (auto outer = Cast<UClass>(delegate->GetOuter()))
+	{
+		// Migrate from UClass::CreateLinkAndAddChildFunctionsToMap().
+		delegate->Next = outer->Children;
+		outer->Children = delegate;
+		outer->AddFunctionToFunctionMap(delegate, delegate->GetFName());
+	}
 }
 
 void ZSharp::FZUnrealFieldEmitter::FinishEmitInterface(UPackage* pak, FZInterfaceDefinition& def) const

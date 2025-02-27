@@ -12,30 +12,6 @@ using ZeroGames.ZSharp.CodeDom.CSharp;
 
 namespace ZeroGames.ZSharp.Emit.SourceGenerator.CSharp;
 
-public class UClassSyntaxReceiver : ISyntaxContextReceiver
-{
-	
-	public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
-	{
-		if (context.Node is ClassDeclarationSyntax { AttributeLists.Count: > 0 } classDeclarationSyntax)
-		{
-			var typeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax) as ITypeSymbol;
-			if (typeSymbol?.GetAttributes().Any(attr => attr.AttributeClass?.ToDisplayString() is "ZeroGames.ZSharp.Emit.Specifier.UClassAttribute") ?? false)
-			{
-				if (!_uclassSymbols.Contains(typeSymbol))
-				{
-					_uclassSymbols.Add(typeSymbol);
-				}
-			}
-		}
-	}
-	
-	public IReadOnlyList<ITypeSymbol> UClassSymbols => _uclassSymbols;
-
-	private readonly List<ITypeSymbol> _uclassSymbols = [];
-	
-}
-
 [Generator]
 public class UClassGenerator : ISourceGenerator
 {
@@ -56,6 +32,26 @@ public class UClassGenerator : ISourceGenerator
 		{
 			GenerateUClass(uclassSymbol, context);
 		}
+	}
+	
+	private class UClassSyntaxReceiver : ISyntaxContextReceiver
+	{
+		public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
+		{
+			if (context.Node is ClassDeclarationSyntax { AttributeLists.Count: > 0 } classDeclarationSyntax)
+			{
+				var typeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax) as ITypeSymbol;
+				if (typeSymbol?.GetAttributes().Any(attr => attr.AttributeClass?.ToDisplayString() is "ZeroGames.ZSharp.Emit.Specifier.UClassAttribute") ?? false)
+				{
+					if (!_uclassSymbols.Contains(typeSymbol))
+					{
+						_uclassSymbols.Add(typeSymbol);
+					}
+				}
+			}
+		}
+		public IReadOnlyList<ITypeSymbol> UClassSymbols => _uclassSymbols;
+		private readonly List<ITypeSymbol> _uclassSymbols = [];
 	}
 
 	private void GenerateUClass(ITypeSymbol uclassSymbol, GeneratorExecutionContext context)

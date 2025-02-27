@@ -211,6 +211,26 @@ struct FZClassDefinitionDto_DefaultSubobjectOverride
 };
 
 USTRUCT(meta = (ZSharpNoExport))
+struct FZDelegateDefinitionDto : public FZStructDefinitionDto
+{
+	GENERATED_BODY()
+	
+	UPROPERTY()
+	uint8 DelegateType = 0;
+
+	UPROPERTY()
+	FName OuterClassName;
+};
+
+USTRUCT(meta = (ZSharpNoExport))
+struct FZInterfaceDefinitionDto : public FZStructDefinitionDto
+{
+	GENERATED_BODY()
+	
+	// @TODO
+};
+
+USTRUCT(meta = (ZSharpNoExport))
 struct FZClassDefinitionDto : public FZStructDefinitionDto
 {
 	GENERATED_BODY()
@@ -247,22 +267,6 @@ struct FZClassDefinitionDto : public FZStructDefinitionDto
 };
 
 USTRUCT(meta = (ZSharpNoExport))
-struct FZInterfaceDefinitionDto : public FZStructDefinitionDto
-{
-	GENERATED_BODY()
-	
-	// @TODO
-};
-
-USTRUCT(meta = (ZSharpNoExport))
-struct FZDelegateDefinitionDto : public FZStructDefinitionDto
-{
-	GENERATED_BODY()
-	
-	// @TODO
-};
-
-USTRUCT(meta = (ZSharpNoExport))
 struct FZUnrealFieldManifestDto
 {
 	GENERATED_BODY()
@@ -277,13 +281,13 @@ struct FZUnrealFieldManifestDto
 	TArray<FZScriptStructDefinitionDto> Structs;
 
 	UPROPERTY()
-	TArray<FZClassDefinitionDto> Classes;
+	TArray<FZDelegateDefinitionDto> Delegates;
 
 	UPROPERTY()
 	TArray<FZInterfaceDefinitionDto> Interfaces;
 
 	UPROPERTY()
-	TArray<FZDelegateDefinitionDto> Delegates;
+	TArray<FZClassDefinitionDto> Classes;
 };
 
 

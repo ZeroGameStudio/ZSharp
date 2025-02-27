@@ -4,16 +4,18 @@ using Mono.Cecil;
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
-internal class UnrealScriptStructModel : UnrealStructModel, IUnrealScriptStructModel, IDeferredTypeModel
+internal class UnrealDelegateModel : UnrealStructModel, IUnrealDelegateModel, IDeferredTypeModel
 {
-	
-	public UnrealScriptStructModel(ModelRegistry registry, TypeDefinition typeDef) : base(typeDef.Name)
-	{
-		_registry = registry;
-		_typeDef = typeDef;
 
+	public UnrealDelegateModel(ModelRegistry registry, TypeDefinition typeDef, IUnrealClassModel? outer = null) : base(typeDef.Name, registry, typeDef)
+	{
 		AssemblyName = typeDef.Scope.GetAssemblyName();
 		FullName = typeDef.FullName;
+
+		_registry = registry;
+		_typeDef = typeDef;
+		
+		Outer = outer;
 	}
 	
 	void IDeferredTypeModel.BaseInitialize()
@@ -38,7 +40,7 @@ internal class UnrealScriptStructModel : UnrealStructModel, IUnrealScriptStructM
 			return;
 		}
 
-		ScanUProperties();
+		ScanUParams(_registry, _typeDef.NestedTypes.Single(t => t.Name is "Signature" && !t.HasGenericParameters).Methods.Single(m => m.Name is "Invoke"));
 		
 		IsFullyInitialized = true;
 	}
@@ -51,7 +53,7 @@ internal class UnrealScriptStructModel : UnrealStructModel, IUnrealScriptStructM
 			return base.Specifiers;
 		}
 	}
-	
+
 	public override IReadOnlyList<IUnrealPropertyModel> Properties
 	{
 		get
@@ -60,7 +62,7 @@ internal class UnrealScriptStructModel : UnrealStructModel, IUnrealScriptStructM
 			return base.Properties;
 		}
 	}
-
+	
 	public string AssemblyName { get; }
 	public string FullName { get; }
 
@@ -89,20 +91,26 @@ internal class UnrealScriptStructModel : UnrealStructModel, IUnrealScriptStructM
 	public bool IsBaseInitialized { get; private set; }
 	public bool IsFullyInitialized { get; private set; }
 	
-	private void ScanUProperties()
+	public IUnrealClassModel? Outer { get; }
+
+	private void ScanUParams(ModelRegistry registry, MethodDefinition methodDef)
 	{
-		foreach (var property in _typeDef.Properties.Where(CustomAttributeProviderExtensions.HasCustomAttribute<UPropertyAttribute>))
+		foreach (var parameter in methodDef.Parameters)
 		{
-			_properties.Add(new(_registry, property, this));
+			_properties.Add(new(registry, parameter, this));
+		}
+
+		if (methodDef.ReturnType.FullName != typeof(void).FullName)
+		{
+			_properties.Add(new(registry, methodDef.MethodReturnType, this));
 		}
 	}
 	
 	private readonly ModelRegistry _registry;
-	private readonly TypeDefinition _typeDef;
 	
+	private readonly TypeDefinition _typeDef;
+
 	private TypeModelReference? _baseType;
 	private InterfaceTypeUri[] _interfaces = null!;
 	
 }
-
-

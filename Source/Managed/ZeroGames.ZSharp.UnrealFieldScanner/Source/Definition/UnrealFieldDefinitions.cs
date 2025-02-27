@@ -48,6 +48,16 @@ public enum EEnumUnderlyingType : uint8
 	Int64,
 };
 
+public enum EDelegateType : uint8
+{
+	None,
+	Unicast,
+	Multicast,
+	Sparse,
+}
+
+public interface IUnrealSignatureDefinition;
+
 public interface ISimpleUnrealPropertyDefinition
 {
 	EPropertyType Type { get; set; }
@@ -94,7 +104,7 @@ public abstract class UnrealStructDefinition : UnrealFieldDefinition
 	public List<UnrealPropertyDefinition> Properties { get; set; } = [];
 }
 
-public class UnrealFunctionDefinition : UnrealStructDefinition
+public class UnrealFunctionDefinition : UnrealStructDefinition, IUnrealSignatureDefinition
 {
 	public override string GetDisplayName()
 	{
@@ -128,6 +138,17 @@ public class UnrealEnumDefinition : UnrealFieldDefinition
 public class UnrealScriptStructDefinition : UnrealStructDefinition
 {
 	public EStructFlags StructFlags { get; set; }
+}
+
+public class UnrealDelegateDefinition : UnrealStructDefinition, IUnrealSignatureDefinition
+{
+	public EDelegateType DelegateType { get; set; }
+	public string? OuterClassName { get; set; }
+}
+
+public class UnrealInterfaceDefinition : UnrealStructDefinition
+{
+	// @TODO
 }
 
 public class UnrealClassDefinition : UnrealStructDefinition
@@ -168,27 +189,17 @@ public class UnrealClassDefinition : UnrealStructDefinition
 	public List<string> FieldNotifies { get; set; } = [];
 }
 
-public class UnrealInterfaceDefinition : UnrealStructDefinition
-{
-	// @TODO
-}
-
-public class UnrealDelegateDefinition : UnrealStructDefinition
-{
-	// @TODO
-}
-
 public class UnrealFieldManifest
 {
 	public required string ModuleName { get; set; }
 	public List<UnrealEnumDefinition> Enums { get; set; } = [];
 	public List<UnrealScriptStructDefinition> Structs { get; set; } = [];
-	public List<UnrealClassDefinition> Classes { get; set; } = [];
-	public List<UnrealInterfaceDefinition> Interfaces { get; set; } = [];
 	public List<UnrealDelegateDefinition> Delegates { get; set; } = [];
+	public List<UnrealInterfaceDefinition> Interfaces { get; set; } = [];
+	public List<UnrealClassDefinition> Classes { get; set; } = [];
 
 	[JsonIgnore]
-	public bool IsEmpty => Enums.Count + Structs.Count + Classes.Count + Interfaces.Count + Delegates.Count == 0;
+	public bool IsEmpty => Enums.Count + Structs.Count + Delegates.Count + Interfaces.Count + Classes.Count == 0;
 }
 
 

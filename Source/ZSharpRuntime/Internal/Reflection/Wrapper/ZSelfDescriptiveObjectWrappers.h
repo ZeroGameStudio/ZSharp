@@ -145,7 +145,7 @@ namespace ZSharp
 			return *this;
 		}
 	
-	private:
+	protected:
 		TStrongObjectPtr<const UClass> Descriptor;
 		T* UnderlyingInstance;
 		bool bOwning;
@@ -166,9 +166,12 @@ struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper>, pu
 	FZSelfDescriptive##Name(const UClass* descriptor) : TZSelfDescriptiveObjectWrapperBase(descriptor){} \
 	FZSelfDescriptive##Name(const UClass* descriptor, UnderlyingInstanceType* underlyingInstance) : TZSelfDescriptiveObjectWrapperBase(descriptor, underlyingInstance){} \
 	FZSelfDescriptive##Name(FZSelfDescriptive##Name&& other) noexcept : TZSelfDescriptiveObjectWrapperBase(MoveTemp(other)){} \
-	virtual void AddReferencedObjects(FReferenceCollector& Collector) override \
+	virtual void AddReferencedObjects(FReferenceCollector& collector) override \
 	{ \
-		Collector.AddReferencedObject(GetUnderlyingInstance()->GetReferencedObject()); \
+		if (bOwning) \
+		{ \
+			collector.AddReferencedObject(UnderlyingInstance->GetReferencedObject()); \
+		} \
 	} \
 	virtual FString GetReferencerName() const override \
 	{ \

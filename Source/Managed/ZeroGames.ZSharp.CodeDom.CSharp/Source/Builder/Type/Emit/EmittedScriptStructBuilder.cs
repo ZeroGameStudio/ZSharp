@@ -40,7 +40,10 @@ public class EmittedScriptStructBuilder(string namespaceName, string typeName) :
 			definition.AddMember(field);
 		}
 	}
-	
+
+	protected override string GetBlackConstructorBody()
+		=> $" {{ if (GetType() == typeof({TypeName})) Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, StaticStruct.Unmanaged); }}";
+
 	protected override string StaticFieldInterfaceName => "IStaticStruct";
 	protected override string StaticFieldTypeName => "UnrealScriptStruct";
 	protected override string StaticFieldPropertyName => "StaticStruct";

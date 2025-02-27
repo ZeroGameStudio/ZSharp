@@ -156,7 +156,7 @@ public static bool operator !=({TypeName}? left, {TypeName}? right) => !Equals(l
 		}
 		
 		string userdata = Kind == EExportedClassKind.Struct ? "StaticStruct.Unmanaged" : "IntPtr.Zero";
-		return $" => Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, {userdata});";
+		return $" {{ if (GetType() == typeof({TypeName})) Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, {userdata}); }}";
 	}
 
 	protected override bool GenerateIntrinsicContent => !IsAbstraction;

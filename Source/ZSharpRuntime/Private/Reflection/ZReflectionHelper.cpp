@@ -109,9 +109,6 @@ ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeT
 		return {};
 	}
 
-	// Fill generic parameter, here it is ObjectWrapper, not Container.
-	ensure(elementProperty->IsA<FObjectPropertyBase>() && !elementProperty->IsA<FObjectProperty>());
-		
 	FZRuntimeTypeUri inner;
 	if (auto classProp = CastField<const FClassProperty>(elementProperty))
 	{
@@ -136,10 +133,6 @@ ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeT
 	else if (auto interfaceProperty = CastField<const FInterfaceProperty>(elementProperty))
 	{
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(interfaceProperty->InterfaceClass) };
-	}
-	else
-	{
-		checkNoEntry();
 	}
 
 	return { rootKey, inner };

@@ -12,18 +12,49 @@ namespace ZSharp
 {
 	namespace ZConjugateRegistryBase_Private
 	{
-		class FDummyGCObject
+		class IGCObject
 		{
 		public:
-			virtual ~FDummyGCObject() = default;
-		protected:
-			virtual void AddReferencedObjects(FReferenceCollector& collector) = 0;
+			virtual void AddReferencedObjects(FReferenceCollector& collector){}
 			virtual FString GetReferencerName() const { return {}; }
+		public:
+			virtual ~IGCObject() = default;
+		};
+
+		// We need this because conjugate registry starts before UObject system.
+		class FLazyReferencer
+		{
+
+		public:
+			explicit FLazyReferencer(IGCObject* outer) : Outer(outer){}
+				
+		public:
+			void Activate()
+			{
+				if (!Inner)
+				{
+					Inner = MakeUnique<FInnerReferencer>();
+					Inner->Owner = this;
+				}
+			}
+			
+		private:
+			struct FInnerReferencer : public FGCObject
+			{
+				virtual void AddReferencedObjects(FReferenceCollector& collector) override { Owner->Outer->AddReferencedObjects(collector); }
+				virtual FString GetReferencerName() const override { return Owner->Outer->GetReferencerName(); }
+				FLazyReferencer* Owner;
+			};
+
+		private:
+			IGCObject* Outer;
+			TUniquePtr<FInnerReferencer> Inner;
+			
 		};
 	}
 	
 	template <typename TImpl, typename TConjugate, typename TConjugateWrapper = TConjugate, bool IsGCObject = false>
-	class TZConjugateRegistryBase : public IZConjugateRegistry, public FNoncopyable, public std::conditional_t<IsGCObject && ZSHARP_TREATS_BLACK_CONJUGATE_AS_GC_OBJECT, FGCObject, ZConjugateRegistryBase_Private::FDummyGCObject>
+	class TZConjugateRegistryBase : public IZConjugateRegistry, public FNoncopyable, public ZConjugateRegistryBase_Private::IGCObject
 	{
 
 	public:
@@ -35,7 +66,8 @@ namespace ZSharp
 
 	public:
 		explicit TZConjugateRegistryBase(IZMasterAssemblyLoadContext& alc)
-			: Alc(alc){}
+			: Alc(alc)
+			, Referencer(this){}
 
 	public:
 		ConjugateType* ConjugateUnsafe(FZConjugateHandle handle) const
@@ -114,6 +146,7 @@ namespace ZSharp
 			TArray<void*> CapturedConjugates;
 		};
 
+#if ZSHARP_TREATS_BLACK_CONJUGATE_AS_GC_OBJECT
 	private:
 		virtual void AddReferencedObjects(FReferenceCollector& collector) override
 		{
@@ -128,7 +161,8 @@ namespace ZSharp
 				}
 			}
 		}
-
+#endif
+		
 	private:
 		virtual void Release() override
 		{
@@ -178,6 +212,13 @@ namespace ZSharp
 			void* unmanaged = wrapper->GetUnderlyingInstance();
 			if (unmanaged)
 			{
+#if ZSHARP_TREATS_BLACK_CONJUGATE_AS_GC_OBJECT
+				if constexpr (IsGCObject)
+				{
+					Referencer.Activate();
+				}
+#endif
+				
 				ConjugateMap.Emplace(unmanaged, { MoveTemp(wrapper), true });
 			}
 			return unmanaged;
@@ -205,6 +246,7 @@ namespace ZSharp
 	private:
 		TMap<void*, FZConjugateRec> ConjugateMap;
 		TArray<FZRedFrame> RedStack;
+		ZConjugateRegistryBase_Private::FLazyReferencer Referencer;
 		
 	};
 }

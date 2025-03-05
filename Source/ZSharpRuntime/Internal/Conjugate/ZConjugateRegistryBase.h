@@ -12,49 +12,49 @@ namespace ZSharp
 {
 	namespace ZConjugateRegistryBase_Private
 	{
-		class IGCObject
+		class IZGCObject
 		{
 		public:
 			virtual void AddReferencedObjects(FReferenceCollector& collector){}
 			virtual FString GetReferencerName() const { return {}; }
 		public:
-			virtual ~IGCObject() = default;
+			virtual ~IZGCObject() = default;
 		};
 
 		// We need this because conjugate registry starts before UObject system.
-		class FLazyReferencer
+		class FZLazyReferencer
 		{
 
 		public:
-			explicit FLazyReferencer(IGCObject* outer) : Outer(outer){}
+			explicit FZLazyReferencer(IZGCObject* outer) : Outer(outer){}
 				
 		public:
 			void Activate()
 			{
 				if (!Inner)
 				{
-					Inner = MakeUnique<FInnerReferencer>();
+					Inner = MakeUnique<FZInnerReferencer>();
 					Inner->Owner = this;
 				}
 			}
 			
 		private:
-			struct FInnerReferencer : public FGCObject
+			struct FZInnerReferencer : public FGCObject
 			{
 				virtual void AddReferencedObjects(FReferenceCollector& collector) override { Owner->Outer->AddReferencedObjects(collector); }
 				virtual FString GetReferencerName() const override { return Owner->Outer->GetReferencerName(); }
-				FLazyReferencer* Owner;
+				FZLazyReferencer* Owner;
 			};
 
 		private:
-			IGCObject* Outer;
-			TUniquePtr<FInnerReferencer> Inner;
+			IZGCObject* Outer;
+			TUniquePtr<FZInnerReferencer> Inner;
 			
 		};
 	}
-	
+
 	template <typename TImpl, typename TConjugate, typename TConjugateWrapper = TConjugate, bool IsGCObject = false>
-	class TZConjugateRegistryBase : public IZConjugateRegistry, public FNoncopyable, public ZConjugateRegistryBase_Private::IGCObject
+	class TZConjugateRegistryBase : public IZConjugateRegistry, public FNoncopyable, public ZConjugateRegistryBase_Private::IZGCObject
 	{
 
 	public:
@@ -130,6 +130,8 @@ namespace ZSharp
 			const FZConjugateRec* rec = ConjugateMap.Find(unmanaged);
 			return rec ? rec->Conjugate.Get() : nullptr;
 		}
+		
+		TImpl& AsImpl() { return static_cast<TImpl&>(*this); }
 
 	protected:
 		IZMasterAssemblyLoadContext& Alc;
@@ -246,7 +248,7 @@ namespace ZSharp
 	private:
 		TMap<void*, FZConjugateRec> ConjugateMap;
 		TArray<FZRedFrame> RedStack;
-		ZConjugateRegistryBase_Private::FLazyReferencer Referencer;
+		ZConjugateRegistryBase_Private::FZLazyReferencer Referencer;
 		
 	};
 }

@@ -39,7 +39,7 @@ namespace ZSharp
 			}
 
 			initialize(*wrapper);
-			const FZRuntimeTypeHandle type = AsImpl().GetManagedType(descriptor);
+			const FZRuntimeTypeHandle type = Super::AsImpl().GetManagedType(descriptor);
 			return Super::BuildConjugate_Red(wrapper, type);
 		}
 		
@@ -55,15 +55,12 @@ namespace ZSharp
 			}
 
 			auto wrapper = new ConjugateType { descriptor, mutableUnmanaged };
-			const FZRuntimeTypeHandle type = AsImpl().GetManagedType(descriptor);
+			const FZRuntimeTypeHandle type = Super::AsImpl().GetManagedType(descriptor);
 			return Super::BuildConjugate_Red(wrapper, type);
 		}
 
 	public:
 		static constexpr uint16 RegistryId = TZConjugateRegistryId_V<ConjugateType>;
-		
-	private:
-		TImpl& AsImpl() { return static_cast<TImpl&>(*this); }
 
 	};
 }

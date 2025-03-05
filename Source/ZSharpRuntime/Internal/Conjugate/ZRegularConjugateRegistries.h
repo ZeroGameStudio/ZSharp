@@ -6,8 +6,8 @@
 
 namespace ZSharp
 {
-#define DECLARE_REGISTRY(Type) \
-class ZSHARPRUNTIME_API FZConjugateRegistry_##Type : public TZRegularConjugateRegistryBase<FZConjugateRegistry_##Type, F##Type> \
+#define DECLARE_REGISTRY(Type, IsGCObject) \
+class ZSHARPRUNTIME_API FZConjugateRegistry_##Type : public TZRegularConjugateRegistryBase<FZConjugateRegistry_##Type, F##Type, IsGCObject> \
 { \
 	friend Super; \
 public: \
@@ -16,13 +16,13 @@ private: \
 	static ConjugateWrapperType* BuildConjugateWrapper(void* userdata) { return new ConjugateWrapperType { new ConjugateType{}, true }; } \
 };
 
-	DECLARE_REGISTRY(String)
-	DECLARE_REGISTRY(Utf8String)
-	DECLARE_REGISTRY(AnsiString)
-	DECLARE_REGISTRY(Name)
-	DECLARE_REGISTRY(Text)
+	DECLARE_REGISTRY(String, false)
+	DECLARE_REGISTRY(Utf8String, false)
+	DECLARE_REGISTRY(AnsiString, false)
+	DECLARE_REGISTRY(Name, false)
+	DECLARE_REGISTRY(Text, false)
 
-	DECLARE_REGISTRY(FieldPath)
+	DECLARE_REGISTRY(FieldPath, true)
 
 #undef DECLARE_REGISTRY
 }

@@ -22,18 +22,25 @@ namespace ZSharp
 					delete UnderlyingInstance;
 				}
 			}
-			TConjugate* GetUnderlyingInstance() { return  UnderlyingInstance; }
+			void AddReferencedObjects(FReferenceCollector& collector)
+			{
+				if constexpr (std::is_same_v<TConjugate, FFieldPath>)
+				{
+					// @TODO: Cached field and owner.
+				}
+			}
+			TConjugate* GetUnderlyingInstance() { return UnderlyingInstance; }
 			TConjugate* UnderlyingInstance;
 			bool bOwning;
 		};
 	}
 
-	template <typename TImpl, typename TConjugate>
-	class TZRegularConjugateRegistryBase : public TZConjugateRegistryBase<TImpl, TConjugate, ZRegularConjugateRegistryBase_Private::TZConjugateWrapper<TConjugate>>
+	template <typename TImpl, typename TConjugate, bool IsGCObject>
+	class TZRegularConjugateRegistryBase : public TZConjugateRegistryBase<TImpl, TConjugate, ZRegularConjugateRegistryBase_Private::TZConjugateWrapper<TConjugate>, IsGCObject>
 	{
 
 	public:
-		using Super = TZConjugateRegistryBase<TImpl, TConjugate, ZRegularConjugateRegistryBase_Private::TZConjugateWrapper<TConjugate>>;
+		using Super = TZConjugateRegistryBase<TImpl, TConjugate, ZRegularConjugateRegistryBase_Private::TZConjugateWrapper<TConjugate>, IsGCObject>;
 		using ThisClass = TImpl;
 		using ConjugateType = TConjugate;
 		using ConjugateWrapperType = ZRegularConjugateRegistryBase_Private::TZConjugateWrapper<TConjugate>;

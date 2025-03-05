@@ -14,25 +14,13 @@ namespace ZSharp
 		static constexpr bool HasCustomDeleteUnderlyingInstance = true;
 	};
 	
-	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptStruct : TZSelfDescriptiveBase<FZSelfDescriptiveScriptStruct, UScriptStruct, void>, public FGCObject
+	struct ZSHARPRUNTIME_API FZSelfDescriptiveScriptStruct : TZSelfDescriptiveBase<FZSelfDescriptiveScriptStruct, UScriptStruct, void>
 	{
 		ZSHARP_SELF_DESCRIPTIVE_GENERATED_BODY_AUTO_CTOR(FZSelfDescriptiveScriptStruct)
 
 		using Super::GetUnderlyingInstance;
 
-	private:
-		virtual void AddReferencedObjects(FReferenceCollector& collector) override
-		{
-			if (bOwning)
-			{
-				collector.AddPropertyReferencesWithStructARO(Descriptor, UnderlyingInstance);
-			}
-		}
-		
-		virtual FString GetReferencerName() const override
-		{
-			return "SelfDescriptiveScriptStruct";
-		}
+		void AddReferencedObjects(FReferenceCollector& collector);
 
 	private:
 		static UnderlyingInstanceType* NewUnderlyingInstance(const DescriptorType* descriptor);

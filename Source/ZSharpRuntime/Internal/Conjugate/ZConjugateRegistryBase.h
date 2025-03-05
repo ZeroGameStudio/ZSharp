@@ -2,17 +2,28 @@
 
 #pragma once
 
+#include "ZConjugateMacros.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "Conjugate/IZConjugateRegistry.h"
 #include "Conjugate/ZConjugateHandle.h"
 #include "Trait/ZConjugateRegistryId.h"
 
-#define ZSHARP_ENABLE_CONJUGATE_UNSAFE 1
-
 namespace ZSharp
 {
-	template <typename TImpl, typename TConjugate, typename TConjugateWrapper = TConjugate>
-	class TZConjugateRegistryBase : public IZConjugateRegistry, public FNoncopyable
+	namespace ZConjugateRegistryBase_Private
+	{
+		class FDummyGCObject
+		{
+		public:
+			virtual ~FDummyGCObject() = default;
+		protected:
+			virtual void AddReferencedObjects(FReferenceCollector& collector) = 0;
+			virtual FString GetReferencerName() const { return {}; }
+		};
+	}
+	
+	template <typename TImpl, typename TConjugate, typename TConjugateWrapper = TConjugate, bool IsGCObject = false>
+	class TZConjugateRegistryBase : public IZConjugateRegistry, public FNoncopyable, public std::conditional_t<IsGCObject && ZSHARP_TREATS_BLACK_CONJUGATE_AS_GC_OBJECT, FGCObject, ZConjugateRegistryBase_Private::FDummyGCObject>
 	{
 
 	public:
@@ -102,6 +113,21 @@ namespace ZSharp
 		{
 			TArray<void*> CapturedConjugates;
 		};
+
+	private:
+		virtual void AddReferencedObjects(FReferenceCollector& collector) override
+		{
+			if constexpr (IsGCObject)
+			{
+				for (auto& pair : ConjugateMap)
+				{
+					if (pair.Value.bBlack)
+					{
+						pair.Value.Conjugate->AddReferencedObjects(collector);
+					}
+				}
+			}
+		}
 
 	private:
 		virtual void Release() override

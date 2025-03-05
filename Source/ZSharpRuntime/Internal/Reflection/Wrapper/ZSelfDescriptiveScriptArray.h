@@ -32,12 +32,14 @@ namespace ZSharp
 
 		int32 Num() const;
 
-		FZSelfDescriptiveScriptArray& operator=(FZSelfDescriptiveScriptArray&& other) noexcept;
-
 		FScriptArrayHelper GetHelper() const
 		{
 			return FScriptArrayHelper::CreateHelperFormInnerProperty(Descriptor, UnderlyingInstance);
 		}
+
+		void AddReferencedObjects(FReferenceCollector& collector);
+
+		FZSelfDescriptiveScriptArray& operator=(FZSelfDescriptiveScriptArray&& other) noexcept;
 
 	private:
 		void DeleteUnderlyingInstance();

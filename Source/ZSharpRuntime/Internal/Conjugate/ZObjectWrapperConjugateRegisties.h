@@ -7,8 +7,12 @@
 
 namespace ZSharp
 {
-#define DECLARE_REGISTRY(Type) \
-class ZSHARPRUNTIME_API FZConjugateRegistry_##Type : public TZObjectWrapperConjugateRegistryBase<FZConjugateRegistry_##Type, FZSelfDescriptive##Type> \
+#define ZSHARP_STRINGFY_REFERENCER_NAME_INNER(Text) TEXT(#Text)
+#define ZSHARP_STRINGFY_REFERENCER_NAME(Text) ZSHARP_STRINGFY_REFERENCER_NAME_INNER(Text)
+#define ZSHARP_COMBINE_REFERENCER_NAME(A, B) A##B
+	
+#define DECLARE_REGISTRY(Type, IsGCObject) \
+class ZSHARPRUNTIME_API FZConjugateRegistry_##Type : public TZObjectWrapperConjugateRegistryBase<FZConjugateRegistry_##Type, FZSelfDescriptive##Type, IsGCObject> \
 { \
 	friend Super; \
 public: \
@@ -19,16 +23,21 @@ private: \
 		auto descriptor = static_cast<const UClass*>(userdata); \
 		return new ConjugateWrapperType { descriptor }; \
 	} \
+private: \
+	virtual FString GetReferencerName() const override { return ZSHARP_STRINGFY_REFERENCER_NAME(ZSHARP_COMBINE_REFERENCER_NAME(ZConjugateRegistry_, Type)); } \
 };
 
-	DECLARE_REGISTRY(SubclassOf)
-	DECLARE_REGISTRY(SoftClassPtr)
-	DECLARE_REGISTRY(SoftObjectPtr)
-	DECLARE_REGISTRY(WeakObjectPtr)
-	DECLARE_REGISTRY(LazyObjectPtr)
-	DECLARE_REGISTRY(ScriptInterface)
+	DECLARE_REGISTRY(SubclassOf, true)
+	DECLARE_REGISTRY(SoftClassPtr, false)
+	DECLARE_REGISTRY(SoftObjectPtr, false)
+	DECLARE_REGISTRY(WeakObjectPtr, false)
+	DECLARE_REGISTRY(LazyObjectPtr, false)
+	DECLARE_REGISTRY(ScriptInterface, true)
 
 #undef DECLARE_REGISTRY
+#undef ZSHARP_COMBINE_REFERENCER_NAME
+#undef ZSHARP_STRINGFY_REFERENCER_NAME
+#undef ZSHARP_STRINGFY_REFERENCER_NAME_INNER
 }
 
 

@@ -122,6 +122,10 @@ void ZSharp::FZSelfDescriptiveScriptMap::Get(FScriptMapHelper::FIterator it, FZC
 	ValuePropertyVisitor->GetValue_InContainer(src, value, 0);
 }
 
+void ZSharp::FZSelfDescriptiveScriptMap::AddReferencedObjects(FReferenceCollector& collector)
+{
+}
+
 ZSharp::FZSelfDescriptiveScriptMap& ZSharp::FZSelfDescriptiveScriptMap::operator=(FZSelfDescriptiveScriptMap&& other) noexcept
 {
 	Super::operator=(MoveTemp(other));

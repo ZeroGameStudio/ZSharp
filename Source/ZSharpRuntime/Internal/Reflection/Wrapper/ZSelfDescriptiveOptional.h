@@ -30,6 +30,8 @@ namespace ZSharp
 		
 		bool IsSet() const;
 
+		void AddReferencedObjects(FReferenceCollector& collector);
+
 		FZSelfDescriptiveOptional& operator=(FZSelfDescriptiveOptional&& other) noexcept;
 
 	private:

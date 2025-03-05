@@ -11,12 +11,12 @@
 
 namespace ZSharp
 {
-	template <typename TImpl, typename TConjugate>
-	class TZObjectWrapperConjugateRegistryBase : public TZConjugateRegistryBase<TImpl, TConjugate>
+	template <typename TImpl, typename TConjugate, bool IsGCObject>
+	class TZObjectWrapperConjugateRegistryBase : public TZConjugateRegistryBase<TImpl, TConjugate, TConjugate, IsGCObject>
 	{
 
 	public:
-		using Super = TZConjugateRegistryBase<TImpl, TConjugate>;
+		using Super = TZConjugateRegistryBase<TImpl, TConjugate, TConjugate, IsGCObject>;
 		using ThisClass = TImpl;
 		using ConjugateType = TConjugate;
 		using ConjugateWrapperType = TConjugate;

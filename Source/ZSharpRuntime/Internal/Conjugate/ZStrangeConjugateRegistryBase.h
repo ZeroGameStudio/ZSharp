@@ -6,12 +6,12 @@
 
 namespace ZSharp
 {
-	template <typename TImpl, typename TConjugate>
-	class TZStrangeConjugateRegistryBase : public TZConjugateRegistryBase<TImpl, TConjugate>
+	template <typename TImpl, typename TConjugate, bool IsGCObject = false>
+	class TZStrangeConjugateRegistryBase : public TZConjugateRegistryBase<TImpl, TConjugate, TConjugate, IsGCObject>
 	{
 	
 	public:
-		using Super = TZConjugateRegistryBase<TImpl, TConjugate>;
+		using Super = TZConjugateRegistryBase<TImpl, TConjugate, TConjugate, IsGCObject>;
 		using ThisClass = TImpl;
 		using ConjugateType = TConjugate;
 		using ConjugateWrapperType = TConjugate;
@@ -61,7 +61,7 @@ namespace ZSharp
 
 	public:
 		static constexpr uint16 RegistryId = TZConjugateRegistryId_V<ConjugateType>;
-
+		
 	private:
 		TImpl& AsImpl() { return static_cast<TImpl&>(*this); }
 

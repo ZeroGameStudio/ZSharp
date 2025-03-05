@@ -82,6 +82,10 @@ void ZSharp::FZSelfDescriptiveScriptSet::Get(FScriptSetHelper::FIterator it, FZC
 	ElementPropertyVisitor->GetValue(src, dest);
 }
 
+void ZSharp::FZSelfDescriptiveScriptSet::AddReferencedObjects(FReferenceCollector& collector)
+{
+}
+
 ZSharp::FZSelfDescriptiveScriptSet& ZSharp::FZSelfDescriptiveScriptSet::operator=(FZSelfDescriptiveScriptSet&& other) noexcept
 {
 	Super::operator=(MoveTemp(other));

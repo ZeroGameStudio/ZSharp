@@ -20,8 +20,7 @@ namespace ZSharp
 
 #define ZSHARP_STRINGFY_INNER(Text) TEXT(#Text)
 #define ZSHARP_STRINGFY(Text) ZSHARP_STRINGFY_INNER(Text)
-#define ZSHARP_COMBINE_MANAGED_TYPE_NAME_INNER(Namespace, TypeName) Namespace.TypeName
-#define ZSHARP_COMBINE_MANAGED_TYPE_NAME(Namespace, TypeName) ZSHARP_COMBINE_MANAGED_TYPE_NAME_INNER(Namespace, TypeName)
+#define ZSHARP_COMBINE_MANAGED_TYPE_NAME(Namespace, TypeName) Namespace.TypeName
 #define ZSHARP_BUILD_UNMANAGED_FUNCTION(ShortTypeName, FieldName) { ZSHARP_STRINGFY(ZSHARP_COMBINE_MANAGED_TYPE_NAME(ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY, ShortTypeName##_Interop)), TEXT(#FieldName), FZ##ShortTypeName##_Interop::FieldName }
 
 #define ZSHARP_BUILD_MANAGED_FUNCTION(Function) reinterpret_cast<void**>(&Function)

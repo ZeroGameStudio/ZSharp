@@ -10,7 +10,6 @@
 #include "Trait/ZConjugateKey.h"
 
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_Array)
-
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_Set)
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_Map)
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_Optional)

@@ -107,6 +107,10 @@ int32 ZSharp::FZSelfDescriptiveScriptArray::Num() const
 	return helper.Num();
 }
 
+void ZSharp::FZSelfDescriptiveScriptArray::AddReferencedObjects(FReferenceCollector& collector)
+{
+}
+
 ZSharp::FZSelfDescriptiveScriptArray& ZSharp::FZSelfDescriptiveScriptArray::operator=(FZSelfDescriptiveScriptArray&& other) noexcept
 {
 	Super::operator=(MoveTemp(other));

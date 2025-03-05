@@ -35,6 +35,8 @@ namespace ZSharp
 
 		void Get(FScriptSetHelper::FIterator it, FZCallBufferSlot& dest) const;
 
+		void AddReferencedObjects(FReferenceCollector& collector);
+
 		FZSelfDescriptiveScriptSet& operator=(FZSelfDescriptiveScriptSet&& other) noexcept;
 
 	private:

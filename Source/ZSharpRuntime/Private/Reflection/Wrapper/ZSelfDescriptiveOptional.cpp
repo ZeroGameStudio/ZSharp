@@ -76,6 +76,10 @@ bool ZSharp::FZSelfDescriptiveOptional::IsSet() const
 	return Helper->IsSet(UnderlyingInstance);
 }
 
+void ZSharp::FZSelfDescriptiveOptional::AddReferencedObjects(FReferenceCollector& collector)
+{
+}
+
 ZSharp::FZSelfDescriptiveOptional& ZSharp::FZSelfDescriptiveOptional::operator=(FZSelfDescriptiveOptional&& other) noexcept
 {
 	Super::operator=(MoveTemp(other));

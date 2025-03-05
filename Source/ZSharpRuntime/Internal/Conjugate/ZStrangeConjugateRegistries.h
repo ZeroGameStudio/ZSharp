@@ -7,7 +7,7 @@
 
 namespace ZSharp
 {
-	class ZSHARPRUNTIME_API FZConjugateRegistry_Array : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_Array, FZSelfDescriptiveScriptArray>
+	class ZSHARPRUNTIME_API FZConjugateRegistry_Array : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_Array, FZSelfDescriptiveScriptArray, true>
 	{
 
 		friend Super;
@@ -15,6 +15,9 @@ namespace ZSharp
 
 	public:
 		FZConjugateRegistry_Array(IZMasterAssemblyLoadContext& alc) : TZStrangeConjugateRegistryBase(alc){}
+
+	private:
+		virtual FString GetReferencerName() const override { return "ZConjugateRegistry_Array"; }
 
 	private:
 		static FZSelfDescriptiveScriptArray* BuildConjugateWrapper(void* userdata);
@@ -25,7 +28,7 @@ namespace ZSharp
 
 	};
 
-	class ZSHARPRUNTIME_API FZConjugateRegistry_Set : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_Set, FZSelfDescriptiveScriptSet>
+	class ZSHARPRUNTIME_API FZConjugateRegistry_Set : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_Set, FZSelfDescriptiveScriptSet, true>
 	{
 
 		friend Super;
@@ -35,6 +38,9 @@ namespace ZSharp
 		FZConjugateRegistry_Set(IZMasterAssemblyLoadContext& alc) : TZStrangeConjugateRegistryBase(alc){}
 
 	private:
+		virtual FString GetReferencerName() const override { return "ZConjugateRegistry_Set"; }
+		
+	private:
 		static FZSelfDescriptiveScriptSet* BuildConjugateWrapper(void* userdata);
 		static void ValidateConjugateWrapper(const FProperty* elementProperty, const FZSelfDescriptiveScriptSet* wrapper);
 
@@ -43,7 +49,7 @@ namespace ZSharp
 	
 	};
 
-	class ZSHARPRUNTIME_API FZConjugateRegistry_Map : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_Map, FZSelfDescriptiveScriptMap>
+	class ZSHARPRUNTIME_API FZConjugateRegistry_Map : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_Map, FZSelfDescriptiveScriptMap, true>
 	{
 
 		friend Super;
@@ -53,6 +59,9 @@ namespace ZSharp
 		FZConjugateRegistry_Map(IZMasterAssemblyLoadContext& alc) : TZStrangeConjugateRegistryBase(alc){}
 
 	private:
+		virtual FString GetReferencerName() const override { return "ZConjugateRegistry_Map"; }
+		
+	private:
 		static FZSelfDescriptiveScriptMap* BuildConjugateWrapper(void* userdata);
 		static void ValidateConjugateWrapper(const TPair<const FProperty*, const FProperty*>* descriptor, const FZSelfDescriptiveScriptMap* wrapper);
 
@@ -61,7 +70,7 @@ namespace ZSharp
 		
 	};
 
-	class ZSHARPRUNTIME_API FZConjugateRegistry_Optional : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_Optional, FZSelfDescriptiveOptional>
+	class ZSHARPRUNTIME_API FZConjugateRegistry_Optional : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_Optional, FZSelfDescriptiveOptional, true>
 	{
 
 		friend Super;
@@ -71,6 +80,9 @@ namespace ZSharp
 		FZConjugateRegistry_Optional(IZMasterAssemblyLoadContext& alc) : TZStrangeConjugateRegistryBase(alc){}
 
 	private:
+		virtual FString GetReferencerName() const override { return "ZConjugateRegistry_Optional"; }
+		
+	private:
 		static FZSelfDescriptiveOptional* BuildConjugateWrapper(void* userdata);
 		static void ValidateConjugateWrapper(const FProperty* elementProperty, const FZSelfDescriptiveOptional* wrapper);
 
@@ -79,7 +91,7 @@ namespace ZSharp
 	
 	};
 
-	class ZSHARPRUNTIME_API FZConjugateRegistry_UScriptStruct : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_UScriptStruct, FZSelfDescriptiveScriptStruct>
+	class ZSHARPRUNTIME_API FZConjugateRegistry_UScriptStruct : public TZStrangeConjugateRegistryBase<FZConjugateRegistry_UScriptStruct, FZSelfDescriptiveScriptStruct, true>
 	{
 
 		friend Super;
@@ -88,6 +100,9 @@ namespace ZSharp
 	public:
 		FZConjugateRegistry_UScriptStruct(IZMasterAssemblyLoadContext& alc) : TZStrangeConjugateRegistryBase(alc){}
 
+	private:
+		virtual FString GetReferencerName() const override { return "ZConjugateRegistry_UScriptStruct"; }
+		
 	private:
 		static FZSelfDescriptiveScriptStruct* BuildConjugateWrapper(void* userdata);
 		static void ValidateConjugateWrapper(const UScriptStruct* descriptor, const FZSelfDescriptiveScriptStruct* wrapper);

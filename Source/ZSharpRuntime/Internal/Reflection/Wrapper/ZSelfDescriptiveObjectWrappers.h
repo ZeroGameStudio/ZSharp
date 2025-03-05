@@ -152,42 +152,35 @@ namespace ZSharp
 		
 	};
 
-#define DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(Name, Wrapper) \
+#define BEGIN_DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(Name, Wrapper) \
 struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper> \
 { \
 	FZSelfDescriptive##Name(const UClass* descriptor) : TZSelfDescriptiveObjectWrapperBase(descriptor){} \
 	FZSelfDescriptive##Name(const UClass* descriptor, UnderlyingInstanceType* underlyingInstance) : TZSelfDescriptiveObjectWrapperBase(descriptor, underlyingInstance){} \
-	FZSelfDescriptive##Name(FZSelfDescriptive##Name&& other) noexcept : TZSelfDescriptiveObjectWrapperBase(MoveTemp(other)){} \
-};
+	FZSelfDescriptive##Name(FZSelfDescriptive##Name&& other) noexcept : TZSelfDescriptiveObjectWrapperBase(MoveTemp(other)){}
 
-#define DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT(Name, Wrapper, GetReferencedObject, ReferencerName) \
-struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper>, public FGCObject \
-{ \
-	FZSelfDescriptive##Name(const UClass* descriptor) : TZSelfDescriptiveObjectWrapperBase(descriptor){} \
-	FZSelfDescriptive##Name(const UClass* descriptor, UnderlyingInstanceType* underlyingInstance) : TZSelfDescriptiveObjectWrapperBase(descriptor, underlyingInstance){} \
-	FZSelfDescriptive##Name(FZSelfDescriptive##Name&& other) noexcept : TZSelfDescriptiveObjectWrapperBase(MoveTemp(other)){} \
-	virtual void AddReferencedObjects(FReferenceCollector& collector) override \
-	{ \
-		if (bOwning) \
-		{ \
-			collector.AddReferencedObject(UnderlyingInstance->GetReferencedObject()); \
-		} \
-	} \
-	virtual FString GetReferencerName() const override \
-	{ \
-		return #ReferencerName; \
-	} \
-};
+#define END_DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER() };
 
-DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT(SubclassOf, TSubclassOf<UObject>, GetGCPtr, SelfDescriptiveSubclassOf)
+#define DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(Name, Wrapper) \
+BEGIN_DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(Name, Wrapper) \
+END_DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER()
+
+#define DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_ARO(Name, Wrapper, GetReferencedObject) \
+BEGIN_DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(Name, Wrapper) \
+	void AddReferencedObjects(FReferenceCollector& collector) { collector.AddReferencedObject(UnderlyingInstance->GetReferencedObject()); } \
+END_DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER()
+
+DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_ARO(SubclassOf, TSubclassOf<UObject>, GetGCPtr)
 DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(SoftClassPtr, TSoftClassPtr<UObject>)
 DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(SoftObjectPtr, FSoftObjectPtr)
 DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(WeakObjectPtr, FWeakObjectPtr)
 DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(LazyObjectPtr, FLazyObjectPtr)
-DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT(ScriptInterface, FScriptInterface, GetObjectRef, SelfDescriptiveScriptInterface)
+DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_ARO(ScriptInterface, FScriptInterface, GetObjectRef)
 
-#undef DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_GCOBJECT
+#undef DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_ARO
 #undef DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER
+#undef END_DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER
+#undef BEGIN_DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER
 }
 
 

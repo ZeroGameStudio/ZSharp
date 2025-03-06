@@ -12,15 +12,15 @@
 #define ZSHARP_STEAL_INVOCATION_LIST(Variable) \
 static TArray<TDelegateBase<FNotThreadSafeNotCheckedDelegateMode>, FMulticastInvocationListAllocatorType>(TMulticastDelegateBase<FDefaultDelegateUserPolicy>::*Variable); \
 template <decltype(Variable) MemberPtr> \
-struct TInvocationListMemberPtrInitializer##__LINE__ \
+struct TInvocationListMemberPtrInitializer \
 { \
-	TInvocationListMemberPtrInitializer##__LINE__() \
+	TInvocationListMemberPtrInitializer() \
 	{ \
 		Variable = MemberPtr; \
 	} \
-	static TInvocationListMemberPtrInitializer##__LINE__ GInstance; \
+	static TInvocationListMemberPtrInitializer GInstance; \
 }; \
-template <decltype(Variable) MemberPtr> TInvocationListMemberPtrInitializer##__LINE__<MemberPtr> TInvocationListMemberPtrInitializer##__LINE__<MemberPtr>::GInstance; \
-template struct TInvocationListMemberPtrInitializer##__LINE__<&TMulticastDelegateBase<FDefaultDelegateUserPolicy>::InvocationList>;
+template <decltype(Variable) MemberPtr> TInvocationListMemberPtrInitializer<MemberPtr> TInvocationListMemberPtrInitializer<MemberPtr>::GInstance; \
+template struct TInvocationListMemberPtrInitializer<&TMulticastDelegateBase<FDefaultDelegateUserPolicy>::InvocationList>;
 
 

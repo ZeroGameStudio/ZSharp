@@ -3,6 +3,7 @@
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptMap.h"
 
 #include "NativePropertyDescriptorCheckMacros.h"
+#include "Misc/ZUnmanagedHeapGCHelper.h"
 
 ZSharp::FZSelfDescriptiveScriptMap::FZSelfDescriptiveScriptMap(const DescriptorType* descriptor, bool ownsDescriptor)
 	: Super(descriptor, ownsDescriptor)
@@ -124,6 +125,7 @@ void ZSharp::FZSelfDescriptiveScriptMap::Get(FScriptMapHelper::FIterator it, FZC
 
 void ZSharp::FZSelfDescriptiveScriptMap::AddReferencedObjects(FReferenceCollector& collector)
 {
+	FZUnmanagedHeapGCHelper::CollectMapReferences(collector, *Descriptor->Get<0>(), *Descriptor->Get<1>(), UnderlyingInstance);
 }
 
 ZSharp::FZSelfDescriptiveScriptMap& ZSharp::FZSelfDescriptiveScriptMap::operator=(FZSelfDescriptiveScriptMap&& other) noexcept

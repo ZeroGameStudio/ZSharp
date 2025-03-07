@@ -2,9 +2,11 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptStruct.h"
 
+#include "Misc/ZUnmanagedHeapGCHelper.h"
+
 void ZSharp::FZSelfDescriptiveScriptStruct::AddReferencedObjects(FReferenceCollector& collector)
 {
-	collector.AddPropertyReferencesWithStructARO(Descriptor, UnderlyingInstance);
+	FZUnmanagedHeapGCHelper::CollectScriptStructReferences(collector, *Descriptor, UnderlyingInstance);
 }
 
 ZSharp::FZSelfDescriptiveScriptStruct::UnderlyingInstanceType* ZSharp::FZSelfDescriptiveScriptStruct::NewUnderlyingInstance(const DescriptorType* descriptor)

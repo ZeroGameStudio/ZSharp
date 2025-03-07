@@ -3,6 +3,7 @@
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptArray.h"
 
 #include "NativePropertyDescriptorCheckMacros.h"
+#include "Misc/ZUnmanagedHeapGCHelper.h"
 
 ZSharp::FZSelfDescriptiveScriptArray::FZSelfDescriptiveScriptArray(const DescriptorType* descriptor, bool ownsDescriptor)
 	: Super(descriptor, ownsDescriptor)
@@ -109,6 +110,7 @@ int32 ZSharp::FZSelfDescriptiveScriptArray::Num() const
 
 void ZSharp::FZSelfDescriptiveScriptArray::AddReferencedObjects(FReferenceCollector& collector)
 {
+	FZUnmanagedHeapGCHelper::CollectArrayReferences(collector, *Descriptor, UnderlyingInstance);
 }
 
 ZSharp::FZSelfDescriptiveScriptArray& ZSharp::FZSelfDescriptiveScriptArray::operator=(FZSelfDescriptiveScriptArray&& other) noexcept

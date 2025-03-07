@@ -3,6 +3,7 @@
 #include "Reflection/Wrapper/ZSelfDescriptiveOptional.h"
 
 #include "NativePropertyDescriptorCheckMacros.h"
+#include "Misc/ZUnmanagedHeapGCHelper.h"
 
 ZSharp::FZSelfDescriptiveOptional::FZSelfDescriptiveOptional(const DescriptorType* descriptor, bool ownsDescriptor)
 	: Super(descriptor, ownsDescriptor)
@@ -78,6 +79,7 @@ bool ZSharp::FZSelfDescriptiveOptional::IsSet() const
 
 void ZSharp::FZSelfDescriptiveOptional::AddReferencedObjects(FReferenceCollector& collector)
 {
+	FZUnmanagedHeapGCHelper::CollectOptionalReference(collector, *Helper, UnderlyingInstance);
 }
 
 ZSharp::FZSelfDescriptiveOptional& ZSharp::FZSelfDescriptiveOptional::operator=(FZSelfDescriptiveOptional&& other) noexcept

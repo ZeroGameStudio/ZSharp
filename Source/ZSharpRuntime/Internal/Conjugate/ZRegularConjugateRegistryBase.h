@@ -7,6 +7,7 @@
 #include "ALC/ZRuntimeTypeUri.h"
 #include "Conjugate/ZConjugateHandle.h"
 #include "Trait/ZConjugateKey.h"
+#include "Misc/ZUnmanagedHeapGCHelper.h"
 
 namespace ZSharp
 {
@@ -26,7 +27,7 @@ namespace ZSharp
 			{
 				if constexpr (std::is_same_v<TConjugate, FFieldPath>)
 				{
-					// @TODO: Cached field and owner.
+					FZUnmanagedHeapGCHelper::CollectFieldPathReference(collector, *UnderlyingInstance);
 				}
 			}
 			TConjugate* GetUnderlyingInstance() { return UnderlyingInstance; }

@@ -5,7 +5,7 @@
 #include "JsonObjectConverter.h"
 #include "ZSharpRuntimeLogChannels.h"
 #include "ZSharpRuntimeSettings.h"
-#include "ZStealInvocationList.h"
+#include "Misc/ZStealInvocationList.h"
 #include "ZUnrealFieldDefinitionDtos.h"
 #include "ALC/IZDefaultAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"

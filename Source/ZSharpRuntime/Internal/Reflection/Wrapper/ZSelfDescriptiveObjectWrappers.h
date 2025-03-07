@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Misc/ZUnmanagedHeapGCHelper.h"
+
 namespace ZSharp
 {
 	template <typename T>
@@ -165,17 +167,17 @@ struct FZSelfDescriptive##Name : TZSelfDescriptiveObjectWrapperBase<Wrapper> \
 BEGIN_DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(Name, Wrapper) \
 END_DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER()
 
-#define DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_ARO(Name, Wrapper, GetReferencedObject) \
+#define DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_ARO(Name, Wrapper, AddReferencedObjectsStat) \
 BEGIN_DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(Name, Wrapper) \
-	void AddReferencedObjects(FReferenceCollector& collector) { collector.AddReferencedObject(UnderlyingInstance->GetReferencedObject()); } \
+	void AddReferencedObjects(FReferenceCollector& collector) { AddReferencedObjectsStat; } \
 END_DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER()
 
-DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_ARO(SubclassOf, TSubclassOf<UObject>, GetGCPtr)
+DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_ARO(SubclassOf, TSubclassOf<UObject>, collector.AddReferencedObject(UnderlyingInstance->GetGCPtr()))
 DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(SoftClassPtr, TSoftClassPtr<UObject>)
 DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(SoftObjectPtr, FSoftObjectPtr)
 DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(WeakObjectPtr, FWeakObjectPtr)
 DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER(LazyObjectPtr, FLazyObjectPtr)
-DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_ARO(ScriptInterface, FScriptInterface, GetObjectRef)
+DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_ARO(ScriptInterface, FScriptInterface, FZUnmanagedHeapGCHelper::CollectInterfaceReference(collector, *UnderlyingInstance))
 
 #undef DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER_WITH_ARO
 #undef DECLARE_SELF_DESCRIPTIVE_OBJECT_WRAPPER

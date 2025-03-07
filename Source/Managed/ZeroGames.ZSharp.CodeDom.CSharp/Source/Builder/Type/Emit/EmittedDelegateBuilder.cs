@@ -58,7 +58,7 @@ public class EmittedDelegateBuilder(string namespaceName, string typeName, strin
 			return base.GetBlackConstructorBody();
 		}
 
-		return " => Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, StaticSignature.Unmanaged);";
+		return " => BuildConjugate_Black(StaticSignature.Unmanaged);";
 	}
 
 	protected override bool HasBlackConstructor => Kind != EDelegateKind.Sparse;

@@ -22,10 +22,7 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 	
 	public static SoftObjectPtr<T> From<TSource>(SoftObjectPtr<TSource> other) where TSource : T => new(other);
 
-	public SoftObjectPtr()
-	{
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealClass.FromType<T>().Unmanaged);
-	}
+	public SoftObjectPtr() => BuildConjugate_Black(UnrealClass.FromType<T>().Unmanaged);
 	
 	public SoftObjectPtr(T? target) : this()
 	{

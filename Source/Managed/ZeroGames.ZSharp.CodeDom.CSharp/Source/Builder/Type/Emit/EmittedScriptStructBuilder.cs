@@ -62,7 +62,7 @@ public static bool operator !=({TypeName}? left, {TypeName}? right) => !Equals(l
 	}
 
 	protected override string GetBlackConstructorBody()
-		=> $" {{ if (GetType() == typeof({TypeName})) Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, StaticStruct.Unmanaged); }}";
+		=> $" {{ if (GetType() == typeof({TypeName})) BuildConjugate_Black(StaticStruct.Unmanaged); }}";
 
 	protected override string StaticFieldInterfaceName => "IStaticStruct";
 	protected override string StaticFieldTypeName => "UnrealScriptStruct";

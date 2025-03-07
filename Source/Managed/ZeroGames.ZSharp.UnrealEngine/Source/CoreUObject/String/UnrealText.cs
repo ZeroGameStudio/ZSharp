@@ -97,10 +97,7 @@ public sealed class UnrealText : UnrealConjugateBase
     public static UnrealText Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s.ToString(), provider);
     public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out UnrealText result) => TryParse(s.ToString(), provider, out result);
 
-    public UnrealText()
-    {
-        Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, IntPtr.Zero);
-    }
+    public UnrealText() => BuildConjugate_Black(IntPtr.Zero);
     public UnrealText(string? content) : this() => Data = content;
     public UnrealText(UnrealText? other) : this() => Data = other?.Data;
 

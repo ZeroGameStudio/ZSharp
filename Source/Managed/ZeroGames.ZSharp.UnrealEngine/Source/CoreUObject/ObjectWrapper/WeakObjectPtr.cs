@@ -20,10 +20,7 @@ public sealed class WeakObjectPtr<T> : WeakObjectPtrBase
 	
 	public static WeakObjectPtr<T> From<TSource>(WeakObjectPtr<TSource> other) where TSource : T => new(other);
 
-	public WeakObjectPtr()
-	{
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealClass.FromType<T>().Unmanaged);
-	}
+	public WeakObjectPtr() => BuildConjugate_Black(UnrealClass.FromType<T>().Unmanaged);
 	
 	public WeakObjectPtr(T? target) : this()
 	{

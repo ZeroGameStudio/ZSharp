@@ -77,8 +77,6 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 	{
 		if (!PropertyHelper.CanBeValue(typeof(T)))
 		{
-			Unmanaged = DEAD_ADDR;
-			GC.SuppressFinalize(this);
 			throw new NotSupportedException($"Element type {typeof(T).FullName} is not supported.");
 		}
 		
@@ -226,7 +224,7 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 		Userdata* pUserdata = &userdata;
 		PropertyHelper.TryGetPropertyDesc(typeof(T), out userdata.ElementProperty);
 		
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, (IntPtr)pUserdata);
+		BuildConjugate_Black((IntPtr)pUserdata);
 	}
 
 	private unsafe void InternalInsert(int32 index, T item) => UnrealArray_Interop.Insert(ConjugateHandle.FromConjugate(this), index, ZCallBufferSlot.FromObject(item));

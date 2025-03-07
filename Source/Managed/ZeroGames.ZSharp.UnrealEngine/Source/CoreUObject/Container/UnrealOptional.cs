@@ -19,8 +19,6 @@ public sealed class UnrealOptional<T> : UnrealConjugateBase
 	{
 		if (!PropertyHelper.CanBeValue(typeof(T)))
 		{
-			Unmanaged = DEAD_ADDR;
-			GC.SuppressFinalize(this);
 			throw new NotSupportedException($"Element type {typeof(T).FullName} is not supported.");
 		}
 		
@@ -84,7 +82,7 @@ public sealed class UnrealOptional<T> : UnrealConjugateBase
 		Userdata* pUserdata = &userdata;
 		PropertyHelper.TryGetPropertyDesc(typeof(T), out userdata.ElementProperty);
 		
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, (IntPtr)pUserdata);
+		BuildConjugate_Black((IntPtr)pUserdata);
 	}
 
 	private unsafe bool InternalTryGetValue([MaybeNullWhen(false)] out T value)

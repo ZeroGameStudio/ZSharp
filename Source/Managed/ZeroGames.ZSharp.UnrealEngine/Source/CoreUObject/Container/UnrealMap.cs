@@ -131,8 +131,6 @@ public sealed class UnrealMap<TKey, TValue> : UnrealConjugateBase
 	{
 		if (!PropertyHelper.CanBeValue(typeof(TKey)) || !PropertyHelper.CanBeValue(typeof(TValue)))
 		{
-			Unmanaged = DEAD_ADDR;
-			GC.SuppressFinalize(this);
 			throw new NotSupportedException($"Element type {typeof(TKey).FullName} or {typeof(TValue).FullName} is not supported.");
 		}
 		
@@ -303,7 +301,7 @@ public sealed class UnrealMap<TKey, TValue> : UnrealConjugateBase
 		PropertyHelper.TryGetPropertyDesc(typeof(TKey), out userdata.KeyProperty);
 		PropertyHelper.TryGetPropertyDesc(typeof(TValue), out userdata.ValueProperty);
 		
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, (IntPtr)pUserdata);
+		BuildConjugate_Black((IntPtr)pUserdata);
 	}
 	
 	private unsafe bool InternalAdd(TKey key, TValue value) => UnrealMap_Interop.TryAdd(ConjugateHandle.FromConjugate(this), ZCallBufferSlot.FromObject(key), ZCallBufferSlot.FromObject(value)) > 0;

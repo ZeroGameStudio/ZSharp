@@ -97,10 +97,7 @@ public sealed class UnrealUtf8String : UnrealConjugateBase
     public static UnrealUtf8String Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s.ToString(), provider);
     public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out UnrealUtf8String result) => TryParse(s.ToString(), provider, out result);
 
-    public UnrealUtf8String()
-    {
-        Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, IntPtr.Zero);
-    }
+    public UnrealUtf8String() => BuildConjugate_Black(IntPtr.Zero);
     public UnrealUtf8String(string? content) : this() => Data = content;
     public UnrealUtf8String(UnrealUtf8String? other) : this() => Data = other?.Data;
 

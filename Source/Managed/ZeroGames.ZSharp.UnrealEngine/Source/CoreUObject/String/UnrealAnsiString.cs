@@ -98,10 +98,7 @@ public sealed class UnrealAnsiString : UnrealConjugateBase
     public static UnrealAnsiString Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s.ToString(), provider);
     public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out UnrealAnsiString result) => TryParse(s.ToString(), provider, out result);
 
-    public UnrealAnsiString()
-    {
-        Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, IntPtr.Zero);
-    }
+    public UnrealAnsiString() => BuildConjugate_Black(IntPtr.Zero);
     public UnrealAnsiString(string? content) : this() => Data = content;
     public UnrealAnsiString(UnrealAnsiString? other) : this() => Data = other?.Data;
 

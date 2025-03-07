@@ -20,10 +20,7 @@ public sealed class ScriptInterface<T> : ScriptInterfaceBase
 	
 	public static ScriptInterface<T> From<TSource>(ScriptInterface<TSource> other) where TSource : T => new(other);
 
-	public ScriptInterface()
-	{
-		Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, UnrealClass.FromType<T>().Unmanaged);
-	}
+	public ScriptInterface() => BuildConjugate_Black(UnrealClass.FromType<T>().Unmanaged);
 	
 	public ScriptInterface(UnrealObject? target) : this()
 	{

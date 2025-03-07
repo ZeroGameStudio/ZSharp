@@ -92,7 +92,7 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
 
     public GCHandle GCHandle { get; }
 
-    public IntPtr Unmanaged { get; protected set; }
+    public IntPtr Unmanaged { get; private set; }
     public bool IsBlack { get; }
     public bool IsRed => !IsBlack;
 
@@ -100,6 +100,16 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
     
     internal const IntPtr DEAD_ADDR = 0xDEAD;
 
+    protected void BuildConjugate_Black(IntPtr userdata)
+    {
+        if (Unmanaged != IntPtr.Zero)
+        {
+            throw new InvalidOperationException();
+        }
+        
+        Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, userdata);
+    }
+    
     private protected UnrealConjugateBase()
     {
         GCHandle = GCHandle.Alloc(this, GCHandleType.Weak);

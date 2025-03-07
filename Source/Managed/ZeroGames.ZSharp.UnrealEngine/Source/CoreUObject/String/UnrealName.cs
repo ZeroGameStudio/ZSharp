@@ -97,10 +97,7 @@ public sealed class UnrealName : UnrealConjugateBase
     public static UnrealName Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s.ToString(), provider);
     public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out UnrealName result) => TryParse(s.ToString(), provider, out result);
 
-    public UnrealName()
-    {
-        Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, IntPtr.Zero);
-    }
+    public UnrealName() => BuildConjugate_Black(IntPtr.Zero);
     public UnrealName(string? content) : this() => Data = content;
     public UnrealName(UnrealName? other) : this() => Data = other?.Data;
 

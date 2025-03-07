@@ -1,6 +1,12 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 #pragma once
+#include "ZSharpClassInstanceRegistry.h"
+#include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZRedFrameScope.h"
+#include "CLR/IZSharpClr.h"
+#include "Conjugate/ZConjugateRegistry_UObject.h"
+#include "ZCall/ZCallBuffer.h"
 
 namespace ZSharp::ZSharpClass_Private
 {
@@ -126,6 +132,24 @@ namespace ZSharp::ZSharpClass_Private
 					ensure(tailProperty->ImportText_Direct(*propertyDefault.Buffer, propertyAddr, nullptr, PPF_None));
 				}
 			}
+
+			{ // Call managed red constructor and UClass constructor.
+				IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
+				// Try build conjugate to trigger managed constructor.
+				FZConjugateHandle conjugate = alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(obj);
+				if (FZCallHandle handle = zscls->GetConstructorZCallHandle())
+				{
+					FZRedFrameScope scope;
+					{
+						FZCallBufferSlot slot { EZCallBufferSlotType::Conjugate, { .Conjugate = conjugate } };
+						FZCallBuffer buffer;
+						buffer.Slots = &slot;
+						buffer.NumSlots = 1;
+						
+						alc->ZCall(handle, &buffer);
+					}
+				}
+			}
 		}
 		// Only call self constructor and stop call up because C++ itself will handle the rest.
 		else
@@ -137,6 +161,10 @@ namespace ZSharp::ZSharpClass_Private
 	static void ClassConstructor(const FObjectInitializer& objectInitializer)
 	{
 		ConstructObject(objectInitializer, objectInitializer.GetClass());
+
+#if ZSHARP_WITH_MASTER_ALC_RELOAD
+		FZSharpClassInstanceRegistry::Get().Register(objectInitializer.GetObj());
+#endif
 	}
 }
 

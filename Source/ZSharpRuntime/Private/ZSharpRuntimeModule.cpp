@@ -3,6 +3,7 @@
 #include "ZSharpRuntimeModule.h"
 
 #include "ZSharpRuntimeLogChannels.h"
+#include "ZSharpRuntimeMacros.h"
 #include "CLR/IZSharpClr.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ALC/ZCommonMethodArgs.h"
@@ -66,12 +67,7 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 
 	static void ReloadMasterAlc()
 	{
-		if (!ensure(GIsEditor))
-		{
-			UE_LOG(LogZSharpRuntime, Warning, TEXT("Reloading Master ALC is disallowed in non-editor environment."));
-			return;
-		}
-		
+#if ZSHARP_WITH_MASTER_ALC_RELOAD
 		const bool existing = UnloadMasterAlc();
 		CreateMasterAlc();
 		if (existing)
@@ -82,6 +78,9 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 		{
 			UE_LOG(LogZSharpRuntime, Log, TEXT("Master ALC created."));
 		}
+#else
+		UE_LOG(LogZSharpRuntime, Warning, TEXT("Reloading Master ALC is disabled in this environment."));
+#endif
 	}
 
 	static void LoadEngineAssembly(IZMasterAssemblyLoadContext* alc)

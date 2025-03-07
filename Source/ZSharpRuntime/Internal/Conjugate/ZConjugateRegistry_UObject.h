@@ -58,6 +58,7 @@ namespace ZSharp
 
 	public:
 		void RegisterController(IZUObjectConjugateController* controller);
+		bool CanBuildConjugate(UObject* unmanaged) const;
 
 	private:
 		virtual void Release() override;
@@ -68,7 +69,6 @@ namespace ZSharp
 
 	private:
 		void ReleaseConjugate_Red(void* unmanaged);
-		bool CanBuildConjugate(UObject* unmanaged) const;
 		void NotifyConjugated(UObject* unmanaged);
 		void NotifyLifecycleExpired(UObject* unmanaged);
 

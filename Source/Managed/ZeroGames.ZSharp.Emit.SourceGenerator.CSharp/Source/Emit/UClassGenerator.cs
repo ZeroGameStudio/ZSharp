@@ -51,7 +51,11 @@ public class UClassGenerator : ISourceGenerator
 		string className = uclassSymbol.Name;
 		string namespaceName = EmitGeneratorHelper.GetTypeNamespace(uclassSymbol);
 
-		EmittedClassBuilder builder = new(namespaceName, className, implicitBase);
+		bool implicitRedConstructor = !uclassSymbol.GetMembers()
+			.OfType<IMethodSymbol>()
+			.Any(method => method.MethodKind == MethodKind.Constructor && method.Parameters.Length == 1 && method.Parameters[0].Type.SpecialType == SpecialType.System_IntPtr);
+
+		EmittedClassBuilder builder = new(namespaceName, className, implicitBase, implicitRedConstructor);
 		List<string> usings = new();
 		
 		var methods = uclassSymbol.GetMembers()

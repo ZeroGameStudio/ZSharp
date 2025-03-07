@@ -88,6 +88,19 @@ void ZSharp::FZConjugateRegistry_UObject::RegisterController(IZUObjectConjugateC
 	}
 }
 
+bool ZSharp::FZConjugateRegistry_UObject::CanBuildConjugate(UObject* unmanaged) const
+{
+	for (const auto& controller : Controllers)
+	{
+		if (!controller->CanBuildConjugate(unmanaged))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 void ZSharp::FZConjugateRegistry_UObject::Release()
 {
 	TArray<void*> reds;
@@ -131,19 +144,6 @@ void ZSharp::FZConjugateRegistry_UObject::ReleaseConjugate_Red(void* unmanaged)
 	{
 		Alc.ReleaseConjugate(unmanaged);
 	}
-}
-
-bool ZSharp::FZConjugateRegistry_UObject::CanBuildConjugate(UObject* unmanaged) const
-{
-	for (const auto& controller : Controllers)
-	{
-		if (!controller->CanBuildConjugate(unmanaged))
-		{
-			return false;
-		}
-	}
-
-	return true;
 }
 
 void ZSharp::FZConjugateRegistry_UObject::NotifyConjugated(UObject* unmanaged)

@@ -61,7 +61,8 @@ ZSharp::FZSharpDelegate& ZSharp::FZSharpFieldRegistry::RegisterDelegate(const UD
 
 ZSharp::FZSharpClass& ZSharp::FZSharpFieldRegistry::RegisterClass(const UClass* cls)
 {
-	auto zscls = new FZSharpClass { cls };
+	auto zscls = new FZSharpClass;
+	zscls->Class = cls;
 	return *ClassRegistry.Emplace(cls, zscls);
 }
 
@@ -84,6 +85,11 @@ ZSharp::FZSharpFieldRegistry::~FZSharpFieldRegistry()
 
 void ZSharp::FZSharpFieldRegistry::ClearAlcSensitiveStates()
 {
+	for (const auto& pair : ClassRegistry)
+	{
+		pair.Value->ConstructorZCallHandle.Reset();
+	}
+	
 	for (const auto& pair : FunctionRegistry)
 	{
 		pair.Value->ZCallHandle = {};

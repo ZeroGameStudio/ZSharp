@@ -1087,6 +1087,8 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
         	defaultObjectOverride.Name = defaultObjectOverrideDef.Name;
         	defaultObjectOverride.ClassPath = defaultObjectOverrideDef.ClassPath;
         }
+
+		zscls.ConstructorZCallName = ZUnrealFieldEmitter_Private::MakeNMZCallName(cls, ".ctor");
 	}
 }
 

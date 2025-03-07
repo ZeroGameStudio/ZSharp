@@ -6,6 +6,27 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 
+ZSharp::FZCallHandle ZSharp::FZSharpClass::GetConstructorZCallHandle() const
+{
+	if (!ConstructorZCallHandle)
+	{
+		if (!ConstructorZCallName.IsEmpty())
+		{
+			if (IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc())
+			{
+				ConstructorZCallHandle = alc->GetZCallHandle(ConstructorZCallName);
+			}
+		}
+		else
+		{
+			ConstructorZCallHandle = FZCallHandle{};
+		}
+	}
+
+	check(ConstructorZCallHandle);
+	return *ConstructorZCallHandle;
+}
+
 ZSharp::FZCallHandle ZSharp::FZSharpFunction::GetZCallHandle() const
 {
 	if (!ZCallHandle)

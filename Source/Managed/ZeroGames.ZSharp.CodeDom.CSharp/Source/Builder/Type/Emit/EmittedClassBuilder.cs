@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class EmittedClassBuilder(string namespaceName, string typeName, bool implicitBase) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName}")
+public class EmittedClassBuilder(string namespaceName, string typeName, bool implicitBase, bool implicitRedConstructor) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName}")
 {
 	
 	public EmittedEventMethodDefinition AddEventMethod(EMemberVisibility visibility, string name, bool withImplementation, bool withValidation, bool isSealed, TypeReference? returnType, params ParameterDeclaration[]? parameters)
@@ -111,7 +111,8 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 			definition.AddMember(field);
 		}
 	}
-	
+
+	protected override bool HasRedConstructor { get; } = implicitRedConstructor;
 	protected override bool HasBlackConstructor => false;
 
 	protected override string StaticFieldInterfaceName => "IStaticClass";

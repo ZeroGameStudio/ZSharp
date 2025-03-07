@@ -25,6 +25,9 @@ namespace ZSharp
 	
 	struct ZSHARPRUNTIME_API FZSharpClass
 	{
+
+		friend class FZSharpFieldRegistry;
+		
 		struct ZSHARPRUNTIME_API FPropertyDefault
 		{
 			TArray<FProperty*> PropertyChain;
@@ -60,6 +63,10 @@ namespace ZSharp
 			bool bPushBased;
 		};
 
+	public:
+		FZCallHandle GetConstructorZCallHandle() const;
+		
+	public:
 		const UClass* Class = nullptr;
 		
 		TArray<FPropertyDefault> PropertyDefaults;
@@ -68,6 +75,12 @@ namespace ZSharp
 
 		TArray<UE::FieldNotification::FFieldId> FieldNotifies;
 		TArray<FReplicatedProperty> ReplicatedProperties;
+
+		FString ConstructorZCallName;
+
+	private:
+		mutable TOptional<FZCallHandle> ConstructorZCallHandle;
+		
 	};
 
 	struct ZSHARPRUNTIME_API FZSharpFunction

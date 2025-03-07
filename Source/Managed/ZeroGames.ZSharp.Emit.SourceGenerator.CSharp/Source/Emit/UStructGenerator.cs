@@ -2,11 +2,8 @@
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
-using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using ZeroGames.ZSharp.CodeDom.CSharp;
 
@@ -28,40 +25,25 @@ public class UStructGenerator : ISourceGenerator
 			return;
 		}
 		
-		foreach (var uclassSymbol in receiver.UStructSymbols)
+		foreach (var pair in receiver.SymbolMap)
 		{
-			GenerateUStruct(uclassSymbol, context);
+			GenerateUStruct(pair.Key, context, pair.Value);
 		}
 	}
 	
-	private class UStructSyntaxReceiver : ISyntaxContextReceiver
+	private class UStructSyntaxReceiver : UFieldSyntaxReceiverBase
 	{
-		public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
-		{
-			if (context.Node is ClassDeclarationSyntax { AttributeLists.Count: > 0 } classDeclarationSyntax)
-			{
-				var typeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax) as ITypeSymbol;
-				if (typeSymbol?.GetAttributes().Any(attr => attr.AttributeClass?.ToDisplayString() is "ZeroGames.ZSharp.Emit.Specifier.UStructAttribute") ?? false)
-				{
-					if (!_ustructSymbols.Contains(typeSymbol))
-					{
-						_ustructSymbols.Add(typeSymbol);
-					}
-				}
-			}
-		}
-		public IReadOnlyList<ITypeSymbol> UStructSymbols => _ustructSymbols;
-		private readonly List<ITypeSymbol> _ustructSymbols = [];
+		protected override string FieldSpecifierName => "UStruct";
 	}
 
-	private void GenerateUStruct(ITypeSymbol ustructSymbol, GeneratorExecutionContext context)
+	private void GenerateUStruct(ITypeSymbol ustructSymbol, GeneratorExecutionContext context, bool implicitBase)
 	{
 		INamedTypeSymbol upropertySymbol = context.Compilation.GetTypeByMetadataName("ZeroGames.ZSharp.Emit.Specifier.UPropertyAttribute")!;
 
 		string className = ustructSymbol.Name;
 		string namespaceName = EmitGeneratorHelper.GetTypeNamespace(ustructSymbol);
 
-		EmittedScriptStructBuilder builder = new(namespaceName, className);
+		EmittedScriptStructBuilder builder = new(namespaceName, className, implicitBase);
 		List<string> usings = new();
 
 		var properties = ustructSymbol.GetMembers()

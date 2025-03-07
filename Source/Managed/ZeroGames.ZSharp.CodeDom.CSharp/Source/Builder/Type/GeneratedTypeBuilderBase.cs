@@ -39,7 +39,7 @@ public abstract class GeneratedTypeBuilderBase<TDefinition>(string namespaceName
 
 		if (GenerateIntrinsicContent)
 		{
-			definition.AddAttributeListAfter(new AttributeDeclaration("System.CodeDom.Compiler.GeneratedCode", "\"Z#\"", $"\"{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}\""));
+			definition.AddAttributeListAfter(new AttributeDeclaration("global::System.CodeDom.Compiler.GeneratedCode", "\"Z#\"", $"\"{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}\""));
 			if (HasUnrealFieldPath)
 			{
 				definition.AddAttributeListAfter(new AttributeDeclaration("UnrealFieldPath", HasUnrealFieldPathConst ? UNREAL_FIELD_PATH_CONST : UnrealFieldPathLiteralText));

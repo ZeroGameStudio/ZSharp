@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class EmittedClassBuilder(string namespaceName, string typeName) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName}")
+public class EmittedClassBuilder(string namespaceName, string typeName, bool implicitBase) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName}")
 {
 	
 	public EmittedEventMethodDefinition AddEventMethod(EMemberVisibility visibility, string name, bool withImplementation, bool withValidation, bool isSealed, TypeReference? returnType, params ParameterDeclaration[]? parameters)
@@ -87,6 +87,11 @@ public class EmittedClassBuilder(string namespaceName, string typeName) : Genera
 	{
 		base.BuildTypeDefinition(definition);
 
+		if (_implicitBase)
+		{
+			AddBaseTypeBefore("UnrealObject");
+		}
+
 		definition.Modifiers |= EMemberModifiers.Unsafe;
 		
 		AddAttributeAfter("ConjugateKey", $"\"{_unrealFieldPath}\"");
@@ -132,6 +137,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName) : Genera
 	private readonly string _namespaceName = namespaceName;
 	private readonly string _typeName = typeName;
 	private readonly string _unrealFieldPath = $"/Script/{namespaceName.Split('.').Last()}.{typeName}";
+	private readonly bool _implicitBase = implicitBase;
 
 }
 

@@ -2,11 +2,8 @@
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
-using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using ZeroGames.ZSharp.CodeDom.CSharp;
 
@@ -28,30 +25,15 @@ public class UDelegateGenerator : ISourceGenerator
 			return;
 		}
 		
-		foreach (var uclassSymbol in receiver.UDelegateSymbols)
+		foreach (var pair in receiver.SymbolMap)
 		{
-			GenerateUDelegate(uclassSymbol, context);
+			GenerateUDelegate(pair.Key, context);
 		}
 	}
 	
-	private class UDelegateSyntaxReceiver : ISyntaxContextReceiver
+	private class UDelegateSyntaxReceiver : UFieldSyntaxReceiverBase
 	{
-		public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
-		{
-			if (context.Node is ClassDeclarationSyntax { AttributeLists.Count: > 0 } classDeclarationSyntax)
-			{
-				var typeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax) as ITypeSymbol;
-				if (typeSymbol?.GetAttributes().Any(attr => attr.AttributeClass?.ToDisplayString() is "ZeroGames.ZSharp.Emit.Specifier.UDelegateAttribute") ?? false)
-				{
-					if (!_udelegateSymbols.Contains(typeSymbol))
-					{
-						_udelegateSymbols.Add(typeSymbol);
-					}
-				}
-			}
-		}
-		public IReadOnlyList<ITypeSymbol> UDelegateSymbols => _udelegateSymbols;
-		private readonly List<ITypeSymbol> _udelegateSymbols = [];
+		protected override string FieldSpecifierName => "UDelegate";
 	}
 
 	private void GenerateUDelegate(ITypeSymbol udelegateSymbol, GeneratorExecutionContext context)

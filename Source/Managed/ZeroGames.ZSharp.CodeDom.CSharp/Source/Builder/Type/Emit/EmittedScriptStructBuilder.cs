@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class EmittedScriptStructBuilder(string namespaceName, string typeName) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName}")
+public class EmittedScriptStructBuilder(string namespaceName, string typeName, bool implicitBase) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName}")
 {
 	
 	public EmittedPropertyDefinition AddProperty(EMemberVisibility visibility, TypeReference type, string name)
@@ -25,6 +25,26 @@ public class EmittedScriptStructBuilder(string namespaceName, string typeName) :
 	protected override void BuildTypeDefinition(ClassDefinition definition)
 	{
 		base.BuildTypeDefinition(definition);
+
+		if (_implicitBase)
+		{
+			AddBaseTypeBefore("UnrealScriptStructBase");
+		}
+		
+		AddBaseTypeAfter($"ICloneable<{TypeName}>");
+		AddBaseTypeAfter($"IEquatable<{TypeName}>");
+		AddBaseTypeAfter($"System.Numerics.IEqualityOperators<{TypeName}?, {TypeName}?, bool>");
+
+		string systemInterfaceBlock =
+$@"public {TypeName}({TypeName} other) : this() => Copy(other);
+public new {TypeName} Clone() => new(this);
+object ICloneable.Clone() => Clone();
+public bool Equals({TypeName}? other) => ReferenceEquals(this, other) || other is not null && other.GetType() == typeof({TypeName}) && Identical(other);
+public override bool Equals(object? obj) => obj is {TypeName} o && Equals(o);
+public override int32 GetHashCode() => throw new NotSupportedException();
+public static bool operator ==({TypeName}? left, {TypeName}? right) => Equals(left, right);
+public static bool operator !=({TypeName}? left, {TypeName}? right) => !Equals(left, right);";
+		definition.AddMember(new Block(systemInterfaceBlock));
 
 		definition.Modifiers |= EMemberModifiers.Unsafe;
 		
@@ -66,7 +86,8 @@ public class EmittedScriptStructBuilder(string namespaceName, string typeName) :
 	private readonly string _namespaceName = namespaceName;
 	private readonly string _typeName = typeName;
 	private readonly string _unrealFieldPath = $"/Script/{namespaceName.Split('.').Last()}.{typeName}";
-	
+	private readonly bool _implicitBase = implicitBase;
+
 }
 
 

@@ -5,8 +5,6 @@
 using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using ZeroGames.ZSharp.CodeDom.CSharp;
 
@@ -28,33 +26,18 @@ public class UClassGenerator : ISourceGenerator
 			return;
 		}
 		
-		foreach (var uclassSymbol in receiver.UClassSymbols)
+		foreach (var pair in receiver.SymbolMap)
 		{
-			GenerateUClass(uclassSymbol, context);
+			GenerateUClass(pair.Key, context, pair.Value);
 		}
 	}
 	
-	private class UClassSyntaxReceiver : ISyntaxContextReceiver
+	private class UClassSyntaxReceiver : UFieldSyntaxReceiverBase
 	{
-		public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
-		{
-			if (context.Node is ClassDeclarationSyntax { AttributeLists.Count: > 0 } classDeclarationSyntax)
-			{
-				var typeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax) as ITypeSymbol;
-				if (typeSymbol?.GetAttributes().Any(attr => attr.AttributeClass?.ToDisplayString() is "ZeroGames.ZSharp.Emit.Specifier.UClassAttribute") ?? false)
-				{
-					if (!_uclassSymbols.Contains(typeSymbol))
-					{
-						_uclassSymbols.Add(typeSymbol);
-					}
-				}
-			}
-		}
-		public IReadOnlyList<ITypeSymbol> UClassSymbols => _uclassSymbols;
-		private readonly List<ITypeSymbol> _uclassSymbols = [];
+		protected override string FieldSpecifierName => "UClass";
 	}
 
-	private void GenerateUClass(ITypeSymbol uclassSymbol, GeneratorExecutionContext context)
+	private void GenerateUClass(ITypeSymbol uclassSymbol, GeneratorExecutionContext context, bool implicitBase)
 	{
 		INamedTypeSymbol ufunctionSpecifierSymbol = context.Compilation.GetTypeByMetadataName("ZeroGames.ZSharp.Emit.Specifier.UFunctionAttribute")!;
 		INamedTypeSymbol eventBaseSpecifierSymbol = context.Compilation.GetTypeByMetadataName("ZeroGames.ZSharp.Emit.Specifier.EventSpecifierBase")!;
@@ -68,7 +51,7 @@ public class UClassGenerator : ISourceGenerator
 		string className = uclassSymbol.Name;
 		string namespaceName = EmitGeneratorHelper.GetTypeNamespace(uclassSymbol);
 
-		EmittedClassBuilder builder = new(namespaceName, className);
+		EmittedClassBuilder builder = new(namespaceName, className, implicitBase);
 		List<string> usings = new();
 		
 		var methods = uclassSymbol.GetMembers()

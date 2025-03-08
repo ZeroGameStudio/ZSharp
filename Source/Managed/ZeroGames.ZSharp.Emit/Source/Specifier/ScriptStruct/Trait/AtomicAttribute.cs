@@ -2,6 +2,6 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-public class UStructAttribute : StructSpecifierBase;
+public class AtomicAttribute : ScriptStructSpecifierBase;
 
 

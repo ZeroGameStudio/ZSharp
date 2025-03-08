@@ -3,6 +3,6 @@
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
 [AttributeUsage(AttributeTargets.Class)]
-public abstract class StructSpecifierBase : UnrealReflectionSpecifierBase;
+public abstract class ScriptStructSpecifierBase : UnrealReflectionSpecifierBase;
 
 

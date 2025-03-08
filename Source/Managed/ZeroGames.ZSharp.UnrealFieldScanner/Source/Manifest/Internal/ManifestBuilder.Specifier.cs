@@ -69,6 +69,7 @@ partial class ManifestBuilder
 						throw new SpecifierConflictException(specifierType, conflicts, rec.Processor.Method, fieldDef);
 					}
 					
+					// If parameter type doesn't match, let the runtime throw.
 					rec.Processor.DynamicInvoke(processorParameters);
 				}
 			}

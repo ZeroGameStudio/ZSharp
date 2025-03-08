@@ -17,9 +17,9 @@ const ZSharp::FZSharpEnum* ZSharp::FZSharpFieldRegistry::GetEnum(const UEnum* en
 	return pEnm ? pEnm->Get() : nullptr;
 }
 
-const ZSharp::FZSharpStruct* ZSharp::FZSharpFieldRegistry::GetStruct(const UScriptStruct* scriptStruct) const
+const ZSharp::FZSharpScriptStruct* ZSharp::FZSharpFieldRegistry::GetScriptStruct(const UScriptStruct* scriptStruct) const
 {
-	const TUniquePtr<FZSharpStruct>* pStruct = StructRegistry.Find(scriptStruct);
+	const TUniquePtr<FZSharpScriptStruct>* pStruct = ScriptStructRegistry.Find(scriptStruct);
 	return pStruct ? pStruct->Get() : nullptr;
 }
 
@@ -47,10 +47,11 @@ ZSharp::FZSharpEnum& ZSharp::FZSharpFieldRegistry::RegisterEnum(const UEnum* enm
 	return *EnumRegistry.Emplace(enm, zsenm);
 }
 
-ZSharp::FZSharpStruct& ZSharp::FZSharpFieldRegistry::RegisterStruct(const UScriptStruct* scriptStruct)
+ZSharp::FZSharpScriptStruct& ZSharp::FZSharpFieldRegistry::RegisterScriptStruct(const UScriptStruct* scriptStruct)
 {
-	auto zsstruct = new FZSharpStruct { scriptStruct };
-	return *StructRegistry.Emplace(scriptStruct, zsstruct);
+	auto zsstruct = new FZSharpScriptStruct;
+	zsstruct->ScriptStruct = scriptStruct;
+	return *ScriptStructRegistry.Emplace(scriptStruct, zsstruct);
 }
 
 ZSharp::FZSharpDelegate& ZSharp::FZSharpFieldRegistry::RegisterDelegate(const UDelegateFunction* delegate)

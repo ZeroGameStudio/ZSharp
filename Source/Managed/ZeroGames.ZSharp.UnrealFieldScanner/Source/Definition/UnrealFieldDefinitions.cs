@@ -100,8 +100,15 @@ public class UnrealPropertyDefinition : UnrealFieldDefinition, ISimpleUnrealProp
 
 public abstract class UnrealStructDefinition : UnrealFieldDefinition
 {
+	public struct PropertyDefault
+	{
+		public required string PropertyChain { get; set; }
+		public required string Buffer { get; set; }
+	}
+	
 	public string? SuperPath { get; set; }
 	public List<UnrealPropertyDefinition> Properties { get; set; } = [];
+	public List<PropertyDefault> PropertyDefaults { get; set; } = [];
 }
 
 public class UnrealFunctionDefinition : UnrealStructDefinition, IUnrealSignatureDefinition
@@ -153,12 +160,6 @@ public class UnrealInterfaceDefinition : UnrealStructDefinition
 
 public class UnrealClassDefinition : UnrealStructDefinition
 {
-	public struct PropertyDefault
-	{
-		public required string PropertyChain { get; set; }
-		public required string Buffer { get; set; }
-	}
-
 	public struct DefaultSubobject
 	{
 		public required string Name { get; set; }
@@ -183,7 +184,6 @@ public class UnrealClassDefinition : UnrealStructDefinition
 	public EClassCastFlags CastFlags { get; set; }
 	public List<string> ImplementedInterfacePaths { get; set; } = [];
 	public List<UnrealFunctionDefinition> Functions { get; set; } = [];
-	public List<PropertyDefault> PropertyDefaults { get; set; } = [];
 	public List<DefaultSubobject> DefaultSubobjects { get; set; } = [];
 	public List<DefaultSubobjectOverride> DefaultSubobjectOverrides { get; set; } = [];
 	public List<string> FieldNotifies { get; set; } = [];

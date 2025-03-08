@@ -703,6 +703,49 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			EmitFunction(outer, defs[i]);
 		}
 	}
+
+	static void ConstructPropertyDefaults(FZStructDefinition& def, UStruct* strct, FZSharpStruct* zsstrct)
+	{
+		bool allowSubobject = strct->IsA<UClass>();
+		
+		zsstrct->PropertyDefaults.Reserve(def.PropertyDefaults.Num());
+		for (const auto& propertyDefaultDef : def.PropertyDefaults)
+		{
+			FZSharpClass::FPropertyDefault& propertyDefault = zsstrct->PropertyDefaults.Emplace_GetRef();
+
+			// Resolve property chain.
+			TArray<FString> segments;
+			propertyDefaultDef.PropertyChain.ParseIntoArray(segments, TEXT("."));
+			UStruct* cur = strct;
+			for (int32 i = 0; i < segments.Num(); ++i)
+			{
+				// UStruct can't set inner property value of an object property through property default because struct can't own an object.
+				if (!allowSubobject && cur->IsA<UClass>())
+				{
+					checkNoEntry();
+				}
+				
+				auto containerPropertyName = FName { segments[i] };
+				FProperty* containerProperty = cur->FindPropertyByName(containerPropertyName);
+				propertyDefault.PropertyChain.Emplace(containerProperty);
+
+				if (auto objectProp = CastField<const FObjectPropertyBase>(containerProperty))
+				{
+					cur = objectProp->PropertyClass;
+				}
+				else if (auto structProp = CastField<const FStructProperty>(containerProperty))
+				{
+					cur = structProp->Struct;
+				}
+				else
+				{
+					check(i == segments.Num() - 1);
+				}
+			}
+			
+			propertyDefault.Buffer = propertyDefaultDef.Buffer;
+		}
+	}
 }
 
 ZSharp::FZUnrealFieldEmitter& ZSharp::FZUnrealFieldEmitter::Get()
@@ -980,7 +1023,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitStructSkeleton(UPackage* pak, FZScriptStr
 	auto scriptStruct = static_cast<UScriptStruct*>(StaticConstructObject_Internal(params));
 	def.ScriptStruct = scriptStruct;
 
-	FZSharpFieldRegistry::Get().RegisterStruct(scriptStruct);
+	FZSharpFieldRegistry::Get().RegisterScriptStruct(scriptStruct);
 }
 
 void ZSharp::FZUnrealFieldEmitter::EmitDelegateSkeleton(UPackage* pak, FZDelegateDefinition& def) const
@@ -1139,8 +1182,9 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 		}
 	}
 	// Make sure the last property is aligned.
+	FZSharpScriptStruct* zsstrct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
 	scriptStruct->SetPropertiesSize(scriptStruct->GetStructureSize());
-	auto ops = new ZSharpScriptStruct_Private::FZSharpStructOps { def, scriptStruct->GetPropertiesSize(), scriptStruct->GetMinAlignment() };
+	auto ops = new ZSharpScriptStruct_Private::FZSharpStructOps { scriptStruct, zsstrct, scriptStruct->GetPropertiesSize(), scriptStruct->GetMinAlignment() };
 	scriptStruct->DeferCppStructOps(FTopLevelAssetPath { pak->GetFName(), scriptStruct->GetFName() }, ops);
 
 	// Compile script struct.
@@ -1180,7 +1224,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 	ops->Fixup();
 
 	// Compile Z# struct.
-	FZSharpStruct* zsstruct = FZSharpFieldRegistry::Get().GetMutableStruct(scriptStruct);
+	FZSharpScriptStruct* zsstruct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
 	zsstruct->CppStructOps = TUniquePtr<UScriptStruct::ICppStructOps> { ops };
 }
 
@@ -1306,6 +1350,9 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitStruct(UPackage* pak, FZScriptStructD
 	{
 		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | STRUCT_HasInstancedReference);
 	}
+
+	FZSharpScriptStruct* zsstrct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
+	ZUnrealFieldEmitter_Private::ConstructPropertyDefaults(def, scriptStruct, zsstrct);
 }
 
 void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinition& def) const
@@ -1335,39 +1382,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 		defaultSubobject.Property = CastFieldChecked<FObjectPropertyBase>(cls->FindPropertyByName(defaultSubobject.PropertyName));
 	}
 	
-	{ // Construct property defaults.
-		zscls->PropertyDefaults.Reserve(def.PropertyDefaults.Num());
-		for (const auto& propertyDefaultDef : def.PropertyDefaults)
-		{
-			FZSharpClass::FPropertyDefault& propertyDefault = zscls->PropertyDefaults.Emplace_GetRef();
-
-			// Resolve property chain.
-			TArray<FString> segments;
-			propertyDefaultDef.PropertyChain.ParseIntoArray(segments, TEXT("."));
-			UStruct* cur = cls;
-			for (int32 i = 0; i < segments.Num(); ++i)
-			{
-				auto containerPropertyName = FName { segments[i] };
-				FProperty* containerProperty = cur->FindPropertyByName(containerPropertyName);
-				propertyDefault.PropertyChain.Emplace(containerProperty);
-
-				if (auto objectProp = CastField<const FObjectPropertyBase>(containerProperty))
-				{
-					cur = objectProp->PropertyClass;
-				}
-				else if (auto structProp = CastField<const FStructProperty>(containerProperty))
-				{
-					cur = structProp->Struct;
-				}
-				else
-				{
-					check(i == segments.Num() - 1);
-				}
-			}
-			
-			propertyDefault.Buffer = propertyDefaultDef.Buffer;
-		}
-	}
+	ZUnrealFieldEmitter_Private::ConstructPropertyDefaults(def, cls, zscls);
 
 	// Notify registration. Migrate from UObjectLoadAllCompiledInDefaultProperties().
 	NotifyRegistrationEvent(*cls->GetOutermost()->GetName(), *cls->GetName(), ENotifyRegistrationType::NRT_Class, ENotifyRegistrationPhase::NRP_Finished, nullptr, false, cls);

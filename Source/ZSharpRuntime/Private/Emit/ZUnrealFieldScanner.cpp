@@ -15,6 +15,20 @@
 namespace ZSharp::ZUnrealFieldScanner_Private
 {
 	ZSHARP_STEAL_INVOCATION_LIST(GInvocationListMemberPtr)
+
+	static TArray<FZStructDefinition::FPropertyDefault> PropertyDefaultDtos2Defs(TArray<FZStructDefinitionDto_PropertyDefault>&& dtos)
+	{
+		TArray<FZStructDefinition::FPropertyDefault> defs;
+		defs.Reserve(dtos.Num());
+		for (auto& dto : dtos)
+		{
+			FZStructDefinition::FPropertyDefault& propertyDefault = defs.Emplace_GetRef();
+			propertyDefault.PropertyChain = MoveTemp(dto.PropertyChain);
+			propertyDefault.Buffer = MoveTemp(dto.Buffer);
+		}
+
+		return defs;
+	}
 	
 	static TArray<FZPropertyDefinition> PropertyDtos2Defs(TArray<FZPropertyDefinitionDto>&& dtos)
 	{
@@ -112,6 +126,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 				scriptStructDef.TransparentDataMap = MoveTemp(scriptStructDto.TransparentDataMap);
 				scriptStructDef.SuperPath = scriptStructDto.SuperPath;
 				scriptStructDef.Properties = PropertyDtos2Defs(MoveTemp(scriptStructDto.Properties));
+				scriptStructDef.PropertyDefaults = PropertyDefaultDtos2Defs(MoveTemp(scriptStructDto.PropertyDefaults));
 				scriptStructDef.StructFlags = static_cast<EStructFlags>(scriptStructDto.StructFlags);
 			}
 		}
@@ -145,20 +160,13 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 				classDef.TransparentDataMap = MoveTemp(classDto.TransparentDataMap);
 				classDef.SuperPath = classDto.SuperPath;
 				classDef.Properties = PropertyDtos2Defs(MoveTemp(classDto.Properties));
+				classDef.PropertyDefaults = PropertyDefaultDtos2Defs(MoveTemp(classDto.PropertyDefaults));
 				classDef.ConfigName = classDto.ConfigName;
 				classDef.WithinPath = classDto.WithinPath;
 				classDef.ClassFlags = static_cast<EClassFlags>(classDto.ClassFlags);
 				classDef.CastFlags = static_cast<EClassCastFlags>(classDto.CastFlags);
 				classDef.ImplementedInterfacePaths = MoveTemp(classDto.ImplementedInterfacePaths);
 				classDef.Functions = FunctionDtos2Defs(MoveTemp(classDto.Functions));
-
-				classDef.PropertyDefaults.Reserve(classDto.PropertyDefaults.Num());
-				for (auto& propertyDefaultDto : classDto.PropertyDefaults)
-				{
-					FZClassDefinition::FPropertyDefault& propertyDefault = classDef.PropertyDefaults.Emplace_GetRef();
-					propertyDefault.PropertyChain = MoveTemp(propertyDefaultDto.PropertyChain);
-					propertyDefault.Buffer = MoveTemp(propertyDefaultDto.Buffer);
-				}
 
 				classDef.DefaultSubobjects.Reserve(classDto.DefaultSubobjects.Num());
 				for (auto& defaultSubobjectDto : classDto.DefaultSubobjects)

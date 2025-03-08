@@ -2,15 +2,18 @@
 
 #pragma once
 
+#include "ZSharpStruct.inl"
+
 namespace ZSharp::ZSharpScriptStruct_Private
 {
 	// Dynamic ICppStructOps implementation for all Z# script structs.
 	struct FZSharpStructOps final : public UScriptStruct::ICppStructOps
 	{
 		
-		explicit FZSharpStructOps(const FZScriptStructDefinition& def, int32 size, int32 align)
+		explicit FZSharpStructOps(const UScriptStruct* scriptStruct, const FZSharpScriptStruct* zsstrct, int32 size, int32 align)
 			: ICppStructOps(size, align)
-			, ScriptStruct(def.ScriptStruct)
+			, ScriptStruct(scriptStruct)
+			, ZSharpScriptStruct(zsstrct)
 		{
 			Capabilities.HasSerializerObjectReferences = EPropertyObjectReferenceType::Conservative;
 			Capabilities.HasDestructor = true;
@@ -28,24 +31,45 @@ namespace ZSharp::ZSharpScriptStruct_Private
 
 		virtual void Construct(void* dest) override
 		{
-			// Migrate from UScriptStruct::InitializeStruct().
-			for (FProperty* property = ScriptStruct->PropertyLink; property; property = property->PropertyLinkNext)
+			// We have to construct super manually because super may have user defined CppStructOps.
+			if (UStruct* super = ScriptStruct->GetSuperStruct())
 			{
-				property->InitializeValue_InContainer(dest);
+				super->InitializeStruct(dest);
 			}
+			
+			for (TFieldIterator<FProperty> it(ScriptStruct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+			{
+				check(it->ArrayDim == 1);
+				it->InitializeValue_InContainer(dest);
+			}
+
+			ZSharpStruct_Private::SetupPropertyDefaults(ZSharpScriptStruct, dest);
 		}
 
 		virtual void ConstructForTests(void* dest) override { Construct(dest); }
 
 		virtual void Destruct(void* dest) override
 		{
-			// Migrate from UScriptStruct::DestroyStruct().
+			UStruct* super = ScriptStruct->GetSuperStruct();
 			for (FProperty* property = ScriptStruct->DestructorLink; property; property = property->DestructorLinkNext)
 			{
+				// hit super.
+				if (super && property->IsInContainer(super->GetStructureSize()))
+				{
+					break;
+				}
+
+				check(property->ArrayDim == 1);
 				if (!property->HasAnyPropertyFlags(CPF_NoDestructor))
 				{
 					property->DestroyValue_InContainer(dest);
 				}
+			}
+
+			// We have to destruct super manually because super may have user defined CppStructOps.
+			if (super)
+			{
+				super->DestroyStruct(dest);
 			}
 		}
 
@@ -79,6 +103,7 @@ namespace ZSharp::ZSharpScriptStruct_Private
 
 	private:
 		const UScriptStruct* ScriptStruct;
+		const FZSharpScriptStruct* ZSharpScriptStruct;
 		FCapabilities Capabilities{};
 
 	};

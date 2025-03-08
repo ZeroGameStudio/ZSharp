@@ -8,15 +8,12 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, UPropertyAttribute specifier)
 	{
-		if (specifier.Default is {} defaultValue)
+		if (specifier.Default?.ToString() is {} defaultValue && !string.IsNullOrWhiteSpace(defaultValue))
 		{
-			check(def.Outer is UnrealClassDefinition);
-
-			var classDef = (UnrealClassDefinition)def.Outer;
-			classDef.PropertyDefaults.Add(new()
+			def.Outer.PropertyDefaults.Add(new()
 			{
 				PropertyChain = def.Name,
-				Buffer = defaultValue.ToString()!,
+				Buffer = defaultValue,
 			});
 		}
 	}

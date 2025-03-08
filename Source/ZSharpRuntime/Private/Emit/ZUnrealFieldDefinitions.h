@@ -78,8 +78,15 @@ namespace ZSharp
 
 	struct FZStructDefinition : public FZFieldDefinition
 	{
+		struct FPropertyDefault
+		{
+			FString PropertyChain;
+			FString Buffer;
+		};
+		
 		FName SuperPath;
 		TArray<FZPropertyDefinition> Properties;
+		TArray<FPropertyDefault> PropertyDefaults;
 	};
 
 	struct FZFunctionDefinition : public FZStructDefinition
@@ -135,12 +142,6 @@ namespace ZSharp
 
 	struct FZClassDefinition : public FZStructDefinition
 	{
-		struct FPropertyDefault
-		{
-			FString PropertyChain;
-			FString Buffer;
-		};
-
 		struct FDefaultSubobject
 		{
 			FName Name;
@@ -172,8 +173,7 @@ namespace ZSharp
 		TArray<FName> ImplementedInterfacePaths;
 		
 		TArray<FZFunctionDefinition> Functions;
-
-		TArray<FPropertyDefault> PropertyDefaults;
+		
 		TArray<FDefaultSubobject> DefaultSubobjects;
 		TArray<FDefaultSubobjectOverride> DefaultSubobjectOverrides;
 		

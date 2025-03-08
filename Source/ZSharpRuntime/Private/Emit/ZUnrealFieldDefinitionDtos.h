@@ -85,6 +85,18 @@ struct FZPropertyDefinitionDto : public FZFieldDefinitionDto
 };
 
 USTRUCT(meta = (ZSharpNoExport))
+struct FZStructDefinitionDto_PropertyDefault
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString PropertyChain;
+
+	UPROPERTY()
+	FString Buffer;
+};
+
+USTRUCT(meta = (ZSharpNoExport))
 struct FZStructDefinitionDto : public FZFieldDefinitionDto
 {
 	GENERATED_BODY()
@@ -94,6 +106,9 @@ struct FZStructDefinitionDto : public FZFieldDefinitionDto
 
 	UPROPERTY()
 	TArray<FZPropertyDefinitionDto> Properties;
+
+	UPROPERTY()
+	TArray<FZStructDefinitionDto_PropertyDefault> PropertyDefaults;
 };
 
 USTRUCT(meta = (ZSharpNoExport))
@@ -154,18 +169,6 @@ struct FZScriptStructDefinitionDto : public FZStructDefinitionDto
 	
 	UPROPERTY()
 	int32 StructFlags = 0;
-};
-
-USTRUCT(meta = (ZSharpNoExport))
-struct FZClassDefinitionDto_PropertyDefault
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString PropertyChain;
-
-	UPROPERTY()
-	FString Buffer;
 };
 
 USTRUCT(meta = (ZSharpNoExport))
@@ -252,9 +255,6 @@ struct FZClassDefinitionDto : public FZStructDefinitionDto
 
 	UPROPERTY()
 	TArray<FZFunctionDefinitionDto> Functions;
-
-	UPROPERTY()
-	TArray<FZClassDefinitionDto_PropertyDefault> PropertyDefaults;
 
 	UPROPERTY()
 	TArray<FZClassDefinitionDto_DefaultSubobject> DefaultSubobjects;

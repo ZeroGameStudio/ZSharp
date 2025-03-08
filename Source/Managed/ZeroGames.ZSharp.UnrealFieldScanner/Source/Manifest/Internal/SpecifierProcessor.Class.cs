@@ -228,16 +228,6 @@ partial class SpecifierProcessor
 	}
 	
 	[SpecifierProcessor]
-	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, PropertyDefaultOverrideAttribute specifier)
-	{
-		def.PropertyDefaults.Add(new()
-		{
-			PropertyChain = specifier.Property,
-			Buffer = specifier.Default.ToString()!,
-		});
-	}
-	
-	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, DefaultSubobjectClassOverrideAttribute specifier)
 	{
 		def.DefaultSubobjectOverrides.Add(new()

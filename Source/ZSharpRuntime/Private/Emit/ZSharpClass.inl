@@ -1,12 +1,15 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 #pragma once
+
 #include "ZSharpClassInstanceRegistry.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ALC/ZRedFrameScope.h"
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "ZCall/ZCallBuffer.h"
+
+#include "ZSharpStruct.inl"
 
 namespace ZSharp::ZSharpClass_Private
 {
@@ -107,31 +110,7 @@ namespace ZSharp::ZSharpClass_Private
 				}
 			}
 
-			{ // Setup property defaults
-				for (const auto& propertyDefault : zscls->PropertyDefaults)
-				{
-					void* propertyAddr = obj;
-					FProperty* tailProperty = propertyDefault.PropertyChain[propertyDefault.PropertyChain.Num() - 1];
-					// Follow the container chain to resolve the actual container.
-					for (const auto& prop : propertyDefault.PropertyChain)
-					{
-						if (prop->IsA<FStructProperty>() || prop == tailProperty)
-						{
-							propertyAddr = prop->ContainerPtrToValuePtr<void>(propertyAddr);
-						}
-						else if (auto objectProp = CastField<const FObjectPropertyBase>(prop))
-						{
-							propertyAddr = objectProp->GetObjectPropertyValue_InContainer(propertyAddr);
-						}
-						else
-						{
-							checkNoEntry();
-						}
-					}
-					
-					ensure(tailProperty->ImportText_Direct(*propertyDefault.Buffer, propertyAddr, nullptr, PPF_None));
-				}
-			}
+			ZSharpStruct_Private::SetupPropertyDefaults(zscls, obj);
 
 			{ // Call managed red constructor and UClass constructor.
 				IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();

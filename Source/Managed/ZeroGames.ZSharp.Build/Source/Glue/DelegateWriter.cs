@@ -11,7 +11,7 @@ public class DelegateWriter
 	public DelegateWriter(ExportedAssemblyRegistry registry, ExportedDelegate exportedDelegate, string directory, string fileName)
 	{
 		_exportedDelegate = exportedDelegate;
-		_filePath = $"{directory}/{fileName}.g.cs";
+		_filePath = $"{directory}/{fileName}.cs";
 	}
 
 	public void Write()

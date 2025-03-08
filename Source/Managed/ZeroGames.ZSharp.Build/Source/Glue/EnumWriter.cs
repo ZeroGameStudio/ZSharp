@@ -11,7 +11,7 @@ public class EnumWriter
 	public EnumWriter(ExportedAssemblyRegistry registry, ExportedEnum exportedEnum, string directory, string fileName)
 	{
 		_exportedEnum = exportedEnum;
-		_filePath = $"{directory}/{fileName}.g.cs";
+		_filePath = $"{directory}/{fileName}.cs";
 	}
 
 	public void Write()

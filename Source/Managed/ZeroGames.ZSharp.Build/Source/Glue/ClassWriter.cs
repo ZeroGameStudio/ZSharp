@@ -11,8 +11,8 @@ public class ClassWriter
 	public ClassWriter(ExportedAssemblyRegistry registry, ExportedClass exportedClass, string directory, string fileName)
 	{
 		_exportedClass = exportedClass;
-		_abstractionFilePath = $"{directory}/{fileName}.Abstraction.g.cs";
-		_implementationFilePath = $"{directory}/{fileName}.Implementation.g.cs";
+		_abstractionFilePath = $"{directory}/{fileName}.d.cs";
+		_implementationFilePath = $"{directory}/{fileName}.cs";
 	}
 
 	public void Write()

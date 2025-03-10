@@ -26,7 +26,8 @@ namespace ZSharp
 	{
 		const UScriptStruct* ScriptStruct = nullptr;
 
-		TUniquePtr<UScriptStruct::ICppStructOps> CppStructOps;
+		// The engine will destruct this. (@see: GetDeferredCppStructOps())
+		UScriptStruct::ICppStructOps* CppStructOps;
 	};
 
 	struct ZSHARPRUNTIME_API FZSharpDelegate

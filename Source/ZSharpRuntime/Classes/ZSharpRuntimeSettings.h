@@ -5,6 +5,31 @@
 #include "Engine/DeveloperSettings.h"
 #include "ZSharpRuntimeSettings.generated.h"
 
+UENUM(meta = (ZSharpNoExport))
+enum class EZEmitVirtualModuleLoadingPhase : uint8
+{
+	EarliestPossible,
+	PostEngineInit,
+	BeforeModule,
+	AfterModule,
+};
+
+USTRUCT(meta = (ZSharpNoExport))
+struct FZEmitVirtualModule
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FString ModuleName;
+
+	UPROPERTY(EditAnywhere)
+	EZEmitVirtualModuleLoadingPhase LoadingPhase;
+
+	UPROPERTY(EditAnywhere, meta = (EditCondition = "LoadingPhase > EZEmitVirtualModuleLoadingPhase::PostEngineInit", EditConditionHides))
+	FString TargetModule;
+	
+};
+
 USTRUCT(meta = (ZSharpNoExport))
 struct FZModuleEmitMetadataSource
 {
@@ -26,7 +51,8 @@ public:
 	virtual FName GetCategoryName() const override { return TEXT("ZSharp"); }
 	
 public:
-	int32 GetModuleEmitMetadataSource(const FString& moduleName, TArray<FZModuleEmitMetadataSource>& result) const;
+	void ForEachEmitVirtualModule(TFunctionRef<void(const FZEmitVirtualModule&)> action) const;
+	int32 GetModuleEmitMetadataSources(const FString& moduleName, TArray<FZModuleEmitMetadataSource>& result) const;
 
 #if WITH_EDITOR
 private:
@@ -45,6 +71,9 @@ private:
 	void InvalidateCache();
 
 private:
+	UPROPERTY(Config, EditAnywhere, Category = "Emit", meta = (ConfigRestartRequired = true))
+	TArray<FZEmitVirtualModule> EmitVirtualModules;
+	
 	UPROPERTY(Config, EditAnywhere, Category = "Emit", meta = (ConfigRestartRequired = true))
 	TArray<FZModuleEmitMetadataSource> ModuleEmitMetadataSources;
 

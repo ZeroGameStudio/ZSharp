@@ -133,9 +133,8 @@ internal sealed partial class ModelRegistry : IModelRegistry
 	{
 		string typeFullName = typeDef.FullName;
 		string[] names = typeFullName.Split('.');
-		// Valid class path name of unreal field requires AssemblyName.ModuleName.FieldName
-		// so name with less than 3 segments must be invalid.
-		if (names.Length < 3)
+		// Type without namespace is invalid.
+		if (names.Length < 2)
 		{
 			return;
 		}
@@ -147,8 +146,9 @@ internal sealed partial class ModelRegistry : IModelRegistry
 		}
 		
 		// AssemblyName mismatch.
-		string assemblyNameToTest = string.Join('.', names.Take(names.Length - 2));
-		if (assemblyNameToTest != RootAssemblyName)
+		string maybeAssemblyName1 = string.Join('.', names.Take(names.Length - 2)); // AssemblyName.ModuleName.FieldName
+		string maybeAssemblyName2 =string.Join('.', names.Take(names.Length - 1)); // AssemblyName.FieldName treats last segment of AssemblyName as ModuleName
+		if (maybeAssemblyName1 != RootAssemblyName && maybeAssemblyName2 != RootAssemblyName)
 		{
 			return;
 		}

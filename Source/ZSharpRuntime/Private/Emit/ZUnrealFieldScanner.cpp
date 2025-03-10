@@ -4,7 +4,6 @@
 
 #include "JsonObjectConverter.h"
 #include "ZSharpRuntimeLogChannels.h"
-#include "ZSharpRuntimeSettings.h"
 #include "Misc/ZStealInvocationList.h"
 #include "ZUnrealFieldDefinitionDtos.h"
 #include "ALC/IZDefaultAssemblyLoadContext.h"
@@ -220,6 +219,7 @@ ZSharp::FZUnrealFieldScanner& ZSharp::FZUnrealFieldScanner::Get()
 
 void ZSharp::FZUnrealFieldScanner::Startup()
 {
+	// Queue up existing modules.
 	TArray<FModuleStatus> moduleStatuses;
 	FModuleManager::Get().QueryModules(moduleStatuses);
 	for (const auto& status : moduleStatuses)
@@ -231,9 +231,26 @@ void ZSharp::FZUnrealFieldScanner::Startup()
 		}
 	}
 
-	// Since 5.5, ProcessNewlyLoadedUObjects() binds to FModuleManager::ProcessLoadedObjectsCallback super early.
-	// And because multicast delegate invokes inner delegates reversely,
-	// we have to use this magic to ensure that ScanUnrealFieldsForModule() executes after ProcessNewlyLoadedUObjects().
+	// Queue up post engine init virtual modules.
+	PostEngineInitDelegate = FCoreDelegates::OnPostEngineInit.AddLambda([this]
+	{
+		check(VirtualModuleLookup);
+		TArray<const FZEmitVirtualModule*> postEngineInitVirtualModules;
+		VirtualModuleLookup->MultiFindPointer(EZEmitVirtualModuleLoadingPhase::PostEngineInit, postEngineInitVirtualModules, true);
+		for (const auto& module : postEngineInitVirtualModules)
+		{
+			ScanUnrealFieldsForModule(FName { module->ModuleName }, true);
+		}
+	});
+
+	/*
+	 * !!!!!!!!!!!!!!!!!!!!! LOW LEVEL HACK !!!!!!!!!!!!!!!!!!!!!
+	 * 
+	 * BECAUSE MULTICAST DELEGATE INVOKES INNER DELEGATES REVERSELY,
+	 * WE HAVE TO USE THIS MAGIC TO ENSURE THAT ScanUnrealFieldsForModule() EXECUTES AFTER ProcessNewlyLoadedUObjects().
+	 * 
+	 * !!!!!!!!!!!!!!!!!!!!! LOW LEVEL HACK !!!!!!!!!!!!!!!!!!!!!
+	 */ 
 	auto& delegate = FModuleManager::Get().OnProcessLoadedObjectsCallback();
 	ProcessLoadedObjectsDelegate = delegate.AddRaw(this, &FZUnrealFieldScanner::ScanUnrealFieldsForModule);
 	auto& invocationList = delegate.*ZUnrealFieldScanner_Private::GInvocationListMemberPtr;
@@ -248,6 +265,33 @@ void ZSharp::FZUnrealFieldScanner::Startup()
 void ZSharp::FZUnrealFieldScanner::Shutdown()
 {
 	FModuleManager::Get().OnProcessLoadedObjectsCallback().Remove(ProcessLoadedObjectsDelegate);
+	FCoreDelegates::OnPostEngineInit.Remove(PostEngineInitDelegate);
+}
+
+void ZSharp::FZUnrealFieldScanner::ProcessVirtualModules()
+{
+	if (VirtualModuleLookup)
+	{
+		return;
+	}
+
+	VirtualModuleLookup = TMultiMap<EZEmitVirtualModuleLoadingPhase, FZEmitVirtualModule>{};
+	GetDefault<UZSharpRuntimeSettings>()->ForEachEmitVirtualModule([this](const FZEmitVirtualModule& module)
+	{
+		VirtualModuleLookup->Emplace(module.LoadingPhase, module);
+		if (module.LoadingPhase > EZEmitVirtualModuleLoadingPhase::PostEngineInit && ensureAlways(module.ModuleName != module.TargetModule))
+		{
+			VirtualModuleTargetLookup.Emplace(FName { module.TargetModule }, module);
+		}
+	});
+
+	TArray<const FZEmitVirtualModule*> earliestPossibleVirtualModules;
+	VirtualModuleLookup->MultiFindPointer(EZEmitVirtualModuleLoadingPhase::EarliestPossible, earliestPossibleVirtualModules, true);
+	for (const auto& module : earliestPossibleVirtualModules)
+	{
+		UE_LOG(LogZSharpEmit, Log, TEXT("[UnrealFieldScanner] Defer scan virtual module [%s]."), *module->ModuleName);
+		ScanUnrealFieldsForModule(FName { module->ModuleName }, false);
+	}
 }
 
 void ZSharp::FZUnrealFieldScanner::FlushDeferredModules()
@@ -295,10 +339,34 @@ void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, b
 		return;
 	}
 
+	ProcessVirtualModules(); // Process virtual modules here because we need UZSharpRuntimeSettings CDO.
+
+	TArray<const FZEmitVirtualModule*> relevantVirtualModules;
+	VirtualModuleTargetLookup.MultiFindPointer(moduleName, relevantVirtualModules, true);
+
+	for (const auto& module : relevantVirtualModules)
+	{
+		if (module->LoadingPhase == EZEmitVirtualModuleLoadingPhase::BeforeModule)
+		{
+			ScanUnrealFieldsForModule(FName { module->ModuleName }, true);
+		}
+	}
+
+	ON_SCOPE_EXIT
+	{
+		for (const auto& module : relevantVirtualModules)
+		{
+			if (module->LoadingPhase == EZEmitVirtualModuleLoadingPhase::AfterModule)
+			{
+				ScanUnrealFieldsForModule(FName { module->ModuleName }, true);
+			}
+		}
+	};
+	
 	FlushDeferredModules();
 
 	TArray<FZModuleEmitMetadataSource> sources;
-	if (!GetDefault<UZSharpRuntimeSettings>()->GetModuleEmitMetadataSource(moduleName.ToString(), sources))
+	if (!GetDefault<UZSharpRuntimeSettings>()->GetModuleEmitMetadataSources(moduleName.ToString(), sources))
 	{
 		UE_LOG(LogZSharpEmit, Verbose, TEXT("[UnrealFieldScanner] Skip unmapped module [%s]."), *moduleName.ToString());
 		return;

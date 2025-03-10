@@ -1225,7 +1225,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 
 	// Compile Z# struct.
 	FZSharpScriptStruct* zsstruct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
-	zsstruct->CppStructOps = TUniquePtr<UScriptStruct::ICppStructOps> { ops };
+	zsstruct->CppStructOps = ops;
 }
 
 void ZSharp::FZUnrealFieldEmitter::FinishEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const

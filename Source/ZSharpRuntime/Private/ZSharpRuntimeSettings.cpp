@@ -2,7 +2,15 @@
 
 #include "ZSharpRuntimeSettings.h"
 
-int32 UZSharpRuntimeSettings::GetModuleEmitMetadataSource(const FString& moduleName, TArray<FZModuleEmitMetadataSource>& result) const
+void UZSharpRuntimeSettings::ForEachEmitVirtualModule(TFunctionRef<void(const FZEmitVirtualModule&)> action) const
+{
+	for (const auto& module : EmitVirtualModules)
+	{
+		action(module);
+	}
+}
+
+int32 UZSharpRuntimeSettings::GetModuleEmitMetadataSources(const FString& moduleName, TArray<FZModuleEmitMetadataSource>& result) const
 {
 	result.Reset();
 	ModuleEmitMetadataSourceLookup.MultiFind(FName { moduleName }, result, true);
@@ -21,6 +29,11 @@ TArray<FString> UZSharpRuntimeSettings::GetModuleOptions()
 	for (const auto& status : statuses)
 	{
 		moduleNames.Emplace(status.Name);
+	}
+
+	for (const auto& module : GetDefault<ThisClass>()->EmitVirtualModules)
+	{
+		moduleNames.Emplace(module.ModuleName);
 	}
 
 	moduleNames.StableSort();

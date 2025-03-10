@@ -376,7 +376,7 @@ void ZSharp::FZUnrealFieldScanner::ScanUnrealFieldsForModule(FName moduleName, b
 
 	for (const auto& source : sources)
 	{
-		const FString assembly = source.AssemblyName;
+		const FString assembly = source.AssemblyName.IsEmpty() ? source.ModuleName : source.AssemblyName;
 		const FString moduleNameStr = source.ModuleName;
 		FString manifest;
 		struct

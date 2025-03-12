@@ -347,6 +347,8 @@ class FZSharpRuntimeModule : public IZSharpRuntimeModule
 	void HandlePreMasterAlcStartup(ZSharp::IZMasterAssemblyLoadContext* alc);
 	void HandleMasterAlcStartup(ZSharp::IZMasterAssemblyLoadContext* alc);
 
+	void EarlyShutdown();
+
 #if WITH_EDITOR
 	void HandleBeginPIE(const bool simulating);
 	void HandleEndPIE(const bool simulating);
@@ -366,6 +368,8 @@ void FZSharpRuntimeModule::StartupModule()
 
 	ZSharp::IZSharpClr::Get().PreMasterAlcStartup().AddRaw(this, &ThisClass::HandlePreMasterAlcStartup);
 	ZSharp::IZSharpClr::Get().OnMasterAlcStartup().AddRaw(this, &ThisClass::HandleMasterAlcStartup);
+
+	FCoreDelegates::OnPreExit.AddRaw(this, &ThisClass::EarlyShutdown);
 	
 	ZSharp::FZUnrealFieldScanner::Get().Startup();
 
@@ -384,12 +388,7 @@ void FZSharpRuntimeModule::ShutdownModule()
 	FEditorDelegates::EndPIE.RemoveAll(this);
 #endif
 
-	ZSharp::ZSharpRuntimeModule_Private::UnloadMasterAlc();
-
-	ZSharp::FZUnrealFieldScanner::Get().Shutdown();
-	
-	ZSharp::IZSharpClr::Get().PreMasterAlcStartup().RemoveAll(this);
-	ZSharp::IZSharpClr::Get().OnMasterAlcStartup().RemoveAll(this);
+	FCoreDelegates::OnPreExit.RemoveAll(this);
 }
 
 #if DO_CHECK
@@ -697,6 +696,17 @@ void FZSharpRuntimeModule::HandleMasterAlcStartup(ZSharp::IZMasterAssemblyLoadCo
 			UE_LOG(LogZSharpRuntime, Fatal, TEXT("Master ALC startup assembly [%s] load failed with error code [%d]"), *assemblyName, err);
 		}
 	}
+}
+
+void FZSharpRuntimeModule::EarlyShutdown()
+{
+	// Some conjugates rely on UObject system to destruct, so we must do this before UObject system shuts down.
+	ZSharp::ZSharpRuntimeModule_Private::UnloadMasterAlc();
+
+	ZSharp::FZUnrealFieldScanner::Get().Shutdown();
+	
+	ZSharp::IZSharpClr::Get().PreMasterAlcStartup().RemoveAll(this);
+	ZSharp::IZSharpClr::Get().OnMasterAlcStartup().RemoveAll(this);
 }
 
 #if WITH_EDITOR

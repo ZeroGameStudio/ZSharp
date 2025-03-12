@@ -10,6 +10,7 @@
 #include "Reflection/ZReflectionHelper.h"
 
 // IMPORTANT: We need this to get value of ZSHARP_ENABLE_CONJUGATE_UNSAFE.
+#include "ALC/ZRedFrameScope.h"
 #include "Conjugate/ZConjugateRegistryBase.h"
 
 ZSHARP_DECLARE_CONJUGATE_REGISTRY(FZConjugateRegistry_UObject)
@@ -61,6 +62,9 @@ ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UObject::Conjugate(const U
 	{
 		return {};
 	}
+
+	// Emitted class may have user defined red constructor.
+	FZRedFrameScope scope;
 
 	const FZRuntimeTypeHandle type = GetManagedType(unmanagedObject);
 	if (Alc.BuildConjugate(unmanagedObject, type))

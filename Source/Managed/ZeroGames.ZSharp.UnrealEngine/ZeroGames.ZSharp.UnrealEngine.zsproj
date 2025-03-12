@@ -1,6 +1,5 @@
 {
 	"Folder": "ZSharp/Engine",
-	"HasGlue": true,
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
 	"AssemblyVersion": "1.0.0",
@@ -12,14 +11,15 @@
 		"ZeroGames.ZSharp.Core.UnrealEngine",
 		"ZeroGames.ZSharp.Core.Async"
 	],
-	"Usings":
+	"PublicUsings":
 	[
-		"ZeroGames.ZSharp.Core",
-		"ZeroGames.ZSharp.Core.UnrealEngine",
-		"ZeroGames.ZSharp.Core.Async",
 		"ZeroGames.ZSharp.UnrealEngine",
 		"ZeroGames.ZSharp.UnrealEngine.CoreUObject",
 		"ZeroGames.ZSharp.UnrealEngine.Engine"
+	],
+	"PublicStaticUsings":
+	[
+		"ZeroGames.ZSharp.UnrealEngine.CoreUObject.UnrealObjectGlobals"
 	]
 }
 

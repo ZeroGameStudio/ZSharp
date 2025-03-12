@@ -1,17 +1,12 @@
 {
-	"IsCore": true,
 	"Folder": "ZSharp/Core",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
 	"AssemblyVersion": "1.0.0",
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
+	"PrecompiledType": "Core",
 	"ProjectReferences":
-	[
-		"ZeroGames.ZSharp.Core",
-		"ZeroGames.ZSharp.Core.UnrealEngine"
-	],
-	"Usings":
 	[
 		"ZeroGames.ZSharp.Core",
 		"ZeroGames.ZSharp.Core.UnrealEngine"

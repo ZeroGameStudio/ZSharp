@@ -1,11 +1,11 @@
 {
-	"IsDeferredShared": true,
 	"Folder": "ZSharp/Engine",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
 	"AssemblyVersion": "1.0.0",
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
+	"PrecompiledType": "DeferredShared",
 	"ProjectReferences":
 	[
 		"ZeroGames.ZSharp.Core",
@@ -14,14 +14,10 @@
 	],
 	"ExternalReferences":
 	[
-		"../../../Precompiled/ForwardShared/Mono.Cecil.dll"
-	],
-	"Usings":
-	[
-		"ZeroGames.ZSharp.Core",
-		"ZeroGames.ZSharp.Core.UnrealEngine",
-		"ZeroGames.ZSharp.Core.UnrealEngine.Specifier",
-		"ZeroGames.ZSharp.Emit.Specifier"
+		{
+			"Name": "Mono.Cecil",
+			"Path": "$(ZSharpPluginDir)/Precompiled/ForwardShared/Mono.Cecil.dll"
+		}
 	]
 }
 

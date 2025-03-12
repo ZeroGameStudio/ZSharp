@@ -1,11 +1,11 @@
 {
-	"IsCore": true,
 	"Folder": "ZSharp/Core",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
 	"AssemblyVersion": "1.0.0",
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
+	"PrecompiledType": "Core",
 	"ProjectReferences":
 	[
 		"ZeroGames.ZSharp.Core",
@@ -13,14 +13,16 @@
 	],
 	"ExternalReferences":
 	[
-		"../../../Precompiled/ForwardShared/ZeroGames.Pooling.dll"
+		{
+			"Name": "ZeroGames.Pooling",
+			"Path": "$(ZSharpPluginDir)/Precompiled/ForwardShared/ZeroGames.Pooling.dll"
+		}
 	],
-	"Usings":
+	"PublicUsings":
 	[
-		"ZeroGames.ZSharp.Core",
-		"ZeroGames.ZSharp.Core.UnrealEngine"
+		"ZeroGames.ZSharp.Core.Async"
 	],
-	"StaticUsings":
+	"PrivateStaticUsings":
 	[
 		"ZeroGames.ZSharp.Core.Async.AsyncLogChannels"
 	]

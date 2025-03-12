@@ -1,20 +1,19 @@
 {
-	"IsDeferredShared": true,
 	"Folder": "ZSharp/Engine",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
 	"AssemblyVersion": "1.0.0",
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
+	"PrecompiledType": "DeferredShared",
 	"ProjectReferences":
 	[
 		"ZeroGames.ZSharp.Core",
 		"ZeroGames.ZSharp.Core.UnrealEngine"
 	],
-	"Usings":
+	"PublicUsings":
 	[
-		"ZeroGames.ZSharp.Core",
-		"ZeroGames.ZSharp.Core.UnrealEngine",
+		"ZeroGames.ZSharp.Emit.Specifier",
 		"ZeroGames.ZSharp.Core.UnrealEngine.Specifier"
 	]
 }

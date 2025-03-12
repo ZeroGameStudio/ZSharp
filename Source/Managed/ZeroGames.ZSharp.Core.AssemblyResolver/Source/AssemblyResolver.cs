@@ -27,6 +27,14 @@ internal class AssemblyResolver : IAssemblyResolver
 		return path;
 	}
 
+	static AssemblyResolver()
+	{
+		if (UnrealBuild.WithEditor)
+		{
+			_sharedDirs.Add("Editor");
+		}
+	}
+
 	private bool TryGetDllPath(string baseDir, string assemblyName, [NotNullWhen(true)] out string? result)
 	{
 		result = null;

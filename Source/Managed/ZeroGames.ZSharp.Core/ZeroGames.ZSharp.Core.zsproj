@@ -1,14 +1,21 @@
 {
-	"IsCore": true,
 	"Folder": "ZSharp/Core",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
 	"AssemblyVersion": "1.0.0",
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
+	"PrecompiledType": "Core",
 	"ExternalReferences":
 	[
-		"../../../Precompiled/ForwardShared/Mono.Cecil.dll"
+		{
+			"Name": "Mono.Cecil",
+			"Path": "$(ZSharpPluginDir)/Precompiled/ForwardShared/Mono.Cecil.dll"
+		}
+	],
+	"PublicUsings":
+	[
+		"ZeroGames.ZSharp.Core"
 	]
 }
 

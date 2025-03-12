@@ -1,14 +1,28 @@
 {
-	"IsRoslynComponent": true,
+	"TargetFramework": "netstandard2.0",
 	"Folder": "ZSharp/Analyzer",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
 	"AssemblyVersion": "1.0.0",
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
+	"OutputType": "Analyzer",
 	"ProjectReferences":
 	[
 		"ZeroGames.ZSharp.CodeDom.CSharp"
+	],
+	"PackageReferences":
+	[
+		{
+			"Name": "Microsoft.CodeAnalysis.CSharp",
+			"Version": "4.11.0",
+			"IsPrivate": true
+		},
+		{
+			"Name": "Microsoft.CodeAnalysis.Analyzers",
+			"Version": "3.11.0",
+			"IsPrivate": true
+		}
 	]
 }
 

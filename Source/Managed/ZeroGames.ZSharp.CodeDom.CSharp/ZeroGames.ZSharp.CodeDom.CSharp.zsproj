@@ -1,12 +1,13 @@
 {
 	"TargetFramework": "netstandard2.0",
-	"IsPrecompiled": true,
 	"Folder": "ZSharp/Program",
 	"Authors": "Lin7Han",
 	"Company": "ZeroGames",
 	"AssemblyVersion": "1.0.0",
 	"FileVersion": "1.0.0",
-	"NeutralLanguage": "zh"
+	"NeutralLanguage": "zh",
+	"OutputType": "Editor",
+	"PrecompiledType": "Normal"
 }
 
 

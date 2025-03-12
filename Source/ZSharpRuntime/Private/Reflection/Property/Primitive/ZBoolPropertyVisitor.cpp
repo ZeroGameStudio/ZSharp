@@ -11,7 +11,7 @@ void ZSharp::FZBoolPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& 
 
 void ZSharp::FZBoolPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& src) const
 {
-	const bool value = src.ReadBool();
+	uint8 value = src.ReadBool() ? 0xFF & UnderlyingBoolProperty->GetFieldMask() : 0;
 	UnderlyingProperty->CopySingleValue(dest, &value);
 }
 

@@ -19,7 +19,7 @@ public class ProjectFileWriter
 	{
 		XDocument doc = XmlHelper.MakeDocument();
 		XElement root = new("Project");
-		root.SetAttributeValue("Sdk", "ZeroGames.ZSharp.Sdk/1.0.0-beta.1");
+		root.SetAttributeValue("Sdk", "ZeroGames.ZSharp.Sdk/1.0.0-beta.3");
 		doc.Add(root);
 		
 		OverrideDotNetProperties(root);

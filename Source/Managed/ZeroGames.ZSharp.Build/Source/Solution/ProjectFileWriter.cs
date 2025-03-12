@@ -73,12 +73,31 @@ public class ProjectFileWriter
 		{
 			propertyGroupElement.Add(new XElement("WarningsAsErrors", $"$(WarningsAsErrors);{string.Join(';', _project.WarningsAsErrors)}"));
 		}
+
+		if (!string.IsNullOrWhiteSpace(_project.Authors))
+		{
+			propertyGroupElement.Add(new XElement("Authors", _project.Authors));
+		}
+
+		if (!string.IsNullOrWhiteSpace(_project.Company))
+		{
+			propertyGroupElement.Add(new XElement("Company", _project.Company));
+		}
 		
-		propertyGroupElement.Add(new XElement("Authors", _project.Authors));
-		propertyGroupElement.Add(new XElement("Company", _project.Company));
-		propertyGroupElement.Add(new XElement("AssemblyVersion", _project.AssemblyVersion));
-		propertyGroupElement.Add(new XElement("FileVersion", _project.FileVersion));
-		propertyGroupElement.Add(new XElement("NeutralLanguage", _project.NeutralLanguage));
+		if (!string.IsNullOrWhiteSpace(_project.AssemblyVersion))
+		{
+			propertyGroupElement.Add(new XElement("AssemblyVersion", _project.AssemblyVersion));
+		}
+		
+		if (!string.IsNullOrWhiteSpace(_project.FileVersion))
+		{
+			propertyGroupElement.Add(new XElement("FileVersion", _project.FileVersion));
+		}
+		
+		if (!string.IsNullOrWhiteSpace(_project.NeutralLanguage))
+		{
+			propertyGroupElement.Add(new XElement("NeutralLanguage", _project.NeutralLanguage));
+		}
 		
 		root.Add(propertyGroupElement);
 	}

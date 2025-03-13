@@ -18,12 +18,12 @@
 		{
 			"Name": "ZSharpCore",
 			"Type": "Runtime",
-			"LoadingPhase": "EarliestPossible"
+			"LoadingPhase": "PostConfigInit"
 		},
 		{
 			"Name": "ZSharpRuntime",
 			"Type": "Runtime",
-			"LoadingPhase": "EarliestPossible"
+			"LoadingPhase": "PostConfigInit"
 		},
 		{
 			"Name": "ZSharpExport",

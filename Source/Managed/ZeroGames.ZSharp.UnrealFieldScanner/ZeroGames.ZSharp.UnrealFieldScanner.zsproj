@@ -5,7 +5,7 @@
 	"AssemblyVersion": "1.0.0",
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
-	"PrecompiledType": "DeferredShared",
+	"OutputPath": "$(ZSharpPluginDir)/Managed/DeferredShared",
 	"ProjectReferences":
 	[
 		"ZeroGames.ZSharp.Core",
@@ -16,7 +16,7 @@
 	[
 		{
 			"Name": "Mono.Cecil",
-			"Path": "$(ZSharpPluginDir)/Precompiled/ForwardShared/Mono.Cecil.dll"
+			"Path": "$(ZSharpPluginDir)/Managed/ForwardShared/Mono.Cecil.dll"
 		}
 	]
 }

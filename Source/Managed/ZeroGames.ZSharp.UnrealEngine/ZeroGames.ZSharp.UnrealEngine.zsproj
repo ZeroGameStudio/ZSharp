@@ -5,6 +5,7 @@
 	"AssemblyVersion": "1.0.0",
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
+	"OutputPath": "$(UnrealProjectDir)/Managed",
 	"ProjectReferences":
 	[
 		"ZeroGames.ZSharp.Core",

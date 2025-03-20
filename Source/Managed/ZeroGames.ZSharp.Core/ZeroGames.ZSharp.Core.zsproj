@@ -5,12 +5,12 @@
 	"AssemblyVersion": "1.0.0",
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
-	"PrecompiledType": "Core",
+	"OutputPath": "$(ZSharpPluginDir)/Managed/Core",
 	"ExternalReferences":
 	[
 		{
 			"Name": "Mono.Cecil",
-			"Path": "$(ZSharpPluginDir)/Precompiled/ForwardShared/Mono.Cecil.dll"
+			"Path": "$(ZSharpPluginDir)/Managed/ForwardShared/Mono.Cecil.dll"
 		}
 	],
 	"PublicUsings":

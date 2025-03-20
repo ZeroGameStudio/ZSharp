@@ -5,7 +5,7 @@
 	"AssemblyVersion": "1.0.0",
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
-	"PrecompiledType": "Core",
+	"OutputPath": "$(ZSharpPluginDir)/Managed/Core",
 	"ProjectReferences":
 	[
 		"ZeroGames.ZSharp.Core"
@@ -14,7 +14,7 @@
 	[
 		{
 			"Name": "ZeroGames.Pooling",
-			"Path": "$(ZSharpPluginDir)/Precompiled/ForwardShared/ZeroGames.Pooling.dll"
+			"Path": "$(ZSharpPluginDir)/Managed/ForwardShared/ZeroGames.Pooling.dll"
 		}
 	],
 	"PublicUsings":

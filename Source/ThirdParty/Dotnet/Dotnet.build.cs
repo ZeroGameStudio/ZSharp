@@ -23,7 +23,6 @@ public class Dotnet : ModuleRules
 		// Z# constants
 		const string BINARIES_DIR = "Binaries";
 		const string CONFIG_DIR = "Config";
-		const string PRE_COMPILED_DIR = "Precompiled";
 		const string DOTNET_ROOT_DIR = "dotnet";
 		const string HOSTFXR_DLL = "hostfxr.dll";
 		const string RUNTIME_CONFIG_JSON = "ZSharp.runtimeconfig.json";
@@ -56,8 +55,7 @@ public class Dotnet : ModuleRules
 			string runtimeSrcDir = Path.Combine(nativeSrcDir, runtimeImpl);
 			string runtimeDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, DOTNET_VERSION);
 			
-			IEnumerable<string> libs = GetFiles(runtimeSrcDir);
-			foreach (var lib in libs)
+			foreach (var lib in GetFiles(runtimeSrcDir))
 			{
 				string relativePath = GetRelativePath(lib, runtimeSrcDir);
 				RuntimeDependencies.Add(Path.Combine(runtimeDstDir, relativePath), lib);
@@ -68,8 +66,7 @@ public class Dotnet : ModuleRules
 			string libSrcDir = Path.Combine(dotnetRoot, "lib");
 			string libDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, DOTNET_VERSION);
 			
-            IEnumerable<string> libs = GetFiles(libSrcDir);
-            foreach (var lib in libs)
+            foreach (var lib in GetFiles(libSrcDir))
             {
 	            string relativePath = GetRelativePath(lib, libSrcDir);
             	RuntimeDependencies.Add(Path.Combine(libDstDir, relativePath), lib);
@@ -85,42 +82,17 @@ public class Dotnet : ModuleRules
 			}
 			else
 			{
-				RuntimeDependencies.Add(runtimeConfigDstPath, defaultRuntimeConfigPath);
+				RuntimeDependencies.Add(defaultRuntimeConfigPath);
 			}
 		}
 		
-		// Copy precompiled assemblies
-		string managedDstDir = Path.Combine(projectDir, BINARIES_DIR, "Managed");
-		HashSet<string> existingLibs = new();
+		// Marks all the rest managed assemblies as runtime dependency. @TODO: Additional paths
 		{
-			string precompiledDir = Path.Combine(zsharpDir, PRE_COMPILED_DIR);
-			IEnumerable<string> precompileds = GetFiles(precompiledDir);
-			foreach (var precompiled in precompileds)
-			{
-				string relativePath = GetRelativePath(precompiled, precompiledDir);
-				string dstPath = Path.Combine(managedDstDir, relativePath);
-				// Multiple precompiled dirs have the same assembly, copy only one.
-				if (!existingLibs.Add(NormalizePath(dstPath)))
-				{
-					continue;
-				}
-				
-				RuntimeDependencies.Add(dstPath, precompiled);
-			}
-		}
-		
-		// Marks all the rest managed assemblies as runtime dependency.
-		{
-			IEnumerable<string> assemblies = GetFiles(managedDstDir);
-			foreach (var assembly in assemblies)
+			string managedDstDir = Path.Combine(projectDir, BINARIES_DIR, "Managed");
+			foreach (var assembly in GetFiles(managedDstDir))
 			{
 				string relativePath = GetRelativePath(assembly, managedDstDir);
 				string dstPath = Path.Combine(managedDstDir, relativePath);
-				// This assembly is already marked by precompiled.
-				if (existingLibs.Contains(dstPath))
-				{
-					continue;
-				}
 				
 				RuntimeDependencies.Add(dstPath);
 			}

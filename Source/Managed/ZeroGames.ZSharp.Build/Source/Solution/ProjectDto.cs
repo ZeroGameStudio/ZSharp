@@ -23,7 +23,8 @@ public class ProjectDto
 	public string NeutralLanguage { get; set; } = string.Empty;
 
 	public bool UsesMinimalImplicitUsings { get; set; } = true;
-	[JsonConverter(typeof(JsonStringEnumConverter<EProjectPrecompiledType>))] public EProjectPrecompiledType PrecompiledType { get; set; }
+
+	public string OutputPath { get; set; } = "$(UnrealProjectDir)/Binaries/Managed";
 
 	public List<string> ProjectReferences { get; set; } = [];
 	public List<PackageReference> PackageReferences { get; set; } = [];

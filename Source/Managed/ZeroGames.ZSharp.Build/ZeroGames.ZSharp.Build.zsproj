@@ -6,7 +6,7 @@
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
 	"OutputType": "Editor",
-	"PrecompiledType": "Normal",
+	"OutputPath": "$(ZSharpPluginDir)/Managed/Editor",
 	"ProjectReferences":
 	[
 		"ZeroGames.ZSharp.Core",

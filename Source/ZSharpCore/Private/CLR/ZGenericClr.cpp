@@ -19,6 +19,7 @@
 #include "Interop/Core/ZMasterAssemblyLoadContext_Interop.h"
 #include "Interop/ZGCHandle.h"
 #include "ALC/ZSlimAssemblyLoadContext.h"
+#include "Interfaces/IPluginManager.h"
 #include "Interop/Engine/ZConfig_Interop.h"
 #include "Interop/Core/ZDefaultAssemblyLoadContext_Interop.h"
 #include "Interop/Async/ZEventLoop_Interop.h"
@@ -46,12 +47,32 @@ namespace ZSharp::ZGenericClr_Private
 		UE_LOG(LogZSharpCore, Error, TEXT("%s"), error);
 	}
 
+	static FString GetZSharpConfigDir()
+	{
+		TSharedPtr<IPlugin> plugin = IPluginManager::Get().FindEnabledPlugin("ZSharp");
+		if (!plugin)
+		{
+			return {};
+		}
+		
+		return FPaths::ConvertRelativePathToFull(FPaths::Combine(plugin->GetBaseDir(), "Config"));
+	}
+
+	static FString GetZSharpManagedDir()
+	{
+		TSharedPtr<IPlugin> plugin = IPluginManager::Get().FindEnabledPlugin("ZSharp");
+		if (!plugin)
+		{
+			return {};
+		}
+		
+		return FPaths::ConvertRelativePathToFull(FPaths::Combine(plugin->GetBaseDir(), "Managed"));
+	}
+
 	static void LoadAssembliesUnderDirectory(const FString& directory, load_assembly_bytes_fn loadAssembly)
 	{
-		const FString fullDirectory = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", directory);
-		
 		TArray<FString> sharedDllFiles;
-		IFileManager::Get().FindFilesRecursive(sharedDllFiles, *fullDirectory, TEXT("*.dll"), true, false);
+		IFileManager::Get().FindFilesRecursive(sharedDllFiles, *directory, TEXT("*.dll"), true, false);
 
 		TArray<uint8> content;
 		for (const auto& dll : sharedDllFiles)
@@ -145,7 +166,7 @@ namespace ZSharp::ZGenericClr_Private
 		void(*dllMain)(const decltype(GArgs)&) = nullptr;
 
 		const FString assemblyName = ZSHARP_CORE_ASSEMBLY_NAME;
-		const FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Core", assemblyName + ".dll");
+		const FString assemblyPath = FPaths::Combine(GetZSharpManagedDir(), "Core", assemblyName + ".dll");
 		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
 		const FString entryMethodName = TEXT("DllMain");
 
@@ -161,7 +182,7 @@ namespace ZSharp::ZGenericClr_Private
 	static void LoadResolverAssembly(load_assembly_bytes_fn loadAssembly)
 	{
 		const FString assemblyName = ZSHARP_RESOLVER_ASSEMBLY_NAME;
-		const FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Core", assemblyName + ".dll");
+		const FString assemblyPath = FPaths::Combine(GetZSharpManagedDir(), "Core", assemblyName + ".dll");
 		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
 		const FString entryMethodName = TEXT("DllMain");
 
@@ -226,7 +247,7 @@ namespace ZSharp::ZGenericClr_Private
 		void(*dllMain)(const decltype(GArgs)&) = nullptr;
 
 		const FString assemblyName = ZSHARP_CORE_ENGINE_ASSEMBLY_NAME;
-		const FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Core", assemblyName + ".dll");
+		const FString assemblyPath = FPaths::Combine(GetZSharpManagedDir(), "Core", assemblyName + ".dll");
 		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
 		const FString entryMethodName = TEXT("DllMain");
 
@@ -254,7 +275,7 @@ namespace ZSharp::ZGenericClr_Private
 		void(*dllMain)(const decltype(GArgs)&) = nullptr;
 
 		const FString assemblyName = ZSHARP_CORE_ASYNC_ASSEMBLY_NAME;
-		const FString assemblyPath = FPaths::Combine(FPaths::ProjectDir(), "Binaries", "Managed", "Core", assemblyName + ".dll");
+		const FString assemblyPath = FPaths::Combine(GetZSharpManagedDir(), "Core", assemblyName + ".dll");
 		const FString entryTypeName = FString::Printf(TEXT("%s.DllEntry, %s"), *assemblyName, *assemblyName);
 		const FString entryMethodName = TEXT("DllMain");
 
@@ -387,7 +408,11 @@ void ZSharp::FZGenericClr::Startup()
 	hostfxr_handle handle = nullptr;
 
 	const FString projectConfigDir = FPaths::ProjectConfigDir();
-	const FString runtimeConfigPath = FPaths::Combine(projectConfigDir, ZSHARP_RUNTIME_CONFIG_FILE_NAME);
+	FString runtimeConfigPath = FPaths::Combine(projectConfigDir, ZSHARP_RUNTIME_CONFIG_FILE_NAME);
+	if (!FPaths::FileExists(runtimeConfigPath))
+	{
+		runtimeConfigPath = FPaths::Combine(ZGenericClr_Private::GetZSharpConfigDir(), ZSHARP_RUNTIME_CONFIG_FILE_NAME);
+	}
 	check(FPaths::FileExists(runtimeConfigPath));
 
 	UE_LOG(LogZSharpCore, Log, TEXT("Runtime config file detected: [%s]."), *FPaths::ConvertRelativePathToFull(runtimeConfigPath));
@@ -403,12 +428,32 @@ void ZSharp::FZGenericClr::Startup()
 
 	closeHostFXR(handle);
 
-	ZGenericClr_Private::LoadAssembliesUnderDirectory("ForwardShared", loadAssembly);
+	{ // Forward Shared
+		ZGenericClr_Private::LoadAssembliesUnderDirectory(FPaths::Combine(ZGenericClr_Private::GetZSharpManagedDir(), "ForwardShared"), loadAssembly);
+		TArray<FString> paths;
+		GConfig->GetArray(TEXT("Managed.AssemblyResolver"), TEXT("ForwardSharedPaths"), paths, "ZSharp");
+		paths.AddUnique("Binaries/Managed/ForwardShared");
+		paths.AddUnique("Managed/ForwardShared");
+		for (const auto& path : paths)
+		{
+			ZGenericClr_Private::LoadAssembliesUnderDirectory(FPaths::Combine(FPaths::ProjectDir(), path), loadAssembly);
+		}
+	}
 	ZGenericClr_Private::LoadCoreAssembly(loadAssembly, getFunctionPointer, debugger);
 	ZGenericClr_Private::LoadResolverAssembly(loadAssembly);
 	ZGenericClr_Private::LoadCoreEngineAssembly(loadAssembly, getFunctionPointer);
 	ZGenericClr_Private::LoadCoreAsyncAssembly(loadAssembly, getFunctionPointer);
-	ZGenericClr_Private::LoadAssembliesUnderDirectory("DeferredShared", loadAssembly);
+	{ // Deferred Shared
+		ZGenericClr_Private::LoadAssembliesUnderDirectory(FPaths::Combine(ZGenericClr_Private::GetZSharpManagedDir(), "DeferredShared"), loadAssembly);
+		TArray<FString> paths;
+		GConfig->GetArray(TEXT("Managed.AssemblyResolver"), TEXT("DeferredSharedPaths"), paths, "ZSharp");
+		paths.AddUnique("Binaries/Managed/DeferredShared");
+		paths.AddUnique("Managed/DeferredShared");
+		for (const auto& path : paths)
+		{
+			ZGenericClr_Private::LoadAssembliesUnderDirectory(FPaths::Combine(FPaths::ProjectDir(), path), loadAssembly);
+		}
+	}
 	
 	FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);
 }

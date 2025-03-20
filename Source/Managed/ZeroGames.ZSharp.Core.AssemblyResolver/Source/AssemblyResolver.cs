@@ -20,19 +20,39 @@ internal class AssemblyResolver : IAssemblyResolver
 				return assembly.Location;
 			}
 		}
-		
-		_cachedManagedDllDir ??= $"{UnrealPaths.ProjectDir}/Binaries/Managed";
-		
-		TryGetDllPath(_cachedManagedDllDir, name, out var path);
-		return path;
-	}
 
-	static AssemblyResolver()
-	{
-		if (UnrealBuild.WithEditor)
+		if (_paths is null)
 		{
-			_sharedDirs.Add("Editor");
+			GConfig.TryGetArray(GZSharpIni, "Managed.AssemblyResolver", "Paths", out var paths);
+			paths ??= [];
+			
+			string[]? editorPaths = null;
+			if (UnrealBuild.WithEditor)
+			{
+				GConfig.TryGetArrayByFileName(GZSharpIni, "Managed.AssemblyResolver", "EditorPaths", out editorPaths);
+			}
+			editorPaths ??= [];
+			
+			_paths = 
+			[ 
+				$"{UnrealPaths.GetPluginDir("ZSharp")}/Managed",
+				$"{UnrealPaths.ProjectDir}/Binaries/Managed",
+				$"{UnrealPaths.ProjectDir}/Managed",
+				..paths.Select(p => $"{UnrealPaths.ProjectDir}/{p}"),
+				..editorPaths.Select(p => $"{UnrealPaths.ProjectDir}/{p}")
+			];
 		}
+
+		string? dllPath = null;
+		foreach (var path in _paths)
+		{
+			if (TryGetDllPath(path, name, out dllPath))
+			{
+				break;
+			}
+		}
+
+		return dllPath;
 	}
 
 	private bool TryGetDllPath(string baseDir, string assemblyName, [NotNullWhen(true)] out string? result)
@@ -55,11 +75,6 @@ internal class AssemblyResolver : IAssemblyResolver
 
 		foreach (var dir in Directory.GetDirectories(baseDir))
 		{
-			if (baseDir == _cachedManagedDllDir && !_sharedDirs.Contains(new DirectoryInfo(dir).Name))
-			{
-				continue;
-			}
-			
 			if (TryGetDllPath(dir, assemblyName, out result))
 			{
 				return true;
@@ -69,9 +84,7 @@ internal class AssemblyResolver : IAssemblyResolver
 		return false;
 	}
 
-	private static readonly HashSet<string> _sharedDirs = [ "Core", "ForwardShared", "DeferredShared" ];
-
-	private string? _cachedManagedDllDir;
+	private string[]? _paths;
 
 }
 

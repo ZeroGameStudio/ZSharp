@@ -24,15 +24,6 @@ public enum EProjectOutputType
 	Analyzer,
 }
 
-public enum EProjectPrecompiledType
-{
-	None,
-	Normal,
-	Core,
-	ForwardShared,
-	DeferredShared,
-}
-
 public readonly struct PackageReference
 {
 	public required string Name { get; init; }
@@ -70,16 +61,8 @@ public class ProjectModel
 	public required string NeutralLanguage { get; set; }
 
 	public required bool UsesMinimalImplicitUsings { get; set; }
-	public required EProjectPrecompiledType PrecompiledType { get; set; }
 
-	public string OutputSubpath => (OutputType, PrecompiledType) switch
-	{
-		(EProjectOutputType.Editor, _) => "/Editor",
-		(_, EProjectPrecompiledType.Core) => "/Core",
-		(_, EProjectPrecompiledType.ForwardShared) => "/ForwardShared",
-		(_, EProjectPrecompiledType.DeferredShared) => "/DeferredShared",
-		_ => "/"
-	};
+	public required string OutputPath { get; set; }
 	
 	public List<ProjectModel> ProjectReferences { get; set; } = null!; // This needs post fixup.
 	public required List<PackageReference> PackageReferences { get; set; }

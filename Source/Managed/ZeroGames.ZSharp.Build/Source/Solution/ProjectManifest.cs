@@ -127,7 +127,7 @@ public class ProjectManifest
 			NeutralLanguage = dto.NeutralLanguage,
 			
 			UsesMinimalImplicitUsings = dto.UsesMinimalImplicitUsings,
-			PrecompiledType = dto.PrecompiledType,
+			OutputPath = dto.OutputPath,
 			
 			PackageReferences = dto.PackageReferences.ToList(),
 			ExternalReferences = dto.ExternalReferences.ToList(),

@@ -19,7 +19,7 @@ public class ProjectFileWriter
 	{
 		XDocument doc = XmlHelper.MakeDocument();
 		XElement root = new("Project");
-		root.SetAttributeValue("Sdk", "ZeroGames.ZSharp.Sdk/1.0.0-beta.4");
+		root.SetAttributeValue("Sdk", "ZeroGames.ZSharp.Sdk/1.0.0-beta.5");
 		doc.Add(root);
 		
 		OverrideDotNetProperties(root);
@@ -108,12 +108,12 @@ public class ProjectFileWriter
 		
 		XElement propertyGroupElement = new("PropertyGroup");
 		
+		propertyGroupElement.Add(new XElement("ZSharpProjectName", _project.Name));
 		propertyGroupElement.Add(new XElement("UnrealProjectDir", _unrealProjectDir));
 		propertyGroupElement.Add(new XElement("ZSharpPluginDir", _zsharpPluginDir));
 		propertyGroupElement.Add(new XElement("ZSharpProjectSourceDir", _project.SourceDir));
-		propertyGroupElement.Add(new XElement("ZSharpProjectName", _project.Name));
+		propertyGroupElement.Add(new XElement("ZSharpOutputDir", _project.OutputDir));
 		propertyGroupElement.Add(new XElement("MinimalImplicitUsings", BooleanToString(_project.UsesMinimalImplicitUsings)));
-		propertyGroupElement.Add(new XElement("ZSharpOutputPath", _project.OutputPath));
 		
 		root.Add(propertyGroupElement);
 	}

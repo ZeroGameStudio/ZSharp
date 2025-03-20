@@ -4,6 +4,7 @@
 
 #include "IZExportedTypeRegistry.h"
 #include "JsonObjectConverter.h"
+#include "ZSharpBuildLogChannels.h"
 #include "ZSharpExportSettings.h"
 #include "ALC/ZCommonMethodArgs.h"
 #include "CLR/IZSharpClr.h"
@@ -183,28 +184,35 @@ void ZSharp::FZBuildEngine::GenerateSolution(const TArray<FString>& args) const
 	
 	TArray<FString> precompiledProjects;
 	ZBuildEngine_Private::ParseArgumentArray(args, "prec", precompiledProjects);
-
+	
 	FString mode;
-	if (ZBuildEngine_Private::ParseArgument(args, "mode", mode))
+	if (!ZBuildEngine_Private::ParseArgument(args, "mode", mode))
 	{
-		// Use precompiled Z# assemblies for user mode.
-		if (mode == "u" || mode == "u1" || mode == "u2")
-		{
-			precompiledProjects.AddUnique(ZSHARP_CORE_ASSEMBLY_NAME);
-			precompiledProjects.AddUnique(ZSHARP_RESOLVER_ASSEMBLY_NAME);
-			precompiledProjects.AddUnique(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME);
-			precompiledProjects.AddUnique(ZSHARP_CORE_ASYNC_ASSEMBLY_NAME);
-			precompiledProjects.AddUnique("ZeroGames.ZSharp.Emit");
-			precompiledProjects.AddUnique(ZSHARP_SCANNER_ASSEMBLY_NAME);
-			precompiledProjects.AddUnique(ZSHARP_BUILD_ASSEMBLY_NAME);
-			precompiledProjects.AddUnique("ZeroGames.ZSharp.CodeDom.CSharp");
+		mode = "u";
+	}
+	
+	// Use precompiled Z# assemblies for user mode.
+	if (mode == "u" || mode == "u1" || mode == "u2")
+	{
+		precompiledProjects.AddUnique(ZSHARP_CORE_ASSEMBLY_NAME);
+		precompiledProjects.AddUnique(ZSHARP_RESOLVER_ASSEMBLY_NAME);
+		precompiledProjects.AddUnique(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME);
+		precompiledProjects.AddUnique(ZSHARP_CORE_ASYNC_ASSEMBLY_NAME);
+		precompiledProjects.AddUnique("ZeroGames.ZSharp.Emit");
+		precompiledProjects.AddUnique(ZSHARP_SCANNER_ASSEMBLY_NAME);
+		precompiledProjects.AddUnique(ZSHARP_BUILD_ASSEMBLY_NAME);
+		precompiledProjects.AddUnique("ZeroGames.ZSharp.CodeDom.CSharp");
 
-			// Use precompiled engine assembly for user mode level 2.
-			if (mode == "u2")
-			{
-				precompiledProjects.AddUnique(ZSHARP_ENGINE_ASSEMBLY_NAME);
-			}
+		// Use precompiled engine assembly for user mode level 2.
+		if (mode == "u2")
+		{
+			precompiledProjects.AddUnique(ZSHARP_ENGINE_ASSEMBLY_NAME);
 		}
+	}
+	else if (mode != "dev")
+	{
+		UE_LOG(LogZSharpBuild, Warning, TEXT("Unknown solution mode [%s]"), *mode);
+		return;
 	}
 
 	const FString precArg = ZBuildEngine_Private::BuildArgument("prec", FString::Join(precompiledProjects, TEXT(";")));

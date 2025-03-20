@@ -63,7 +63,7 @@ public class ProjectModel
 
 	public required bool UsesMinimalImplicitUsings { get; set; }
 
-	public required string OutputPath { get; set; }
+	public required string OutputDir { get; set; }
 	
 	public List<ProjectModel> ProjectReferences { get; set; } = null!; // This needs post fixup.
 	public required List<PackageReference> PackageReferences { get; set; }

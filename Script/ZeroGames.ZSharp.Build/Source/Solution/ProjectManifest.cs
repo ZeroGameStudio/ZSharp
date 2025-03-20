@@ -135,7 +135,7 @@ public class ProjectManifest
 			NeutralLanguage = dto.NeutralLanguage,
 			
 			UsesMinimalImplicitUsings = dto.UsesMinimalImplicitUsings,
-			OutputPath = dto.OutputPath,
+			OutputDir = dto.OutputDir,
 			
 			PackageReferences = dto.PackageReferences.ToList(),
 			ExternalReferences = dto.ExternalReferences.ToList(),
@@ -192,7 +192,7 @@ public class ProjectManifest
 				project.ExternalReferences.Add(new()
 				{
 					Name = reference.Name,
-					Path = $"{reference.OutputPath}/{reference.Name}.dll",
+					Path = $"{reference.OutputDir}/{reference.Name}.dll",
 				});
 			}
 			

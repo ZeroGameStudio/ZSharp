@@ -7,7 +7,7 @@
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
 	"OutputType": "Editor",
-	"OutputPath": "$(ZSharpPluginDir)/Managed/Editor"
+	"OutputDir": "$(ZSharpPluginDir)/Managed/Editor"
 }
 
 

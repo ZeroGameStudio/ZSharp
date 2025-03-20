@@ -5,7 +5,7 @@
 	"AssemblyVersion": "1.0.0",
 	"FileVersion": "1.0.0",
 	"NeutralLanguage": "zh",
-	"OutputPath": "$(ZSharpPluginDir)/Managed/Core",
+	"OutputPath": "$(ZSharpPluginDir)/Managed",
 	"ExternalReferences":
 	[
 		{

@@ -1,5 +1,7 @@
 // Copyright Zero Games. All Rights Reserved.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +20,7 @@ public class Dotnet : ModuleRules
 		string platformName = Target.Platform.ToString();
 		string moduleDir = ModuleDirectory;
 		string zsharpDir = PluginDirectory;
-		string projectDir = DirectoryReference.FromFile(Target.ProjectFile)!.FullName;
+		string? projectDir = DirectoryReference.FromFile(Target.ProjectFile)?.FullName;
 		
 		// Z# constants
 		const string BINARIES_DIR = "Binaries";
@@ -33,72 +35,71 @@ public class Dotnet : ModuleRules
 		const bool USE_MONO_FOR_EDITOR_BUILD = false;
 		const string DOTNET_VERSION = "9.0.0";
 		
-		// Select runtime implementation
+		// Select runtime implementation.
 		string runtimeImpl = FORCE_USE_MONO || Target.bBuildEditor && USE_MONO_FOR_EDITOR_BUILD ? "mono" : platformName switch
 		{
 			"Win64" or "Linux" or "LinuxArm64" => "coreclr",
 			_ => "mono",
 		};
-
-		// Copy runtime
-		string dotnetRoot = Path.Combine(moduleDir, "runtime", DOTNET_VERSION);
-		string nativeSrcDir = Path.Combine(dotnetRoot, "native", platformName);
-		string dotnetDstDir = Path.Combine(projectDir, BINARIES_DIR, platformName, DOTNET_ROOT_DIR);
 		
-		{ // hostfxr
-			string hostfxrSrcPath = Path.Combine(nativeSrcDir, HOSTFXR_DLL);
-			string hostfxrDstPath = Path.Combine(dotnetDstDir, "host", "fxr", DOTNET_VERSION, HOSTFXR_DLL);
-			RuntimeDependencies.Add(hostfxrDstPath, hostfxrSrcPath);
-		}
-		
-		{ // native
-			string runtimeSrcDir = Path.Combine(nativeSrcDir, runtimeImpl);
-			string runtimeDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, DOTNET_VERSION);
-			
-			foreach (var lib in GetFiles(runtimeSrcDir))
-			{
-				string relativePath = GetRelativePath(lib, runtimeSrcDir);
-				RuntimeDependencies.Add(Path.Combine(runtimeDstDir, relativePath), lib);
-			}
-		}
-		
-		{ // lib
-			string libSrcDir = Path.Combine(dotnetRoot, "lib");
-			string libDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, DOTNET_VERSION);
-			
-            foreach (var lib in GetFiles(libSrcDir))
-            {
-	            string relativePath = GetRelativePath(lib, libSrcDir);
-            	RuntimeDependencies.Add(Path.Combine(libDstDir, relativePath), lib);
-            }
-		}
-		
-		{ // ZSharp.runtimeconfig.json
-			string runtimeConfigDstPath = Path.Combine(projectDir, CONFIG_DIR, RUNTIME_CONFIG_JSON);
-			string defaultRuntimeConfigPath = Path.Combine(zsharpDir, CONFIG_DIR, RUNTIME_CONFIG_JSON);
-			if (File.Exists(runtimeConfigDstPath))
-			{
-				RuntimeDependencies.Add(runtimeConfigDstPath);
-			}
-			else
-			{
-				RuntimeDependencies.Add(defaultRuntimeConfigPath);
-			}
-		}
-		
-		// Marks all the rest managed assemblies as runtime dependency. @TODO: Additional paths
+		// Copy runtime if there is a project.
+		if (projectDir is not null)
 		{
-			string managedDstDir = Path.Combine(projectDir, BINARIES_DIR, "Managed");
-			foreach (var assembly in GetFiles(managedDstDir))
-			{
-				string relativePath = GetRelativePath(assembly, managedDstDir);
-				string dstPath = Path.Combine(managedDstDir, relativePath);
+			string dotnetRoot = Path.Combine(moduleDir, "runtime", DOTNET_VERSION);
+			string nativeSrcDir = Path.Combine(dotnetRoot, "native", platformName);
+			string dotnetDstDir = Path.Combine(projectDir, BINARIES_DIR, platformName, DOTNET_ROOT_DIR);
+			
+			{ // hostfxr
+				string hostfxrSrcPath = Path.Combine(nativeSrcDir, HOSTFXR_DLL);
+				string hostfxrDstPath = Path.Combine(dotnetDstDir, "host", "fxr", DOTNET_VERSION, HOSTFXR_DLL);
+				RuntimeDependencies.Add(hostfxrDstPath, hostfxrSrcPath);
+			}
+			
+			{ // native
+				string runtimeSrcDir = Path.Combine(nativeSrcDir, runtimeImpl);
+				string runtimeDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, DOTNET_VERSION);
 				
-				RuntimeDependencies.Add(dstPath);
+				foreach (var lib in GetFiles(runtimeSrcDir))
+				{
+					string relativePath = GetRelativePath(lib, runtimeSrcDir);
+					RuntimeDependencies.Add(Path.Combine(runtimeDstDir, relativePath), lib);
+				}
+			}
+			
+			{ // lib
+				string libSrcDir = Path.Combine(dotnetRoot, "lib");
+				string libDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, DOTNET_VERSION);
+				
+        	    foreach (var lib in GetFiles(libSrcDir))
+        	    {
+	    	        string relativePath = GetRelativePath(lib, libSrcDir);
+        	    	RuntimeDependencies.Add(Path.Combine(libDstDir, relativePath), lib);
+        	    }
+			}
+			
+			{ // ZSharp.runtimeconfig.json
+				string runtimeConfigDstPath = Path.Combine(projectDir, CONFIG_DIR, RUNTIME_CONFIG_JSON);
+				string defaultRuntimeConfigPath = Path.Combine(zsharpDir, CONFIG_DIR, RUNTIME_CONFIG_JSON);
+				RuntimeDependencies.Add(File.Exists(runtimeConfigDstPath) ? runtimeConfigDstPath : defaultRuntimeConfigPath);
+			}
+			
+			// Marks all the rest managed assemblies as runtime dependency.
+			{
+				string[] managedDstDirs = new string[] { Path.Combine(zsharpDir, "Managed"), Path.Combine(projectDir, "Managed") };
+				foreach (var managedDstDir in managedDstDirs)
+				{
+					foreach (var assembly in GetFiles(managedDstDir))
+					{
+						string relativePath = GetRelativePath(assembly, managedDstDir);
+						string dstPath = Path.Combine(managedDstDir, relativePath);
+					
+						RuntimeDependencies.Add(dstPath);
+					}
+				}
 			}
 		}
 		
-		// Predefined macros.
+		// Predefined macros
 		if (runtimeImpl is "coreclr")
 		{
 			PublicDefinitions.Add("ZSHARP_WITH_CORECLR=1");

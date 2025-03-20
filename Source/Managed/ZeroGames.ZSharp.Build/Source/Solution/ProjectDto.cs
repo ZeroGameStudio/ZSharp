@@ -24,7 +24,7 @@ public class ProjectDto
 
 	public bool UsesMinimalImplicitUsings { get; set; } = true;
 
-	public string OutputPath { get; set; } = "$(UnrealProjectDir)/Binaries/Managed";
+	public string OutputPath { get; set; } = "$(UnrealProjectDir)/Managed";
 
 	public List<string> ProjectReferences { get; set; } = [];
 	public List<PackageReference> PackageReferences { get; set; } = [];

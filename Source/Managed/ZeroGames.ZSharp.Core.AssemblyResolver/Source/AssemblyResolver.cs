@@ -21,28 +21,6 @@ internal class AssemblyResolver : IAssemblyResolver
 			}
 		}
 
-		if (_paths is null)
-		{
-			GConfig.TryGetArray(GZSharpIni, "Managed.AssemblyResolver", "Paths", out var paths);
-			paths ??= [];
-			
-			string[]? editorPaths = null;
-			if (UnrealBuild.WithEditor)
-			{
-				GConfig.TryGetArrayByFileName(GZSharpIni, "Managed.AssemblyResolver", "EditorPaths", out editorPaths);
-			}
-			editorPaths ??= [];
-			
-			_paths = 
-			[ 
-				$"{UnrealPaths.GetPluginDir("ZSharp")}/Managed",
-				$"{UnrealPaths.ProjectDir}/Binaries/Managed",
-				$"{UnrealPaths.ProjectDir}/Managed",
-				..paths.Select(p => $"{UnrealPaths.ProjectDir}/{p}"),
-				..editorPaths.Select(p => $"{UnrealPaths.ProjectDir}/{p}")
-			];
-		}
-
 		string? dllPath = null;
 		foreach (var path in _paths)
 		{
@@ -84,7 +62,7 @@ internal class AssemblyResolver : IAssemblyResolver
 		return false;
 	}
 
-	private string[]? _paths;
+	private string[] _paths = [ $"{UnrealPaths.GetPluginDir("ZSharp")}/Managed", $"{UnrealPaths.ProjectDir}/Managed" ];
 
 }
 

@@ -1158,10 +1158,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 	// We have no way but calculate size and align like this... (Link() is idempotent, hopefully...)
 	class : public FArchive
 	{
-		virtual FArchive& operator<<(struct FObjectPtr& Value) override
-		{
-			return *this;
-		}
+		virtual FArchive& operator<<(FObjectPtr& Value) override { return *this; }
 	} ar;
 	scriptStruct->SetPropertiesSize(superScriptStruct ? superScriptStruct->GetPropertiesSize() : 0);
 	scriptStruct->MinAlignment = superScriptStruct ? superScriptStruct->GetMinAlignment() : 1;

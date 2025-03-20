@@ -663,10 +663,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			check(function->IsSignatureCompatibleWith(superFunction));
 
 			function->FunctionFlags |= FUNC_Native;
-
-			// Migrate from FBlueprintCompilationManager::FastGenerateSkeletonClass().
 			function->SetSuperStruct(superFunction);
-			function->FunctionFlags |= (superFunction->FunctionFlags & (FUNC_FuncInherit | FUNC_Public | FUNC_Protected | FUNC_Private | FUNC_BlueprintPure));
 
 #if WITH_METADATA
 			UMetaData::CopyMetadata(superFunction, function);

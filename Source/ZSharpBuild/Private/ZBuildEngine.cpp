@@ -47,9 +47,9 @@ namespace ZSharp::ZBuildEngine_Private
 		return FPaths::ConvertRelativePathToFull(plugin->GetBaseDir());
 	}
 
-	static FString AppendSourceManagedDir(const FString& baseDir)
+	static FString AppendScriptDir(const FString& baseDir)
 	{
-		return baseDir / "Source" / "Managed";
+		return baseDir / "Script";
 	}
 
 	static FString BuildArgument(const FString& key, const FString& value)
@@ -130,7 +130,7 @@ void ZSharp::FZBuildEngine::GenerateSolution(const TArray<FString>& args) const
 	FJsonObjectConverter::UStructToJsonObjectString(moduleMappingInfoDto, moduleMappingInfo);
 	const FString moduleMappingInfoArg = ZBuildEngine_Private::BuildArgument("modulemappinginfo", moduleMappingInfo);
 
-	TArray<FString> sourceDirs = { ZBuildEngine_Private::AppendSourceManagedDir(projectDir), ZBuildEngine_Private::AppendSourceManagedDir(pluginDir) };
+	TArray<FString> sourceDirs = { ZBuildEngine_Private::AppendScriptDir(projectDir), ZBuildEngine_Private::AppendScriptDir(pluginDir) };
 #if WITH_EDITOR
 	for (const auto& plugin : IPluginManager::Get().GetEnabledPlugins())
 	{
@@ -139,10 +139,10 @@ void ZSharp::FZBuildEngine::GenerateSolution(const TArray<FString>& args) const
 			continue;
 		}
 		
-		bool hasZSharpProject = false;
-		if (plugin->GetDescriptorJson()->TryGetBoolField(TEXT("HasZSharpProject"), hasZSharpProject) && hasZSharpProject)
+		bool hasZSharpScript = false;
+		if (plugin->GetDescriptorJson()->TryGetBoolField(TEXT("HasZSharpScript"), hasZSharpScript) && hasZSharpScript)
 		{
-			sourceDirs.Emplace(ZBuildEngine_Private::AppendSourceManagedDir(ZBuildEngine_Private::GetPluginDir(plugin->GetName())));
+			sourceDirs.Emplace(ZBuildEngine_Private::AppendScriptDir(ZBuildEngine_Private::GetPluginDir(plugin->GetName())));
 		}
 	}
 #endif

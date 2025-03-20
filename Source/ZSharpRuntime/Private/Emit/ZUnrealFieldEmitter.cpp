@@ -670,6 +670,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 #if WITH_METADATA
 			UMetaData::CopyMetadata(superFunction, function);
+			function->SetMetaData("BlueprintInternalUseOnly", TEXT("true"));
 #endif
 		}
 

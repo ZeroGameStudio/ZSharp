@@ -56,6 +56,39 @@ namespace ZSharp::ZBuildEngine_Private
 	{
 		return FString::Printf(TEXT("%s=%s"), *key, *value);
 	}
+
+	static bool ParseArgument(const TArray<FString>& args, const FString& key, FString& value)
+	{
+		FRegexPattern pattern { FString::Printf(TEXT("^%s=.+$"), *key) };
+		for (const auto& arg : args)
+		{
+			FRegexMatcher matcher { pattern, arg };
+			if (matcher.FindNext())
+			{
+				arg.Split("=", nullptr, &value);
+				return true;
+			}
+		}
+
+		value = {};
+		return false;
+	}
+
+	static void ParseArgumentArray(const TArray<FString>& args, const FString& key, TArray<FString>& result)
+	{
+		FRegexPattern pattern { FString::Printf(TEXT("^%s=.+$"), *key) };
+		for (const auto& arg : args)
+		{
+			FRegexMatcher matcher { pattern, arg };
+			if (matcher.FindNext())
+			{
+				FString value;
+				arg.Split("=", nullptr, &value);
+				value.ParseIntoArray(result, TEXT(";"));
+				break;
+			}
+		}
+	}
 }
 
 ZSharp::FZBuildEngine& ZSharp::FZBuildEngine::Get()
@@ -147,6 +180,34 @@ void ZSharp::FZBuildEngine::GenerateSolution(const TArray<FString>& args) const
 	}
 #endif
 	const FString sourceArg = ZBuildEngine_Private::BuildArgument("source", FString::Join(sourceDirs, TEXT(";")));
+	
+	TArray<FString> precompiledProjects;
+	ZBuildEngine_Private::ParseArgumentArray(args, "prec", precompiledProjects);
+
+	FString mode;
+	if (ZBuildEngine_Private::ParseArgument(args, "mode", mode))
+	{
+		// Use precompiled Z# assemblies for user mode.
+		if (mode == "u" || mode == "u1" || mode == "u2")
+		{
+			precompiledProjects.AddUnique(ZSHARP_CORE_ASSEMBLY_NAME);
+			precompiledProjects.AddUnique(ZSHARP_RESOLVER_ASSEMBLY_NAME);
+			precompiledProjects.AddUnique(ZSHARP_CORE_ENGINE_ASSEMBLY_NAME);
+			precompiledProjects.AddUnique(ZSHARP_CORE_ASYNC_ASSEMBLY_NAME);
+			precompiledProjects.AddUnique("ZeroGames.ZSharp.Emit");
+			precompiledProjects.AddUnique(ZSHARP_SCANNER_ASSEMBLY_NAME);
+			precompiledProjects.AddUnique(ZSHARP_BUILD_ASSEMBLY_NAME);
+			precompiledProjects.AddUnique("ZeroGames.ZSharp.CodeDom.CSharp");
+
+			// Use precompiled engine assembly for user mode level 2.
+			if (mode == "u2")
+			{
+				precompiledProjects.AddUnique(ZSHARP_ENGINE_ASSEMBLY_NAME);
+			}
+		}
+	}
+
+	const FString precArg = ZBuildEngine_Private::BuildArgument("prec", FString::Join(precompiledProjects, TEXT(";")));
 
 	const TCHAR* argv[] =
 	{
@@ -155,6 +216,7 @@ void ZSharp::FZBuildEngine::GenerateSolution(const TArray<FString>& args) const
 		*zsharpDirArg,
 		*sourceArg,
 		*moduleMappingInfoArg,
+		*precArg,
 	};
 	FZCommonMethodArgs commonArgs { UE_ARRAY_COUNT(argv), argv };
 	IZSharpClr::Get().Run(ZSHARP_BUILD_ASSEMBLY_NAME, &commonArgs);
@@ -164,17 +226,7 @@ void ZSharp::FZBuildEngine::GenerateGlue(const TArray<FString>& args) const
 {
 	{ // Step I: Export types and generate manifest.json file.
 		TArray<FString> assemblies;
-		FRegexPattern pattern { "^assemblies=.+$" };
-		for (const auto& arg : args)
-		{
-			FRegexMatcher matcher { pattern, arg };
-			if (matcher.FindNext())
-			{
-				FString value;
-				arg.Split("=", nullptr, &value);
-				value.ParseIntoArray(assemblies, TEXT(","));
-			}
-		}
+		ZBuildEngine_Private::ParseArgumentArray(args, "asm", assemblies);
 
 		IZExportedTypeRegistry::Get().ExportDynamicTypes(assemblies);
 		FZGlueManifestWriter{}.Write(assemblies);

@@ -36,12 +36,14 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
 		, [Argument("projectdir")] string projectDir
 		, [Argument("zsharpdir")] string zsharpDir
 		, [Argument("source")] string source
-		, [Argument("modulemappinginfo")] string moduleMappingInfo) : base(engine)
+		, [Argument("modulemappinginfo")] string moduleMappingInfo
+		, [Argument("prec")] string prec) : base(engine)
 	{
 		UnrealProjectDir = projectDir.TrimEnd('/', '\\');
 		ZSharpPluginDir = zsharpDir.TrimEnd('/', '\\');
 		
 		string[] sources = source.Split(';');
+		HashSet<string> precompiledProjects = prec.Split(';').ToHashSet();
 		
 		JsonSerializerOptions options = new()
 		{
@@ -55,7 +57,7 @@ public class BuildTarget_GenerateSolution : BuildTargetBase, IUnrealProjectDir
 
 		Dictionary<string, string> moduleMap = moduleMappingInfoDto.Mapping;
 
-		_manifest = new(UnrealProjectDir, ZSharpPluginDir, sources, moduleMap);
+		_manifest = new(UnrealProjectDir, ZSharpPluginDir, sources, moduleMap, precompiledProjects);
 	}
 
 	private void PrepareDirectory()

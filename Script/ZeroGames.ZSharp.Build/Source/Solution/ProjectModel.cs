@@ -43,6 +43,7 @@ public class ProjectModel
 	public required string Path { get; set; }
 	public required string SourceDir { get; set; }
 	public required EIntrinsicProjectType IntrinsicType { get; set; }
+	public required bool IsPrecompiled { get; set; }
 	
 	public required string Folder { get; set; }
 

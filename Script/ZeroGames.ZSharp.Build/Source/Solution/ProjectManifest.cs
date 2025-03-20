@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.Build.Solution;
 public class ProjectManifest
 {
 
-	public ProjectManifest(string unrealProjectDir, string zsharpPluginDir, IEnumerable<string> sources, Dictionary<string, string> moduleMap)
+	public ProjectManifest(string unrealProjectDir, string zsharpPluginDir, IEnumerable<string> sources, Dictionary<string, string> moduleMap, HashSet<string> precompiledProjects)
 	{
 		_unrealProjectDir = unrealProjectDir;
 		_zsharpPluginDir = zsharpPluginDir;
@@ -25,6 +25,8 @@ public class ProjectManifest
 			}
 		}
 		
+		_precompiledProjects = precompiledProjects;
+		
 		List<string> projectFilePaths = new List<string>();
 		foreach (var source in sources)
 		{
@@ -40,7 +42,7 @@ public class ProjectManifest
 	}
 	
 	public SolutionModel Solution { get; }
-	public IEnumerable<ProjectModel> Projects => _projectMap.Values;
+	public IEnumerable<ProjectModel> Projects => _projectMap.Values.Where(p => !p.IsPrecompiled);
 
 	private static void LootZSharpProjects(string source, List<string> projectFilePaths)
 	{
@@ -100,7 +102,12 @@ public class ProjectManifest
 
 		if (dto.OutputType is EProjectOutputType.Analyzer && dto.TargetFramework is not "netstandard2.0")
 		{
-			throw new InvalidOperationException($"Illegal target framework {dto.TargetFramework} for analyzer project {dto.OutputType}.");
+			throw new InvalidOperationException($"Illegal target framework {dto.TargetFramework} for analyzer project {name}.");
+		}
+
+		if (dto.OutputType is EProjectOutputType.Analyzer && _precompiledProjects.Contains(name))
+		{
+			throw new InvalidOperationException($"Illegal precompiled project {name}.");
 		}
 		
 		ProjectModel project = new()
@@ -109,6 +116,7 @@ public class ProjectManifest
 			Path = $"{_unrealProjectDir}/Intermediate/ZSharp/ProjectFiles/{name}/{name}{projectFileExtension}",
 			SourceDir = Path.GetDirectoryName(zsharpProjectFilePath)!.Replace('\\', '/'),
 			IntrinsicType = intrinsicType,
+			IsPrecompiled = _precompiledProjects.Contains(name),
 			
 			Folder = dto.Folder,
 			
@@ -164,6 +172,7 @@ public class ProjectManifest
 			ProjectModel project = pair.Value;
 			project.ProjectReferences = [];
 			
+			// Fixup project references.
 			if (_projectReferenceLookup.TryGetValue(project, out var references))
 			{
 				foreach (var reference in references)
@@ -175,6 +184,16 @@ public class ProjectManifest
 					
 					project.ProjectReferences.Add(referencedProject);
 				}
+			}
+			
+			// Add precompiled project references to external references.
+			foreach (var reference in project.ProjectReferences.Where(p => p.IsPrecompiled))
+			{
+				project.ExternalReferences.Add(new()
+				{
+					Name = reference.Name,
+					Path = $"{reference.OutputPath}/{reference.Name}.dll",
+				});
 			}
 			
 			string language = project.Language switch
@@ -231,9 +250,8 @@ public class ProjectManifest
 			return cur;
 		}
 
-		foreach (var pair in _projectMap)
+		foreach (var project in Projects)
 		{
-			ProjectModel project = pair.Value;
 			SolutionFolder folder = GetOrAddSolutionFolder(project.Folder);
 			folder.AddProject(project);
 		}
@@ -244,6 +262,7 @@ public class ProjectManifest
 	private readonly string _unrealProjectDir;
 	private readonly string _zsharpPluginDir;
 	private readonly Dictionary<string, List<string>> _assemblyModulesLookup;
+	private readonly HashSet<string> _precompiledProjects;
 	private readonly Dictionary<string, ProjectModel> _projectMap;
 	private readonly Dictionary<ProjectModel, List<string>> _projectReferenceLookup;
 	private readonly Lock _projectMapLock = new();

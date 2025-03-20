@@ -120,7 +120,7 @@ public class ProjectFileWriter
 	
 	private void AddProjectReferences(XElement root)
 	{
-		if (_project.ProjectReferences.Count == 0)
+		if (_project.ProjectReferences.All(p => p.IsPrecompiled))
 		{
 			return;
 		}
@@ -129,7 +129,7 @@ public class ProjectFileWriter
 		
 		XElement itemGroupElement = new("ItemGroup");
 
-		foreach (var reference in _project.ProjectReferences)
+		foreach (var reference in _project.ProjectReferences.Where(p => !p.IsPrecompiled))
 		{
 			XElement referenceElement = new("ProjectReference");
 			referenceElement.SetAttributeValue("Include", reference.Path);

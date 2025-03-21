@@ -39,7 +39,7 @@ public class EmittedDelegateBuilder(string namespaceName, string typeName, strin
 		string stateParameterName = signatureParameters is not null && signatureParameters.Any(p => p.Name is "state") ? "userState" : "state";
 		ParameterDeclaration[] statefulSignatureParameters = [..signatureParameters ?? [], new(EParameterKind.In, new("TState", null), stateParameterName)];
 		
-		MethodDefinition statefulSignature = new(EMemberVisibility.Public, "Signature<TState>", signatureReturnType, statefulSignatureParameters)
+		MethodDefinition statefulSignature = new(EMemberVisibility.Public, "Signature<in TState>", signatureReturnType, statefulSignatureParameters)
 		{
 			IsDelegate = true,
 		};
@@ -94,20 +94,8 @@ public class EmittedDelegateBuilder(string namespaceName, string typeName, strin
 			}
 		}
 
-		AttributeDeclaration[]? targetAttributes = source.Attributes?.Declarations.ToArray();
-		if (targetAttributes is not null)
-		{
-			for (int32 i = 0; i < targetAttributes.Length; ++i)
-			{
-				if (targetAttributes[i].Name == "NotNull")
-				{
-					targetAttributes[i] = new("AllowNull");
-				}
-			}
-		}
-
 		TypeReference targetType = new(targetTypeName, sourceType.UnderlyingType, sourceType.IsNullInNotNullOut);
-		return new(kind, targetType, source.Name, source.DefaultValue, targetAttributes);
+		return new(kind, targetType, source.Name, source.DefaultValue, source.Attributes?.Declarations.Where(attr => attr.Name is not "NotNull").ToArray());
 	}
 	
 	private string BindMethodName => Kind == EDelegateKind.Unicast ? "Bind" : "Add";

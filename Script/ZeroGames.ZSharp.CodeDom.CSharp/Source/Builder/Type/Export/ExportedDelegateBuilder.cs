@@ -34,8 +34,9 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 		
 		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}(Signature @delegate) => base.{BindMethodName}(@delegate);"));
 		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state) => base.{BindMethodName}(@delegate, state);"));
-		
-		definition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, Parameters) { Modifiers = EMemberModifiers.Partial, Body = new StrangeZCallBodyBuilder($"base.{ExecuteMethodName}", ReturnType, false, Parameters).Build() });
+
+		ParameterDeclaration[]? parameters = Parameters?.Select(p => p.Attributes is not null ? new(p.Kind, p.Type, p.Name, p.Attributes.Value.Declarations.Where(attr => attr.Name is not "NotNull").ToArray()) : p).ToArray();
+		definition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, parameters) { Modifiers = EMemberModifiers.Partial, Body = new StrangeZCallBodyBuilder($"base.{ExecuteMethodName}", ReturnType, false, parameters).Build() });
 	}
 
 	protected override void PreAddMainType(CompilationUnit compilationUnit, ClassDefinition? outerClassDefinition)
@@ -58,7 +59,7 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 		string stateParameterName = signatureParameters is not null && signatureParameters.Any(p => p.Name is "state") ? "userState" : "state";
 		ParameterDeclaration[] statefulSignatureParameters = [..signatureParameters ?? [], new(EParameterKind.In, new("TState", null), stateParameterName)];
 		
-		MethodDefinition statefulSignature = new(EMemberVisibility.Public, "Signature<TState>", signatureReturnType, statefulSignatureParameters)
+		MethodDefinition statefulSignature = new(EMemberVisibility.Public, "Signature<in TState>", signatureReturnType, statefulSignatureParameters)
 		{
 			IsDelegate = true,
 		};
@@ -116,20 +117,8 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 			}
 		}
 
-		AttributeDeclaration[]? targetAttributes = source.Attributes?.Declarations.ToArray();
-		if (targetAttributes is not null)
-		{
-			for (int32 i = 0; i < targetAttributes.Length; ++i)
-			{
-				if (targetAttributes[i].Name == "NotNull")
-				{
-					targetAttributes[i] = new("AllowNull");
-				}
-			}
-		}
-
 		TypeReference targetType = new(targetTypeName, sourceType.UnderlyingType, sourceType.IsNullInNotNullOut);
-		return new(kind, targetType, source.Name, source.DefaultValue, targetAttributes);
+		return new(kind, targetType, source.Name, source.DefaultValue, source.Attributes?.Declarations.Where(attr => attr.Name is not "NotNull").ToArray());
 	}
 	
 	private string BindMethodName => Kind == EDelegateKind.Unicast ? "Bind" : "Add";

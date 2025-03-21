@@ -660,7 +660,6 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			params.ApplyFlags = GCompiledInFlags;
 
 			function = static_cast<UFunction*>(StaticDuplicateObjectEx(params));
-			check(function->IsSignatureCompatibleWith(superFunction));
 
 			function->FunctionFlags |= FUNC_Native;
 			function->SetSuperStruct(superFunction);
@@ -681,6 +680,9 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 		function->Bind();
 		function->StaticLink(true);
+
+		// Now that all parameters have linked up so we can check for signature compability.
+		check(!def.bIsEventOverride || function->IsSignatureCompatibleWith(function->GetSuperFunction()));
 
 		// Migrate from UClass::CreateLinkAndAddChildFunctionsToMap().
 		function->Next = outer->Children;

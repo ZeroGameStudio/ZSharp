@@ -299,18 +299,15 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		}
 
 		// Copy out params and destroy them if called from blueprint.
+		FOutParmRec* out = outParmLink;
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{
 			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
 			if (OutParamIndices.Contains(i))
 			{
-				FOutParmRec* out = outParmLink;
-				// This must succeed, otherwise let it crash by null pointer.
-				while (out->Property != visitor->GetUnderlyingProperty())
-				{
-					out = out->NextOutParm;
-				}
+				check(FStructUtils::ArePropertiesTheSame(out->Property, visitor->GetUnderlyingProperty(), true));
 				visitor->SetValue(out->PropAddr, buffer[bIsStatic ? i : i + 1]);
+				out = out->NextOutParm;
 			}
 			
 			if (fromBlueprint)
@@ -318,6 +315,9 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 				visitor->DestructValue_InContainer(params);
 			}
 		}
+
+		// Out params should all be consumed.
+		check(ReturnProperty ? FStructUtils::ArePropertiesTheSame(out->Property, ReturnProperty->GetUnderlyingProperty(), true) : !out);
 
 		if (ReturnProperty)
 		{

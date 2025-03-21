@@ -73,12 +73,12 @@ namespace ZSharp::PropertyFactory_Private
 		{ GNameTypeId, [](const FZPropertyDesc&){ return Create<FNameProperty>(); } },
 		{ GTextTypeId, [](const FZPropertyDesc&){ return Create<FTextProperty>(); } },
 
-		{ GSubclassOfTypeId, [](const FZPropertyDesc& desc){ return Create<FClassProperty>([&](FClassProperty* prop){ prop->PropertyClass = UClass::StaticClass(); prop->MetaClass = static_cast<UClass*>(desc.Metadata); }); } },
-		{ GSoftClassPtrTypeId, [](const FZPropertyDesc& desc){ return Create<FSoftClassProperty>([&](FSoftClassProperty* prop){ prop->PropertyClass = UClass::StaticClass(); prop->MetaClass = static_cast<UClass*>(desc.Metadata); }); } },
-		{ GSoftObjectPtrTypeId, [](const FZPropertyDesc& desc){ return Create<FSoftObjectProperty>([&](FSoftObjectProperty* prop){ prop->PropertyClass = static_cast<UClass*>(desc.Metadata); }); } },
-		{ GWeakObjectPtrTypeId, [](const FZPropertyDesc& desc){ return Create<FWeakObjectProperty>([&](FWeakObjectProperty* prop){ prop->PropertyClass = static_cast<UClass*>(desc.Metadata); }); } },
-		{ GLazyObjectPtrTypeId, [](const FZPropertyDesc& desc){ return Create<FLazyObjectProperty>([&](FLazyObjectProperty* prop){ prop->PropertyClass = static_cast<UClass*>(desc.Metadata); }); } },
-		{ GScriptInterfaceTypeId, [](const FZPropertyDesc& desc){ return Create<FInterfaceProperty>([&](FInterfaceProperty* prop){ prop->InterfaceClass = static_cast<UClass*>(desc.Metadata); }); } },
+		{ GSubclassOfTypeId, [](const FZPropertyDesc& desc){ return Create<FClassProperty>([&](FClassProperty* prop){ prop->PropertyFlags |= CPF_UObjectWrapper; prop->PropertyClass = UClass::StaticClass(); prop->MetaClass = static_cast<UClass*>(desc.Metadata); }); } },
+		{ GSoftClassPtrTypeId, [](const FZPropertyDesc& desc){ return Create<FSoftClassProperty>([&](FSoftClassProperty* prop){ prop->PropertyFlags |= CPF_UObjectWrapper; prop->PropertyClass = UClass::StaticClass(); prop->MetaClass = static_cast<UClass*>(desc.Metadata); }); } },
+		{ GSoftObjectPtrTypeId, [](const FZPropertyDesc& desc){ return Create<FSoftObjectProperty>([&](FSoftObjectProperty* prop){ prop->PropertyFlags |= CPF_UObjectWrapper; prop->PropertyClass = static_cast<UClass*>(desc.Metadata); }); } },
+		{ GWeakObjectPtrTypeId, [](const FZPropertyDesc& desc){ return Create<FWeakObjectProperty>([&](FWeakObjectProperty* prop){ prop->PropertyFlags |= CPF_UObjectWrapper; prop->PropertyClass = static_cast<UClass*>(desc.Metadata); }); } },
+		{ GLazyObjectPtrTypeId, [](const FZPropertyDesc& desc){ return Create<FLazyObjectProperty>([&](FLazyObjectProperty* prop){ prop->PropertyFlags |= CPF_UObjectWrapper; prop->PropertyClass = static_cast<UClass*>(desc.Metadata); }); } },
+		{ GScriptInterfaceTypeId, [](const FZPropertyDesc& desc){ return Create<FInterfaceProperty>([&](FInterfaceProperty* prop){ prop->PropertyFlags |= CPF_UObjectWrapper; prop->InterfaceClass = static_cast<UClass*>(desc.Metadata); }); } },
 
 		{ GFieldPathTypeId, [](const FZPropertyDesc&){ return Create<FFieldPathProperty>(); } },
 	};

@@ -21,6 +21,16 @@ namespace ZSharp
 	public:
 		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override
 		{
+			// Special case for TObjectPtr<UClass> and UClass*.
+			if constexpr (std::is_same_v<TProperty, FClassProperty>)
+			{
+				if (!UnderlyingWrapperProperty->HasAnyPropertyFlags(CPF_UObjectWrapper) || UnderlyingWrapperProperty->HasAllPropertyFlags(CPF_TObjectPtr))
+				{
+					TZCallBufferSlotEncoder<UClass*>::Encode(CastChecked<UClass>(UnderlyingWrapperProperty->GetPropertyValue(src), ECastCheckedType::NullAllowed), dest);
+					return;
+				}
+			}
+			
 			TSelfDescriptiveObjectWrapper* sdow = TZCallBufferSlotEncoder<TSelfDescriptiveObjectWrapper>::DecodePointer(dest);
 			if (!sdow)
 			{
@@ -35,11 +45,33 @@ namespace ZSharp
 		
 		virtual void GetRef(const void* src, FZCallBufferSlot& dest) const override
 		{
+			// Special case for TObjectPtr<UClass> and UClass*.
+			if constexpr (std::is_same_v<TProperty, FClassProperty>)
+			{
+				if (!UnderlyingWrapperProperty->HasAnyPropertyFlags(CPF_UObjectWrapper) || UnderlyingWrapperProperty->HasAllPropertyFlags(CPF_TObjectPtr))
+				{
+					TZCallBufferSlotEncoder<UClass*>::Encode(CastChecked<UClass>(UnderlyingWrapperProperty->GetPropertyValue(src), ECastCheckedType::NullAllowed), dest);
+					return;
+				}
+			}
+			
 			dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<TConjugateRegistry>().Conjugate(GetDescriptor(), (UnderlyingInstanceType*)src));
 		}
 		
 		virtual void SetValue(void* dest, const FZCallBufferSlot& src) const override
 		{
+			// Special case for TObjectPtr<UClass> and UClass*.
+			if constexpr (std::is_same_v<TProperty, FClassProperty>)
+			{
+				if (!UnderlyingWrapperProperty->HasAnyPropertyFlags(CPF_UObjectWrapper) || UnderlyingWrapperProperty->HasAllPropertyFlags(CPF_TObjectPtr))
+				{
+					UClass* value = TZCallBufferSlotEncoder<UClass*>::Decode(src);
+					check(!value || value->IsChildOf(UnderlyingWrapperProperty->MetaClass));
+					UnderlyingProperty->CopySingleValue(dest, &value);
+					return;
+				}
+			}
+			
 			const TSelfDescriptiveObjectWrapper* value = TZCallBufferSlotEncoder<TSelfDescriptiveObjectWrapper>::DecodePointer(src);
 			if (!value)
 			{
@@ -54,11 +86,11 @@ namespace ZSharp
 	private:
 		const UClass* GetDescriptor() const
 		{
-			if constexpr (std::is_same_v<UnderlyingInstanceType, FScriptInterface>)
+			if constexpr (std::is_same_v<TProperty, FInterfaceProperty>)
 			{
 				return UnderlyingWrapperProperty->InterfaceClass;
 			}
-			else if constexpr (std::is_same_v<UnderlyingInstanceType, TSoftClassPtr<UObject>> || std::is_same_v<UnderlyingInstanceType, TSubclassOf<UObject>>)
+			else if constexpr (std::is_same_v<TProperty, FClassProperty> || std::is_same_v<TProperty, FSoftClassProperty>)
 			{
 				return UnderlyingWrapperProperty->MetaClass;
 			}
@@ -70,7 +102,7 @@ namespace ZSharp
 
 		void ValidateValue(const TSelfDescriptiveObjectWrapper& value) const
 		{
-			// @TODO
+			check(value.GetDescriptor()->IsChildOf(GetDescriptor()));
 		}
 
 	private:

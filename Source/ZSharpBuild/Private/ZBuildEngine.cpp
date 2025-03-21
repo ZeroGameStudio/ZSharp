@@ -126,9 +126,9 @@ void ZSharp::FZBuildEngine::GenerateExampleContent() const
 	const TMap<FString, FString> templateTargetDirMap
 	{
 		{ "DefaultZSharp.ini", "Config" },
-		{ "Game.zsproj", "Source/Managed/Game" },
-		{ "DllEntry.cs", "Source/Managed/Game/Source" },
-		{ "MagicCube.cs", FString::Printf(TEXT("Source/Managed/Game/Source/%s"), *gameModuleName) },
+		{ "Game.zsproj", "Script/Game" },
+		{ "DllEntry.cs", "Script/Game/Source" },
+		{ "MagicCube.cs", "Script/Game/Source" },
 	};
 
 	const FString projectDir = ZBuildEngine_Private::GetProjectDir();

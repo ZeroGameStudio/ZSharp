@@ -51,22 +51,8 @@ public partial class MagicCube : Actor
 	 */
 	public MagicCube(IntPtr unmanaged) : base(unmanaged)
 	{
-		/*
-		 * Native object returned by function is 'red',
-		 * which means it's lifecycle is owned by C++ and can be released at any time.
-		 * So if you want to cache it in script, you should create a copy from script side.
-		 *
-		 * Native object created by script is 'black',
-		 * which means it's lifecycle is owned by managed garbage collector,
-		 * so it will be alive until it is not referenced by anyone.
-		 *
-		 * By the way, in Z# interop system, a native object is either black or red.
-		 */
-		Vector startPos = K2_GetActorLocation();
-		_startPos = startPos.Clone();
-		ensure(startPos.IsRed);
-		ensure(_startPos.IsBlack);
-		ensure(_startPos == startPos);
+		_rotationSpeed = 100f;
+		_startPos = new();
 	}
 	
 	protected virtual partial void SayHello_Implementation()
@@ -85,6 +71,21 @@ public partial class MagicCube : Actor
 	 */
 	protected override async void ReceiveBeginPlay_Implementation()
 	{
+		/*
+		 * Native object returned by function is 'red',
+		 * which means it's lifecycle is owned by C++ and can be released at any time.
+		 * So if you want to cache it in script, you should create a copy from script side.
+		 *
+		 * Native object created by script is 'black',
+		 * which means it's lifecycle is owned by managed garbage collector,
+		 * so it will be alive until it is not referenced by anyone.
+		 */
+		Vector startPos = K2_GetActorLocation();
+		_startPos = startPos.Clone();
+		ensure(startPos.IsRed);
+		ensure(_startPos.IsBlack);
+		ensure(_startPos == startPos);
+		
 		RotateAsync();
 
 		/*
@@ -121,7 +122,7 @@ public partial class MagicCube : Actor
 	protected override void ReceiveTick_Implementation(float deltaSeconds)
 	{
 		_accumulatedTime += deltaSeconds;
-		double offsetZ = 100 * Math.Sin(_accumulatedTime);
+		double offsetZ = _rotationSpeed * Math.Sin(_accumulatedTime);
 		K2_SetActorLocation(new(_startPos.X, _startPos.Y, _startPos.Z + offsetZ), false, out _, true);
 	}
 	
@@ -147,6 +148,7 @@ public partial class MagicCube : Actor
 	 * so the script object can also hold states.
 	 */
 	private Vector _startPos;
+	private float _rotationSpeed;
 	private float _accumulatedTime;
 
 }

@@ -11,15 +11,15 @@ namespace ZSharpEditorModule_Private
 	{
 #define LOCTEXT_NAMESPACE "ZSharpProjectStartup"
 
-		const FString SourceDir = FPaths::ProjectDir() / "Source";
-		if (!FPaths::DirectoryExists(SourceDir))
+		const FString sourceDir = FPaths::ProjectDir() / "Source";
+		if (!FPaths::DirectoryExists(sourceDir))
 		{
 			return;
 		}
 	
-		const FString ManagedSourceDir = SourceDir / "Managed";
+		const FString scriptDir = FPaths::ProjectDir() / "Script";
 		const FString DefaultZSharpIniPath = FPaths::ProjectConfigDir() / "DefaultZSharp.ini";
-		if (FPaths::DirectoryExists(ManagedSourceDir) || FPaths::FileExists(DefaultZSharpIniPath))
+		if (FPaths::DirectoryExists(scriptDir) || FPaths::FileExists(DefaultZSharpIniPath))
 		{
 			return;
 		}
@@ -47,7 +47,7 @@ namespace ZSharpEditorModule_Private
 		}
 
 		static const FText GRestartTitle = LOCTEXT("RestartTitle", "Generate Finished");
-		static const FText GRestartMessage = LOCTEXT("RestartMessage", "Example content generated:\n\n/Source/Managed/*\n/Config/DefaultZSharp.ini\n\nThe editor will close. Please build the Script.sln in project root directory then restart the editor.");
+		static const FText GRestartMessage = LOCTEXT("RestartMessage", "Example content generated:\n\n/Script/*\n/Config/DefaultZSharp.ini\n\nThe editor will close. Please build the Script.sln in project root directory then restart the editor.");
 
 		FMessageDialog::Open(EAppMsgCategory::Success, EAppMsgType::Ok, GRestartMessage, GRestartTitle);
 		RequestEngineExit(TEXT("Z# Startup"));

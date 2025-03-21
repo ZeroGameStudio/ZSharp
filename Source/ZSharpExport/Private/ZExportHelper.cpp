@@ -582,6 +582,8 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 		{ FBoolProperty::StaticClass(), TZExportedTypeName<bool>::Get(), },
 
 		{ FStrProperty::StaticClass(), TZExportedTypeName<FString>::Get(), },
+		{ FAnsiStrProperty::StaticClass(), TZExportedTypeName<FAnsiString>::Get(), },
+		{ FUtf8StrProperty::StaticClass(), TZExportedTypeName<FUtf8String>::Get(), },
 		{ FNameProperty::StaticClass(), TZExportedTypeName<FName>::Get(), },
 		{ FTextProperty::StaticClass(), TZExportedTypeName<FText>::Get(), },
 

@@ -24,7 +24,7 @@ ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Cr
 FString ZSharp::FZDynamicallyExportedProperty::GetName() const
 {
 	FString name = FZExportHelper::GetFieldRedirectedName(Property);
-	if (Index)
+	if (Property->ArrayDim > 1)
 	{
 		name.AppendInt(Index);
 	}

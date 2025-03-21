@@ -211,7 +211,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
         foreach (var type in assembly.GetTypes())
         {
-            if (!type.IsClass)
+            if (type is { IsClass: false, IsInterface: false })
             {
                 continue;
             }

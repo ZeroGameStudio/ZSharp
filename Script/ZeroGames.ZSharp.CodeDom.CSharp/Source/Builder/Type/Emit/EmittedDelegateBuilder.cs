@@ -33,8 +33,8 @@ public class EmittedDelegateBuilder(string namespaceName, string typeName, strin
 		
 		definition.Modifiers |= EMemberModifiers.Sealed | EMemberModifiers.Partial;
 
-		TypeReference? signatureReturnType = ReturnType is not null ? ToSignatureParameterDecl(new(EParameterKind.Out, ReturnType.Value, string.Empty)).Type : null;
-		ParameterDeclaration[]? signatureParameters = Parameters?.Select(ToSignatureParameterDecl).ToArray();
+		TypeReference? signatureReturnType = ReturnType is not null ? DelegateHelper.ToSignatureParameterDecl(new(EParameterKind.Out, ReturnType.Value, string.Empty)).Type : null;
+		ParameterDeclaration[]? signatureParameters = Parameters?.Select(DelegateHelper.ToSignatureParameterDecl).ToArray();
 
 		string stateParameterName = signatureParameters is not null && signatureParameters.Any(p => p.Name is "state") ? "userState" : "state";
 		ParameterDeclaration[] statefulSignatureParameters = [..signatureParameters ?? [], new(EParameterKind.In, new("TState", null), stateParameterName)];
@@ -72,30 +72,6 @@ public class EmittedDelegateBuilder(string namespaceName, string typeName, strin
 	{
 		string typeSegment = outerClassName is null ? typeName : $"{outerClassName}:{typeName}";
 		return $"/Script/{namespaceName.Split('.').Last()}.{typeSegment}__DelegateSignature";
-	}
-
-	private ParameterDeclaration ToSignatureParameterDecl(ParameterDeclaration source)
-	{
-		EParameterKind kind = source.Kind;
-		TypeReference sourceType = source.Type;
-		string targetTypeName = sourceType.TypeName;
-		if (kind == EParameterKind.In)
-		{
-			if (source.Type.IsNullInNotNullOut && targetTypeName.EndsWith("?"))
-			{
-				targetTypeName = targetTypeName.Substring(0, targetTypeName.Length - 1);
-			}
-		}
-		else if (kind == EParameterKind.Out)
-		{
-			if (source.Type.IsNullInNotNullOut && !targetTypeName.EndsWith("?"))
-			{
-				targetTypeName += "?";
-			}
-		}
-
-		TypeReference targetType = new(targetTypeName, sourceType.UnderlyingType, sourceType.IsNullInNotNullOut);
-		return new(kind, targetType, source.Name, source.DefaultValue, source.Attributes?.Declarations.Where(attr => attr.Name is not "NotNull").ToArray());
 	}
 	
 	private string BindMethodName => Kind == EDelegateKind.Unicast ? "Bind" : "Add";

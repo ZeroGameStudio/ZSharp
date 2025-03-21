@@ -47,8 +47,8 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 		abstractionDefinition.Modifiers |= EMemberModifiers.Sealed | EMemberModifiers.Partial;
 		abstractionDefinition.AddBaseType(BaseType);
 
-		TypeReference? signatureReturnType = ReturnType is not null ? ToSignatureParameterDecl(new(EParameterKind.Out, ReturnType.Value, string.Empty)).Type : null;
-		ParameterDeclaration[]? signatureParameters = Parameters?.Select(ToSignatureParameterDecl).ToArray();
+		TypeReference? signatureReturnType = ReturnType is not null ? DelegateHelper.ToSignatureParameterDecl(new(EParameterKind.Out, ReturnType.Value, string.Empty)).Type : null;
+		ParameterDeclaration[]? signatureParameters = Parameters?.Select(DelegateHelper.ToSignatureParameterDecl).ToArray();
 
 		MethodDefinition statelessSignature = new(EMemberVisibility.Public, "Signature", signatureReturnType, signatureParameters)
 		{
@@ -96,30 +96,6 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 	protected override string StaticFieldInterfaceName => "IStaticSignature";
 	protected override string StaticFieldTypeName => "DelegateFunction";
 	protected override string StaticFieldPropertyName => "StaticSignature";
-
-	private ParameterDeclaration ToSignatureParameterDecl(ParameterDeclaration source)
-	{
-		EParameterKind kind = source.Kind;
-		TypeReference sourceType = source.Type;
-		string targetTypeName = sourceType.TypeName;
-		if (kind == EParameterKind.In)
-		{
-			if (source.Type.IsNullInNotNullOut && targetTypeName.EndsWith("?"))
-			{
-				targetTypeName = targetTypeName.Substring(0, targetTypeName.Length - 1);
-			}
-		}
-		else if (kind == EParameterKind.Out)
-		{
-			if (source.Type.IsNullInNotNullOut && !targetTypeName.EndsWith("?"))
-			{
-				targetTypeName += "?";
-			}
-		}
-
-		TypeReference targetType = new(targetTypeName, sourceType.UnderlyingType, sourceType.IsNullInNotNullOut);
-		return new(kind, targetType, source.Name, source.DefaultValue, source.Attributes?.Declarations.Where(attr => attr.Name is not "NotNull").ToArray());
-	}
 	
 	private string BindMethodName => Kind == EDelegateKind.Unicast ? "Bind" : "Add";
 	private string ExecuteMethodName => Kind == EDelegateKind.Unicast ? "Execute" : "Broadcast";

@@ -384,6 +384,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		
 		res = alc->ZCall(GetDelegateZCallHandle(), &buffer);
 
+		// Note we never own params in this case so we only copy out but never destroy it.
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{
 			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
@@ -391,13 +392,11 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 			{
 				visitor->SetValue_InContainer(params, buffer[i + 1], 0);
 			}
-			visitor->DestructValue_InContainer(params);
 		}
 
 		if (ReturnProperty)
 		{
 			ReturnProperty->SetValue_InContainer(params, buffer[-1], 0);
-			ReturnProperty->DestructValue_InContainer(params);
 		}
 	}
 

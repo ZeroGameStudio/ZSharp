@@ -12,7 +12,7 @@ if (auto objectProperty = CastField<const FObjectPropertyBase>(property)) \
 	} \
 	else if (auto softClassProperty = CastField<const FSoftClassProperty>(property)) \
 	{ \
-		check(classProperty->MetaClass->IsNative()); \
+		check(softClassProperty->MetaClass->IsNative()); \
 	} \
 } \
 else if (auto interfaceProperty = CastField<const FInterfaceProperty>(property)) \

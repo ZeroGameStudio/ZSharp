@@ -77,7 +77,7 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 	{
 		if (!PropertyHelper.CanBeValue(typeof(T)))
 		{
-			throw new NotSupportedException($"Element type {typeof(T).FullName} is not supported.");
+			NotifyInitializationFailed(new NotSupportedException($"Element type {typeof(T).FullName} is not supported."));
 		}
 		
 		InternalConstruct();

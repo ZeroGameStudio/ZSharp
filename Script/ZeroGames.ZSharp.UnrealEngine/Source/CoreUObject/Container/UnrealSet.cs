@@ -124,7 +124,7 @@ public sealed class UnrealSet<T> : UnrealConjugateBase
 	{
 		if (!PropertyHelper.CanBeKey(typeof(T)) || !PropertyHelper.CanBeValue(typeof(T)))
 		{
-			throw new NotSupportedException($"Element type {typeof(T).FullName} is not supported.");
+			NotifyInitializationFailed(new NotSupportedException($"Element type {typeof(T).FullName} is not supported."));
 		}
 		
 		InternalConstruct();

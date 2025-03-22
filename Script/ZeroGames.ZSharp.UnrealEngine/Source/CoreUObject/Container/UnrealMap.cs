@@ -131,7 +131,7 @@ public sealed class UnrealMap<TKey, TValue> : UnrealConjugateBase
 	{
 		if (!PropertyHelper.CanBeValue(typeof(TKey)) || !PropertyHelper.CanBeValue(typeof(TValue)))
 		{
-			throw new NotSupportedException($"Element type {typeof(TKey).FullName} or {typeof(TValue).FullName} is not supported.");
+			NotifyInitializationFailed(new NotSupportedException($"Element type {typeof(TKey).FullName} or {typeof(TValue).FullName} is not supported."));
 		}
 		
 		InternalConstruct();

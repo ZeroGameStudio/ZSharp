@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using InvalidOperationException = System.InvalidOperationException;
@@ -12,7 +13,7 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
     public void Dispose()
     {
         InternalDispose();
-        GC.SuppressFinalize(this);
+        SuppressFinalize();
     }
 
     public LifecycleExpiredRegistration RegisterOnExpired(Action callback)
@@ -109,6 +110,20 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
         
         Unmanaged = MasterAlcCache.Instance.BuildConjugate(this, userdata);
     }
+
+    [DoesNotReturn]
+    protected void NotifyInitializationFailed(Exception exception)
+    {
+        if (Unmanaged != IntPtr.Zero)
+        {
+            throw new InvalidOperationException();
+        }
+        
+        ClearUnmanaged();
+        SuppressFinalize();
+        
+        throw exception;
+    }
     
     private protected UnrealConjugateBase()
     {
@@ -122,7 +137,7 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
         Unmanaged = unmanaged;
         IsBlack = false;
         
-        GC.SuppressFinalize(this);
+        SuppressFinalize();
     }
 
     ~UnrealConjugateBase() => InternalDispose();
@@ -193,9 +208,21 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
     {
         ensure(!IsExpired);
         
+        ClearUnmanaged();
+        BroadcastOnExpired();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ClearUnmanaged()
+    {
         GCHandle.Free();
         Unmanaged = DEAD_ADDR;
-        BroadcastOnExpired();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void SuppressFinalize()
+    {
+        GC.SuppressFinalize(this);
     }
     
     private void ValidateToken(LifecycleToken token)

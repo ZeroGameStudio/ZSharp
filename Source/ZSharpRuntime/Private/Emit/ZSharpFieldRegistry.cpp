@@ -88,7 +88,7 @@ void ZSharp::FZSharpFieldRegistry::ClearAlcSensitiveStates()
 {
 	for (const auto& pair : ClassRegistry)
 	{
-		pair.Value->ConstructorZCallHandle.Reset();
+		pair.Value->ConstructorZCallHandle = {};
 	}
 	
 	for (const auto& pair : FunctionRegistry)

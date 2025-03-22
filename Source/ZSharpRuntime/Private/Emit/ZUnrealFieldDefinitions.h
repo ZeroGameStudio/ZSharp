@@ -163,6 +163,9 @@ namespace ZSharp
 		};
 		
 		UClass* Class = nullptr;
+
+		bool bConstructor = false;
+		bool bContextual = false;
 		
 		FName ConfigName;
 		FName WithinPath;

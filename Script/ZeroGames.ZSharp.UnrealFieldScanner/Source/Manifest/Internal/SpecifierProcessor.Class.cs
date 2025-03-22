@@ -12,6 +12,12 @@ partial class SpecifierProcessor
 	}
 	
 	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, ContextualAttribute specifier)
+	{
+		def.IsContextual = true;
+	}
+	
+	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, WithinAttribute specifier)
 	{
 		def.WithinPath = ((ITypeModel)specifier.OuterType_SCANTIME).GetUnrealFieldPath();

@@ -239,6 +239,12 @@ struct FZClassDefinitionDto : public FZStructDefinitionDto
 	GENERATED_BODY()
 
 	UPROPERTY()
+	bool bConstructor = false;
+
+	UPROPERTY()
+	bool bContextual = false;
+
+	UPROPERTY()
 	FName ConfigName;
 
 	UPROPERTY()

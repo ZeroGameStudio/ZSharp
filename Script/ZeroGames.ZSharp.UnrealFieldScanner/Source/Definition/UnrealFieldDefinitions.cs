@@ -178,6 +178,8 @@ public class UnrealClassDefinition : UnrealStructDefinition
 		public string? ClassPath { get; set; }
 	}
 	
+	[JsonPropertyName("bConstructor")] public bool HasUClassConstructor { get; set; }
+	[JsonPropertyName("bContextual")] public bool IsContextual { get; set; }
 	public string? ConfigName { get; set; }
 	public string? WithinPath { get; set; }
 	public EClassFlags ClassFlags { get; set; }

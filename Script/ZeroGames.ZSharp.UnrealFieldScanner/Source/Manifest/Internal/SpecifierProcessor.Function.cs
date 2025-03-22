@@ -12,6 +12,12 @@ partial class SpecifierProcessor
 	}
 	
 	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, UClassConstructorAttribute specifier)
+	{
+		// Nothing to do.
+	}
+	
+	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintCallableAttribute specifier)
 	{
 		def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintCallable;

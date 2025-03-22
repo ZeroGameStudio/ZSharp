@@ -14,6 +14,14 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 
 		AssemblyName = typeDef.Scope.GetAssemblyName();
 		FullName = typeDef.FullName;
+
+		MethodDefinition? maybeCtor = typeDef.Methods.SingleOrDefault(method => method.HasCustomAttribute<UClassConstructorAttribute>());
+		if (maybeCtor is { HasParameters: true } or { IsStatic: true })
+		{
+			throw new InvalidOperationException();
+		}
+		
+		HasUClassConstructor = maybeCtor is not null;
 		IsInternal = typeDef.IsNotPublic;
 	}
 
@@ -88,6 +96,7 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 	}
 	
 	public IReadOnlyList<IUnrealFunctionModel> Functions => _functions;
+	public bool HasUClassConstructor { get; }
 	public bool IsInternal { get; }
 
 	public bool IsBaseInitialized { get; private set; }

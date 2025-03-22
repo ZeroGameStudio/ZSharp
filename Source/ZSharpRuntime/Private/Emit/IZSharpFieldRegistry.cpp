@@ -8,23 +8,19 @@
 
 ZSharp::FZCallHandle ZSharp::FZSharpClass::GetConstructorZCallHandle() const
 {
+	check(bConstructor);
+	check(!ConstructorZCallName.IsEmpty());
+	
 	if (!ConstructorZCallHandle)
 	{
-		if (!ConstructorZCallName.IsEmpty())
+		if (IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc())
 		{
-			if (IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc())
-			{
-				ConstructorZCallHandle = alc->GetZCallHandle(ConstructorZCallName);
-			}
-		}
-		else
-		{
-			ConstructorZCallHandle = FZCallHandle{};
+			ConstructorZCallHandle = alc->GetZCallHandle(ConstructorZCallName);
 		}
 	}
 
 	check(ConstructorZCallHandle);
-	return *ConstructorZCallHandle;
+	return ConstructorZCallHandle;
 }
 
 ZSharp::FZCallHandle ZSharp::FZSharpFunction::GetZCallHandle() const

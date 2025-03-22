@@ -13,7 +13,7 @@
 
 namespace ZSharp::ZSharpClass_Private
 {
-	static void ConstructObject(const FObjectInitializer& objectInitializer, UClass* cls)
+	static void ConstructObject(const FObjectInitializer& objectInitializer, UClass* cls, bool& contextual, IZMasterAssemblyLoadContext*& alc, FZConjugateHandle& conjugate)
 	{
 		UObject* obj = objectInitializer.GetObj();
 
@@ -42,7 +42,7 @@ namespace ZSharp::ZSharpClass_Private
 				}
 			}
 			
-			ConstructObject(objectInitializer, cls->GetSuperClass());
+			ConstructObject(objectInitializer, cls->GetSuperClass(), contextual, alc, conjugate);
 		}
 
 		// BPGC doesn't need to do anything else.
@@ -113,11 +113,17 @@ namespace ZSharp::ZSharpClass_Private
 			ZSharpStruct_Private::SetupPropertyDefaults(zscls, obj);
 
 			{ // Call managed red constructor and UClass constructor.
-				IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
-				// Try build conjugate to trigger managed constructor.
-				FZConjugateHandle conjugate = alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(obj);
-				if (FZCallHandle handle = zscls->GetConstructorZCallHandle())
+				if (!alc && (!contextual && zscls->bContextual || zscls->bConstructor))
 				{
+					alc = IZSharpClr::Get().GetMasterAlc();
+					conjugate = alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(obj);
+				}
+
+				contextual |= zscls->bContextual;
+				
+				if (zscls->bConstructor)
+				{
+					FZCallHandle handle = zscls->GetConstructorZCallHandle();
 					FZRedFrameScope scope;
 					{
 						FZCallBufferSlot slot { EZCallBufferSlotType::Conjugate, { .Conjugate = conjugate } };
@@ -139,10 +145,16 @@ namespace ZSharp::ZSharpClass_Private
 	
 	static void ClassConstructor(const FObjectInitializer& objectInitializer)
 	{
-		ConstructObject(objectInitializer, objectInitializer.GetClass());
+		bool contextual = false;
+		IZMasterAssemblyLoadContext* alc = nullptr;
+		FZConjugateHandle conjugate{};
+		ConstructObject(objectInitializer, objectInitializer.GetClass(), contextual, alc, conjugate);
 
 #if ZSHARP_WITH_MASTER_ALC_RELOAD
-		FZSharpClassInstanceRegistry::Get().Register(objectInitializer.GetObj());
+		if (contextual)
+		{
+			FZSharpClassInstanceRegistry::Get().Register(objectInitializer.GetObj());
+		}
 #endif
 	}
 }

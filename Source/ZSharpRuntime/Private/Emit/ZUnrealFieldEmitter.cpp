@@ -1107,6 +1107,9 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 	{ // Finally setup proxy.
 		FZSharpClass& zscls = FZSharpFieldRegistry::Get().RegisterClass(cls);
 
+		zscls.bConstructor = def.bConstructor;
+		zscls.bContextual = def.bContextual;
+
 		// Property defaults will be constructed in PostEmitClass().
 		
         zscls.DefaultSubobjects.Reserve(def.DefaultSubobjects.Num());
@@ -1131,7 +1134,10 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
         	defaultObjectOverride.ClassPath = defaultObjectOverrideDef.ClassPath;
         }
 
-		zscls.ConstructorZCallName = ZUnrealFieldEmitter_Private::MakeNMZCallName(cls, ".ctor");
+		if (zscls.bConstructor)
+		{
+			zscls.ConstructorZCallName = ZUnrealFieldEmitter_Private::MakeNMZCallName(cls, ".ctor");
+		}
 	}
 }
 

@@ -23,7 +23,7 @@ struct FZEmitVirtualModule
 	FString ModuleName;
 
 	UPROPERTY(EditAnywhere)
-	EZEmitVirtualModuleLoadingPhase LoadingPhase;
+	EZEmitVirtualModuleLoadingPhase LoadingPhase = EZEmitVirtualModuleLoadingPhase::PostEngineInit;
 
 	UPROPERTY(EditAnywhere, meta = (EditCondition = "LoadingPhase > EZEmitVirtualModuleLoadingPhase::PostEngineInit", EditConditionHides))
 	FString TargetModule;

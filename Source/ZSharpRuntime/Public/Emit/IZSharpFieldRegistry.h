@@ -74,6 +74,9 @@ namespace ZSharp
 		
 	public:
 		const UClass* Class = nullptr;
+
+		bool bConstructor = false;
+		bool bContextual = false;
 		
 		TArray<FDefaultSubobject> DefaultSubobjects;
 		TArray<FDefaultSubobjectOverride> DefaultSubobjectOverrides;
@@ -84,7 +87,7 @@ namespace ZSharp
 		FString ConstructorZCallName;
 
 	private:
-		mutable TOptional<FZCallHandle> ConstructorZCallHandle;
+		mutable FZCallHandle ConstructorZCallHandle{};
 		
 	};
 

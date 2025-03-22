@@ -8,14 +8,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, UPropertyAttribute specifier)
 	{
-		if (specifier.Default?.ToString() is {} defaultValue && !string.IsNullOrWhiteSpace(defaultValue))
-		{
-			def.Outer.PropertyDefaults.Add(new()
-			{
-				PropertyChain = def.Name,
-				Buffer = defaultValue,
-			});
-		}
+		// Nothing to do.
 	}
 	
 	[SpecifierProcessor]
@@ -310,6 +303,19 @@ partial class SpecifierProcessor
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, AttachmentAttribute specifier)
 	{
 		// Do nothing because DefaultSubobject/OptionalDefaultSubobject specifier will deal with us.
+	}
+
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, DefaultValueAttribute specifier)
+	{
+		if (specifier.Value?.ToString() is {} defaultValue && !string.IsNullOrWhiteSpace(defaultValue))
+		{
+			def.Outer.PropertyDefaults.Add(new()
+			{
+				PropertyChain = def.Name,
+				Buffer = defaultValue,
+			});
+		}
 	}
 
 	[SpecifierProcessor]

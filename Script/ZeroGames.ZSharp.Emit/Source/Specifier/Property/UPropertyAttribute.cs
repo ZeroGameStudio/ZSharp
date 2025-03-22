@@ -2,9 +2,6 @@
 
 namespace ZeroGames.ZSharp.Emit.Specifier;
 
-public class UPropertyAttribute : PropertySpecifierBase
-{
-	public object? Default { get; init; }
-}
+public class UPropertyAttribute : PropertySpecifierBase;
 
 

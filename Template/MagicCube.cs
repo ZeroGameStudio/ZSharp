@@ -43,7 +43,7 @@ public partial class MagicCube : Actor
 	/*
 	 * Define a UProperty that can be edited in property editor.
 	 */
-	[UProperty(Default = 180), EditAnywhere]
+	[UProperty, DefaultValue(180), EditAnywhere]
 	public partial double RotationSpeed { get; set; }
 
 	/*
@@ -51,7 +51,7 @@ public partial class MagicCube : Actor
 	 */
 	public MagicCube(IntPtr unmanaged) : base(unmanaged)
 	{
-		_rotationSpeed = 100f;
+		_translationSpeed = 100f;
 		_startPos = new();
 	}
 	
@@ -122,7 +122,7 @@ public partial class MagicCube : Actor
 	protected override void ReceiveTick_Implementation(float deltaSeconds)
 	{
 		_accumulatedTime += deltaSeconds;
-		double offsetZ = _rotationSpeed * Math.Sin(_accumulatedTime);
+		double offsetZ = _translationSpeed * Math.Sin(_accumulatedTime);
 		K2_SetActorLocation(new(_startPos.X, _startPos.Y, _startPos.Z + offsetZ), false, out _, true);
 	}
 	
@@ -148,7 +148,7 @@ public partial class MagicCube : Actor
 	 * so the script object can also hold states.
 	 */
 	private Vector _startPos;
-	private float _rotationSpeed;
+	private float _translationSpeed;
 	private float _accumulatedTime;
 
 }

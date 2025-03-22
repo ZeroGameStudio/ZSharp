@@ -35,20 +35,16 @@ namespace ZSharp::PropertyFactory_Private
 	template <std::derived_from<FProperty> T>
 	T* Create(TFunctionRef<void(T*)> initialize = [](T*){})
 	{
-		class FNullArchive : public FArchive
+		class : public FArchive
 		{
-			virtual FArchive& operator<<(FObjectPtr& Value) override
-			{
-				return *this;
-			}
-		};
+			virtual FArchive& operator<<(FObjectPtr& Value) override { return *this; }
+		} ar;
 		
 		auto prop = new T(nullptr, NAME_None, RF_Public | RF_MarkAsNative | RF_Transient);
 
 		initialize(prop);
 
-		FNullArchive dummy;
-		prop->Link(dummy);
+		prop->Link(ar);
 		
 		return prop;
 	}

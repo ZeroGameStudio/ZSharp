@@ -17,10 +17,18 @@ ZSharp::FZSelfDescriptiveOptional::FZSelfDescriptiveOptional(const DescriptorTyp
 		CHECK_NATIVE_PROPERTY_DESCRIPTOR();
 	}
 #endif
+
+	class : public FArchive
+	{
+		virtual FArchive& operator<<(FObjectPtr& Value) override { return *this; }
+	} ar;
 	
 	// FOptionalProperty owns it's ValueProperty, so we have to make a copy.
 	auto duplicatedValueProperty = CastField<FProperty>(FField::Duplicate(descriptor, nullptr));
 	Helper->SetValueProperty(duplicatedValueProperty);
+	Helper->Link(ar);
+
+	UnderlyingInstance = FMemory::Malloc(Helper->GetSize(), Helper->GetMinAlignment());
 	Helper->InitializeValue(UnderlyingInstance);
 }
 
@@ -90,13 +98,6 @@ ZSharp::FZSelfDescriptiveOptional& ZSharp::FZSelfDescriptiveOptional::operator=(
 	UnderlyingPropertyVisitor = MoveTemp(other.UnderlyingPropertyVisitor);
 
 	return *this;
-}
-
-ZSharp::FZSelfDescriptiveOptional::UnderlyingInstanceType* ZSharp::FZSelfDescriptiveOptional::NewUnderlyingInstance(const DescriptorType* descriptor)
-{
-	// Here the helper is not available so we only allocate memory for the underlying instance.
-	// Let our constructor to initialize it.
-	return FMemory::Malloc(descriptor->GetSize(), descriptor->GetMinAlignment());
 }
 
 

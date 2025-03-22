@@ -35,7 +35,11 @@ namespace ZSharp
 		FZSelfDescriptiveOptional& operator=(FZSelfDescriptiveOptional&& other) noexcept;
 
 	private:
-		static UnderlyingInstanceType* NewUnderlyingInstance(const DescriptorType* descriptor);
+		/**
+		 * Here the helper is not available so we only allocate memory for the underlying instance.
+		 * Let our constructor initialize it.
+		 */ 
+		static UnderlyingInstanceType* NewUnderlyingInstance(const DescriptorType* descriptor) { return nullptr; }
 		/**
 		 * Helper is already dead here so we need to delete underlying instance in our destructor.
 		 * This is only to tell base class not do anything.

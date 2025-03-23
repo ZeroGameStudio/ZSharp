@@ -38,9 +38,9 @@ public class UEnumAnalyzer : DiagnosticAnalyzer
 
         var unrealFieldPathAttribute = enumDeclaration.AttributeLists
             .SelectMany(a => a.Attributes)
-            .First(a => a.Name.ToString() is "UnrealFieldPath" or "UnrealFieldPathAttribute");
+            .SingleOrDefault(a => a.Name.ToString() is "UnrealFieldPath" or "UnrealFieldPathAttribute");
 
-        var arguments = unrealFieldPathAttribute.ArgumentList?.Arguments ?? default;
+        var arguments = unrealFieldPathAttribute?.ArgumentList?.Arguments ?? default;
         if (arguments.Count != 1)
         {
             goto error;

@@ -13,7 +13,7 @@ public static class UnrealFieldDefinitionExtensions
 		}
 
 		@this.MetadataMap ??= new();
-		@this.MetadataMap[key] = value.ToString() ?? string.Empty;
+		@this.MetadataMap[key] = ToString(value);
 	}
 	
 	public static void AddMetadata(this UnrealFieldDefinition @this, string key) => AddMetadata(@this, key, string.Empty);
@@ -59,6 +59,16 @@ public static class UnrealFieldDefinitionExtensions
 		}
 		
 		@this.TransparentDataMap.Remove(key);
+	}
+
+	private static string ToString(object value)
+	{
+		if (value is bool)
+		{
+			return value.ToString()!.ToLower();
+		}
+		
+		return value.ToString() ?? string.Empty;
 	}
 	
 }

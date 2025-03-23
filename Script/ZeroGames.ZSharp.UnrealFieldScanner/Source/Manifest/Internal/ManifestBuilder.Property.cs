@@ -26,6 +26,13 @@ partial class ManifestBuilder
 			EnumUnderlyingType = enumUnderlyingType,
 			DescriptorFieldPath = descriptorFieldPath,
 		};
+
+		if (structDef is not IUnrealSignatureDefinition)
+		{
+			result.AddMetadata("Category", structDef.Name);
+		}
+		
+		ProcessSpecifiers(result, propertyModel);
 		
 		result.InnerProperty = GetInnerProperty(result.Type, propertyModelType);
 		result.OuterProperty = GetOuterProperty(result.Type, propertyModelType);
@@ -38,8 +45,6 @@ partial class ManifestBuilder
 		{
 			ScanMemberProperty(result, propertyModel);
 		}
-		
-		ProcessSpecifiers(result, propertyModel);
 		
 		return result;
 	}

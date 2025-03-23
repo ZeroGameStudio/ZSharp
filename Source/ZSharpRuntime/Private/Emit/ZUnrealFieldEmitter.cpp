@@ -1193,39 +1193,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 	// Compile script struct.
 	// All referenced script structs should be initialized so struct properties can link properly.
 	scriptStruct->StaticLink(true);
-	// Migrate from UScriptStruct::Link().
-	// We have ICppStructOps, but it is 'fake',
-	// so we need to manually deal with some problem that should have done by C++ compiler.
-	scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | STRUCT_ZeroConstructor | STRUCT_NoDestructor | STRUCT_IsPlainOldData);
-	for (FProperty* property = scriptStruct->PropertyLink; property; property = property->PropertyLinkNext)
-	{
-		if (!property->HasAnyPropertyFlags(CPF_ZeroConstructor))
-		{
-			scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags & ~STRUCT_ZeroConstructor);
-		}
-		if (!property->HasAnyPropertyFlags(CPF_NoDestructor))
-		{
-			scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags & ~STRUCT_NoDestructor);
-		}
-		if (!property->HasAnyPropertyFlags(CPF_IsPlainOldData))
-		{
-			scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags & ~STRUCT_IsPlainOldData);
-		}
-	}
-	if (scriptStruct->StructFlags & STRUCT_IsPlainOldData)
-	{
-		UE_LOG(LogZSharpEmit, Verbose, TEXT("Z# struct %s is plain old data."), *scriptStruct->GetName());
-	}
-	if (scriptStruct->StructFlags & STRUCT_NoDestructor)
-	{
-		UE_LOG(LogZSharpEmit, Verbose, TEXT("Z# struct %s has no destructor."), *scriptStruct->GetName());
-	}
-	if (scriptStruct->StructFlags & STRUCT_ZeroConstructor)
-	{
-		UE_LOG(LogZSharpEmit, Verbose, TEXT("Z# struct %s has zero construction."), *scriptStruct->GetName());
-	}
-	ops->Fixup();
-
+	
 	// Compile Z# struct.
 	FZSharpScriptStruct* zsstruct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
 	zsstruct->CppStructOps = ops;

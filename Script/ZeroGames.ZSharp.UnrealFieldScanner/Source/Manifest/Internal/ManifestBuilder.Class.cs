@@ -14,7 +14,7 @@ partial class ManifestBuilder
 			ClassFlags = classModel.IsInternal ? EClassFlags.CLASS_RequiredAPI : EClassFlags.CLASS_MinimalAPI,
 			HasUClassConstructor = classModel.HasUClassConstructor,
 		};
-
+		
 		ProcessSpecifiers(result, classModel);
 		
 		ScanUFunctions(result, classModel);

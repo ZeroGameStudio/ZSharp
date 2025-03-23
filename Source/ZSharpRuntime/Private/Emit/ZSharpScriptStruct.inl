@@ -15,16 +15,9 @@ namespace ZSharp::ZSharpScriptStruct_Private
 			, ScriptStruct(scriptStruct)
 			, ZSharpScriptStruct(zsstrct)
 		{
+			// Never treat emitted struct as POD type.
 			Capabilities.HasSerializerObjectReferences = EPropertyObjectReferenceType::Conservative;
 			Capabilities.HasDestructor = true;
-		}
-
-		void Fixup()
-		{
-			Capabilities.ComputedPropertyFlags =
-				(ScriptStruct->StructFlags & STRUCT_IsPlainOldData ? CPF_IsPlainOldData : CPF_None) |
-				(ScriptStruct->StructFlags & STRUCT_NoDestructor ? CPF_NoDestructor : CPF_None) |
-				(ScriptStruct->StructFlags & STRUCT_ZeroConstructor ? CPF_ZeroConstructor : CPF_None);
 		}
 
 		virtual FCapabilities GetCapabilities() const override { return Capabilities; }

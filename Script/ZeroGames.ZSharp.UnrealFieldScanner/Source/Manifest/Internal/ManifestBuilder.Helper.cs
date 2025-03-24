@@ -18,8 +18,8 @@ partial class ManifestBuilder
 			"System.Int64" => EEnumUnderlyingType.Int64,
 			_ => throw new ArgumentOutOfRangeException(nameof(type)),
 		};
-	
-		// Namespaces
+
+	// Namespaces
 	private const string ZSHARP_NAMESPACE = "ZeroGames.ZSharp.";
 	private const string ENGINE_NAMESPACE = ZSHARP_NAMESPACE + "UnrealEngine.";
 	private const string ENGINE_CORE_UOBJECT_NAMESPACE = ENGINE_NAMESPACE + "CoreUObject.";

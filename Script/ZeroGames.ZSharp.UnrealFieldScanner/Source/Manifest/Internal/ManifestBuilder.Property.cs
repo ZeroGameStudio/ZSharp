@@ -173,16 +173,8 @@ partial class ManifestBuilder
 				}
 			}
 
-			// There is an exception for object property that TObjectPtr<UClass> is treated as TSubclassOf<UObject>.
-			if (result == EPropertyType.Object)
-			{
-				if (propertyTypeModel.FullName == UNREAL_CLASS_TYPE_FULL_NAME)
-				{
-					result = EPropertyType.Class;
-				}
-			}
 			// For delegate property, we need a further check.
-			else if (result == EPropertyType.Delegate)
+			if (result == EPropertyType.Delegate)
 			{
 				result = propertyTypeModel.BaseType!.Value.FullName switch
 				{

@@ -31,6 +31,7 @@ public readonly struct TypeModelReference : ITypeModel
 	public string AssemblyName => Type.AssemblyName;
 	public string FullName { get; init; }
 	public TypeModelReference? BaseType => Type.BaseType;
+	public TypeModelReference EnumUnderlyingType => Type.EnumUnderlyingType;
 	public IReadOnlyList<InterfaceTypeUri> Interfaces => Type.Interfaces;
 
 	public IReadOnlyCollection<IUnrealReflectionSpecifier> Specifiers => Type.Specifiers;

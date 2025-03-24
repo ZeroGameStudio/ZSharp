@@ -76,6 +76,8 @@ internal class UnrealScriptStructModel : UnrealStructModel, IUnrealScriptStructM
 		}
 	}
 	
+	public TypeModelReference EnumUnderlyingType => throw new NotSupportedException();
+	
 	public IReadOnlyList<InterfaceTypeUri> Interfaces
 	{
 		get

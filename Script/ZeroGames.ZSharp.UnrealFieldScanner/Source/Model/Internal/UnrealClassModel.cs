@@ -84,6 +84,8 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 			return _baseType;
 		}
 	}
+	
+	public TypeModelReference EnumUnderlyingType => throw new NotSupportedException();
 
 	public IReadOnlyList<InterfaceTypeUri> Interfaces
 	{

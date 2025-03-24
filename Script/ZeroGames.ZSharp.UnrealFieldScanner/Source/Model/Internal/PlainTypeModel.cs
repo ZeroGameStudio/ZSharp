@@ -19,7 +19,7 @@ internal class PlainTypeModel : ITypeModel
 
 		if (typeDef.IsEnum)
 		{
-			EnumUnderlyingType = new(registry, typeDef.Fields.Single(f => f.Name == "value__").FieldType);
+			_enumUnderlyingType = new(registry, typeDef.Fields.Single(f => f.Name == "value__").FieldType);
 		}
 		
 		Interfaces = typeDef.Interfaces.Select(i => new InterfaceTypeUri(i.InterfaceType.Scope.GetAssemblyName(), i.InterfaceType.FullName)).ToArray();
@@ -34,12 +34,13 @@ internal class PlainTypeModel : ITypeModel
 	public string AssemblyName { get; }
 	public string FullName { get; }
 	public TypeModelReference? BaseType { get; }
-	public TypeModelReference? EnumUnderlyingType { get; }
+	public TypeModelReference EnumUnderlyingType => _enumUnderlyingType ?? throw new NotSupportedException();
 	public IReadOnlyList<InterfaceTypeUri> Interfaces { get; }
 
 	public IReadOnlyCollection<IUnrealReflectionSpecifier> Specifiers => _specifiers;
 	
 	private readonly List<IUnrealReflectionSpecifier> _specifiers = new();
+	private readonly TypeModelReference? _enumUnderlyingType;
 	
 }
 

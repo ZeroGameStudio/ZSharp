@@ -370,14 +370,27 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				break;
 			}
 			// Object wrappers
-			// @TODO: If PropertyClass has CLASS_DefaultToInstanced in hierarchy, then the property should set CPF_InstancedReference | CPF_ExportObject. (@see: UhtObjectPropertyBase.cs)
 		case EZPropertyType::Object:
 			{
-				NEW_PROPERTY(Object);
+				auto descriptor = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				if (descriptor->IsChildOf<UClass>())
+				{
+					// Special case for TObjectPtr<UClass>.
+					NEW_PROPERTY(Class);
 
-				property->PropertyFlags |= CPF_TObjectPtrWrapper; // Migrate from UHT.
+					property->PropertyFlags |= CPF_TObjectPtrWrapper; // Migrate from UHT.
 				
-				property->PropertyClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+					property->PropertyClass = descriptor;
+					property->MetaClass = UObject::StaticClass();
+				}
+				else
+				{
+					NEW_PROPERTY(Object);
+
+					property->PropertyFlags |= CPF_TObjectPtrWrapper; // Migrate from UHT.
+				
+					property->PropertyClass = descriptor;
+				}
 				
 				break;
 			}
@@ -385,7 +398,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(Class);
 
-				property->PropertyFlags |= CPF_TObjectPtrWrapper; // Migrate from UHT.
+				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
 				
 				property->PropertyClass = UClass::StaticClass();
 				property->MetaClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
@@ -397,7 +410,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				NEW_PROPERTY(SoftClass);
 
 				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
-				
+
+				property->PropertyClass = UClass::StaticClass();
 				property->MetaClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
@@ -412,7 +426,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				
 				break;
 			}
-			// There seems to be a TAutoWeakObjectPtr<> and CPF_AutoWeak but I don't see...
+			// There seems to be a TAutoWeakObjectPtr<> and CPF_AutoWeak, but I don't see...
 		case EZPropertyType::WeakObject:
 			{
 				NEW_PROPERTY(WeakObject);
@@ -492,6 +506,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			// Special types
 		case EZPropertyType::FieldPath:
 			{
+				UE_LOG(LogZSharpEmit, Fatal, TEXT("FieldPath property is not supported by emit!!!"));
+				
 				NEW_PROPERTY(FieldPath);
 
 				property->PropertyClass = FProperty::StaticClass();

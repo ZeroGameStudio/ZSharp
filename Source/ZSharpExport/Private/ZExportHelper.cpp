@@ -608,6 +608,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 
 		if (auto classProp = CastField<const FClassProperty>(property))
 		{
+			// @FIXME: ClassProperty
 			if (classProp->MetaClass == UObject::StaticClass())
 			{
 				return GetUFieldFullyExportedTypeName(UClass::StaticClass());

@@ -78,6 +78,8 @@ internal class UnrealDelegateModel : UnrealStructModel, IUnrealDelegateModel, ID
 		}
 	}
 	
+	public TypeModelReference EnumUnderlyingType => throw new NotSupportedException();
+	
 	public IReadOnlyList<InterfaceTypeUri> Interfaces
 	{
 		get

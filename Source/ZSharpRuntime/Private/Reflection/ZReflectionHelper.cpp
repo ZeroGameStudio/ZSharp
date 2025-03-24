@@ -66,6 +66,7 @@ ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeT
 	
 	if (auto classProp = CastField<const FClassProperty>(elementProperty))
 	{
+		// @FIXME: ClassProperty
 		if (classProp->MetaClass == UObject::StaticClass())
 		{
 			return FZRuntimeTypeUri { GetFieldConjugateKey(UClass::StaticClass()) };

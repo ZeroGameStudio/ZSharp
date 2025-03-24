@@ -23,6 +23,7 @@ internal class IntrinsicTypeModel : ITypeModel
 	public string AssemblyName { get; }
 	public string FullName { get; }
 	public TypeModelReference? BaseType { get; }
+	public TypeModelReference EnumUnderlyingType => throw new NotSupportedException();
 	public IReadOnlyList<InterfaceTypeUri> Interfaces { get; } = [];
 
 	public IReadOnlyCollection<IUnrealReflectionSpecifier> Specifiers { get; } = [];

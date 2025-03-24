@@ -90,6 +90,7 @@ FProperty* ZSharp::FZPropertyFactory::Create(const FZPropertyDesc& desc)
 	UField* field = static_cast<UField*>(desc.Descriptor);
 	if (auto cls = Cast<UClass>(field))
 	{
+		// @FIXME: ClassProperty
 		if (cls == UClass::StaticClass())
 		{
 			return PropertyFactory_Private::Create<FClassProperty>([&](FClassProperty* prop)

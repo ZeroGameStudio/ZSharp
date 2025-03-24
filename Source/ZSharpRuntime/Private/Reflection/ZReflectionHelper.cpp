@@ -69,7 +69,7 @@ ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeT
 		// Special cast for TObjectPtr<UClass> and UClass*.
 		if (classProp->HasAllPropertyFlags(CPF_TObjectPtr) || !classProp->HasAnyPropertyFlags(CPF_UObjectWrapper))
 		{
-			return FZRuntimeTypeUri { GetFieldConjugateKey(classProp->MetaClass) };
+			return FZRuntimeTypeUri { GetFieldConjugateKey(classProp->PropertyClass) };
 		}
 	}
 	else if (auto objectProp = CastField<const FObjectProperty>(elementProperty))

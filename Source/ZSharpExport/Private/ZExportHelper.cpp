@@ -611,7 +611,7 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 			// Special cast for TObjectPtr<UClass> and UClass*.
 			if (classProp->HasAllPropertyFlags(CPF_TObjectPtr) || !classProp->HasAnyPropertyFlags(CPF_UObjectWrapper))
 			{
-				return GetUFieldFullyExportedTypeName(classProp->MetaClass);
+				return GetUFieldFullyExportedTypeName(classProp->PropertyClass);
 			}
 			
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveSubclassOf>::Get();

@@ -66,10 +66,10 @@ ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeT
 	
 	if (auto classProp = CastField<const FClassProperty>(elementProperty))
 	{
-		// @FIXME: ClassProperty
-		if (classProp->MetaClass == UObject::StaticClass())
+		// Special cast for TObjectPtr<UClass> and UClass*.
+		if (classProp->HasAllPropertyFlags(CPF_TObjectPtr) || !classProp->HasAnyPropertyFlags(CPF_UObjectWrapper))
 		{
-			return FZRuntimeTypeUri { GetFieldConjugateKey(UClass::StaticClass()) };
+			return FZRuntimeTypeUri { GetFieldConjugateKey(classProp->MetaClass) };
 		}
 	}
 	else if (auto objectProp = CastField<const FObjectProperty>(elementProperty))
@@ -113,6 +113,7 @@ ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeT
 	FZRuntimeTypeUri inner;
 	if (auto classProp = CastField<const FClassProperty>(elementProperty))
 	{
+		// It must be TSubclassOf<T> at this point.
 		inner = FZRuntimeTypeUri { GetFieldConjugateKey(classProp->MetaClass) };
 	}
 	else if (auto softClassProp = CastField<const FSoftClassProperty>(elementProperty))

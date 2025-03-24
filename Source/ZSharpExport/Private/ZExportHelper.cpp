@@ -608,10 +608,10 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 
 		if (auto classProp = CastField<const FClassProperty>(property))
 		{
-			// @FIXME: ClassProperty
-			if (classProp->MetaClass == UObject::StaticClass())
+			// Special cast for TObjectPtr<UClass> and UClass*.
+			if (classProp->HasAllPropertyFlags(CPF_TObjectPtr) || !classProp->HasAnyPropertyFlags(CPF_UObjectWrapper))
 			{
-				return GetUFieldFullyExportedTypeName(UClass::StaticClass());
+				return GetUFieldFullyExportedTypeName(classProp->MetaClass);
 			}
 			
 			FZFullyExportedTypeName name = TZExportedTypeName<FZSelfDescriptiveSubclassOf>::Get();

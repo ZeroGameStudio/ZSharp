@@ -90,11 +90,12 @@ FProperty* ZSharp::FZPropertyFactory::Create(const FZPropertyDesc& desc)
 	UField* field = static_cast<UField*>(desc.Descriptor);
 	if (auto cls = Cast<UClass>(field))
 	{
-		// @FIXME: ClassProperty
-		if (cls == UClass::StaticClass())
+		// Special case for TObject<UClass>.
+		if (cls->IsChildOf<UClass>())
 		{
 			return PropertyFactory_Private::Create<FClassProperty>([&](FClassProperty* prop)
 			{
+				prop->PropertyFlags |= CPF_TObjectPtrWrapper;
 				prop->PropertyClass = cls;
 				prop->MetaClass = UObject::StaticClass();
 			});
@@ -103,6 +104,7 @@ FProperty* ZSharp::FZPropertyFactory::Create(const FZPropertyDesc& desc)
 		{
 			return PropertyFactory_Private::Create<FObjectProperty>([&](FObjectProperty* prop)
 			{
+				prop->PropertyFlags |= CPF_TObjectPtrWrapper;
 				prop->PropertyClass = cls;
 			});
 		}

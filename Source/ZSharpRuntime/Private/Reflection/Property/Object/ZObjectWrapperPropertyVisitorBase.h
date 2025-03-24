@@ -24,7 +24,7 @@ namespace ZSharp
 			// Special case for TObjectPtr<UClass> and UClass*.
 			if constexpr (std::is_same_v<TProperty, FClassProperty>)
 			{
-				if (!UnderlyingWrapperProperty->HasAnyPropertyFlags(CPF_UObjectWrapper) || UnderlyingWrapperProperty->HasAllPropertyFlags(CPF_TObjectPtr))
+				if (UnderlyingWrapperProperty->HasAllPropertyFlags(CPF_TObjectPtr) || !UnderlyingWrapperProperty->HasAnyPropertyFlags(CPF_UObjectWrapper))
 				{
 					TZCallBufferSlotEncoder<UClass*>::Encode(CastChecked<UClass>(UnderlyingWrapperProperty->GetPropertyValue(src), ECastCheckedType::NullAllowed), dest);
 					return;
@@ -48,7 +48,7 @@ namespace ZSharp
 			// Special case for TObjectPtr<UClass> and UClass*.
 			if constexpr (std::is_same_v<TProperty, FClassProperty>)
 			{
-				if (!UnderlyingWrapperProperty->HasAnyPropertyFlags(CPF_UObjectWrapper) || UnderlyingWrapperProperty->HasAllPropertyFlags(CPF_TObjectPtr))
+				if (UnderlyingWrapperProperty->HasAllPropertyFlags(CPF_TObjectPtr) || !UnderlyingWrapperProperty->HasAnyPropertyFlags(CPF_UObjectWrapper))
 				{
 					TZCallBufferSlotEncoder<UClass*>::Encode(CastChecked<UClass>(UnderlyingWrapperProperty->GetPropertyValue(src), ECastCheckedType::NullAllowed), dest);
 					return;
@@ -63,7 +63,7 @@ namespace ZSharp
 			// Special case for TObjectPtr<UClass> and UClass*.
 			if constexpr (std::is_same_v<TProperty, FClassProperty>)
 			{
-				if (!UnderlyingWrapperProperty->HasAnyPropertyFlags(CPF_UObjectWrapper) || UnderlyingWrapperProperty->HasAllPropertyFlags(CPF_TObjectPtr))
+				if (UnderlyingWrapperProperty->HasAllPropertyFlags(CPF_TObjectPtr) || !UnderlyingWrapperProperty->HasAnyPropertyFlags(CPF_UObjectWrapper))
 				{
 					UClass* value = TZCallBufferSlotEncoder<UClass*>::Decode(src);
 					check(!value || value->IsChildOf(UnderlyingWrapperProperty->MetaClass));

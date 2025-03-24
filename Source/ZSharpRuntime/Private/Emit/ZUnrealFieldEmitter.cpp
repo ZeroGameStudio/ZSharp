@@ -202,8 +202,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 	static void FinishEmitSimpleProperty(FZSimplePropertyDefinition& def)
 	{
 		FProperty* property = def.Property;
-		property->PropertyFlags |= def.PropertyFlags;
-
+		
 		// Migrate from FProperty::Init().
 		if (property->GetOwner<UObject>())
 		{
@@ -221,7 +220,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 #define NEW_PROPERTY(PropertyTypeName) \
 	auto property = new F##PropertyTypeName##Property(owner, name, flags | GCompiledInPropertyObjectFlags); \
-	def.Property = property;
+	def.Property = property; \
+	property->PropertyFlags |= def.PropertyFlags;
 	
 	static void EmitSimpleProperty(FFieldVariant owner, FZSimplePropertyDefinition& def, FName name, EObjectFlags flags)
 	{
@@ -281,10 +281,17 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		case EZPropertyType::Bool:
 			{
 				NEW_PROPERTY(Bool);
+
+				// Migrate from FBoolProperty constructor.
+				// Emitted bool property is always treated as native bool.
+				property->SetBoolSize(sizeof(bool), true);
+				
 				break;
 			}
 		case EZPropertyType::Enum:
 			{
+				static const FName GUnderlyingPropertyName { "UnderlyingType" };
+				
 				NEW_PROPERTY(Enum);
 
 				property->SetEnum(FindObjectChecked<UEnum>(nullptr, *def.DescriptorFieldPath.ToString()));
@@ -294,43 +301,43 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				{
 				case EZEnumUnderlyingType::UInt8:
 					{
-						underlyingProperty = new FByteProperty { property, NAME_None, GCompiledInPropertyObjectFlags };
+						underlyingProperty = new FByteProperty { property, GUnderlyingPropertyName, GCompiledInPropertyObjectFlags };
 						break;
 					}
 				case EZEnumUnderlyingType::UInt16:
 					{
-						underlyingProperty = new FUInt16Property { property, NAME_None, GCompiledInPropertyObjectFlags };
+						underlyingProperty = new FUInt16Property { property, GUnderlyingPropertyName, GCompiledInPropertyObjectFlags };
 						break;
 					}
 				case EZEnumUnderlyingType::UInt32:
 					{
-						underlyingProperty = new FUInt32Property { property, NAME_None, GCompiledInPropertyObjectFlags };
+						underlyingProperty = new FUInt32Property { property, GUnderlyingPropertyName, GCompiledInPropertyObjectFlags };
 						break;
 					}
 				case EZEnumUnderlyingType::UInt64:
 					{
-						underlyingProperty = new FUInt64Property { property, NAME_None, GCompiledInPropertyObjectFlags };
+						underlyingProperty = new FUInt64Property { property, GUnderlyingPropertyName, GCompiledInPropertyObjectFlags };
 						break;
 					}
 				case EZEnumUnderlyingType::Int8:
 					{
-						underlyingProperty = new FInt8Property { property, NAME_None, GCompiledInPropertyObjectFlags };
+						underlyingProperty = new FInt8Property { property, GUnderlyingPropertyName, GCompiledInPropertyObjectFlags };
 						break;
 					}
 
 				case EZEnumUnderlyingType::Int16:
 					{
-						underlyingProperty = new FInt16Property { property, NAME_None, GCompiledInPropertyObjectFlags };
+						underlyingProperty = new FInt16Property { property, GUnderlyingPropertyName, GCompiledInPropertyObjectFlags };
 						break;
 					}
 				case EZEnumUnderlyingType::Int32:
 					{
-						underlyingProperty = new FIntProperty { property, NAME_None, GCompiledInPropertyObjectFlags };
+						underlyingProperty = new FIntProperty { property, GUnderlyingPropertyName, GCompiledInPropertyObjectFlags };
 						break;
 					}
 				case EZEnumUnderlyingType::Int64:
 					{
-						underlyingProperty = new FInt64Property { property, NAME_None, GCompiledInPropertyObjectFlags };
+						underlyingProperty = new FInt64Property { property, GUnderlyingPropertyName, GCompiledInPropertyObjectFlags };
 						break;
 					}
 				default:
@@ -549,11 +556,15 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(Array);
 
+				// FArrayProperty doesn't call TTypeFundamentals::GetComputedFlagsPropertyFlags() to calculate computed flags,
+				// we directly bake the result here (using FScriptArray).
+				property->PropertyFlags |= CPF_ZeroConstructor;
+
 				EmitSimpleProperty(property, def.InnerProperty, name, RF_NoFlags);
 
 				// Migrate from UHT.
 				property->PropertyFlags |= property->Inner->PropertyFlags & CPF_TObjectPtrWrapper;
-				property->Inner->PropertyFlags = property->PropertyFlags & CPF_PropagateToArrayInner;
+				property->Inner->PropertyFlags = property->PropertyFlags & (CPF_PropagateToArrayInner | CPF_TObjectPtr); // Fix C++ and UHT mismatch.
 
 				break;
 			}
@@ -568,7 +579,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 				// Migrate from UHT.
 				property->PropertyFlags |= property->ElementProp->PropertyFlags & CPF_TObjectPtrWrapper;
-				property->ElementProp->PropertyFlags = property->PropertyFlags & CPF_PropagateToSetElement;
+				property->ElementProp->PropertyFlags = property->PropertyFlags & (CPF_PropagateToSetElement | CPF_TObjectPtr); // Fix C++ and UHT mismatch.
 
 				break;
 			}
@@ -582,11 +593,15 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				EmitSimpleProperty(property, def.InnerProperty, FName(FString::Printf(TEXT("%s_Key"), *name.ToString())), RF_NoFlags);
 				EmitSimpleProperty(property, def.OuterProperty, name, RF_NoFlags);
 
-				// @TODO: These should migrate from UHT but I don't really understand what it does...
-				property->PropertyFlags |= property->KeyProp->PropertyFlags & CPF_TObjectPtrWrapper;
+				/*
+				 * Migrate from UHT.
+				 * Rule:
+				 * 1. Key doesn't propagate to Outer.
+				 * 2. Value propagates CPF_TObjectPtrWrapper to Outer.
+				 */
 				property->PropertyFlags |= property->ValueProp->PropertyFlags & CPF_TObjectPtrWrapper;
-				property->KeyProp->PropertyFlags = property->PropertyFlags & CPF_PropagateToMapKey;
-				property->ValueProp->PropertyFlags = property->PropertyFlags & CPF_PropagateToMapValue;
+				property->KeyProp->PropertyFlags = property->PropertyFlags & CPF_PropagateToMapKey | property->KeyProp->PropertyFlags & CPF_TObjectPtr; // Key only maintains CPF_TObjectPtr on itself.
+				property->ValueProp->PropertyFlags = property->PropertyFlags & (CPF_PropagateToMapValue | CPF_TObjectPtr); // Fix C++ and UHT mismatch.
 				
 				break;
 			}
@@ -597,8 +612,9 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				EmitSimpleProperty(property, def.InnerProperty, name, RF_NoFlags);
 
 				// Migrate from UHT.
-				property->PropertyFlags |= property->GetValueProperty()->PropertyFlags & CPF_TObjectPtrWrapper;
-				property->GetValueProperty()->PropertyFlags = property->PropertyFlags & CPF_PropagateToOptionalInner;
+				FProperty* valueProperty = property->GetValueProperty();
+				property->PropertyFlags |= valueProperty->PropertyFlags & CPF_UObjectWrapper; // No CPF_TObjectPtr.
+				valueProperty->PropertyFlags = property->PropertyFlags & CPF_PropagateToOptionalInner | valueProperty->PropertyFlags & CPF_TObjectPtr; // Value only maintains CPF_TObjectPtr on itself.
 
 				break;
 			}

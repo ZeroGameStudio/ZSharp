@@ -95,7 +95,7 @@ partial class ManifestBuilder
 		result.PropertyFlags |= propertyModel.Visibility switch
 		{
 			EMemberVisibility.Public => EPropertyFlags.CPF_NativeAccessSpecifierPublic,
-			EMemberVisibility.Protected => EPropertyFlags.CPF_NativeAccessSpecifierProtected,
+			EMemberVisibility.Protected => EPropertyFlags.CPF_NativeAccessSpecifierProtected | EPropertyFlags.CPF_Protected,
 			EMemberVisibility.Private => EPropertyFlags.CPF_NativeAccessSpecifierPrivate,
 			_ => throw Thrower.NoEntry()
 		};

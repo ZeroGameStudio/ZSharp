@@ -107,7 +107,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		return false;
 	}
 
-	static bool FixupInstancedFlags(UStruct* strct)
+	static bool FixupInstancedFlagsForStruct(UStruct* strct)
 	{
 		bool containsInstancedRef = false;
 		for (TFieldIterator<FProperty> it(strct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
@@ -121,7 +121,6 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			}
 			else if (auto structProperty = CastField<FStructProperty>(property))
 			{
-				// @FIXME: Struct circular reference via container.
 				containsInstancedRef |= FixupInstancedFlagsForContainerProperty(structProperty, structProperty);
 			}
 			else if (auto arrayProperty = CastField<FArrayProperty>(property))
@@ -887,15 +886,44 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 				}
 			}
 
+			auto addDependency = [&scriptStruct2def, &dependencies](FName dependencyFieldPath)
+			{
+				if (auto referencedStruct = FindObjectChecked<const UScriptStruct>(nullptr, *dependencyFieldPath.ToString()); scriptStruct2def.Contains(referencedStruct))
+				{
+					dependencies.Emplace(referencedStruct);
+				}
+			};
+
 			for (const auto& propertyDef : scriptStructDef->Properties)
 			{
-				// The only thing we need to consider is direct references -
-				// other forms of references (containers, delegates) do not require calculating the size of the referenced structure in place.
-				if (propertyDef.Type == EZPropertyType::Struct)
+				// More strict than the engine - any kind of in-module circular struct reference is not allowed, not only directly reference.
+				switch (propertyDef.Type)
 				{
-					if (auto referencedStruct = FindObjectChecked<const UScriptStruct>(nullptr, *propertyDef.DescriptorFieldPath.ToString()); scriptStruct2def.Contains(referencedStruct))
+				case EZPropertyType::Struct:
 					{
-						dependencies.Emplace(referencedStruct);
+						addDependency(propertyDef.DescriptorFieldPath);
+						break;
+					}
+				case EZPropertyType::Array:
+				case EZPropertyType::Set:
+				case EZPropertyType::Map:
+				case EZPropertyType::Optional:
+					{
+						if (propertyDef.InnerProperty.Type == EZPropertyType::Struct)
+						{
+							addDependency(propertyDef.InnerProperty.DescriptorFieldPath);
+						}
+
+						if (propertyDef.Type == EZPropertyType::Map && propertyDef.OuterProperty.Type == EZPropertyType::Struct)
+						{
+							addDependency(propertyDef.OuterProperty.DescriptorFieldPath);
+						}
+						
+						break;
+					}
+				default:
+					{
+						break;
 					}
 				}
 			}
@@ -1201,6 +1229,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 		scriptStruct->SetSuperStruct(superScriptStruct);
 		// Migrate from UHT. (@see: UhtScriptStruct.cs)
 		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | superScriptStruct->StructFlags & STRUCT_Inherit);
+		check(!FZSharpFieldRegistry::Get().IsZSharpScriptStruct(superScriptStruct) || (scriptStruct->StructFlags & STRUCT_HasInstancedReference) == STRUCT_NoFlags); // If super is a Z# script struct then it should not have STRUCT_HasInstancedReference fixed up yet.
 	}
 
 	// There is no RegisterDependencies() call for script struct.
@@ -1284,6 +1313,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 	check(superClass->IsNative());
 	cls->SetSuperStruct(superClass);
 	cls->ClassFlags |= superClass->ClassFlags & CLASS_ScriptInherit;
+	check(!FZSharpFieldRegistry::Get().IsZSharpClass(superClass) || !cls->HasAnyClassFlags(CLASS_HasInstancedReference)); // If super is a Z# class then it should not have CLASS_HasInstancedReference fixed up yet.
 
 	auto withinClass = !def.WithinPath.IsNone() ? FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString()) : UObject::StaticClass();
 	check(withinClass->IsNative());
@@ -1363,9 +1393,15 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitStruct(UPackage* pak, FZScriptStructD
 	UScriptStruct* scriptStruct = def.ScriptStruct;
 
 	/* Fixup STRUCT_HasInstancedReference for ourselves and CPF_InstancedReference | CPF_ContainsInstancedReference for our own properties.
-	 * This must be deferred here because we need globally complete reflection data. (After compilation, hopefully not too late...)
+	 * This must be deferred here because we need globally complete reflection data.
+	 * For those inherit from Z# script struct in the same module, super STRUCT_HasInstancedReference should just be calculated so we propagate again here.
 	 */
-	if (ZUnrealFieldEmitter_Private::FixupInstancedFlags(scriptStruct))
+	if (auto superScriptStruct = CastChecked<const UScriptStruct>(scriptStruct->GetSuperStruct(), ECastCheckedType::NullAllowed))
+	{
+		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | superScriptStruct->StructFlags & STRUCT_HasInstancedReference);
+	}
+	
+	if (ZUnrealFieldEmitter_Private::FixupInstancedFlagsForStruct(scriptStruct))
 	{
 		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | STRUCT_HasInstancedReference);
 	}
@@ -1380,8 +1416,14 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 
 	/* Fixup CLASS_HasInstancedReference for ourselves and CPF_InstancedReference | CPF_ContainsInstancedReference for our own properties.
 	 * This must be deferred here because we need globally complete reflection data.
+	 * For those inherit from Z# class in the same module, super CLASS_HasInstancedReference should just be calculated so we propagate again here.
 	 */
-	if (ZUnrealFieldEmitter_Private::FixupInstancedFlags(cls))
+	if (auto superClass = cls->GetSuperClass())
+	{
+		cls->ClassFlags |= superClass->ClassFlags & CLASS_HasInstancedReference;
+	}
+	
+	if (ZUnrealFieldEmitter_Private::FixupInstancedFlagsForStruct(cls))
 	{
 		cls->ClassFlags |= CLASS_HasInstancedReference;
 	}

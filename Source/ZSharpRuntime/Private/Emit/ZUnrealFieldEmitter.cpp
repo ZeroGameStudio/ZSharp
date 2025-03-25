@@ -27,11 +27,6 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		return FString::Printf(TEXT("nm:/%s:%s"), *outer->GetPathName(), *lastName);
 	}
 	
-	/*
-	 * WARNING: This behaves differently from UHT.
-	 *   - STRUCT_HasInstancedReference is shallow scan so struct won't have this flag even if it has a struct property with instanced reference. (@see: UhtScriptStruct.cs)
-	 *   - CPF_ContainsInstancedReference is deep scan so struct properties whose struct has nested instanced reference also have this flag. (@see: UhtStructProperty.cs)
-	 */
 	static bool IsInstancedProperty(const FProperty* property)
 	{
 		if (property->HasAnyPropertyFlags(CPF_InstancedReference | CPF_ContainsInstancedReference))
@@ -43,8 +38,42 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		return structProperty && EnumHasAllFlags(structProperty->Struct->StructFlags, STRUCT_HasInstancedReference);
 	}
 
+	static bool FixupInstancedFlagsForContainerElementProperty(FProperty* containerProperty, FProperty* elementProperty)
+	{
+		if (IsInstancedProperty(elementProperty))
+		{
+			containerProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+			containerProperty->PropertyFlags &= ~(CPF_InstancedReference | CPF_PersistentInstance);
+
+			if (EnumHasAllFlags(static_cast<EClassCastFlags>(elementProperty->GetCastFlags()), CASTCLASS_FStructProperty))
+			{
+				elementProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+			}
+			
+#if WITH_METADATA
+			if (elementProperty->HasAllPropertyFlags(CPF_PersistentInstance))
+			{
+				if (const TMap<FName, FString>* metadata = containerProperty->GetMetaDataMap())
+				{
+					for (const auto& [key, value] : *metadata)
+					{
+						elementProperty->SetMetaData(key, *value);
+					}
+				}
+			}
+#endif
+
+			return true;
+		}
+
+		return false;
+	}
+
 	static bool FixupInstancedFlags(UStruct* strct)
 	{
+		// Migrate from UHT. (@see: UhtObjectPropertyBase.cs and UhtInterfaceProperty.cs)
+		static constexpr EPropertyFlags GDefaultToInstancedPropertyFlags = CPF_InstancedReference | CPF_ExportObject; // No CPF_PersistentObject.
+		
 		// @FIXME: Currently, instanced container properties may be wrong.
 		bool containsInstancedRef = false;
 		for (TFieldIterator<FProperty> it(strct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
@@ -56,7 +85,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				if (objectProperty->PropertyClass->HasAllClassFlags(CLASS_DefaultToInstanced))
 				{
-					property->PropertyFlags |= CPF_InstancedReference | CPF_ExportObject;
+					property->PropertyFlags |= GDefaultToInstancedPropertyFlags;
+					property->SetMetaData("EditInline", "true"); // Object property need this.
 				}
 			}
 
@@ -64,72 +94,47 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				if (interfaceProperty->InterfaceClass->HasAllClassFlags(CLASS_DefaultToInstanced))
 				{
-					property->PropertyFlags |= CPF_InstancedReference | CPF_ExportObject;
+					property->PropertyFlags |= GDefaultToInstancedPropertyFlags;
 				}
 			}
 			
-			/* Then fixup CPF_ContainsInstancedReference.
-			 * There are three cases we should care about:
-			 *   I: property has CPF_InstancedReference regardless of whether it's class has CLASS_HasInstancedReference.
-			 *  II: property is a struct with instanced reference. (All structs should be ready to use at this point)
-			 * III: property is a container with struct element with instanced reference.
-			 */
+			// Then fixup CPF_ContainsInstancedReference.
 			if (property->HasAllPropertyFlags(CPF_InstancedReference))
 			{
 				containsInstancedRef = true;
 			}
 
-			if (IsInstancedProperty(property))
+			// Migrate from UHT. (@see: UhtStructProperty.cs and UhtContainerBaseProperty.cs)
+			if (auto structProperty = CastField<FStructProperty>(property))
 			{
-				property->PropertyFlags |= CPF_ContainsInstancedReference;
-				containsInstancedRef = true;
-			}
-
-			if (auto arrayProperty = CastField<FArrayProperty>(property))
-			{
-				if (IsInstancedProperty(arrayProperty->Inner))
+				// @FIXME: Struct circular reference via container.
+				if (IsInstancedProperty(structProperty))
 				{
-					arrayProperty->Inner->PropertyFlags |= CPF_ContainsInstancedReference;
-					arrayProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+					structProperty->PropertyFlags |= CPF_ContainsInstancedReference;
 					containsInstancedRef = true;
 				}
 			}
-
-			if (auto setProperty = CastField<FSetProperty>(property))
+			else if (auto arrayProperty = CastField<FArrayProperty>(property))
 			{
-				if (IsInstancedProperty(setProperty->ElementProp))
+				containsInstancedRef |= FixupInstancedFlagsForContainerElementProperty(arrayProperty, arrayProperty->Inner);
+			}
+			else if (auto setProperty = CastField<FSetProperty>(property))
+			{
+				containsInstancedRef |= FixupInstancedFlagsForContainerElementProperty(setProperty, setProperty->ElementProp);
+			}
+			else if (auto mapProperty = CastField<FMapProperty>(property))
+			{
+				bool fixed = FixupInstancedFlagsForContainerElementProperty(mapProperty, mapProperty->ValueProp);
+				containsInstancedRef |= fixed;
+				if (fixed)
 				{
-					setProperty->ElementProp->PropertyFlags |= CPF_ContainsInstancedReference;
-					setProperty->PropertyFlags |= CPF_ContainsInstancedReference;
-					containsInstancedRef = true;
+					// CPF_ContainsInstancedReference need to propagate from value to key.
+					mapProperty->KeyProp->PropertyFlags |= mapProperty->ValueProp->PropertyFlags & CPF_ContainsInstancedReference;
 				}
 			}
-
-			if (auto mapProperty = CastField<FMapProperty>(property))
+			else if (auto optionalProperty = CastField<FOptionalProperty>(property))
 			{
-				if (IsInstancedProperty(mapProperty->KeyProp))
-				{
-					mapProperty->KeyProp->PropertyFlags |= CPF_ContainsInstancedReference;
-					mapProperty->PropertyFlags |= CPF_ContainsInstancedReference;
-					containsInstancedRef = true;
-				}
-
-				if (IsInstancedProperty(mapProperty->ValueProp))
-				{
-					mapProperty->ValueProp->PropertyFlags |= CPF_ContainsInstancedReference;
-					mapProperty->PropertyFlags |= CPF_ContainsInstancedReference;
-					containsInstancedRef = true;
-				}
-			}
-
-			if (auto optionalProperty = CastField<FOptionalProperty>(property))
-			{
-				if (IsInstancedProperty(optionalProperty->GetValueProperty()))
-				{
-					optionalProperty->GetValueProperty()->PropertyFlags |= CPF_ContainsInstancedReference;
-					optionalProperty->PropertyFlags |= CPF_ContainsInstancedReference;
-					containsInstancedRef = true;
-				}
+				containsInstancedRef |= FixupInstancedFlagsForContainerElementProperty(optionalProperty, optionalProperty->GetValueProperty());
 			}
 		}
 
@@ -600,7 +605,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				 * 2. Value propagates CPF_TObjectPtrWrapper to Outer.
 				 */
 				property->PropertyFlags |= property->ValueProp->PropertyFlags & CPF_TObjectPtrWrapper;
-				property->KeyProp->PropertyFlags = property->PropertyFlags & CPF_PropagateToMapKey | property->KeyProp->PropertyFlags & CPF_TObjectPtr; // Key only maintains CPF_TObjectPtr on itself.
+				property->KeyProp->PropertyFlags = property->PropertyFlags & (CPF_PropagateToMapKey & ~CPF_UObjectWrapper | CPF_TObjectPtr) | property->KeyProp->PropertyFlags & CPF_UObjectWrapper; // Fix C++ and UHT mismatch & Key only maintains CPF_UObjectWrapper on itself.
 				property->ValueProp->PropertyFlags = property->PropertyFlags & (CPF_PropagateToMapValue | CPF_TObjectPtr); // Fix C++ and UHT mismatch.
 				
 				break;

@@ -27,6 +27,7 @@ public static class MetadataConstants
 	public const string EditorConfig = nameof(EditorConfig);
 	
 	// Property metadata names
+	public const string EditInline = nameof(EditInline);
 	public const string BlueprintGetter = nameof(BlueprintGetter);
 	public const string BlueprintSetter = nameof(BlueprintSetter);
 

@@ -109,7 +109,6 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 	static bool FixupInstancedFlags(UStruct* strct)
 	{
-		// @FIXME: Currently, instanced container properties may be wrong.
 		bool containsInstancedRef = false;
 		for (TFieldIterator<FProperty> it(strct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
 		{

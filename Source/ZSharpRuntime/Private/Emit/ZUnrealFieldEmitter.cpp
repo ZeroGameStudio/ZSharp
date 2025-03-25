@@ -38,30 +38,68 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		return structProperty && EnumHasAllFlags(structProperty->Struct->StructFlags, STRUCT_HasInstancedReference);
 	}
 
-	static bool FixupInstancedFlagsForContainerElementProperty(FProperty* containerProperty, FProperty* elementProperty)
+	// Fixup implicit instanced flags caused by CLASS_DefaultToInstanced.
+	static bool FixupInstancedFlagsForObjectProperty(FProperty* property)
 	{
+		// Migrate from UHT. (@see: UhtObjectPropertyBase.cs and UhtInterfaceProperty.cs)
+		static constexpr EPropertyFlags GDefaultToInstancedPropertyFlags = CPF_InstancedReference | CPF_ExportObject; // No CPF_PersistentObject.
+		
+		if (auto objectProperty = CastField<const FObjectPropertyBase>(property))
+		{
+			if (objectProperty->PropertyClass->HasAllClassFlags(CLASS_DefaultToInstanced))
+			{
+				property->PropertyFlags |= GDefaultToInstancedPropertyFlags;
+				FProperty* ownerProperty = property->GetOwnerProperty();
+				FProperty* editInlineProperty = ownerProperty ? ownerProperty : property;
+				editInlineProperty->SetMetaData("EditInline", "true"); // Only object property need this.
+				return true;
+			}
+		}
+		else if (auto interfaceProperty = CastField<const FInterfaceProperty>(property))
+		{
+			if (interfaceProperty->InterfaceClass->HasAllClassFlags(CLASS_DefaultToInstanced))
+			{
+				property->PropertyFlags |= GDefaultToInstancedPropertyFlags;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	// Fixup implicit instanced flags caused by CLASS_DefaultToInstanced and propagated instanced flags.
+	static bool FixupInstancedFlagsForContainerProperty(FProperty* containerProperty, FProperty* elementProperty)
+	{
+		FixupInstancedFlagsForObjectProperty(elementProperty);
+		
 		if (IsInstancedProperty(elementProperty))
 		{
-			containerProperty->PropertyFlags |= CPF_ContainsInstancedReference;
-			containerProperty->PropertyFlags &= ~(CPF_InstancedReference | CPF_PersistentInstance);
+			containerProperty->PropertyFlags |= CPF_ContainsInstancedReference | elementProperty->PropertyFlags & CPF_ExportObject;
 
-			if (EnumHasAllFlags(static_cast<EClassCastFlags>(elementProperty->GetCastFlags()), CASTCLASS_FStructProperty))
+			bool structProperty = containerProperty == elementProperty;
+			check(structProperty == containerProperty->IsA<FStructProperty>());
+			if (!structProperty)
 			{
-				elementProperty->PropertyFlags |= CPF_ContainsInstancedReference;
-			}
-			
-#if WITH_METADATA
-			if (elementProperty->HasAllPropertyFlags(CPF_PersistentInstance))
-			{
-				if (const TMap<FName, FString>* metadata = containerProperty->GetMetaDataMap())
+				containerProperty->PropertyFlags &= ~(CPF_InstancedReference | CPF_PersistentInstance);
+				
+				if (EnumHasAllFlags(static_cast<EClassCastFlags>(elementProperty->GetCastFlags()), CASTCLASS_FStructProperty))
 				{
-					for (const auto& [key, value] : *metadata)
+					elementProperty->PropertyFlags |= CPF_ContainsInstancedReference;
+				}
+
+#if WITH_METADATA
+				if (elementProperty->HasAllPropertyFlags(CPF_PersistentInstance))
+				{
+					if (const TMap<FName, FString>* metadata = containerProperty->GetMetaDataMap())
 					{
-						elementProperty->SetMetaData(key, *value);
+						for (const auto& [key, value] : *metadata)
+						{
+							elementProperty->SetMetaData(key, *value);
+						}
 					}
 				}
-			}
 #endif
+			}
 
 			return true;
 		}
@@ -71,70 +109,43 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 	static bool FixupInstancedFlags(UStruct* strct)
 	{
-		// Migrate from UHT. (@see: UhtObjectPropertyBase.cs and UhtInterfaceProperty.cs)
-		static constexpr EPropertyFlags GDefaultToInstancedPropertyFlags = CPF_InstancedReference | CPF_ExportObject; // No CPF_PersistentObject.
-		
 		// @FIXME: Currently, instanced container properties may be wrong.
 		bool containsInstancedRef = false;
 		for (TFieldIterator<FProperty> it(strct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
 		{
 			FProperty* property = *it;
 			
-			// First fixup CPF_InstancedReference for object/interface properties whose class has CLASS_DefaultToInstanced.
-			if (auto objectProperty = CastField<const FObjectPropertyBase>(property))
+			// Migrate from UHT. (@see: UhtObjectPropertyBase.cs, UhtInterfaceProperty.cs, UhtStructProperty.cs and UhtContainerBaseProperty.cs)
+			if (EnumHasAnyFlags(static_cast<EClassCastFlags>(property->GetCastFlags()), CASTCLASS_FObjectPropertyBase | CASTCLASS_FInterfaceProperty))
 			{
-				if (objectProperty->PropertyClass->HasAllClassFlags(CLASS_DefaultToInstanced))
-				{
-					property->PropertyFlags |= GDefaultToInstancedPropertyFlags;
-					property->SetMetaData("EditInline", "true"); // Object property need this.
-				}
+				containsInstancedRef |= FixupInstancedFlagsForObjectProperty(property);
 			}
-
-			if (auto interfaceProperty = CastField<const FInterfaceProperty>(property))
-			{
-				if (interfaceProperty->InterfaceClass->HasAllClassFlags(CLASS_DefaultToInstanced))
-				{
-					property->PropertyFlags |= GDefaultToInstancedPropertyFlags;
-				}
-			}
-			
-			// Then fixup CPF_ContainsInstancedReference.
-			if (property->HasAllPropertyFlags(CPF_InstancedReference))
-			{
-				containsInstancedRef = true;
-			}
-
-			// Migrate from UHT. (@see: UhtStructProperty.cs and UhtContainerBaseProperty.cs)
-			if (auto structProperty = CastField<FStructProperty>(property))
+			else if (auto structProperty = CastField<FStructProperty>(property))
 			{
 				// @FIXME: Struct circular reference via container.
-				if (IsInstancedProperty(structProperty))
-				{
-					structProperty->PropertyFlags |= CPF_ContainsInstancedReference;
-					containsInstancedRef = true;
-				}
+				containsInstancedRef |= FixupInstancedFlagsForContainerProperty(structProperty, structProperty);
 			}
 			else if (auto arrayProperty = CastField<FArrayProperty>(property))
 			{
-				containsInstancedRef |= FixupInstancedFlagsForContainerElementProperty(arrayProperty, arrayProperty->Inner);
+				containsInstancedRef |= FixupInstancedFlagsForContainerProperty(arrayProperty, arrayProperty->Inner);
 			}
 			else if (auto setProperty = CastField<FSetProperty>(property))
 			{
-				containsInstancedRef |= FixupInstancedFlagsForContainerElementProperty(setProperty, setProperty->ElementProp);
+				containsInstancedRef |= FixupInstancedFlagsForContainerProperty(setProperty, setProperty->ElementProp);
 			}
 			else if (auto mapProperty = CastField<FMapProperty>(property))
 			{
-				bool fixed = FixupInstancedFlagsForContainerElementProperty(mapProperty, mapProperty->ValueProp);
+				bool fixed = FixupInstancedFlagsForContainerProperty(mapProperty, mapProperty->ValueProp);
 				containsInstancedRef |= fixed;
 				if (fixed)
 				{
-					// CPF_ContainsInstancedReference need to propagate from value to key.
-					mapProperty->KeyProp->PropertyFlags |= mapProperty->ValueProp->PropertyFlags & CPF_ContainsInstancedReference;
+					// Propagate fixed flags from value to key.
+					mapProperty->KeyProp->PropertyFlags |= mapProperty->ValueProp->PropertyFlags & (CPF_ContainsInstancedReference | CPF_ExportObject | CPF_InstancedReference);
 				}
 			}
 			else if (auto optionalProperty = CastField<FOptionalProperty>(property))
 			{
-				containsInstancedRef |= FixupInstancedFlagsForContainerElementProperty(optionalProperty, optionalProperty->GetValueProperty());
+				containsInstancedRef |= FixupInstancedFlagsForContainerProperty(optionalProperty, optionalProperty->GetValueProperty());
 			}
 		}
 
@@ -605,7 +616,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				 * 2. Value propagates CPF_TObjectPtrWrapper to Outer.
 				 */
 				property->PropertyFlags |= property->ValueProp->PropertyFlags & CPF_TObjectPtrWrapper;
-				property->KeyProp->PropertyFlags = property->PropertyFlags & (CPF_PropagateToMapKey & ~CPF_UObjectWrapper | CPF_TObjectPtr) | property->KeyProp->PropertyFlags & CPF_UObjectWrapper; // Fix C++ and UHT mismatch & Key only maintains CPF_UObjectWrapper on itself.
+				property->KeyProp->PropertyFlags = property->PropertyFlags & (CPF_PropagateToMapKey & ~CPF_UObjectWrapper | CPF_TObjectPtr) | property->KeyProp->PropertyFlags & CPF_TObjectPtrWrapper; // Fix C++ and UHT mismatch & Key only maintains CPF_UObjectWrapper on itself and CPF_TObjectPtr on both itself and outer.
 				property->ValueProp->PropertyFlags = property->PropertyFlags & (CPF_PropagateToMapValue | CPF_TObjectPtr); // Fix C++ and UHT mismatch.
 				
 				break;
@@ -1313,7 +1324,8 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 			check(!interfaceClass->HasMetaData("CannotImplementInterfaceInBlueprint"));
 #endif
 			// Interfaces implemented by UZSharpClass is always regarded as implemented in blueprint.
-			FImplementedInterface implementedInterface { interfaceClass, 0, true };
+			FImplementedInterface implementedInterface { interfaceClass, 0,
+				true };
 			cls->Interfaces.Emplace(implementedInterface);
 		}
 	}

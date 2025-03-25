@@ -1283,7 +1283,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 	cls->RegisterDependencies();
 
 	// UECodeGen_Private::ConstructUClass() calls UObjectForceRegistration() to initialize statically constructed class.
-	// This process sets value for ClassPrivate, OuterPrivate, etc. and add add the class to object hash.
+	// This process sets value for ClassPrivate, OuterPrivate, etc. and register the class to object hash.
 	// StaticConstructObject_Internal() has already done these for us so we don't need to do anymore.
 
 	cls->ClassFlags |= CLASS_Constructed;

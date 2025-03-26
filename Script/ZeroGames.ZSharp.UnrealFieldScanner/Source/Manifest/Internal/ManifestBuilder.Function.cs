@@ -11,6 +11,9 @@ partial class ManifestBuilder
 		{
 			classDef.Functions.Add(ScanUFunction(classDef, functionModel));
 		}
+		
+		// UHT sorts function by name using StringComparison.OrdinalIgnoreCase strategy. (@see: UhtHeaderCodeGeneratorCppFile.cs)
+		classDef.Functions.Sort((lhs, rhs) => StringComparer.OrdinalIgnoreCase.Compare(lhs.Name, rhs.Name));
 	}
 
 	private UnrealFunctionDefinition ScanUFunction(UnrealClassDefinition classDef, IUnrealFunctionModel functionModel)

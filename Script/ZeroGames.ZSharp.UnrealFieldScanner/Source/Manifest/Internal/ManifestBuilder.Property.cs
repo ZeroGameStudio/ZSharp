@@ -105,7 +105,7 @@ partial class ManifestBuilder
 	{
 		check(propertyModel.Role != EPropertyRole.Member);
 		
-		result.PropertyFlags |= EPropertyFlags.CPF_Parm;
+		result.PropertyFlags |= EPropertyFlags.CPF_Parm | EPropertyFlags.CPF_NativeAccessSpecifierPublic; // Parameter is always public. (@see: UhtPropertyParser.cs)
 		if (propertyModel.Role == EPropertyRole.Parameter)
 		{
 			if (propertyModel.Type.IsByRef)

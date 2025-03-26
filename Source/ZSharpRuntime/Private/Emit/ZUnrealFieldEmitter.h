@@ -47,6 +47,7 @@ namespace ZSharp
 		void FinishEmitClass(UPackage* pak, FZClassDefinition& def) const;
 
 		void PostEmitStruct(UPackage* pak, FZScriptStructDefinition& def) const;
+		void PostEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const;
 		void PostEmitClass_I(UPackage* pak, FZClassDefinition& def) const;
 		void PostEmitClass_II(UPackage* pak, FZClassDefinition& def) const;
 

@@ -43,15 +43,15 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 	{
 		// Migrate from UHT. (@see: UhtObjectPropertyBase.cs and UhtInterfaceProperty.cs)
 		static constexpr EPropertyFlags GDefaultToInstancedPropertyFlags = CPF_InstancedReference | CPF_ExportObject; // No CPF_PersistentObject.
+		static constexpr EPropertyFlags GDefaultToInstancedPropertyFlagsForInputParameter = CPF_InstancedReference; // Input parameter can't have CPF_ExportObject.
 		
 		if (auto objectProperty = CastField<const FObjectPropertyBase>(property))
 		{
 			if (objectProperty->PropertyClass->HasAllClassFlags(CLASS_DefaultToInstanced))
 			{
-				property->PropertyFlags |= GDefaultToInstancedPropertyFlags;
 				FProperty* ownerProperty = property->GetOwnerProperty();
-				FProperty* editInlineProperty = ownerProperty ? ownerProperty : property;
-				editInlineProperty->SetMetaData("EditInline", "true"); // Only object property need this.
+				property->PropertyFlags |= ownerProperty->HasAllPropertyFlags(CPF_Parm) && !ownerProperty->HasAnyPropertyFlags(CPF_OutParm) ? GDefaultToInstancedPropertyFlagsForInputParameter : GDefaultToInstancedPropertyFlags;
+				ownerProperty->SetMetaData("EditInline", "true"); // Only object property need this.
 				return true;
 			}
 		}
@@ -59,7 +59,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		{
 			if (interfaceProperty->InterfaceClass->HasAllClassFlags(CLASS_DefaultToInstanced))
 			{
-				property->PropertyFlags |= GDefaultToInstancedPropertyFlags;
+				FProperty* ownerProperty = property->GetOwnerProperty();
+				property->PropertyFlags |= ownerProperty->HasAllPropertyFlags(CPF_Parm) && !ownerProperty->HasAnyPropertyFlags(CPF_OutParm) ? GDefaultToInstancedPropertyFlagsForInputParameter : GDefaultToInstancedPropertyFlags;
 				return true;
 			}
 		}
@@ -393,25 +394,30 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			// Object wrappers
 		case EZPropertyType::Object:
 			{
+				FObjectProperty* objectProperty;
 				auto descriptor = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
 				if (descriptor->IsChildOf<UClass>())
 				{
 					// Special case for TObjectPtr<UClass>.
 					NEW_PROPERTY(Class);
 
-					property->PropertyFlags |= CPF_TObjectPtrWrapper; // Migrate from UHT.
-				
-					property->PropertyClass = descriptor;
 					property->MetaClass = UObject::StaticClass();
+					
+					objectProperty = property;
 				}
 				else
 				{
 					NEW_PROPERTY(Object);
-
-					property->PropertyFlags |= CPF_TObjectPtrWrapper; // Migrate from UHT.
-				
-					property->PropertyClass = descriptor;
+					objectProperty = property;
 				}
+
+				// TObjectPtr<T> parameter is decayed to T*.
+				if (!objectProperty->GetOwnerProperty()->HasAnyPropertyFlags(CPF_Parm))
+				{
+					objectProperty->PropertyFlags |= CPF_TObjectPtrWrapper; // Migrate from UHT.
+				}
+				
+				objectProperty->PropertyClass = descriptor;
 				
 				break;
 			}
@@ -657,6 +663,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 	static void EmitProperties(UStruct* outer, TArray<FZPropertyDefinition>& defs)
 	{
+		// Emit by declared order. (reversed because EmitProperty() uses head-insert)
 		for (int32 i = defs.Num() - 1; i >= 0; --i)
 		{
 			EmitProperty(outer, defs[i]);
@@ -726,6 +733,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 		function->Bind();
 		function->StaticLink(true);
+		function->MinAlignment = 1; // Function is always aligned by 1.
 
 		// Now that all parameters have linked up so we can check for signature compability.
 		check(!def.bIsEventOverride || function->IsSignatureCompatibleWith(function->GetSuperFunction()));
@@ -744,9 +752,10 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 	static void EmitFunctions(UClass* outer, TArray<FZFunctionDefinition>& defs)
 	{
-		for (int32 i = defs.Num() - 1; i >= 0; --i)
+		// Scanner should have sorted functions so we use the list directly.
+		for (auto& def : defs)
 		{
-			EmitFunction(outer, defs[i]);
+			EmitFunction(outer, def);
 		}
 	}
 
@@ -1147,7 +1156,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 	// Migrate from GetPrivateStaticClassBody().
 	constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Standalone | RF_Transient | RF_MarkAsNative | RF_MarkAsRootSet;
 	// Migrate from static constructor of UClass.
-	constexpr EClassFlags GCompiledInClassFlags = CLASS_Native;
+	constexpr EClassFlags GCompiledInClassFlags = CLASS_Native | CLASS_MatchedSerializers;
 
 	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
 	
@@ -1174,9 +1183,10 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 #endif
 
 	// Migrate from UECodeGen_Private::ConstructUClass().
-	FCppClassTypeInfoStatic typeInfo;
-	typeInfo.bIsAbstract = cls->HasAllClassFlags(CLASS_Abstract);
-	cls->SetCppTypeInfoStatic(&typeInfo);
+	// FCppClassTypeInfoStatic is trivially destructible so we don't need to release this manually.
+	static_assert(std::is_trivially_destructible_v<FCppClassTypeInfoStatic>);
+	auto typeInfo = new FCppClassTypeInfoStatic { cls->HasAllClassFlags(CLASS_Abstract) };
+	cls->SetCppTypeInfoStatic(typeInfo);
 	cls->ClassConfigName = def.ConfigName;
 
 	{ // Finally setup proxy.
@@ -1254,10 +1264,10 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 			break;
 		}
 
-		if (FProperty* Property = CastField<FProperty>(field))
+		if (FProperty* property = CastField<FProperty>(field))
 		{
-			scriptStruct->SetPropertiesSize(Property->Link(ar));
-			scriptStruct->MinAlignment = FMath::Max(scriptStruct->GetMinAlignment(), Property->GetMinAlignment());
+			scriptStruct->SetPropertiesSize(property->Link(ar));
+			scriptStruct->MinAlignment = FMath::Max(scriptStruct->GetMinAlignment(), property->GetMinAlignment());
 		}
 	}
 	// Make sure the last property is aligned.
@@ -1313,6 +1323,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 	check(superClass->IsNative());
 	cls->SetSuperStruct(superClass);
 	cls->ClassFlags |= superClass->ClassFlags & CLASS_ScriptInherit;
+	// @FIXME: Inherit cast flags.
 	check(!FZSharpFieldRegistry::Get().IsZSharpClass(superClass) || !cls->HasAnyClassFlags(CLASS_HasInstancedReference)); // If super is a Z# class then it should not have CLASS_HasInstancedReference fixed up yet.
 
 	auto withinClass = !def.WithinPath.IsNone() ? FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString()) : UObject::StaticClass();
@@ -1353,8 +1364,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 			check(!interfaceClass->HasMetaData("CannotImplementInterfaceInBlueprint"));
 #endif
 			// Interfaces implemented by UZSharpClass is always regarded as implemented in blueprint.
-			FImplementedInterface implementedInterface { interfaceClass, 0,
-				true };
+			FImplementedInterface implementedInterface { interfaceClass, 0, true };
 			cls->Interfaces.Emplace(implementedInterface);
 		}
 	}
@@ -1372,7 +1382,11 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 		const FString subtractName1 = pSubtractName1 ? *pSubtractName1 : FString{}; \
 		const FString* pSubtractName2 = def.TransparentDataMap.Find(#SubtractKey2); \
 		const FString subtractName2 = pSubtractName2 ? *pSubtractName2 : FString{}; \
-		cls->SetMetaData(#LhsKey, *ZUnrealFieldEmitter_Private::MergeNames(lhsName, rhsName, subtractName1, subtractName2)); \
+		const FString mergedName = ZUnrealFieldEmitter_Private::MergeNames(lhsName, rhsName, subtractName1, subtractName2); \
+		if (!mergedName.IsEmpty()) \
+		{ \
+			cls->SetMetaData(#LhsKey, *mergedName); \
+		} \
 	}
 	
 	MERGE_METADATA(ClassGroup,,);
@@ -1410,9 +1424,29 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitStruct(UPackage* pak, FZScriptStructD
 	ZUnrealFieldEmitter_Private::ConstructPropertyDefaults(def, scriptStruct, zsstrct);
 }
 
+void ZSharp::FZUnrealFieldEmitter::PostEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const
+{
+	UDelegateFunction* delegate = def.Delegate;
+
+	// Fixup CPF_InstancedReference | CPF_ContainsInstancedReference for our signature parameters.
+	ZUnrealFieldEmitter_Private::FixupInstancedFlagsForStruct(delegate);
+}
+
 void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinition& def) const
 {
 	UClass* cls = def.Class;
+
+	// Fixup CPF_InstancedReference | CPF_ContainsInstancedReference for our function parameters.
+	for (TFieldIterator<UFunction> it(cls, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+	{
+		// PostEmitDelegate() should already have fixed up delegate signature.
+		if (it->HasAllFunctionFlags(FUNC_Delegate))
+		{
+			continue;
+		}
+		
+		ZUnrealFieldEmitter_Private::FixupInstancedFlagsForStruct(*it);
+	}
 
 	/* Fixup CLASS_HasInstancedReference for ourselves and CPF_InstancedReference | CPF_ContainsInstancedReference for our own properties.
 	 * This must be deferred here because we need globally complete reflection data.
@@ -1431,7 +1465,10 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 	// Compile unreal class.
 	cls->Bind();
 	cls->StaticLink(true);
+	// Make sure the last property is aligned then mark as intrinsic.
+	cls->SetPropertiesSize(cls->GetStructureSize());
 	cls->SetSparseClassDataStruct(cls->GetSparseClassDataArchetypeStruct());
+	cls->ClassFlags |= CLASS_Intrinsic;
 	
 	cls->AssembleReferenceTokenStream(true);
 

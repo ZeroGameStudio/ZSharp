@@ -1185,7 +1185,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 	// Migrate from UECodeGen_Private::ConstructUClass().
 	// FCppClassTypeInfoStatic is trivially destructible so we don't need to release this manually.
 	static_assert(std::is_trivially_destructible_v<FCppClassTypeInfoStatic>);
-	auto typeInfo = new FCppClassTypeInfoStatic { cls->HasAllClassFlags(CLASS_Abstract) };
+	auto typeInfo = new FCppClassTypeInfoStatic { false };
 	cls->SetCppTypeInfoStatic(typeInfo);
 	cls->ClassConfigName = def.ConfigName;
 
@@ -1323,12 +1323,12 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 	check(superClass->IsNative());
 	cls->SetSuperStruct(superClass);
 	cls->ClassFlags |= superClass->ClassFlags & CLASS_ScriptInherit;
-	// @FIXME: Inherit cast flags.
+	// UClass::Bind() will propagate cast flags so we don't need to do it manually.
 	check(!FZSharpFieldRegistry::Get().IsZSharpClass(superClass) || !cls->HasAnyClassFlags(CLASS_HasInstancedReference)); // If super is a Z# class then it should not have CLASS_HasInstancedReference fixed up yet.
 
-	auto withinClass = !def.WithinPath.IsNone() ? FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString()) : UObject::StaticClass();
+	auto withinClass = !def.WithinPath.IsNone() ? FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString()) : superClass->ClassWithin.Get();
 	check(withinClass->IsNative());
-	check(withinClass->IsChildOf(UObject::StaticClass()));
+	check(withinClass->IsChildOf(superClass->ClassWithin));
 	cls->ClassWithin = withinClass;
 
 	cls->RegisterDependencies();

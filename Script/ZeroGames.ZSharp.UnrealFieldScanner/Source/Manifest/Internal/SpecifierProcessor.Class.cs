@@ -32,6 +32,8 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, ConstAttribute specifier)
 	{
+		throw new NotImplementedException();
+		
 		def.ClassFlags |= EClassFlags.CLASS_Const;
 	}
 	

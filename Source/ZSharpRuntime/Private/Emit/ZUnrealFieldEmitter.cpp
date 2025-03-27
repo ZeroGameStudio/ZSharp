@@ -38,10 +38,15 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		return structProperty && EnumHasAllFlags(structProperty->Struct->StructFlags, STRUCT_HasInstancedReference);
 	}
 
+	static bool IsInputParameter(const FProperty* property)
+	{
+		return property->HasAllPropertyFlags(CPF_Parm) && (property->HasAllPropertyFlags(CPF_ConstParm) || !property->HasAnyPropertyFlags(CPF_OutParm));
+	}
+
 	// Fixup implicit instanced flags caused by CLASS_DefaultToInstanced.
 	static bool FixupInstancedFlagsForObjectProperty(FProperty* property)
 	{
-		// Migrate from UHT. (@see: UhtObjectPropertyBase.cs and UhtInterfaceProperty.cs)
+		// Migrate from UhtObjectPropertyBase.ResolveSelf() and UhtInterfaceProperty.ResolveSelf().
 		static constexpr EPropertyFlags GDefaultToInstancedPropertyFlags = CPF_InstancedReference | CPF_ExportObject; // No CPF_PersistentObject.
 		static constexpr EPropertyFlags GDefaultToInstancedPropertyFlagsForInputParameter = CPF_InstancedReference; // Input parameter can't have CPF_ExportObject.
 		
@@ -50,7 +55,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			if (objectProperty->PropertyClass->HasAllClassFlags(CLASS_DefaultToInstanced))
 			{
 				FProperty* ownerProperty = property->GetOwnerProperty();
-				property->PropertyFlags |= ownerProperty->HasAllPropertyFlags(CPF_Parm) && !ownerProperty->HasAnyPropertyFlags(CPF_OutParm) ? GDefaultToInstancedPropertyFlagsForInputParameter : GDefaultToInstancedPropertyFlags;
+				property->PropertyFlags |= IsInputParameter(ownerProperty) ? GDefaultToInstancedPropertyFlagsForInputParameter : GDefaultToInstancedPropertyFlags;
 				ownerProperty->SetMetaData("EditInline", "true"); // Only object property need this.
 				return true;
 			}
@@ -60,7 +65,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			if (interfaceProperty->InterfaceClass->HasAllClassFlags(CLASS_DefaultToInstanced))
 			{
 				FProperty* ownerProperty = property->GetOwnerProperty();
-				property->PropertyFlags |= ownerProperty->HasAllPropertyFlags(CPF_Parm) && !ownerProperty->HasAnyPropertyFlags(CPF_OutParm) ? GDefaultToInstancedPropertyFlagsForInputParameter : GDefaultToInstancedPropertyFlags;
+				property->PropertyFlags |= IsInputParameter(ownerProperty) ? GDefaultToInstancedPropertyFlagsForInputParameter : GDefaultToInstancedPropertyFlags;
 				return true;
 			}
 		}
@@ -108,22 +113,37 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		return false;
 	}
 
-	static bool FixupInstancedFlagsForStruct(UStruct* strct)
+	static bool FixupFlagsForStruct(UStruct* strct)
 	{
 		bool containsInstancedRef = false;
 		for (TFieldIterator<FProperty> it(strct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
 		{
 			FProperty* property = *it;
+
+			// Migrate from UhtObjectPropertyBase constructor.
+			// This must be fixed first.
+			if (property->HasAllPropertyFlags(CPF_Parm))
+			{
+				if (auto objectProperty = CastField<FObjectPropertyBase>(property))
+				{
+					if (objectProperty->PropertyClass->HasAllClassFlags(CLASS_Const))
+					{
+						property->PropertyFlags |= CPF_ConstParm;
+					}
+				}
+			}
 			
-			// Migrate from UHT. (@see: UhtObjectPropertyBase.cs, UhtInterfaceProperty.cs, UhtStructProperty.cs and UhtContainerBaseProperty.cs)
+			// Migrate from UhtObjectPropertyBase and UhtInterfaceProperty.
 			if (EnumHasAnyFlags(static_cast<EClassCastFlags>(property->GetCastFlags()), CASTCLASS_FObjectPropertyBase | CASTCLASS_FInterfaceProperty))
 			{
 				containsInstancedRef |= FixupInstancedFlagsForObjectProperty(property);
 			}
+			// Migrate from UhtStructProperty.
 			else if (auto structProperty = CastField<FStructProperty>(property))
 			{
 				containsInstancedRef |= FixupInstancedFlagsForContainerProperty(structProperty, structProperty);
 			}
+			// Migrate from UhtContainerProperty.
 			else if (auto arrayProperty = CastField<FArrayProperty>(property))
 			{
 				containsInstancedRef |= FixupInstancedFlagsForContainerProperty(arrayProperty, arrayProperty->Inner);
@@ -1237,7 +1257,6 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 		superScriptStruct = FindObjectChecked<UScriptStruct>(nullptr, *def.SuperPath.ToString());
 		check(superScriptStruct->IsNative());
 		scriptStruct->SetSuperStruct(superScriptStruct);
-		// Migrate from UHT. (@see: UhtScriptStruct.cs)
 		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | superScriptStruct->StructFlags & STRUCT_Inherit);
 		check(!FZSharpFieldRegistry::Get().IsZSharpScriptStruct(superScriptStruct) || (scriptStruct->StructFlags & STRUCT_HasInstancedReference) == STRUCT_NoFlags); // If super is a Z# script struct then it should not have STRUCT_HasInstancedReference fixed up yet.
 	}
@@ -1415,7 +1434,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitStruct(UPackage* pak, FZScriptStructD
 		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | superScriptStruct->StructFlags & STRUCT_HasInstancedReference);
 	}
 	
-	if (ZUnrealFieldEmitter_Private::FixupInstancedFlagsForStruct(scriptStruct))
+	if (ZUnrealFieldEmitter_Private::FixupFlagsForStruct(scriptStruct))
 	{
 		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | STRUCT_HasInstancedReference);
 	}
@@ -1428,15 +1447,13 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitDelegate(UPackage* pak, FZDelegateDef
 {
 	UDelegateFunction* delegate = def.Delegate;
 
-	// Fixup CPF_InstancedReference | CPF_ContainsInstancedReference for our signature parameters.
-	ZUnrealFieldEmitter_Private::FixupInstancedFlagsForStruct(delegate);
+	ZUnrealFieldEmitter_Private::FixupFlagsForStruct(delegate);
 }
 
 void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinition& def) const
 {
 	UClass* cls = def.Class;
 
-	// Fixup CPF_InstancedReference | CPF_ContainsInstancedReference for our function parameters.
 	for (TFieldIterator<UFunction> it(cls, EFieldIteratorFlags::ExcludeSuper); it; ++it)
 	{
 		// PostEmitDelegate() should already have fixed up delegate signature.
@@ -1445,7 +1462,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 			continue;
 		}
 		
-		ZUnrealFieldEmitter_Private::FixupInstancedFlagsForStruct(*it);
+		ZUnrealFieldEmitter_Private::FixupFlagsForStruct(*it);
 	}
 
 	/* Fixup CLASS_HasInstancedReference for ourselves and CPF_InstancedReference | CPF_ContainsInstancedReference for our own properties.
@@ -1457,7 +1474,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 		cls->ClassFlags |= superClass->ClassFlags & CLASS_HasInstancedReference;
 	}
 	
-	if (ZUnrealFieldEmitter_Private::FixupInstancedFlagsForStruct(cls))
+	if (ZUnrealFieldEmitter_Private::FixupFlagsForStruct(cls))
 	{
 		cls->ClassFlags |= CLASS_HasInstancedReference;
 	}

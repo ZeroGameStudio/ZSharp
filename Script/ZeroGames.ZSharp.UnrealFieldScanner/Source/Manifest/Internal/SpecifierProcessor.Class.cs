@@ -34,7 +34,7 @@ partial class SpecifierProcessor
 	{
 		throw new NotImplementedException();
 		
-		def.ClassFlags |= EClassFlags.CLASS_Const;
+		// def.ClassFlags |= EClassFlags.CLASS_Const;
 	}
 	
 	[SpecifierProcessor]

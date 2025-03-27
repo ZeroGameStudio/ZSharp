@@ -34,7 +34,6 @@ partial class ManifestBuilder
 		
 		ProcessSpecifiers(result, enumFieldModel);
 		
-		// Migrate from UEnum::GenerateFullEnumName(), ECppForm::EnumClass case.
 		result.AddMetadata("Name", $"{enumModel.Name}::{result.Name}");
 
 		return result;

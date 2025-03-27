@@ -108,13 +108,42 @@ partial class ManifestBuilder
 		result.PropertyFlags |= EPropertyFlags.CPF_Parm | EPropertyFlags.CPF_NativeAccessSpecifierPublic; // Parameter is always public. (@see: UhtPropertyParser.cs)
 		if (propertyModel.Role == EPropertyRole.Parameter)
 		{
-			if (propertyModel.Type.IsByRef)
+			bool output = propertyModel.Type.IsByRef;
+			if (output)
 			{
 				result.PropertyFlags |= EPropertyFlags.CPF_OutParm;
 				if (!propertyModel.Type.IsOut)
 				{
 					result.PropertyFlags |= EPropertyFlags.CPF_ReferenceParm;
 				}
+			}
+			// These types of input are passed by const&.
+			else if (result.Type
+			         is EPropertyType.String
+			         or EPropertyType.AnsiString
+			         or EPropertyType.Utf8String
+			         or EPropertyType.Name
+			         or EPropertyType.Text
+			         or EPropertyType.WeakObject
+			         or EPropertyType.SoftObject
+			         or EPropertyType.LazyObject
+			         or EPropertyType.SoftClass
+			         or EPropertyType.Interface
+			         or EPropertyType.Struct
+			         or EPropertyType.Array
+			         or EPropertyType.Set
+			         or EPropertyType.Map
+			         or EPropertyType.Optional
+			         or EPropertyType.Delegate
+			         or EPropertyType.MulticastInlineDelegate)
+			{
+				// String properties don't have these. (@see: UhtXXXStrProperty constructor)
+				if (result.Type is not (EPropertyType.String or EPropertyType.AnsiString or EPropertyType.Utf8String))
+				{
+					result.PropertyFlags |= EPropertyFlags.CPF_ConstParm | EPropertyFlags.CPF_ReferenceParm | EPropertyFlags.CPF_OutParm; // const& input also has CPF_OutParm.
+				}
+
+				result.AddMetadata(MetadataConstants.NativeConst);
 			}
 		}
 		else

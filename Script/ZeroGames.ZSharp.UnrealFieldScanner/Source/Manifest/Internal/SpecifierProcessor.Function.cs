@@ -26,8 +26,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintPureAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintCallable;
-		def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintPure;
+		def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintCallable | EFunctionFlags.FUNC_BlueprintPure;
 	}
 	
 	[SpecifierProcessor]

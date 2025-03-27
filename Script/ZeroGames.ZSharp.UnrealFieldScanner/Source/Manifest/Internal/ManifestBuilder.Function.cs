@@ -45,17 +45,25 @@ partial class ManifestBuilder
 		ProcessSpecifiers(result, functionModel);
 		
 		ScanUProperties(result, functionModel);
-
-		foreach (var property in result.Properties)
-		{
-			if ((property.PropertyFlags & EPropertyFlags.CPF_OutParm) != EPropertyFlags.CPF_None)
-			{
-				result.FunctionFlags |= EFunctionFlags.FUNC_HasOutParms;
-				break;
-			}
-		}
+		
+		FinishScanUFunction(classDef, functionModel, result);
 		
 		return result;
+	}
+
+	private void FinishScanUFunction(UnrealClassDefinition classDef, IUnrealFunctionModel functionModel, UnrealFunctionDefinition result)
+	{
+		// Only event function can be overridden.
+		if (!result.FunctionFlags.HasFlag(EFunctionFlags.FUNC_Event))
+		{
+			result.FunctionFlags |= EFunctionFlags.FUNC_Final;
+		}
+
+		// Check for non-return out param.
+		if (result.Properties.Any(p => (p.PropertyFlags & (EPropertyFlags.CPF_OutParm | EPropertyFlags.CPF_ReturnParm)) == EPropertyFlags.CPF_OutParm))
+		{
+			result.FunctionFlags |= EFunctionFlags.FUNC_HasOutParms;
+		}
 	}
 	
 }

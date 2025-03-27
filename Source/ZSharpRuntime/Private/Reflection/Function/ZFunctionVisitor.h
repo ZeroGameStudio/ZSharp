@@ -72,7 +72,7 @@ namespace ZSharp
 		TArray<TUniquePtr<IZPropertyVisitor>> ParameterProperties;
 		TUniquePtr<IZPropertyVisitor> ReturnProperty;
 		TSet<int32> InParamIndices;
-		TSet<int32> OutParamIndices;
+		TSet<int32> NonConstOutParamIndices;
 		
 	};
 }

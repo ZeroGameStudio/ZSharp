@@ -227,7 +227,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 
 				stack.Step(object, visitor->ContainerPtrToValuePtr(params, 0));
 
-				if (OutParamIndices.Contains(i))
+				if (NonConstOutParamIndices.Contains(i))
 				{
 					auto out = static_cast<FOutParmRec*>(FMemory_Alloca(sizeof(FOutParmRec)));
 					check(stack.MostRecentPropertyAddress);
@@ -303,7 +303,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{
 			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
-			if (OutParamIndices.Contains(i))
+			if (NonConstOutParamIndices.Contains(i))
 			{
 				check(FStructUtils::ArePropertiesTheSame(out->Property, visitor->GetUnderlyingProperty(), true));
 				visitor->SetValue(out->PropAddr, buffer[bIsStatic ? i : i + 1]);
@@ -388,7 +388,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 		{
 			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
-			if (OutParamIndices.Contains(i))
+			if (NonConstOutParamIndices.Contains(i))
 			{
 				visitor->SetValue_InContainer(params, buffer[i + 1], 0);
 			}
@@ -459,7 +459,7 @@ ZSharp::FZFunctionVisitor::FZFunctionVisitor(UFunction* function)
 	
 	ParameterProperties.Empty();
 	ReturnProperty.Reset();
-	OutParamIndices.Empty();
+	NonConstOutParamIndices.Empty();
 	
 	for (TFieldIterator<FProperty> it(Function.Get()); it && it->HasAllPropertyFlags(CPF_Parm); ++it)
 	{
@@ -483,7 +483,7 @@ ZSharp::FZFunctionVisitor::FZFunctionVisitor(UFunction* function)
 			{
 				InParamIndices.Emplace(index);
 			}
-			OutParamIndices.Emplace(index);
+			NonConstOutParamIndices.Emplace(index);
 		}
 		else
 		{
@@ -517,7 +517,7 @@ void ZSharp::FZFunctionVisitor::CopyOut(FZCallBuffer* buffer, void* params) cons
 	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 	{
 		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
-		if (OutParamIndices.Contains(i))
+		if (NonConstOutParamIndices.Contains(i))
 		{
 			visitor->GetValue_InContainer(params, (*buffer)[bIsStatic ? i : i + 1], 0);
 		}

@@ -30,6 +30,9 @@ public static class MetadataConstants
 	public const string EditInline = nameof(EditInline);
 	public const string BlueprintGetter = nameof(BlueprintGetter);
 	public const string BlueprintSetter = nameof(BlueprintSetter);
+	
+	// Parameter metadata names
+	public const string NativeConst = nameof(NativeConst);
 
 }
 

@@ -38,9 +38,9 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		return structProperty && EnumHasAllFlags(structProperty->Struct->StructFlags, STRUCT_HasInstancedReference);
 	}
 
-	static bool IsInputParameter(const FProperty* property)
+	static bool IsNonReturnParameter(const FProperty* property)
 	{
-		return property->HasAllPropertyFlags(CPF_Parm) && (property->HasAllPropertyFlags(CPF_ConstParm) || !property->HasAnyPropertyFlags(CPF_OutParm));
+		return property->HasAllPropertyFlags(CPF_Parm) && !property->HasAllPropertyFlags(CPF_ReturnParm);
 	}
 
 	// Fixup implicit instanced flags caused by CLASS_DefaultToInstanced.
@@ -49,13 +49,14 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		// Migrate from UhtXXXProperty.ResolveSelf().
 		static constexpr EPropertyFlags GDefaultToInstancedPropertyFlags = CPF_InstancedReference | CPF_ExportObject; // No CPF_PersistentObject.
 		static constexpr EPropertyFlags GDefaultToInstancedPropertyFlagsForInputParameter = CPF_InstancedReference; // Input parameter can't have CPF_ExportObject.
-		
+
+		// @FIXME: There are many special cases about return parameter, but I don't really know if it is UHT bug...
 		if (auto objectProperty = CastField<const FObjectPropertyBase>(property))
 		{
 			if (objectProperty->PropertyClass->HasAllClassFlags(CLASS_DefaultToInstanced))
 			{
 				FProperty* ownerProperty = property->GetOwnerProperty();
-				property->PropertyFlags |= IsInputParameter(ownerProperty) ? GDefaultToInstancedPropertyFlagsForInputParameter : GDefaultToInstancedPropertyFlags;
+				property->PropertyFlags |= IsNonReturnParameter(ownerProperty) ? GDefaultToInstancedPropertyFlagsForInputParameter : GDefaultToInstancedPropertyFlags;
 				ownerProperty->SetMetaData("EditInline", "true"); // Only object property need this.
 				return true;
 			}
@@ -65,7 +66,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			if (interfaceProperty->InterfaceClass->HasAllClassFlags(CLASS_DefaultToInstanced))
 			{
 				FProperty* ownerProperty = property->GetOwnerProperty();
-				property->PropertyFlags |= IsInputParameter(ownerProperty) ? GDefaultToInstancedPropertyFlagsForInputParameter : GDefaultToInstancedPropertyFlags;
+				property->PropertyFlags |= IsNonReturnParameter(ownerProperty) ? GDefaultToInstancedPropertyFlagsForInputParameter : GDefaultToInstancedPropertyFlags;
 				return true;
 			}
 		}
@@ -73,7 +74,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		{
 			FProperty* ownerProperty = property->GetOwnerProperty();
 			// Member property or return value of delegate have CPF_InstancedReference.
-			if (!ownerProperty->HasAnyPropertyFlags(CPF_Parm) || ownerProperty->HasAllPropertyFlags(CPF_ReturnParm))
+			if (!IsNonReturnParameter(ownerProperty))
 			{
 				property->PropertyFlags |= CPF_InstancedReference;
 			}
@@ -696,6 +697,27 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		}
 	}
 
+	static void CompileFunction(UFunction* function)
+	{
+		function->Bind();
+		function->StaticLink(true);
+		FixupAlignmentForStruct(function);
+		function->MinAlignment = 1; // Function is always aligned by 1.
+
+		// Migrate from UClass::CreateLinkAndAddChildFunctionsToMap().
+		if (auto owner = function->GetOwnerClass())
+		{
+			function->Next = owner->Children;
+			owner->Children = function;
+			owner->AddFunctionToFunctionMap(function, function->GetFName());
+		}
+		else
+		{
+			// Top level function must be a delegate.
+			check(function->HasAllFunctionFlags(FUNC_Delegate));
+		}
+	}
+
 	static void EmitFunction(UClass* outer, FZFunctionDefinition& def)
 	{
 		// Migrate from UECodeGen_Private::ConstructUFunction().
@@ -757,18 +779,10 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			outer->AddNativeFunction(*function->GetName(), thunk);
 		}
 
-		function->Bind();
-		function->StaticLink(true);
-		FixupAlignmentForStruct(function);
-		function->MinAlignment = 1; // Function is always aligned by 1.
+		CompileFunction(function);
 
 		// Now that all parameters have linked up so we can check for signature compability.
 		check(!def.bIsEventOverride || function->IsSignatureCompatibleWith(function->GetSuperFunction()));
-
-		// Migrate from UClass::CreateLinkAndAddChildFunctionsToMap().
-		function->Next = outer->Children;
-		outer->Children = function;
-		outer->AddFunctionToFunctionMap(function, function->GetFName());
 
 		{ // Finally setup proxy.
 			FZSharpFunction& zsfunction = FZSharpFieldRegistry::Get().RegisterFunction(function);
@@ -1046,6 +1060,11 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 			FZScriptStructDefinition* scriptStructDef = scriptStruct2def.FindChecked(scriptStruct);
 			PostEmitStruct(pak, *scriptStructDef);
 		}
+
+		for (auto& def : manifest.Delegates)
+		{
+			PostEmitDelegate(pak, def);
+		}
 		
 		// Compile class but don't create CDO.
 		// Because the constructor of a CDO might trigger the creation of other CDOs,
@@ -1142,12 +1161,12 @@ void ZSharp::FZUnrealFieldEmitter::EmitDelegateSkeleton(UPackage* pak, FZDelegat
 	// UDelegateFunction only has RF_Public | RF_Transient | RF_MarkAsNative set in UHT generated code,
 	// but I think it's okay to keep sync with UClass.
 	constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Standalone | RF_Transient | RF_MarkAsNative | RF_MarkAsRootSet;
-	constexpr EFunctionFlags GCompiledInFunctionFlags = FUNC_Delegate;
+	constexpr EFunctionFlags GCompiledInFunctionFlags = FUNC_Public | FUNC_Delegate; // @see: UhtFunctionParser.ParseUDelegate().
 
 	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
 
 	// @TODO: Support sparse delegate.
-	check(def.DelegateType != EZDelegateType::Sparse);
+	UE_CLOG(def.DelegateType == EZDelegateType::Sparse, LogZSharpEmit, Fatal, TEXT("Sparse delegate is not support for emit yet!!! Delegate: [%s]"), *def.Name.ToString());
 
 	FStaticConstructObjectParameters params { def.DelegateType == EZDelegateType::Sparse ? USparseDelegateFunction::StaticClass() : UDelegateFunction::StaticClass() };
 	params.Outer = def.OuterClassName.IsNone() ? static_cast<UObject*>(pak) : static_cast<UObject*>(FindObjectChecked<UClass>(pak, *def.OuterClassName.ToString()));
@@ -1157,7 +1176,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitDelegateSkeleton(UPackage* pak, FZDelegat
 	auto delegate = static_cast<UDelegateFunction*>(StaticConstructObject_Internal(params));
 	def.Delegate = delegate;
 
-	delegate->FunctionFlags |= GCompiledInFunctionFlags;
+	delegate->FunctionFlags |= GCompiledInFunctionFlags | def.FunctionFlags;
 	if (def.DelegateType != EZDelegateType::Unicast)
 	{
 		delegate->FunctionFlags |= FUNC_MulticastDelegate;
@@ -1318,22 +1337,9 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitDelegate(UPackage* pak, FZDelegateD
 {
 	UDelegateFunction* delegate = def.Delegate;
 
-	// Migrate from UECodeGen_Private::ConstructUFunctionInternal().
 	ZUnrealFieldEmitter_Private::EmitProperties(delegate, def.Properties);
-	
 	ZUnrealFieldEmitter_Private::AddMetadata(delegate, def.MetadataMap);
-
-	delegate->Bind();
-	delegate->StaticLink(true);
-
-	// For nested delegate, we need to add it to outer class child link.
-	if (auto outer = Cast<UClass>(delegate->GetOuter()))
-	{
-		// Migrate from UClass::CreateLinkAndAddChildFunctionsToMap().
-		delegate->Next = outer->Children;
-		outer->Children = delegate;
-		outer->AddFunctionToFunctionMap(delegate, delegate->GetFName());
-	}
+	ZUnrealFieldEmitter_Private::CompileFunction(delegate);
 }
 
 void ZSharp::FZUnrealFieldEmitter::FinishEmitInterface(UPackage* pak, FZInterfaceDefinition& def) const

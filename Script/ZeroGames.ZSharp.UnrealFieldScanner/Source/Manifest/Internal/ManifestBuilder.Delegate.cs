@@ -24,6 +24,16 @@ partial class ManifestBuilder
 		
 		ScanUProperties(result, delegateModel);
 
+		if (delegateModel.Outer is not null) // @FIXME: I don't know wtf this is alright...
+		{
+			// Check for non-return out param.
+			// IMPORTANT: Keep sync with function.
+			if (result.Properties.Any(p => (p.PropertyFlags & (EPropertyFlags.CPF_OutParm | EPropertyFlags.CPF_ReturnParm)) == EPropertyFlags.CPF_OutParm))
+			{
+				result.FunctionFlags |= EFunctionFlags.FUNC_HasOutParms;
+			}
+		}
+
 		return result;
 	}
 	

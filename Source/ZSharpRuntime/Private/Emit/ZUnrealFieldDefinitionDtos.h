@@ -223,6 +223,9 @@ struct FZDelegateDefinitionDto : public FZStructDefinitionDto
 
 	UPROPERTY()
 	FName OuterClassName;
+
+	UPROPERTY()
+	uint32 FunctionFlags = 0;
 };
 
 USTRUCT(meta = (ZSharpNoExport))

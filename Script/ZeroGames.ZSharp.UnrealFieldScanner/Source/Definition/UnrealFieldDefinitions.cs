@@ -151,6 +151,7 @@ public class UnrealDelegateDefinition : UnrealStructDefinition, IUnrealSignature
 {
 	public EDelegateType DelegateType { get; set; }
 	public string? OuterClassName { get; set; }
+	public EFunctionFlags FunctionFlags { get; set; }
 }
 
 public class UnrealInterfaceDefinition : UnrealStructDefinition

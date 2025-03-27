@@ -89,8 +89,9 @@ public class UDelegateGenerator : ISourceGenerator
 		CompilationUnit compilationUnit = builder.Build();
 		CSharpGenerator generator = new();
 		string content = generator.Generate(compilationUnit);
-		
-		context.AddSource($"{className}.g.cs", SourceText.From(content, Encoding.UTF8));
+
+		string prefix = string.IsNullOrWhiteSpace(outerTypeName) ? string.Empty : $"{outerTypeName}.";
+		context.AddSource($"{prefix}{className}.g.cs", SourceText.From(content, Encoding.UTF8));
 	}
 
 }

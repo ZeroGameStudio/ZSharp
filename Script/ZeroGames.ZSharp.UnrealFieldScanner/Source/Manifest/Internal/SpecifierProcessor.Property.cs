@@ -51,7 +51,7 @@ partial class SpecifierProcessor
 		check(model.Outer is IUnrealClassModel);
 		
 		var classModel = (IUnrealClassModel)model.Outer;
-		IUnrealFunctionModel getterModel = classModel.Functions.Single(func => func.Name == specifier.AccessorName);
+		IUnrealFunctionModel setterModel = classModel.Functions.Single(func => func.Name == specifier.AccessorName);
 		// @TODO: Check signature
 		
 		UnrealClassDefinition classDef = (UnrealClassDefinition)def.Outer;

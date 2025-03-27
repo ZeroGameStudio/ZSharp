@@ -142,6 +142,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 				delegateDef.Properties = PropertyDtos2Defs(MoveTemp(delegateDto.Properties));
 				delegateDef.DelegateType = static_cast<EZDelegateType>(delegateDto.DelegateType);
 				delegateDef.OuterClassName = delegateDto.OuterClassName;
+				delegateDef.FunctionFlags = static_cast<EFunctionFlags>(delegateDto.FunctionFlags);
 			}
 		}
 

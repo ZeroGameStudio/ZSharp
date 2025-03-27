@@ -133,6 +133,7 @@ namespace ZSharp
 		
 		EZDelegateType DelegateType = EZDelegateType::None;
 		FName OuterClassName;
+		EFunctionFlags FunctionFlags = FUNC_None;
 	};
 
 	struct FZInterfaceDefinition : public FZStructDefinition

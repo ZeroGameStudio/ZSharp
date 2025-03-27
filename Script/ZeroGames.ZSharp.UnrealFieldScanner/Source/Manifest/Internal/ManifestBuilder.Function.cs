@@ -60,6 +60,7 @@ partial class ManifestBuilder
 		}
 
 		// Check for non-return out param.
+		// IMPORTANT: Keep sync with delegate.
 		if (result.Properties.Any(p => (p.PropertyFlags & (EPropertyFlags.CPF_OutParm | EPropertyFlags.CPF_ReturnParm)) == EPropertyFlags.CPF_OutParm))
 		{
 			result.FunctionFlags |= EFunctionFlags.FUNC_HasOutParms;

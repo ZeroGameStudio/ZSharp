@@ -55,6 +55,29 @@ public static class EmitGeneratorHelper
 
 	public static string GetTypeNamespace(ITypeSymbol type) => type.ContainingNamespace.ToString();
 
+	public static void LootNamespace(ITypeSymbol type, ICollection<string> result)
+	{
+		HashSet<string> lootedTypes = [];
+		void Loot(ITypeSymbol cur)
+		{
+			if (!lootedTypes.Add(cur.MetadataName))
+			{
+				return;
+			}
+
+			result.Add(GetTypeNamespace(cur));
+			if (type is INamedTypeSymbol { IsGenericType: true } namedType)
+			{
+				foreach (var typeArgument in namedType.TypeArguments)
+				{
+					Loot(typeArgument);
+				}
+			}
+		}
+		
+		Loot(type);
+	}
+
 	public static TypeReference GetTypeReference(ITypeSymbol type) => new(GetNormalizedTypeName(type), type.TypeKind == TypeKind.Enum ? "int64" : null);
 	
 }

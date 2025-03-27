@@ -23,7 +23,7 @@ public class EmittedDelegateBuilder(string namespaceName, string typeName, strin
 		return base.GetOuterClassDefinition();
 	}
 
-	protected override ClassDefinition AllocateTypeDefinition() => new(false, EMemberVisibility.Public, TypeName) { Modifiers = EMemberModifiers.Unsafe };
+	protected override ClassDefinition AllocateTypeDefinition() => new(false, EMemberVisibility.Default, TypeName) { Modifiers = EMemberModifiers.Unsafe };
 
 	protected override void BuildTypeDefinition(ClassDefinition definition)
 	{

@@ -140,7 +140,12 @@ partial class ManifestBuilder
 				// String properties don't have these. (@see: UhtXXXStrProperty constructor)
 				if (result.Type is not (EPropertyType.String or EPropertyType.AnsiString or EPropertyType.Utf8String))
 				{
-					result.PropertyFlags |= EPropertyFlags.CPF_ConstParm | EPropertyFlags.CPF_ReferenceParm | EPropertyFlags.CPF_OutParm; // const& input also has CPF_OutParm.
+					result.PropertyFlags |= EPropertyFlags.CPF_ConstParm | EPropertyFlags.CPF_ReferenceParm;
+					// Non replicated parameter will also have CPF_OutParm. (@see: UhtPropertyParser.ResolvePropertyType)
+					if (result.Outer is not UnrealFunctionDefinition function || !function.FunctionFlags.HasFlag(EFunctionFlags.FUNC_Net))
+					{
+						result.PropertyFlags |= EPropertyFlags.CPF_OutParm;
+					}
 				}
 
 				result.AddMetadata(MetadataConstants.NativeConst);

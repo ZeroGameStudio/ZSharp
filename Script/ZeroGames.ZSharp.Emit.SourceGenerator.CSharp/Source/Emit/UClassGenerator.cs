@@ -56,7 +56,7 @@ public class UClassGenerator : ISourceGenerator
 			.Any(method => method.MethodKind == MethodKind.Constructor && method.Parameters.Length == 1 && method.Parameters[0].Type.SpecialType == SpecialType.System_IntPtr);
 
 		EmittedClassBuilder builder = new(namespaceName, className, implicitBase, implicitRedConstructor);
-		List<string> usings = new();
+		HashSet<string> usings = new();
 		
 		var methods = uclassSymbol.GetMembers()
 			.OfType<IMethodSymbol>()
@@ -87,13 +87,13 @@ public class UClassGenerator : ISourceGenerator
 		{
 			if (!method.ReturnsVoid)
 			{
-				usings.Add(EmitGeneratorHelper.GetTypeNamespace(method.ReturnType));
+				EmitGeneratorHelper.LootNamespace(method.ReturnType, usings);
 			}
 			
 			List<ParameterDeclaration> parameters = new();
 			foreach (var parameter in method.Parameters)
 			{
-				usings.Add(EmitGeneratorHelper.GetTypeNamespace(parameter.Type));
+				EmitGeneratorHelper.LootNamespace(parameter.Type, usings);
 				
 				parameters.Add(new(EmitGeneratorHelper.RefKindToParameterKind(parameter.RefKind), EmitGeneratorHelper.GetTypeReference(parameter.Type), parameter.Name));
 			}
@@ -117,7 +117,7 @@ public class UClassGenerator : ISourceGenerator
 
 		foreach (var property in properties)
 		{
-			usings.Add(EmitGeneratorHelper.GetTypeNamespace(property.Type));
+			EmitGeneratorHelper.LootNamespace(property.Type, usings);
 			
 			ImmutableArray<AttributeData> attributes = property.GetAttributes();
 			AttributeData? fieldNotify = attributes.SingleOrDefault(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, fieldNotifySpecifierSymbol));

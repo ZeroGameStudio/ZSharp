@@ -81,7 +81,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 		return new(property, zcallHandle);
 	}
 	
-	protected override ClassDefinition AllocateTypeDefinition() => new(false, EMemberVisibility.Public, TypeName);
+	protected override ClassDefinition AllocateTypeDefinition() => new(false, EMemberVisibility.Default, TypeName);
 
 	protected override void BuildTypeDefinition(ClassDefinition definition)
 	{

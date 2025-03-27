@@ -44,7 +44,7 @@ public class UStructGenerator : ISourceGenerator
 		string namespaceName = EmitGeneratorHelper.GetTypeNamespace(ustructSymbol);
 
 		EmittedScriptStructBuilder builder = new(namespaceName, className, implicitBase);
-		List<string> usings = new();
+		HashSet<string> usings = new();
 
 		var properties = ustructSymbol.GetMembers()
 			.OfType<IPropertySymbol>()
@@ -52,7 +52,7 @@ public class UStructGenerator : ISourceGenerator
 
 		foreach (var property in properties)
 		{
-			usings.Add(EmitGeneratorHelper.GetTypeNamespace(property.Type));
+			EmitGeneratorHelper.LootNamespace(property.Type, usings);
 			builder.AddProperty
 			(
 				EmitGeneratorHelper.AccessibilityToMemberVisibility(property.DeclaredAccessibility),

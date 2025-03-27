@@ -60,20 +60,20 @@ public class UDelegateGenerator : ISourceGenerator
 		};
 
 		EmittedDelegateBuilder builder = new(namespaceName, className, outerTypeName, kind);
-		List<string> usings = new();
+		HashSet<string> usings = new();
 		
 		ITypeSymbol signatureTypeSymbol = udelegateSymbol.GetTypeMembers().Single(t => t.Name is "Signature");
 		IMethodSymbol signature = signatureTypeSymbol.GetMembers().OfType<IMethodSymbol>().Single(m => m.Name == "Invoke");
 		builder.ReturnType = !signature.ReturnsVoid ? EmitGeneratorHelper.GetTypeReference(signature.ReturnType) : null;
 		if (!signature.ReturnsVoid)
 		{
-			usings.Add(EmitGeneratorHelper.GetTypeNamespace(signature.ReturnType));
+			EmitGeneratorHelper.LootNamespace(signature.ReturnType, usings);
 		}
 			
 		List<ParameterDeclaration> parameters = new();
 		foreach (var parameter in signature.Parameters)
 		{
-			usings.Add(EmitGeneratorHelper.GetTypeNamespace(parameter.Type));
+			EmitGeneratorHelper.LootNamespace(parameter.Type, usings);
 				
 			parameters.Add(new(EmitGeneratorHelper.RefKindToParameterKind(parameter.RefKind), EmitGeneratorHelper.GetTypeReference(parameter.Type), parameter.Name));
 		}

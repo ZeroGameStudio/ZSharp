@@ -20,7 +20,7 @@ public class EmittedScriptStructBuilder(string namespaceName, string typeName, b
 		return new(property, zcallHandle);
 	}
 	
-	protected override ClassDefinition AllocateTypeDefinition() => new(false, EMemberVisibility.Public, TypeName);
+	protected override ClassDefinition AllocateTypeDefinition() => new(false, EMemberVisibility.Default, TypeName);
 
 	protected override void BuildTypeDefinition(ClassDefinition definition)
 	{

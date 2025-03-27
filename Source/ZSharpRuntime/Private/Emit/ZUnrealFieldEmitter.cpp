@@ -44,9 +44,9 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 	}
 
 	// Fixup implicit instanced flags caused by CLASS_DefaultToInstanced.
-	static bool FixupInstancedFlagsForObjectProperty(FProperty* property)
+	static bool FixupInstancedFlagsForProperty(FProperty* property)
 	{
-		// Migrate from UhtObjectPropertyBase.ResolveSelf() and UhtInterfaceProperty.ResolveSelf().
+		// Migrate from UhtXXXProperty.ResolveSelf().
 		static constexpr EPropertyFlags GDefaultToInstancedPropertyFlags = CPF_InstancedReference | CPF_ExportObject; // No CPF_PersistentObject.
 		static constexpr EPropertyFlags GDefaultToInstancedPropertyFlagsForInputParameter = CPF_InstancedReference; // Input parameter can't have CPF_ExportObject.
 		
@@ -69,6 +69,15 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				return true;
 			}
 		}
+		else if (EnumHasAnyFlags(static_cast<EClassCastFlags>(property->GetCastFlags()), CASTCLASS_FDelegateProperty | CASTCLASS_FMulticastDelegateProperty))
+		{
+			FProperty* ownerProperty = property->GetOwnerProperty();
+			// Member property or return value of delegate have CPF_InstancedReference.
+			if (!ownerProperty->HasAnyPropertyFlags(CPF_Parm) || ownerProperty->HasAllPropertyFlags(CPF_ReturnParm))
+			{
+				property->PropertyFlags |= CPF_InstancedReference;
+			}
+		}
 
 		return false;
 	}
@@ -76,8 +85,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 	// Fixup implicit instanced flags caused by CLASS_DefaultToInstanced and propagated instanced flags.
 	static bool FixupInstancedFlagsForContainerProperty(FProperty* containerProperty, FProperty* elementProperty)
 	{
-		FixupInstancedFlagsForObjectProperty(elementProperty);
-		
+		FixupInstancedFlagsForProperty(elementProperty);
+
 		if (IsInstancedProperty(elementProperty))
 		{
 			containerProperty->PropertyFlags |= CPF_ContainsInstancedReference | elementProperty->PropertyFlags & CPF_ExportObject;
@@ -133,13 +142,10 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				}
 			}
 			
-			// Migrate from UhtObjectPropertyBase and UhtInterfaceProperty.
-			if (EnumHasAnyFlags(static_cast<EClassCastFlags>(property->GetCastFlags()), CASTCLASS_FObjectPropertyBase | CASTCLASS_FInterfaceProperty))
-			{
-				containsInstancedRef |= FixupInstancedFlagsForObjectProperty(property);
-			}
+			containsInstancedRef |= FixupInstancedFlagsForProperty(property);
+			
 			// Migrate from UhtStructProperty.
-			else if (auto structProperty = CastField<FStructProperty>(property))
+			if (auto structProperty = CastField<FStructProperty>(property))
 			{
 				containsInstancedRef |= FixupInstancedFlagsForContainerProperty(structProperty, structProperty);
 			}
@@ -169,6 +175,12 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		}
 
 		return containsInstancedRef;
+	}
+
+	static void FixupAlignmentForStruct(UStruct* strct)
+	{
+		// UStruct::Link() doesn't align the last property so we need this.
+		strct->SetPropertiesSize(strct->GetStructureSize());
 	}
 	
 	static FString MergeNames(const FString& lhs, const FString& rhs, const FString& subtract1, const FString& subtract2)
@@ -522,8 +534,6 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(Delegate);
 
-				property->PropertyFlags |= CPF_InstancedReference; // Migrate from UHT.
-				
 				property->SignatureFunction = FindObjectChecked<UDelegateFunction>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
@@ -532,8 +542,6 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(MulticastInlineDelegate);
 
-				property->PropertyFlags |= CPF_InstancedReference; // Migrate from UHT.
-				
 				property->SignatureFunction = FindObjectChecked<UDelegateFunction>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
@@ -544,8 +552,6 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				
 				NEW_PROPERTY(MulticastSparseDelegate);
 
-				property->PropertyFlags |= CPF_InstancedReference; // Migrate from UHT.
-				
 				property->SignatureFunction = FindObjectChecked<USparseDelegateFunction>(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
@@ -753,6 +759,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 		function->Bind();
 		function->StaticLink(true);
+		FixupAlignmentForStruct(function);
 		function->MinAlignment = 1; // Function is always aligned by 1.
 
 		// Now that all parameters have linked up so we can check for signature compability.
@@ -1290,14 +1297,17 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 		}
 	}
 	// Make sure the last property is aligned.
+	ZUnrealFieldEmitter_Private::FixupAlignmentForStruct(scriptStruct);
+
 	FZSharpScriptStruct* zsstrct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
-	scriptStruct->SetPropertiesSize(scriptStruct->GetStructureSize());
+	
 	auto ops = new ZSharpScriptStruct_Private::FZSharpStructOps { scriptStruct, zsstrct, scriptStruct->GetPropertiesSize(), scriptStruct->GetMinAlignment() };
 	scriptStruct->DeferCppStructOps(FTopLevelAssetPath { pak->GetFName(), scriptStruct->GetFName() }, ops);
 
 	// Compile script struct.
 	// All referenced script structs should be initialized so struct properties can link properly.
 	scriptStruct->StaticLink(true);
+	ZUnrealFieldEmitter_Private::FixupAlignmentForStruct(scriptStruct); // Link() aligns the last property for script struct, but we don't want to depend on implementation.
 	
 	// Compile Z# struct.
 	FZSharpScriptStruct* zsstruct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
@@ -1482,8 +1492,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 	// Compile unreal class.
 	cls->Bind();
 	cls->StaticLink(true);
-	// Make sure the last property is aligned then mark as intrinsic.
-	cls->SetPropertiesSize(cls->GetStructureSize());
+	ZUnrealFieldEmitter_Private::FixupAlignmentForStruct(cls);
 	cls->SetSparseClassDataStruct(cls->GetSparseClassDataArchetypeStruct());
 	cls->ClassFlags |= CLASS_Intrinsic;
 	

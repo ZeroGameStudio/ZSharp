@@ -149,15 +149,15 @@ partial class SpecifierProcessor
 		
 		var classModel = (IUnrealClassModel)model.Outer;
 		def.PropertyFlags |= EPropertyFlags.CPF_Net;
+		def.RepCondition = specifier.Condition;
+		def.RepNotifyCondition = specifier.NotifyCondition;
+		def.IsRepPushBased = specifier.IsPushBased;
 		if (specifier.Notify is not null)
 		{
 			check(classModel.Functions.Any(func => func.Name == specifier.Notify));
 			
 			def.PropertyFlags |= EPropertyFlags.CPF_RepNotify;
 			def.RepNotifyName = specifier.Notify;
-			def.RepCondition = specifier.Condition;
-			def.RepNotifyCondition = specifier.NotifyCondition;
-			def.IsRepPushBased = specifier.IsPushBased;
 		}
 	}
 	

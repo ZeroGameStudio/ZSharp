@@ -11,7 +11,7 @@ const ZSharp::FZFunctionVisitorRegistry& ZSharp::FZFunctionVisitorRegistry::Get(
 	return GInstance;
 }
 
-ZSharp::FZFunctionVisitorHandle ZSharp::FZFunctionVisitorRegistry::Get(const UFunction* function) const
+ZSharp::FZFunctionVisitorHandle ZSharp::FZFunctionVisitorRegistry::Get(const UFunction* function, bool* native) const
 {
 	if (!function)
 	{
@@ -22,6 +22,11 @@ ZSharp::FZFunctionVisitorHandle ZSharp::FZFunctionVisitorRegistry::Get(const UFu
 	while (const UFunction* super = ancestor->GetSuperFunction())
 	{
 		ancestor = super;
+	}
+
+	if (native)
+	{
+		*native = ancestor->IsNative();
 	}
 
 	return { ancestor };

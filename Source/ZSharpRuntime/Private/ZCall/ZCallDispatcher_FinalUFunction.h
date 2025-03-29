@@ -20,13 +20,16 @@ namespace ZSharp
 		virtual EZCallErrorCode Dispatch(FZCallBuffer* buffer) const override;
 
 	private:
+		bool ResolveFinalFunction() const;
 		bool InvalidateCache() const;
 
 	private:
 		FString Name;
 		FString Path;
 		mutable TWeakObjectPtr<UFunction> FinalFunction;
+		mutable bool bNativeFinalFunction = false;
 		mutable FZFunctionVisitorHandle Function;
+		mutable const FZFunctionVisitor* NativeFunction = nullptr;
 		
 	};
 }

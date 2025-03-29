@@ -6,17 +6,21 @@
 
 ZSharp::EZCallErrorCode ZSharp::FZCallDispatcher_FinalUFunction::Dispatch(FZCallBuffer* buffer) const
 {
-	if ((!FinalFunction.IsValid() || !Function) && !InvalidateCache())
+	if (!NativeFunction && !Function && !InvalidateCache())
 	{
 		return EZCallErrorCode::DispatcherError;
 	}
 
-	return Function->InvokeUFunction(buffer, FinalFunction.Get());
+	if (!bNativeFinalFunction && !FinalFunction.IsValid() && !ResolveFinalFunction())
+	{
+		return EZCallErrorCode::DispatcherError;
+	}
+
+	return NativeFunction ? NativeFunction->InvokeUFunction(buffer, FinalFunction.Get()) : Function->InvokeUFunction(buffer, FinalFunction.Get());
 }
 
-bool ZSharp::FZCallDispatcher_FinalUFunction::InvalidateCache() const
+bool ZSharp::FZCallDispatcher_FinalUFunction::ResolveFinalFunction() const
 {
-	// @FIXME: Can we just find this function since it must have already loaded?
 	auto func = LoadObject<UFunction>(nullptr, *Path);
 	if (!func)
 	{
@@ -24,10 +28,28 @@ bool ZSharp::FZCallDispatcher_FinalUFunction::InvalidateCache() const
 	}
 
 	FinalFunction = func;
-	Function = FZFunctionVisitorRegistry::Get().Get(func);
+	bNativeFinalFunction = func->IsNative();
+	return true;
+}
+
+bool ZSharp::FZCallDispatcher_FinalUFunction::InvalidateCache() const
+{
+	if (!ResolveFinalFunction())
+	{
+		return false;
+	}
+
+	bool native;
+	Function = FZFunctionVisitorRegistry::Get().Get(FinalFunction.Get(), &native);
 	if (!Function)
 	{
 		return false;
+	}
+
+	// Native field is never GCed so we can safely cache a pointer.
+	if (native)
+	{
+		NativeFunction = Function.Get();
 	}
 
 	return true;

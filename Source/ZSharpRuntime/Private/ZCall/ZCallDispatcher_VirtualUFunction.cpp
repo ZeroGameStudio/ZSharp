@@ -14,17 +14,16 @@ ZSharp::FZCallDispatcher_VirtualUFunction::FZCallDispatcher_VirtualUFunction(con
 
 ZSharp::EZCallErrorCode ZSharp::FZCallDispatcher_VirtualUFunction::Dispatch(FZCallBuffer* buffer) const
 {
-	if (!Function && !InvalidateCache())
+	if (!NativeFunction && !Function && !InvalidateCache())
 	{
 		return EZCallErrorCode::DispatcherError;
 	}
 
-	return Function->InvokeUFunction(buffer);
+	return NativeFunction ? NativeFunction->InvokeUFunction(buffer) : Function->InvokeUFunction(buffer);
 }
 
 bool ZSharp::FZCallDispatcher_VirtualUFunction::InvalidateCache() const
 {
-	// @FIXME: Can we just find this function since it must have already loaded?
 	const UClass* cls = LoadObject<UClass>(nullptr, *ClassPath);
 	if (!cls)
 	{
@@ -37,10 +36,17 @@ bool ZSharp::FZCallDispatcher_VirtualUFunction::InvalidateCache() const
 		return false;
 	}
 
-	Function = FZFunctionVisitorRegistry::Get().Get(func);
+	bool native;
+	Function = FZFunctionVisitorRegistry::Get().Get(func, &native);
 	if (!Function)
 	{
 		return false;
+	}
+
+	// Native field is never GCed so we can safely cache a pointer.
+	if (native)
+	{
+		NativeFunction = Function.Get();
 	}
 
 	return true;

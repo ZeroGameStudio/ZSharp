@@ -18,7 +18,7 @@ namespace ZSharp
 		static const FZFunctionVisitorRegistry& Get();
 
 	public:
-		FZFunctionVisitorHandle Get(const UFunction* function) const;
+		FZFunctionVisitorHandle Get(const UFunction* function, bool* native = nullptr) const;
 
 	private:
 		FZFunctionVisitorRegistry();

@@ -25,6 +25,7 @@ namespace ZSharp
 		FString ClassPath;
 		FName FunctionName;
 		mutable FZFunctionVisitorHandle Function;
+		mutable const FZFunctionVisitor* NativeFunction = nullptr;
 		
 	};
 }

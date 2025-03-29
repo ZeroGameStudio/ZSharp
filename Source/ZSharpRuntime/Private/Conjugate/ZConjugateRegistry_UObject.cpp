@@ -181,6 +181,7 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UObject::GetManagedType(
 			if (FZRuntimeTypeHandle type = Alc.GetType(uri))
 			{
 				handle = type;
+				break;
 			}
 		}
 

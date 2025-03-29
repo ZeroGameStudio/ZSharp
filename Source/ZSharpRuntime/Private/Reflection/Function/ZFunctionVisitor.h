@@ -69,6 +69,7 @@ namespace ZSharp
 		bool bIsDelegate;
 		bool bIsMulticastDelegate;
 		bool bIsRpc;
+		bool bUseOptimizedProcessEvent;
 		TArray<TUniquePtr<IZPropertyVisitor>> ParameterProperties;
 		TUniquePtr<IZPropertyVisitor> ReturnProperty;
 		TSet<int32> InParamIndices;

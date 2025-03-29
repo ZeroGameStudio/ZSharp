@@ -47,11 +47,11 @@ ZSharp::EZCallErrorCode ZSharp::FZCallDispatcher_UProperty::Dispatch(FZCallBuffe
 	const int32 index = buf[2].ReadInt32();
 	if (write)
 	{
-		Property->SetValue_InContainer(self, buf[3], index);
+		Property->SetPropertyValue_InContainer(self, buf[3], index);
 	}
 	else
 	{
-		Property->GetRef_InContainer(self, buf[3], index);
+		Property->GetPropertyValue_InContainer(self, buf[3], index);
 	}
 	
 	return EZCallErrorCode::Succeed;

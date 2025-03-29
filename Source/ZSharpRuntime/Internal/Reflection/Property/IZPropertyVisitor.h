@@ -32,6 +32,8 @@ namespace ZSharp
 		void GetValue_InContainer(const void* src, FZCallBufferSlot& dest, int32 index) const;
 		void GetRef_InContainer(const void* src, FZCallBufferSlot& dest, int32 index) const;
 		void SetValue_InContainer(void* dest, const FZCallBufferSlot& src, int32 index) const;
+		void GetPropertyValue_InContainer(const void* src, FZCallBufferSlot& dest, int32 index) const;
+		void SetPropertyValue_InContainer(void* dest, const FZCallBufferSlot& src, int32 index) const;
 
 	public:
 		virtual const FProperty* GetUnderlyingProperty() const = 0;

@@ -305,6 +305,15 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
 			if (NonConstOutParamIndices.Contains(i))
 			{
+				// Native code may link const& parameters to out param rec, skip them.
+				if (!fromBlueprint)
+				{
+					while (out->Property->HasAllPropertyFlags(CPF_ConstParm))
+					{
+						out = out->NextOutParm;
+					}
+				}
+
 				checkSlow(FStructUtils::ArePropertiesTheSame(out->Property, visitor->GetUnderlyingProperty(), true));
 				visitor->SetValue(out->PropAddr, buffer[bIsStatic ? i : i + 1]);
 				out = out->NextOutParm;
@@ -406,15 +415,62 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InternalInvokeUFunction(FZCallBuffer* buffer, UObject* object, const UFunction* function) const
 {
 	void* params = FMemory_Alloca_Aligned(function->ParmsSize, function->MinAlignment);
-
-	FillParams(params, buffer);
 	
-	object->ProcessEvent(const_cast<UFunction*>(function), params);
+	FillParams(params, buffer);
 
+	if (bUseOptimizedProcessEvent)
+	{
+		UFunction* mutableFunc = const_cast<UFunction*>(function);
+		FFrame stack(object, mutableFunc, params, nullptr, mutableFunc->ChildProperties);
+		if (function->HasAnyFunctionFlags(FUNC_HasOutParms))
+		{
+			FOutParmRec** lastOut = &stack.OutParms;
+			for (FProperty* property = function->PropertyLink; property && property->HasAllPropertyFlags(CPF_Parm); property = property->PropertyLinkNext)
+			{
+				if (property->HasAnyPropertyFlags(CPF_OutParm))
+				{
+					auto out = static_cast<FOutParmRec*>(FMemory_Alloca(sizeof(FOutParmRec)));
+					out->PropAddr = property->ContainerPtrToValuePtr<uint8>(params);
+					out->Property = property;
+
+					if (*lastOut)
+					{
+						(*lastOut)->NextOutParm = out;
+						lastOut = &(*lastOut)->NextOutParm;
+					}
+					else
+					{
+						*lastOut = out;
+					}
+				}
+			}
+
+			if (*lastOut)
+			{
+				(*lastOut)->NextOutParm = nullptr;
+			}
+		}
+		
+		const bool hasReturnParam = function->ReturnValueOffset != MAX_uint16;
+		uint8* returnAddr = hasReturnParam ? static_cast<uint8*>(params) + function->ReturnValueOffset : nullptr;
+		{
+			UClass* owner = function->GetOuterUClass();
+			if (owner->HasAllClassFlags(CLASS_Interface))
+			{
+				object = static_cast<UObject*>(object->GetInterfaceAddress(owner));
+			}
+			
+			TGuardValue<UFunction*> NativeFuncGuard(stack.CurrentNativeFunction, mutableFunc);
+			mutableFunc->GetNativeFunc()(object, stack, returnAddr);
+		}
+	}
+	else
+	{
+		object->ProcessEvent(const_cast<UFunction*>(function), params);
+	}
+	
 	CopyOut(buffer, params);
-
-	params = nullptr;
-
+	
 	return EZCallErrorCode::Succeed;
 }
 
@@ -443,6 +499,7 @@ ZSharp::FZFunctionVisitor::FZFunctionVisitor(UFunction* function)
 	, bIsDelegate(false)
 	, bIsMulticastDelegate(false)
 	, bIsRpc(false)
+	, bUseOptimizedProcessEvent(false)
 {
 	Function = function;
 	if (!Function.IsValid(true))
@@ -451,11 +508,12 @@ ZSharp::FZFunctionVisitor::FZFunctionVisitor(UFunction* function)
 	}
 
 	check(!function->GetSuperFunction());
-
+	
 	bIsStatic = function->HasAllFunctionFlags(FUNC_Static);
 	bIsDelegate = function->HasAllFunctionFlags(FUNC_Delegate);
 	bIsMulticastDelegate = function->HasAllFunctionFlags(FUNC_MulticastDelegate);
 	bIsRpc = function->HasAllFunctionFlags(FUNC_Net);
+	bUseOptimizedProcessEvent = function->HasAllFunctionFlags(FUNC_Native) && !bIsRpc; // Native local function can be invoked more efficiently.
 	
 	ParameterProperties.Empty();
 	ReturnProperty.Reset();
@@ -499,10 +557,11 @@ void ZSharp::FZFunctionVisitor::FillParams(void* params, const FZCallBuffer* buf
 	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 	{
 		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
-		visitor->InitializeValue_InContainer(params);
+		void* dest = visitor->ContainerPtrToValuePtr(params, 0);
+		visitor->InitializeValue(dest);
 		if (InParamIndices.Contains(i))
 		{
-			visitor->SetValue_InContainer(params, (*buffer)[bIsStatic ? i : i + 1], 0);
+			visitor->SetValue(dest, (*buffer)[bIsStatic ? i : i + 1]);
 		}
 	}
 
@@ -517,17 +576,19 @@ void ZSharp::FZFunctionVisitor::CopyOut(FZCallBuffer* buffer, void* params) cons
 	for (int32 i = 0; i < ParameterProperties.Num(); ++i)
 	{
 		const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
+		void* dest = visitor->ContainerPtrToValuePtr(params, 0);
 		if (NonConstOutParamIndices.Contains(i))
 		{
-			visitor->GetValue_InContainer(params, (*buffer)[bIsStatic ? i : i + 1], 0);
+			visitor->GetValue(dest, (*buffer)[bIsStatic ? i : i + 1]);
 		}
-		visitor->DestructValue_InContainer(params);
+		visitor->DestructValue(dest);
 	}
 
 	if (ReturnProperty)
 	{
-		ReturnProperty->GetValue_InContainer(params, (*buffer)[-1], 0);
-		ReturnProperty->DestructValue_InContainer(params);
+		void* dest = ReturnProperty->ContainerPtrToValuePtr(params, 0);
+		ReturnProperty->GetValue(dest, (*buffer)[-1]);
+		ReturnProperty->DestructValue(dest);
 	}
 }
 

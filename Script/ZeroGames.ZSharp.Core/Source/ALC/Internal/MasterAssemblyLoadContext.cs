@@ -149,19 +149,18 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         return handle;
     }
 
-    public IntPtr BuildConjugate_Red(IntPtr unmanaged, Type type)
+    public IntPtr BuildConjugate_Red(IntPtr unmanaged, IntPtr typeHandle)
     {
         GuardInvariant();
-
-        Type conjugateType = typeof(IConjugate<>).MakeGenericType(type);
-        Thrower.FatalIf(!type.IsAssignableTo(conjugateType));
-
-        if (!_buildRedConjugateDelegateLookup.TryGetValue(conjugateType, out var buildConjugate))
+        
+        if (!_buildRedConjugateDelegateLookup.TryGetValue(typeHandle, out var buildConjugate))
         {
+            Type? type = Type.GetTypeFromHandle(RuntimeTypeHandle.FromIntPtr(typeHandle));
+            Thrower.FatalIf(type is null);
             MethodInfo? method = type.GetMethod(BUILD_CONJUGATE_METHOD_NAME);
             Thrower.FatalIf(method is null);
             buildConjugate = method.CreateDelegate<Func<IntPtr, IConjugate>>();
-            _buildRedConjugateDelegateLookup[conjugateType] = buildConjugate;
+            _buildRedConjugateDelegateLookup[typeHandle] = buildConjugate;
         }
         
         IConjugate conjugate = buildConjugate(unmanaged);
@@ -454,7 +453,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private readonly Queue<IConjugate> _pendingDisposedConjugates = new();
     private readonly Lock _pendingDisposedConjugatesLock = new();
 
-    private readonly Dictionary<Type, Func<IntPtr, IConjugate>> _buildRedConjugateDelegateLookup = [];
+    private readonly Dictionary<IntPtr, Func<IntPtr, IConjugate>> _buildRedConjugateDelegateLookup = [];
 
 }
 

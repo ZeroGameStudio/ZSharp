@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -29,6 +30,7 @@ public static class Thrower
 		}
 	}
 	
+	[Conditional("ASSERTION_CHECK")]
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void ThrowIfNotInGameThread(string? message = "Operation occurs in non-game thread.", Exception? innerException = default)
 	{

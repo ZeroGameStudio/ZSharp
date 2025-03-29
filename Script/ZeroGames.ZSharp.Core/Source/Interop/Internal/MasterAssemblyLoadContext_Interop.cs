@@ -102,24 +102,24 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
             return default;
         }
     }
-    
+
     [UnmanagedCallersOnly]
     public static IntPtr BuildConjugate_Red(IntPtr unmanaged, InteropRuntimeTypeHandle type)
     {
         try
         {
-            Type? managedType = type.Type;
-            if (managedType is null)
+            IntPtr handle = type.Handle;
+            if (handle == IntPtr.Zero)
             {
-                return default;
+                return IntPtr.Zero;
             }
 
-            return MasterAssemblyLoadContext.Instance!.BuildConjugate_Red(unmanaged, managedType);
+            return MasterAssemblyLoadContext.Instance!.BuildConjugate_Red(unmanaged, type.Handle);
         }
         catch (Exception ex)
         {
             UnhandledExceptionHelper.Guard(ex);
-            return default;
+            return IntPtr.Zero;
         }
     }
     

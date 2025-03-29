@@ -14,7 +14,7 @@ public readonly struct InteropRuntimeTypeHandle : IEquatable<InteropRuntimeTypeH
 	{
 		if (type is not null)
 		{
-			_handle = RuntimeTypeHandle.ToIntPtr(type.TypeHandle);
+			Handle = RuntimeTypeHandle.ToIntPtr(type.TypeHandle);
 		}
 	}
 	
@@ -25,17 +25,15 @@ public readonly struct InteropRuntimeTypeHandle : IEquatable<InteropRuntimeTypeH
 
 	public override int32 GetHashCode()
 	{
-		return _handle.GetHashCode();
+		return Handle.GetHashCode();
 	}
 	
 	public bool Equals(InteropRuntimeTypeHandle other)
 	{
-		return _handle == other._handle;
+		return Handle == other.Handle;
 	}
 
-	public Type? Type => Type.GetTypeFromHandle(RuntimeTypeHandle.FromIntPtr(_handle));
-	
-	private readonly IntPtr _handle;
+	public IntPtr Handle { get; }
 	
 }
 

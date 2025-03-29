@@ -12,7 +12,7 @@ ZSharp::FZCallHandle ZSharp::FZFunctionVisitor::DelegateZCallHandle{};
 
 ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer* buffer) const
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	check(bAvailable);
 	check(!bIsDelegate);
 
@@ -28,8 +28,8 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 		}
 		const UFunction* proto = func;
 		func = self->FindFunctionChecked(func->GetFName()); // Instance function may be polymorphism
-		check(func->IsChildOf(proto));
-		check(func->IsSignatureCompatibleWith(proto));
+		checkSlow(func->IsChildOf(proto));
+		checkSlow(func->IsSignatureCompatibleWith(proto));
 	}
 	else
 	{
@@ -37,14 +37,14 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 	}
 
 	check(self);
-	check(self->IsA(func->GetOuterUClass()));
+	checkSlow(self->IsA(func->GetOuterUClass()));
 
 	return InternalInvokeUFunction(buffer, self, func);
 }
 
 ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer* buffer, const UFunction* finalFunction) const
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	check(bAvailable);
 	check(!bIsDelegate);
 
@@ -64,29 +64,29 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeUFunction(FZCallBuffer*
 		self = finalFunction->GetOuterUClass()->GetDefaultObject();
 	}
 	
-	check(finalFunction->IsChildOf(proto));
-	check(finalFunction->IsSignatureCompatibleWith(proto));
+	checkSlow(finalFunction->IsChildOf(proto));
+	checkSlow(finalFunction->IsSignatureCompatibleWith(proto));
 
 	check(self);
 
-#if DO_CHECK
+#if DO_GUARD_SLOW
 	const UClass* outerClass = finalFunction->GetOuterUClass();
 	if (outerClass->HasAllClassFlags(CLASS_Interface))
 	{
-		check(self->GetClass()->ImplementsInterface(outerClass));
+		checkSlow(self->GetClass()->ImplementsInterface(outerClass));
 	}
 	else
 	{
-		check(self->IsA(outerClass));
+		checkSlow(self->IsA(outerClass));
 	}
 #endif
-
+	
 	return InternalInvokeUFunction(buffer, self, finalFunction);
 }
 
 ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBuffer* buffer) const
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	check(bAvailable);
 	check(bIsDelegate);
 	check(!bIsMulticastDelegate);
@@ -114,7 +114,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeScriptDelegate(FZCallBu
 
 ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastInlineScriptDelegate(FZCallBuffer* buffer) const
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	check(bAvailable);
 	check(bIsDelegate);
 	check(bIsMulticastDelegate);
@@ -143,7 +143,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastInlineScriptDe
 
 ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastSparseScriptDelegate(FZCallBuffer* buffer) const
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	check(bAvailable);
 	check(bIsDelegate);
 	check(bIsMulticastDelegate);
@@ -172,15 +172,15 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastSparseScriptDe
 
 ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, FFrame& stack, RESULT_DECL) const
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	check(bAvailable);
 	check(!bIsDelegate);
 
 	UFunction* currentFunction = stack.CurrentNativeFunction;
 	const FZSharpFunction* zsfunction = FZSharpFieldRegistry::Get().GetFunction(currentFunction);
 	check(zsfunction);
-	check(currentFunction->IsChildOf(Function.Get()));
-	check(currentFunction->IsSignatureCompatibleWith(Function.Get()));
+	checkSlow(currentFunction->IsChildOf(Function.Get()));
+	checkSlow(currentFunction->IsSignatureCompatibleWith(Function.Get()));
 	
 	// IMPORTANT: Event if ALC is not available we can't return directly because we always need to balance the stack!!!
 	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
@@ -305,7 +305,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 			const TUniquePtr<IZPropertyVisitor>& visitor = ParameterProperties[i];
 			if (NonConstOutParamIndices.Contains(i))
 			{
-				check(FStructUtils::ArePropertiesTheSame(out->Property, visitor->GetUnderlyingProperty(), true));
+				checkSlow(FStructUtils::ArePropertiesTheSame(out->Property, visitor->GetUnderlyingProperty(), true));
 				visitor->SetValue(out->PropAddr, buffer[bIsStatic ? i : i + 1]);
 				out = out->NextOutParm;
 			}
@@ -317,7 +317,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		}
 
 		// Out params should all be consumed.
-		check(ReturnProperty ? FStructUtils::ArePropertiesTheSame(out->Property, ReturnProperty->GetUnderlyingProperty(), true) : !out);
+		checkSlow(ReturnProperty ? FStructUtils::ArePropertiesTheSame(out->Property, ReturnProperty->GetUnderlyingProperty(), true) : !out);
 
 		if (ReturnProperty)
 		{
@@ -330,7 +330,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 
 ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, void* params) const
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	check(bAvailable);
 	check(bIsDelegate);
 	check(!bIsStatic);
@@ -338,7 +338,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 	checkf(!bIsRpc, TEXT("RPC is not supported on delegates."));
 
 	check(object);
-	check(object->Implements<UZManagedDelegateProxy>());
+	checkSlow(object->Implements<UZManagedDelegateProxy>());
 
 	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
 	if (!alc)
@@ -408,7 +408,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InternalInvokeUFunction(FZCal
 	void* params = FMemory_Alloca_Aligned(function->ParmsSize, function->MinAlignment);
 
 	FillParams(params, buffer);
-
+	
 	object->ProcessEvent(const_cast<UFunction*>(function), params);
 
 	CopyOut(buffer, params);

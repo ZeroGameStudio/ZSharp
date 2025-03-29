@@ -45,7 +45,7 @@ UObject* ZSharp::FZConjugateRegistry_UObject::Conjugate(FZConjugateHandle handle
 
 ZSharp::FZConjugateHandle ZSharp::FZConjugateRegistry_UObject::Conjugate(const UObjectBase* unmanaged)
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	
 	auto unmanagedObject = (UObject*)unmanaged;
 	if (!unmanagedObject)

@@ -31,7 +31,7 @@ ZSharp::FZMasterAssemblyLoadContext::~FZMasterAssemblyLoadContext()
 
 void ZSharp::FZMasterAssemblyLoadContext::Unload()
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	check(!IsInRedStack());
 
 	if (bUnloaded)
@@ -63,7 +63,7 @@ ZSharp::EZInvokeMethodErrorCode ZSharp::FZMasterAssemblyLoadContext::InvokeMetho
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const FZRuntimeTypeUri& uri) const
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 
 	FZInteropRuntimeTypeUri interopUri { *uri.Uri };
 	FZRuntimeTypeHandle handle = FZMasterAssemblyLoadContext_Interop::GGetType(interopUri);
@@ -72,7 +72,7 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZMasterAssemblyLoadContext::GetType(const F
 
 ZSharp::IZConjugateRegistry& ZSharp::FZMasterAssemblyLoadContext::GetConjugateRegistry(uint16 id) const
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	check(ConjugateRegistries.IsValidIndex(id));
 
 	return *ConjugateRegistries[id];
@@ -80,21 +80,21 @@ ZSharp::IZConjugateRegistry& ZSharp::FZMasterAssemblyLoadContext::GetConjugateRe
 
 void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate(void* unmanaged, FZRuntimeTypeHandle type)
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 
 	return BuildConjugate_Red(unmanaged, type);
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate(void* unmanaged)
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 
 	ReleaseConjugate_Red(unmanaged);
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::PushRedFrame()
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	
 	++RedStackDepth;
 	
@@ -106,7 +106,7 @@ void ZSharp::FZMasterAssemblyLoadContext::PushRedFrame()
 
 void ZSharp::FZMasterAssemblyLoadContext::PopRedFrame()
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	check(IsInRedStack());
 	
 	for (const auto& registry : ConjugateRegistries)
@@ -119,7 +119,7 @@ void ZSharp::FZMasterAssemblyLoadContext::PopRedFrame()
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::RegisterZCall(IZCallDispatcher* dispatcher)
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	
 	FZCallHandle handle = FZCallHandle::Alloc();
 
@@ -131,7 +131,7 @@ ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::RegisterZCall(IZCallDi
 
 void ZSharp::FZMasterAssemblyLoadContext::RegisterZCallResolver(IZCallResolver* resolver, uint64 priority)
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	
 	ZCallResolverLink.Emplace(TTuple<uint64, TUniquePtr<IZCallResolver>> { priority, resolver });
 	ZCallResolverLink.StableSort([](auto& lhs, auto& rhs){ return lhs.template Get<0>() < rhs.template Get<0>(); });
@@ -139,14 +139,14 @@ void ZSharp::FZMasterAssemblyLoadContext::RegisterZCallResolver(IZCallResolver* 
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle(const FString& name)
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	
 	return GetZCallHandle_Red(name);
 }
 
 ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall(FZCallHandle handle, FZCallBuffer* buffer)
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	check(IsInRedStack());
 
 	return ZCall_Red(handle, buffer);
@@ -154,21 +154,21 @@ ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall(FZCallHandle 
 
 void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate_Black(uint16 registryId, void* userdata)
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 
 	return GetConjugateRegistry(registryId).BuildConjugate(userdata);
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::ReleaseConjugate_Black(uint16 registryId, void* unmanaged)
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 
 	GetConjugateRegistry(registryId).ReleaseConjugate(unmanaged);
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle_Black(const FString& name)
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 
 	FZCallHandle handle{};
 	const FZCallHandle* pHandle = ZCallName2Handle.Find(name);
@@ -193,7 +193,7 @@ ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext::GetZCallHandle_Black(c
 
 ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	check(IsInRedStack());
 	
 	if (!handle.IsBlack())

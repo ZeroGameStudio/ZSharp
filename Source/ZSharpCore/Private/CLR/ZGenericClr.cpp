@@ -511,7 +511,7 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
 
 ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::GetMasterAlc()
 {
-	check(IsInGameThread());
+	checkSlow(IsInGameThread());
 	
 	return MasterAlc.Get();
 }

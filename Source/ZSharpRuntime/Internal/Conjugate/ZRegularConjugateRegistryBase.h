@@ -54,7 +54,7 @@ namespace ZSharp
 		
 		FZConjugateHandle Conjugate(const TConjugate* unmanaged, bool owning)
 		{
-			check(IsInGameThread());
+			checkSlow(IsInGameThread());
 			
 			auto mutableUnmanaged = const_cast<TConjugate*>(unmanaged);
 			if (Super::FindConjugateWrapper(mutableUnmanaged))

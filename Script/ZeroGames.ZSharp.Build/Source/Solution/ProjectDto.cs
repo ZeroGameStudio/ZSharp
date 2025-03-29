@@ -11,7 +11,7 @@ public class ProjectDto
 	public string TargetFramework { get; set; } = "net9.0";
 	[JsonConverter(typeof(JsonStringEnumConverter<EProjectOutputType>))] public EProjectOutputType OutputType { get; set; } = EProjectOutputType.Runtime;
 	[JsonConverter(typeof(JsonStringEnumConverter<EProjectLanguageType>))] public EProjectLanguageType Language { get; set; } = EProjectLanguageType.CSharp;
-	public string LanguageVersion { get; set; } = "13";
+	public string LanguageVersion { get; set; } = "preview";
 	public string RootNamespace { get; set; } = string.Empty;
 	public bool AllowUnsafeBlocks { get; set; } = true;
 	public List<string> WarningsAsErrors { get; set; } = [];

@@ -152,16 +152,21 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     public IntPtr BuildConjugate_Red(IntPtr unmanaged, Type type)
     {
         GuardInvariant();
-        
-        Type conjugateType = typeof(IConjugate<>).MakeGenericType(type);
-        if (type.IsAssignableTo(conjugateType))
-        {
-            IConjugate conjugate = (IConjugate)type.GetMethod("BuildConjugate")!.Invoke(null, new object[] { unmanaged })!;
-            _conjugateMap[unmanaged] = new(0, new(conjugate, true));
-            return unmanaged;
-        }
 
-        return new();
+        Type conjugateType = typeof(IConjugate<>).MakeGenericType(type);
+        Thrower.FatalIf(!type.IsAssignableTo(conjugateType));
+
+        if (!_buildRedConjugateDelegateLookup.TryGetValue(conjugateType, out var buildConjugate))
+        {
+            MethodInfo? method = type.GetMethod(BUILD_CONJUGATE_METHOD_NAME);
+            Thrower.FatalIf(method is null);
+            buildConjugate = method.CreateDelegate<Func<IntPtr, IConjugate>>();
+            _buildRedConjugateDelegateLookup[conjugateType] = buildConjugate;
+        }
+        
+        IConjugate conjugate = buildConjugate(unmanaged);
+        _conjugateMap[unmanaged] = new(0, new(conjugate, true));
+        return unmanaged;
     }
 
     public void ReleaseConjugate_Red(IntPtr unmanaged)
@@ -435,6 +440,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     }
 
     private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 1 << 16;
+    private const string BUILD_CONJUGATE_METHOD_NAME = "BuildConjugate"; // @FIXME: Use nameof(IConjugate<>.BuildConjugate).
 
     private static readonly List<UnloadingRec> _unloadingCallbacks = new();
     private static uint64 _unloadingHandle;
@@ -447,6 +453,8 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private readonly Dictionary<Type, uint16> _conjugateRegistryIdLookup = new();
     private readonly Queue<IConjugate> _pendingDisposedConjugates = new();
     private readonly Lock _pendingDisposedConjugatesLock = new();
+
+    private readonly Dictionary<Type, Func<IntPtr, IConjugate>> _buildRedConjugateDelegateLookup = [];
 
 }
 

@@ -80,6 +80,8 @@ namespace ZSharp
 		TMap<void*, FObjectKey> ConjugateMap;
 
 		TArray<TUniquePtr<IZUObjectConjugateController>> Controllers;
+
+		mutable TMap<const void*, FZRuntimeTypeHandle> ManagedTypeLookup;
 		
 	};
 }

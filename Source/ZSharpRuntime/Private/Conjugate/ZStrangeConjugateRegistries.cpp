@@ -139,6 +139,12 @@ void ZSharp::FZConjugateRegistry_UScriptStruct::ValidateConjugateWrapper(const U
 
 ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UScriptStruct::GetManagedType(const UScriptStruct* scriptStruct) const
 {
+	if (const FZRuntimeTypeHandle* handle = ManagedTypeLookup.Find(scriptStruct))
+	{
+		return *handle;
+	}
+
+	FZRuntimeTypeHandle handle{};
 	const UScriptStruct* currentStruct = scriptStruct;
 	while (currentStruct)
 	{
@@ -147,14 +153,21 @@ ZSharp::FZRuntimeTypeHandle ZSharp::FZConjugateRegistry_UScriptStruct::GetManage
 			FZRuntimeTypeUri uri { FZReflectionHelper::GetFieldConjugateKey(currentStruct) };
 			if (FZRuntimeTypeHandle type = Alc.GetType(uri))
 			{
-				return type;
+				handle = type;
 			}
 		}
 
 		currentStruct = CastChecked<UScriptStruct>(currentStruct->GetSuperStruct(), ECastCheckedType::NullAllowed);
 	}
 
-	return Alc.GetType(FZRuntimeTypeUri { TZConjugateKey<FZDynamicScriptStruct>::Value });
+	if (!handle)
+	{
+		handle = Alc.GetType(FZRuntimeTypeUri { TZConjugateKey<FZDynamicScriptStruct>::Value });
+	}
+
+	check(handle);
+	ManagedTypeLookup.Emplace(scriptStruct, handle);
+	return handle;
 }
 
 ZSharp::FZSelfDescriptiveScriptDelegate* ZSharp::FZConjugateRegistry_Delegate::BuildConjugateWrapper(void* userdata)

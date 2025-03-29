@@ -109,6 +109,9 @@ namespace ZSharp
 
 	private:
 		FZRuntimeTypeHandle GetManagedType(const UScriptStruct* descriptor) const;
+
+	private:
+		mutable TMap<const void*, FZRuntimeTypeHandle> ManagedTypeLookup;
 	
 	};
 

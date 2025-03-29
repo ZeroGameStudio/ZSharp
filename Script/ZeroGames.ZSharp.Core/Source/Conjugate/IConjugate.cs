@@ -15,7 +15,7 @@ public interface IConjugate : IDisposable
 
 public interface IConjugate<out T> : IConjugate where T : class, IConjugate<T>
 {
-    static abstract T BuildConjugate(IntPtr unmanaged);
+	static abstract T BuildConjugate(IntPtr unmanaged);
 }
 
 

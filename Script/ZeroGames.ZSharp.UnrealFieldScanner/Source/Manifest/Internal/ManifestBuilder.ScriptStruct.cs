@@ -11,7 +11,7 @@ partial class ManifestBuilder
 		{
 			Name = scriptStructModel.Name,
 			SuperPath = scriptStructModel.BaseType?.GetUnrealFieldPath(),
-			StructFlags = EStructFlags.STRUCT_NoFlags,
+			StructFlags = EStructFlags.NoFlags,
 		};
 
 		ProcessSpecifiers(result, scriptStructModel);

@@ -94,9 +94,9 @@ partial class ManifestBuilder
 		
 		result.PropertyFlags |= propertyModel.Visibility switch
 		{
-			EMemberVisibility.Public => EPropertyFlags.CPF_NativeAccessSpecifierPublic,
-			EMemberVisibility.Protected => EPropertyFlags.CPF_NativeAccessSpecifierProtected | EPropertyFlags.CPF_Protected,
-			EMemberVisibility.Private => EPropertyFlags.CPF_NativeAccessSpecifierPrivate,
+			EMemberVisibility.Public => EPropertyFlags.NativeAccessSpecifierPublic,
+			EMemberVisibility.Protected => EPropertyFlags.NativeAccessSpecifierProtected | EPropertyFlags.Protected,
+			EMemberVisibility.Private => EPropertyFlags.NativeAccessSpecifierPrivate,
 			_ => throw Thrower.NoEntry()
 		};
 	}
@@ -105,16 +105,16 @@ partial class ManifestBuilder
 	{
 		check(propertyModel.Role != EPropertyRole.Member);
 		
-		result.PropertyFlags |= EPropertyFlags.CPF_Parm | EPropertyFlags.CPF_NativeAccessSpecifierPublic; // Parameter is always public. (@see: UhtPropertyParser.cs)
+		result.PropertyFlags |= EPropertyFlags.Parm | EPropertyFlags.NativeAccessSpecifierPublic; // Parameter is always public. (@see: UhtPropertyParser.cs)
 		if (propertyModel.Role == EPropertyRole.Parameter)
 		{
 			bool output = propertyModel.Type.IsByRef;
 			if (output)
 			{
-				result.PropertyFlags |= EPropertyFlags.CPF_OutParm;
+				result.PropertyFlags |= EPropertyFlags.OutParm;
 				if (!propertyModel.Type.IsOut)
 				{
-					result.PropertyFlags |= EPropertyFlags.CPF_ReferenceParm;
+					result.PropertyFlags |= EPropertyFlags.ReferenceParm;
 				}
 			}
 			// These types of input are passed by const&.
@@ -140,11 +140,11 @@ partial class ManifestBuilder
 				// String properties don't have these. (@see: UhtXXXStrProperty constructor)
 				if (result.Type is not (EPropertyType.String or EPropertyType.AnsiString or EPropertyType.Utf8String))
 				{
-					result.PropertyFlags |= EPropertyFlags.CPF_ConstParm | EPropertyFlags.CPF_ReferenceParm;
+					result.PropertyFlags |= EPropertyFlags.ConstParm | EPropertyFlags.ReferenceParm;
 					// Non replicated parameter will also have CPF_OutParm. (@see: UhtPropertyParser.ResolvePropertyType)
-					if (result.Outer is not UnrealFunctionDefinition function || !function.FunctionFlags.HasFlag(EFunctionFlags.FUNC_Net))
+					if (result.Outer is not UnrealFunctionDefinition function || !function.FunctionFlags.HasFlag(EFunctionFlags.Net))
 					{
-						result.PropertyFlags |= EPropertyFlags.CPF_OutParm;
+						result.PropertyFlags |= EPropertyFlags.OutParm;
 					}
 				}
 
@@ -153,7 +153,7 @@ partial class ManifestBuilder
 		}
 		else
 		{
-			result.PropertyFlags |= EPropertyFlags.CPF_OutParm | EPropertyFlags.CPF_ReturnParm;
+			result.PropertyFlags |= EPropertyFlags.OutParm | EPropertyFlags.ReturnParm;
 		}
 	}
 	

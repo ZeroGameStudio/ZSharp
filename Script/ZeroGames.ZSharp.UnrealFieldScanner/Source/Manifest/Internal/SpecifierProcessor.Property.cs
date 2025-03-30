@@ -14,13 +14,13 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BlueprintReadWriteAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
+		def.PropertyFlags |= EPropertyFlags.BlueprintVisible;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BlueprintReadOnlyAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible | EPropertyFlags.CPF_BlueprintReadOnly;
+		def.PropertyFlags |= EPropertyFlags.BlueprintVisible | EPropertyFlags.BlueprintReadOnly;
 	}
 	
 	[SpecifierProcessor]
@@ -34,12 +34,12 @@ partial class SpecifierProcessor
 		
 		UnrealClassDefinition classDef = (UnrealClassDefinition)def.Outer;
 		UnrealFunctionDefinition functionDef = classDef.Functions.Single(func => func.Name == specifier.AccessorName);
-		check(!functionDef.FunctionFlags.HasFlag(EFunctionFlags.FUNC_Event));
+		check(!functionDef.FunctionFlags.HasFlag(EFunctionFlags.Event));
 		
-		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
+		def.PropertyFlags |= EPropertyFlags.BlueprintVisible;
 		if (!model.HasSpecifier<BlueprintSetterAttribute>())
 		{
-			def.PropertyFlags |= EPropertyFlags.CPF_BlueprintReadOnly;
+			def.PropertyFlags |= EPropertyFlags.BlueprintReadOnly;
 		}
 		def.AddMetadata(MetadataConstants.BlueprintGetter, specifier.AccessorName);
 		functionDef.AddMetadata(MetadataConstants.BlueprintGetter);
@@ -56,9 +56,9 @@ partial class SpecifierProcessor
 		
 		UnrealClassDefinition classDef = (UnrealClassDefinition)def.Outer;
 		UnrealFunctionDefinition functionDef = classDef.Functions.Single(func => func.Name == specifier.AccessorName);
-		check(!functionDef.FunctionFlags.HasFlag(EFunctionFlags.FUNC_Event));
+		check(!functionDef.FunctionFlags.HasFlag(EFunctionFlags.Event));
 		
-		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintVisible;
+		def.PropertyFlags |= EPropertyFlags.BlueprintVisible;
 		def.AddMetadata(MetadataConstants.BlueprintSetter, specifier.AccessorName);
 		functionDef.AddMetadata(MetadataConstants.BlueprintSetter);
 	}
@@ -66,80 +66,80 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BlueprintAssignableDelegateAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintAssignable;
+		def.PropertyFlags |= EPropertyFlags.BlueprintAssignable;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BlueprintCallableDelegateAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintCallable;
+		def.PropertyFlags |= EPropertyFlags.BlueprintCallable;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BlueprintAuthorityOnlyDelegateAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_BlueprintAuthorityOnly;
+		def.PropertyFlags |= EPropertyFlags.BlueprintAuthorityOnly;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, ConfigAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Config;
+		def.PropertyFlags |= EPropertyFlags.Config;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, GlobalConfigAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Config | EPropertyFlags.CPF_GlobalConfig;
+		def.PropertyFlags |= EPropertyFlags.Config | EPropertyFlags.GlobalConfig;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, TransientAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Transient;
+		def.PropertyFlags |= EPropertyFlags.Transient;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, DuplicateTransientAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_DuplicateTransient;
+		def.PropertyFlags |= EPropertyFlags.DuplicateTransient;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, TextExportTransientAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_TextExportTransient;
+		def.PropertyFlags |= EPropertyFlags.TextExportTransient;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, NonPieDuplicatedTransientAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_NonPIEDuplicateTransient;
+		def.PropertyFlags |= EPropertyFlags.NonPIEDuplicateTransient;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, ExportAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_ExportObject;
+		def.PropertyFlags |= EPropertyFlags.ExportObject;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, InstancedAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_ExportObject | EPropertyFlags.CPF_InstancedReference | EPropertyFlags.CPF_PersistentInstance;
+		def.PropertyFlags |= EPropertyFlags.ExportObject | EPropertyFlags.InstancedReference | EPropertyFlags.PersistentInstance;
 		def.AddMetadata(MetadataConstants.EditInline, true);
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, SaveGameAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_SaveGame;
+		def.PropertyFlags |= EPropertyFlags.SaveGame;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, SkipSerializationAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_SkipSerialization;
+		def.PropertyFlags |= EPropertyFlags.SkipSerialization;
 	}
 	
 	[SpecifierProcessor]
@@ -148,7 +148,7 @@ partial class SpecifierProcessor
 		check(model.Outer is IUnrealClassModel);
 		
 		var classModel = (IUnrealClassModel)model.Outer;
-		def.PropertyFlags |= EPropertyFlags.CPF_Net;
+		def.PropertyFlags |= EPropertyFlags.Net;
 		def.RepCondition = specifier.Condition;
 		def.RepNotifyCondition = specifier.NotifyCondition;
 		def.IsRepPushBased = specifier.IsPushBased;
@@ -156,7 +156,7 @@ partial class SpecifierProcessor
 		{
 			check(classModel.Functions.Any(func => func.Name == specifier.Notify));
 			
-			def.PropertyFlags |= EPropertyFlags.CPF_RepNotify;
+			def.PropertyFlags |= EPropertyFlags.RepNotify;
 			def.RepNotifyName = specifier.Notify;
 		}
 	}
@@ -165,10 +165,10 @@ partial class SpecifierProcessor
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, NotReplicatedAttribute specifier)
 	{
 		bool isStructMember = def.Outer is UnrealScriptStructDefinition;
-		bool isRpcParameter = def.Outer is UnrealFunctionDefinition functionDef && functionDef.FunctionFlags.HasFlag(EFunctionFlags.FUNC_Net);
+		bool isRpcParameter = def.Outer is UnrealFunctionDefinition functionDef && functionDef.FunctionFlags.HasFlag(EFunctionFlags.Net);
 		check(isStructMember || isRpcParameter);
 
-		def.PropertyFlags |= EPropertyFlags.CPF_RepSkip;
+		def.PropertyFlags |= EPropertyFlags.RepSkip;
 	}
 	
 	[SpecifierProcessor]
@@ -183,79 +183,79 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EditAnywhereAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit;
+		def.PropertyFlags |= EPropertyFlags.Edit;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EditDefaultsOnlyAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_DisableEditOnInstance;
+		def.PropertyFlags |= EPropertyFlags.Edit | EPropertyFlags.DisableEditOnInstance;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EditInstanceOnlyAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_DisableEditOnTemplate;
+		def.PropertyFlags |= EPropertyFlags.Edit | EPropertyFlags.DisableEditOnTemplate;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, VisibleAnywhereAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_EditConst;
+		def.PropertyFlags |= EPropertyFlags.Edit | EPropertyFlags.EditConst;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, VisibleDefaultsOnlyAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_EditConst | EPropertyFlags.CPF_DisableEditOnInstance;
+		def.PropertyFlags |= EPropertyFlags.Edit | EPropertyFlags.EditConst | EPropertyFlags.DisableEditOnInstance;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, VisibleInstanceOnlyAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_EditConst | EPropertyFlags.CPF_DisableEditOnTemplate;
+		def.PropertyFlags |= EPropertyFlags.Edit | EPropertyFlags.EditConst | EPropertyFlags.DisableEditOnTemplate;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, NoClearAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_NoClear;
+		def.PropertyFlags |= EPropertyFlags.NoClear;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EditFixedSizeAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_EditFixedSize;
+		def.PropertyFlags |= EPropertyFlags.EditFixedSize;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, InterpAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_Edit | EPropertyFlags.CPF_BlueprintVisible | EPropertyFlags.CPF_Interp;
+		def.PropertyFlags |= EPropertyFlags.Edit | EPropertyFlags.BlueprintVisible | EPropertyFlags.Interp;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, NonTransactionalAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_NonTransactional;
+		def.PropertyFlags |= EPropertyFlags.NonTransactional;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, AssetRegistrySearchableAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_AssetRegistrySearchable;
+		def.PropertyFlags |= EPropertyFlags.AssetRegistrySearchable;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, SimpleDisplayAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_SimpleDisplay;
+		def.PropertyFlags |= EPropertyFlags.SimpleDisplay;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, AdvancedDisplayAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_AdvancedDisplay;
+		def.PropertyFlags |= EPropertyFlags.AdvancedDisplay;
 	}
 	
 	[SpecifierProcessor]
@@ -334,7 +334,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, RequiredAttribute specifier)
 	{
-		def.PropertyFlags |= EPropertyFlags.CPF_RequiredParm;
+		def.PropertyFlags |= EPropertyFlags.RequiredParm;
 	}
 	
 }

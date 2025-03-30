@@ -14,13 +14,13 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealScriptStructDefinition def, IUnrealScriptStructModel model, AtomicAttribute specifier)
 	{
-		def.StructFlags |= EStructFlags.STRUCT_Atomic;
+		def.StructFlags |= EStructFlags.Atomic;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealScriptStructDefinition def, IUnrealScriptStructModel model, ImmutableAttribute specifier)
 	{
-		def.StructFlags |= EStructFlags.STRUCT_Atomic | EStructFlags.STRUCT_Immutable;
+		def.StructFlags |= EStructFlags.Atomic | EStructFlags.Immutable;
 	}
 	
 }

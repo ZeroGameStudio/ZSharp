@@ -194,7 +194,7 @@ internal static class PropertyHelper
 		return false;
 	}
 	
-	// IMPORTANT: KEEP SYNC WITH ZPropertyFactory.cpp
+	// IMPORTANT: KEEP SYNC WITH ZPropertyFactory.cpp.
 	private const IntPtr UINT8_TYPE_ID = 1;
 	private const IntPtr UINT16_TYPE_ID = 2;
 	private const IntPtr UINT32_TYPE_ID = 3;

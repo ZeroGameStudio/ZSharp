@@ -17,7 +17,7 @@ public abstract class UnrealFieldDefinition
 	public Dictionary<string, string>? TransparentDataMap { get; set; }
 }
 
-// IMPORTANT: KEEP SYNC WITH ZUnrealFieldDefinitions.h
+// IMPORTANT: KEEP SYNC WITH ZUnrealFieldDefinitions.h.
 public enum EPropertyType : uint8
 {
 	None,

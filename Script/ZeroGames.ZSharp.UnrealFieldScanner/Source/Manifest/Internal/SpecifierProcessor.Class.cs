@@ -26,7 +26,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, AbstractAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_Abstract;
+		def.ClassFlags |= EClassFlags.Abstract;
 	}
 	
 	[SpecifierProcessor]
@@ -40,13 +40,13 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, OptionalAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_Optional;
+		def.ClassFlags |= EClassFlags.Optional;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, DeprecatedAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_Deprecated | EClassFlags.CLASS_NotPlaceable;
+		def.ClassFlags |= EClassFlags.Deprecated | EClassFlags.NotPlaceable;
 	}
 	
 	[SpecifierProcessor]
@@ -58,103 +58,103 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, PerObjectConfigAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_PerObjectConfig;
+		def.ClassFlags |= EClassFlags.PerObjectConfig;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, PerPlatformConfigAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_PerPlatformConfig;
+		def.ClassFlags |= EClassFlags.PerPlatformConfig;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, ConfigDontCheckDefaultsAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_ConfigDoNotCheckDefaults;
+		def.ClassFlags |= EClassFlags.ConfigDoNotCheckDefaults;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, DefaultConfigAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_DefaultConfig;
+		def.ClassFlags |= EClassFlags.DefaultConfig;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, ProjectUserConfigAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_ProjectUserConfig;
+		def.ClassFlags |= EClassFlags.ProjectUserConfig;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, GlobalUserConfigAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_GlobalUserConfig;
+		def.ClassFlags |= EClassFlags.GlobalUserConfig;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, DefaultToTransientAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_Transient;
+		def.ClassFlags |= EClassFlags.Transient;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, DefaultToNonTransientAttribute specifier)
 	{
-		def.ClassFlags &= ~EClassFlags.CLASS_Transient;
+		def.ClassFlags &= ~EClassFlags.Transient;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, DefaultToInstancedAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_DefaultToInstanced;
+		def.ClassFlags |= EClassFlags.DefaultToInstanced;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, EditInlineNewAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_EditInlineNew;
+		def.ClassFlags |= EClassFlags.EditInlineNew;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, NotEditInlineNewAttribute specifier)
 	{
-		def.ClassFlags &= ~EClassFlags.CLASS_EditInlineNew;
+		def.ClassFlags &= ~EClassFlags.EditInlineNew;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, PlaceableAttribute specifier)
 	{
-		def.ClassFlags &= ~EClassFlags.CLASS_NotPlaceable;
+		def.ClassFlags &= ~EClassFlags.NotPlaceable;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, NotPlaceableAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_NotPlaceable;
+		def.ClassFlags |= EClassFlags.NotPlaceable;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, HideDropdownAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_HideDropDown;
+		def.ClassFlags |= EClassFlags.HideDropDown;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, HiddenAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_Hidden;
+		def.ClassFlags |= EClassFlags.Hidden;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, CollapseCategoriesAttribute specifier)
 	{
-		def.ClassFlags |= EClassFlags.CLASS_CollapseCategories;
+		def.ClassFlags |= EClassFlags.CollapseCategories;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, DontCollapseCategoriesAttribute specifier)
 	{
-		def.ClassFlags &= ~EClassFlags.CLASS_CollapseCategories;
+		def.ClassFlags &= ~EClassFlags.CollapseCategories;
 	}
 	
 	[SpecifierProcessor]

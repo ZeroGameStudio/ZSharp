@@ -21,7 +21,7 @@ partial class ManifestBuilder
 		UnrealFunctionDefinition result = new()
 		{
 			Outer = classDef,
-			FunctionFlags = EFunctionFlags.FUNC_Native,
+			FunctionFlags = EFunctionFlags.Native,
 			Name = functionModel.Name,
 			ZCallName = functionModel.Name,
 		};
@@ -36,9 +36,9 @@ partial class ManifestBuilder
 
 		result.FunctionFlags |= functionModel.Visibility switch
 		{
-			EMemberVisibility.Public => EFunctionFlags.FUNC_Public,
-			EMemberVisibility.Protected => EFunctionFlags.FUNC_Protected,
-			EMemberVisibility.Private => EFunctionFlags.FUNC_Private,
+			EMemberVisibility.Public => EFunctionFlags.Public,
+			EMemberVisibility.Protected => EFunctionFlags.Protected,
+			EMemberVisibility.Private => EFunctionFlags.Private,
 			_ => throw Thrower.NoEntry()
 		};
 
@@ -54,16 +54,16 @@ partial class ManifestBuilder
 	private void FinishScanUFunction(UnrealClassDefinition classDef, IUnrealFunctionModel functionModel, UnrealFunctionDefinition result)
 	{
 		// Only event function can be overridden.
-		if (!result.FunctionFlags.HasFlag(EFunctionFlags.FUNC_Event))
+		if (!result.FunctionFlags.HasFlag(EFunctionFlags.Event))
 		{
-			result.FunctionFlags |= EFunctionFlags.FUNC_Final;
+			result.FunctionFlags |= EFunctionFlags.Final;
 		}
 
 		// Check for non-return out param.
 		// IMPORTANT: Keep sync with delegate.
-		if (result.Properties.Any(p => (p.PropertyFlags & (EPropertyFlags.CPF_OutParm | EPropertyFlags.CPF_ReturnParm)) == EPropertyFlags.CPF_OutParm))
+		if (result.Properties.Any(p => (p.PropertyFlags & (EPropertyFlags.OutParm | EPropertyFlags.ReturnParm)) == EPropertyFlags.OutParm))
 		{
-			result.FunctionFlags |= EFunctionFlags.FUNC_HasOutParms;
+			result.FunctionFlags |= EFunctionFlags.HasOutParms;
 		}
 	}
 	

@@ -20,25 +20,25 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintCallableAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintCallable;
+		def.FunctionFlags |= EFunctionFlags.BlueprintCallable;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintPureAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintCallable | EFunctionFlags.FUNC_BlueprintPure;
+		def.FunctionFlags |= EFunctionFlags.BlueprintCallable | EFunctionFlags.BlueprintPure;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintAuthorityOnlyAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintCallable;
+		def.FunctionFlags |= EFunctionFlags.BlueprintCallable;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintCosmeticAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.FUNC_BlueprintCallable;
+		def.FunctionFlags |= EFunctionFlags.BlueprintCallable;
 	}
 	
 	[SpecifierProcessor]
@@ -46,8 +46,8 @@ partial class SpecifierProcessor
 	{
 		check(model.Visibility != EMemberVisibility.Private);
 
-		def.FunctionFlags &= ~EFunctionFlags.FUNC_Native;
-		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_BlueprintEvent;
+		def.FunctionFlags &= ~EFunctionFlags.Native;
+		def.FunctionFlags |= EFunctionFlags.Event | EFunctionFlags.BlueprintEvent;
 	}
 	
 	[SpecifierProcessor]
@@ -56,13 +56,13 @@ partial class SpecifierProcessor
 		check(model.Visibility != EMemberVisibility.Private);
 
 		def.ZCallName = $"{def.Name}_Implementation";
-		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_BlueprintEvent;
+		def.FunctionFlags |= EFunctionFlags.Event | EFunctionFlags.BlueprintEvent;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, SealedEventAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.FUNC_Final;
+		def.FunctionFlags |= EFunctionFlags.Final;
 	}
 	
 	[SpecifierProcessor]
@@ -71,7 +71,7 @@ partial class SpecifierProcessor
 		check(!model.HasReturnValue());
 		
 		def.ZCallName = $"{def.Name}_Implementation";
-		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetServer;
+		def.FunctionFlags |= EFunctionFlags.Event | EFunctionFlags.Net | EFunctionFlags.NetServer;
 	}
 	
 	[SpecifierProcessor]
@@ -80,7 +80,7 @@ partial class SpecifierProcessor
 		check(!model.HasReturnValue());
 		
 		def.ZCallName = $"{def.Name}_Implementation";
-		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetClient;
+		def.FunctionFlags |= EFunctionFlags.Event | EFunctionFlags.Net | EFunctionFlags.NetClient;
 	}
 	
 	[SpecifierProcessor]
@@ -89,20 +89,20 @@ partial class SpecifierProcessor
 		check(!model.HasReturnValue());
 		
 		def.ZCallName = $"{def.Name}_Implementation";
-		def.FunctionFlags |= EFunctionFlags.FUNC_Event | EFunctionFlags.FUNC_Net | EFunctionFlags.FUNC_NetMulticast;
+		def.FunctionFlags |= EFunctionFlags.Event | EFunctionFlags.Net | EFunctionFlags.NetMulticast;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, WithValidationAttribute specifier)
 	{
 		def.ValidateZCallName = $"{def.Name}_Validate";
-		def.FunctionFlags |= EFunctionFlags.FUNC_NetValidate;
+		def.FunctionFlags |= EFunctionFlags.NetValidate;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, ReliableAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.FUNC_NetReliable;
+		def.FunctionFlags |= EFunctionFlags.NetReliable;
 	}
 	
 	[SpecifierProcessor]
@@ -120,7 +120,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, ExecAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.FUNC_Exec;
+		def.FunctionFlags |= EFunctionFlags.Exec;
 	}
 	
 	[SpecifierProcessor]

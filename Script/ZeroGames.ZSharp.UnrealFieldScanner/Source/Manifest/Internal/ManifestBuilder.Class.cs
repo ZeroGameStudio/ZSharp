@@ -11,7 +11,7 @@ partial class ManifestBuilder
 		{
 			Name = classModel.Name,
 			SuperPath = classModel.BaseType?.GetUnrealFieldPath(),
-			ClassFlags = classModel.IsInternal ? EClassFlags.CLASS_MinimalAPI : EClassFlags.CLASS_RequiredAPI,
+			ClassFlags = classModel.IsInternal ? EClassFlags.MinimalAPI : EClassFlags.RequiredAPI,
 			HasUClassConstructor = classModel.HasUClassConstructor,
 		};
 		
@@ -22,9 +22,9 @@ partial class ManifestBuilder
 		
 		foreach (var property in result.Properties)
 		{
-			if ((property.PropertyFlags & EPropertyFlags.CPF_Config) != EPropertyFlags.CPF_None)
+			if ((property.PropertyFlags & EPropertyFlags.Config) != EPropertyFlags.None)
 			{
-				result.ClassFlags |= EClassFlags.CLASS_Config;
+				result.ClassFlags |= EClassFlags.Config;
 				break;
 			}
 		}

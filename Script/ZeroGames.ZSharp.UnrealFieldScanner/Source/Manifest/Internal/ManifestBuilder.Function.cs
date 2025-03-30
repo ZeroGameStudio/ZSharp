@@ -29,9 +29,15 @@ partial class ManifestBuilder
 		// Early out for event override because what we need is only a flag.
 		if (functionModel.EventOverrideName is not null)
 		{
+			check(!functionModel.IsStatic);
 			result.Name = functionModel.EventOverrideName;
 			result.IsEventOverride = true;
 			return result;
+		}
+
+		if (functionModel.IsStatic)
+		{
+			result.FunctionFlags |= EFunctionFlags.Static;
 		}
 
 		result.FunctionFlags |= functionModel.Visibility switch

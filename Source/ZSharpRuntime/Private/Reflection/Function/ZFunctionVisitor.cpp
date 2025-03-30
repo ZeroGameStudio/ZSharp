@@ -170,7 +170,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeMulticastSparseScriptDe
 	return EZCallErrorCode::Succeed;
 }
 
-ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, FFrame& stack, RESULT_DECL) const
+ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* context, FFrame& stack, RESULT_DECL) const
 {
 	checkSlow(IsInGameThread());
 	check(bAvailable);
@@ -225,7 +225,10 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 				stack.MostRecentPropertyAddress = nullptr;
 				stack.MostRecentPropertyContainer = nullptr;
 
-				stack.Step(object, visitor->ContainerPtrToValuePtr(params, 0));
+				// Instance function: context == stack.Object, both are the caller (this).
+				// Static function: context is function CDO, stack.Object is the caller.
+				// This may evaluate 'self', which means the caller.
+				stack.Step(stack.Object, visitor->ContainerPtrToValuePtr(params, 0));
 
 				if (NonConstOutParamIndices.Contains(i))
 				{
@@ -253,7 +256,7 @@ ZSharp::EZCallErrorCode ZSharp::FZFunctionVisitor::InvokeZCall(UObject* object, 
 		// Now we can fill ZCallBuffer.
 		if (!bIsStatic)
 		{
-			TZCallBufferSlotEncoder<UObject*>::Encode(object, buffer[0]);
+			TZCallBufferSlotEncoder<UObject*>::Encode(context, buffer[0]);
 		}
 
 		for (int32 i = 0; i < ParameterProperties.Num(); ++i)

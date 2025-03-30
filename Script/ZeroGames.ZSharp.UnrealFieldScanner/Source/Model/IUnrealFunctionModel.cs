@@ -6,6 +6,7 @@ public interface IUnrealFunctionModel : IUnrealStructModel, IMemberModel, IUnrea
 {
 	IUnrealClassModel Outer { get; }
 	string? EventOverrideName { get; }
+	bool IsStatic { get; }
 }
 
 

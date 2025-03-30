@@ -12,6 +12,7 @@ internal class UnrealFunctionModel : UnrealStructModel, IUnrealFunctionModel
 		Visibility = methodDef.IsPublic ? EMemberVisibility.Public : methodDef.IsFamily ? EMemberVisibility.Protected : EMemberVisibility.Private;
 		Outer = outer;
 		EventOverrideName = eventOverrideName;
+		IsStatic = methodDef.IsStatic;
 
 		if (EventOverrideName is null)
 		{
@@ -22,6 +23,7 @@ internal class UnrealFunctionModel : UnrealStructModel, IUnrealFunctionModel
 	public EMemberVisibility Visibility { get; }
 	public IUnrealClassModel Outer { get; }
 	public string? EventOverrideName { get; }
+	public bool IsStatic { get; }
 
 	private void ScanUParams(ModelRegistry registry, MethodDefinition methodDef)
 	{

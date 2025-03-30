@@ -26,7 +26,7 @@ namespace ZSharp
 		
 	public:
 		// This is called from ZSharpFunction to support call managed code via UFunction.
-		EZCallErrorCode InvokeZCall(UObject* object, FFrame& stack, RESULT_DECL) const;
+		EZCallErrorCode InvokeZCall(UObject* context, FFrame& stack, RESULT_DECL) const;
 		// This is called from ManagedDelegateProxy to support call managed code via dynamic delegate.
 		EZCallErrorCode InvokeZCall(UObject* object, void* params) const;
 

@@ -32,13 +32,13 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintAuthorityOnlyAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.BlueprintCallable;
+		def.FunctionFlags |= EFunctionFlags.BlueprintAuthorityOnly;
 	}
 	
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintCosmeticAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.BlueprintCallable;
+		def.FunctionFlags |= EFunctionFlags.BlueprintCosmetic;
 	}
 	
 	[SpecifierProcessor]

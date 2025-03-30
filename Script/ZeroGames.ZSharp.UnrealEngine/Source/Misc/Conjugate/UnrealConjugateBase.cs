@@ -3,11 +3,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using InvalidOperationException = System.InvalidOperationException;
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
-public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBackend
+public abstract class UnrealConjugateBase : IConjugate
 {
 
     public void Dispose()
@@ -15,91 +14,16 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
         InternalDispose();
         SuppressFinalize();
     }
-
-    public LifecycleExpiredRegistration RegisterOnExpired(Action callback)
-    {
-        Thrower.ThrowIfNotInGameThread();
-
-        if (IsExpired)
-        {
-            callback();
-
-            return default;
-        }
-        else
-        {
-            _onExpiredRegistry ??= new();
-            LifecycleExpiredRegistration reg = new(this, ++_onExpiredRegistrationHandle);
-            _onExpiredRegistry[reg] = new(callback, null, null);
-
-            return reg;
-        }
-    }
-    LifecycleExpiredRegistration IReactiveLifecycleBackend.RegisterOnExpired(Action callback, LifecycleToken token)
-    {
-        ValidateToken(token);
-        return RegisterOnExpired(callback);
-    }
-
-    public LifecycleExpiredRegistration RegisterOnExpired(Action<object?> callback, object? state)
-    {
-        Thrower.ThrowIfNotInGameThread();
-        
-        if (IsExpired)
-        {
-            callback(state);
-
-            return default;
-        }
-        else
-        {
-            _onExpiredRegistry ??= new();
-            LifecycleExpiredRegistration reg = new(this, ++_onExpiredRegistrationHandle);
-            _onExpiredRegistry[reg] = new(null, callback, state);
-
-            return reg;
-        }
-    }
-    LifecycleExpiredRegistration IReactiveLifecycleBackend.RegisterOnExpired(Action<object?> callback, object? state, LifecycleToken token)
-    {
-        ValidateToken(token);
-        return RegisterOnExpired(callback, state);
-    }
-    
-    public void UnregisterOnExpired(LifecycleExpiredRegistration registration)
-    {
-        Thrower.ThrowIfNotInGameThread();
-        
-        if (!IsExpired)
-        {
-            _onExpiredRegistry?.Remove(registration);
-        }
-    }
-    void IReactiveLifecycleBackend.UnregisterOnExpired(LifecycleExpiredRegistration registration, LifecycleToken token)
-    {
-        ValidateToken(token);
-        UnregisterOnExpired(registration);
-    }
-
-    bool ILifecycleBackend.IsExpired(LifecycleToken token)
-    {
-        ValidateToken(token);
-        return IsExpired;
-    }
     
     public bool IsExpired => Unmanaged == DEAD_ADDR;
-    public Lifecycle Lifecycle => ReactiveLifecycle.ForceNonReactive();
-    public ReactiveLifecycle ReactiveLifecycle => ReactiveLifecycle.FromBackend(this);
 
     public GCHandle GCHandle { get; }
 
     public IntPtr Unmanaged { get; private set; }
     public bool IsBlack { get; }
     public bool IsRed => !IsBlack;
-
-    LifecycleToken ILifecycleBackend.Token { get; } = default(LifecycleToken).Next;
     
-    internal const IntPtr DEAD_ADDR = 0xDEAD;
+    protected virtual void HandleExpired(){}
 
     protected void BuildConjugate_Black(IntPtr userdata)
     {
@@ -131,11 +55,12 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
         IsBlack = true;
     }
 
-    private protected UnrealConjugateBase(IntPtr unmanaged)
+    private protected UnrealConjugateBase(IntPtr unmanaged, bool needsHandleExpired = false)
     {
         GCHandle = GCHandle.Alloc(this);
         Unmanaged = unmanaged;
         IsBlack = false;
+        _needsHandleExpired = needsHandleExpired;
         
         SuppressFinalize();
     }
@@ -147,31 +72,6 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
         ensure(IsRed);
 
         MarkAsDead();
-    }
-    
-    private void BroadcastOnExpired()
-    {
-        ensure(!_hasBroadcastOnExpired);
-        
-        _hasBroadcastOnExpired = true;
-        if (_onExpiredRegistry is not null)
-        {
-            foreach (var pair in _onExpiredRegistry)
-            {
-                OnExpiredCallbackRec rec = pair.Value;
-                try
-                {
-                    rec.StatelessCallback?.Invoke();
-                    rec.StatefulCallback?.Invoke(rec.State);
-                }
-                catch (Exception ex)
-                {
-                    UnhandledExceptionHelper.Guard(ex, null, LogZSharpScriptEngine);
-                }
-
-                _onExpiredRegistry = null;
-            }
-        }
     }
 
     private void InternalDispose()
@@ -209,7 +109,11 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
         ensure(!IsExpired);
         
         ClearUnmanaged();
-        BroadcastOnExpired();
+
+        if (_needsHandleExpired)
+        {
+            HandleExpired();
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -225,22 +129,10 @@ public abstract class UnrealConjugateBase : IConjugate, IReactiveLifecycleBacken
         GC.SuppressFinalize(this);
     }
     
-    private void ValidateToken(LifecycleToken token)
-    {
-        if (token != ((IReactiveLifecycleBackend)this).Token)
-        {
-            // Throw if token mismatch because this type is not reused and the token should be a constant.
-            throw new InvalidOperationException();
-        }
-    }
+    private const IntPtr DEAD_ADDR = 0xDEAD;
 
-    private readonly record struct OnExpiredCallbackRec(Action? StatelessCallback, Action<object?>? StatefulCallback, object? State);
-    
+    private readonly bool _needsHandleExpired;
     private bool _disposed;
-
-    private uint64 _onExpiredRegistrationHandle;
-    private bool _hasBroadcastOnExpired;
-    private Dictionary<LifecycleExpiredRegistration, OnExpiredCallbackRec>? _onExpiredRegistry;
     
 }
 

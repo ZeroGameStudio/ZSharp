@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+#pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
+
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

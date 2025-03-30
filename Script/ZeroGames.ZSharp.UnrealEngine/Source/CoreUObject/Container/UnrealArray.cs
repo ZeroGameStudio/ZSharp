@@ -101,7 +101,13 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 	public void Insert(int32 index, T item)
 	{
 		MasterAlcCache.GuardInvariant();
-		GuardIndex(index);
+
+		// index == Count is allowed for insert.
+		if (index < 0 || index > Count)
+		{
+			throw new IndexOutOfRangeException();
+		}
+		
 		InternalInsert(index, item);
 	}
 	void IList.Insert(int32 index, object? value) => Insert(index, (T)value!);

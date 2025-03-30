@@ -7,7 +7,7 @@
 #include "ZSharpClr.h"
 #include "ZSharpCoreLogChannels.h"
 #include "ALC/IZSlimAssemblyLoadContext.h"
-#include "Interop/Engine/Console_Interop.h"
+#include "Interop/Engine/ZConsole_Interop.h"
 #include "Interop/Core/ZCoreLog_Interop.h"
 #include "Interop/Engine/ZLog_Interop.h"
 #include "Interop/Core/ZCoreSettings_Interop.h"

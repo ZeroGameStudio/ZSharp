@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+#pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
+
 using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.Core;
@@ -136,10 +138,10 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
         }
     }
     
-    public static delegate* unmanaged<ZCallHandle, ZCallBuffer*, EZCallErrorCode> ZCall_Black = null;
-    public static delegate* unmanaged<char*, ZCallHandle> GetZCallHandle_Black = null;
-    public static delegate* unmanaged<uint16, IntPtr, IntPtr> BuildConjugate_Black = null;
-    public static delegate* unmanaged<uint16, IntPtr, void> ReleaseConjugate_Black = null;
+    public static delegate* unmanaged<ZCallHandle, ZCallBuffer*, EZCallErrorCode> ZCall_Black;
+    public static delegate* unmanaged<char*, ZCallHandle> GetZCallHandle_Black;
+    public static delegate* unmanaged<uint16, IntPtr, IntPtr> BuildConjugate_Black;
+    public static delegate* unmanaged<uint16, IntPtr, void> ReleaseConjugate_Black;
 
 }
 

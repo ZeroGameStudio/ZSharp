@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-#include "Console_Interop.h"
+#include "ZConsole_Interop.h"
 
 namespace ZSharp::ZConsole_Interop_Private
 {

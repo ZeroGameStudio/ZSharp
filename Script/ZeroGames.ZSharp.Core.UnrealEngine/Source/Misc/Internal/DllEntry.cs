@@ -58,7 +58,7 @@ internal class DllEntry
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, IntPtr, void>)&Console_Interop.HandleExecuteCommand;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, void>)&Console_Interop.HandleVariableChanged;
         
-        CoreGlobals_Interop.IsInGameThreadFuncPtr = (delegate* unmanaged<uint8>)args->UnmanagedProperties.IsInGameThreadFuncPtr;
+        CoreGlobals_Interop.IsInGameThreadFuncPtr = (delegate* unmanaged[SuppressGCTransition]<uint8>)args->UnmanagedProperties.IsInGameThreadFuncPtr;
         CoreGlobals_Interop.GIsServerPtr = args->UnmanagedProperties.GIsServerPtr;
         CoreGlobals_Interop.GIsClientPtr = args->UnmanagedProperties.GIsClientPtr;
         CoreGlobals_Interop.GIsEditorPtr = args->UnmanagedProperties.GIsEditorPtr;

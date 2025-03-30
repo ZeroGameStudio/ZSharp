@@ -47,15 +47,53 @@ public sealed class ScriptInterface<T> : ScriptInterfaceBase
 
 	public UnrealObject? Target
 	{
-		get => InternalGet(false);
-		set => InternalSet(value);
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalGet(false);
+		}
+		set
+		{
+			MasterAlcCache.GuardInvariant();
+			InternalSet(value);
+		}
 	}
 
-	public UnrealObject? TargetEvenIfGarbage => InternalGet(true);
+	public UnrealObject? TargetEvenIfGarbage
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalGet(true);
+		}
+	}
 
-	public bool IsValid => InternalIsValid(false);
-	public bool IsValidEventIfGarbage => InternalIsValid(true);
-	public bool IsNull => InternalIsNull();
+	public bool IsValid
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsValid(false);
+		}
+	}
+
+	public bool IsValidEventIfGarbage
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsValid(true);
+		}
+	}
+
+	public bool IsNull
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsNull();
+		}
+	}
 
 	private sealed class EqualityComparer : IEqualityComparer<ScriptInterface<T>>
 	{
@@ -68,9 +106,6 @@ public sealed class ScriptInterface<T> : ScriptInterfaceBase
 
 	private unsafe void InternalCopy(ScriptInterfaceBase? other)
 	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		
 		if (other is not null)
 		{
 			ScriptInterface_Interop.Copy(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other));
@@ -82,16 +117,10 @@ public sealed class ScriptInterface<T> : ScriptInterfaceBase
 	}
 
 	private unsafe UnrealObject? InternalGet(bool evenIfGarbage)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return ScriptInterface_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<UnrealObject>();
-	}
+		=> ScriptInterface_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<UnrealObject>();
 
 	private unsafe void InternalSet(UnrealObject? target)
 	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
 		if (target is not null && !target.Implements<T>())
 		{
 			throw new ArgumentOutOfRangeException($"Target type {target.GetType().FullName} mismatch.");
@@ -101,18 +130,10 @@ public sealed class ScriptInterface<T> : ScriptInterfaceBase
 	}
 	
 	private unsafe bool InternalIsValid(bool evenIfGarbage)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return ScriptInterface_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
-	}
+		=> ScriptInterface_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
 
 	private unsafe bool InternalIsNull()
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return ScriptInterface_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
-	}
+		=> ScriptInterface_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
 	
 }
 

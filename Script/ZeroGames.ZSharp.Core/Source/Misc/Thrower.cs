@@ -30,7 +30,7 @@ public static class Thrower
 		}
 	}
 	
-	[Conditional("ASSERTION_CHECK")]
+	[Conditional("ASSERTION_CHECK_SLOW")]
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void ThrowIfNotInGameThread(string? message = "Operation occurs in non-game thread.", Exception? innerException = default)
 	{

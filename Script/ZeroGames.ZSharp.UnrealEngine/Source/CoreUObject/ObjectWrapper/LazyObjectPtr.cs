@@ -47,16 +47,62 @@ public sealed class LazyObjectPtr<T> : LazyObjectPtrBase
 
 	public T? Target
 	{
-		get => InternalGet(false);
-		set => InternalSet(value);
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalGet(false);
+		}
+		set
+		{
+			MasterAlcCache.GuardInvariant();
+			InternalSet(value);
+		}
 	}
 
-	public T? TargetEvenIfGarbage => InternalGet(true);
+	public T? TargetEvenIfGarbage
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalGet(true);
+		}
+	}
 
-	public bool IsValid => InternalIsValid(false);
-	public bool IsValidEventIfGarbage => InternalIsValid(true);
-	public bool IsNull => InternalIsNull();
-	public bool IsPending => InternalIsPending();
+	public bool IsValid
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsValid(false);
+		}
+	}
+
+	public bool IsValidEventIfGarbage
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsValid(true);
+		}
+	}
+
+	public bool IsNull
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsNull();
+		}
+	}
+
+	public bool IsPending
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsPending();
+		}
+	}
 
 	private sealed class EqualityComparer : IEqualityComparer<LazyObjectPtr<T>>
 	{
@@ -69,9 +115,6 @@ public sealed class LazyObjectPtr<T> : LazyObjectPtrBase
 
 	private unsafe void InternalCopy(LazyObjectPtrBase? other)
 	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		
 		if (other is not null)
 		{
 			LazyObjectPtr_Interop.Copy(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other));
@@ -83,39 +126,19 @@ public sealed class LazyObjectPtr<T> : LazyObjectPtrBase
 	}
 
 	private unsafe T? InternalGet(bool evenIfGarbage)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return LazyObjectPtr_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<T>();
-	}
+		=> LazyObjectPtr_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<T>();
 
 	private unsafe void InternalSet(T? target)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		LazyObjectPtr_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
-	}
+		=> LazyObjectPtr_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
 	
 	private unsafe bool InternalIsValid(bool evenIfGarbage)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return LazyObjectPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
-	}
+		=> LazyObjectPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
 
 	private unsafe bool InternalIsNull()
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return LazyObjectPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
-	}
+		=> LazyObjectPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
 
 	private unsafe bool InternalIsPending()
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return LazyObjectPtr_Interop.IsPending(ConjugateHandle.FromConjugate(this)) > 0;
-	}
+		=> LazyObjectPtr_Interop.IsPending(ConjugateHandle.FromConjugate(this)) > 0;
 	
 }
 

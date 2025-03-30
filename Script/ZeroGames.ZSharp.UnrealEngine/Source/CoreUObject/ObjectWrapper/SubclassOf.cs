@@ -47,15 +47,53 @@ public sealed class SubclassOf<T> : SubclassOfBase
 
 	public UnrealClass? Target
 	{
-		get => InternalGet(false);
-		set => InternalSet(value);
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalGet(false);
+		}
+		set
+		{
+			MasterAlcCache.GuardInvariant();
+			InternalSet(value);
+		}
 	}
 
-	public UnrealClass? TargetEvenIfGarbage => InternalGet(true);
+	public UnrealClass? TargetEvenIfGarbage
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalGet(true);
+		}
+	}
 
-	public bool IsValid => InternalIsValid(false);
-	public bool IsValidEventIfGarbage => InternalIsValid(true);
-	public bool IsNull => InternalIsNull();
+	public bool IsValid
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsValid(false);
+		}
+	}
+
+	public bool IsValidEventIfGarbage
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsValid(true);
+		}
+	}
+
+	public bool IsNull
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsNull();
+		}
+	}
 
 	private sealed class EqualityComparer : IEqualityComparer<SubclassOf<T>>
 	{
@@ -68,9 +106,6 @@ public sealed class SubclassOf<T> : SubclassOfBase
 
 	private unsafe void InternalCopy(SubclassOfBase? other)
 	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		
 		if (other is not null)
 		{
 			SubclassOf_Interop.Copy(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other));
@@ -82,16 +117,10 @@ public sealed class SubclassOf<T> : SubclassOfBase
 	}
 
 	private unsafe UnrealClass? InternalGet(bool evenIfGarbage)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return SubclassOf_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<UnrealClass>();
-	}
+		=> SubclassOf_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<UnrealClass>();
 
 	private unsafe void InternalSet(UnrealClass? target)
 	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
 		if (target is not null && !target.IsChildOf<T>())
 		{
 			throw new ArgumentOutOfRangeException($"Target type {target.GetType().FullName} mismatch.");
@@ -101,18 +130,10 @@ public sealed class SubclassOf<T> : SubclassOfBase
 	}
 	
 	private unsafe bool InternalIsValid(bool evenIfGarbage)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return SubclassOf_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
-	}
+		=> SubclassOf_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
 
 	private unsafe bool InternalIsNull()
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return SubclassOf_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
-	}
+		=> SubclassOf_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
 	
 }
 

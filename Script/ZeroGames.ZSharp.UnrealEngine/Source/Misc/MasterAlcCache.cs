@@ -1,5 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Loader;
 
@@ -7,6 +8,7 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 
 public static class MasterAlcCache
 {
+	[Conditional("ASSERTION_CHECK_SLOW")]
 	public static void GuardInvariant()
 	{
 		Thrower.ThrowIfNotInGameThread();

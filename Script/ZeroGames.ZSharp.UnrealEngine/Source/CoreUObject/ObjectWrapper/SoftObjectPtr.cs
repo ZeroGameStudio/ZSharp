@@ -41,7 +41,11 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 	public override bool Equals(object? obj) => base.Equals(obj);
 	public override int32 GetHashCode() => base.GetHashCode();
 
-	public bool TryLoad([NotNullWhen(true)] out T? target) => InternalTryLoad(out target);
+	public bool TryLoad([NotNullWhen(true)] out T? target)
+	{
+		MasterAlcCache.GuardInvariant();
+		return InternalTryLoad(out target);
+	}
 	
 	public static implicit operator SoftObjectPtr<T>(T? target) => new(target);
 	public static bool operator ==(SoftObjectPtr<T>? left, SoftObjectPtr<T>? right) => Equals(left, right);
@@ -49,20 +53,73 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 	
 	public static IEqualityComparer<SoftObjectPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
 
-	public string Path => Target?.GetPathName() ?? string.Empty;
+	public string Path
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return Target?.GetPathName() ?? string.Empty;
+		}
+	}
 	
 	public T? Target
 	{
-		get => InternalGet(false);
-		set => InternalSet(value);
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalGet(false);
+		}
+		set
+		{
+			MasterAlcCache.GuardInvariant();
+			InternalSet(value);
+		}
 	}
 
-	public T? TargetEvenIfGarbage => InternalGet(true);
+	public T? TargetEvenIfGarbage
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalGet(true);
+		}
+	}
 
-	public bool IsValid => InternalIsValid(false);
-	public bool IsValidEventIfGarbage => InternalIsValid(true);
-	public bool IsNull => InternalIsNull();
-	public bool IsPending => InternalIsPending();
+	public bool IsValid
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsValid(false);
+		}
+	}
+
+	public bool IsValidEventIfGarbage
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsValid(true);
+		}
+	}
+
+	public bool IsNull
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsNull();
+		}
+	}
+
+	public bool IsPending
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsPending();
+		}
+	}
 
 	private sealed class EqualityComparer : IEqualityComparer<SoftObjectPtr<T>>
 	{
@@ -75,9 +132,6 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 
 	private unsafe void InternalCopy(SoftObjectPtrBase? other)
 	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		
 		if (other is not null)
 		{
 			SoftObjectPtr_Interop.Copy(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other));
@@ -89,44 +143,22 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 	}
 
 	private unsafe T? InternalGet(bool evenIfGarbage)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return SoftObjectPtr_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<T>();
-	}
+		=> SoftObjectPtr_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<T>();
 
 	private unsafe void InternalSet(T? target)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		SoftObjectPtr_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
-	}
+		=> SoftObjectPtr_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
 	
 	private unsafe bool InternalIsValid(bool evenIfGarbage)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return SoftObjectPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
-	}
+		=> SoftObjectPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
 
 	private unsafe bool InternalIsNull()
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return SoftObjectPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
-	}
+		=> SoftObjectPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
 
 	private unsafe bool InternalIsPending()
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return SoftObjectPtr_Interop.IsPending(ConjugateHandle.FromConjugate(this)) > 0;
-	}
+		=> SoftObjectPtr_Interop.IsPending(ConjugateHandle.FromConjugate(this)) > 0;
 
 	private unsafe bool InternalTryLoad([NotNullWhen(true)] out T? target)
 	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
 		target = SoftObjectPtr_Interop.Load(ConjugateHandle.FromConjugate(this)).GetTarget<T>();
 		return target is not null;
 	}

@@ -9,9 +9,18 @@ public abstract class SoftClassPtrBase : UnrealConjugateBase
 	, IEqualityOperators<SoftClassPtrBase?, SoftClassPtrBase?, bool>
 {
 	
-	public bool Equals(SoftClassPtrBase? other) => ReferenceEquals(this, other) || InternalEquals(other);
+	public bool Equals(SoftClassPtrBase? other)
+	{
+		MasterAlcCache.GuardInvariant();
+		return ReferenceEquals(this, other) || InternalEquals(other);
+	}
 	public override bool Equals(object? obj) => obj is SoftClassPtrBase other && Equals(other);
-	public override int32 GetHashCode() => InternalGetHashCode();
+	
+	public override int32 GetHashCode()
+	{
+		MasterAlcCache.GuardInvariant();
+		return InternalGetHashCode();
+	}
 	
 	public static bool operator ==(SoftClassPtrBase? left, SoftClassPtrBase? right) => Equals(left, right);
 	public static bool operator !=(SoftClassPtrBase? left, SoftClassPtrBase? right) => !Equals(left, right);
@@ -20,17 +29,9 @@ public abstract class SoftClassPtrBase : UnrealConjugateBase
 	protected SoftClassPtrBase(IntPtr unmanaged) : base(unmanaged){}
 
 	private unsafe bool InternalEquals(SoftClassPtrBase? other)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return other is not null && SoftClassPtr_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
-	}
+		=> other is not null && SoftClassPtr_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
 	
 	private unsafe int32 InternalGetHashCode()
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return SoftClassPtr_Interop.Hash(ConjugateHandle.FromConjugate(this));
-	}
+		=> SoftClassPtr_Interop.Hash(ConjugateHandle.FromConjugate(this));
 	
 }

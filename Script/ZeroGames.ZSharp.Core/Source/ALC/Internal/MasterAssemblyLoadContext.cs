@@ -329,7 +329,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         RegisterZCallResolver(new ZCallResolver_Method(this), 1);
     }
 
-    [Conditional("ASSERTION_CHECK")]
+    [Conditional("ASSERTION_CHECK_SLOW")]
     private void GuardInvariant()
     {
         Thrower.ThrowIfNotInGameThread("Access Master ALC in non-game thread.");

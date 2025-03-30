@@ -15,16 +15,16 @@ public static class AssertionMacros
 	public static void check
 	(
 		[DoesNotReturnIf(false)] bool condition,
-		string? message = default,
-		[CallerArgumentExpression(nameof(condition))] string? expr = default,
-		[CallerFilePath] string? file = default,
-		[CallerLineNumber] int32 line = default,
-		[CallerColumnNumber] int32 column = default
+		string? message = null,
+		[CallerArgumentExpression(nameof(condition))] string? expr = null,
+		[CallerFilePath] string? file = null,
+		[CallerLineNumber] int32 line = 0,
+		[CallerColumnNumber] int32 column = -1
 	)
 	{
-		CallerInfoHelper.Inject(ref column);
 		if (!condition)
 		{
+			CallerInfoHelper.Inject(ref column);
 			Fail(message, expr, file, line, column, false);
 		}
 	}
@@ -41,8 +41,11 @@ public static class AssertionMacros
 		[CallerColumnNumber] int32 column = default
 	)
 	{
-		CallerInfoHelper.Inject(ref column);
-		check(condition, message, expr, file, line, column);
+		if (!condition)
+		{
+			CallerInfoHelper.Inject(ref column);
+			Fail(message, expr, file, line, column, false);
+		}
 	}
 	
 	[Conditional("ASSERTION_CHECK")]
@@ -76,7 +79,7 @@ public static class AssertionMacros
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static IDisposable? checkNoRecursion
+	public static IDisposable checkNoRecursion
 	(
 		AssemblyLoadContext? context = default,
 		[CallerFilePath] string? file = default,
@@ -110,8 +113,11 @@ public static class AssertionMacros
 	)
 	{
 #if ASSERTION_CHECK
-		CallerInfoHelper.Inject(ref column);
-		check(condition, message, expr, file, line, column);
+		if (!condition)
+		{
+			CallerInfoHelper.Inject(ref column);
+			Fail(message, expr, file, line, column, false);
+		}
 #else
 		if (!condition)
 		{
@@ -132,8 +138,11 @@ public static class AssertionMacros
 	)
 	{
 #if ASSERTION_CHECK_SLOW
-		CallerInfoHelper.Inject(ref column);
-		verify(condition, message, expr, file, line, column);
+		if (!condition)
+		{
+			CallerInfoHelper.Inject(ref column);
+			Fail(message, expr, file, line, column, false);
+		}
 #else
 		if (!condition)
 		{
@@ -155,10 +164,13 @@ public static class AssertionMacros
 	)
 	{
 #if ASSERTION_CHECK
-		CallerInfoHelper.Inject(ref context, ref column);
-		if (_ensureCache.Add(new(context, file ?? string.Empty, line, column)))
+		if (!condition)
 		{
-			ensureAlways(condition, message, expr, file, line, column);
+			CallerInfoHelper.Inject(ref context, ref column);
+			if (_ensureCache.Add(new(context, file ?? string.Empty, line, column)))
+			{
+				EnsureFail(message, expr, file, line, column);
+			}
 		}
 #endif
 
@@ -177,38 +189,14 @@ public static class AssertionMacros
 	)
 	{
 #if ASSERTION_CHECK_SLOW
-		CallerInfoHelper.Inject(ref column);
 		if (!condition)
 		{
-			try
-			{
-				Fail(message, expr, file, line, column, true);
-			}
-			catch (AssertionFailedException ex)
-			{
-				UE_ERROR(LogZSharpScriptEngine, ex);
-			}
+			CallerInfoHelper.Inject(ref column);
+			EnsureFail(message, expr, file, line, column);
 		}
 #endif
 		
 		return condition;
-	}
-	
-	[DoesNotReturn]
-	private static void Fail(string? message, string? expr, string? file, int32 line, int32 column, bool forceNoFatal)
-	{
-		string finalMessage = $"Assertion [{expr}] failed: {message} at file {file} line {line} column {column}.";
-		if (Debugger.IsAttached || forceNoFatal)
-		{
-			UE_ERROR(LogZSharpScriptEngine, finalMessage);
-			Debugger.Break();
-		}
-		else
-		{
-			Thrower.Fatal(finalMessage);
-		}
-		
-		throw new AssertionFailedException(finalMessage);
 	}
 
 	private readonly struct RecursionScope(Coordinate coord) : IDisposable
@@ -257,6 +245,35 @@ public static class AssertionMacros
 		}
 		
 		private static readonly HashSet<AssemblyLoadContext> _relevantContexts = new();
+	}
+	
+	[DoesNotReturn]
+	private static void Fail(string? message, string? expr, string? file, int32 line, int32 column, bool forceNoFatal)
+	{
+		string finalMessage = $"Assertion [{expr}] failed: {message} at file {file} line {line} column {column}.";
+		if (Debugger.IsAttached || forceNoFatal)
+		{
+			UE_ERROR(LogZSharpScriptEngine, finalMessage);
+			Debugger.Break();
+		}
+		else
+		{
+			Thrower.Fatal(finalMessage);
+		}
+		
+		throw new AssertionFailedException(finalMessage);
+	}
+
+	private static void EnsureFail(string? message, string? expr, string? file, int32 line, int32 column)
+	{
+		try
+		{
+			Fail(message, expr, file, line, column, true);
+		}
+		catch (AssertionFailedException ex)
+		{
+			UE_ERROR(LogZSharpScriptEngine, ex);
+		}
 	}
 
 	private static readonly HashSet<Coordinate> _reentryCache = new();

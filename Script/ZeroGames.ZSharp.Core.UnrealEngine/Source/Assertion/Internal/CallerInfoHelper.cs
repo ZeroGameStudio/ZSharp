@@ -12,7 +12,7 @@ internal static class CallerInfoHelper
 	
 	public static void Inject(ref int32 column)
 	{
-		if (column == default)
+		if (column == -1)
 		{
 			column = new StackFrame(2, true).GetFileColumnNumber();
 		}
@@ -28,7 +28,7 @@ internal static class CallerInfoHelper
 			context = AssemblyLoadContext.GetLoadContext(assembly)!;
 		}
 		
-		if (column == default)
+		if (column == -1)
 		{
 			frame ??= new(2, true);
 			column = frame.GetFileColumnNumber();

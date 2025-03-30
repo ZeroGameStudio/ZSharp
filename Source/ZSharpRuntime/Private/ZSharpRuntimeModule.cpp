@@ -17,7 +17,7 @@
 #include "Interop/CoreUObject/Object/ZUnrealObject_Interop.h"
 #include "Interop/CoreUObject/Object/ZUnrealStruct_Interop.h"
 #include "Interop/CoreUObject/Object/ZUnrealClass_Interop.h"
-#include "Interop/CoreUObject/Struct/ZUnrealScriptStruct_Interop.h"
+#include "Interop/CoreUObject/Struct/ZUnrealScriptStructBase_Interop.h"
 #include "Interop/CoreUObject/String/ZUnrealString_Interop.h"
 #include "Interop/CoreUObject/String/ZUnrealUtf8String_Interop.h"
 #include "Interop/CoreUObject/String/ZUnrealAnsiString_Interop.h"
@@ -111,8 +111,10 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, IsInterface),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealClass, ImplementsInterface),
 
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealScriptStruct, Copy),
-			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealScriptStruct, Identical),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealScriptStructBase, Copy),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealScriptStructBase, Identical),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealScriptStructBase, GetScriptStruct),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealScriptStructBase, IsA),
 			
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealString, GetData),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealString, SetData),

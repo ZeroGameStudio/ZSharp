@@ -6,6 +6,20 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public abstract class UnrealScriptStructBase : UnrealConjugateBase, IUnrealFieldPath
 {
 
+	public UnrealScriptStruct GetScriptStruct()
+	{
+		MasterAlcCache.GuardInvariant();
+		return InternalGetScriptStruct();
+	}
+	
+	public bool IsA(UnrealScriptStruct scriptStruct)
+	{
+		MasterAlcCache.GuardInvariant();
+		return InternalIsA(scriptStruct);
+	}
+	public bool IsA(Type scriptStruct) => IsA(UnrealScriptStruct.FromType(scriptStruct));
+	public bool IsA<T>() where T : IStaticStruct => IsA(UnrealScriptStruct.FromType<T>());
+
 	public DynamicZCallResult ReadUnrealPropertyEx<T>(string name, int32 index)
     {
 	    string zcallName = $"up:/{UnrealFieldPath}:{name}";
@@ -31,8 +45,17 @@ public abstract class UnrealScriptStructBase : UnrealConjugateBase, IUnrealField
     protected UnrealScriptStructBase(){}
     protected UnrealScriptStructBase(IntPtr unmanaged) : base(unmanaged){}
     
-    protected unsafe void Copy(UnrealScriptStructBase other) => UnrealScriptStruct_Interop.Copy(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other));
-    protected unsafe bool Identical(UnrealScriptStructBase other) => UnrealScriptStruct_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
+    protected unsafe void Copy(UnrealScriptStructBase other)
+	    => UnrealScriptStructBase_Interop.Copy(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other));
+    
+    protected unsafe bool Identical(UnrealScriptStructBase other)
+	    => UnrealScriptStructBase_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
+    
+    private unsafe UnrealScriptStruct InternalGetScriptStruct()
+	    => UnrealScriptStructBase_Interop.GetScriptStruct(ConjugateHandle.FromConjugate(this)).GetTargetChecked<UnrealScriptStruct>();
+    
+    private unsafe bool InternalIsA(UnrealScriptStruct scriptStruct)
+	    => UnrealScriptStructBase_Interop.IsA(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(scriptStruct)) > 0;
 
 }
 

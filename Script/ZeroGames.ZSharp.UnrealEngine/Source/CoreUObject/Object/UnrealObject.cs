@@ -67,7 +67,8 @@ public partial class UnrealObject : IUnrealObject
     public bool Rename(string newName) => Rename(newName, null);
     public bool Rename(UnrealObject newOuter) => Rename(null, newOuter);
 
-    private unsafe UnrealClass InternalGetClass() => UnrealObject_Interop.GetClass(ConjugateHandle.FromConjugate(this)).GetTargetChecked<UnrealClass>();
+    private unsafe UnrealClass InternalGetClass()
+        => UnrealObject_Interop.GetClass(ConjugateHandle.FromConjugate(this)).GetTargetChecked<UnrealClass>();
 
     private unsafe string InternalGetName()
     {

@@ -49,6 +49,7 @@ public:
 	bool ShouldExportDeprecatedFields() const { return bExportDeprecatedFields; }
 	bool ShouldTreatDeprecatedPostfixAsDeprecated() const { return bTreatDeprecatedPostfixAsDeprecated; }
 	bool ShouldExportEditorOnlyFields() const { return bExportEditorOnlyFields; }
+	bool ShouldExportLazyObjectFields() const { return bExportLazyObjectFields; }
 	bool IsForceExportFieldPath(const FString& path) const { return ForceExportFieldPathsLookup.Contains(path); }
 	bool IsForceNotExportFieldPath(const FString& path) const { return ForceNotExportFieldPathsLookup.Contains(path); }
 
@@ -103,6 +104,9 @@ private:
 	
 	UPROPERTY(Config, EditAnywhere, Category = "Export")
 	bool bExportEditorOnlyFields = false;
+
+	UPROPERTY(Config, EditAnywhere, Category = "Export")
+	bool bExportLazyObjectFields = false;
 
 	UPROPERTY(Config, EditAnywhere, Category = "Export")
 	TArray<FString> ForceExportFieldPaths;

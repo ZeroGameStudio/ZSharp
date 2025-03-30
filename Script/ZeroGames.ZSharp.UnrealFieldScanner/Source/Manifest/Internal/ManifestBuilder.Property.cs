@@ -105,6 +105,20 @@ partial class ManifestBuilder
 	{
 		check(propertyModel.Role != EPropertyRole.Member);
 		
+		// These can't be parameter.
+		if (result.Type is EPropertyType.WeakObject or EPropertyType.LazyObject or EPropertyType.Optional or EPropertyType.MulticastSparseDelegate)
+		{
+			throw new NotSupportedException();
+		}
+		// There can't be non-return out parameter
+		else if (result.Type is EPropertyType.Delegate or EPropertyType.MulticastInlineDelegate)
+		{
+			if ((result.PropertyFlags & (EPropertyFlags.ReturnParm | EPropertyFlags.ConstParm)) == EPropertyFlags.None && result.PropertyFlags.HasFlag(EPropertyFlags.OutParm))
+			{
+				throw new NotSupportedException();
+			}
+		}
+		
 		result.PropertyFlags |= EPropertyFlags.Parm | EPropertyFlags.NativeAccessSpecifierPublic; // Parameter is always public. (@see: UhtPropertyParser.cs)
 		if (propertyModel.Role == EPropertyRole.Parameter)
 		{

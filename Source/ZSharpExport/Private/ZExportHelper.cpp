@@ -3,7 +3,6 @@
 #include "ZExportHelper.h"
 
 #include "ZSharpExportSettings.h"
-#include "Emit/IZSharpFieldRegistry.h"
 #include "UObject/PropertyOptional.h"
 #include "Trait/ZExportedTypeName.h"
 
@@ -97,14 +96,14 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 			name.InsertAt(0, 'I');
 		}
 
-		if (cls->HasAllClassFlags(CLASS_Deprecated) && !cls->GetName().ToUpper().EndsWith("_DEPRECATED"))
+		if (cls->HasAllClassFlags(CLASS_Deprecated) && !cls->GetName().EndsWith("_DEPRECATED"))
 		{
 			name.Append("_DEPRECATED");
 		}
 	}
 	else if (auto enm = field.Get<const UEnum>())
 	{
-		if (!name.StartsWith("E"))
+		if (!name.StartsWith("E", ESearchCase::CaseSensitive))
 		{
 			name.InsertAt(0, 'E');
 		}
@@ -112,7 +111,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 	else if (auto delegate = field.Get<const UDelegateFunction>())
 	{
 		static const FString GDelegatePostfix = "__DelegateSignature";
-		if (delegate->HasAllFunctionFlags(FUNC_Delegate) && name.EndsWith(GDelegatePostfix))
+		if (delegate->HasAllFunctionFlags(FUNC_Delegate) && name.EndsWith(GDelegatePostfix, ESearchCase::CaseSensitive))
 		{
 			name.LeftChopInline(GDelegatePostfix.Len());
 		}
@@ -132,7 +131,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 			name.Append("_EDITORONLY");
 		}
 
-		if (property->HasAllPropertyFlags(CPF_Deprecated) && !property->GetName().ToUpper().EndsWith("_DEPRECATED"))
+		if (property->HasAllPropertyFlags(CPF_Deprecated) && !property->GetName().EndsWith("_DEPRECATED"))
 		{
 			name.Append("_DEPRECATED");
 		}
@@ -166,7 +165,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 	
 		for (const auto& structToCheck : structsToCheck)
 		{
-			if (name == GetFieldRedirectedName(structToCheck))
+			if (name.Equals(GetFieldRedirectedName(structToCheck), ESearchCase::CaseSensitive))
 			{
 				conflicts = true;
 				break;
@@ -177,7 +176,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 	// Check conflict with managed root class System.Object.
 	if (!conflicts)
 	{
-		static const TSet<FString> GManagedConflicts
+		static const TArray<FString> GManagedConflicts
 		{
 			"GetType",
 			"GetHashCode",
@@ -188,7 +187,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 			"Finalize",
 		};
 
-		if (GManagedConflicts.Contains(name))
+		if (GManagedConflicts.ContainsByPredicate([&name](const FString& elem){ return name.Equals(elem, ESearchCase::CaseSensitive); }))
 		{
 			conflicts = true;
 		}
@@ -201,7 +200,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 	else
 	{
 		// Check conflict with reserved keywords.
-		static const TSet<FString> GReservedKeywords
+		static const TArray<FString> GReservedKeywords
 		{
 			"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked", "class", "const", "continue",
 			"decimal", "default", "delegate", "do", "double", "else", "enum", "event", "explicit", "extern", "false", "finally", 
@@ -212,7 +211,7 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 			"void", "volatile", "while",
 		};
 
-		if (GReservedKeywords.Contains(name))
+		if (GReservedKeywords.ContainsByPredicate([&name](const FString& elem){ return name.Equals(elem, ESearchCase::CaseSensitive); }))
 		{
 			name.InsertAt(0, '@');
 		}
@@ -301,6 +300,15 @@ bool ZSharp::FZExportHelper::ShouldExportField(FFieldVariant field)
 					return false;
 				}
 			}
+
+			// WeakObject parameter is not exportable. (Engine bug)
+			if (auto parameter = field.Get<const FWeakObjectProperty>())
+			{
+				if (parameter->HasAllPropertyFlags(CPF_Parm))
+				{
+					return false;
+				}
+			}
 		}
 	}
 
@@ -319,6 +327,12 @@ bool ZSharp::FZExportHelper::ShouldExportField(FFieldVariant field)
 
 		// Skip export by Editor-Only flag.
 		if (!settings->ShouldExportEditorOnlyFields() && IsFieldEditorOnly(field))
+		{
+			return false;
+		}
+
+		// Skip export by LazyObject flag.
+		if (!settings->ShouldExportLazyObjectFields() && field.IsA<FLazyObjectProperty>())
 		{
 			return false;
 		}

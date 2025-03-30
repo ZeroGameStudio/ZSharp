@@ -101,15 +101,18 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 	public void Insert(int32 index, T item)
 	{
 		MasterAlcCache.GuardInvariant();
+		GuardIndex(index);
 		InternalInsert(index, item);
 	}
 	void IList.Insert(int32 index, object? value) => Insert(index, (T)value!);
 
 	public void InsertRange(int32 index, IEnumerable<T> items)
 	{
+		MasterAlcCache.GuardInvariant();
+		GuardIndex(index);
 		foreach (var item in items)
 		{
-			Insert(index, item);
+			InternalInsert(index, item);
 		}
 	}
 	
@@ -123,6 +126,7 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 	public void RemoveAt(int32 index)
 	{
 		MasterAlcCache.GuardInvariant();
+		GuardIndex(index);
 		InternalRemoveAt(index);
 	}
 
@@ -167,6 +171,13 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 	
 	public UnrealArray<T> Slice(int32 start, int32 length)
 	{
+		if (length < 0)
+		{
+			throw new ArgumentOutOfRangeException(nameof(length));
+		}
+		
+		GuardIndex(start);
+		GuardIndex(start + length - 1);
 		UnrealArray<T> result = new();
 		for (int32 i = start; i < start + length; ++i)
 		{
@@ -175,16 +186,20 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 		return result;
 	}
 	
+	public bool IsValidIndex(int32 index) => index >= 0 && index < Count;
+	
 	public T this[int32 index]
 	{
 		get
 		{
 			MasterAlcCache.GuardInvariant();
+			GuardIndex(index);
 			return InternalGet(index);
 		}
 		set
 		{
 			MasterAlcCache.GuardInvariant();
+			GuardIndex(index);
 			InternalSet(index, value);
 		}
 	}
@@ -217,6 +232,14 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 	}
 
 	private UnrealArray(IntPtr unmanaged) : base(unmanaged){}
+
+	private void GuardIndex(int32 index)
+	{
+		if (!IsValidIndex(index))
+		{
+			throw new IndexOutOfRangeException();
+		}
+	}
 	
 	private unsafe void InternalConstruct()
 	{
@@ -241,7 +264,7 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 	}
 	
 	private unsafe void InternalSet(int32 index, T item) => UnrealArray_Interop.Set(ConjugateHandle.FromConjugate(this), index, ZCallBufferSlot.FromObject(item));
-
+	
 	private unsafe int32 InternalCount => UnrealArray_Interop.Count(ConjugateHandle.FromConjugate(this));
 	
 }

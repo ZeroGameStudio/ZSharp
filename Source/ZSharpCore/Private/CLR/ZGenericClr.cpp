@@ -226,13 +226,22 @@ namespace ZSharp::ZGenericClr_Private
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZConsole_Interop::GHandleExecuteCommand),
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZConsole_Interop::GHandleVariableChanged),
 		};
+
+#if !WITH_EDITORONLY_DATA
+		// GIsEditor is a macro without editor-only data so we need this dummy global variable.
+		static bool GIsEditorDummy = false;
+#endif
 		
 		static const struct
 		{
 			void* IsInGameThreadFuncPtr = &IsInGameThread;
 			bool* GIsServerPtr = &GIsServer;
 			bool* GIsClientPtr = &GIsClient;
+#if WITH_EDITORONLY_DATA
 			bool* GIsEditorPtr = &GIsEditor;
+#else
+			bool* GIsEditorPtr = &GIsEditorDummy;
+#endif
 			uint64* GFrameCounterPtr = &GFrameCounter;
 			FConfigCacheIni* Config = GConfig;
 		} GUnmanagedProperties;

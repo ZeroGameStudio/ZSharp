@@ -57,7 +57,9 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				FProperty* ownerProperty = property->GetOwnerProperty();
 				property->PropertyFlags |= IsNonReturnParameter(ownerProperty) ? GDefaultToInstancedPropertyFlagsForInputParameter : GDefaultToInstancedPropertyFlags;
+#if WITH_METADATA
 				ownerProperty->SetMetaData("EditInline", "true"); // Only object property need this.
+#endif
 				return true;
 			}
 		}

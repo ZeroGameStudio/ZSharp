@@ -34,11 +34,11 @@ public static class AssertionMacros
 	public static void checkSlow
 	(
 		[DoesNotReturnIf(false)] bool condition,
-		string? message = default,
-		[CallerArgumentExpression(nameof(condition))] string? expr = default,
-		[CallerFilePath] string? file = default,
-		[CallerLineNumber] int32 line = default,
-		[CallerColumnNumber] int32 column = default
+		string? message = null,
+		[CallerArgumentExpression(nameof(condition))] string? expr = null,
+		[CallerFilePath] string? file = null,
+		[CallerLineNumber] int32 line = 0,
+		[CallerColumnNumber] int32 column = -1
 	)
 	{
 		if (!condition)
@@ -52,9 +52,9 @@ public static class AssertionMacros
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void checkNoEntry
 	(
-		[CallerFilePath] string? file = default,
-		[CallerLineNumber] int32 line = default,
-		[CallerColumnNumber] int32 column = default
+		[CallerFilePath] string? file = null,
+		[CallerLineNumber] int32 line = 0,
+		[CallerColumnNumber] int32 column = -1
 	)
 	{
 		CallerInfoHelper.Inject(ref column);
@@ -65,10 +65,10 @@ public static class AssertionMacros
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void checkNoReentry
 	(
-		AssemblyLoadContext? context = default,
-		[CallerFilePath] string? file = default,
-		[CallerLineNumber] int32 line = default,
-		[CallerColumnNumber] int32 column = default
+		AssemblyLoadContext? context = null,
+		[CallerFilePath] string? file = null,
+		[CallerLineNumber] int32 line = 0,
+		[CallerColumnNumber] int32 column = -1
 	)
 	{
 		CallerInfoHelper.Inject(ref context, ref column);
@@ -81,10 +81,10 @@ public static class AssertionMacros
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static IDisposable checkNoRecursion
 	(
-		AssemblyLoadContext? context = default,
-		[CallerFilePath] string? file = default,
-		[CallerLineNumber] int32 line = default,
-		[CallerColumnNumber] int32 column = default
+		AssemblyLoadContext? context = null,
+		[CallerFilePath] string? file = null,
+		[CallerLineNumber] int32 line = 0,
+		[CallerColumnNumber] int32 column = -1
 	)
 	{
 #if ASSERTION_CHECK
@@ -105,11 +105,11 @@ public static class AssertionMacros
 	public static void verify
 	(
 		[DoesNotReturnIf(false)] bool condition,
-		string? message = default,
-		[CallerArgumentExpression(nameof(condition))] string? expr = default,
-		[CallerFilePath] string? file = default,
-		[CallerLineNumber] int32 line = default,
-		[CallerColumnNumber] int32 column = default
+		string? message = null,
+		[CallerArgumentExpression(nameof(condition))] string? expr = null,
+		[CallerFilePath] string? file = null,
+		[CallerLineNumber] int32 line = 0,
+		[CallerColumnNumber] int32 column = -1
 	)
 	{
 #if ASSERTION_CHECK
@@ -130,11 +130,11 @@ public static class AssertionMacros
 	public static void verifySlow
 	(
 		[DoesNotReturnIf(false)] bool condition,
-		string? message = default,
-		[CallerArgumentExpression(nameof(condition))] string? expr = default,
-		[CallerFilePath] string? file = default,
-		[CallerLineNumber] int32 line = default,
-		[CallerColumnNumber] int32 column = default
+		string? message = null,
+		[CallerArgumentExpression(nameof(condition))] string? expr = null,
+		[CallerFilePath] string? file = null,
+		[CallerLineNumber] int32 line = 0,
+		[CallerColumnNumber] int32 column = -1
 	)
 	{
 #if ASSERTION_CHECK_SLOW
@@ -155,12 +155,12 @@ public static class AssertionMacros
 	public static bool ensure
 	(
 		bool condition,
-		string? message = default,
-		AssemblyLoadContext? context = default,
-		[CallerArgumentExpression(nameof(condition))] string? expr = default,
-		[CallerFilePath] string? file = default,
-		[CallerLineNumber] int32 line = default,
-		[CallerColumnNumber] int32 column = default
+		string? message = null,
+		AssemblyLoadContext? context = null,
+		[CallerArgumentExpression(nameof(condition))] string? expr = null,
+		[CallerFilePath] string? file = null,
+		[CallerLineNumber] int32 line = 0,
+		[CallerColumnNumber] int32 column = -1
 	)
 	{
 #if ASSERTION_CHECK
@@ -181,11 +181,11 @@ public static class AssertionMacros
 	public static bool ensureAlways
 	(
 		bool condition,
-		string? message = default,
-		[CallerArgumentExpression(nameof(condition))] string? expr = default,
-		[CallerFilePath] string? file = default,
-		[CallerLineNumber] int32 line = default,
-		[CallerColumnNumber] int32 column = default
+		string? message = null,
+		[CallerArgumentExpression(nameof(condition))] string? expr = null,
+		[CallerFilePath] string? file = null,
+		[CallerLineNumber] int32 line = 0,
+		[CallerColumnNumber] int32 column = -1
 	)
 	{
 #if ASSERTION_CHECK_SLOW

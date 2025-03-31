@@ -59,7 +59,7 @@ public class Dotnet : ModuleRules
 				string runtimeSrcDir = Path.Combine(nativeSrcDir, runtimeImpl);
 				string runtimeDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, DOTNET_VERSION);
 				
-				foreach (var lib in GetFiles(runtimeSrcDir))
+				foreach (var lib in GetFiles(Target, runtimeSrcDir))
 				{
 					string relativePath = GetRelativePath(lib, runtimeSrcDir);
 					RuntimeDependencies.Add(Path.Combine(runtimeDstDir, relativePath), lib);
@@ -70,7 +70,7 @@ public class Dotnet : ModuleRules
 				string libSrcDir = Path.Combine(dotnetRoot, "lib");
 				string libDstDir = Path.Combine(dotnetDstDir, "shared", NETCOREAPP, DOTNET_VERSION);
 				
-        	    foreach (var lib in GetFiles(libSrcDir))
+        	    foreach (var lib in GetFiles(Target, libSrcDir))
         	    {
 	    	        string relativePath = GetRelativePath(lib, libSrcDir);
         	    	RuntimeDependencies.Add(Path.Combine(libDstDir, relativePath), lib);
@@ -88,7 +88,7 @@ public class Dotnet : ModuleRules
 				string[] managedDstDirs = new string[] { Path.Combine(zsharpDir, "Managed"), Path.Combine(projectDir, "Managed") };
 				foreach (var managedDstDir in managedDstDirs)
 				{
-					foreach (var assembly in GetFiles(managedDstDir))
+					foreach (var assembly in GetFiles(Target, managedDstDir))
 					{
 						string relativePath = GetRelativePath(assembly, managedDstDir);
 						string dstPath = Path.Combine(managedDstDir, relativePath);
@@ -120,27 +120,38 @@ public class Dotnet : ModuleRules
 		PublicDefinitions.Add($"ZSHARP_RUNTIME_CONFIG_FILE_NAME=\"{RUNTIME_CONFIG_JSON}\"");
 	}
 
-	private static IEnumerable<string> GetFiles(string directory, string pattern = "*.*")
+	private static IEnumerable<string> GetFiles(ReadOnlyTargetRules target, string directory, string pattern = "*.*")
 	{
-		if (!Directory.Exists(directory))
+		List<string> files = new List<string>();
+		void Traverse(string cur, int depth)
 		{
-			return Array.Empty<string>();
-		}
+			if (!Directory.Exists(cur))
+			{
+				return;
+			}
 		
-		var files = new List<string>();
+			var strings = Directory.GetFiles(cur, pattern);
 
-		var strings = Directory.GetFiles(directory, pattern);
+			foreach (var file in strings)
+			{
+				files.Add(file);
+			}
 
-		foreach (var file in strings)
-		{
-			files.Add(file);
+			foreach (var dir in Directory.GetDirectories(cur))
+			{
+				if (depth == 0)
+				{
+					if (!target.bBuildEditor && new DirectoryInfo(dir).Name == "Editor")
+					{
+						continue;
+					}
+				}
+				
+				Traverse(dir, depth + 1);
+			}
 		}
 
-		foreach (var file in Directory.GetDirectories(directory))
-		{
-			files.AddRange(GetFiles(file));
-		}
-
+		Traverse(directory, 0);
 		return files;
 	}
 
@@ -149,11 +160,6 @@ public class Dotnet : ModuleRules
 		return file.Substring(relative.Length + 1, file.Length - relative.Length - 1);
 	}
 
-	private static string NormalizePath(string path)
-	{
-		return path.Replace('\\', '/');
-	}
-	
 }
 
 

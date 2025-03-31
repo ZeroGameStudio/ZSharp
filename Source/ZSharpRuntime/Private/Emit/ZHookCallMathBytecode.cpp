@@ -41,7 +41,14 @@ static DEFINE_FUNCTION(execCallMathFunction)
 		(*Func)(NewContext, Stack, RESULT_PARAM);
 	}
 }
-DLLIMPORT extern FNativeFuncPtr GNatives[EX_Max];
+
+#if IS_MONOLITHIC
+#define CONDITIONAL_DLLIMPORT
+#else
+#define CONDITIONAL_DLLIMPORT DLLIMPORT
+#endif
+
+CONDITIONAL_DLLIMPORT extern FNativeFuncPtr GNatives[EX_Max];
 
 struct FZHookCallMathBytecode
 {

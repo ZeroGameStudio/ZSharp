@@ -5,6 +5,7 @@
 #include "Misc/Log/ZLogCategoryRegistry.h"
 #include "Misc/Log/ZRegisterLogCategoryMacros.h"
 
+#if !NO_LOGGING
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptAsync, Log, All)
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptEngine, Log, All)
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScript, Log, All)
@@ -13,9 +14,11 @@ ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptAsync)
 ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptEngine)
 ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScript)
 ZSHARP_REGISTER_LOG_CATEGORY(LogTemp)
+#endif
 
 void ZSharp::FZLog_Interop::Log(const TCHAR* category, ELogVerbosity::Type verbosity, const TCHAR* message)
 {
+#if !NO_LOGGING
 	static const FString GEmpty;
 	
 	if (!message)
@@ -49,6 +52,7 @@ void ZSharp::FZLog_Interop::Log(const TCHAR* category, ELogVerbosity::Type verbo
 				break;
 			}
 	}
+#endif
 }
 
 

@@ -10,7 +10,7 @@ public abstract class ExportedType : ExportedMember
 	public EZCallBufferSlotType SlotType { get; set; }
 	public string Assembly { get; set; } = null!;
 	
-	public string Namespace => $"{Assembly}.{Module}";
+	public string Namespace => Assembly.Split('.').Last() == Module ? Assembly : $"{Assembly}.{Module}";
 }
 
 

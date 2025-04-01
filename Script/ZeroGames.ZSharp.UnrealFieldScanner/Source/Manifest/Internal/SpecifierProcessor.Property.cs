@@ -337,6 +337,13 @@ partial class SpecifierProcessor
 		def.PropertyFlags |= EPropertyFlags.RequiredParm;
 	}
 	
+	// Metadata
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, AllowPrivateAccessAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.AllowPrivateAccess, true);
+	}
+	
 }
 
 

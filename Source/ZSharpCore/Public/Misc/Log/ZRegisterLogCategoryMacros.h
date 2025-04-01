@@ -13,7 +13,12 @@
  * @param Category a LogCategoryBase& to register.
  * @param CategoryName An optional name only used to build variable name.
  */
+#if NO_LOGGING
+#define ZSHARP_REGISTER_LOG_CATEGORY_EX(Category, CategoryName)
+#else
 #define ZSHARP_REGISTER_LOG_CATEGORY_EX(Category, CategoryName) namespace ZSharp::__ZRegisterLogCategory_Private { static FZRegisterLogCategory ZSHARP_REGISTER_LOG_CATEGORY_COMBINE(__GRegisterLogCategory, CategoryName, __LINE__) { Category }; }
+#endif
+
 #define ZSHARP_REGISTER_LOG_CATEGORY(Category) ZSHARP_REGISTER_LOG_CATEGORY_EX(Category, Category)
 
 

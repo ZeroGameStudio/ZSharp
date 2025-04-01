@@ -129,6 +129,19 @@ partial class SpecifierProcessor
 		def.CustomThunkName = specifier.ThunkName;
 	}
 	
+	// Parameter
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, WorldContextAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.WorldContext, specifier.Name);
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, DefaultToSelfAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.DefaultToSelf, specifier.Name);
+	}
+	
 }
 
 

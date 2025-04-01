@@ -26,10 +26,15 @@ public static class MetadataConstants
 	public const string IgnoreCategoryKeywordsInSubclasses = nameof(IgnoreCategoryKeywordsInSubclasses);
 	public const string EditorConfig = nameof(EditorConfig);
 	
+	// Function metadata names
+	public const string WorldContext = nameof(WorldContext);
+	public const string DefaultToSelf = nameof(DefaultToSelf);
+	
 	// Property metadata names
 	public const string EditInline = nameof(EditInline);
 	public const string BlueprintGetter = nameof(BlueprintGetter);
 	public const string BlueprintSetter = nameof(BlueprintSetter);
+	public const string AllowPrivateAccess = nameof(AllowPrivateAccess);
 	
 	// Parameter metadata names
 	public const string NativeConst = nameof(NativeConst);

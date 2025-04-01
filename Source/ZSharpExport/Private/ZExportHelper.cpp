@@ -575,8 +575,14 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetUFieldFullyExportedTy
 	{
 		return {};
 	}
+	
+	FString assemblyLastName;
+	assemblyName.Split(".", nullptr, &assemblyLastName, ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+	FString namespaceName = assemblyLastName.Equals(moduleName, ESearchCase::CaseSensitive)
+		? assemblyName
+		: FString::Printf(TEXT("%s.%s"), *assemblyName, *moduleName);
 
-	return { FString::Printf(TEXT("%s.%s"), *assemblyName, *moduleName), GetFieldRedirectedFullName(field), field->IsA<UClass>() };
+	return { namespaceName, GetFieldRedirectedFullName(field), field->IsA<UClass>() };
 }
 
 ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExportedTypeName(const FProperty* property)

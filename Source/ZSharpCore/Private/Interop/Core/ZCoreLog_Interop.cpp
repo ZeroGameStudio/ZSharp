@@ -2,9 +2,7 @@
 
 #include "ZCoreLog_Interop.h"
 
-#if !NO_LOGGING
 DEFINE_LOG_CATEGORY_STATIC(LogZSharpScriptCore, Log, All)
-#endif
 
 void ZSharp::FZCoreLog_Interop::Log(uint8 verbosity, const TCHAR* message)
 {

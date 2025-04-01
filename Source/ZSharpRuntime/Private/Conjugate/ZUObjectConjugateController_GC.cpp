@@ -4,12 +4,12 @@
 
 ZSharp::FZUObjectConjugateController_GC::FZUObjectConjugateController_GC()
 {
-	GCDelegate = FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);
+	ReachabilityAnalysisDelegate = FCoreUObjectDelegates::PostReachabilityAnalysis.AddRaw(this, &ThisClass::HandleReachabilityAnalysis);
 }
 
 ZSharp::FZUObjectConjugateController_GC::~FZUObjectConjugateController_GC()
 {
-	FCoreUObjectDelegates::GarbageCollectComplete.Remove(GCDelegate);
+	FCoreUObjectDelegates::PostReachabilityAnalysis.Remove(ReachabilityAnalysisDelegate);
 }
 
 bool ZSharp::FZUObjectConjugateController_GC::CanBuildConjugate(UObject* unmanaged) const
@@ -32,7 +32,7 @@ void ZSharp::FZUObjectConjugateController_GC::SetLifecycleExpiredCallback(const 
 	OnExpired = callback;
 }
 
-void ZSharp::FZUObjectConjugateController_GC::HandleGarbageCollectComplete()
+void ZSharp::FZUObjectConjugateController_GC::HandleReachabilityAnalysis()
 {
 	TArray<UObject*> pendingRemoves;
 	for (const auto& pair : ConjugateMap)

@@ -4,24 +4,20 @@
 
 ZSharp::FZUObjectConjugateController_Actor::FZUObjectConjugateController_Actor()
 {
-
+	FWorldDelegates::OnPostWorldCreation.AddRaw(this, &ThisClass::HandleWorldCreated);
 }
 
 ZSharp::FZUObjectConjugateController_Actor::~FZUObjectConjugateController_Actor()
 {
-	if (!Proxy)
+	for (const auto& [key, delegate] : WorldRemoveActorDelegateMap)
 	{
-		return;
-	}
-
-	UZUObjectConjugateController_Actor_Proxy* proxy = Proxy.Get();
-	for (const auto& key : Actors)
-	{
-		if (AActor* actor = key.ResolveObjectPtrEvenIfGarbage())
+		if (UWorld* world = key.ResolveObjectPtrEvenIfGarbage())
 		{
-			actor->OnDestroyed.RemoveAll(proxy);
+			world->RemoveOnActorRemovedFromWorldHandler(delegate);
 		}
 	}
+
+	FWorldDelegates::OnPostWorldCreation.RemoveAll(this);
 }
 
 bool ZSharp::FZUObjectConjugateController_Actor::CanBuildConjugate(UObject* unmanaged) const
@@ -43,13 +39,12 @@ void ZSharp::FZUObjectConjugateController_Actor::NotifyConjugated(UObject* unman
 	if (AActor* actor = Cast<AActor>(unmanaged))
 	{
 		Actors.Emplace(actor);
-		// Reinstance copies this delegate to new instance before we remove.
-		actor->OnDestroyed.AddUniqueDynamic(GetProxy(), &UZUObjectConjugateController_Actor_Proxy::HandleActorDestroyed);
 	}
 }
 
 void ZSharp::FZUObjectConjugateController_Actor::NotifyConjugateReleased(UObject* unmanaged)
 {
+	// Also try remove because it may be released by another controller.
 	if (AActor* actor = Cast<AActor>(unmanaged))
 	{
 		Actors.Remove(actor);
@@ -61,33 +56,42 @@ void ZSharp::FZUObjectConjugateController_Actor::SetLifecycleExpiredCallback(con
 	OnExpired = callback;
 }
 
-UZUObjectConjugateController_Actor_Proxy* ZSharp::FZUObjectConjugateController_Actor::GetProxy() const
+void ZSharp::FZUObjectConjugateController_Actor::HandleWorldCreated(UWorld* world)
 {
-	UZUObjectConjugateController_Actor_Proxy* proxy = Proxy.Get();
-	if (!proxy)
+	if (world->IsTemplate())
 	{
-		proxy = NewObject<UZUObjectConjugateController_Actor_Proxy>();
-		proxy->Owner = const_cast<FZUObjectConjugateController_Actor*>(this);
-		Proxy = TStrongObjectPtr { proxy };
+		return;
 	}
 
-	return proxy;
+	// NOTE: This is called in UWorld constructor, don't do too much.
+
+	// It is highly likely some world is released when a new world comes up.
+	TMap oldWorldRemoveActorDelegateMap { MoveTemp(WorldRemoveActorDelegateMap) };
+	WorldRemoveActorDelegateMap.Reset();
+	for (const auto& [key, delegate] : oldWorldRemoveActorDelegateMap)
+	{
+		if (key.ResolveObjectPtrEvenIfGarbage())
+		{
+			WorldRemoveActorDelegateMap.Emplace(key, delegate);
+		}
+	}
+	
+	FDelegateHandle delegate = world->AddOnActorRemovedFromWorldHandler(FOnActorRemovedFromWorld::FDelegate::CreateRaw(this, &ThisClass::HandleActorDestroyed));
+	WorldRemoveActorDelegateMap.Emplace(world, delegate);
 }
 
 void ZSharp::FZUObjectConjugateController_Actor::HandleActorDestroyed(AActor* actor)
 {
+	if (!Actors.Remove(actor))
+	{
+		return;
+	}
+	
 	OnExpired(actor);
 	actor->ForEachComponent(false, [this](UActorComponent* component)
 	{
 		OnExpired(component);
 	});
-	actor->OnDestroyed.RemoveAll(Proxy.Get());
-	Actors.Remove(actor);
-}
-
-void UZUObjectConjugateController_Actor_Proxy::HandleActorDestroyed(AActor* actor)
-{
-	Owner->HandleActorDestroyed(actor);
 }
 
 

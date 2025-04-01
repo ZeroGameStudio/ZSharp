@@ -147,6 +147,10 @@ void ZSharp::FZConjugateRegistry_UObject::ReleaseConjugate_Red(void* unmanaged)
 	if (ConjugateMap.Remove(unmanaged))
 	{
 		Alc.ReleaseConjugate(unmanaged);
+		for (const auto& controller : Controllers)
+		{
+			controller->NotifyConjugateReleased(static_cast<UObject*>(unmanaged));
+		}
 	}
 }
 

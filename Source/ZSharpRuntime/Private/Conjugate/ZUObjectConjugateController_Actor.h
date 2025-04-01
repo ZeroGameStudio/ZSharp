@@ -4,16 +4,12 @@
 
 #include "Conjugate/IZUObjectConjugateController.h"
 
-#include "ZUObjectConjugateController_Actor.generated.h"
-
-class UZUObjectConjugateController_Actor_Proxy;
-
 namespace ZSharp
 {
 	class FZUObjectConjugateController_Actor : public IZUObjectConjugateController
 	{
 
-		friend UZUObjectConjugateController_Actor_Proxy;
+		using ThisClass = FZUObjectConjugateController_Actor;
 
 	public:
 		FZUObjectConjugateController_Actor();
@@ -24,32 +20,17 @@ namespace ZSharp
 		virtual void NotifyConjugated(UObject* unmanaged) override;
 		virtual void NotifyConjugateReleased(UObject* unmanaged) override;
 		virtual void SetLifecycleExpiredCallback(const TFunction<void(UObject*)>& callback) override;
-
+		
 	private:
-		UZUObjectConjugateController_Actor_Proxy* GetProxy() const;
+		void HandleWorldCreated(UWorld* world);
 		void HandleActorDestroyed(AActor* actor);
 
 	private:
-		mutable TStrongObjectPtr<UZUObjectConjugateController_Actor_Proxy> Proxy;
+		TMap<TObjectKey<UWorld>, FDelegateHandle> WorldRemoveActorDelegateMap;
 		TSet<TObjectKey<AActor>> Actors;
 		TFunction<void(UObject*)> OnExpired;
 		
 	};
 }
-
-UCLASS(MinimalAPI, meta = (ZSharpNoExport))
-class UZUObjectConjugateController_Actor_Proxy : public UObject
-{
-	GENERATED_BODY()
-	
-	friend ZSharp::FZUObjectConjugateController_Actor;
-
-private:
-	UFUNCTION()
-	void HandleActorDestroyed(AActor* actor);
-
-	ZSharp::FZUObjectConjugateController_Actor* Owner;
-	
-};
 
 

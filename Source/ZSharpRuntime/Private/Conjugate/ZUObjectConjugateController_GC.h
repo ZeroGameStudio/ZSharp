@@ -22,13 +22,13 @@ namespace ZSharp
 		virtual void SetLifecycleExpiredCallback(const TFunction<void(UObject*)>& callback) override;
 
 	private:
-		void HandleGarbageCollectComplete();
+		void HandleReachabilityAnalysis();
 
 	private:
 		TMap<void*, FObjectKey> ConjugateMap;
 		TFunction<void(UObject*)> OnExpired;
 
-		FDelegateHandle GCDelegate;
+		FDelegateHandle ReachabilityAnalysisDelegate;
 		
 	};
 }

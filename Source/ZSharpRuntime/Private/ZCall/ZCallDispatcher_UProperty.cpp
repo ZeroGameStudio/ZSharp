@@ -34,11 +34,12 @@ ZSharp::EZCallErrorCode ZSharp::FZCallDispatcher_UProperty::Dispatch(FZCallBuffe
 	{
 		UObject* typedSelf = TZCallBufferSlotEncoder<UObject*>::Decode(buf[0]);
 		check(typedSelf);
-		check(typedSelf->IsA(cls));
+		checkSlow(typedSelf->IsA(cls));
 		self = typedSelf;
 	}
 	else
 	{
+		checkSlow(GCRoot->IsA<UScriptStruct>());
 		const FZSelfDescriptiveScriptStruct* sdss = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(buf[0].ReadConjugate());
 		self = sdss ? sdss->GetUnderlyingInstance() : nullptr;
 	}

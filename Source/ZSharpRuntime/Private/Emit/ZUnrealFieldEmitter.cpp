@@ -1361,7 +1361,6 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 	cls->SetSuperStruct(superClass);
 	cls->ClassFlags |= superClass->ClassFlags & CLASS_ScriptInherit;
 	// UClass::Bind() will propagate cast flags so we don't need to do it manually.
-	check(!FZSharpFieldRegistry::Get().IsZSharpClass(superClass) || !cls->HasAnyClassFlags(CLASS_HasInstancedReference)); // If super is a Z# class then it should not have CLASS_HasInstancedReference fixed up yet.
 
 	auto withinClass = !def.WithinPath.IsNone() ? FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString()) : superClass->ClassWithin.Get();
 	check(withinClass->IsNative());

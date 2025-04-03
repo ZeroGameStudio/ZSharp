@@ -140,7 +140,7 @@ public class ClassWriter
 			{
 				// Ignoring abstract allows to call parent on both virtual and abstract functions,
 				// providing a unified approach that reduces cognitive load, but would slightly decrease performance.
-				bool ignoreAbstract = false;
+				bool ignoreAbstract = true;
 				string implName = $"{method.Name}_Implementation";
 				MethodDefinition? methodDefinition = null;
 				// Remove default value info.

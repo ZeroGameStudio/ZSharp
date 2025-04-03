@@ -2,6 +2,7 @@
 
 #if UE_MODULE_ENHANCEDINPUT
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace ZeroGames.ZSharp.UnrealEngine.EnhancedInput;
@@ -9,22 +10,24 @@ namespace ZeroGames.ZSharp.UnrealEngine.EnhancedInput;
 public partial class EnhancedInputComponent
 {
 
-	public UnrealObject BindAction(InputAction inputAction, ETriggerEvent triggerEvent, EnhancedInputActionHandlerDynamicSignature.Signature @delegate)
+	[return: NotNullIfNotNull(nameof(inputAction))]
+	public UnrealObject? BindAction(InputAction? inputAction, ETriggerEvent triggerEvent, EnhancedInputActionHandlerDynamicSignature.Signature @delegate)
 	{
 		MasterAlcCache.GuardInvariant();
-		return InternalBindAction(inputAction, triggerEvent, @delegate);
+		return inputAction is not null ? InternalBindAction(inputAction, triggerEvent, @delegate) : null;
 	}
 	
-	public UnrealObject BindAction<TState>(InputAction inputAction, ETriggerEvent triggerEvent, EnhancedInputActionHandlerDynamicSignature.Signature<TState> @delegate, TState state)
+	[return: NotNullIfNotNull(nameof(inputAction))]
+	public UnrealObject? BindAction<TState>(InputAction? inputAction, ETriggerEvent triggerEvent, EnhancedInputActionHandlerDynamicSignature.Signature<TState> @delegate, TState state)
 	{
 		MasterAlcCache.GuardInvariant();
-		return InternalBindAction(inputAction, triggerEvent, @delegate, state);
+		return inputAction is not null ? InternalBindAction(inputAction, triggerEvent, @delegate, state) : null;
 	}
 
-	public bool RemoveBinding(UnrealObject handle)
+	public bool RemoveBinding(UnrealObject? handle)
 	{
 		MasterAlcCache.GuardInvariant();
-		return InternalRemoveBinding(handle);
+		return handle.IsValid() && InternalRemoveBinding(handle);
 	}
 
 	private unsafe UnrealObject InternalBindAction(InputAction action, ETriggerEvent triggerEvent, EnhancedInputActionHandlerDynamicSignature.Signature @delegate)

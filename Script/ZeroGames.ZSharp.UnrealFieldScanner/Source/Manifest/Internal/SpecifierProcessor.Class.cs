@@ -254,6 +254,12 @@ partial class SpecifierProcessor
 		});
 	}
 	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, DefaultToReplicatedAttribute specifier)
+	{
+		def.IsDefaultToReplicated = true;
+	}
+	
 }
 
 

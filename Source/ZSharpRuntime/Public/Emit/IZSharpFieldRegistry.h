@@ -77,6 +77,7 @@ namespace ZSharp
 
 		bool bConstructor = false;
 		bool bContextual = false;
+		bool bDefaultToReplicated = false;
 		
 		TArray<FDefaultSubobject> DefaultSubobjects;
 		TArray<FDefaultSubobjectOverride> DefaultSubobjectOverrides;

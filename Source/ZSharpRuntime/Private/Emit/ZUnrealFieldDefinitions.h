@@ -167,6 +167,7 @@ namespace ZSharp
 
 		bool bConstructor = false;
 		bool bContextual = false;
+		bool bDefaultToReplicated = false;
 		
 		FName ConfigName;
 		FName WithinPath;

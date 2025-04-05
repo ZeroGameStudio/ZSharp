@@ -10,6 +10,7 @@
 #include "ZCall/ZCallBuffer.h"
 
 #include "ZSharpStruct.inl"
+#include "Net/Core/PushModel/PushModel.h"
 
 namespace ZSharp::ZSharpClass_Private
 {
@@ -111,6 +112,25 @@ namespace ZSharp::ZSharpClass_Private
 			}
 
 			ZSharpStruct_Private::SetupPropertyDefaults(zscls, obj);
+			if (zscls->bDefaultToReplicated)
+			{
+				static constexpr uint8 GMaxByteAsTrue = 0xFF;
+				if (obj->IsA<AActor>())
+				{
+					static const FProperty* GActorReplicatesProperty = AActor::StaticClass()->FindPropertyByName("bReplicates");
+					GActorReplicatesProperty->SetValue_InContainer(obj, &GMaxByteAsTrue);
+				}
+				else if (obj->IsA<UActorComponent>())
+				{
+					static const FProperty* GComponentReplicatesProperty = UActorComponent::StaticClass()->FindPropertyByName("bReplicates");
+					GComponentReplicatesProperty->SetValue_InContainer(obj, &GMaxByteAsTrue);
+					MARK_PROPERTY_DIRTY(obj, GComponentReplicatesProperty);
+				}
+				else
+				{
+					ensure(false);
+				}
+			}
 
 			{ // Call managed red constructor and UClass constructor.
 				if (!alc && (!contextual && zscls->bContextual || zscls->bConstructor))

@@ -248,6 +248,9 @@ struct FZClassDefinitionDto : public FZStructDefinitionDto
 	bool bContextual = false;
 
 	UPROPERTY()
+	bool bDefaultToReplicated = false;
+
+	UPROPERTY()
 	FName ConfigName;
 
 	UPROPERTY()

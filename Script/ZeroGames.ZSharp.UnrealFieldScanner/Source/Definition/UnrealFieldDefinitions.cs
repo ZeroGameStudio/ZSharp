@@ -181,6 +181,7 @@ public class UnrealClassDefinition : UnrealStructDefinition
 	
 	[JsonPropertyName("bConstructor")] public bool HasUClassConstructor { get; set; }
 	[JsonPropertyName("bContextual")] public bool IsContextual { get; set; }
+	[JsonPropertyName("bDefaultToReplicated")] public bool IsDefaultToReplicated { get; set; }
 	public string? ConfigName { get; set; }
 	public string? WithinPath { get; set; }
 	public EClassFlags ClassFlags { get; set; }

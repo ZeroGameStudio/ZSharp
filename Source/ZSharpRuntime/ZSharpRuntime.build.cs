@@ -43,6 +43,7 @@ public class ZSharpRuntime : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
+				"NetCore",
 				
 				"Json",
 				"JsonUtilities",

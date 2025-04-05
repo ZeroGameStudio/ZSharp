@@ -1242,6 +1242,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 
 		zscls.bConstructor = def.bConstructor;
 		zscls.bContextual = def.bContextual;
+		zscls.bDefaultToReplicated = def.bDefaultToReplicated;
 
 		// Property defaults will be constructed in PostEmitClass().
 		

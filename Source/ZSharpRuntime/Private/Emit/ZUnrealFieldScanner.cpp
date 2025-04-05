@@ -163,6 +163,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 				classDef.PropertyDefaults = PropertyDefaultDtos2Defs(MoveTemp(classDto.PropertyDefaults));
 				classDef.bConstructor = classDto.bConstructor;
 				classDef.bContextual = classDto.bContextual;
+				classDef.bDefaultToReplicated = classDto.bDefaultToReplicated;
 				classDef.ConfigName = classDto.ConfigName;
 				classDef.WithinPath = classDto.WithinPath;
 				classDef.ClassFlags = static_cast<EClassFlags>(classDto.ClassFlags);

@@ -11,3 +11,5 @@ ENetMode ZSharp::FZActorComponent_Interop::GetNetMode(FZConjugateHandle self)
 	auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<UActorComponent>(self);
 	return pSelf->GetNetMode();
 }
+
+

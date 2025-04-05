@@ -15,10 +15,15 @@ public partial class ActorComponent
 		MasterAlcCache.GuardInvariant();
 		return InternalGetNetMode();
 	}
+
+	public void SetIsReplicatedByDefault(bool replicated)
+	{
+		MasterAlcCache.GuardInvariant();
+	}
 	
 	private unsafe ENetMode InternalGetNetMode()
 		=> ActorComponent_Interop.GetNetMode(ConjugateHandle.FromConjugate(this));
-	
+
 }
 
 

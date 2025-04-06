@@ -260,6 +260,12 @@ partial class SpecifierProcessor
 		def.IsDefaultToReplicated = true;
 	}
 	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, BlueprintSpawnableComponentAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.BlueprintSpawnableComponent, true);
+	}
+	
 }
 
 

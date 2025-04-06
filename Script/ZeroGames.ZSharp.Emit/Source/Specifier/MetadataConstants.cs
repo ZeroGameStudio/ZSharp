@@ -25,6 +25,7 @@ public static class MetadataConstants
 	public const string IsConversionRoot = nameof(IsConversionRoot);
 	public const string IgnoreCategoryKeywordsInSubclasses = nameof(IgnoreCategoryKeywordsInSubclasses);
 	public const string EditorConfig = nameof(EditorConfig);
+	public const string BlueprintSpawnableComponent = nameof(BlueprintSpawnableComponent);
 	
 	// Function metadata names
 	public const string WorldContext = nameof(WorldContext);

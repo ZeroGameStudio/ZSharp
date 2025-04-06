@@ -9,8 +9,9 @@
 #include "ZCall/IZCallDispatcher.h"
 #include "Conjugate/ZConjugateRegistryDeclarations.h"
 
-ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(TUniqueFunction<void()>&& unloadCallback)
-	: UnloadCallback(MoveTemp(unloadCallback))
+ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(TUniqueFunction<void()>&& unloadingCallback, TUniqueFunction<void()>&& unloadedCallback)
+	: UnloadingCallback(MoveTemp(unloadingCallback))
+	, UnloadedCallback(MoveTemp(unloadedCallback))
 	, bUnloaded(false)
 	, RedStackDepth(0)
 {
@@ -39,6 +40,8 @@ void ZSharp::FZMasterAssemblyLoadContext::Unload()
 		return;
 	}
 
+	UnloadingCallback();
+
 	for (const auto& registry : ConjugateRegistries)
 	{
 		registry->Release();
@@ -48,7 +51,7 @@ void ZSharp::FZMasterAssemblyLoadContext::Unload()
 
 	bUnloaded = true;
 
-	UnloadCallback();
+	UnloadedCallback();
 }
 
 ZSharp::EZLoadAssemblyErrorCode ZSharp::FZMasterAssemblyLoadContext::LoadAssembly(const FString& assemblyName, void* args)

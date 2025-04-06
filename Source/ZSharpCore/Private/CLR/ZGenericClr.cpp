@@ -508,7 +508,7 @@ ZSharp::IZMasterAssemblyLoadContext* ZSharp::FZGenericClr::CreateMasterAlc()
 		return nullptr;
 	}
 	
-	MasterAlc = MakeUnique<FZMasterAssemblyLoadContext>([this]{ HandleMasterAlcUnloaded(); });
+	MasterAlc = MakeUnique<FZMasterAssemblyLoadContext>([this]{ HandleMasterAlcUnloading(); }, [this]{ HandleMasterAlcUnloaded(); });
 
 	PreMasterAlcStartupDelegate.Broadcast(MasterAlc.Get());
 	OnMasterAlcStartupDelegate.Broadcast(MasterAlc.Get());
@@ -587,6 +587,11 @@ void ZSharp::FZGenericClr::HandleGarbageCollectComplete()
 	{
 		CollectGarbage();
 	}
+}
+
+void ZSharp::FZGenericClr::HandleMasterAlcUnloading()
+{
+	OnMasterAlcUnloadingDelegate.Broadcast(MasterAlc.Get());
 }
 
 

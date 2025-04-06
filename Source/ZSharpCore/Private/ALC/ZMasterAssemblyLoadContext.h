@@ -16,7 +16,7 @@ namespace ZSharp
 		using ThisClass = FZMasterAssemblyLoadContext;
 
 	public:
-		FZMasterAssemblyLoadContext(TUniqueFunction<void()>&& unloadCallback);
+		FZMasterAssemblyLoadContext(TUniqueFunction<void()>&& unloadingCallback, TUniqueFunction<void()>&& unloadedCallback);
 		virtual ~FZMasterAssemblyLoadContext() override;
 
 	public:
@@ -61,7 +61,8 @@ namespace ZSharp
 		void HandleGarbageCollectComplete();
 
 	private:
-		TUniqueFunction<void()> UnloadCallback;
+		TUniqueFunction<void()> UnloadingCallback;
+		TUniqueFunction<void()> UnloadedCallback;
 		bool bUnloaded;
 
 		TMap<FZCallHandle, TUniquePtr<IZCallDispatcher>> ZCallMap;

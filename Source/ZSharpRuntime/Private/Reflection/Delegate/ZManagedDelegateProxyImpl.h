@@ -3,8 +3,10 @@
 #pragma once
 
 #include "ZManagedDelegateProxy.h"
+#include "CLR/IZSharpClr.h"
 #include "Interop/ZGCHandle.h"
 #include "Reflection/Function/ZFunctionVisitorHandle.h"
+#include "ZSharpRuntimeMacros.h"
 
 #include "ZManagedDelegateProxyImpl.generated.h"
 
@@ -24,6 +26,14 @@ public:
 		result->Signature = TStrongObjectPtr { signature };
 		result->Delegate = delegate;
 		result->State = state;
+
+#if ZSHARP_WITH_MASTER_ALC_RELOAD
+		ZSharp::IZSharpClr::Get().OnMasterAlcUnloading().AddWeakLambda(result, [result](ZSharp::IZMasterAssemblyLoadContext*)
+		{
+			result->MarkAsGarbage();
+		});
+#endif
+		
 		return result;
 	}
 

@@ -47,6 +47,7 @@ namespace ZSharp
 
 	private:
 		void HandleGarbageCollectComplete();
+		void HandleMasterAlcUnloading();
 		void HandleMasterAlcUnloaded();
 		void HandleSlimAlcUnloaded(const FString& name);
 

@@ -5,7 +5,7 @@ namespace ZeroGames.ZSharp.Core.Async;
 internal class ZeroTaskBackend_DelayFrames : PooledZeroTaskBackendBase<int32, ZeroTaskBackend_DelayFrames>
 {
 
-	public static ZeroTaskBackend_DelayFrames GetFromPool(int32 delayFrames, Lifecycle lifecycle, IProgress<int32>? progress)
+	public static ZeroTaskBackend_DelayFrames GetFromPool(int32 delayFrames, Lifecycle lifecycle)
 	{
 		var task = InternalGetFromPool();
 		task._delayFrames = delayFrames;

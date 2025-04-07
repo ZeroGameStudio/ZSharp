@@ -4,14 +4,8 @@ using System.Threading;
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public readonly partial struct Lifecycle : IEquatable<Lifecycle>
+public readonly partial struct Lifecycle
 {
-
-	public bool Equals(Lifecycle other) => _backend == other._backend && _token == other._token && _nonReactive == other._nonReactive;
-	public override bool Equals(object? obj) => obj is Lifecycle other && Equals(other);
-	public override int32 GetHashCode() => _backend?.GetHashCode() ?? 0;
-	public static bool operator==(Lifecycle lhs, Lifecycle rhs) => lhs.Equals(rhs);
-	public static bool operator!=(Lifecycle lhs, Lifecycle rhs) => !lhs.Equals(rhs);
 
 	public static implicit operator Lifecycle(CancellationToken cancellationToken) => new(cancellationToken);
 

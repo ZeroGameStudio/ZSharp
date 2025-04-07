@@ -23,7 +23,7 @@ internal class ZeroTaskBackend_Exception<TResult> : IZeroTaskBackend<TResult>
 	void IZeroTaskBackend.SetContinuation(Action continuation, ZeroTaskToken token) => throw new NotSupportedException();
 	void IZeroTaskBackend.SetMoveNextSource(IMoveNextSource source, ZeroTaskToken token) => throw new NotSupportedException();
 
-	ZeroTaskToken IZeroTaskBackend.Token { get; } = default(ZeroTaskToken).Next;
+	ZeroTaskToken IZeroTaskTokenSource.Token { get; } = default(ZeroTaskToken).Next;
 	
 	private readonly ExceptionDispatchInfo _exception;
 	private readonly EZeroTaskStatus _status;

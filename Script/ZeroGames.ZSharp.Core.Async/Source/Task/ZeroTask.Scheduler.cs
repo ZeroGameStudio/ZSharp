@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public partial struct ZeroTask
+partial struct ZeroTask
 {
 
 	public static SwitchToGameThreadTask SwitchToGameThread() => default;

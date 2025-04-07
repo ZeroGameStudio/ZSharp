@@ -40,12 +40,6 @@ internal class EventLoop : IEventLoop
 		InternalUnregister(registration);
 	}
 
-	public void UnregisterAll(Lifecycle lifecycle)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		InternalUnregisterAll(lifecycle);
-	}
-
 	public bool IsValidRegistration(EventLoopRegistration registration)
 	{
 		Thrower.ThrowIfNotInGameThread();
@@ -218,32 +212,6 @@ internal class EventLoop : IEventLoop
 		innerRegistry[reg] = new(statelessCallback, statefulCallback, state, lifecycle, statelessOnExpired, statefulOnExpired);
 
 		return reg;
-	}
-
-	private void InternalUnregisterAll(Lifecycle lifecycle)
-	{
-		static void Traverse(Dictionary<EEventLoopTickingGroup, Dictionary<EventLoopRegistration, Rec>> registry, Lifecycle lifecycle)
-		{
-			foreach (var pair in registry)
-			{
-				var innerRegistry = pair.Value;
-				foreach (var innerPair in innerRegistry)
-				{
-					if (innerPair.Value.Lifecycle == lifecycle)
-					{
-						innerRegistry[innerPair.Key] = default;
-					}
-				}
-			}
-		}
-
-		
-		if (_notifing)
-		{
-			Traverse(_pendingRegistry, lifecycle);
-		}
-
-		Traverse(_registry, lifecycle);
 	}
 
 	private void FlushPendingRegistry()

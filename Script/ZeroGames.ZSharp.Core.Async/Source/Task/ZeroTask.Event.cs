@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public partial struct ZeroTask
+partial struct ZeroTask
 {
 
 	public static ZeroTask Until(Func<bool> predicate, TimeSpan pollInterval, Lifecycle lifecycle = default) => throw new NotImplementedException();

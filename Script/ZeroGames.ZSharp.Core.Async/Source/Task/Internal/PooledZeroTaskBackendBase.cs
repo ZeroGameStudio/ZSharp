@@ -16,17 +16,15 @@ internal abstract class PooledZeroTaskBackendBase<TResult, TImpl> : ZeroTaskBack
 	void IPooled.PreReturnToPool()
 	{
 		Deinitialize();
-		Lifecycle = default;
+		Comp.TryPublishUnobservedException();
 		Comp.Deinitialize();
+		Lifecycle = default;
 	}
 	
 	protected static TImpl InternalGetFromPool() => _pool.Get();
-	
+
 	protected virtual void Initialize(){}
-	protected virtual void Deinitialize()
-	{
-		Comp.TryPublishUnobservedException();
-	}
+	protected virtual void Deinitialize(){}
 
 	protected new void SetResult(TResult result)
 	{

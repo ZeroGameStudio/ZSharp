@@ -6,13 +6,12 @@ namespace ZeroGames.ZSharp.Core.Async;
 /// Background heap-allocated object for task which completes asynchronously.
 /// Similar to IValueTaskSource.
 /// </summary>
-public interface IZeroTaskBackend
+public interface IZeroTaskBackend : IZeroTaskTokenSource
 {
 	EZeroTaskStatus GetStatus(ZeroTaskToken token);
 	void GetResult(ZeroTaskToken token);
 	void SetContinuation(Action continuation, ZeroTaskToken token);
 	void SetMoveNextSource(IMoveNextSource source, ZeroTaskToken token);
-	ZeroTaskToken Token { get; }
 }
 
 public interface IZeroTaskBackend<out TResult> : IZeroTaskBackend

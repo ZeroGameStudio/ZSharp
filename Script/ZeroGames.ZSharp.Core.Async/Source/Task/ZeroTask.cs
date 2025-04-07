@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 namespace ZeroGames.ZSharp.Core.Async;
 
 [AsyncMethodBuilder(typeof(AsyncZeroTaskMethodBuilderVoid))]
-public readonly partial struct ZeroTask : IAwaitable<ZeroTask.Awaiter>, IEquatable<ZeroTask>
+public readonly partial struct ZeroTask : IAwaitable<ZeroTask.Awaiter>
 {
 	
 	public readonly struct Awaiter : IAwaiter, IMoveNextSourceAwaiter
@@ -46,12 +46,6 @@ public readonly partial struct ZeroTask : IAwaitable<ZeroTask.Awaiter>, IEquatab
 
 	public Awaiter GetAwaiter() => new(this);
 
-	public bool Equals(ZeroTask other) => _backend == other._backend && _token == other._token;
-	public override bool Equals(object? obj) => obj is ZeroTask other && Equals(other);
-	public override int32 GetHashCode() => _backend?.GetHashCode() ?? 0;
-	public static bool operator ==(ZeroTask lhs, ZeroTask rhs) => lhs.Equals(rhs);
-	public static bool operator !=(ZeroTask lhs, ZeroTask rhs) => !lhs.Equals(rhs);
-	
 	internal ZeroTask(IZeroTaskBackend backend)
 	{
 		_backend = backend;
@@ -98,7 +92,7 @@ public readonly partial struct ZeroTask : IAwaitable<ZeroTask.Awaiter>, IEquatab
 }
 
 [AsyncMethodBuilder(typeof(AsyncZeroTaskMethodBuilder<>))]
-public readonly struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>.Awaiter>, IEquatable<ZeroTask<TResult>>
+public readonly partial struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>.Awaiter>
 {
 	
 	public readonly struct Awaiter : IAwaiter<TResult>, IMoveNextSourceAwaiter
@@ -141,25 +135,9 @@ public readonly struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>
 
 	public Awaiter GetAwaiter() => new(this);
 
-	public bool Equals(ZeroTask<TResult> other) => _backend == other._backend && _token == other._token;
-	public override bool Equals(object? obj) => obj is ZeroTask<TResult> other && Equals(other);
-	public override int32 GetHashCode() => _backend?.GetHashCode() ?? 0;
-	public static bool operator ==(ZeroTask<TResult> lhs, ZeroTask<TResult> rhs) => lhs.Equals(rhs);
-	public static bool operator !=(ZeroTask<TResult> lhs, ZeroTask<TResult> rhs) => !lhs.Equals(rhs);
-
-	public static implicit operator ZeroTask(ZeroTask<TResult> @this)
+	internal ZeroTask(TResult result)
 	{
-		if (@this._backend is null)
-		{
-			return ZeroTask.CompletedTask;
-		}
-
-		return new(@this._backend!);
-	}
-	
-	internal ZeroTask(TResult inlineResult)
-	{
-		_inlineResult = inlineResult;
+		_result = result;
 	}
 
 	internal ZeroTask(IZeroTaskBackend<TResult> backend)
@@ -177,7 +155,7 @@ public readonly struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>
 			return _backend.GetResult(_token);
 		}
 
-		return _inlineResult!;
+		return _result!;
 	}
 	
 	private void SetMoveNextSource(IMoveNextSource source)
@@ -204,7 +182,7 @@ public readonly struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<TResult>
 		}
 	}
 
-	private readonly TResult? _inlineResult;
+	private readonly TResult? _result;
 	private readonly IZeroTaskBackend<TResult>? _backend;
 	private readonly ZeroTaskToken _token;
 	

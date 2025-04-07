@@ -5,7 +5,7 @@ namespace ZeroGames.ZSharp.Core.Async;
 internal class ZeroTaskBackend_DelaySeconds : PooledZeroTaskBackendBase<float, ZeroTaskBackend_DelaySeconds>
 {
 
-	public static ZeroTaskBackend_DelaySeconds GetFromPool(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle, IProgress<float>? progress)
+	public static ZeroTaskBackend_DelaySeconds GetFromPool(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle)
 	{
 		var task = InternalGetFromPool();
 		task._delayType = delayType;

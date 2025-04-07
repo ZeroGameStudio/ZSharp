@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public partial struct ZeroTask
+partial struct ZeroTask
 {
 
 	public static ZeroTask<T> FromResult<T>(T result)
@@ -33,18 +33,30 @@ public partial struct ZeroTask
 		return FromException<T>(new LifecycleExpiredException(lifecycle));
 	}
 	
-	public static ZeroTask FromBackend(IZeroTaskBackend backend)
+	public static ZeroTask FromBackend(IZeroTaskBackend backend, Lifecycle lifecycle = default)
 	{
 		Thrower.ThrowIfNotInGameThread();
 
 		return new(backend);
 	}
 
-	public static ZeroTask<T> FromBackend<T>(IZeroTaskBackend<T> backend)
+	public static ZeroTask<T> FromBackend<T>(IZeroTaskBackend<T> backend, Lifecycle lifecycle = default)
 	{
 		Thrower.ThrowIfNotInGameThread();
 
 		return new(backend);
+	}
+
+	public static ZeroTask FromCompletionSource(out ZeroTaskCompletionSource source, Lifecycle lifecycle = default)
+	{
+		source = ZeroTaskCompletionSource.Create();
+		return source.Task;
+	}
+
+	public static ZeroTask<T> FromCompletionSource<T>(out ZeroTaskCompletionSource<T> source, Lifecycle lifecycle = default)
+	{
+		source = ZeroTaskCompletionSource<T>.Create();
+		return source.Task;
 	}
 	
 	public static ZeroTask CompletedTask

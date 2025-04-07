@@ -102,15 +102,15 @@ internal struct ZeroTaskBackendComp<TResult>
 		}
 	}
 	
-	public ZeroTaskToken Token { get; private set; }
-
-	private void ValidateToken(ZeroTaskToken token)
+	public void ValidateToken(ZeroTaskToken token)
 	{
 		if (token != Token)
 		{
 			throw new InvalidOperationException("Token expired.");
 		}
 	}
+	
+	public ZeroTaskToken Token { get; private set; }
 
 	private void ValidateContinuation()
 	{

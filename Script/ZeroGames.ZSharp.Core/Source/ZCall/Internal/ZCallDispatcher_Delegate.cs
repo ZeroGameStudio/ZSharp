@@ -22,7 +22,7 @@ internal sealed class ZCallDispatcher_Delegate : IZCallDispatcher
 		for (int32 i = 0; i < parameterInfos.Length; ++i)
 		{
 			Type parameterType = parameterInfos[i].ParameterType;
-			parameters[i] = parameterType.IsEnum ? Convert.ChangeType((*buffer)[pos++].Object, parameterType) : (*buffer)[pos++].Object;
+			parameters[i] = parameterType.IsEnum ? Convert.ChangeType((*buffer)[pos++].Object, parameterType.GetEnumUnderlyingType()) : (*buffer)[pos++].Object;
 		}
 
 		object? returnValue = @delegate.DynamicInvoke(parameters);

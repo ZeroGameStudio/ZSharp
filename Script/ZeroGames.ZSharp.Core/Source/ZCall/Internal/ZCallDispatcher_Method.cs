@@ -27,7 +27,7 @@ internal sealed class ZCallDispatcher_Method(string name, MethodInfo method) : I
         for (int32 i = 0; i < parameterInfos.Length; ++i)
         {
 	        Type parameterType = parameterInfos[i].ParameterType;
-	        parameters[i] = parameterType.IsEnum ? Convert.ChangeType((*buffer)[pos++].Object, parameterType) : (*buffer)[pos++].Object;
+	        parameters[i] = parameterType.IsEnum ? Convert.ChangeType((*buffer)[pos++].Object, parameterType.GetEnumUnderlyingType()) : (*buffer)[pos++].Object;
         }
         
         object? returnValue = Method.Invoke(obj, parameters);

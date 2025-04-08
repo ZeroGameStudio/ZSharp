@@ -67,6 +67,10 @@ public partial class UnrealObject : IUnrealObject
     public bool Rename(string newName) => Rename(newName, null);
     public bool Rename(UnrealObject newOuter) => Rename(null, newOuter);
 
+    // Only called on emitted class, just before C++ UObject::PostInitProperties().
+    [ZCall(Name = ".pip")]
+    protected virtual void PostInitProperties(){}
+
     private unsafe UnrealClass InternalGetClass()
         => UnrealObject_Interop.GetClass(ConjugateHandle.FromConjugate(this)).GetTargetChecked<UnrealClass>();
 

@@ -145,6 +145,7 @@ public class UnrealEnumDefinition : UnrealFieldDefinition
 public class UnrealScriptStructDefinition : UnrealStructDefinition
 {
 	public EStructFlags StructFlags { get; set; }
+	[JsonPropertyName("bHasNetSerialize")] public bool HasNetSerialize { get; set; }
 }
 
 public class UnrealDelegateDefinition : UnrealStructDefinition, IUnrealSignatureDefinition

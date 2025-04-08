@@ -14,6 +14,54 @@ internal class UnrealScriptStructModel : UnrealStructModel, IUnrealScriptStructM
 
 		AssemblyName = typeDef.Scope.GetAssemblyName();
 		FullName = typeDef.FullName;
+		
+		MethodDefinition? maybeNetSerialize = typeDef.Methods.SingleOrDefault(method => method.HasCustomAttribute<NetSerializeAttribute>());
+		if (maybeNetSerialize is null)
+		{
+			HasNetSerialize = false;
+		}
+		else
+		{
+			if (maybeNetSerialize.IsStatic)
+			{
+				throw new InvalidOperationException();
+			}
+
+			if (maybeNetSerialize.Parameters.Count != 3)
+			{
+				throw new InvalidOperationException();
+			}
+
+			if (maybeNetSerialize.Parameters[0].ParameterType.FullName != "ZeroGames.ZSharp.UnrealEngine.IArchive")
+			{
+				throw new InvalidOperationException();
+			}
+			
+			if (maybeNetSerialize.Parameters[1].ParameterType.FullName != "ZeroGames.ZSharp.UnrealEngine.CoreUObject.PackageMap")
+			{
+				throw new InvalidOperationException();
+			}
+			
+			if (maybeNetSerialize.Parameters[2].ParameterType.FullName != "System.Boolean&")
+			{
+				throw new InvalidOperationException();
+			}
+
+			if (!maybeNetSerialize.Parameters[2].IsOut)
+			{
+				throw new InvalidOperationException();
+			}
+
+			if (maybeNetSerialize.ReturnType.FullName != "System.Boolean")
+			{
+				throw new InvalidOperationException();
+			}
+
+			HasNetSerialize = true;
+			
+		}
+		
+		HasNetSerialize = maybeNetSerialize is not null;
 	}
 	
 	void IDeferredTypeModel.BaseInitialize()
@@ -87,6 +135,8 @@ internal class UnrealScriptStructModel : UnrealStructModel, IUnrealScriptStructM
 			return _interfaces;
 		}
 	}
+	
+	public bool HasNetSerialize { get; }
 	
 	public bool IsBaseInitialized { get; private set; }
 	public bool IsFullyInitialized { get; private set; }

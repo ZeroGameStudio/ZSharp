@@ -127,6 +127,7 @@ namespace ZSharp::ZUnrealFieldScanner_Private
 				scriptStructDef.Properties = PropertyDtos2Defs(MoveTemp(scriptStructDto.Properties));
 				scriptStructDef.PropertyDefaults = PropertyDefaultDtos2Defs(MoveTemp(scriptStructDto.PropertyDefaults));
 				scriptStructDef.StructFlags = static_cast<EStructFlags>(scriptStructDto.StructFlags);
+				scriptStructDef.bHasNetSerialize = scriptStructDto.bHasNetSerialize;
 			}
 		}
 

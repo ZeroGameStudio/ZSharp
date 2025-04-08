@@ -14,7 +14,7 @@
 
 namespace ZSharp::ZSharpClass_Private
 {
-	static void ConstructObject(const FObjectInitializer& objectInitializer, UClass* cls, bool& contextual, IZMasterAssemblyLoadContext*& alc, FZConjugateHandle& conjugate)
+	static void ConstructObject(const FObjectInitializer& objectInitializer, UClass* cls, IZMasterAssemblyLoadContext* alc, FZConjugateHandle conjugate, bool& contextual)
 	{
 		UObject* obj = objectInitializer.GetObj();
 
@@ -43,7 +43,7 @@ namespace ZSharp::ZSharpClass_Private
 				}
 			}
 			
-			ConstructObject(objectInitializer, cls->GetSuperClass(), contextual, alc, conjugate);
+			ConstructObject(objectInitializer, cls->GetSuperClass(), alc, conjugate, contextual);
 		}
 
 		// BPGC doesn't need to do anything else.
@@ -133,12 +133,6 @@ namespace ZSharp::ZSharpClass_Private
 			}
 
 			{ // Call managed red constructor and UClass constructor.
-				if (!alc && (!contextual && zscls->bContextual || zscls->bConstructor))
-				{
-					alc = IZSharpClr::Get().GetMasterAlc();
-					conjugate = alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(obj);
-				}
-
 				contextual |= zscls->bContextual;
 				
 				if (zscls->bConstructor)
@@ -165,10 +159,23 @@ namespace ZSharp::ZSharpClass_Private
 	
 	static void ClassConstructor(const FObjectInitializer& objectInitializer)
 	{
+		IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
+		FZConjugateHandle conjugate = alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(objectInitializer.GetObj());
 		bool contextual = false;
-		IZMasterAssemblyLoadContext* alc = nullptr;
-		FZConjugateHandle conjugate{};
-		ConstructObject(objectInitializer, objectInitializer.GetClass(), contextual, alc, conjugate);
+		ConstructObject(objectInitializer, objectInitializer.GetClass(), alc, conjugate, contextual);
+		const_cast<FObjectInitializer&>(objectInitializer).AddPropertyPostInitCallback([alc, conjugate]
+		{
+			FZCallHandle handle = FZSharpFieldRegistry::Get().GetObjectPostInitPropertiesZCallHandle();
+			FZRedFrameScope scope;
+			{
+				FZCallBufferSlot slot { EZCallBufferSlotType::Conjugate, { .Conjugate = conjugate } };
+				FZCallBuffer buffer;
+				buffer.Slots = &slot;
+				buffer.NumSlots = 1;
+									
+				alc->ZCall(handle, &buffer);
+			}
+		});
 
 #if ZSHARP_WITH_MASTER_ALC_RELOAD
 		if (contextual)

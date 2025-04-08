@@ -2,6 +2,9 @@
 
 namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
-public interface IUnrealScriptStructModel : IUnrealStructModel, ITypeModel;
+public interface IUnrealScriptStructModel : IUnrealStructModel, ITypeModel
+{
+	bool HasNetSerialize { get; }
+}
 
 

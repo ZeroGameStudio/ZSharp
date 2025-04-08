@@ -24,10 +24,26 @@ namespace ZSharp
 
 	struct ZSHARPRUNTIME_API FZSharpScriptStruct : public FZSharpStruct
 	{
+
+		friend class FZSharpFieldRegistry;
+		
 		const UScriptStruct* ScriptStruct = nullptr;
 
 		// The engine will destruct this. (@see: GetDeferredCppStructOps())
 		UScriptStruct::ICppStructOps* CppStructOps;
+		
+	public:
+		FZCallHandle GetNetSerializeZCallHandle() const;
+
+	public:
+		FString NetSerializeZCallName;
+
+		bool bHasNetSerialize = false;
+		bool bHasIdentical = false;
+
+	private:
+		mutable FZCallHandle NetSerializeZCallHandle{};
+		
 	};
 
 	struct ZSHARPRUNTIME_API FZSharpDelegate

@@ -34,6 +34,9 @@ namespace ZSharp
 		FZSharpClass* GetMutableClass(const UClass* cls) { return const_cast<FZSharpClass*>(GetClass(cls)); }
 		FZSharpFunction* GetMutableFunction(const UFunction* function) { return const_cast<FZSharpFunction*>(GetFunction(function)); }
 
+	public:
+		FZCallHandle GetObjectPostInitPropertiesZCallHandle() const;
+		
 	private:
 		FZSharpFieldRegistry();
 		virtual ~FZSharpFieldRegistry() override;
@@ -49,6 +52,8 @@ namespace ZSharp
 		TMap<const UDelegateFunction*, TUniquePtr<FZSharpDelegate>> DelegateRegistry;
 		TMap<const UClass*, TUniquePtr<FZSharpClass>> ClassRegistry;
 		TMap<const UFunction*, TUniquePtr<FZSharpFunction>> FunctionRegistry;
+
+		mutable FZCallHandle ObjectPostInitPropertiesZCallHandle{};
 		
 	};
 }

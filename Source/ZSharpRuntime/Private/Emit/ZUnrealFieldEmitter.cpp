@@ -17,7 +17,7 @@
 
 namespace ZSharp::ZUnrealFieldEmitter_Private
 {
-	static FString MakeNMZCallName(const UClass* outer, const FString& lastName)
+	static FString MakeNMZCallName(const UObject* outer, const FString& lastName)
 	{
 		if (lastName.IsEmpty())
 		{
@@ -1322,6 +1322,13 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 	ZUnrealFieldEmitter_Private::FixupAlignmentForStruct(scriptStruct);
 
 	FZSharpScriptStruct* zsstrct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
+	if (def.bHasNetSerialize)
+	{
+		UE_CLOG(superScriptStruct, LogZSharpEmit, Fatal, TEXT("Struct with NetSerialize can't have super struct yet!!!"));
+		zsstrct->bHasNetSerialize = true;
+		zsstrct->bHasIdentical = true; // @FIXME
+		zsstrct->NetSerializeZCallName = ZUnrealFieldEmitter_Private::MakeNMZCallName(scriptStruct, ".netserialize");
+	}
 	
 	auto ops = new ZSharpScriptStruct_Private::FZSharpStructOps { scriptStruct, zsstrct, scriptStruct->GetPropertiesSize(), scriptStruct->GetMinAlignment() };
 	scriptStruct->DeferCppStructOps(FTopLevelAssetPath { pak->GetFName(), scriptStruct->GetFName() }, ops);

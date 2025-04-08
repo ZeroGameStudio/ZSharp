@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 internal class Archive : IArchive
 {
 
-	public static object ToManaged(IntPtr unmanaged) => new Archive(unmanaged);
+	public static IDisposable ToManaged(IntPtr unmanaged) => new Archive(unmanaged);
 	
 	public void Dispose() => _unmanaged = IntPtr.Zero;
 	
@@ -233,7 +233,7 @@ internal class Archive : IArchive
 		return this;
 	}
 
-	public IArchive Serialize(string value)
+	public IArchive Serialize(string? value)
 	{
 		return Serialize(new UnrealString(value));
 	}

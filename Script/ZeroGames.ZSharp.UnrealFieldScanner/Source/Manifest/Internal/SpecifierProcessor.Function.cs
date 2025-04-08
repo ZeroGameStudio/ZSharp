@@ -12,12 +12,6 @@ partial class SpecifierProcessor
 	}
 	
 	[SpecifierProcessor]
-	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, UClassConstructorAttribute specifier)
-	{
-		// Nothing to do.
-	}
-	
-	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintCallableAttribute specifier)
 	{
 		def.FunctionFlags |= EFunctionFlags.BlueprintCallable;
@@ -140,6 +134,18 @@ partial class SpecifierProcessor
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, DefaultToSelfAttribute specifier)
 	{
 		def.AddMetadata(MetadataConstants.DefaultToSelf, specifier.Name);
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, UClassConstructorAttribute specifier)
+	{
+		// Nothing to do.
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, NetSerializeAttribute specifier)
+	{
+		// Nothing to do.
 	}
 	
 }

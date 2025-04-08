@@ -2,10 +2,11 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine;
 
+// IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 // C# doesn't support ref parameter on operators so we can't use archive like this: ar << x << y << z.
 public interface IArchive : IMarshalPointer
 {
-	public new static object ToManaged(IntPtr unmanaged) => Archive.ToManaged(unmanaged);
+	public new static IDisposable ToManaged(IntPtr unmanaged) => Archive.ToManaged(unmanaged);
 	
 	IArchive Serialize(uint8 value);
 	IArchive Serialize(out uint8 value);

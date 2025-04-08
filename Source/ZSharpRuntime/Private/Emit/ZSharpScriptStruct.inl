@@ -3,6 +3,12 @@
 #pragma once
 
 #include "ZSharpStruct.inl"
+#include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZRedFrameScope.h"
+#include "CLR/IZSharpClr.h"
+#include "Conjugate/ZConjugateRegistry_UObject.h"
+#include "Conjugate/ZStrangeConjugateRegistries.h"
+#include "ZCall/ZCallBuffer.h"
 
 namespace ZSharp::ZSharpScriptStruct_Private
 {
@@ -18,6 +24,8 @@ namespace ZSharp::ZSharpScriptStruct_Private
 			// Never treat emitted struct as POD type.
 			Capabilities.HasSerializerObjectReferences = EPropertyObjectReferenceType::Conservative;
 			Capabilities.HasDestructor = true;
+			Capabilities.HasNetSerializer = zsstrct->bHasNetSerialize;
+			Capabilities.HasIdentical = zsstrct->bHasIdentical;
 		}
 
 		virtual FCapabilities GetCapabilities() const override { return Capabilities; }
@@ -69,12 +77,49 @@ namespace ZSharp::ZSharpScriptStruct_Private
 		virtual bool Serialize(FArchive& ar, void* data) override { checkNoEntry(); return false; }
 		virtual bool Serialize(FStructuredArchive::FSlot slot, void* data) override { checkNoEntry(); return false; }
 		virtual void PostSerialize(const FArchive& ar, void* data) override { checkNoEntry(); }
-		virtual bool NetSerialize(FArchive& ar, UPackageMap* map, bool& outSuccess, void* data) override { checkNoEntry(); return false; }
+
+		virtual bool NetSerialize(FArchive& ar, UPackageMap* map, bool& outSuccess, void* data) override
+		{
+			if (IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc()) 
+			{
+				FZCallHandle handle = ZSharpScriptStruct->GetNetSerializeZCallHandle();
+				FZRedFrameScope scope;
+				{
+					FZCallBufferSlot slots[5] =
+					{
+						{ EZCallBufferSlotType::Conjugate, { .Conjugate = alc->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(ScriptStruct, data) } },
+						{ EZCallBufferSlotType::Pointer, { .Pointer = &ar } },
+						{ EZCallBufferSlotType::Conjugate, { .Conjugate = alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(map) } },
+						{ EZCallBufferSlotType::Bool, { .Bool = false } },
+						{ EZCallBufferSlotType::Bool, { .Bool = false } }
+					};
+					FZCallBuffer buffer;
+					buffer.Slots = slots;
+					buffer.NumSlots = UE_ARRAY_COUNT(slots);
+						
+					alc->ZCall(handle, &buffer);
+					
+					outSuccess = slots[3].ReadBool();
+					return slots[4].ReadBool();
+				}
+			}
+
+			outSuccess = false;
+			return false;
+		}
+
 		virtual bool NetDeltaSerialize(FNetDeltaSerializeInfo& deltaParms, void* data) override { checkNoEntry(); return false; }
 		virtual void PostScriptConstruct(void* data) override { checkNoEntry(); }
 		virtual void GetPreloadDependencies(void* data, TArray<UObject*>& outDeps) override { checkNoEntry(); }
 		virtual bool Copy(void* dest, void const* src, int32 arrayDim) override { checkNoEntry(); return false; }
-		virtual bool Identical(const void* a, const void* b, uint32 portFlags, bool& outResult) override { checkNoEntry(); return false; }
+		
+		virtual bool Identical(const void* a, const void* b, uint32 portFlags, bool& outResult) override
+		{
+			// @FIXME: Currently only serialization proxies can enter this, we return false to always trigger serialization.
+			outResult = false;
+			return true;
+		}
+
 		virtual bool ExportTextItem(FString& valueStr, const void* propertyValue, const void* defaultValue, UObject* parent, int32 portFlags, UObject* exportRootScope) override { checkNoEntry(); return false; }
 		virtual bool ImportTextItem(const TCHAR*& buffer, void* data, int32 portFlags, UObject* ownerObject, FOutputDevice* errorText) override { checkNoEntry(); return false; }
 		virtual bool FindInnerPropertyInstance(FName propertyName, const void* data, const FProperty*& outProp, const void*& outData) const override { checkNoEntry(); return false; }

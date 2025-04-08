@@ -169,6 +169,9 @@ struct FZScriptStructDefinitionDto : public FZStructDefinitionDto
 	
 	UPROPERTY()
 	int32 StructFlags = 0;
+
+	UPROPERTY()
+	bool bHasNetSerialize = false;
 };
 
 USTRUCT(meta = (ZSharpNoExport))

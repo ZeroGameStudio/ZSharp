@@ -12,6 +12,7 @@ partial class ManifestBuilder
 			Name = scriptStructModel.Name,
 			SuperPath = scriptStructModel.BaseType?.GetUnrealFieldPath(),
 			StructFlags = EStructFlags.NoFlags,
+			HasNetSerialize = scriptStructModel.HasNetSerialize,
 		};
 
 		ProcessSpecifiers(result, scriptStructModel);

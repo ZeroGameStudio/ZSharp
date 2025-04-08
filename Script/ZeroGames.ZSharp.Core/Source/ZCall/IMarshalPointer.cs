@@ -4,7 +4,7 @@ namespace ZeroGames.ZSharp.Core;
 
 public interface IMarshalPointer : IDisposable
 {
-	static abstract object ToManaged(IntPtr unmanaged);
+	static abstract IDisposable ToManaged(IntPtr unmanaged);
 }
 
 

@@ -2,6 +2,7 @@
 
 #include "ZSharpFieldRegistry.h"
 
+#include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 
 ZSharp::FZSharpFieldRegistry& ZSharp::FZSharpFieldRegistry::Get()
@@ -74,6 +75,22 @@ ZSharp::FZSharpFunction& ZSharp::FZSharpFieldRegistry::RegisterFunction(const UF
 	return *FunctionRegistry.Emplace(function, zsfunction);
 }
 
+ZSharp::FZCallHandle ZSharp::FZSharpFieldRegistry::GetObjectPostInitPropertiesZCallHandle() const
+{
+	static const FString GObjectPostInitPropertiesZCallName = "nm://Script/CoreUObject.Object:.pip";
+	
+	if (!ObjectPostInitPropertiesZCallHandle)
+	{
+		if (IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc())
+		{
+			ObjectPostInitPropertiesZCallHandle = alc->GetZCallHandle(GObjectPostInitPropertiesZCallName);
+		}
+	}
+
+	check(ObjectPostInitPropertiesZCallHandle);
+	return ObjectPostInitPropertiesZCallHandle;
+}
+
 ZSharp::FZSharpFieldRegistry::FZSharpFieldRegistry()
 {
 	MasterAlcUnloadedDelegate = IZSharpClr::Get().OnMasterAlcUnloaded().AddRaw(this, &ThisClass::ClearAlcSensitiveStates);
@@ -86,6 +103,13 @@ ZSharp::FZSharpFieldRegistry::~FZSharpFieldRegistry()
 
 void ZSharp::FZSharpFieldRegistry::ClearAlcSensitiveStates()
 {
+	ObjectPostInitPropertiesZCallHandle = {};
+	
+	for (const auto& pair : ScriptStructRegistry)
+	{
+		pair.Value->NetSerializeZCallHandle = {};
+	}
+	
 	for (const auto& pair : ClassRegistry)
 	{
 		pair.Value->ConstructorZCallHandle = {};

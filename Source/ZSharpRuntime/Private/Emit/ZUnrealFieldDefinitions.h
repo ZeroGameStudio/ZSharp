@@ -125,6 +125,7 @@ namespace ZSharp
 		UScriptStruct* ScriptStruct = nullptr;
 		
 		EStructFlags StructFlags = STRUCT_NoFlags;
+		bool bHasNetSerialize = false;
 	};
 
 	struct FZDelegateDefinition : public FZStructDefinition

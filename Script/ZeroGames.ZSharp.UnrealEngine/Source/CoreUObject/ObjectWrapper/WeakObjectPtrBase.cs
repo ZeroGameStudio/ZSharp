@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public abstract class WeakObjectPtrBase : UnrealConjugateBase
+public abstract class WeakObjectPtrBase : UnrealObjectWrapperBase
 	, IEquatable<WeakObjectPtrBase>
 	, IEqualityOperators<WeakObjectPtrBase?, WeakObjectPtrBase?, bool>
 {
@@ -27,6 +27,12 @@ public abstract class WeakObjectPtrBase : UnrealConjugateBase
 	
 	protected WeakObjectPtrBase(){}
 	protected WeakObjectPtrBase(IntPtr unmanaged) : base(unmanaged){}
+
+	protected override unsafe bool InternalIsValid(bool evenIfGarbage)
+		=> WeakObjectPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
+
+	protected override unsafe bool InternalIsNull()
+		=> WeakObjectPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
 
 	private unsafe bool InternalEquals(WeakObjectPtrBase? other)
 		=> other is not null && WeakObjectPtr_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;

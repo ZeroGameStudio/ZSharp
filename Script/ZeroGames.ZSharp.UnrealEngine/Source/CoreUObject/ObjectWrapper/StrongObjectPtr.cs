@@ -30,17 +30,40 @@ public sealed class StrongObjectPtr<T> : StrongObjectPtrBase
 	
 	public static IEqualityComparer<StrongObjectPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
 
-	public T? Target
+	public new T? Target
 	{
-		get => InternalGet(false);
-		set => InternalSet(value);
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalGet(false);
+		}
+		set
+		{
+			MasterAlcCache.GuardInvariant();
+			InternalSet(value);
+		}
 	}
 
-	public T? TargetEvenIfGarbage => InternalGet(true);
+	public new T? TargetEvenIfGarbage
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalGet(true);
+		}
+	}
 
-	public bool IsValid => InternalIsValid(false);
-	public bool IsValidEventIfGarbage => InternalIsValid(true);
-	public bool IsNull => InternalIsNull();
+	protected override UnrealObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
+
+	protected override void InternalSetTarget(UnrealObject? target)
+	{
+		if (target is not null && target is not T)
+		{
+			throw new ArgumentOutOfRangeException(nameof(target));
+		}
+
+		Target = (T?)target;
+	}
 
 	private sealed class EqualityComparer : IEqualityComparer<StrongObjectPtr<T>>
 	{
@@ -60,20 +83,6 @@ public sealed class StrongObjectPtr<T> : StrongObjectPtrBase
 		Thrower.ThrowIfNotInGameThread();
 		MasterAlcCache.Instance.GuardUnloaded();
 		StrongObjectPtr_Interop.Set(Unmanaged, ConjugateHandle.FromConjugate(target));
-	}
-	
-	private unsafe bool InternalIsValid(bool evenIfGarbage)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return StrongObjectPtr_Interop.IsValid(Unmanaged, Convert.ToByte(evenIfGarbage)) > 0;
-	}
-
-	private unsafe bool InternalIsNull()
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return StrongObjectPtr_Interop.IsNull(Unmanaged) > 0;
 	}
 	
 }

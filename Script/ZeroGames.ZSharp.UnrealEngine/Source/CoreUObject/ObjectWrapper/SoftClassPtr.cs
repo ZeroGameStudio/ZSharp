@@ -62,7 +62,7 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 		}
 	}
 	
-	public UnrealClass? Target
+	public new UnrealClass? Target
 	{
 		get
 		{
@@ -76,39 +76,12 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 		}
 	}
 
-	public UnrealClass? TargetEvenIfGarbage
+	public new UnrealClass? TargetEvenIfGarbage
 	{
 		get
 		{
 			MasterAlcCache.GuardInvariant();
 			return InternalGet(true);
-		}
-	}
-
-	public bool IsValid
-	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalIsValid(false);
-		}
-	}
-
-	public bool IsValidEventIfGarbage
-	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalIsValid(true);
-		}
-	}
-
-	public bool IsNull
-	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalIsNull();
 		}
 	}
 
@@ -121,6 +94,18 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 		}
 	}
 
+	protected override UnrealObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
+	
+	protected override void InternalSetTarget(UnrealObject? target)
+	{
+		if (target is not null && target is not UnrealClass)
+		{
+			throw new ArgumentOutOfRangeException(nameof(target));
+		}
+
+		Target = (UnrealClass?)target;
+	}
+	
 	private sealed class EqualityComparer : IEqualityComparer<SoftClassPtr<T>>
 	{
 		public bool Equals(SoftClassPtr<T>? lhs, SoftClassPtr<T>? rhs) => lhs == rhs;
@@ -154,13 +139,7 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 		
 		SoftClassPtr_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
 	}
-	
-	private unsafe bool InternalIsValid(bool evenIfGarbage)
-		=> SoftClassPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
 
-	private unsafe bool InternalIsNull()
-		=> SoftClassPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
-	
 	private unsafe bool InternalIsPending()
 		=> SoftClassPtr_Interop.IsPending(ConjugateHandle.FromConjugate(this)) > 0;
 

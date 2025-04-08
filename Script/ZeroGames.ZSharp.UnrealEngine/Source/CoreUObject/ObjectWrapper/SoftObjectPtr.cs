@@ -62,7 +62,7 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 		}
 	}
 	
-	public T? Target
+	public new T? Target
 	{
 		get
 		{
@@ -76,39 +76,12 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 		}
 	}
 
-	public T? TargetEvenIfGarbage
+	public new T? TargetEvenIfGarbage
 	{
 		get
 		{
 			MasterAlcCache.GuardInvariant();
 			return InternalGet(true);
-		}
-	}
-
-	public bool IsValid
-	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalIsValid(false);
-		}
-	}
-
-	public bool IsValidEventIfGarbage
-	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalIsValid(true);
-		}
-	}
-
-	public bool IsNull
-	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalIsNull();
 		}
 	}
 
@@ -120,7 +93,19 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 			return InternalIsPending();
 		}
 	}
+	
+	protected override UnrealObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
+	
+	protected override void InternalSetTarget(UnrealObject? target)
+	{
+		if (target is not null && target is not T)
+		{
+			throw new ArgumentOutOfRangeException(nameof(target));
+		}
 
+		Target = (T?)target;
+	}
+	
 	private sealed class EqualityComparer : IEqualityComparer<SoftObjectPtr<T>>
 	{
 		public bool Equals(SoftObjectPtr<T>? lhs, SoftObjectPtr<T>? rhs) => lhs == rhs;
@@ -147,12 +132,6 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 
 	private unsafe void InternalSet(T? target)
 		=> SoftObjectPtr_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
-	
-	private unsafe bool InternalIsValid(bool evenIfGarbage)
-		=> SoftObjectPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
-
-	private unsafe bool InternalIsNull()
-		=> SoftObjectPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
 
 	private unsafe bool InternalIsPending()
 		=> SoftObjectPtr_Interop.IsPending(ConjugateHandle.FromConjugate(this)) > 0;

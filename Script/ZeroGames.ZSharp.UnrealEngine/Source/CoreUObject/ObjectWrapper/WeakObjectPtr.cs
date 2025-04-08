@@ -45,20 +45,59 @@ public sealed class WeakObjectPtr<T> : WeakObjectPtrBase
 	
 	public static IEqualityComparer<WeakObjectPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
 
-	public T? Target
+	public new T? Target
 	{
-		get => InternalGet(false);
-		set => InternalSet(value);
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalGet(false);
+		}
+		set
+		{
+			MasterAlcCache.GuardInvariant();
+			InternalSet(value);
+		}
 	}
 
-	public T? TargetEvenIfGarbage => InternalGet(true);
+	public new T? TargetEvenIfGarbage
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalGet(true);
+		}
+	}
 
-	public bool IsValid => InternalIsValid(false);
-	public bool IsValidEventIfGarbage => InternalIsValid(true);
-	public bool IsNull => InternalIsNull();
-	public bool IsStale => InternalIsStale(true);
-	public bool IsStaleExcludingGarbage => InternalIsStale(false);
+	public bool IsStale
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsStale(true);
+		}
+	}
+
+	public bool IsStaleExcludingGarbage
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsStale(false);
+		}
+	}
 	
+	protected override UnrealObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
+		
+	protected override void InternalSetTarget(UnrealObject? target)
+	{
+		if (target is not null && target is not T)
+		{
+			throw new ArgumentOutOfRangeException(nameof(target));
+		}
+
+		Target = (T?)target;
+	}
+
 	private sealed class EqualityComparer : IEqualityComparer<WeakObjectPtr<T>>
 	{
 		public bool Equals(WeakObjectPtr<T>? lhs, WeakObjectPtr<T>? rhs) => lhs == rhs;
@@ -70,9 +109,6 @@ public sealed class WeakObjectPtr<T> : WeakObjectPtrBase
 
 	private unsafe void InternalCopy(WeakObjectPtrBase? other)
 	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		
 		if (other is not null)
 		{
 			WeakObjectPtr_Interop.Copy(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other));
@@ -84,39 +120,13 @@ public sealed class WeakObjectPtr<T> : WeakObjectPtrBase
 	}
 
 	private unsafe T? InternalGet(bool evenIfGarbage)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return WeakObjectPtr_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<T>();
-	}
+		=> WeakObjectPtr_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<T>();
 
 	private unsafe void InternalSet(T? target)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		WeakObjectPtr_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
-	}
-	
-	private unsafe bool InternalIsValid(bool evenIfGarbage)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return WeakObjectPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
-	}
-
-	private unsafe bool InternalIsNull()
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return WeakObjectPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
-	}
+		=> WeakObjectPtr_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
 
 	private unsafe bool InternalIsStale(bool includingGarbage)
-	{
-		Thrower.ThrowIfNotInGameThread();
-		MasterAlcCache.Instance.GuardUnloaded();
-		return WeakObjectPtr_Interop.IsStale(ConjugateHandle.FromConjugate(this), Convert.ToByte(includingGarbage)) > 0;
-	}
+		=> WeakObjectPtr_Interop.IsStale(ConjugateHandle.FromConjugate(this), Convert.ToByte(includingGarbage)) > 0;
 	
 }
 

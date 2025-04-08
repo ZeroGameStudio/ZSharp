@@ -7,12 +7,14 @@ public interface IUnrealObjectWrapper
 	bool IsValid { get; }
 	bool IsValidEventIfGarbage { get; }
 	bool IsNull { get; }
+	UnrealObject? Target { get; set; }
+	UnrealObject? TargetEvenIfGarbage { get; }
 }
 
 public interface IUnrealObjectWrapper<T> : IUnrealObjectWrapper where T : UnrealObject
 {
-	T? Target { get; set; }
-	T? TargetEvenIfGarbage { get; }
+	new T? Target { get; set; }
+	new T? TargetEvenIfGarbage { get; }
 }
 
 

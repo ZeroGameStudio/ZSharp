@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public abstract class SubclassOfBase : UnrealConjugateBase
+public abstract class SubclassOfBase : UnrealObjectWrapperBase
 	, IEquatable<SubclassOfBase>
 	, IEqualityOperators<SubclassOfBase?, SubclassOfBase?, bool>
 {
@@ -27,6 +27,12 @@ public abstract class SubclassOfBase : UnrealConjugateBase
 	
 	protected SubclassOfBase(){}
 	protected SubclassOfBase(IntPtr unmanaged) : base(unmanaged){}
+	
+	protected override unsafe bool InternalIsValid(bool evenIfGarbage)
+		=> SubclassOf_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
+
+	protected override unsafe bool InternalIsNull()
+		=> SubclassOf_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
 
 	private unsafe bool InternalEquals(SubclassOfBase? other)
 		=> other is not null && SubclassOf_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;

@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public abstract class SoftClassPtrBase : UnrealConjugateBase
+public abstract class SoftClassPtrBase : UnrealObjectWrapperBase
 	, IEquatable<SoftClassPtrBase>
 	, IEqualityOperators<SoftClassPtrBase?, SoftClassPtrBase?, bool>
 {
@@ -24,9 +24,15 @@ public abstract class SoftClassPtrBase : UnrealConjugateBase
 	
 	public static bool operator ==(SoftClassPtrBase? left, SoftClassPtrBase? right) => Equals(left, right);
 	public static bool operator !=(SoftClassPtrBase? left, SoftClassPtrBase? right) => !Equals(left, right);
-	
+
 	protected SoftClassPtrBase(){}
 	protected SoftClassPtrBase(IntPtr unmanaged) : base(unmanaged){}
+		
+	protected override unsafe bool InternalIsValid(bool evenIfGarbage)
+		=> SoftClassPtr_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
+
+	protected override unsafe bool InternalIsNull()
+		=> SoftClassPtr_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
 
 	private unsafe bool InternalEquals(SoftClassPtrBase? other)
 		=> other is not null && SoftClassPtr_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;

@@ -45,7 +45,7 @@ public sealed class SubclassOf<T> : SubclassOfBase
 	
 	public static IEqualityComparer<SubclassOf<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
 
-	public UnrealClass? Target
+	public new UnrealClass? Target
 	{
 		get
 		{
@@ -59,7 +59,7 @@ public sealed class SubclassOf<T> : SubclassOfBase
 		}
 	}
 
-	public UnrealClass? TargetEvenIfGarbage
+	public new UnrealClass? TargetEvenIfGarbage
 	{
 		get
 		{
@@ -67,32 +67,17 @@ public sealed class SubclassOf<T> : SubclassOfBase
 			return InternalGet(true);
 		}
 	}
-
-	public bool IsValid
+	
+	protected override UnrealObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
+	
+	protected override void InternalSetTarget(UnrealObject? target)
 	{
-		get
+		if (target is not null && target is not UnrealClass)
 		{
-			MasterAlcCache.GuardInvariant();
-			return InternalIsValid(false);
+			throw new ArgumentOutOfRangeException(nameof(target));
 		}
-	}
 
-	public bool IsValidEventIfGarbage
-	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalIsValid(true);
-		}
-	}
-
-	public bool IsNull
-	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalIsNull();
-		}
+		Target = (UnrealClass?)target;
 	}
 
 	private sealed class EqualityComparer : IEqualityComparer<SubclassOf<T>>
@@ -128,12 +113,6 @@ public sealed class SubclassOf<T> : SubclassOfBase
 		
 		SubclassOf_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
 	}
-	
-	private unsafe bool InternalIsValid(bool evenIfGarbage)
-		=> SubclassOf_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
-
-	private unsafe bool InternalIsNull()
-		=> SubclassOf_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
 	
 }
 

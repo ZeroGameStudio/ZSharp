@@ -45,54 +45,16 @@ public sealed class ScriptInterface<T> : ScriptInterfaceBase
 	
 	public static IEqualityComparer<ScriptInterface<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
 
-	public UnrealObject? Target
+	protected override UnrealObject? InternalGetTarget(bool evenIfGarbage)
 	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalGet(false);
-		}
-		set
-		{
-			MasterAlcCache.GuardInvariant();
-			InternalSet(value);
-		}
+		MasterAlcCache.GuardInvariant();
+		return InternalGet(evenIfGarbage);
 	}
 
-	public UnrealObject? TargetEvenIfGarbage
+	protected override void InternalSetTarget(UnrealObject? target)
 	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalGet(true);
-		}
-	}
-
-	public bool IsValid
-	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalIsValid(false);
-		}
-	}
-
-	public bool IsValidEventIfGarbage
-	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalIsValid(true);
-		}
-	}
-
-	public bool IsNull
-	{
-		get
-		{
-			MasterAlcCache.GuardInvariant();
-			return InternalIsNull();
-		}
+		MasterAlcCache.GuardInvariant();
+		InternalSet(target);
 	}
 
 	private sealed class EqualityComparer : IEqualityComparer<ScriptInterface<T>>
@@ -128,12 +90,6 @@ public sealed class ScriptInterface<T> : ScriptInterfaceBase
 		
 		ScriptInterface_Interop.Set(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(target));
 	}
-	
-	private unsafe bool InternalIsValid(bool evenIfGarbage)
-		=> ScriptInterface_Interop.IsValid(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)) > 0;
-
-	private unsafe bool InternalIsNull()
-		=> ScriptInterface_Interop.IsNull(ConjugateHandle.FromConjugate(this)) > 0;
 	
 }
 

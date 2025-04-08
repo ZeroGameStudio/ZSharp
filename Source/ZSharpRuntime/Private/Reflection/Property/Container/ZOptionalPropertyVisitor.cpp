@@ -13,7 +13,7 @@ void ZSharp::FZOptionalPropertyVisitor::GetValue(const void* src, FZCallBufferSl
 	const FZSelfDescriptiveOptional* sdo = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Optional>().Conjugate(dest.ReadConjugate());
 	if (!sdo)
 	{
-		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Optional>().Conjugate(UnderlyingOptionalProperty->GetValueProperty(), [src, this](const FZSelfDescriptiveOptional& sdo){ UnderlyingProperty->CopySingleValue(sdo.GetUnderlyingInstance(), src); }));
+		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Optional>().Conjugate(UnderlyingOptionalProperty->GetValueProperty(), [src, this](FZSelfDescriptiveOptional& sdo){ UnderlyingProperty->CopySingleValue(sdo.GetUnderlyingInstance(), src); }));
 	}
 	else
 	{

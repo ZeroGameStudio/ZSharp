@@ -16,7 +16,7 @@ void ZSharp::FZInputActionValue_Interop::Deconstruct(FZConjugateHandle self, dou
 		return;
 	}
 
-	auto inputActionValue = static_cast<const FInputActionValue*>(sdself->GetUnderlyingInstance());
+	auto inputActionValue = sdself->GetTypedUnderlyingInstance<FInputActionValue>();
 	auto value = inputActionValue->Get<FVector>();
 	x = value.X;
 	y = value.Y;

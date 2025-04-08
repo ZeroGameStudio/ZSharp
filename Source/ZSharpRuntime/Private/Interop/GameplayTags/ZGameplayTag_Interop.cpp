@@ -11,7 +11,7 @@ ZSharp::FZConjugateHandle ZSharp::FZGameplayTag_Interop::Request(const TCHAR* ta
 {
 	return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(FGameplayTag::StaticStruct(), [tagName](const FZSelfDescriptiveScriptStruct& sdss)
 	{
-		*static_cast<FGameplayTag*>(sdss.GetUnderlyingInstance()) = FGameplayTag::RequestGameplayTag(tagName, false);
+		*sdss.GetTypedUnderlyingInstance<FGameplayTag>() = FGameplayTag::RequestGameplayTag(tagName, false);
 	});
 }
 

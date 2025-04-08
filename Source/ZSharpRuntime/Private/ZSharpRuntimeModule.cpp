@@ -13,6 +13,7 @@
 #include "ZCall/ZCallResolver_UProperty.h"
 #include "Interop/ZUnmanagedFunctionInteropHelper.h"
 
+#include "Interop/Serialization/ZArchive_Interop.h"
 #include "Interop/CoreUObject/Object/ZUnrealObjectGlobals_Interop.h"
 #include "Interop/CoreUObject/Object/ZUnrealObject_Interop.h"
 #include "Interop/CoreUObject/Object/ZUnrealStruct_Interop.h"
@@ -88,6 +89,50 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
         {
 #define ZSHARP_UNMANAGED_FUNCTION_ASSEMBLY ZeroGames.ZSharp.UnrealEngine
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveUInt8),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadUInt8),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveUInt16),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadUInt16),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveUInt32),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadUInt32),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveUInt64),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadUInt64),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveInt8),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadInt8),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveInt16),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadInt16),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveInt32),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadInt32),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveInt64),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadInt64),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveFloat),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadFloat),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveDouble),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadDouble),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveString),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadString),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveAnsiString),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadAnsiString),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveUtf8String),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadUtf8String),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveName),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadName),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveText),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadText),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadObject),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveScriptStruct),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadScriptStruct),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, NetSaveScriptStruct),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, NetLoadScriptStruct),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, SaveSoftObjectPath),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, LoadSoftObjectPath),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, IsSaving),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, IsLoading),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, Tell),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, Seek),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Archive, GetTotalSize),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, NewObject),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObjectGlobals, LoadObject),

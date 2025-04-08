@@ -14,7 +14,7 @@ void ZSharp::FZMapPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& d
 	if (!sdsm)
 	{
 		auto desc = new TPair<const FProperty*, const FProperty*> { UnderlyingMapProperty->KeyProp, UnderlyingMapProperty->ValueProp };
-		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Map>().Conjugate(desc, [src, this](const FZSelfDescriptiveScriptMap& sdsm){ UnderlyingProperty->CopySingleValue(sdsm.GetUnderlyingInstance(), src); }));
+		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Map>().Conjugate(desc, [src, this](FZSelfDescriptiveScriptMap& sdsm){ UnderlyingProperty->CopySingleValue(sdsm.GetUnderlyingInstance(), src); }));
 	}
 	else
 	{

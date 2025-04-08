@@ -24,7 +24,7 @@ namespace ZSharp
 	public:
 		using Super::Conjugate;
 		
-		FZConjugateHandle Conjugate(const DescriptorType* descriptor, TFunctionRef<void(const ConjugateType&)> initialize = [](const ConjugateType&){})
+		FZConjugateHandle Conjugate(const DescriptorType* descriptor, TFunctionRef<void(ConjugateType&)> initialize = [](ConjugateType&){})
 		{
 			checkSlow(IsInGameThread());
 			

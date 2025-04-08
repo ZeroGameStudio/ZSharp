@@ -15,7 +15,7 @@ ZSharp::FZConjugateHandle ZSharp::FZWorld_Interop::SpawnActor(FZConjugateHandle 
 	UWorld* pSelf = registry.ConjugateUnsafe<UWorld>(self);
 	UClass* pCls = registry.ConjugateUnsafe<UClass>(cls);
 	FZSelfDescriptiveScriptStruct* sdTransform = alc->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().ConjugateUnsafe(transform);
-	const FTransform& spawnTransform = sdTransform->GetDescriptor() == TBaseStructure<FTransform>::Get() ? *static_cast<FTransform*>(sdTransform->GetUnderlyingInstance()) : FTransform::Identity;
+	const FTransform& spawnTransform = sdTransform->GetDescriptor() == TBaseStructure<FTransform>::Get() ? *sdTransform->GetTypedUnderlyingInstance<FTransform>() : FTransform::Identity;
 	AActor* pTemplate = registry.ConjugateUnsafe<AActor>(actorTemplate);
 	AActor* pOwner = registry.ConjugateUnsafe<AActor>(owner);
 	APawn* pInstigator = registry.ConjugateUnsafe<APawn>(instigator);

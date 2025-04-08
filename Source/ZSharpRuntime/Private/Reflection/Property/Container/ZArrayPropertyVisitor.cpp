@@ -13,7 +13,7 @@ void ZSharp::FZArrayPropertyVisitor::GetValue(const void* src, FZCallBufferSlot&
 	const FZSelfDescriptiveScriptArray* sdsa = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Array>().Conjugate(dest.ReadConjugate());
 	if (!sdsa)
 	{
-		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Array>().Conjugate(UnderlyingArrayProperty->Inner, [src, this](const FZSelfDescriptiveScriptArray& sdsa){ UnderlyingProperty->CopySingleValue(sdsa.GetUnderlyingInstance(), src); }));
+		dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Array>().Conjugate(UnderlyingArrayProperty->Inner, [src, this](FZSelfDescriptiveScriptArray& sdsa){ UnderlyingProperty->CopySingleValue(sdsa.GetUnderlyingInstance(), src); }));
 	}
 	else
 	{

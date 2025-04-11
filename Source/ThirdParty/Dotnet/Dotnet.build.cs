@@ -32,7 +32,7 @@ public class Dotnet : ModuleRules
 		
 		// Z# configurations
 		const bool FORCE_USE_MONO = false;
-		const bool USE_MONO_FOR_EDITOR_BUILD = false;
+		const bool USE_MONO_FOR_EDITOR_BUILD = true;
 		const string DOTNET_VERSION = "9.0.0";
 		
 		// Select runtime implementation.

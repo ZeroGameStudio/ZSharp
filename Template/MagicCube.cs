@@ -9,7 +9,12 @@ namespace Game;
 /*+
  * Define a UClass that can be inherited by blueprint.
  * Place this class into map, play in editor, and you will see a rotating cube.
+ * 
+ * [Contextual] means when the script engine reloads (only happens in editor),
+ * it should reconstruct the script object immediately, not defer to first use.
+ * We are contextual because field '_translationSpeed' depends on time.
  */
+[Contextual]
 [UClass, Blueprintable]
 public partial class MagicCube : Actor
 {
@@ -51,8 +56,20 @@ public partial class MagicCube : Actor
 	 */
 	public MagicCube(IntPtr unmanaged) : base(unmanaged)
 	{
-		_translationSpeed = 100f;
-		_startPos = new();
+		_translationSpeed = DateTime.Now.Second + 30;
+		_startPos = null!; // We know what we are doing - we never use it before we initialize it.
+	}
+
+	/*
+	 * This is called just before C++ UObject::PostInitProperties().
+	 * You can do some contextual UProperty initialization here.
+	 */
+	protected override void PostInitProperties()
+	{
+		/*
+		 * Must do here, not constructor, otherwise it will be overridden by CDO.
+		 */
+		RotationSpeed = new Random().NextInt64(90, 360);
 	}
 	
 	protected virtual partial void SayHello_Implementation()
@@ -86,7 +103,10 @@ public partial class MagicCube : Actor
 		ensure(_startPos.IsBlack);
 		ensure(_startPos == startPos);
 		
-		RotateAsync();
+		/*
+		 * Fire and forget this task so it will automaticallly return to task pool when it completes.
+		 */
+		RotateAsync().Forget();
 
 		/*
 		 * This will suspend the function for 1s but won't block the game thread.
@@ -115,9 +135,9 @@ public partial class MagicCube : Actor
 	}
 	
 	/*
-	 * Unfortunately, Unreal Engine does not call the Native Actor's ReceiveTick.
+	 * Unfortunately, Unreal Engine does not call Native Actor's ReceiveTick.
 	 * Since script class is native class, if you directly instantiate an Actor of this type, the function will not execute.
-	 * However, if you create a Blueprint subclass of this type and instantiate it, the function will execute.
+	 * You can create a Blueprint subclass of this type and instantiate it, then this will execute.
 	 */
 	protected override void ReceiveTick_Implementation(float deltaSeconds)
 	{
@@ -128,9 +148,11 @@ public partial class MagicCube : Actor
 	
 	/*
 	 * Define UClass constructor, which runs only when native UObject is created.
+	 * You can also use [PropertyDefaultOverride(Property = "PrimaryActorTick.bCanEverTick", Default = true)]
+	 * to avoid calling constructor - it overrides default value directly in C++.
 	 */
 	[UClassConstructor]
-	private void ConstructMagicCube()
+	private void UMagicCube()
 	{
 		PrimaryActorTick.bCanEverTick = true;
 	}

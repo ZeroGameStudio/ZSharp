@@ -89,11 +89,6 @@ void ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::Clear()
 
 ZSharp::EZCallErrorCode ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::Broadcast(FZCallBuffer* buffer)
 {
-	if (!IsBound())
-	{
-		return EZCallErrorCode::ExternalError;
-	}
-	
 	if (!Visitor || !*Visitor)
 	{
 		if (Visitor = MakePimpl<FZFunctionVisitorHandle>(FZFunctionVisitorRegistry::Get().Get(Descriptor)); !Visitor || !*Visitor)

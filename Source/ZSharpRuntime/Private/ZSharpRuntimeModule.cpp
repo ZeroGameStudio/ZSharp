@@ -322,6 +322,8 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(World, GetNetMode),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, FinishSpawning),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, AddComponent),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, FinishAddComponent),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, GetNetMode),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(ActorComponent, GetNetMode),

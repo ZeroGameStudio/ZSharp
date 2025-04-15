@@ -771,9 +771,14 @@ bool ZSharp::FZExportHelper::IsFieldScriptNoExport(FFieldVariant field)
 bool ZSharp::FZExportHelper::IsFieldInternal(FFieldVariant field)
 {
 #if WITH_METADATA
-	if (const auto strct = field.Get<UStruct>())
+	if (const auto function = field.Get<UFunction>())
 	{
-		return strct->HasMetaData("BlueprintInternalUseOnly") || strct->HasMetaDataHierarchical("BlueprintInternalUseOnlyHierarchical");
+		return function->HasMetaData("BlueprintInternalUseOnly") || function->HasMetaDataHierarchical("BlueprintInternalUseOnlyHierarchical");
+	}
+	// Types are always treated as public.
+	else if (field.IsUObject())
+	{
+		return false;
 	}
 	else
 	{

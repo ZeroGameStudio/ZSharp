@@ -5,7 +5,7 @@
 #include "IZBuildEngine.h"
 #include "Interfaces/IMainFrameModule.h"
 
-namespace ZSharpEditorModule_Private
+namespace ZSharp::ZSharpEditorModule_Private
 {
 	static void Generate()
 	{
@@ -91,7 +91,7 @@ void FZSharpEditorModule::HandleMainFrameCreationFinished(TSharedPtr<SWindow>, b
 			return;
 		}
 		
-		ZSharpEditorModule_Private::Generate();
+		ZSharp::ZSharpEditorModule_Private::Generate();
 	});
 }
 

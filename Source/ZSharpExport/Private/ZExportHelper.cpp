@@ -6,7 +6,7 @@
 #include "UObject/PropertyOptional.h"
 #include "Trait/ZExportedTypeName.h"
 
-namespace ZExportHelper_Private
+namespace ZSharp::ZExportHelper_Private
 {
 	/**
 	 * Single word name -> Add 0.

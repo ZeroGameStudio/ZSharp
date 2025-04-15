@@ -8,7 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "Reflection/Delegate/ZManagedDelegateProxy_EnhancedInput.h"
 
-namespace ZEnhancedInputComponent_Interop_Private
+namespace ZSharp::ZEnhancedInputComponent_Interop_Private
 {
 	static const UFunction* GetSignature()
 	{

@@ -2,7 +2,7 @@
 
 #include "ZCoreSettings_Interop.h"
 
-namespace ZCoreSettings_Interop_Private
+namespace ZSharp::ZCoreSettings_Interop_Private
 {
 	static TAutoConsoleVariable<bool> GCVarTreatManagedFatalAsError
 	{

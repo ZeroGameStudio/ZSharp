@@ -344,6 +344,74 @@ partial class SpecifierProcessor
 		def.AddMetadata(MetadataConstants.AllowPrivateAccess, true);
 	}
 	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, EditConditionAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.EditCondition, specifier.Condition);
+		if (specifier.Hides)
+		{
+			def.AddMetadata(MetadataConstants.EditConditionHides);
+		}
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, InlineEditConditionToggleAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.InlineEditConditionToggle);
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, ClampRangeAttribute specifier)
+	{
+		if (!double.IsNegativeInfinity(specifier.Min))
+		{
+			def.AddMetadata(MetadataConstants.ClampMin, specifier.Min);
+		}
+
+		if (!double.IsPositiveInfinity(specifier.Max))
+		{
+			def.AddMetadata(MetadataConstants.ClampMax, specifier.Max);
+		}
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, UIRangeAttribute specifier)
+	{
+		if (!double.IsNegativeInfinity(specifier.Min))
+		{
+			def.AddMetadata(MetadataConstants.UIMin, specifier.Min);
+		}
+
+		if (!double.IsPositiveInfinity(specifier.Max))
+		{
+			def.AddMetadata(MetadataConstants.UIMax, specifier.Max);
+		}
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, GetOptionsAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.GetOptions, specifier.Function);
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BindWidgetAttribute specifier)
+	{
+		def.AddMetadata(specifier.Optional ? MetadataConstants.BindWidgetOptional : MetadataConstants.BindWidget);
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, BindWidgetAnimAttribute specifier)
+	{
+		def.AddMetadata(specifier.Optional ? MetadataConstants.BindWidgetAnimOptional : MetadataConstants.BindWidgetAnim);
+	}
+	
+	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealPropertyDefinition def, IUnrealPropertyModel model, WidgetEventAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.IsBindableEvent);
+	}
+	
 }
 
 

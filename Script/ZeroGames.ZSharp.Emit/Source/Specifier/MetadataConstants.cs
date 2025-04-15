@@ -36,6 +36,19 @@ public static class MetadataConstants
 	public const string BlueprintGetter = nameof(BlueprintGetter);
 	public const string BlueprintSetter = nameof(BlueprintSetter);
 	public const string AllowPrivateAccess = nameof(AllowPrivateAccess);
+	public const string EditCondition = nameof(EditCondition);
+	public const string EditConditionHides = nameof(EditConditionHides);
+	public const string InlineEditConditionToggle = nameof(InlineEditConditionToggle);
+	public const string ClampMin = nameof(ClampMin);
+	public const string ClampMax = nameof(ClampMax);
+	public const string UIMin = nameof(UIMin);
+	public const string UIMax = nameof(UIMax);
+	public const string GetOptions = nameof(GetOptions);
+	public const string BindWidget = nameof(BindWidget);
+	public const string BindWidgetOptional = nameof(BindWidgetOptional);
+	public const string BindWidgetAnim = nameof(BindWidgetAnim);
+	public const string BindWidgetAnimOptional = nameof(BindWidgetAnimOptional);
+	public const string IsBindableEvent = nameof(IsBindableEvent);
 	
 	// Parameter metadata names
 	public const string NativeConst = nameof(NativeConst);

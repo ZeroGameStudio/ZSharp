@@ -45,7 +45,9 @@ public:
 	void ForeachMappedModule(TFunctionRef<void(const FString&, const FZModuleMappingContext&)> action) const;
 
 	FString RedirectFieldName(const FString& sourcePath) const;
-	
+
+	bool ShouldExportScriptNoExportFields() const { return bExportScriptNoExportFields; }
+	bool ShouldExportInternalFields() const { return bExportInternalFields; }
 	bool ShouldExportDeprecatedFields() const { return bExportDeprecatedFields; }
 	bool ShouldTreatDeprecatedPostfixAsDeprecated() const { return bTreatDeprecatedPostfixAsDeprecated; }
 	bool ShouldExportEditorOnlyFields() const { return bExportEditorOnlyFields; }
@@ -95,6 +97,12 @@ private:
 
 	UPROPERTY(Transient, VisibleAnywhere, Category = "Field")
 	TArray<FZFieldNameRedirector> IntrinsicFieldNameRedirectors;
+
+	UPROPERTY(Config, EditAnywhere, Category = "Export")
+	bool bExportScriptNoExportFields = false;
+
+	UPROPERTY(Config, EditAnywhere, Category = "Export")
+	bool bExportInternalFields = false;
 	
 	UPROPERTY(Config, EditAnywhere, Category = "Export")
 	bool bExportDeprecatedFields = false;

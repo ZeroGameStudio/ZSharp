@@ -319,6 +319,18 @@ bool ZSharp::FZExportHelper::ShouldExportField(FFieldVariant field)
 			return true;
 		}
 
+		// Skip export by ScriptNoExport flag.
+		if (!settings->ShouldExportScriptNoExportFields() && IsFieldScriptNoExport(field))
+		{
+			return false;
+		}
+
+		// Skit export by Internal flag.
+		if (!settings->ShouldExportInternalFields() && IsFieldInternal(field))
+		{
+			return false;
+		}
+
 		// Skip export by Deprecated flag.
 		if (!settings->ShouldExportDeprecatedFields() && IsFieldDeprecated(field))
 		{
@@ -745,6 +757,31 @@ ZSharp::FZFullyExportedTypeName ZSharp::FZExportHelper::GetFPropertyFullyExporte
 bool ZSharp::FZExportHelper::IsFieldModuleMapped(FFieldVariant field)
 {
 	return !!GetDefault<UZSharpExportSettings>()->GetModuleMappingContext(GetFieldModuleName(field));
+}
+
+bool ZSharp::FZExportHelper::IsFieldScriptNoExport(FFieldVariant field)
+{
+#if WITH_METADATA
+	return field.HasMetaData("ScriptNoExport");
+#else
+	return false;
+#endif
+}
+
+bool ZSharp::FZExportHelper::IsFieldInternal(FFieldVariant field)
+{
+#if WITH_METADATA
+	if (const auto strct = field.Get<UStruct>())
+	{
+		return strct->HasMetaData("BlueprintInternalUseOnly") || strct->HasMetaDataHierarchical("BlueprintInternalUseOnlyHierarchical");
+	}
+	else
+	{
+		return field.HasMetaData("BlueprintInternalUseOnly");
+	}
+#else
+	return false;
+#endif
 }
 
 bool ZSharp::FZExportHelper::IsFieldDeprecated(FFieldVariant field)

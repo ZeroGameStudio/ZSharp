@@ -30,6 +30,8 @@ namespace ZSharp
 		static FZFullyExportedTypeName GetFPropertyFullyExportedTypeName(const FProperty* property);
 		
 		static bool IsFieldModuleMapped(FFieldVariant field);
+		static bool IsFieldScriptNoExport(FFieldVariant field);
+		static bool IsFieldInternal(FFieldVariant field);
 		static bool IsFieldDeprecated(FFieldVariant field);
 		static bool IsFieldEditorOnly(FFieldVariant field);
 	};

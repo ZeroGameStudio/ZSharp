@@ -426,7 +426,7 @@ void FZSharpRuntimeModule::StartupModule()
 	
 #if WITH_EDITOR
 	FEditorDelegates::PreBeginPIE.AddRaw(this, &ThisClass::HandleBeginPIE);
-	FEditorDelegates::EndPIE.AddRaw(this, &ThisClass::HandleEndPIE);
+	FEditorDelegates::ShutdownPIE.AddRaw(this, &ThisClass::HandleEndPIE);
 #endif
 }
 
@@ -434,7 +434,7 @@ void FZSharpRuntimeModule::ShutdownModule()
 {
 #if WITH_EDITOR
 	FEditorDelegates::PreBeginPIE.RemoveAll(this);
-	FEditorDelegates::EndPIE.RemoveAll(this);
+	FEditorDelegates::ShutdownPIE.RemoveAll(this);
 #endif
 
 	FCoreDelegates::OnPreExit.RemoveAll(this);

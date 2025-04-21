@@ -118,12 +118,22 @@ FProperty* ZSharp::FZPropertyFactory::Create(const FZPropertyDesc& desc)
 	}
 	else if (auto enm = Cast<UEnum>(field))
 	{
-		return PropertyFactory_Private::Create<FEnumProperty>([&](FEnumProperty* prop)
+		if (enm->GetCppForm() == UEnum::ECppForm::EnumClass)
 		{
-			auto underlyingProperty = new FInt64Property { prop, NAME_None, RF_NoFlags };
-			prop->SetEnum(enm);
-			prop->AddCppProperty(underlyingProperty);
-		});
+			return PropertyFactory_Private::Create<FEnumProperty>([&](FEnumProperty* prop)
+			{
+				auto underlyingProperty = new FInt64Property { prop, NAME_None, RF_NoFlags };
+				prop->SetEnum(enm);
+				prop->AddCppProperty(underlyingProperty);
+			});
+		}
+		else
+		{
+			return PropertyFactory_Private::Create<FByteProperty>([&](FByteProperty* prop)
+			{
+				prop->Enum = enm;
+			});
+		}
 	}
 	else if (auto sign = Cast<UDelegateFunction>(field); sign && !sign->IsA<USparseDelegateFunction>())
 	{

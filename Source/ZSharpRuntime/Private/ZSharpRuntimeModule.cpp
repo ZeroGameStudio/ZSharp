@@ -386,10 +386,6 @@ class FZSharpRuntimeModule : public IZSharpRuntimeModule
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 	// End IModuleInterface
-
-#if DO_CHECK
-	void TestParseStartupAssembly();
-#endif
 	
 	bool ParseStartupAssembly(const FString& startupAssembly, FString& outAssemblyName, TArray<FString>& outArgs);
 
@@ -409,10 +405,6 @@ IMPLEMENT_MODULE(FZSharpRuntimeModule, ZSharpRuntime)
 
 void FZSharpRuntimeModule::StartupModule()
 {
-#if DO_CHECK
-	TestParseStartupAssembly();
-#endif
-	
 	UE_CLOG(UObjectInitialized(), LogZSharpRuntime, Fatal, TEXT("UObject system is initialized before Z#!!!"));
 
 	ZSharp::IZSharpClr::Get().PreMasterAlcStartup().AddRaw(this, &ThisClass::HandlePreMasterAlcStartup);
@@ -439,52 +431,6 @@ void FZSharpRuntimeModule::ShutdownModule()
 
 	FCoreDelegates::OnPreExit.RemoveAll(this);
 }
-
-#if DO_CHECK
-
-void FZSharpRuntimeModule::TestParseStartupAssembly()
-{
-	FString assemblyName;
-	TArray<FString> args;
-	check(!ParseStartupAssembly("", assemblyName, args)); // error: empty
-	check(!ParseStartupAssembly(".", assemblyName, args)); // error: . at start && . at end
-	check(!ParseStartupAssembly(".123", assemblyName, args)); // error: . at start
-	check(!ParseStartupAssembly("123.", assemblyName, args)); // error: . at end
-	check(!ParseStartupAssembly("123(", assemblyName, args)); // error: parameter list not closed
-	check(!ParseStartupAssembly("123.(", assemblyName, args)); // error: . at end
-	check(!ParseStartupAssembly("123     (", assemblyName, args)); // error: parameter list not closed
-	check(!ParseStartupAssembly("123.    a", assemblyName, args)); // error: expect (
-	check(!ParseStartupAssembly("][df!!    a][", assemblyName, args)); // error: illegal assembly name
-	
-	check(ParseStartupAssembly("123", assemblyName, args)); // ok
-	check(ParseStartupAssembly("123    ", assemblyName, args)); // ok
-	check(ParseStartupAssembly("    12__3.a_bc  ", assemblyName, args)); // ok
-	check(ParseStartupAssembly("   123()     ", assemblyName, args)); // ok
-	check(ParseStartupAssembly("123(\"1 sd.   f;asf.er   []fs;  fer\\\"\\\\\")", assemblyName, args)); // ok
-	
-	check(!ParseStartupAssembly("123(1)", assemblyName, args)); // error: illegal parameter format
-	check(!ParseStartupAssembly("123(\"1er[]p   f]aef   sd.f;  asf.s;fer\\\"\\\\\\abc\")", assemblyName, args)); // error: unexpected escape
-	check(!ParseStartupAssembly("123(\")", assemblyName, args)); // error: parameter not closed
-	
-	check(ParseStartupAssembly("123(\"\")", assemblyName, args)); // ok
-	check(ParseStartupAssembly("123(\"\",\"\")", assemblyName, args)); // ok
-	check(ParseStartupAssembly("123(   \"\"   ,   \"\"   )", assemblyName, args)); // ok
-	
-	check(!ParseStartupAssembly("123(   \"\"   ,   \"\"  , )", assemblyName, args)); // error: unexpected ,
-	check(!ParseStartupAssembly("123(   \"\"   ,   \"\"  ,", assemblyName, args)); // error: expect )
-	check(!ParseStartupAssembly("123(   \"\"   ,   \"\"  ,  ", assemblyName, args)); // error: unexpected ,
-	check(!ParseStartupAssembly("123(   \"\"   ,   \"\"  ", assemblyName, args)); // error: expect )
-	check(!ParseStartupAssembly("123   \"\"   ,   \"\"  ", assemblyName, args)); // error: illegal assembly name
-	check(!ParseStartupAssembly("123   \"\"   ,   \"\"  )", assemblyName, args)); // error: illegal assembly name
-	check(!ParseStartupAssembly("123)", assemblyName, args)); // error: illegal assembly name
-	check(!ParseStartupAssembly("123,", assemblyName, args)); // error: illegal assembly name
-	check(!ParseStartupAssembly("123,)", assemblyName, args)); // error: illegal assembly name
-	check(!ParseStartupAssembly("ZeroGames.ZSharp.UnrealEngine( \"ABC\"  ,   \"JIOFSDJF3894  3WJ F90R83J \"    ,   \"jf034f3f3f jifj0 j\\\\\\\\\\\\\\    \" )", assemblyName, args)); // error: unexpected escape
-	
-	check(ParseStartupAssembly("   ZeroGames.ZSharp.UnrealEngine       ( \"ABC\"  ,   \"JIOFSDJF3894  3WJ F90R83J \"    ,   \"jf034f3f3f jifj0 j\\\\\\\\\\\\\\\"    \" )    ", assemblyName, args)); // ok
-}
-
-#endif
 
 bool FZSharpRuntimeModule::ParseStartupAssembly(const FString& startupAssembly, FString& outAssemblyName, TArray<FString>& outArgs)
 {

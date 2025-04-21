@@ -18,6 +18,7 @@ void ZSharp::FZMapPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& d
 	}
 	else
 	{
+		// @FIXME: Enum Decay
 		check(sdsm->GetDescriptor()->Key->GetClass() == UnderlyingMapProperty->KeyProp->GetClass());
 		check(sdsm->GetDescriptor()->Value->GetClass() == UnderlyingMapProperty->ValueProp->GetClass());
 		UnderlyingProperty->CopySingleValue(sdsm->GetUnderlyingInstance(), src);
@@ -37,7 +38,8 @@ void ZSharp::FZMapPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& 
 	{
 		UnderlyingProperty->InitializeValue(dest);
 	}
-	
+
+	// @FIXME: Enum Decay
 	check(sdsm->GetDescriptor()->Key->GetClass() == UnderlyingMapProperty->KeyProp->GetClass());
 	check(sdsm->GetDescriptor()->Value->GetClass() == UnderlyingMapProperty->ValueProp->GetClass());
 	UnderlyingProperty->CopySingleValue(dest, sdsm->GetUnderlyingInstance());

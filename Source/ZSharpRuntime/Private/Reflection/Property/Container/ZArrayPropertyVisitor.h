@@ -20,6 +20,9 @@ namespace ZSharp
 		virtual void SetValue(void* dest, const FZCallBufferSlot& src) const override;
 
 	private:
+		void InternalCopyEnumArray(const FEnumProperty* srcElementProperty, const void* src, const FEnumProperty* destElementProperty, void* dest) const;
+
+	private:
 		const FArrayProperty* UnderlyingArrayProperty;
 		
 	};

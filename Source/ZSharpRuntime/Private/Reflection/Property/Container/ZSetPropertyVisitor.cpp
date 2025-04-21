@@ -17,6 +17,7 @@ void ZSharp::FZSetPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& d
 	}
 	else
 	{
+		// @FIXME: Enum Decay
 		check(sdss->GetDescriptor()->GetClass() == UnderlyingSetProperty->ElementProp->GetClass());
 		UnderlyingProperty->CopySingleValue(sdss->GetUnderlyingInstance(), src);
 	}
@@ -34,7 +35,8 @@ void ZSharp::FZSetPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& 
 	{
 		UnderlyingProperty->InitializeValue(dest);
 	}
-	
+
+	// @FIXME: Enum Decay
 	check(sdss->GetDescriptor()->GetClass() == UnderlyingSetProperty->ElementProp->GetClass());
 	UnderlyingProperty->CopySingleValue(dest, sdss->GetUnderlyingInstance());
 }

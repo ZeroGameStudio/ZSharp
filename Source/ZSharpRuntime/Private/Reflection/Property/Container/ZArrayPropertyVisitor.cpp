@@ -6,6 +6,7 @@
 #include "CLR/IZSharpClr.h"
 #include "ZCall/ZCallBuffer.h"
 #include "Conjugate/ZStrangeConjugateRegistries.h"
+#include "Reflection/ZReflectionHelper.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptArray.h"
 
 void ZSharp::FZArrayPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const
@@ -17,8 +18,17 @@ void ZSharp::FZArrayPropertyVisitor::GetValue(const void* src, FZCallBufferSlot&
 	}
 	else
 	{
-		check(sdsa->GetDescriptor()->GetClass() == UnderlyingArrayProperty->Inner->GetClass());
-		UnderlyingProperty->CopySingleValue(sdsa->GetUnderlyingInstance(), src);
+		auto srcEnumProperty = CastField<const FEnumProperty>(UnderlyingArrayProperty->Inner);
+		auto destEnumProperty = CastField<const FEnumProperty>(sdsa->GetDescriptor());
+		if (srcEnumProperty && destEnumProperty && srcEnumProperty->GetUnderlyingProperty()->GetClass() != destEnumProperty->GetUnderlyingProperty()->GetClass())
+		{
+			InternalCopyEnumArray(srcEnumProperty, src, destEnumProperty, sdsa->GetUnderlyingInstance());
+		}
+		else
+		{
+			check(sdsa->GetDescriptor()->GetClass() == UnderlyingArrayProperty->Inner->GetClass());
+			UnderlyingProperty->CopySingleValue(sdsa->GetUnderlyingInstance(), src);
+		}
 	}
 }
 
@@ -34,9 +44,33 @@ void ZSharp::FZArrayPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot
 	{
 		UnderlyingProperty->InitializeValue(dest);
 	}
+
+	auto srcEnumProperty = CastField<const FEnumProperty>(sdsa->GetDescriptor());
+	auto destEnumProperty = CastField<const FEnumProperty>(UnderlyingArrayProperty->Inner);
+	if (srcEnumProperty && destEnumProperty && srcEnumProperty->GetUnderlyingProperty()->GetClass() != destEnumProperty->GetUnderlyingProperty()->GetClass())
+	{
+		InternalCopyEnumArray(srcEnumProperty, sdsa->GetUnderlyingInstance(), destEnumProperty, dest);
+	}
+	else
+	{
+		check(sdsa->GetDescriptor()->GetClass() == UnderlyingArrayProperty->Inner->GetClass());
+		UnderlyingProperty->CopySingleValue(dest, sdsa->GetUnderlyingInstance());
+	}
+}
+
+void ZSharp::FZArrayPropertyVisitor::InternalCopyEnumArray(const FEnumProperty* srcElementProperty, const void* src, const FEnumProperty* destElementProperty, void* dest) const
+{
+	FScriptArrayHelper srcHelper = FScriptArrayHelper::CreateHelperFormInnerProperty(srcElementProperty, src);
+	FScriptArrayHelper destHelper = FScriptArrayHelper::CreateHelperFormInnerProperty(destElementProperty, dest);
 	
-	check(sdsa->GetDescriptor()->GetClass() == UnderlyingArrayProperty->Inner->GetClass());
-	UnderlyingProperty->CopySingleValue(dest, sdsa->GetUnderlyingInstance());
+	int32 num = srcHelper.Num();
+	destHelper.EmptyAndAddValues(num);
+	for (int32 i = 0; i < num; ++i)
+	{
+		void* srcValue = srcHelper.GetElementPtr(i);
+		void* destValue = destHelper.GetElementPtr(i);
+		FZReflectionHelper::ChangeEnumValueType(srcElementProperty, srcValue, destElementProperty, destValue);
+	}
 }
 
 

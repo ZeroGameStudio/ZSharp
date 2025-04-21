@@ -17,6 +17,7 @@ void ZSharp::FZOptionalPropertyVisitor::GetValue(const void* src, FZCallBufferSl
 	}
 	else
 	{
+		// @FIXME: Enum Decay
 		check(sdo->GetDescriptor()->GetClass() == UnderlyingOptionalProperty->GetValueProperty()->GetClass());
 		UnderlyingProperty->CopySingleValue(sdo->GetUnderlyingInstance(), src);
 	}
@@ -34,7 +35,8 @@ void ZSharp::FZOptionalPropertyVisitor::SetValue(void* dest, const FZCallBufferS
 	{
 		UnderlyingProperty->InitializeValue(dest);
 	}
-	
+
+	// @FIXME: Enum Decay
 	check(sdo->GetDescriptor()->GetClass() == UnderlyingOptionalProperty->GetValueProperty()->GetClass());
 	UnderlyingProperty->CopySingleValue(dest, sdo->GetUnderlyingInstance());
 }

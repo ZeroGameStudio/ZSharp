@@ -140,4 +140,109 @@ ZSharp::FZRuntimeTypeUri ZSharp::FZReflectionHelper::GetContainerElementRuntimeT
 	return { rootKey, inner };
 }
 
+void ZSharp::FZReflectionHelper::ChangeEnumValueType(const FEnumProperty* srcProperty, const void* src, const FEnumProperty* destProperty, void* dest)
+{
+	FNumericProperty* srcUnderlyingProperty = srcProperty->GetUnderlyingProperty();
+	FNumericProperty* destUnderlyingProperty = destProperty->GetUnderlyingProperty();
+
+	if (srcUnderlyingProperty->GetClass() == destUnderlyingProperty->GetClass())
+	{
+		FMemory::Memcpy(dest, src, srcUnderlyingProperty->GetElementSize());
+		return;
+	}
+	
+	int64 srcValue = 0;
+	if (auto uint8Prop = CastField<const FByteProperty>(srcUnderlyingProperty))
+	{
+		const uint8 value = uint8Prop->GetPropertyValue(src);
+		srcValue = value;
+	}
+	else if (auto uint16Prop = CastField<const FUInt16Property>(srcUnderlyingProperty))
+	{
+		const uint16 value = uint16Prop->GetPropertyValue(src);
+		srcValue = value;
+	}
+	else if (auto uint32Prop = CastField<const FUInt32Property>(srcUnderlyingProperty))
+	{
+		const uint32 value = uint32Prop->GetPropertyValue(src);
+		srcValue = value;
+	}
+	else if (auto uint64Prop = CastField<const FUInt64Property>(srcUnderlyingProperty))
+	{
+		const uint64 value = uint64Prop->GetPropertyValue(src);
+		check(value <= MAX_int64);
+		srcValue = value;
+	}
+	else if (auto int8Prop = CastField<const FInt8Property>(srcUnderlyingProperty))
+	{
+		const int8 value = int8Prop->GetPropertyValue(src);
+		srcValue = value;
+	}
+	else if (auto int16Prop = CastField<const FInt16Property>(srcUnderlyingProperty))
+	{
+		const int16 value = int16Prop->GetPropertyValue(src);
+		srcValue = value;
+	}
+	else if (auto int32Prop = CastField<const FIntProperty>(srcUnderlyingProperty))
+	{
+		const int32 value = int32Prop->GetPropertyValue(src);
+		srcValue = value;
+	}
+	else if (auto int64Prop = CastField<const FInt64Property>(srcUnderlyingProperty))
+	{
+		const int64 value = int64Prop->GetPropertyValue(src);
+		srcValue = value;
+	}
+	else
+	{
+		checkNoEntry();
+	}
+
+	if (destUnderlyingProperty->IsA<FByteProperty>())
+	{
+		auto value = static_cast<const uint8>(srcValue);
+		destUnderlyingProperty->CopySingleValue(dest, &value);
+	}
+	else if (destUnderlyingProperty->IsA<FUInt16Property>())
+	{
+		auto value = static_cast<const uint16>(srcValue);
+		destUnderlyingProperty->CopySingleValue(dest, &value);
+	}
+	else if (destUnderlyingProperty->IsA<FUInt32Property>())
+	{
+		auto value = static_cast<const uint32>(srcValue);
+		destUnderlyingProperty->CopySingleValue(dest, &value);
+	}
+	else if (destUnderlyingProperty->IsA<FUInt64Property>())
+	{
+		check(srcValue >= 0);
+		auto value = static_cast<const uint64>(srcValue);
+		destUnderlyingProperty->CopySingleValue(dest, &value);
+	}
+	else if (destUnderlyingProperty->IsA<FInt8Property>())
+	{
+		auto value = static_cast<const int8>(srcValue);
+		destUnderlyingProperty->CopySingleValue(dest, &value);
+	}
+	else if (destUnderlyingProperty->IsA<FInt16Property>())
+	{
+		auto value = static_cast<const int16>(srcValue);
+		destUnderlyingProperty->CopySingleValue(dest, &value);
+	}
+	else if (destUnderlyingProperty->IsA<FIntProperty>())
+	{
+		auto value = static_cast<const int32>(srcValue);
+		destUnderlyingProperty->CopySingleValue(dest, &value);
+	}
+	else if (destUnderlyingProperty->IsA<FInt64Property>())
+	{
+		auto value = srcValue;
+		destUnderlyingProperty->CopySingleValue(dest, &value);
+	}
+	else
+	{
+		checkNoEntry();
+	}
+}
+
 

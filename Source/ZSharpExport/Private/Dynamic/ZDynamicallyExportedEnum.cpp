@@ -65,9 +65,27 @@ void ZSharp::FZDynamicallyExportedEnum::ForeachEnumValue(TFunctionRef<void(const
 
 	for (int32 i = 0; i < Enum->NumEnums(); ++i)
 	{
-		FString name = Enum->GetNameStringByIndex(i);
+		FString name;
+		// Special cases for some engine enums.
+#define nameof(x) StaticEnum<ECollisionChannel>()->GetNameStringByValue(x)
+		static const FString GObjectCollisionChannels[] { nameof(ECC_WorldStatic), nameof(ECC_WorldDynamic), nameof(ECC_Pawn), nameof(ECC_PhysicsBody), nameof(ECC_Vehicle), nameof(ECC_Destructible) };
+		static const FString GTraceCollisionChannels[] { nameof(ECC_Visibility), nameof(ECC_Camera) };
+#undef nameof
+		if (Enum == StaticEnum<EObjectTypeQuery>() && i < UE_ARRAY_COUNT(GObjectCollisionChannels))
+		{
+			name = GObjectCollisionChannels[i];
+		}
+		else if (Enum == StaticEnum<ETraceTypeQuery>() && i < UE_ARRAY_COUNT(GTraceCollisionChannels))
+		{
+			name = GTraceCollisionChannels[i];
+		}
+		else
+		{
+			name = Enum->GetNameStringByIndex(i);
+		}
+
 		const FString scriptName = preferScriptName ? Enum->GetMetaData(TEXT("ScriptName"), i) : "";
-		FRegexMatcher matcher { GIdentifierRegex, name };
+		FRegexMatcher matcher { GIdentifierRegex, scriptName };
 		if (!scriptName.IsEmpty() && ensureAlways(matcher.FindNext()))
 		{
 			name = scriptName;

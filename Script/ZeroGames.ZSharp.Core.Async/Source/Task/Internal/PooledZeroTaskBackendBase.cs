@@ -50,6 +50,8 @@ internal abstract class PooledZeroTaskBackendBase<TResult, TImpl> : ZeroTaskBack
 		}
 	}
 
+	protected override bool IsPreserved => false;
+
 	private void ReturnToPool() => _pool.Return((TImpl)this);
 	
 	private static readonly ObjectPool<TImpl> _pool = new(new PoolingConfigProvider<TImpl>());

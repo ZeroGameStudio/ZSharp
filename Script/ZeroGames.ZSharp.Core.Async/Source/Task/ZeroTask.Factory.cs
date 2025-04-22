@@ -55,7 +55,7 @@ partial struct ZeroTask
 
 	public static ZeroTask<T> FromCompletionSource<T>(out ZeroTaskCompletionSource<T> source, Lifecycle lifecycle = default)
 	{
-		source = ZeroTaskCompletionSource<T>.Create();
+		source = ZeroTaskCompletionSource.Create<T>();
 		return source.Task;
 	}
 	

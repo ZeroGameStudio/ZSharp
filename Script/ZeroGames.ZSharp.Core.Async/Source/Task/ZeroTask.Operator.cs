@@ -8,20 +8,35 @@ partial struct ZeroTask
 	public void Forget(){} // @TODO
 
 	public ZeroTask Preserve()
-		=> _backend is not null ? throw new NotImplementedException() : this;
+		=> _backend is not { IsPreserved: false } ? this : throw new NotImplementedException();
 
-	public ZeroTask<bool> DontThrowOnExpired()
+	public async ZeroTask<bool> DontThrowOnExpired()
 	{
-		return _backend?.GetStatus(_token) switch
+		try
 		{
-			null or EZeroTaskStatus.Succeeded => FromResult(false),
-			EZeroTaskStatus.Canceled => FromResult(true),
-			_ => throw new NotImplementedException()
-		};
+			await this;
+			return false;
+		}
+		catch (OperationCanceledException)
+		{
+			return true;
+		}
 	}
 	
+	public async ZeroTask<T> WithResult<T>(T result)
+	{
+		await this;
+		return result;
+	}
+
 	public static implicit operator ZeroTask<AsyncVoid>(ZeroTask @this)
-		=> throw new NotImplementedException();
+		=> @this.ToAsyncVoidTask();
+
+	private async ZeroTask<AsyncVoid> ToAsyncVoidTask()
+	{
+		await this;
+		return default;
+	}
 
 }
 
@@ -31,23 +46,31 @@ partial struct ZeroTask<TResult>
 	public void Forget(){} // @TODO
 	
 	public ZeroTask<TResult> Preserve()
-		=> _backend is not null ? throw new NotImplementedException() : this;
+		=> _backend is not { IsPreserved: false } ? this : throw new NotImplementedException();
 	
-	public ZeroTask<(TResult? Result, bool IsCanceled)> DontThrowOnExpired()
+	public async ZeroTask<(TResult? Result, bool IsCanceled)> DontThrowOnExpired()
 	{
-		return _backend?.GetStatus(_token) switch
+		try
 		{
-			null => ZeroTask.FromResult((_inlineResult: _result, false)),
-			EZeroTaskStatus.Canceled => ZeroTask.FromResult((default(TResult?), true)),
-			_ => throw new NotImplementedException()
-		};
+			return (await this, false);
+		}
+		catch (OperationCanceledException)
+		{
+			return (default, true);
+		}
 	}
 	
 	public static implicit operator ZeroTask(ZeroTask<TResult> @this)
 		=> @this._backend is not null ? new(@this._backend) : ZeroTask.CompletedTask;
 
 	public static implicit operator ZeroTask<AsyncVoid>(ZeroTask<TResult> @this)
-		=> throw new NotImplementedException();
+		=> @this.ToAsyncVoidTask();
+	
+	private async ZeroTask<AsyncVoid> ToAsyncVoidTask()
+	{
+		await this;
+		return default;
+	}
 
 }
 

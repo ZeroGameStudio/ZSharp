@@ -24,7 +24,8 @@ internal class ZeroTaskBackend_Exception<TResult> : IZeroTaskBackend<TResult>
 	void IZeroTaskBackend.SetMoveNextSource(IMoveNextSource source, ZeroTaskToken token) => throw new NotSupportedException();
 
 	ZeroTaskToken IZeroTaskTokenSource.Token { get; } = default(ZeroTaskToken).Next;
-	
+	public bool IsPreserved => true;
+
 	private readonly ExceptionDispatchInfo _exception;
 	private readonly EZeroTaskStatus _status;
 

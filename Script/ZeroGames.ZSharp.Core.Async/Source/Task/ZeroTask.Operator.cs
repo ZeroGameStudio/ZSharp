@@ -60,6 +60,12 @@ partial struct ZeroTask<TResult>
 		}
 	}
 	
+	public async ZeroTask<T> WithResult<T>(T result)
+	{
+		await this;
+		return result;
+	}
+	
 	public static implicit operator ZeroTask(ZeroTask<TResult> @this)
 		=> @this._backend is not null ? new(@this._backend) : ZeroTask.CompletedTask;
 

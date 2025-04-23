@@ -1241,6 +1241,9 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 	{ // Finally setup proxy.
 		FZSharpClass& zscls = FZSharpFieldRegistry::Get().RegisterClass(cls);
 
+		// @TODO: Construct on async loading thread.
+		UE_CLOG(def.bConstructor, LogZSharpEmit, Fatal, TEXT("UClassConstructor has unresolved problem with async loading thread yet!!!"));
+
 		zscls.bConstructor = def.bConstructor;
 		zscls.bContextual = def.bContextual;
 		zscls.bDefaultToReplicated = def.bDefaultToReplicated;
@@ -1325,6 +1328,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 	FZSharpScriptStruct* zsstrct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
 	if (def.bHasNetSerialize)
 	{
+		// @TODO: Full traits support.
 		UE_CLOG(superScriptStruct, LogZSharpEmit, Fatal, TEXT("Struct with NetSerialize can't have super struct yet!!!"));
 		zsstrct->bHasNetSerialize = true;
 		zsstrct->bHasIdentical = true; // @FIXME

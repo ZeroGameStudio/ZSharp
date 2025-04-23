@@ -137,6 +137,8 @@ namespace ZSharp::ZSharpClass_Private
 				
 				if (zscls->bConstructor)
 				{
+					checkNoEntry();
+					
 					FZCallHandle handle = zscls->GetConstructorZCallHandle();
 					FZRedFrameScope scope;
 					{
@@ -159,23 +161,24 @@ namespace ZSharp::ZSharpClass_Private
 	
 	static void ClassConstructor(const FObjectInitializer& objectInitializer)
 	{
-		IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
-		FZConjugateHandle conjugate = alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(objectInitializer.GetObj());
+		IZMasterAssemblyLoadContext* alc = nullptr; // IZSharpClr::Get().GetMasterAlc();
+		FZConjugateHandle conjugate = {}; // alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(objectInitializer.GetObj());
 		bool contextual = false;
 		ConstructObject(objectInitializer, objectInitializer.GetClass(), alc, conjugate, contextual);
-		const_cast<FObjectInitializer&>(objectInitializer).AddPropertyPostInitCallback([alc, conjugate]
-		{
-			FZCallHandle handle = FZSharpFieldRegistry::Get().GetObjectPostInitPropertiesZCallHandle();
-			FZRedFrameScope scope;
-			{
-				FZCallBufferSlot slot { EZCallBufferSlotType::Conjugate, { .Conjugate = conjugate } };
-				FZCallBuffer buffer;
-				buffer.Slots = &slot;
-				buffer.NumSlots = 1;
-									
-				alc->ZCall(handle, &buffer);
-			}
-		});
+		// @TODO: Construct on async loading thread.
+		// const_cast<FObjectInitializer&>(objectInitializer).AddPropertyPostInitCallback([alc, conjugate]
+		// {
+		// 	FZCallHandle handle = FZSharpFieldRegistry::Get().GetObjectPostInitPropertiesZCallHandle();
+		// 	FZRedFrameScope scope;
+		// 	{
+		// 		FZCallBufferSlot slot { EZCallBufferSlotType::Conjugate, { .Conjugate = conjugate } };
+		// 		FZCallBuffer buffer;
+		// 		buffer.Slots = &slot;
+		// 		buffer.NumSlots = 1;
+		// 							
+		// 		alc->ZCall(handle, &buffer);
+		// 	}
+		// });
 
 #if ZSHARP_WITH_MASTER_ALC_RELOAD
 		if (contextual)

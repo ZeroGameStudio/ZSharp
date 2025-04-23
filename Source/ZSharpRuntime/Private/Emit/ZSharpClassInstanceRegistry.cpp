@@ -23,6 +23,9 @@ ZSharp::FZSharpClassInstanceRegistry::FZSharpClassInstanceRegistry()
 
 void ZSharp::FZSharpClassInstanceRegistry::Register(UObject* instance)
 {
+	// @FIXME: Multithread loading should be disabled if master ALC reloading is enabled, but this can change in the future.
+	check(IsInGameThread());
+	
 	bool alreadyExists;
 	Instances.Emplace(instance, &alreadyExists);
 	check(!alreadyExists);

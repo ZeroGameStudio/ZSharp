@@ -1523,23 +1523,12 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinit
 	
 	ZUnrealFieldEmitter_Private::ConstructPropertyDefaults(def, cls, zscls);
 
-	// Notify registration. Migrate from UObjectLoadAllCompiledInDefaultProperties().
-	NotifyRegistrationEvent(*cls->GetOutermost()->GetName(), *cls->GetName(), ENotifyRegistrationType::NRT_Class, ENotifyRegistrationPhase::NRP_Finished, nullptr, false, cls);
-}
-
-void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefinition& def) const
-{
-	UClass* cls = def.Class;
-	FZSharpClass* zscls = FZSharpFieldRegistry::Get().GetMutableClass(cls);
-	const UClass* superCls = cls->GetSuperClass();
-	
-	// Create CDO.
-	// No need to call NotifyRegistrationEvent(), UClass::CreateDefaultObject() does.
-	const UObject* cdo = def.Class->GetDefaultObject();
-
-	// Precache replicated properties, then setup runtime replication data.
-	// This must be done after create CDO. (see UClass::SetUpRuntimeReplicationData() and UClass::ValidateRuntimeReplicationData())
+	// Setup Z# replicated properties.
+	// This must be done before creating CDO because blueprint class reference in CDO can trigger
+	// UClass::SetUpRuntimeReplicationData() and UClass::ValidateRuntimeReplicationData() which uses these.
 	{
+		check(!cls->HasAnyClassFlags(CLASS_ReplicationDataIsSetUp));
+		
 		TMap<FName, const FZPropertyDefinition*> netPropertyName2Def;
 		for (const auto& propertyDef : def.Properties)
 		{
@@ -1550,7 +1539,6 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefini
 		}
 		
 		// Super class's ClassReps should be ready to use at this point.
-		auto currentRepIndex = static_cast<uint16>(superCls->ClassReps.Num());
 		for (TFieldIterator<FProperty> it(cls, EFieldIteratorFlags::ExcludeSuper); it; ++it)
 		{
 			FProperty* property = *it;
@@ -1559,25 +1547,23 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefini
 				const FZPropertyDefinition** pPropertyDef = netPropertyName2Def.Find(property->GetFName());
 				check(pPropertyDef && *pPropertyDef);
 				const FZPropertyDefinition& propertyDef = **pPropertyDef;
-				check(property->RepIndex == 0);
-				property->RepIndex = currentRepIndex++;
 				zscls->ReplicatedProperties.Emplace(FZSharpClass::FReplicatedProperty { property, propertyDef.RepCondition, propertyDef.RepNotifyCondition, propertyDef.IsRepPushBased });
 			}
 		}
-
-		cls->SetUpRuntimeReplicationData();
-		
-#if DO_CHECK
-		// Migrate from UClass::ValidateRuntimeReplicationData().
-		TArray<FLifetimeProperty> lifetimeProps;
-		lifetimeProps.Reserve(cls->ClassReps.Num());
-		cdo->GetLifetimeReplicatedProps(lifetimeProps);
-
-		checkf(lifetimeProps.Num() == cls->ClassReps.Num(), TEXT("Some replicated properties don't get registered."));
-#endif
 	}
 
+	// Notify registration. Migrate from UObjectLoadAllCompiledInDefaultProperties().
+	NotifyRegistrationEvent(*cls->GetOutermost()->GetName(), *cls->GetName(), ENotifyRegistrationType::NRT_Class, ENotifyRegistrationPhase::NRP_Finished, nullptr, false, cls);
+}
+
+void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefinition& def) const
+{
+	UClass* cls = def.Class;
+	FZSharpClass* zscls = FZSharpFieldRegistry::Get().GetMutableClass(cls);
+	const UClass* superCls = cls->GetSuperClass();
+
 	// Construct field notifies.
+	// Must be done in this pass because we need super CDO.
 	if (!def.FieldNotifies.IsEmpty())
 	{
 		const UObject* superCdo = superCls->GetDefaultObject(false);
@@ -1605,6 +1591,14 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefini
 			zscls->FieldNotifies.Emplace(UE::FieldNotification::FFieldId { field, currentFieldNotifyIndex++ });
 		}
 	}
+
+	// Create CDO.
+	// No need to call NotifyRegistrationEvent(), UClass::CreateDefaultObject() does.
+	(void)def.Class->GetDefaultObject();
+
+	// setup runtime replication data.
+	// This must be done after creating CDO. (see UClass::SetUpRuntimeReplicationData() and UClass::ValidateRuntimeReplicationData())
+	cls->SetUpRuntimeReplicationData();
 
 	UE_LOG(LogZSharpEmit, Log, TEXT("Successfully emit Z# class [%s]!"), *cls->GetPathName());
 }

@@ -761,6 +761,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			FObjectDuplicationParameters params { superFunction, outer };
 			params.DestName = *def.Name.ToString();
 			params.ApplyFlags = GCompiledInFlags;
+			params.bSkipPostLoad = true;
 
 			function = static_cast<UFunction*>(StaticDuplicateObjectEx(params));
 

@@ -59,18 +59,6 @@ public partial class MagicCube : Actor
 		_translationSpeed = DateTime.Now.Second + 30;
 		_startPos = null!; // We know what we are doing - we never use it before we initialize it.
 	}
-
-	/*
-	 * This is called just before C++ UObject::PostInitProperties().
-	 * You can do some contextual UProperty initialization here.
-	 */
-	protected override void PostInitProperties()
-	{
-		/*
-		 * Must do here, not constructor, otherwise it will be overridden by CDO.
-		 */
-		RotationSpeed = new Random().NextInt64(90, 360);
-	}
 	
 	protected virtual partial void SayHello_Implementation()
 	{

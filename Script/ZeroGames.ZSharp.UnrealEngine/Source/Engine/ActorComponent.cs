@@ -9,6 +9,16 @@ public partial class ActorComponent
 	{
 		return GetOwner() as T;
 	}
+
+	public T GetOwnerChecked<T>() where T : Actor
+	{
+		if (GetOwner() is T owner)
+		{
+			return owner;
+		}
+
+		throw new InvalidOperationException();
+	}
 	
 	public ENetMode GetNetMode()
 	{

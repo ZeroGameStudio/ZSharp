@@ -10,6 +10,8 @@ public partial class ActorComponent
 		return GetOwner() as T;
 	}
 
+	public Actor GetOwnerChecked() => GetOwnerChecked<Actor>();
+
 	public T GetOwnerChecked<T>() where T : Actor
 	{
 		if (GetOwner() is T owner)

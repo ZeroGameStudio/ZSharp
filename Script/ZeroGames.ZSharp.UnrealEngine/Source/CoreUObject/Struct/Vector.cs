@@ -5,23 +5,10 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public partial class Vector
 {
 
-	public static Vector Zero => new();
-	public static Vector One => new(1, 1, 1);
-	
-	public static Vector UnitX => new(1, 0, 0);
-	public static Vector UnitY => new(0, 1, 0);
-	public static Vector UnitZ => new(0, 0, 1);
-
-	public static Vector XAxis => new(1, 0, 0);
-	public static Vector YAxis => new(0, 1, 0);
-	public static Vector ZAxis => new(0, 0, 1);
-
-	public static Vector Forward => new(1, 0, 0);
-	public static Vector Backward => new(-1, 0, 0);
-	public static Vector Right => new(0, 1, 0);
-	public static Vector Left => new(0, -1, 0);
-	public static Vector Up => new(0, 1, 0);
-	public static Vector Down => new(0, -1, 0);
+	public static double Distance(Vector lhs, Vector rhs) => lhs.Distance(rhs);
+	public static double DistanceSquared(Vector lhs, Vector rhs) => lhs.DistanceSquared(rhs);
+	public static double Distance2D(Vector lhs, Vector rhs) => lhs.Distance2D(rhs);
+	public static double DistanceSquared2D(Vector lhs, Vector rhs) => lhs.DistanceSquared2D(rhs);
 
 	public Vector(double x, double y, double z) : this()
 	{
@@ -37,6 +24,11 @@ public partial class Vector
 
 	public double Dot(Vector other) => X * other.X + Y * other.Y + Z * other.Z;
 	public Vector Cross(Vector other) => new(Y * other.Z - Z * other.Y, Z * other.X - X * other.Z, X * other.Y - Y * other.X);
+
+	public double Distance(Vector other) => Math.Sqrt(DistanceSquared(other));
+	public double DistanceSquared(Vector other) => (X - other.X) * (X - other.X) + (Y - other.Y) * (Y - other.Y) + (Z - other.Z) * (Z - other.Z);
+	public double Distance2D(Vector other) => Math.Sqrt(DistanceSquared2D(other));
+	public double DistanceSquared2D(Vector other) => (X - other.X) * (X - other.X) + (Y - other.Y) * (Y - other.Y);
 	
 	public bool IsNearlyEqual(Vector other, double tolerance = TOLERANCE) => Math.Abs(X - other.X) <= tolerance && Math.Abs(Y - other.Y) <= tolerance && Math.Abs(Z - other.Z) <= tolerance;
 
@@ -119,6 +111,24 @@ public partial class Vector
 			}
 		}
 	}
+	
+	public static Vector Zero => new();
+	public static Vector One => new(1, 1, 1);
+	
+	public static Vector UnitX => new(1, 0, 0);
+	public static Vector UnitY => new(0, 1, 0);
+	public static Vector UnitZ => new(0, 0, 1);
+
+	public static Vector XAxis => new(1, 0, 0);
+	public static Vector YAxis => new(0, 1, 0);
+	public static Vector ZAxis => new(0, 0, 1);
+
+	public static Vector Forward => new(1, 0, 0);
+	public static Vector Backward => new(-1, 0, 0);
+	public static Vector Right => new(0, 1, 0);
+	public static Vector Left => new(0, -1, 0);
+	public static Vector Up => new(0, 1, 0);
+	public static Vector Down => new(0, -1, 0);
 
 	public double Max => Math.Max(X, Math.Max(Y, Z));
 	public double AbsMax => Math.Max(Math.Abs(X), Math.Max(Math.Abs(Y), Math.Abs(Z)));
@@ -126,9 +136,9 @@ public partial class Vector
 	public double AbsMin => Math.Min(Math.Abs(X), Math.Min(Math.Abs(Y), Math.Abs(Z)));
 	public Vector Abs => new(Math.Abs(X), Math.Abs(Y), Math.Abs(Z));
 
-	public double Size => Math.Sqrt(X * X + Y * Y + Z * Z);
+	public double Size => Math.Sqrt(SizeSquared);
 	public double SizeSquared => X * X + Y * Y + Z * Z;
-	public double Size2D => Math.Sqrt(X * X + Y * Y);
+	public double Size2D => Math.Sqrt(SizeSquared2D);
 	public double SizeSquared2D => X * X + Y * Y;
 	public bool IsZero => X == 0 && Y == 0 && Z == 0;
 	public bool IsNearlyZero => Math.Abs(X) <= TOLERANCE && Math.Abs(Y) <= TOLERANCE && Math.Abs(Z) <= TOLERANCE;

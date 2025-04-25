@@ -48,7 +48,7 @@ public partial class World
 		=> SpawnActor<Actor>(@class, transform, spawnParameters);
 
 	public T? SpawnActor<T>(UnrealClass @class, Vector? location, Rotator? rotation, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
-		=> SpawnActor<T>(@class, new() { Translation = location, Rotation = rotation?.ToQuat() }, spawnParameters);
+		=> SpawnActor<T>(@class, new() { Translation = location, Rotation = rotation?.Quat }, spawnParameters);
 	
 	public T? SpawnActor<T>(Transform? transform, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
 		=> SpawnActor<T>(T.StaticClass, transform, spawnParameters);
@@ -74,7 +74,7 @@ public partial class World
 		=> SpawnActorAbsolute<Actor>(@class, transform, spawnParameters);
 
 	public T? SpawnActorAbsolute<T>(UnrealClass @class, Vector? location, Rotator? rotation, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
-		=> SpawnActorAbsolute<T>(@class, new() { Translation = location, Rotation = rotation?.ToQuat() }, spawnParameters);
+		=> SpawnActorAbsolute<T>(@class, new() { Translation = location, Rotation = rotation?.Quat }, spawnParameters);
 
 	public T? SpawnActorAbsolute<T>(Transform? transform, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
 		=> SpawnActorAbsolute<T>(T.StaticClass, transform, spawnParameters);
@@ -120,7 +120,7 @@ public partial class World
 		=> SpawnActorDeferred<Actor>(@class, transform, initialize, spawnParameters);
 
 	public T? SpawnActorDeferred<T>(UnrealClass @class, Vector? location, Rotator? rotation, Action<T> initialize, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
-		=> SpawnActorDeferred<T>(@class, new() { Translation = location, Rotation = rotation?.ToQuat() }, initialize, spawnParameters);
+		=> SpawnActorDeferred<T>(@class, new() { Translation = location, Rotation = rotation?.Quat }, initialize, spawnParameters);
 
 	public T? SpawnActorDeferred<T>(Transform? transform, Action<T> initialize, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
 		=> SpawnActorDeferred<T>(T.StaticClass, transform, initialize, spawnParameters);
@@ -162,7 +162,7 @@ public partial class World
 		=> SpawnActorDeferred<Actor, TState>(@class, transform, initialize, state, spawnParameters);
 
 	public T? SpawnActorDeferred<T, TState>(UnrealClass @class, Vector? location, Rotator? rotation, Action<T, TState> initialize, TState state, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
-		=> SpawnActorDeferred<T, TState>(@class, new() { Translation = location, Rotation = rotation?.ToQuat() }, initialize, state, spawnParameters);
+		=> SpawnActorDeferred<T, TState>(@class, new() { Translation = location, Rotation = rotation?.Quat }, initialize, state, spawnParameters);
 	
 	public T? SpawnActorDeferred<T, TState>(Transform? transform, Action<T, TState> initialize, TState state, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
 		=> SpawnActorDeferred<T, TState>(T.StaticClass, transform, initialize, state, spawnParameters);
@@ -190,13 +190,13 @@ public partial class World
 		=> SpawnActorDeferredAsync<Actor>(@class, transform, initializeAsync, spawnParameters);
 
 	public ZeroTask<T?> SpawnActorDeferredAsync<T>(UnrealClass @class, Vector? location, Rotator? rotation, Func<T, Lifecycle, ZeroTask> initializeAsync, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
-		=> SpawnActorDeferredAsync<T>(@class, new() { Translation = location, Rotation = rotation?.ToQuat() }, initializeAsync, spawnParameters);
+		=> SpawnActorDeferredAsync<T>(@class, new() { Translation = location, Rotation = rotation?.Quat }, initializeAsync, spawnParameters);
 
 	public ZeroTask<T?> SpawnActorDeferredAsync<T>(Transform? transform, Func<T, Lifecycle, ZeroTask> initializeAsync, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
 		=> SpawnActorDeferredAsync<T>(T.StaticClass, transform, initializeAsync, spawnParameters);
 
 	public ZeroTask<T?> SpawnActorDeferredAsync<T>(Vector? location, Rotator? rotation, Func<T, Lifecycle, ZeroTask> initializeAsync, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
-		=> SpawnActorDeferredAsync<T>(T.StaticClass, new() { Translation = location, Rotation = rotation?.ToQuat() }, initializeAsync, spawnParameters);
+		=> SpawnActorDeferredAsync<T>(T.StaticClass, new() { Translation = location, Rotation = rotation?.Quat }, initializeAsync, spawnParameters);
 
 	public ZeroTask<T?> SpawnActorDeferredAsync<T, TState>(UnrealClass @class, Transform? transform, Func<T, TState, Lifecycle, ZeroTask> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
 	{
@@ -214,13 +214,13 @@ public partial class World
 		=> SpawnActorDeferredAsync<Actor, TState>(@class, transform, initializeAsync, state, spawnParameters);
 
 	public ZeroTask<T?> SpawnActorDeferredAsync<T, TState>(UnrealClass @class, Vector? location, Rotator? rotation, Func<T, TState, Lifecycle, ZeroTask> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
-		=> SpawnActorDeferredAsync<T, TState>(@class, new() { Translation = location, Rotation = rotation?.ToQuat() }, initializeAsync, state, spawnParameters);
+		=> SpawnActorDeferredAsync<T, TState>(@class, new() { Translation = location, Rotation = rotation?.Quat }, initializeAsync, state, spawnParameters);
 	
 	public ZeroTask<T?> SpawnActorDeferredAsync<T, TState>(Transform? transform, Func<T, TState, Lifecycle, ZeroTask> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
 		=> SpawnActorDeferredAsync<T, TState>(T.StaticClass, transform, initializeAsync, state, spawnParameters);
 
 	public ZeroTask<T?> SpawnActorDeferredAsync<T, TState>(Vector? location, Rotator? rotation, Func<T, TState, Lifecycle, ZeroTask> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default) where T : Actor, IStaticClass
-		=> SpawnActorDeferredAsync<T, TState>(T.StaticClass, new() { Translation = location, Rotation = rotation?.ToQuat() }, initializeAsync, state, spawnParameters);
+		=> SpawnActorDeferredAsync<T, TState>(T.StaticClass, new() { Translation = location, Rotation = rotation?.Quat }, initializeAsync, state, spawnParameters);
 
 	#endregion
 

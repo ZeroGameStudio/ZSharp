@@ -17,7 +17,14 @@ public partial class Rotator
 		return $"Rotator {{ Pitch={Pitch}, Yaw={Yaw}, Roll={Roll} }}";
 	}
 
-	public Quat ToQuat() => KismetMathLibrary.Conv_RotatorToQuaternion(this);
+	public Vector RotateVector(Vector vector) => KismetMathLibrary.Quat_RotateVector(Quat, vector);
+	public Vector UnrotateVector(Vector vector) => KismetMathLibrary.Quat_UnrotateVector(Quat, vector);
+	
+	public static explicit operator Vector(Rotator @this) => @this.Vector;
+	public static explicit operator Quat(Rotator @this) => @this.Quat;
+
+	public Vector Vector => KismetMathLibrary.Conv_RotatorToVector(this);
+	public Quat Quat => KismetMathLibrary.Conv_RotatorToQuaternion(this);
 
 }
 

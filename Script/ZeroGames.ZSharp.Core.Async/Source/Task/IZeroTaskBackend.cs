@@ -12,8 +12,6 @@ public interface IZeroTaskBackend : IZeroTaskTokenSource
 	void GetResult(ZeroTaskToken token);
 	void SetContinuation(Action continuation, ZeroTaskToken token);
 	void SetMoveNextSource(IMoveNextSource source, ZeroTaskToken token);
-	
-	bool IsPreserved { get; }
 }
 
 public interface IZeroTaskBackend<out TResult> : IZeroTaskBackend

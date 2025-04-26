@@ -106,7 +106,7 @@ internal struct ZeroTaskBackendComp<TResult>
 	{
 		if (token != Token)
 		{
-			throw new InvalidOperationException("Token expired.");
+			throw new InvalidOperationException("Await one instance of ZeroTask more than once.");
 		}
 	}
 	

@@ -63,7 +63,7 @@ public struct LifecycleBackendComp(ILifecycleBackend backend)
 	{
 		if (token != Token)
 		{
-			throw new InvalidOperationException("Token expired.");
+			throw new InvalidOperationException("Lifecycle token expired.");
 		}
 	}
 

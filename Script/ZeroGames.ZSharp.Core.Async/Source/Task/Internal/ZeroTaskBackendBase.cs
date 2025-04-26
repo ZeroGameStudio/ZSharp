@@ -28,12 +28,9 @@ internal abstract class ZeroTaskBackendBase<TResult> : IZeroTaskBackend<TResult>
 	}
 	
 	public ZeroTaskToken Token => _comp.Token;
-	bool IZeroTaskBackend.IsPreserved => IsPreserved;
-	
+
 	protected void SetResult(TResult result) => _comp.SetResult(result);
 	protected void SetException(Exception exception) => _comp.SetException(exception);
-	
-	protected virtual bool IsPreserved => true;
 	
 	protected ref Lifecycle Lifecycle => ref _lifecycle;
 	protected ref ZeroTaskBackendComp<TResult> Comp => ref _comp;

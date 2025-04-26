@@ -4,7 +4,7 @@ using ZeroGames.Pooling;
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-internal abstract class PooledZeroTaskBackendBase<TResult, TImpl> : ZeroTaskBackendBase<TResult>, IPooled where TImpl : PooledZeroTaskBackendBase<TResult, TImpl>, new()
+internal abstract class PooledZeroTaskBackendBase<TResult, TImpl> : ZeroTaskBackendBase<TResult>, IReusedZeroTaskBackend, IPooled where TImpl : PooledZeroTaskBackendBase<TResult, TImpl>, new()
 {
 
 	void IPooled.PreGetFromPool()
@@ -49,8 +49,6 @@ internal abstract class PooledZeroTaskBackendBase<TResult, TImpl> : ZeroTaskBack
 			ReturnToPool();
 		}
 	}
-
-	protected override bool IsPreserved => false;
 
 	private void ReturnToPool() => _pool.Return((TImpl)this);
 	

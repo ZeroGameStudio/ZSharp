@@ -31,7 +31,7 @@ partial struct ZeroTask
 	}
 
 	public ZeroTask Preserve()
-		=> _backend is not { IsPreserved: false } ? this : throw new NotImplementedException();
+		=> _backend is IReusedZeroTaskBackend ? new(new ZeroTaskBackend_Memoize<AsyncVoid>(_backend, _token)) : this;
 
 	public async ZeroTask<bool> DontThrowOnExpired()
 	{
@@ -92,7 +92,7 @@ partial struct ZeroTask<TResult>
 	public void Forget(Action<Exception>? exceptionHandler = null) => ((ZeroTask)this).Forget(exceptionHandler);
 	
 	public ZeroTask<TResult> Preserve()
-		=> _backend is not { IsPreserved: false } ? this : throw new NotImplementedException();
+		=> _backend is IReusedZeroTaskBackend ? new(new ZeroTaskBackend_Memoize<TResult>(_backend, _token)) : this;
 	
 	public async ZeroTask<(TResult? Result, bool IsCanceled)> DontThrowOnExpired()
 	{

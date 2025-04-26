@@ -12,6 +12,14 @@ public partial class Rotator
 		Roll = roll;
 	}
 	
+	public void Deconstruct(out double pitch, out double yaw, out double roll)
+	{
+		pitch = Pitch;
+		yaw = Yaw;
+		roll = Roll;
+	}
+	public void Deconstruct(out double pitch, out double yaw) => Deconstruct(out pitch, out yaw, out _);
+	
 	public override string ToString()
 	{
 		return $"Rotator {{ Pitch={Pitch}, Yaw={Yaw}, Roll={Roll} }}";

@@ -5,17 +5,37 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public partial class Vector
 {
 
+	public static Vector MakeForward(double scalar = 1) => new(scalar, 0, 0);
+	public static Vector MakeBackward(double scalar = 1) => new(-scalar, 0, 0);
+	public static Vector MakeRight(double scalar = 1) => new(0, scalar, 0);
+	public static Vector MakeLeft(double scalar = 1) => new(0, -scalar, 0);
+	public static Vector MakeUp(double scalar = 1) => new(0, scalar, 0);
+	public static Vector MakeDown(double scalar = 1) => new(0, -scalar, 0);
+
+	public static double Dot(Vector lhs, Vector rhs) => lhs | rhs;
+	public static Vector Cross(Vector lhs, Vector rhs) => lhs ^ rhs;
+	
 	public static double Distance(Vector lhs, Vector rhs) => lhs.Distance(rhs);
 	public static double DistanceSquared(Vector lhs, Vector rhs) => lhs.DistanceSquared(rhs);
 	public static double Distance2D(Vector lhs, Vector rhs) => lhs.Distance2D(rhs);
 	public static double DistanceSquared2D(Vector lhs, Vector rhs) => lhs.DistanceSquared2D(rhs);
-
+	
+	public Vector(double scalar) : this(scalar, scalar, scalar){}
+	
 	public Vector(double x, double y, double z) : this()
 	{
 		X = x;
 		Y = y;
 		Z = z;
 	}
+	
+	public void Deconstruct(out double x, out double y, out double z)
+	{
+		x = X;
+		y = Y;
+		z = Z;
+	}
+	public void Deconstruct(out double x, out double y) => Deconstruct(out x, out y, out _);
 	
 	public override string ToString()
 	{
@@ -46,7 +66,7 @@ public partial class Vector
 
 		return false;
 	}
-
+	
 	public void Set(double x, double y, double z) => (X, Y, Z) = (x, y, z);
 
 	public static Vector operator+(Vector @this) => new(@this.X, @this.Y, @this.Z);
@@ -113,22 +133,22 @@ public partial class Vector
 	}
 	
 	public static Vector Zero => new();
-	public static Vector One => new(1, 1, 1);
+	public static Vector One => new(1.0);
 	
-	public static Vector UnitX => new(1, 0, 0);
-	public static Vector UnitY => new(0, 1, 0);
-	public static Vector UnitZ => new(0, 0, 1);
+	public static Vector UnitX => Forward;
+	public static Vector UnitY => Right;
+	public static Vector UnitZ => Up;
 
-	public static Vector XAxis => new(1, 0, 0);
-	public static Vector YAxis => new(0, 1, 0);
-	public static Vector ZAxis => new(0, 0, 1);
+	public static Vector XAxis => Forward;
+	public static Vector YAxis => Right;
+	public static Vector ZAxis => Up;
 
-	public static Vector Forward => new(1, 0, 0);
-	public static Vector Backward => new(-1, 0, 0);
-	public static Vector Right => new(0, 1, 0);
-	public static Vector Left => new(0, -1, 0);
-	public static Vector Up => new(0, 1, 0);
-	public static Vector Down => new(0, -1, 0);
+	public static Vector Forward => MakeForward();
+	public static Vector Backward => MakeBackward();
+	public static Vector Right => MakeRight();
+	public static Vector Left => MakeLeft();
+	public static Vector Up => MakeUp();
+	public static Vector Down => MakeDown();
 
 	public double Max => Math.Max(X, Math.Max(Y, Z));
 	public double AbsMax => Math.Max(Math.Abs(X), Math.Max(Math.Abs(Y), Math.Abs(Z)));

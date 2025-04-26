@@ -4,10 +4,10 @@ using System.Runtime.CompilerServices;
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public struct AsyncZeroTaskMethodBuilderVoid : IAsyncMethodBuilder<AsyncZeroTaskMethodBuilderVoid, ZeroTask, ZeroTask.Awaiter>
+public struct AsyncZeroTaskMethodBuilder : IAsyncMethodBuilder<AsyncZeroTaskMethodBuilder, ZeroTask>
 {
 
-	public static AsyncZeroTaskMethodBuilderVoid Create() => default;
+	public static AsyncZeroTaskMethodBuilder Create() => default;
 
 	public void SetStateMachine(IAsyncStateMachine stateMachine) => throw new NotSupportedException();
 	
@@ -59,7 +59,7 @@ public struct AsyncZeroTaskMethodBuilderVoid : IAsyncMethodBuilder<AsyncZeroTask
 
 }
 
-public struct AsyncZeroTaskMethodBuilder<TResult> : IAsyncMethodBuilder<TResult, AsyncZeroTaskMethodBuilder<TResult>, ZeroTask<TResult>, ZeroTask<TResult>.Awaiter>
+public struct AsyncZeroTaskMethodBuilder<TResult> : IAsyncMethodBuilder<TResult, AsyncZeroTaskMethodBuilder<TResult>, ZeroTask<TResult>>
 {
 
 	public static AsyncZeroTaskMethodBuilder<TResult> Create() => default;
@@ -84,7 +84,7 @@ public struct AsyncZeroTaskMethodBuilder<TResult> : IAsyncMethodBuilder<TResult,
 	public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : ICriticalNotifyCompletion where TStateMachine : IAsyncStateMachine
 		=> AwaitOnCompleted(ref awaiter, ref stateMachine);
 
-	void IAsyncMethodBuilder<AsyncZeroTaskMethodBuilder<TResult>, ZeroTask<TResult>, ZeroTask<TResult>.Awaiter>.SetResult() => throw new NotSupportedException();
+	void IAsyncMethodBuilder<AsyncZeroTaskMethodBuilder<TResult>, ZeroTask<TResult>>.SetResult() => throw new NotSupportedException();
 	public void SetResult(TResult result)
 	{
 		if (_backend is not null)
@@ -112,6 +112,56 @@ public struct AsyncZeroTaskMethodBuilder<TResult> : IAsyncMethodBuilder<TResult,
 	public ZeroTask<TResult> Task { get; private set; }
 
 	private IAsyncStateMachineTask<TResult>? _backend;
+
+}
+
+public struct AsyncZeroTaskVoidMethodBuilder : IAsyncMethodBuilder<AsyncZeroTaskVoidMethodBuilder, ZeroTaskVoid>
+{
+
+	public static AsyncZeroTaskVoidMethodBuilder Create() => default;
+
+	public void SetStateMachine(IAsyncStateMachine stateMachine) => throw new NotSupportedException();
+	
+	public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine => stateMachine.MoveNext();
+
+	public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : INotifyCompletion where TStateMachine : IAsyncStateMachine
+	{
+		if (_backend is null)
+		{
+			var backend = ZeroTaskBackend_AsyncStateMachine<AsyncVoid, TStateMachine>.GetFromPool();
+			backend.StateMachine = stateMachine;
+			_backend = backend;
+		}
+		
+		AsyncZeroTaskMethodBuilderShared.AwaitOnCompleted(ref awaiter, _backend);
+	}
+
+	public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : ICriticalNotifyCompletion where TStateMachine : IAsyncStateMachine
+		=> AwaitOnCompleted(ref awaiter, ref stateMachine);
+
+	public void SetResult()
+	{
+		if (_backend is not null)
+		{
+			_backend.SetResult(default);
+			_backend.GetResult();
+		}
+	}
+
+	public void SetException(Exception exception)
+	{
+		if (_backend is not null)
+		{
+			_backend.SetResult(default);
+			_backend.GetResult();
+		}
+		
+		UnobservedZeroTaskExceptionPublisher.Publish(exception);
+	}
+
+	public ZeroTaskVoid Task => default;
+
+	private IAsyncStateMachineTask<AsyncVoid>? _backend;
 
 }
 

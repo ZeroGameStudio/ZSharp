@@ -97,7 +97,7 @@ internal struct ZeroTaskBackendComp<TResult>
 			_resultGot = true;
 			if (_error?.SourceException is { } ex)
 			{
-				UnhandledExceptionHelper.Guard(ex, "Unobserved exception detected in ZeroTask.");
+				UnobservedZeroTaskExceptionPublisher.Publish(ex);
 			}
 		}
 	}

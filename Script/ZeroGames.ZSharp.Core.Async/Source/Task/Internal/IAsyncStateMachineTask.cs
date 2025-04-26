@@ -6,6 +6,8 @@ internal interface IAsyncStateMachineTask<in TResult> : IMoveNextSource
 {
 	void SetResult(TResult result);
 	void SetException(Exception exception);
+
+	void GetResult();
 	
 	Action MoveNextDelegate { get; }
 }

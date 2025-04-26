@@ -11,6 +11,7 @@ internal class ZeroTaskBackend_AsyncStateMachine<TResult, TStateMachine> : Poole
 
 	public new void SetResult(TResult result) => base.SetResult(result);
 	public new void SetException(Exception exception) => base.SetException(exception);
+	public void GetResult() => base.GetResult(Token);
 
 	public void MoveNext()
 	{

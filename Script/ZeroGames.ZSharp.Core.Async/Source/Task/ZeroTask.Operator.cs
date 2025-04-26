@@ -1,11 +1,34 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Runtime.CompilerServices;
+
 namespace ZeroGames.ZSharp.Core.Async;
 
 partial struct ZeroTask
 {
 
-	public void Forget(){} // @TODO
+	// Forget must return void so we expand the state machine manually.
+	public void Forget(Action<Exception>? exceptionHandler = null)
+	{
+		Awaiter awaiter = GetAwaiter();
+		if (awaiter.IsCompleted)
+		{
+			try
+			{
+				awaiter.GetResult();
+			}
+			catch (Exception ex)
+			{
+				(exceptionHandler ?? _defaultExceptionHandler)(ex);
+			}
+		}
+		else
+		{
+			var backend = ZeroTaskBackend_AsyncStateMachine<AsyncVoid, ForgotStateMachine>.GetFromPool();
+			backend.StateMachine = new(awaiter, exceptionHandler ?? _defaultExceptionHandler);
+			((IMoveNextSourceAwaiter)awaiter).OnCompleted(backend);
+		}
+	}
 
 	public ZeroTask Preserve()
 		=> _backend is not { IsPreserved: false } ? this : throw new NotImplementedException();
@@ -38,12 +61,35 @@ partial struct ZeroTask
 		return default;
 	}
 
+	private readonly struct ForgotStateMachine(Awaiter awaiter, Action<Exception> exceptionHandler) : IAsyncStateMachine
+	{
+		void IAsyncStateMachine.MoveNext()
+		{
+			try
+			{
+				_awaiter.GetResult();
+			}
+			catch (Exception ex)
+			{
+				_exceptionHandler(ex);
+			}
+		}
+
+		void IAsyncStateMachine.SetStateMachine(IAsyncStateMachine stateMachine){}
+		
+		private readonly Awaiter _awaiter = awaiter;
+		private readonly Action<Exception> _exceptionHandler = exceptionHandler;
+	}
+	
+	private static readonly Action<Exception> _defaultExceptionHandler = UnobservedZeroTaskExceptionPublisher.Publish;
+
 }
 
 partial struct ZeroTask<TResult>
 {
-	
-	public void Forget(){} // @TODO
+
+	// We don't care about the result so forward to ZeroTask directly.
+	public void Forget(Action<Exception>? exceptionHandler = null) => ((ZeroTask)this).Forget(exceptionHandler);
 	
 	public ZeroTask<TResult> Preserve()
 		=> _backend is not { IsPreserved: false } ? this : throw new NotImplementedException();

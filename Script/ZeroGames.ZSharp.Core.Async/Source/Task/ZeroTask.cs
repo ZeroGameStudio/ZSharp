@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-[AsyncMethodBuilder(typeof(AsyncZeroTaskMethodBuilderVoid))]
+[AsyncMethodBuilder(typeof(AsyncZeroTaskMethodBuilder))]
 public readonly partial struct ZeroTask : IAwaitable<ZeroTask.Awaiter>
 {
 	
@@ -186,6 +186,14 @@ public readonly partial struct ZeroTask<TResult> : IAwaitable<TResult, ZeroTask<
 	private readonly IZeroTaskBackend<TResult>? _backend;
 	private readonly ZeroTaskToken _token;
 	
+}
+
+// Dummy async method return type to replace void.
+[AsyncMethodBuilder(typeof(AsyncZeroTaskVoidMethodBuilder))]
+public struct ZeroTaskVoid
+{
+	// This exists only for remove compiler warning.
+	public void Forget(){}
 }
 
 

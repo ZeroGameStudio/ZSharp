@@ -15,6 +15,7 @@ namespace Game;
  * We are contextual because field '_translationSpeed' depends on time.
  */
 [Contextual]
+[PropertyDefaultOverride(Property = nameof(PrimaryActorTick) + "." + nameof(ActorTickFunction.bCanEverTick), Default = true)]
 [UClass, Blueprintable]
 public partial class MagicCube : Actor
 {
@@ -132,17 +133,6 @@ public partial class MagicCube : Actor
 		_accumulatedTime += deltaSeconds;
 		double offsetZ = _translationSpeed * Math.Sin(_accumulatedTime);
 		K2_SetActorLocation(new(_startPos.X, _startPos.Y, _startPos.Z + offsetZ), false, out _, true);
-	}
-	
-	/*
-	 * Define UClass constructor, which runs only when native UObject is created.
-	 * You can also use [PropertyDefaultOverride(Property = "PrimaryActorTick.bCanEverTick", Default = true)]
-	 * to avoid calling constructor - it overrides default value directly in C++.
-	 */
-	[UClassConstructor]
-	private void UMagicCube()
-	{
-		PrimaryActorTick.bCanEverTick = true;
 	}
 
 	private async ZeroTask RotateAsync()

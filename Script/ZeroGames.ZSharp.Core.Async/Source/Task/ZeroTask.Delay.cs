@@ -14,7 +14,7 @@ partial struct ZeroTask
 			return FromExpired<float>(lifecycle);
 		}
 
-		var backend = ZeroTaskBackend_DelaySeconds.GetFromPool(delayType, delayTime.Seconds, lifecycle);
+		var backend = ZeroTaskBackend_DelaySeconds.GetFromPool(delayType, (float)delayTime.TotalSeconds, lifecycle);
 		ZeroTask<float> task = FromBackend(backend);
 		backend.Run();
 		return task;

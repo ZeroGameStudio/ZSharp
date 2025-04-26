@@ -340,8 +340,9 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		}
 		else
 		{
+			T deltaTime = _accumulatedTime - data.StartTime;
 			data.StartTime = _accumulatedTime;
-			return _accumulatedTime - data.StartTime;
+			return deltaTime;
 		}
 	}
 

@@ -37,7 +37,7 @@ internal struct ZeroTaskBackendComp<TResult>
 	{
 		ValidateToken(token);
 
-		if (!_completed || (_moveNextSource is null && _continuation is null))
+		if (!_completed)
 		{
 			return EZeroTaskStatus.Pending;
 		}

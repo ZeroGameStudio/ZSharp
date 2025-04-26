@@ -5,10 +5,12 @@ namespace ZeroGames.ZSharp.Core.Async;
 internal class ZeroTaskBackend_Memoize<TResult> : ZeroTaskBackendBase<TResult>, IMoveNextSource
 {
 
-	public ZeroTaskBackend_Memoize(IZeroTaskBackend backend, ZeroTaskToken token)
+	public ZeroTaskBackend_Memoize(IZeroTaskBackend backend)
 	{
 		check(typeof(TResult) == typeof(AsyncVoid));
 		check(backend is IReusedZeroTaskBackend);
+
+		ZeroTaskToken token = backend.Token;
 		
 		_backend = backend;
 		_token = token;
@@ -31,9 +33,11 @@ internal class ZeroTaskBackend_Memoize<TResult> : ZeroTaskBackendBase<TResult>, 
 		}
 	}
 
-	public ZeroTaskBackend_Memoize(IZeroTaskBackend<TResult> backend, ZeroTaskToken token)
+	public ZeroTaskBackend_Memoize(IZeroTaskBackend<TResult> backend)
 	{
 		check(backend is IReusedZeroTaskBackend);
+		
+		ZeroTaskToken token = backend.Token;
 		
 		_backend = backend;
 		_token = token;

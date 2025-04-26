@@ -11,7 +11,8 @@ public readonly struct ZeroTaskToken : IEquatable<ZeroTaskToken>
 	public static bool operator==(ZeroTaskToken lhs, ZeroTaskToken rhs) => lhs.Equals(rhs);
 	public static bool operator!=(ZeroTaskToken lhs, ZeroTaskToken rhs) => !lhs.Equals(rhs);
 
-	public ZeroTaskToken InlineExpired => new(INLINE_EXPIRED);
+	public static ZeroTaskToken First => new(1);
+	public static ZeroTaskToken InlineExpired => new(INLINE_EXPIRED);
 
 	public bool IsValid => _version > 0;
 	public bool IsInlineExpired => _version == INLINE_EXPIRED;

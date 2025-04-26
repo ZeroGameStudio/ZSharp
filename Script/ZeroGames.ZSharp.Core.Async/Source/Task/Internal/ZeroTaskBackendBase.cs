@@ -33,6 +33,8 @@ internal abstract class ZeroTaskBackendBase<TResult> : IZeroTaskBackend<TResult>
 	protected virtual void PostGetResult(){}
 	protected void SetResult(TResult result) => _comp.SetResult(result);
 	protected void SetException(Exception exception) => _comp.SetException(exception);
+	protected void TrySetResult(TResult result) => _comp.TrySetResult(result);
+	protected void TrySetException(Exception exception) => _comp.TrySetException(exception);
 	
 	protected ref Lifecycle Lifecycle => ref _lifecycle;
 	protected ref ZeroTaskBackendComp<TResult> Comp => ref _comp;

@@ -90,6 +90,22 @@ internal struct ZeroTaskBackendComp<TResult>
 		SignalCompletion();
 	}
 	
+	public void TrySetResult(TResult result)
+	{
+		if (!_completed)
+		{
+			SetResult(result);
+		}
+	}
+
+	public void TrySetException(Exception exception)
+	{
+		if (!_completed)
+		{
+			SetException(exception);
+		}
+	}
+	
 	public void TryPublishUnobservedException()
 	{
 		if (_completed && !_resultGot)

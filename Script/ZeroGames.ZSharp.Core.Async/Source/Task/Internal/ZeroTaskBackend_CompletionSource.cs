@@ -15,26 +15,45 @@ internal class ZeroTaskBackend_CompletionSource<TResult> : PooledZeroTaskBackend
 	
 	public void SetResult(TResult result, ZeroTaskToken token)
 	{
-		Comp.ValidateToken(token);
+		// User may not know whether this is expired when using reactive lifecycle so we return silently.
+		if (token != Token)
+		{
+			return;
+		}
+
+		if (_completed)
+		{
+			return;
+		}
+
+		_completed = true;
 
 		if (Lifecycle.IsExpired)
 		{
 			SetException(new LifecycleExpiredException(Lifecycle));
 		}
-		
-		SetResult(result);
+		else
+		{
+			SetResult(result);
+		}
 	}
 
 	public void SetException(Exception exception, ZeroTaskToken token)
 	{
-		Comp.ValidateToken(token);
-		
-		if (Lifecycle.IsExpired)
+		// User may not know whether this is expired when using reactive lifecycle so we return silently.
+		if (token != Token)
 		{
-			SetException(new LifecycleExpiredException(null, exception, Lifecycle));
+			return;
 		}
 		
-		SetException(exception);
+		if (_completed)
+		{
+			return;
+		}
+
+		_completed = true;
+
+		SetException(Lifecycle.IsExpired ? new LifecycleExpiredException(null, exception, Lifecycle) : exception);
 	}
 
 	public ZeroTask<TResult> GetTask(ZeroTaskToken token)
@@ -43,6 +62,29 @@ internal class ZeroTaskBackend_CompletionSource<TResult> : PooledZeroTaskBackend
 		return new(this);
 	}
 
+	protected override void Initialize()
+	{
+		base.Initialize();
+		
+		if (Lifecycle.TryToReactive(out var reactiveLifecycle))
+		{
+			reactiveLifecycle.RegisterOnExpired(static state =>
+			{
+				var (@this, token) = ((ZeroTaskBackend_CompletionSource<TResult>, ZeroTaskToken))state!;
+				@this._completed = true;
+				@this.SetException(new LifecycleExpiredException(@this.Lifecycle));
+			}, (this, Token));
+		}
+	}
+
+	protected override void Deinitialize()
+	{
+		_completed = false;
+		base.Deinitialize();
+	}
+	
+	private bool _completed;
+	
 }
 
 

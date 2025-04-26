@@ -51,15 +51,15 @@ partial struct ZeroTask
 		await this;
 		return result;
 	}
-
-	public static implicit operator ZeroTask<AsyncVoid>(ZeroTask @this)
-		=> @this.ToAsyncVoidTask();
-
-	private async ZeroTask<AsyncVoid> ToAsyncVoidTask()
+	
+	public async ZeroTask<AsyncVoid> ToAsyncVoidTask()
 	{
 		await this;
 		return default;
 	}
+
+	public static implicit operator ZeroTask<AsyncVoid>(ZeroTask @this)
+		=> @this.ToAsyncVoidTask();
 
 	private readonly struct ForgotStateMachine(Awaiter awaiter, Action<Exception> exceptionHandler) : IAsyncStateMachine
 	{
@@ -111,18 +111,21 @@ partial struct ZeroTask<TResult>
 		await this;
 		return result;
 	}
-	
-	public static implicit operator ZeroTask(ZeroTask<TResult> @this)
-		=> @this._backend is not null ? new(@this._backend) : ZeroTask.CompletedTask;
 
-	public static implicit operator ZeroTask<AsyncVoid>(ZeroTask<TResult> @this)
-		=> @this.ToAsyncVoidTask();
+	public ZeroTask ToZeroTask()
+		=> _backend is not null ? new(_backend) : ZeroTask.CompletedTask;
 	
-	private async ZeroTask<AsyncVoid> ToAsyncVoidTask()
+	public async ZeroTask<AsyncVoid> ToAsyncVoidTask()
 	{
 		await this;
 		return default;
 	}
+	
+	public static implicit operator ZeroTask(ZeroTask<TResult> @this)
+		=> @this.ToZeroTask();
+
+	public static implicit operator ZeroTask<AsyncVoid>(ZeroTask<TResult> @this)
+		=> @this.ToAsyncVoidTask();
 
 }
 

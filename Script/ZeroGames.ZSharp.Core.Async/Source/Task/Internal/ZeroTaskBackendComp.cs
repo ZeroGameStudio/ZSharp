@@ -20,7 +20,7 @@ internal struct ZeroTaskBackendComp<TResult>
 		}
 	}
 
-	public void Deinitialize()
+	public void Reset()
 	{
 		// Invalidate token immediately.
 		Token = Token.Next;
@@ -126,6 +126,7 @@ internal struct ZeroTaskBackendComp<TResult>
 		
 		_completed = true;
 
+		// IMPORTANT: Continuation is highly likely to call GetResult() here and return us to pool, DO NOT do anything after this.
 		if (_moveNextSource is not null)
 		{
 			_moveNextSource.MoveNext();

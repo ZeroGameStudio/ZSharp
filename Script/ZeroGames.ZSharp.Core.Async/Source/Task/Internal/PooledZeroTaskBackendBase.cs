@@ -9,7 +9,7 @@ internal abstract class PooledZeroTaskBackendBase<TResult, TImpl> : ZeroTaskBack
 
 	void IPooled.PreGetFromPool()
 	{
-		Comp.Initialize();
+		GC.ReRegisterForFinalize(this);
 		Initialize();
 	}
 
@@ -17,7 +17,7 @@ internal abstract class PooledZeroTaskBackendBase<TResult, TImpl> : ZeroTaskBack
 	{
 		Deinitialize();
 		Comp.TryPublishUnobservedException();
-		Comp.Deinitialize();
+		Comp.Reset();
 		Lifecycle = default;
 	}
 	
@@ -26,29 +26,13 @@ internal abstract class PooledZeroTaskBackendBase<TResult, TImpl> : ZeroTaskBack
 	protected virtual void Initialize(){}
 	protected virtual void Deinitialize(){}
 
-	protected new void SetResult(TResult result)
+	protected override void PostGetResult()
 	{
-		try
-		{
-			base.SetResult(result);
-		}
-		finally
-		{
-			ReturnToPool();
-		}
+		base.PostGetResult();
+		ReturnToPool();
 	}
 
-	protected new void SetException(Exception exception)
-	{
-		try
-		{
-			base.SetException(exception);
-		}
-		finally
-		{
-			ReturnToPool();
-		}
-	}
+	~PooledZeroTaskBackendBase() => ReturnToPool();
 
 	private void ReturnToPool() => _pool.Return((TImpl)this);
 	

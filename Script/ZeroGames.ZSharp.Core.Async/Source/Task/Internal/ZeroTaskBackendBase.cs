@@ -17,6 +17,7 @@ internal abstract class ZeroTaskBackendBase<TResult> : IZeroTaskBackend<TResult>
 	public TResult GetResult(ZeroTaskToken token)
 	{
 		TResult result = _comp.GetResult(token);
+		PostGetResult();
 		GC.SuppressFinalize(this);
 		return result;
 	}
@@ -29,6 +30,7 @@ internal abstract class ZeroTaskBackendBase<TResult> : IZeroTaskBackend<TResult>
 	
 	public ZeroTaskToken Token => _comp.Token;
 
+	protected virtual void PostGetResult(){}
 	protected void SetResult(TResult result) => _comp.SetResult(result);
 	protected void SetException(Exception exception) => _comp.SetException(exception);
 	

@@ -441,7 +441,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     }
 
     private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 1 << 16;
-    private const string BUILD_CONJUGATE_METHOD_NAME = "BuildConjugate"; // @FIXME: Use nameof(IConjugate<>.BuildConjugate).
+    private const string BUILD_CONJUGATE_METHOD_NAME = nameof(IConjugate<>.BuildConjugate);
 
     private static readonly List<UnloadingRec> _unloadingCallbacks = new();
     private static uint64 _unloadingHandle;

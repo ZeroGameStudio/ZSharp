@@ -213,7 +213,7 @@ public struct ZCallBufferSlot
 		}
 		else if (t.IsEnum)
 		{
-			// @FIXME
+			// @FIXME: UEnum should always marshal as int64 but others not.
 			return FromObject(Convert.ChangeType(value, t.GetEnumUnderlyingType()));
 		}
 		else
@@ -487,7 +487,7 @@ public struct ZCallBufferSlot
 		}
 		else if (t.IsEnum)
 		{
-			// @FIXME
+			// @FIXME: UEnum should always marshal as int64 but others not.
 			Object = Convert.ChangeType(value, t.GetEnumUnderlyingType());
 		}
 		else

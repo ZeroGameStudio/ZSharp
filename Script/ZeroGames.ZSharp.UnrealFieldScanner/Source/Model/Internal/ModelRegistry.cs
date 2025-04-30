@@ -18,6 +18,8 @@ internal sealed partial class ModelRegistry : IModelRegistry
 		RootAssemblyName = rootAssemblyName;
 		RootModuleName = rootModuleName;
 		WithMetadata = withMetadata;
+
+		_emitRootNamespace = rootAssemblyName;
 		
 		Setup();
 
@@ -106,6 +108,11 @@ internal sealed partial class ModelRegistry : IModelRegistry
 		SetupIntrinsicTypes();
 		
 		AssemblyDefinition rootAssembly = LoadAssemblyDefinition(RootAssemblyName);
+
+		if (rootAssembly.CustomAttributes.SingleOrDefault(attr => attr.AttributeType.FullName == typeof(EmitRootNamespaceAttribute).FullName) is { } attribute)
+		{
+			_emitRootNamespace = (string)attribute.ConstructorArguments[0].Value;
+		}
 		
 		// First generate skeleton for root types. This step can run in parallel.
 		Parallel.ForEach(rootAssembly.Modules.SelectMany(module => module.Types), (type, _) => ScanTypeDefinition(type));
@@ -147,8 +154,8 @@ internal sealed partial class ModelRegistry : IModelRegistry
 		
 		// AssemblyName mismatch.
 		string maybeAssemblyName1 = string.Join('.', names.Take(names.Length - 2)); // AssemblyName.ModuleName.FieldName
-		string maybeAssemblyName2 =string.Join('.', names.Take(names.Length - 1)); // AssemblyName.FieldName treats last segment of AssemblyName as ModuleName
-		if (maybeAssemblyName1 != RootAssemblyName && maybeAssemblyName2 != RootAssemblyName)
+		string maybeAssemblyName2 = string.Join('.', names.Take(names.Length - 1)); // AssemblyName.FieldName treats last segment of AssemblyName as ModuleName
+		if (maybeAssemblyName1 != _emitRootNamespace && maybeAssemblyName2 != _emitRootNamespace)
 		{
 			return;
 		}
@@ -186,6 +193,8 @@ internal sealed partial class ModelRegistry : IModelRegistry
 			}
 		}
 	}
+
+	private string _emitRootNamespace;
 	
 	private readonly IAssemblyResolver _resolver = IAssemblyResolver.Create();
 

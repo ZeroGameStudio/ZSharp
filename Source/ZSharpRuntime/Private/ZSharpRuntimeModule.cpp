@@ -39,6 +39,7 @@
 #include "Interop/CoreUObject/Delegate/ZUnrealMulticastInlineDelegate_Interop.h"
 #include "Interop/CoreUObject/Delegate/ZUnrealMulticastSparseDelegate_Interop.h"
 #include "Interop/Engine/ZEngine_Interop.h"
+#include "Interop/Engine/ZGameInstance_Interop.h"
 #include "Interop/Engine/ZStreamableManager_Interop.h"
 #include "Interop/Engine/ZStreamingTask_Interop.h"
 #include "Interop/Engine/ZWorld_Interop.h"
@@ -309,6 +310,8 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, Contains),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Engine, GetEngine),
+
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(GameInstance, GetPrimaryInstance),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamableManager, GetGlobalStreamableManager),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(StreamableManager, RequestAsyncLoading),

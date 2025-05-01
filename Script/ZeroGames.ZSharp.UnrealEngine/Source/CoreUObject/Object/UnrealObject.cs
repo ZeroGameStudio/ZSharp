@@ -41,6 +41,12 @@ public partial class UnrealObject : IUnrealObject
         return InternalGetWorld();
     }
 
+    public World GetWorldChecked()
+    {
+        verify(GetWorld() is var world && world is not null);
+        return world;
+    }
+
     public bool IsA(UnrealClass @class)
     {
         MasterAlcCache.GuardInvariant();

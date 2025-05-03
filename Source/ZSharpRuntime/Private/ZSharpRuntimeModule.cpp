@@ -346,6 +346,11 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 		{
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZStreamableManager_Interop::GUpdate),
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZStreamableManager_Interop::GSignalCompletion),
+
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZWorld_Interop::GNotifyWorldInitialized),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZWorld_Interop::GNotifyWorldTearingDown),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZWorld_Interop::GPreLoadMap),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZWorld_Interop::GPostLoadMap),
 		};
 
 		static const struct

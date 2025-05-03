@@ -24,6 +24,11 @@ public struct ActorSpawnParameters()
 
 public partial class World
 {
+
+	public static event Action<World>? OnInitialized;
+	public static event Action<World>? OnTearingDown;
+	public static event Action<string>? PreLoadMap;
+	public static event Action<World>? PostLoadMap;
 	
 	public T? GetSubsystem<T>() where T : WorldSubsystem, IStaticClass => SubsystemBlueprintLibrary.GetWorldSubsystem(this, T.StaticClass) as T;
 
@@ -235,6 +240,18 @@ public partial class World
 		MasterAlcCache.GuardInvariant();
 		return InternalGetNetMode();
 	}
+
+	internal static void InternalNotifyWorldInitialized(ConjugateHandle world)
+		=> OnInitialized?.Invoke(world.GetTargetChecked<World>());
+	
+	internal static void InternalNotifyWorldTearingDown(ConjugateHandle world)
+		=> OnTearingDown?.Invoke(world.GetTargetChecked<World>());
+	
+	internal static void InternalPreLoadMap(string map)
+		=> PreLoadMap?.Invoke(map);
+	
+	internal static void InternalPostLoadMap(ConjugateHandle world)
+		=> PostLoadMap?.Invoke(world.GetTargetChecked<World>());
 
 	private unsafe Actor? InternalSpawnActor(UnrealClass @class, Transform? transform, in ActorSpawnParameters spawnParameters, bool absolute, bool deferred)
 	{

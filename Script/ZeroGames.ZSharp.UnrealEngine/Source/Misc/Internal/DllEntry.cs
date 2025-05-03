@@ -49,6 +49,12 @@ internal static class DllEntry
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, IntPtr, int32, void>)&StreamableManager_Interop.Update;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, IntPtr, void>)&StreamableManager_Interop.SignalCompletion;
 
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<ConjugateHandle, void>)&World_Interop.NotifyWorldInitialized;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<ConjugateHandle, void>)&World_Interop.NotifyWorldTearingDown;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, void>)&World_Interop.PreLoadMap;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<ConjugateHandle, void>)&World_Interop.PostLoadMap;
+
+        
         UE_LOG(LogZSharpScriptEngine, "===================== Z# Engine Startup =====================");
     }
 

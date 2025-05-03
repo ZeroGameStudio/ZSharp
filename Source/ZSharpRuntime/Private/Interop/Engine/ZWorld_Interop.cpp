@@ -7,6 +7,20 @@
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Conjugate/ZStrangeConjugateRegistries.h"
 
+namespace ZSharp::ZWorld_Interop_Private
+{
+	struct FWorldDelegateListener
+	{
+		FWorldDelegateListener()
+		{
+			FWorldDelegates::OnPostWorldInitialization.AddLambda([](UWorld* world, const UWorld::InitializationValues){ FZWorld_Interop::GNotifyWorldInitialized(world); });
+			FWorldDelegates::OnWorldBeginTearDown.AddLambda([](UWorld* world){ FZWorld_Interop::GNotifyWorldTearingDown(world); });
+			FCoreUObjectDelegates::PreLoadMap.AddLambda([](const FString& map){ FZWorld_Interop::GPreLoadMap(*map); });
+			FCoreUObjectDelegates::PostLoadMapWithWorld.AddLambda([](UWorld* world){ FZWorld_Interop::GPostLoadMap(world); });
+		}
+	} GWorldDelegateListener;
+}
+
 ZSharp::FZConjugateHandle ZSharp::FZWorld_Interop::SpawnActor(FZConjugateHandle self, FZConjugateHandle cls, FZConjugateHandle transform, const TCHAR* name, FZConjugateHandle actorTemplate, FZConjugateHandle owner, FZConjugateHandle instigator, FZConjugateHandle overrideLevel, ESpawnActorCollisionHandlingMethod spawnCollisionHandlingOverride, ESpawnActorScaleMethod transformScaleMethod, FActorSpawnParameters::ESpawnActorNameMode nameMode, uint8 absolute, uint8 deferred)
 {
 	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();

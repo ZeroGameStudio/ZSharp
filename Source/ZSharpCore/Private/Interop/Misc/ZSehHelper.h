@@ -2,7 +2,7 @@
 
 #pragma once
 
-#if PLATFORM_SEH_EXCEPTIONS_DISABLED
+#if PLATFORM_SEH_EXCEPTIONS_DISABLED || ZSHARP_WITH_MONO
 #define GUARDED_INVOKE(Try, Catch) return Try;
 #else
 #include "HAL/ExceptionHandling.h"

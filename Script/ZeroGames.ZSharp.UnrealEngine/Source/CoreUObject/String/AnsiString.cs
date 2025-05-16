@@ -8,20 +8,20 @@ using System.Runtime.CompilerServices;
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
-[ConjugateRegistryId(11)]
-[ConjugateKey("Unreal.String")]
-public sealed class UnrealString : UnrealConjugateBase
-    , IConjugate<UnrealString>
-    , ICloneable<UnrealString>
-    , IEquatable<UnrealString>
+[ConjugateRegistryId(13)]
+[ConjugateKey("Unreal.AnsiString")]
+public sealed class FAnsiString : UnrealConjugateBase
+    , IConjugate<FAnsiString>
+    , ICloneable<FAnsiString>
+    , IEquatable<FAnsiString>
     , IEquatable<string>
     , IComparable
-    , IComparable<UnrealString>
+    , IComparable<FAnsiString>
     , IComparable<string>
-    , IComparisonOperators<UnrealString?, UnrealString?, bool>
-    , IComparisonOperators<UnrealString?, string?, bool>
+    , IComparisonOperators<FAnsiString?, FAnsiString?, bool>
+    , IComparisonOperators<FAnsiString?, string?, bool>
     , IEnumerable<char>
-    , ISpanParsable<UnrealString>
+    , ISpanParsable<FAnsiString>
     , IConvertible
     , IPinnable<char>
     , IUnrealString
@@ -52,7 +52,7 @@ public sealed class UnrealString : UnrealConjugateBase
         }
         object IEnumerator.Current => Current;
 
-        internal Enumerator(UnrealString target)
+        internal Enumerator(FAnsiString target)
         {
             _target = target;
             _snapshot = target.Data;
@@ -79,33 +79,33 @@ public sealed class UnrealString : UnrealConjugateBase
             return data;
         }
         
-        private UnrealString? _target;
+        private FAnsiString? _target;
         private readonly string _snapshot;
         private int32 _index = -1;
     }
     
-    public static UnrealString BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+    public static FAnsiString BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-    public static UnrealString Parse(string s, IFormatProvider? provider) => s;
+    public static FAnsiString Parse(string s, IFormatProvider? provider) => s;
 
-    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out UnrealString result)
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out FAnsiString result)
     {
         result = s;
         return s is not null;
     }
 
-    public static UnrealString Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s.ToString(), provider);
-    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out UnrealString result) => TryParse(s.ToString(), provider, out result);
+    public static FAnsiString Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s.ToString(), provider);
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out FAnsiString result) => TryParse(s.ToString(), provider, out result);
 
-    public UnrealString() => BuildConjugate_Black(IntPtr.Zero);
-    public UnrealString(string? content) : this() => Data = content;
-    public UnrealString(UnrealString? other) : this() => Data = other?.Data;
+    public FAnsiString() => BuildConjugate_Black(IntPtr.Zero);
+    public FAnsiString(string? content) : this() => Data = content;
+    public FAnsiString(FAnsiString? other) : this() => Data = other?.Data;
 
-    public UnrealString Clone() => new(Data);
+    public FAnsiString Clone() => new(Data);
     object ICloneable.Clone() => Clone();
 
     public bool Equals(string? other) => Data == other;
-    public bool Equals(UnrealString? other) => Equals(other?.Data);
+    public bool Equals(FAnsiString? other) => Equals(other?.Data);
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(this, obj))
@@ -113,7 +113,7 @@ public sealed class UnrealString : UnrealConjugateBase
             return true;
         }
 
-        if (obj is UnrealString other)
+        if (obj is FAnsiString other)
         {
             return Equals(other);
         }
@@ -128,7 +128,7 @@ public sealed class UnrealString : UnrealConjugateBase
 
     public override int32 GetHashCode() => Data.GetHashCode();
 
-    public int32 CompareTo(UnrealString? other) => InternalCompare(this, other);
+    public int32 CompareTo(FAnsiString? other) => InternalCompare(this, other);
     public int32 CompareTo(string? other) => InternalCompare(this, other);
     int32 IComparable.CompareTo(object? obj)
     {
@@ -137,7 +137,7 @@ public sealed class UnrealString : UnrealConjugateBase
             return 1;
         }
 
-        if (obj is UnrealString other)
+        if (obj is FAnsiString other)
         {
             return CompareTo(other);
         }
@@ -176,27 +176,27 @@ public sealed class UnrealString : UnrealConjugateBase
     public DateTime ToDateTime(IFormatProvider? provider = null) => ((IConvertible)Data).ToDateTime(provider);
     public object ToType(Type conversionType, IFormatProvider? provider = null) => ((IConvertible)Data).ToType(conversionType, provider);
 
-    public static bool operator ==(UnrealString? lhs, UnrealString? rhs) => Equals(lhs, rhs);
-    public static bool operator !=(UnrealString? lhs, UnrealString? rhs) => !Equals(lhs, rhs);
-    public static bool operator >(UnrealString? lhs, UnrealString? rhs) => InternalCompare(lhs, rhs) > 0;
-    public static bool operator >=(UnrealString? lhs, UnrealString? rhs) => InternalCompare(lhs, rhs) >= 0;
-    public static bool operator <(UnrealString? lhs, UnrealString? rhs) => InternalCompare(lhs, rhs) < 0;
-    public static bool operator <=(UnrealString? lhs, UnrealString? rhs) => InternalCompare(lhs, rhs) <= 0;
+    public static bool operator ==(FAnsiString? lhs, FAnsiString? rhs) => Equals(lhs, rhs);
+    public static bool operator !=(FAnsiString? lhs, FAnsiString? rhs) => !Equals(lhs, rhs);
+    public static bool operator >(FAnsiString? lhs, FAnsiString? rhs) => InternalCompare(lhs, rhs) > 0;
+    public static bool operator >=(FAnsiString? lhs, FAnsiString? rhs) => InternalCompare(lhs, rhs) >= 0;
+    public static bool operator <(FAnsiString? lhs, FAnsiString? rhs) => InternalCompare(lhs, rhs) < 0;
+    public static bool operator <=(FAnsiString? lhs, FAnsiString? rhs) => InternalCompare(lhs, rhs) <= 0;
 
-    public static bool operator ==(UnrealString? lhs, string? rhs) => Equals(lhs?.Data, rhs);
-    public static bool operator !=(UnrealString? lhs, string? rhs) => !Equals(lhs?.Data, rhs);
-    public static bool operator >(UnrealString? lhs, string? rhs) => InternalCompare(lhs, rhs) > 0;
-    public static bool operator >=(UnrealString? lhs, string? rhs) => InternalCompare(lhs, rhs) >= 0;
-    public static bool operator <(UnrealString? lhs, string? rhs) => InternalCompare(lhs, rhs) < 0;
-    public static bool operator <=(UnrealString? lhs, string? rhs) => InternalCompare(lhs, rhs) <= 0;
+    public static bool operator ==(FAnsiString? lhs, string? rhs) => Equals(lhs?.Data, rhs);
+    public static bool operator !=(FAnsiString? lhs, string? rhs) => !Equals(lhs?.Data, rhs);
+    public static bool operator >(FAnsiString? lhs, string? rhs) => InternalCompare(lhs, rhs) > 0;
+    public static bool operator >=(FAnsiString? lhs, string? rhs) => InternalCompare(lhs, rhs) >= 0;
+    public static bool operator <(FAnsiString? lhs, string? rhs) => InternalCompare(lhs, rhs) < 0;
+    public static bool operator <=(FAnsiString? lhs, string? rhs) => InternalCompare(lhs, rhs) <= 0;
 
-    public static implicit operator UnrealString(string? value) => new(value);
-    public static implicit operator UnrealString(ReadOnlySpan<char> value) => new(value.ToString());
-    public static implicit operator string(UnrealString? value) => value?.Data ?? string.Empty;
-    public static implicit operator ReadOnlySpan<char>(UnrealString? value) => value?.Data;
+    public static implicit operator FAnsiString(string? value) => new(value);
+    public static implicit operator FAnsiString(ReadOnlySpan<char> value) => new(value.ToString());
+    public static implicit operator string(FAnsiString? value) => value?.Data ?? string.Empty;
+    public static implicit operator ReadOnlySpan<char>(FAnsiString? value) => value?.Data;
     
-    public static IEqualityComparer<UnrealString> DefaultEqualityComparer { get; } = new EqualityComparer();
-    public static IComparer<UnrealString> DefaultRelationalComparer { get; } = new RelationalComparer();
+    public static IEqualityComparer<FAnsiString> DefaultEqualityComparer { get; } = new EqualityComparer();
+    public static IComparer<FAnsiString> DefaultRelationalComparer { get; } = new RelationalComparer();
     
     [AllowNull]
     public string Data
@@ -213,28 +213,33 @@ public sealed class UnrealString : UnrealConjugateBase
         }
     }
     
-    private sealed class EqualityComparer : IEqualityComparer<UnrealString>
+    private sealed class EqualityComparer : IEqualityComparer<FAnsiString>
     {
-        public bool Equals(UnrealString? lhs, UnrealString? rhs) => lhs == rhs;
-        public int32 GetHashCode(UnrealString obj) => obj.GetHashCode();
+        public bool Equals(FAnsiString? lhs, FAnsiString? rhs) => lhs == rhs;
+        public int32 GetHashCode(FAnsiString obj) => obj.GetHashCode();
     }
 
-    private sealed class RelationalComparer : IComparer<UnrealString>
+    private sealed class RelationalComparer : IComparer<FAnsiString>
     {
-        public int32 Compare(UnrealString? lhs, UnrealString? rhs) => InternalCompare(lhs, rhs);
+        public int32 Compare(FAnsiString? lhs, FAnsiString? rhs) => InternalCompare(lhs, rhs);
     }
     
     private static int32 InternalCompare(string? lhs, string? rhs) => string.Compare(lhs, rhs, StringComparison.Ordinal);
     
-    private UnrealString(IntPtr unmanaged) : base(unmanaged){}
+    private FAnsiString(IntPtr unmanaged) : base(unmanaged){}
 
-    private unsafe string InternalGetData() => new(UnrealString_Interop.GetData(ConjugateHandle.FromConjugate(this)));
+    private unsafe string InternalGetData()
+    {
+        using InteropString buffer = new();
+        UnrealAnsiString_Interop.GetData(ConjugateHandle.FromConjugate(this), buffer.Address);
+        return buffer;
+    }
     
     private unsafe void InternalSetData(string? value)
     {
         fixed (char* buffer = value)
         {
-            UnrealString_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);
+            UnrealAnsiString_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);
         }
     }
     

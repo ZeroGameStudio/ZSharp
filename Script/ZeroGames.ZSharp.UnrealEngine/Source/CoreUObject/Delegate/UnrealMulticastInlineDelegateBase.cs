@@ -9,7 +9,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public abstract class UnrealMulticastInlineDelegateBase : UnrealConjugateBase, IUnrealFieldPath
 {
 
-	public void Add(UnrealObject? obj, string? name)
+	public void Add(UObject? obj, string? name)
 	{
 		if (obj is null || string.IsNullOrWhiteSpace(name))
 		{
@@ -20,7 +20,7 @@ public abstract class UnrealMulticastInlineDelegateBase : UnrealConjugateBase, I
 		InternalAdd(obj, name);
 	}
 
-	public void Remove(UnrealObject? obj, string? name)
+	public void Remove(UObject? obj, string? name)
 	{
 		if (obj is null || string.IsNullOrWhiteSpace(name))
 		{
@@ -31,7 +31,7 @@ public abstract class UnrealMulticastInlineDelegateBase : UnrealConjugateBase, I
 		InternalRemove(obj, name);
 	}
 
-	public void RemoveAll(UnrealObject? obj)
+	public void RemoveAll(UObject? obj)
 	{
 		if (obj is null)
 		{
@@ -48,7 +48,7 @@ public abstract class UnrealMulticastInlineDelegateBase : UnrealConjugateBase, I
 		InternalClear();
 	}
 
-	public bool IsBoundToObject(UnrealObject? obj)
+	public bool IsBoundToObject(UObject? obj)
 	{
 		if (obj is null)
 		{
@@ -59,7 +59,7 @@ public abstract class UnrealMulticastInlineDelegateBase : UnrealConjugateBase, I
 		return InternalIsBoundToObject(obj);
 	}
 
-	public bool Contains(UnrealObject? obj, string? name)
+	public bool Contains(UObject? obj, string? name)
 	{
 		if (obj is null || string.IsNullOrWhiteSpace(name))
 		{
@@ -85,10 +85,10 @@ public abstract class UnrealMulticastInlineDelegateBase : UnrealConjugateBase, I
 	protected UnrealMulticastInlineDelegateBase(IntPtr unmanaged) : base(unmanaged){}
 	
 	protected unsafe EZCallErrorCode Broadcast(ZCallBuffer* buffer) => UnrealMulticastInlineDelegate_Interop.Broadcast(buffer);
-	protected unsafe UnrealObject Add(Delegate @delegate) => UnrealMulticastInlineDelegate_Interop.AddStatelessManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();
-	protected unsafe UnrealObject Add(Delegate @delegate, object? state) => UnrealMulticastInlineDelegate_Interop.AddStatefulManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate), GCHandle.Alloc(state)).GetTargetChecked<UnrealObject>();
+	protected unsafe UObject Add(Delegate @delegate) => UnrealMulticastInlineDelegate_Interop.AddStatelessManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UObject>();
+	protected unsafe UObject Add(Delegate @delegate, object? state) => UnrealMulticastInlineDelegate_Interop.AddStatefulManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate), GCHandle.Alloc(state)).GetTargetChecked<UObject>();
 
-	private unsafe void InternalAdd(UnrealObject obj, string name)
+	private unsafe void InternalAdd(UObject obj, string name)
 	{
 		fixed (char* nameBuffer = name)
 		{
@@ -96,7 +96,7 @@ public abstract class UnrealMulticastInlineDelegateBase : UnrealConjugateBase, I
 		}
 	}
 
-	private unsafe void InternalRemove(UnrealObject obj, string name)
+	private unsafe void InternalRemove(UObject obj, string name)
 	{
 		fixed (char* nameBuffer = name)
 		{
@@ -104,10 +104,10 @@ public abstract class UnrealMulticastInlineDelegateBase : UnrealConjugateBase, I
 		}
 	}
 
-	private unsafe void InternalRemoveAll(UnrealObject obj) => UnrealMulticastInlineDelegate_Interop.RemoveAll(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj));
+	private unsafe void InternalRemoveAll(UObject obj) => UnrealMulticastInlineDelegate_Interop.RemoveAll(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj));
 	private unsafe void InternalClear() => UnrealMulticastInlineDelegate_Interop.Clear(ConjugateHandle.FromConjugate(this));
-	private unsafe bool InternalIsBoundToObject(UnrealObject obj) => UnrealMulticastInlineDelegate_Interop.IsBoundToObject(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj)) > 0;
-	private unsafe bool InternalContains(UnrealObject obj, string name)
+	private unsafe bool InternalIsBoundToObject(UObject obj) => UnrealMulticastInlineDelegate_Interop.IsBoundToObject(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj)) > 0;
+	private unsafe bool InternalContains(UObject obj, string name)
 	{
 		fixed (char* nameBuffer = name)
 		{

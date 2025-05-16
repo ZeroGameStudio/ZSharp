@@ -6,10 +6,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ZeroGames.ZSharp.UnrealEngine.GameplayTags;
 
-public partial class GameplayTag
+public partial class FGameplayTag
 {
 
-	public static GameplayTag Request(string tagName)
+	public static FGameplayTag Request(string tagName)
 	{
 		if (!TryRequest(tagName, out var tag))
 		{
@@ -19,18 +19,18 @@ public partial class GameplayTag
 		return tag;
 	}
 	
-	public static bool TryRequest(string tagName, [NotNullWhen(true)] out GameplayTag? tag)
+	public static bool TryRequest(string tagName, [NotNullWhen(true)] out FGameplayTag? tag)
 	{
 		MasterAlcCache.GuardInvariant();
 		tag = InternalRequest(tagName);
 		return tag is not null;
 	}
 
-	private static unsafe GameplayTag? InternalRequest(string tagName)
+	private static unsafe FGameplayTag? InternalRequest(string tagName)
 	{
 		fixed (char* buffer = tagName)
 		{
-			return GameplayTag_Interop.Request(buffer).GetTarget<GameplayTag>();
+			return GameplayTag_Interop.Request(buffer).GetTarget<FGameplayTag>();
 		}
 	}
 

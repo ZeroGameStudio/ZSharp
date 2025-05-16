@@ -2,10 +2,10 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public partial class UnrealObject : IUnrealObject
+public partial class UObject : IUnrealObject
 {
 
-    public UnrealClass GetClass()
+    public UClass GetClass()
     {
         MasterAlcCache.GuardInvariant();
         return InternalGetClass();
@@ -23,63 +23,63 @@ public partial class UnrealObject : IUnrealObject
         return InternalGetPathName();
     }
 
-    public UnrealObject? GetOuter()
+    public UObject? GetOuter()
     {
         MasterAlcCache.GuardInvariant();
         return InternalGetOuter();
     }
 
-    public UnrealObject GetOuterChecked()
+    public UObject GetOuterChecked()
     {
         verify(GetOuter() is var outer && outer is not null);
         return outer;
     }
     
-    public World? GetWorld()
+    public UWorld? GetWorld()
     {
         MasterAlcCache.GuardInvariant();
         return InternalGetWorld();
     }
 
-    public World GetWorldChecked()
+    public UWorld GetWorldChecked()
     {
         verify(GetWorld() is var world && world is not null);
         return world;
     }
 
-    public bool IsA(UnrealClass @class)
+    public bool IsA(UClass @class)
     {
         MasterAlcCache.GuardInvariant();
         return InternalIsA(@class);
     }
-    public bool IsA(Type @class) => IsA(UnrealClass.FromType(@class));
-    public bool IsA<T>() where T : UnrealObject => IsA(UnrealClass.FromType<T>());
+    public bool IsA(Type @class) => IsA(UClass.FromType(@class));
+    public bool IsA<T>() where T : UObject => IsA(UClass.FromType<T>());
 
-    public bool Implements(UnrealClass @interface) => GetClass().ImplementsInterface(@interface);
-    public bool Implements(Type @interface) => Implements(UnrealClass.FromType(@interface));
-    public bool Implements<T>() where T : IUnrealInterface => Implements(typeof(T));
+    public bool Implements(UClass @interface) => GetClass().ImplementsInterface(@interface);
+    public bool Implements(Type @interface) => Implements(UClass.FromType(@interface));
+    public bool Implements<T>() where T : IInterface => Implements(typeof(T));
 
-    public bool IsIn(UnrealObject outer)
+    public bool IsIn(UObject outer)
     {
         MasterAlcCache.GuardInvariant();
         return InternalIsIn(outer);
     }
 
-    public bool Rename(string? newName, UnrealObject? newOuter)
+    public bool Rename(string? newName, UObject? newOuter)
     {
         MasterAlcCache.GuardInvariant();
         return InternalRename(newName, newOuter);
     }
     public bool Rename(string newName) => Rename(newName, null);
-    public bool Rename(UnrealObject newOuter) => Rename(null, newOuter);
+    public bool Rename(UObject newOuter) => Rename(null, newOuter);
 
     // @TODO: Construct on async loading thread.
     // Only called on emitted class, just before C++ UObject::PostInitProperties().
     // [ZCall(Name = ".pip")]
     // protected virtual void PostInitProperties(){}
 
-    private unsafe UnrealClass InternalGetClass()
-        => UnrealObject_Interop.GetClass(ConjugateHandle.FromConjugate(this)).GetTargetChecked<UnrealClass>();
+    private unsafe UClass InternalGetClass()
+        => UnrealObject_Interop.GetClass(ConjugateHandle.FromConjugate(this)).GetTargetChecked<UClass>();
 
     private unsafe string InternalGetName()
     {
@@ -95,19 +95,19 @@ public partial class UnrealObject : IUnrealObject
         return buffer;
     }
     
-    private unsafe World? InternalGetWorld()
-        => UnrealObject_Interop.GetWorld(ConjugateHandle.FromConjugate(this)).GetTarget<World>();
+    private unsafe UWorld? InternalGetWorld()
+        => UnrealObject_Interop.GetWorld(ConjugateHandle.FromConjugate(this)).GetTarget<UWorld>();
     
-    private unsafe UnrealObject? InternalGetOuter()
-        => UnrealObject_Interop.GetOuter(ConjugateHandle.FromConjugate(this)).GetTarget<UnrealObject>();
+    private unsafe UObject? InternalGetOuter()
+        => UnrealObject_Interop.GetOuter(ConjugateHandle.FromConjugate(this)).GetTarget<UObject>();
     
-    private unsafe bool InternalIsA(UnrealClass @class)
+    private unsafe bool InternalIsA(UClass @class)
         => UnrealObject_Interop.IsA(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(@class)) > 0;
     
-    private unsafe bool InternalIsIn(UnrealObject outer)
+    private unsafe bool InternalIsIn(UObject outer)
         => UnrealObject_Interop.IsIn(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(outer)) > 0;
 
-    private unsafe bool InternalRename(string? newName, UnrealObject? newOuter)
+    private unsafe bool InternalRename(string? newName, UObject? newOuter)
     {
         fixed (char* newNameBuffer = newName)
         {

@@ -10,19 +10,19 @@ internal static unsafe class World_Interop
 {
 	[UnmanagedCallersOnly]
 	public static void NotifyWorldInitialized(ConjugateHandle world)
-		=> World.InternalNotifyWorldInitialized(world);
+		=> UWorld.InternalNotifyWorldInitialized(world);
 	
 	[UnmanagedCallersOnly]
 	public static void NotifyWorldTearingDown(ConjugateHandle world)
-		=> World.InternalNotifyWorldTearingDown(world);
+		=> UWorld.InternalNotifyWorldTearingDown(world);
 	
 	[UnmanagedCallersOnly]
 	public static void PreLoadMap(char* map)
-		=> World.InternalPreLoadMap(new(map));
+		=> UWorld.InternalPreLoadMap(new(map));
 	
 	[UnmanagedCallersOnly]
 	public static void PostLoadMap(ConjugateHandle world)
-		=> World.InternalPostLoadMap(world);
+		=> UWorld.InternalPostLoadMap(world);
 	
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle, ConjugateHandle, char*, ConjugateHandle, ConjugateHandle, ConjugateHandle, ConjugateHandle, ESpawnActorCollisionHandlingMethod, ESpawnActorScaleMethod, ESpawnActorNameMode, uint8, uint8, ConjugateHandle> SpawnActor;
 	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, EWorldType> GetWorldType;

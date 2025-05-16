@@ -5,7 +5,7 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 public interface IStaticSignature
 {
-	static abstract DelegateFunction StaticSignature { get; }
+	static abstract UDelegateFunction StaticSignature { get; }
 }
 
 

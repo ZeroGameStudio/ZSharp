@@ -2,17 +2,17 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 
-public partial class ActorComponent
+public partial class UActorComponent
 {
 
-	public T? GetOwner<T>() where T : Actor
+	public T? GetOwner<T>() where T : AActor
 	{
 		return GetOwner() as T;
 	}
 
-	public Actor GetOwnerChecked() => GetOwnerChecked<Actor>();
+	public AActor GetOwnerChecked() => GetOwnerChecked<AActor>();
 
-	public T GetOwnerChecked<T>() where T : Actor
+	public T GetOwnerChecked<T>() where T : AActor
 	{
 		if (GetOwner() is T owner)
 		{

@@ -4,10 +4,10 @@ using System.Reflection;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public partial class UnrealStruct
+public partial class UStruct
 {
 
-	public static UnrealStruct FromType(Type type)
+	public static UStruct FromType(Type type)
 	{
 		PropertyInfo? staticUnrealFieldProperty = null;
 		if (type.IsAssignableTo(typeof(IUnrealObject)))
@@ -31,11 +31,11 @@ public partial class UnrealStruct
 			throw new ArgumentOutOfRangeException($"Type {type.FullName} is not a valid unreal field.");
 		}
 		
-		return (UnrealStruct)staticUnrealFieldProperty.GetValue(null)!;
+		return (UStruct)staticUnrealFieldProperty.GetValue(null)!;
 	}
-	public static UnrealStruct FromType<T>() => FromType(typeof(T));
+	public static UStruct FromType<T>() => FromType(typeof(T));
 
-	public bool IsChildOf(UnrealStruct other)
+	public bool IsChildOf(UStruct other)
 	{
 		MasterAlcCache.GuardInvariant();
 		return InternalIsChildOf(other);
@@ -43,7 +43,7 @@ public partial class UnrealStruct
 	public bool IsChildOf(Type other) => IsChildOf(FromType(other));
 	public bool IsChildOf<T>() => IsChildOf(typeof(T));
 
-	private unsafe bool InternalIsChildOf(UnrealStruct other) => UnrealStruct_Interop.IsChildOf(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
+	private unsafe bool InternalIsChildOf(UStruct other) => UnrealStruct_Interop.IsChildOf(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
 
 }
 

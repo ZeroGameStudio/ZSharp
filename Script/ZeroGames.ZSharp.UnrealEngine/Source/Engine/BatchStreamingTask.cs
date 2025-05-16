@@ -6,7 +6,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 
 public readonly record struct BatchStreamingProgress(int32 LoadedCount, int32 TotalCount);
 
-public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStreamingTask<T>.Awaiter> where T : UnrealObject
+public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStreamingTask<T>.Awaiter> where T : UObject
 {
 
 	public readonly struct Awaiter : IAwaiter<T[]>, IMoveNextSourceAwaiter

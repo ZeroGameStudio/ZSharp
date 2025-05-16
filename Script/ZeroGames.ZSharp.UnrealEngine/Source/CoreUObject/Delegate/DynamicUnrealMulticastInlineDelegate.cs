@@ -14,7 +14,7 @@ public sealed class DynamicUnrealMulticastInlineDelegate : UnrealScriptStructBas
 	public static DynamicUnrealMulticastInlineDelegate BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 	
 	public static string StaticUnrealFieldPath => throw new NotSupportedException();
-	public static DelegateFunction StaticSignature => throw new NotSupportedException();
+	public static UDelegateFunction StaticSignature => throw new NotSupportedException();
 	public override string UnrealFieldPath => throw new NotSupportedException();
 	
 	private DynamicUnrealMulticastInlineDelegate(IntPtr unmanaged) : base(unmanaged){}

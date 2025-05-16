@@ -9,7 +9,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public abstract class UnrealDelegateBase : UnrealConjugateBase, IUnrealFieldPath
 {
 
-	public void Bind(UnrealObject? obj, string? name)
+	public void Bind(UObject? obj, string? name)
 	{
 		if (obj is null || string.IsNullOrWhiteSpace(name))
 		{
@@ -26,7 +26,7 @@ public abstract class UnrealDelegateBase : UnrealConjugateBase, IUnrealFieldPath
 		InternalUnbind();
 	}
 
-	public bool IsBoundToObject(UnrealObject? obj)
+	public bool IsBoundToObject(UObject? obj)
 	{
 		if (obj is null)
 		{
@@ -37,7 +37,7 @@ public abstract class UnrealDelegateBase : UnrealConjugateBase, IUnrealFieldPath
 		return InternalIsBoundToObject(obj);
 	}
 
-	public UnrealObject? Object
+	public UObject? Object
 	{
 		get
 		{
@@ -70,10 +70,10 @@ public abstract class UnrealDelegateBase : UnrealConjugateBase, IUnrealFieldPath
 	protected UnrealDelegateBase(IntPtr unmanaged) : base(unmanaged){}
 
 	protected unsafe EZCallErrorCode Execute(ZCallBuffer* buffer) => UnrealDelegate_Interop.Execute(buffer);
-	protected unsafe UnrealObject Bind(Delegate @delegate) => UnrealDelegate_Interop.BindStatelessManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UnrealObject>();
-	protected unsafe UnrealObject Bind(Delegate @delegate, object? state) => UnrealDelegate_Interop.BindStatefulManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate), GCHandle.Alloc(state)).GetTargetChecked<UnrealObject>();
+	protected unsafe UObject Bind(Delegate @delegate) => UnrealDelegate_Interop.BindStatelessManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate)).GetTargetChecked<UObject>();
+	protected unsafe UObject Bind(Delegate @delegate, object? state) => UnrealDelegate_Interop.BindStatefulManagedDelegate(ConjugateHandle.FromConjugate(this), GCHandle.Alloc(@delegate), GCHandle.Alloc(state)).GetTargetChecked<UObject>();
 
-	private unsafe void InternalBind(UnrealObject obj, string name)
+	private unsafe void InternalBind(UObject obj, string name)
 	{
 		fixed (char* nameBuffer = name)
 		{
@@ -82,9 +82,9 @@ public abstract class UnrealDelegateBase : UnrealConjugateBase, IUnrealFieldPath
 	}
 
 	private unsafe void InternalUnbind() => UnrealDelegate_Interop.Unbind(ConjugateHandle.FromConjugate(this));
-	private unsafe bool InternalIsBoundToObject(UnrealObject obj) => UnrealDelegate_Interop.IsBoundToObject(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj)) > 0;
+	private unsafe bool InternalIsBoundToObject(UObject obj) => UnrealDelegate_Interop.IsBoundToObject(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(obj)) > 0;
 	
-	private unsafe UnrealObject? InternalObject => UnrealDelegate_Interop.GetObject(ConjugateHandle.FromConjugate(this)).GetTarget<UnrealObject>();
+	private unsafe UObject? InternalObject => UnrealDelegate_Interop.GetObject(ConjugateHandle.FromConjugate(this)).GetTarget<UObject>();
 
 	private unsafe string InternalFunctionName
 	{

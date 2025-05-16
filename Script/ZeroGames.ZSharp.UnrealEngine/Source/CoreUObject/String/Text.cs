@@ -8,20 +8,20 @@ using System.Runtime.CompilerServices;
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
-[ConjugateRegistryId(14)]
-[ConjugateKey("Unreal.Name")]
-public sealed class UnrealName : UnrealConjugateBase
-    , IConjugate<UnrealName>
-    , ICloneable<UnrealName>
-    , IEquatable<UnrealName>
+[ConjugateRegistryId(15)]
+[ConjugateKey("Unreal.Text")]
+public sealed class FText : UnrealConjugateBase
+    , IConjugate<FText>
+    , ICloneable<FText>
+    , IEquatable<FText>
     , IEquatable<string>
     , IComparable
-    , IComparable<UnrealName>
+    , IComparable<FText>
     , IComparable<string>
-    , IComparisonOperators<UnrealName?, UnrealName?, bool>
-    , IComparisonOperators<UnrealName?, string?, bool>
+    , IComparisonOperators<FText?, FText?, bool>
+    , IComparisonOperators<FText?, string?, bool>
     , IEnumerable<char>
-    , ISpanParsable<UnrealName>
+    , ISpanParsable<FText>
     , IConvertible
     , IPinnable<char>
     , IUnrealString
@@ -52,7 +52,7 @@ public sealed class UnrealName : UnrealConjugateBase
         }
         object IEnumerator.Current => Current;
 
-        internal Enumerator(UnrealName target)
+        internal Enumerator(FText target)
         {
             _target = target;
             _snapshot = target.Data;
@@ -79,33 +79,33 @@ public sealed class UnrealName : UnrealConjugateBase
             return data;
         }
         
-        private UnrealName? _target;
+        private FText? _target;
         private readonly string _snapshot;
         private int32 _index = -1;
     }
     
-    public static UnrealName BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+    public static FText BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-    public static UnrealName Parse(string s, IFormatProvider? provider) => s;
+    public static FText Parse(string s, IFormatProvider? provider) => s;
 
-    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out UnrealName result)
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out FText result)
     {
         result = s;
         return s is not null;
     }
 
-    public static UnrealName Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s.ToString(), provider);
-    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out UnrealName result) => TryParse(s.ToString(), provider, out result);
+    public static FText Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s.ToString(), provider);
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out FText result) => TryParse(s.ToString(), provider, out result);
 
-    public UnrealName() => BuildConjugate_Black(IntPtr.Zero);
-    public UnrealName(string? content) : this() => Data = content;
-    public UnrealName(UnrealName? other) : this() => Data = other?.Data;
+    public FText() => BuildConjugate_Black(IntPtr.Zero);
+    public FText(string? content) : this() => Data = content;
+    public FText(FText? other) : this() => Data = other?.Data;
 
-    public UnrealName Clone() => new(Data);
+    public FText Clone() => new(Data);
     object ICloneable.Clone() => Clone();
 
     public bool Equals(string? other) => Data == other;
-    public bool Equals(UnrealName? other) => Equals(other?.Data);
+    public bool Equals(FText? other) => Equals(other?.Data);
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(this, obj))
@@ -113,7 +113,7 @@ public sealed class UnrealName : UnrealConjugateBase
             return true;
         }
 
-        if (obj is UnrealName other)
+        if (obj is FText other)
         {
             return Equals(other);
         }
@@ -128,7 +128,7 @@ public sealed class UnrealName : UnrealConjugateBase
 
     public override int32 GetHashCode() => Data.GetHashCode();
 
-    public int32 CompareTo(UnrealName? other) => InternalCompare(this, other);
+    public int32 CompareTo(FText? other) => InternalCompare(this, other);
     public int32 CompareTo(string? other) => InternalCompare(this, other);
     int32 IComparable.CompareTo(object? obj)
     {
@@ -137,7 +137,7 @@ public sealed class UnrealName : UnrealConjugateBase
             return 1;
         }
 
-        if (obj is UnrealName other)
+        if (obj is FText other)
         {
             return CompareTo(other);
         }
@@ -176,27 +176,27 @@ public sealed class UnrealName : UnrealConjugateBase
     public DateTime ToDateTime(IFormatProvider? provider = null) => ((IConvertible)Data).ToDateTime(provider);
     public object ToType(Type conversionType, IFormatProvider? provider = null) => ((IConvertible)Data).ToType(conversionType, provider);
 
-    public static bool operator ==(UnrealName? lhs, UnrealName? rhs) => Equals(lhs, rhs);
-    public static bool operator !=(UnrealName? lhs, UnrealName? rhs) => !Equals(lhs, rhs);
-    public static bool operator >(UnrealName? lhs, UnrealName? rhs) => InternalCompare(lhs, rhs) > 0;
-    public static bool operator >=(UnrealName? lhs, UnrealName? rhs) => InternalCompare(lhs, rhs) >= 0;
-    public static bool operator <(UnrealName? lhs, UnrealName? rhs) => InternalCompare(lhs, rhs) < 0;
-    public static bool operator <=(UnrealName? lhs, UnrealName? rhs) => InternalCompare(lhs, rhs) <= 0;
+    public static bool operator ==(FText? lhs, FText? rhs) => Equals(lhs, rhs);
+    public static bool operator !=(FText? lhs, FText? rhs) => !Equals(lhs, rhs);
+    public static bool operator >(FText? lhs, FText? rhs) => InternalCompare(lhs, rhs) > 0;
+    public static bool operator >=(FText? lhs, FText? rhs) => InternalCompare(lhs, rhs) >= 0;
+    public static bool operator <(FText? lhs, FText? rhs) => InternalCompare(lhs, rhs) < 0;
+    public static bool operator <=(FText? lhs, FText? rhs) => InternalCompare(lhs, rhs) <= 0;
 
-    public static bool operator ==(UnrealName? lhs, string? rhs) => Equals(lhs?.Data, rhs);
-    public static bool operator !=(UnrealName? lhs, string? rhs) => !Equals(lhs?.Data, rhs);
-    public static bool operator >(UnrealName? lhs, string? rhs) => InternalCompare(lhs, rhs) > 0;
-    public static bool operator >=(UnrealName? lhs, string? rhs) => InternalCompare(lhs, rhs) >= 0;
-    public static bool operator <(UnrealName? lhs, string? rhs) => InternalCompare(lhs, rhs) < 0;
-    public static bool operator <=(UnrealName? lhs, string? rhs) => InternalCompare(lhs, rhs) <= 0;
+    public static bool operator ==(FText? lhs, string? rhs) => Equals(lhs?.Data, rhs);
+    public static bool operator !=(FText? lhs, string? rhs) => !Equals(lhs?.Data, rhs);
+    public static bool operator >(FText? lhs, string? rhs) => InternalCompare(lhs, rhs) > 0;
+    public static bool operator >=(FText? lhs, string? rhs) => InternalCompare(lhs, rhs) >= 0;
+    public static bool operator <(FText? lhs, string? rhs) => InternalCompare(lhs, rhs) < 0;
+    public static bool operator <=(FText? lhs, string? rhs) => InternalCompare(lhs, rhs) <= 0;
 
-    public static implicit operator UnrealName(string? value) => new(value);
-    public static implicit operator UnrealName(ReadOnlySpan<char> value) => new(value.ToString());
-    public static implicit operator string(UnrealName? value) => value?.Data ?? string.Empty;
-    public static implicit operator ReadOnlySpan<char>(UnrealName? value) => value?.Data;
+    public static implicit operator FText(string? value) => new(value);
+    public static implicit operator FText(ReadOnlySpan<char> value) => new(value.ToString());
+    public static implicit operator string(FText? value) => value?.Data ?? string.Empty;
+    public static implicit operator ReadOnlySpan<char>(FText? value) => value?.Data;
     
-    public static IEqualityComparer<UnrealName> DefaultEqualityComparer { get; } = new EqualityComparer();
-    public static IComparer<UnrealName> DefaultRelationalComparer { get; } = new RelationalComparer();
+    public static IEqualityComparer<FText> DefaultEqualityComparer { get; } = new EqualityComparer();
+    public static IComparer<FText> DefaultRelationalComparer { get; } = new RelationalComparer();
     
     [AllowNull]
     public string Data
@@ -212,47 +212,31 @@ public sealed class UnrealName : UnrealConjugateBase
             InternalSetData(value);
         }
     }
-
-    public bool IsNone
-    {
-        get
-        {
-            MasterAlcCache.GuardInvariant();
-            return InternalIsNone();
-        }
-    }
     
-    private sealed class EqualityComparer : IEqualityComparer<UnrealName>
+    private sealed class EqualityComparer : IEqualityComparer<FText>
     {
-        public bool Equals(UnrealName? lhs, UnrealName? rhs) => lhs == rhs;
-        public int32 GetHashCode(UnrealName obj) => obj.GetHashCode();
+        public bool Equals(FText? lhs, FText? rhs) => lhs == rhs;
+        public int32 GetHashCode(FText obj) => obj.GetHashCode();
     }
 
-    private sealed class RelationalComparer : IComparer<UnrealName>
+    private sealed class RelationalComparer : IComparer<FText>
     {
-        public int32 Compare(UnrealName? lhs, UnrealName? rhs) => InternalCompare(lhs, rhs);
+        public int32 Compare(FText? lhs, FText? rhs) => InternalCompare(lhs, rhs);
     }
     
     private static int32 InternalCompare(string? lhs, string? rhs) => string.Compare(lhs, rhs, StringComparison.Ordinal);
     
-    private UnrealName(IntPtr unmanaged) : base(unmanaged){}
+    private FText(IntPtr unmanaged) : base(unmanaged){}
 
-    private unsafe string InternalGetData()
-    {
-        using InteropString buffer = new();
-        UnrealName_Interop.GetData(ConjugateHandle.FromConjugate(this), buffer.Address);
-        return buffer;
-    }
+    private unsafe string InternalGetData() => new(UnrealText_Interop.GetData(ConjugateHandle.FromConjugate(this)));
     
     private unsafe void InternalSetData(string? value)
     {
         fixed (char* buffer = value)
         {
-            UnrealName_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);
+            UnrealText_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);
         }
     }
-
-    private unsafe bool InternalIsNone() => UnrealName_Interop.IsNone(ConjugateHandle.FromConjugate(this)) > 0;
     
 }
 

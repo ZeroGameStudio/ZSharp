@@ -163,70 +163,70 @@ internal class Archive : IArchive
 		return this;
 	}
 
-	public IArchive Serialize(UnrealString? value)
+	public IArchive Serialize(FString? value)
 	{
 		GuardSaving();
 		InternalSerialize(value);
 		return this;
 	}
 
-	public IArchive Serialize(out UnrealString value)
+	public IArchive Serialize(out FString value)
 	{
 		GuardLoading();
 		InternalSerialize(out value);
 		return this;
 	}
 
-	public IArchive Serialize(UnrealAnsiString? value)
+	public IArchive Serialize(FAnsiString? value)
 	{
 		GuardSaving();
 		InternalSerialize(value);
 		return this;
 	}
 
-	public IArchive Serialize(out UnrealAnsiString value)
+	public IArchive Serialize(out FAnsiString value)
 	{
 		GuardLoading();
 		InternalSerialize(out value);
 		return this;
 	}
 
-	public IArchive Serialize(UnrealUtf8String? value)
+	public IArchive Serialize(FUtf8String? value)
 	{
 		GuardSaving();
 		InternalSerialize(value);
 		return this;
 	}
 
-	public IArchive Serialize(out UnrealUtf8String value)
+	public IArchive Serialize(out FUtf8String value)
 	{
 		GuardLoading();
 		InternalSerialize(out value);
 		return this;
 	}
 
-	public IArchive Serialize(UnrealName? value)
+	public IArchive Serialize(FName? value)
 	{
 		GuardSaving();
 		InternalSerialize(value);
 		return this;
 	}
 
-	public IArchive Serialize(out UnrealName value)
+	public IArchive Serialize(out FName value)
 	{
 		GuardLoading();
 		InternalSerialize(out value);
 		return this;
 	}
 
-	public IArchive Serialize(UnrealText? value)
+	public IArchive Serialize(FText? value)
 	{
 		GuardSaving();
 		InternalSerialize(value);
 		return this;
 	}
 
-	public IArchive Serialize(out UnrealText value)
+	public IArchive Serialize(out FText value)
 	{
 		GuardLoading();
 		InternalSerialize(out value);
@@ -235,24 +235,24 @@ internal class Archive : IArchive
 
 	public IArchive Serialize(string? value)
 	{
-		return Serialize(new UnrealString(value));
+		return Serialize(new FString(value));
 	}
 
 	public IArchive Serialize(out string value)
 	{
-		Serialize(out UnrealString str);
+		Serialize(out FString str);
 		value = str;
 		return this;
 	}
 
-	public IArchive Serialize(UnrealObject? value)
+	public IArchive Serialize(UObject? value)
 	{
 		GuardSaving();
 		InternalSerialize(value);
 		return this;
 	}
 
-	public IArchive Serialize(out UnrealObject? value)
+	public IArchive Serialize(out UObject? value)
 	{
 		GuardLoading();
 		InternalSerialize(out value);
@@ -273,26 +273,26 @@ internal class Archive : IArchive
 		return this;
 	}
 
-	public bool NetSerialize(UnrealScriptStructBase? value, PackageMap map, out bool success)
+	public bool NetSerialize(UnrealScriptStructBase? value, UPackageMap map, out bool success)
 	{
 		GuardSaving();
 		return InternalNetSerialize(value, map, out success);
 	}
 
-	public bool NetSerialize(out UnrealScriptStructBase value, PackageMap map, out bool success)
+	public bool NetSerialize(out UnrealScriptStructBase value, UPackageMap map, out bool success)
 	{
 		GuardLoading();
 		return InternalNetSerialize(out value, map, out success);
 	}
 
-	public IArchive Serialize(SoftObjectPath? value)
+	public IArchive Serialize(FSoftObjectPath? value)
 	{
 		GuardSaving();
 		InternalSerialize(value);
 		return this;
 	}
 
-	public IArchive Serialize(out SoftObjectPath value)
+	public IArchive Serialize(out FSoftObjectPath value)
 	{
 		GuardLoading();
 		InternalSerialize(out value);
@@ -418,35 +418,35 @@ internal class Archive : IArchive
 	private unsafe void InternalSerialize(double value) => Archive_Interop.SaveDouble(_unmanaged, value);
 	private unsafe void InternalSerialize(out double value) => value = Archive_Interop.LoadDouble(_unmanaged);
 
-	private unsafe void InternalSerialize(UnrealString? value) => Archive_Interop.SaveString(_unmanaged, ConjugateHandle.FromConjugate(value));
-	private unsafe void InternalSerialize(out UnrealString value) => value = Archive_Interop.LoadString(_unmanaged).GetTargetChecked<UnrealString>();
+	private unsafe void InternalSerialize(FString? value) => Archive_Interop.SaveString(_unmanaged, ConjugateHandle.FromConjugate(value));
+	private unsafe void InternalSerialize(out FString value) => value = Archive_Interop.LoadString(_unmanaged).GetTargetChecked<FString>();
 
-	private unsafe void InternalSerialize(UnrealAnsiString? value) => Archive_Interop.SaveAnsiString(_unmanaged, ConjugateHandle.FromConjugate(value));
-	private unsafe void InternalSerialize(out UnrealAnsiString value) => value = Archive_Interop.LoadAnsiString(_unmanaged).GetTargetChecked<UnrealAnsiString>();
+	private unsafe void InternalSerialize(FAnsiString? value) => Archive_Interop.SaveAnsiString(_unmanaged, ConjugateHandle.FromConjugate(value));
+	private unsafe void InternalSerialize(out FAnsiString value) => value = Archive_Interop.LoadAnsiString(_unmanaged).GetTargetChecked<FAnsiString>();
 
-	private unsafe void InternalSerialize(UnrealUtf8String? value) => Archive_Interop.SaveUtf8String(_unmanaged, ConjugateHandle.FromConjugate(value));
-	private unsafe void InternalSerialize(out UnrealUtf8String value) => value = Archive_Interop.LoadUtf8String(_unmanaged).GetTargetChecked<UnrealUtf8String>();
+	private unsafe void InternalSerialize(FUtf8String? value) => Archive_Interop.SaveUtf8String(_unmanaged, ConjugateHandle.FromConjugate(value));
+	private unsafe void InternalSerialize(out FUtf8String value) => value = Archive_Interop.LoadUtf8String(_unmanaged).GetTargetChecked<FUtf8String>();
 
-	private unsafe void InternalSerialize(UnrealName? value) => Archive_Interop.SaveName(_unmanaged, ConjugateHandle.FromConjugate(value));
-	private unsafe void InternalSerialize(out UnrealName value) => value = Archive_Interop.LoadName(_unmanaged).GetTargetChecked<UnrealName>();
+	private unsafe void InternalSerialize(FName? value) => Archive_Interop.SaveName(_unmanaged, ConjugateHandle.FromConjugate(value));
+	private unsafe void InternalSerialize(out FName value) => value = Archive_Interop.LoadName(_unmanaged).GetTargetChecked<FName>();
 
-	private unsafe void InternalSerialize(UnrealText? value) => Archive_Interop.SaveText(_unmanaged, ConjugateHandle.FromConjugate(value));
-	private unsafe void InternalSerialize(out UnrealText value) => value = Archive_Interop.LoadText(_unmanaged).GetTargetChecked<UnrealText>();
+	private unsafe void InternalSerialize(FText? value) => Archive_Interop.SaveText(_unmanaged, ConjugateHandle.FromConjugate(value));
+	private unsafe void InternalSerialize(out FText value) => value = Archive_Interop.LoadText(_unmanaged).GetTargetChecked<FText>();
 
-	private unsafe void InternalSerialize(UnrealObject? value) => Archive_Interop.SaveObject(_unmanaged, ConjugateHandle.FromConjugate(value));
-	private unsafe void InternalSerialize(out UnrealObject? value) => value = Archive_Interop.LoadObject(_unmanaged).GetTargetChecked<UnrealObject>();
+	private unsafe void InternalSerialize(UObject? value) => Archive_Interop.SaveObject(_unmanaged, ConjugateHandle.FromConjugate(value));
+	private unsafe void InternalSerialize(out UObject? value) => value = Archive_Interop.LoadObject(_unmanaged).GetTargetChecked<UObject>();
 
 	private unsafe void InternalSerialize(UnrealScriptStructBase? value) => Archive_Interop.SaveScriptStruct(_unmanaged, ConjugateHandle.FromConjugate(value));
 	private unsafe void InternalSerialize(out UnrealScriptStructBase value) => value = Archive_Interop.LoadScriptStruct(_unmanaged).GetTargetChecked<UnrealScriptStructBase>();
 
-	private unsafe bool InternalNetSerialize(UnrealScriptStructBase? value, PackageMap map, out bool success)
+	private unsafe bool InternalNetSerialize(UnrealScriptStructBase? value, UPackageMap map, out bool success)
 	{
 		uint8 res = Archive_Interop.NetSaveScriptStruct(_unmanaged, ConjugateHandle.FromConjugate(value), ConjugateHandle.FromConjugate(map), out var suc);
 		success = suc > 0;
 		return res > 0;
 	}
 
-	private unsafe bool InternalNetSerialize(out UnrealScriptStructBase value, PackageMap map, out bool success)
+	private unsafe bool InternalNetSerialize(out UnrealScriptStructBase value, UPackageMap map, out bool success)
 	{
 		uint8 res = Archive_Interop.NetLoadScriptStruct(_unmanaged, out var val, ConjugateHandle.FromConjugate(map), out var suc);
 		value = val.GetTargetChecked<UnrealScriptStructBase>();
@@ -454,8 +454,8 @@ internal class Archive : IArchive
 		return res > 0;
 	}
 	
-	private unsafe void InternalSerialize(SoftObjectPath? value) => Archive_Interop.SaveSoftObjectPath(_unmanaged, ConjugateHandle.FromConjugate(value));
-	private unsafe void InternalSerialize(out SoftObjectPath value) => value = Archive_Interop.LoadSoftObjectPath(_unmanaged).GetTargetChecked<SoftObjectPath>();
+	private unsafe void InternalSerialize(FSoftObjectPath? value) => Archive_Interop.SaveSoftObjectPath(_unmanaged, ConjugateHandle.FromConjugate(value));
+	private unsafe void InternalSerialize(out FSoftObjectPath value) => value = Archive_Interop.LoadSoftObjectPath(_unmanaged).GetTargetChecked<FSoftObjectPath>();
 
 	private unsafe bool InternalIsSaving => Archive_Interop.IsSaving(_unmanaged) > 0;
 	private unsafe bool InternalIsLoading => Archive_Interop.IsLoading(_unmanaged) > 0;

@@ -8,14 +8,14 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(34)]
 [ConjugateKey("Unreal.Optional")]
-public sealed class UnrealOptional<T> : UnrealConjugateBase
-	, IConjugate<UnrealOptional<T>>
-	, ICloneable<UnrealOptional<T>>
+public sealed class TOptional<T> : UnrealConjugateBase
+	, IConjugate<TOptional<T>>
+	, ICloneable<TOptional<T>>
 {
 	
-	public static UnrealOptional<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+	public static TOptional<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-	public UnrealOptional()
+	public TOptional()
 	{
 		if (!PropertyHelper.CanBeValue(typeof(T)))
 		{
@@ -25,9 +25,9 @@ public sealed class UnrealOptional<T> : UnrealConjugateBase
 		InternalConstruct();
 	}
 
-	public UnrealOptional(T value) : this() => Set(value);
+	public TOptional(T value) : this() => Set(value);
 
-	public UnrealOptional<T> Clone() => new(this);
+	public TOptional<T> Clone() => new(this);
 	object ICloneable.Clone() => Clone();
 
 	public bool TryGetValue([MaybeNullWhen(false)] out T value)
@@ -48,7 +48,7 @@ public sealed class UnrealOptional<T> : UnrealConjugateBase
 		InternalReset();
 	}
 
-	public static implicit operator UnrealOptional<T>(T value) => new(value);
+	public static implicit operator TOptional<T>(T value) => new(value);
 
 	public bool IsSet
 	{
@@ -65,9 +65,9 @@ public sealed class UnrealOptional<T> : UnrealConjugateBase
 		public PropertyDesc ElementProperty;
 	}
 	
-	private UnrealOptional(IntPtr unmanaged) : base(unmanaged){}
+	private TOptional(IntPtr unmanaged) : base(unmanaged){}
 
-	private UnrealOptional(UnrealOptional<T>? other) : this()
+	private TOptional(TOptional<T>? other) : this()
 	{
 		MasterAlcCache.GuardInvariant();
 		if (other is not null && other.TryGetValue(out var value))

@@ -83,7 +83,7 @@ public class ClassWriter
 			if (_exportedClass.IsImplementableInterface)
 			{
 				@static = true;
-				parameters.Add(new(EParameterKind.In, new("UnrealObject", null), "@this"));
+				parameters.Add(new(EParameterKind.In, new("UObject", null), "@this"));
 			}
 
 			bool hasOutParameter = method.Parameters.Any(p => p is { IsReturn: false, IsOut: true });

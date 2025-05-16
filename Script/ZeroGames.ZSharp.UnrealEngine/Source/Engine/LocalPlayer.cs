@@ -2,10 +2,10 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 
-public partial class LocalPlayer
+public partial class ULocalPlayer
 {
 	
-	public T? GetSubsystem<T>() where T : LocalPlayerSubsystem, IStaticClass => SubsystemBlueprintLibrary.GetLocalPlayerSubsystem(this, T.StaticClass) as T;
+	public T? GetSubsystem<T>() where T : ULocalPlayerSubsystem, IStaticClass => USubsystemBlueprintLibrary.GetLocalPlayerSubsystem(this, T.StaticClass) as T;
 
 }
 

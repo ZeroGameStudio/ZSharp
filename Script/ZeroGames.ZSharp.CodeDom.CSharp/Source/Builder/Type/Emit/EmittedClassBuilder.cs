@@ -89,7 +89,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 
 		if (_implicitBase)
 		{
-			AddBaseTypeBefore("UnrealObject");
+			AddBaseTypeBefore("UObject");
 		}
 
 		definition.Modifiers |= EMemberModifiers.Unsafe;
@@ -116,7 +116,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 	protected override bool HasBlackConstructor => false;
 
 	protected override string StaticFieldInterfaceName => "IStaticClass";
-	protected override string StaticFieldTypeName => "UnrealClass";
+	protected override string StaticFieldTypeName => "UClass";
 	protected override string StaticFieldPropertyName => "StaticClass";
 	
 	private FieldDefinition AddStaticField(TypeReference type, string name)

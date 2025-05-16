@@ -2,6 +2,6 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public partial class SoftClassPath : IUnrealClassPath;
+public partial class FSoftClassPath : IUnrealClassPath;
 
 

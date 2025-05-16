@@ -2,10 +2,10 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public partial class Rotator
+public partial class FRotator
 {
 	
-	public Rotator(double pitch, double yaw, double roll) : this()
+	public FRotator(double pitch, double yaw, double roll) : this()
 	{
 		Pitch = pitch;
 		Yaw = yaw;
@@ -25,14 +25,14 @@ public partial class Rotator
 		return $"Rotator {{ Pitch={Pitch}, Yaw={Yaw}, Roll={Roll} }}";
 	}
 
-	public Vector RotateVector(Vector vector) => KismetMathLibrary.Quat_RotateVector(Quat, vector);
-	public Vector UnrotateVector(Vector vector) => KismetMathLibrary.Quat_UnrotateVector(Quat, vector);
+	public FVector RotateVector(FVector vector) => UKismetMathLibrary.Quat_RotateVector(Quat, vector);
+	public FVector UnrotateVector(FVector vector) => UKismetMathLibrary.Quat_UnrotateVector(Quat, vector);
 	
-	public static explicit operator Vector(Rotator @this) => @this.Vector;
-	public static explicit operator Quat(Rotator @this) => @this.Quat;
+	public static explicit operator FVector(FRotator @this) => @this.Vector;
+	public static explicit operator FQuat(FRotator @this) => @this.Quat;
 
-	public Vector Vector => KismetMathLibrary.Conv_RotatorToVector(this);
-	public Quat Quat => KismetMathLibrary.Conv_RotatorToQuaternion(this);
+	public FVector Vector => UKismetMathLibrary.Conv_RotatorToVector(this);
+	public FQuat Quat => UKismetMathLibrary.Conv_RotatorToQuaternion(this);
 
 }
 

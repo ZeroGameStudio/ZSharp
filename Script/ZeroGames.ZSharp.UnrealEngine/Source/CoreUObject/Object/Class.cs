@@ -5,11 +5,10 @@ using System.Reflection;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-// IMPORTANT: Type name and namespace is used by magic, DO NOT change!
-public partial class UnrealClass
+public partial class UClass
 {
 	
-	public new static UnrealClass FromType(Type type)
+	public new static UClass FromType(Type type)
 	{
 		PropertyInfo? staticUnrealFieldProperty = null;
 		if (type.IsAssignableTo(typeof(IUnrealObject)))
@@ -22,11 +21,11 @@ public partial class UnrealClass
 			throw new ArgumentOutOfRangeException($"Type {type.FullName} is not a valid unreal field.");
 		}
 		
-		return (UnrealClass)staticUnrealFieldProperty.GetValue(null)!;
+		return (UClass)staticUnrealFieldProperty.GetValue(null)!;
 	}
-	public new static UnrealClass FromType<T>() where T : IUnrealObject => FromType(typeof(T));
+	public new static UClass FromType<T>() where T : IUnrealObject => FromType(typeof(T));
 
-	public bool TryGetDefaultObject([NotNullWhen(true)] out UnrealObject? result)
+	public bool TryGetDefaultObject([NotNullWhen(true)] out UObject? result)
 	{
 		MasterAlcCache.GuardInvariant();
 		if (IsInterface)
@@ -38,7 +37,7 @@ public partial class UnrealClass
 		return result is not null;
 	}
 
-	public UnrealObject GetDefaultObject()
+	public UObject GetDefaultObject()
 	{
 		MasterAlcCache.GuardInvariant();
 		if (IsInterface)
@@ -49,7 +48,7 @@ public partial class UnrealClass
 		return InternalGetDefaultObject(true)!;
 	}
 
-	public bool ImplementsInterface(UnrealClass @interface)
+	public bool ImplementsInterface(UClass @interface)
 	{
 		MasterAlcCache.GuardInvariant();
 		if (!@interface.IsInterface)
@@ -60,7 +59,7 @@ public partial class UnrealClass
 		return InternalImplementsInterface(@interface);
 	}
 	public bool ImplementsInterface(Type @interface) => ImplementsInterface(FromType(@interface));
-	public bool ImplementsInterface<T>() where T : IUnrealInterface => ImplementsInterface(typeof(T));
+	public bool ImplementsInterface<T>() where T : IInterface => ImplementsInterface(typeof(T));
 	
 	public bool IsInterface
 	{
@@ -71,8 +70,8 @@ public partial class UnrealClass
 		}
 	}
 	
-	private unsafe UnrealObject? InternalGetDefaultObject(bool createIfNeeded) => UnrealClass_Interop.GetDefaultObject(ConjugateHandle.FromConjugate(this), Convert.ToByte(createIfNeeded)).GetTarget<UnrealObject>();
-	private unsafe bool InternalImplementsInterface(UnrealClass other) => UnrealClass_Interop.ImplementsInterface(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
+	private unsafe UObject? InternalGetDefaultObject(bool createIfNeeded) => UnrealClass_Interop.GetDefaultObject(ConjugateHandle.FromConjugate(this), Convert.ToByte(createIfNeeded)).GetTarget<UObject>();
+	private unsafe bool InternalImplementsInterface(UClass other) => UnrealClass_Interop.ImplementsInterface(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
 
 	private unsafe bool InternalIsInterface => UnrealClass_Interop.IsInterface(ConjugateHandle.FromConjugate(this)) > 0;
 

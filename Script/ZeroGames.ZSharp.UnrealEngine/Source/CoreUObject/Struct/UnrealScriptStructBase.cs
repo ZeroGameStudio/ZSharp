@@ -6,19 +6,19 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public abstract class UnrealScriptStructBase : UnrealConjugateBase, IUnrealFieldPath
 {
 
-	public UnrealScriptStruct GetScriptStruct()
+	public UScriptStruct GetScriptStruct()
 	{
 		MasterAlcCache.GuardInvariant();
 		return InternalGetScriptStruct();
 	}
 	
-	public bool IsA(UnrealScriptStruct scriptStruct)
+	public bool IsA(UScriptStruct scriptStruct)
 	{
 		MasterAlcCache.GuardInvariant();
 		return InternalIsA(scriptStruct);
 	}
-	public bool IsA(Type scriptStruct) => IsA(UnrealScriptStruct.FromType(scriptStruct));
-	public bool IsA<T>() where T : IStaticStruct => IsA(UnrealScriptStruct.FromType<T>());
+	public bool IsA(Type scriptStruct) => IsA(UScriptStruct.FromType(scriptStruct));
+	public bool IsA<T>() where T : IStaticStruct => IsA(UScriptStruct.FromType<T>());
 
 	public DynamicZCallResult ReadUnrealPropertyEx<T>(string name, int32 index)
     {
@@ -51,10 +51,10 @@ public abstract class UnrealScriptStructBase : UnrealConjugateBase, IUnrealField
     protected unsafe bool Identical(UnrealScriptStructBase other)
 	    => UnrealScriptStructBase_Interop.Identical(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(other)) > 0;
     
-    private unsafe UnrealScriptStruct InternalGetScriptStruct()
-	    => UnrealScriptStructBase_Interop.GetScriptStruct(ConjugateHandle.FromConjugate(this)).GetTargetChecked<UnrealScriptStruct>();
+    private unsafe UScriptStruct InternalGetScriptStruct()
+	    => UnrealScriptStructBase_Interop.GetScriptStruct(ConjugateHandle.FromConjugate(this)).GetTargetChecked<UScriptStruct>();
     
-    private unsafe bool InternalIsA(UnrealScriptStruct scriptStruct)
+    private unsafe bool InternalIsA(UScriptStruct scriptStruct)
 	    => UnrealScriptStructBase_Interop.IsA(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(scriptStruct)) > 0;
 
 }

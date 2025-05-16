@@ -4,10 +4,10 @@ using System.Reflection;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public partial class UnrealScriptStruct
+public partial class UScriptStruct
 {
 	
-	public new static UnrealScriptStruct FromType(Type type)
+	public new static UScriptStruct FromType(Type type)
 	{
 		PropertyInfo? staticUnrealFieldProperty = null;
 		if (type.IsAssignableTo(typeof(IStaticStruct)))
@@ -20,9 +20,9 @@ public partial class UnrealScriptStruct
 			throw new ArgumentOutOfRangeException($"Type {type.FullName} is not a valid unreal field.");
 		}
 		
-		return (UnrealScriptStruct)staticUnrealFieldProperty.GetValue(null)!;
+		return (UScriptStruct)staticUnrealFieldProperty.GetValue(null)!;
 	}
-	public new static UnrealScriptStruct FromType<T>() where T : IStaticStruct => FromType(typeof(T));
+	public new static UScriptStruct FromType<T>() where T : IStaticStruct => FromType(typeof(T));
 	
 }
 

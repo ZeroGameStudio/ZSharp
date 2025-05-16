@@ -2,12 +2,12 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 
-public partial class Engine
+public partial class UEngine
 {
 
-	public T? GetSubsystem<T>() where T : EngineSubsystem, IStaticClass => SubsystemBlueprintLibrary.GetEngineSubsystem(T.StaticClass) as T;
+	public T? GetSubsystem<T>() where T : UEngineSubsystem, IStaticClass => USubsystemBlueprintLibrary.GetEngineSubsystem(T.StaticClass) as T;
 
-	public static Engine Instance
+	public static UEngine Instance
 	{
 		get
 		{
@@ -16,7 +16,7 @@ public partial class Engine
 		}
 	}
 
-	private static unsafe Engine InternalInstance { get; } = Engine_Interop.GetEngine().GetTargetChecked<Engine>();
+	private static unsafe UEngine InternalInstance { get; } = Engine_Interop.GetEngine().GetTargetChecked<UEngine>();
 
 }
 

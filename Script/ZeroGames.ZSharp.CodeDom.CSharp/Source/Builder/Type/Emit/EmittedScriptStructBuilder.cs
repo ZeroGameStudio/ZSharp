@@ -65,7 +65,7 @@ public static bool operator !=({TypeName}? left, {TypeName}? right) => !Equals(l
 		=> $" {{ if (GetType() == typeof({TypeName})) BuildConjugate_Black(StaticStruct.Unmanaged); }}";
 
 	protected override string StaticFieldInterfaceName => "IStaticStruct";
-	protected override string StaticFieldTypeName => "UnrealScriptStruct";
+	protected override string StaticFieldTypeName => "UScriptStruct";
 	protected override string StaticFieldPropertyName => "StaticStruct";
 	
 	private FieldDefinition AddStaticField(TypeReference type, string name)

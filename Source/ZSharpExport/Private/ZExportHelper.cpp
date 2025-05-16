@@ -95,11 +95,23 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 		{
 			name.InsertAt(0, 'I');
 		}
+		else if (cls->IsChildOf<AActor>())
+		{
+			name.InsertAt(0, 'A');
+		}
+		else
+		{
+			name.InsertAt(0, 'U');
+		}
 
 		if (cls->HasAllClassFlags(CLASS_Deprecated) && !cls->GetName().EndsWith("_DEPRECATED"))
 		{
 			name.Append("_DEPRECATED");
 		}
+	}
+	else if (auto scriptStruct = field.Get<const UScriptStruct>())
+	{
+		name.InsertAt(0, 'F');
 	}
 	else if (auto enm = field.Get<const UEnum>())
 	{
@@ -115,6 +127,8 @@ FString ZSharp::FZExportHelper::GetFieldRedirectedName(FFieldVariant field)
 		{
 			name.LeftChopInline(GDelegatePostfix.Len());
 		}
+
+		name.InsertAt(0, 'F');
 	}
 	// IMPORTANT: This must be under delegate.
 	else if (auto function = field.Get<const UFunction>())

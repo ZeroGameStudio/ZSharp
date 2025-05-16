@@ -32,8 +32,8 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 		
 		AddAttributeAfter("ConjugateKey", $"\"{ConjugateKey}\"");
 		
-		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}(Signature @delegate) => base.{BindMethodName}(@delegate);"));
-		definition.AddMember(new Block($"public partial UnrealObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state) => base.{BindMethodName}(@delegate, state);"));
+		definition.AddMember(new Block($"public partial UObject {BindMethodName}(Signature @delegate) => base.{BindMethodName}(@delegate);"));
+		definition.AddMember(new Block($"public partial UObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state) => base.{BindMethodName}(@delegate, state);"));
 
 		ParameterDeclaration[]? parameters = Parameters?.Select(p => p.Attributes is not null ? new(p.Kind, p.Type, p.Name, p.Attributes.Value.Declarations.Where(attr => attr.Name is not "NotNull").ToArray()) : p).ToArray();
 		definition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, parameters) { Modifiers = EMemberModifiers.Partial, Body = new StrangeZCallBodyBuilder($"base.{ExecuteMethodName}", ReturnType, false, parameters).Build() });
@@ -65,8 +65,8 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 		};
 		abstractionDefinition.AddMember(statefulSignature);
 
-		abstractionDefinition.AddMember(new Block($"public partial UnrealObject {BindMethodName}(Signature @delegate);"));
-		abstractionDefinition.AddMember(new Block($"public partial UnrealObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state);"));
+		abstractionDefinition.AddMember(new Block($"public partial UObject {BindMethodName}(Signature @delegate);"));
+		abstractionDefinition.AddMember(new Block($"public partial UObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state);"));
 		
 		abstractionDefinition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, Parameters) { Modifiers = EMemberModifiers.Partial });
 		
@@ -94,7 +94,7 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 	protected override string RedConstructorVisibility => "private";
 
 	protected override string StaticFieldInterfaceName => "IStaticSignature";
-	protected override string StaticFieldTypeName => "DelegateFunction";
+	protected override string StaticFieldTypeName => "UDelegateFunction";
 	protected override string StaticFieldPropertyName => "StaticSignature";
 	
 	private string BindMethodName => Kind == EDelegateKind.Unicast ? "Bind" : "Add";

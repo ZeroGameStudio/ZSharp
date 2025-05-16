@@ -170,7 +170,7 @@ public static bool operator !=({TypeName}? left, {TypeName}? right) => !Equals(l
 	protected override bool HasRedConstructor => Kind != EExportedClassKind.Interface;
 
 	protected override string StaticFieldInterfaceName => Kind == EExportedClassKind.Struct ? "IStaticStruct" : Kind != EExportedClassKind.Plain ? "IStaticClass" : throw new InvalidOperationException();
-	protected override string StaticFieldTypeName => Kind == EExportedClassKind.Struct ? "UnrealScriptStruct" : Kind != EExportedClassKind.Plain ? "UnrealClass" : throw new InvalidOperationException();
+	protected override string StaticFieldTypeName => Kind == EExportedClassKind.Struct ? "UScriptStruct" : Kind != EExportedClassKind.Plain ? "UClass" : throw new InvalidOperationException();
 	protected override string StaticFieldPropertyName => Kind == EExportedClassKind.Struct ? "StaticStruct" : Kind != EExportedClassKind.Plain ? "StaticClass" : throw new InvalidOperationException();
 
 	private readonly List<MethodDefinition> _methods = new();

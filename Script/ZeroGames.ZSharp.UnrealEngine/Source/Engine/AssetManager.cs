@@ -2,10 +2,10 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 
-public partial class AssetManager
+public partial class UAssetManager
 {
 
-	public static AssetManager Instance { get; } = Engine.Instance.AssetManager!;
+	public static UAssetManager Instance { get; } = UEngine.Instance.AssetManager!;
 
 	public IStreamableManager StreamableManager => IStreamableManager.GlobalInstance;
 

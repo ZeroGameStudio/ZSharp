@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public interface IPersistentObjectWrapper<T> : IUnrealObjectWrapper<T> where T : UnrealObject
+public interface IPersistentObjectWrapper<T> : IUnrealObjectWrapper<T> where T : UObject
 {
 	bool IsPending { get; }
 }

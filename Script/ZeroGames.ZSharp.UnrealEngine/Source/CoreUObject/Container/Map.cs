@@ -9,12 +9,12 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(33)]
 [ConjugateKey("Unreal.Map")]
-public sealed class UnrealMap<TKey, TValue> : UnrealConjugateBase
-	, IConjugate<UnrealMap<TKey, TValue>>
+public sealed class TMap<TKey, TValue> : UnrealConjugateBase
+	, IConjugate<TMap<TKey, TValue>>
 	, IDictionary
 	, IDictionary<TKey, TValue>
 	, IReadOnlyDictionary<TKey, TValue>
-	, ICloneable<UnrealMap<TKey, TValue>>
+	, ICloneable<TMap<TKey, TValue>>
 {
 	
 	public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDictionaryEnumerator
@@ -69,7 +69,7 @@ public sealed class UnrealMap<TKey, TValue> : UnrealConjugateBase
 	    object? IDictionaryEnumerator.Value => Current.Value;
 	    DictionaryEntry IDictionaryEnumerator.Entry => new(Current.Key!, Current.Value);
 
-	    internal Enumerator(UnrealMap<TKey, TValue> target)
+	    internal Enumerator(TMap<TKey, TValue> target)
 	    {
 		    _target = target;
 		    _snapshot = target.Count;
@@ -119,15 +119,15 @@ public sealed class UnrealMap<TKey, TValue> : UnrealConjugateBase
 		    }
 	    }
 
-	    private UnrealMap<TKey, TValue>? _target;
+	    private TMap<TKey, TValue>? _target;
 	    private readonly int32 _snapshot;
 	    private bool _first;
 	    private IntPtr _unmanaged;
     }
 	
-	public static UnrealMap<TKey, TValue> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+	public static TMap<TKey, TValue> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-	public UnrealMap()
+	public TMap()
 	{
 		if (!PropertyHelper.CanBeValue(typeof(TKey)) || !PropertyHelper.CanBeValue(typeof(TValue)))
 		{
@@ -137,7 +137,7 @@ public sealed class UnrealMap<TKey, TValue> : UnrealConjugateBase
 		InternalConstruct();
 	}
 
-	public UnrealMap(IEnumerable<KeyValuePair<TKey, TValue>> source) : this()
+	public TMap(IEnumerable<KeyValuePair<TKey, TValue>> source) : this()
 	{
 		foreach (var pair in source)
 		{
@@ -213,7 +213,7 @@ public sealed class UnrealMap<TKey, TValue> : UnrealConjugateBase
 	}
 	void ICollection.CopyTo(Array array, int32 index) => CopyTo((KeyValuePair<TKey, TValue>[])array, index);
 	
-	public UnrealMap<TKey, TValue> Clone() => new(this);
+	public TMap<TKey, TValue> Clone() => new(this);
 	object ICloneable.Clone() => Clone();
 
 	public TValue this[TKey key]
@@ -292,7 +292,7 @@ public sealed class UnrealMap<TKey, TValue> : UnrealConjugateBase
 		public PropertyDesc ValueProperty;
 	}
 	
-	private UnrealMap(IntPtr unmanaged) : base(unmanaged){}
+	private TMap(IntPtr unmanaged) : base(unmanaged){}
 	
 	private unsafe void InternalConstruct()
 	{

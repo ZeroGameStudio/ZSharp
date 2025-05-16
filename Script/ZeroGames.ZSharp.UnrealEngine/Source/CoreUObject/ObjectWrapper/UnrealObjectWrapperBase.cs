@@ -32,20 +32,20 @@ public abstract class UnrealObjectWrapperBase : UnrealConjugateBase, IUnrealObje
 		}
 	}
 
-	public UnrealObject? Target
+	public UObject? Target
 	{
 		get => InternalGetTarget(false);
 		set => InternalSetTarget(value);
 	}
-	public UnrealObject? TargetEvenIfGarbage => InternalGetTarget(true);
+	public UObject? TargetEvenIfGarbage => InternalGetTarget(true);
 	
 	protected UnrealObjectWrapperBase(){}
 	protected UnrealObjectWrapperBase(IntPtr unmanaged) : base(unmanaged){}
 
 	protected abstract bool InternalIsValid(bool evenIfGarbage);
 	protected abstract bool InternalIsNull();
-	protected abstract UnrealObject? InternalGetTarget(bool evenIfGarbage);
-	protected abstract void InternalSetTarget(UnrealObject? target);
+	protected abstract UObject? InternalGetTarget(bool evenIfGarbage);
+	protected abstract void InternalSetTarget(UObject? target);
 	
 }
 

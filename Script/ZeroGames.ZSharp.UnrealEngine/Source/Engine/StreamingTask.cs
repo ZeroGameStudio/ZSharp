@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 
-public class StreamingTask<T> : StreamingTaskBase, IAwaitable<T?, StreamingTask<T>.Awaiter> where T : UnrealObject
+public class StreamingTask<T> : StreamingTaskBase, IAwaitable<T?, StreamingTask<T>.Awaiter> where T : UObject
 {
 
 	public readonly struct Awaiter : IAwaiter<T?>, IMoveNextSourceAwaiter

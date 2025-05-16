@@ -14,21 +14,6 @@ UZSharpExportSettings::UZSharpExportSettings()
 	IntrinsicModuleMappings.Emplace("Engine", EngineAssemblyName);
 
 	IntrinsicModuleMappings.Emplace("ZSharpRuntime", EngineAssemblyName);
-
-	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Object", "UnrealObject");
-
-	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Field", "UnrealField");
-	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Struct", "UnrealStruct");
-	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Class", "UnrealClass");
-	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.ScriptStruct", "UnrealScriptStruct");
-	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Enum", "UnrealEnum");
-	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Interface", "UnrealInterface");
-
-	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Function", "UnrealFunction");
-	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Property", "UnrealProperty");
-
-	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.Guid", "UnrealGuid");
-	IntrinsicFieldNameRedirectors.Emplace("/Script/CoreUObject.DateTime", "UnrealDateTime");
 }
 
 const FZModuleMappingContext* UZSharpExportSettings::GetModuleMappingContext(const FString& module) const

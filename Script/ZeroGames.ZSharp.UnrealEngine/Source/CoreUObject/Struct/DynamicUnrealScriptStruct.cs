@@ -14,7 +14,7 @@ public sealed class DynamicUnrealScriptStruct : UnrealScriptStructBase
 	public static DynamicUnrealScriptStruct BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 	
 	public static string StaticUnrealFieldPath => throw new NotSupportedException();
-	public static UnrealScriptStruct StaticStruct => throw new NotSupportedException();
+	public static UScriptStruct StaticStruct => throw new NotSupportedException();
 	
 	public override string UnrealFieldPath => throw new NotSupportedException();
 	

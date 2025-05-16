@@ -4,31 +4,31 @@ using System.Numerics;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public sealed class StrongObjectPtr<T> : StrongObjectPtrBase
-	, ICloneable<StrongObjectPtr<T>>
-	, IEquatable<StrongObjectPtr<T>>
-	, IEqualityOperators<StrongObjectPtr<T>?, StrongObjectPtr<T>?, bool>
+public sealed class TStrongObjectPtr<T> : StrongObjectPtrBase
+	, ICloneable<TStrongObjectPtr<T>>
+	, IEquatable<TStrongObjectPtr<T>>
+	, IEqualityOperators<TStrongObjectPtr<T>?, TStrongObjectPtr<T>?, bool>
 	, IUnrealObjectWrapper<T>
-	where T : UnrealObject
+	where T : UObject
 {
 
-	public static StrongObjectPtr<T> From<TSource>(StrongObjectPtr<TSource> other) where TSource : T => new(other.Target);
+	public static TStrongObjectPtr<T> From<TSource>(TStrongObjectPtr<TSource> other) where TSource : T => new(other.Target);
 
-	public StrongObjectPtr() : this(null){}
-	public StrongObjectPtr(T? target) : base(target){}
+	public TStrongObjectPtr() : this(null){}
+	public TStrongObjectPtr(T? target) : base(target){}
 
-	public StrongObjectPtr<T> Clone() => new(Target);
+	public TStrongObjectPtr<T> Clone() => new(Target);
 	object ICloneable.Clone() => Clone();
 
-	public bool Equals(StrongObjectPtr<T>? other) => base.Equals(other);
+	public bool Equals(TStrongObjectPtr<T>? other) => base.Equals(other);
 	public override bool Equals(object? obj) => base.Equals(obj);
 	public override int32 GetHashCode() => base.GetHashCode();
 	
-	public static implicit operator StrongObjectPtr<T>(T? target) => new(target);
-	public static bool operator ==(StrongObjectPtr<T>? left, StrongObjectPtr<T>? right) => Equals(left, right);
-	public static bool operator !=(StrongObjectPtr<T>? left, StrongObjectPtr<T>? right) => !Equals(left, right);
+	public static implicit operator TStrongObjectPtr<T>(T? target) => new(target);
+	public static bool operator ==(TStrongObjectPtr<T>? left, TStrongObjectPtr<T>? right) => Equals(left, right);
+	public static bool operator !=(TStrongObjectPtr<T>? left, TStrongObjectPtr<T>? right) => !Equals(left, right);
 	
-	public static IEqualityComparer<StrongObjectPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
+	public static IEqualityComparer<TStrongObjectPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
 
 	public new T? Target
 	{
@@ -53,9 +53,9 @@ public sealed class StrongObjectPtr<T> : StrongObjectPtrBase
 		}
 	}
 
-	protected override UnrealObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
+	protected override UObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
 
-	protected override void InternalSetTarget(UnrealObject? target)
+	protected override void InternalSetTarget(UObject? target)
 	{
 		if (target is not null && target is not T)
 		{
@@ -65,10 +65,10 @@ public sealed class StrongObjectPtr<T> : StrongObjectPtrBase
 		Target = (T?)target;
 	}
 
-	private sealed class EqualityComparer : IEqualityComparer<StrongObjectPtr<T>>
+	private sealed class EqualityComparer : IEqualityComparer<TStrongObjectPtr<T>>
 	{
-		public bool Equals(StrongObjectPtr<T>? lhs, StrongObjectPtr<T>? rhs) => lhs == rhs;
-		public int32 GetHashCode(StrongObjectPtr<T> obj) => obj.GetHashCode();
+		public bool Equals(TStrongObjectPtr<T>? lhs, TStrongObjectPtr<T>? rhs) => lhs == rhs;
+		public int32 GetHashCode(TStrongObjectPtr<T> obj) => obj.GetHashCode();
 	}
 
 	private unsafe T? InternalGet(bool evenIfGarbage)

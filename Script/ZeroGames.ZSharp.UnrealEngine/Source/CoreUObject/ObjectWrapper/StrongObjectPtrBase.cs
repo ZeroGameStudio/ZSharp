@@ -64,23 +64,23 @@ public abstract class StrongObjectPtrBase
 		}
 	}
 	
-	public UnrealObject? Target
+	public UObject? Target
 	{
 		get => InternalGetTarget(false);
 		set => InternalSetTarget(value);
 	}
-	public UnrealObject? TargetEvenIfGarbage => InternalGetTarget(true);
+	public UObject? TargetEvenIfGarbage => InternalGetTarget(true);
 
-	protected StrongObjectPtrBase(UnrealObject? target) => InternalAlloc(target);
+	protected StrongObjectPtrBase(UObject? target) => InternalAlloc(target);
 	
-	protected abstract UnrealObject? InternalGetTarget(bool evenIfGarbage);
-	protected abstract void InternalSetTarget(UnrealObject? target);
+	protected abstract UObject? InternalGetTarget(bool evenIfGarbage);
+	protected abstract void InternalSetTarget(UObject? target);
 	
 	protected IntPtr Unmanaged { get; private set; }
 	
 	~StrongObjectPtrBase() => InternalDispose();
 
-	private unsafe void InternalAlloc(UnrealObject? target)
+	private unsafe void InternalAlloc(UObject? target)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		MasterAlcCache.GuardInvariant();

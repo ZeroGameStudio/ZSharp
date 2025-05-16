@@ -8,11 +8,11 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(32)]
 [ConjugateKey("Unreal.Set")]
-public sealed class UnrealSet<T> : UnrealConjugateBase
-	, IConjugate<UnrealSet<T>>
+public sealed class TSet<T> : UnrealConjugateBase
+	, IConjugate<TSet<T>>
 	, ISet<T>
 	, IReadOnlySet<T>
-	, ICloneable<UnrealSet<T>>
+	, ICloneable<TSet<T>>
 {
 	
     public struct Enumerator : IEnumerator<T>
@@ -63,7 +63,7 @@ public sealed class UnrealSet<T> : UnrealConjugateBase
 	    }
 	    object? IEnumerator.Current => Current;
 
-	    internal Enumerator(UnrealSet<T> target)
+	    internal Enumerator(TSet<T> target)
 	    {
 		    _target = target;
 		    _snapshot = target.Count;
@@ -112,15 +112,15 @@ public sealed class UnrealSet<T> : UnrealConjugateBase
 		    }
 	    }
 
-	    private UnrealSet<T>? _target;
+	    private TSet<T>? _target;
 	    private readonly int32 _snapshot;
 	    private bool _first;
 	    private IntPtr _unmanaged;
     }
 	
-	public static UnrealSet<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+	public static TSet<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-	public UnrealSet()
+	public TSet()
 	{
 		if (!PropertyHelper.CanBeKey(typeof(T)) || !PropertyHelper.CanBeValue(typeof(T)))
 		{
@@ -130,7 +130,7 @@ public sealed class UnrealSet<T> : UnrealConjugateBase
 		InternalConstruct();
 	}
 
-	public UnrealSet(IEnumerable<T> source) : this()
+	public TSet(IEnumerable<T> source) : this()
 	{
 		foreach (var item in source)
 		{
@@ -204,7 +204,7 @@ public sealed class UnrealSet<T> : UnrealConjugateBase
 	bool ISet<T>.SetEquals(IEnumerable<T> other) => throw new NotSupportedException();
 	bool IReadOnlySet<T>.SetEquals(IEnumerable<T> other) => throw new NotSupportedException();
 	
-	public UnrealSet<T> Clone() => new(this);
+	public TSet<T> Clone() => new(this);
 	object ICloneable.Clone() => Clone();
 
 	public int32 Count
@@ -224,7 +224,7 @@ public sealed class UnrealSet<T> : UnrealConjugateBase
 		public PropertyDesc ElementProperty;
 	}
 
-	private UnrealSet(IntPtr unmanaged) : base(unmanaged){}
+	private TSet(IntPtr unmanaged) : base(unmanaged){}
 	
 	private unsafe void InternalConstruct()
 	{

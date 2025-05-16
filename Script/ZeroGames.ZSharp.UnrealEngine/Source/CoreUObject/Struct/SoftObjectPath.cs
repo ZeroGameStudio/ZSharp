@@ -2,13 +2,13 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public partial class SoftObjectPath : IUnrealObjectPath
+public partial class FSoftObjectPath : IUnrealObjectPath
 {
 	public string Path
 	{
 		get
 		{
-			KismetSystemLibrary.BreakSoftObjectPath(this, out var path);
+			UKismetSystemLibrary.BreakSoftObjectPath(this, out var path);
 			return path;
 		}
 	}

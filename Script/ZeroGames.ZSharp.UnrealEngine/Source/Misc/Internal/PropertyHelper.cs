@@ -13,7 +13,7 @@ internal static class PropertyHelper
 		// UClasses + UStructs + UEnums
 		if (type.IsAssignableTo(typeof(UnrealObjectBase))
 		    || type.IsAssignableTo(typeof(UnrealScriptStructBase))
-		    || UnrealEnum.IsUnrealEnumType(type))
+		    || UEnum.IsUnrealEnumType(type))
 		{
 			return true;
 		}
@@ -44,7 +44,7 @@ internal static class PropertyHelper
 		}
 		
 		// Special types
-		if (type == typeof(FieldPath))
+		if (type == typeof(FFieldPath))
 		{
 			return true;
 		}
@@ -54,11 +54,11 @@ internal static class PropertyHelper
 
 	public static bool IsUnrealPrimitiveProperty(Type type) => type.IsPrimitive;
 
-	public static bool IsUnrealStringProperty(Type type) => type == typeof(UnrealString)
-	                                                        || type == typeof(UnrealUtf8String)
-	                                                        || type == typeof(UnrealAnsiString)
-	                                                        || type == typeof(UnrealName)
-	                                                        || type == typeof(UnrealText);
+	public static bool IsUnrealStringProperty(Type type) => type == typeof(FString)
+	                                                        || type == typeof(FUtf8String)
+	                                                        || type == typeof(FAnsiString)
+	                                                        || type == typeof(FName)
+	                                                        || type == typeof(FText);
 
 	public static bool IsUnrealObjectWrapperProperty(Type type) => type.IsAssignableTo(typeof(SubclassOfBase))
 	                                                               || type.IsAssignableTo(typeof(SoftClassPtrBase))
@@ -67,10 +67,10 @@ internal static class PropertyHelper
 	                                                               || type.IsAssignableTo(typeof(LazyObjectPtrBase))
 	                                                               || type.IsAssignableTo(typeof(ScriptInterfaceBase));
 
-	public static bool IsUnrealContainerProperty(Type type) => type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(UnrealArray<>)
-	                                                                                  || type.GetGenericTypeDefinition() == typeof(UnrealSet<>)
-	                                                                                  || type.GetGenericTypeDefinition() == typeof(UnrealMap<,>)
-	                                                                                  || type.GetGenericTypeDefinition() == typeof(UnrealOptional<>));
+	public static bool IsUnrealContainerProperty(Type type) => type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(TArray<>)
+	                                                                                  || type.GetGenericTypeDefinition() == typeof(TSet<>)
+	                                                                                  || type.GetGenericTypeDefinition() == typeof(TMap<,>)
+	                                                                                  || type.GetGenericTypeDefinition() == typeof(TOptional<>));
 
 	public static bool IsUnrealDelegateProperty(Type type) => type.IsAssignableTo(typeof(UnrealDelegateBase))
 	                                                          || type.IsAssignableTo(typeof(UnrealMulticastInlineDelegateBase))
@@ -79,7 +79,7 @@ internal static class PropertyHelper
 	public static bool CanBeKey(Type type)
 	{
 		// Text is not hashable.
-		if (type == typeof(UnrealText))
+		if (type == typeof(FText))
 		{
 			return false;
 		}
@@ -129,21 +129,21 @@ internal static class PropertyHelper
 		// UClasses
 		if (type.IsAssignableTo(typeof(UnrealObjectBase)))
 		{
-			desc.Descriptor = UnrealClass.FromType(type).Unmanaged;
+			desc.Descriptor = UClass.FromType(type).Unmanaged;
 			return true;
 		}
 		
 		// UStructs
 		if (type.IsAssignableTo(typeof(UnrealScriptStructBase)))
 		{
-			desc.Descriptor = ((UnrealScriptStruct)type.GetProperty(nameof(IStaticStruct.StaticStruct))!.GetValue(null)!).Unmanaged;
+			desc.Descriptor = ((UScriptStruct)type.GetProperty(nameof(IStaticStruct.StaticStruct))!.GetValue(null)!).Unmanaged;
 			return true;
 		}
 		
 		// UEnums
-		if (UnrealEnum.IsUnrealEnumType(type))
+		if (UEnum.IsUnrealEnumType(type))
 		{
-			desc.Descriptor = UnrealEnum.FromType(type).Unmanaged;
+			desc.Descriptor = UEnum.FromType(type).Unmanaged;
 			return true;
 		}
 		
@@ -151,44 +151,44 @@ internal static class PropertyHelper
 		if (type.IsAssignableTo(typeof(SubclassOfBase)))
 		{
 			desc.Descriptor = SUBCLASS_OF_TYPE_ID;
-			desc.Metadata = UnrealClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = UClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(SoftClassPtrBase)))
 		{
 			desc.Descriptor = SOFT_CLASS_PTR_TYPE_ID;
-			desc.Metadata = UnrealClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = UClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(SoftObjectPtrBase)))
 		{
 			desc.Descriptor = SOFT_OBJECT_PTR_TYPE_ID;
-			desc.Metadata = UnrealClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = UClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(WeakObjectPtrBase)))
 		{
 			desc.Descriptor = WEAK_OBJECT_PTR_TYPE_ID;
-			desc.Metadata = UnrealClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = UClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(LazyObjectPtrBase)))
 		{
 			desc.Descriptor = LAZY_OBJECT_PTR_TYPE_ID;
-			desc.Metadata = UnrealClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = UClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		if (type.IsAssignableTo(typeof(ScriptInterfaceBase)))
 		{
 			desc.Descriptor = SCRIPT_INTERFACE_TYPE_ID;
-			desc.Metadata = UnrealClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
+			desc.Metadata = UClass.FromType(type.GetGenericArguments()[0]).Unmanaged;
 			return true;
 		}
 		
 		// 2 delegates.
 		if (type.IsAssignableTo(typeof(UnrealDelegateBase)) || type.IsAssignableTo(typeof(UnrealMulticastInlineDelegateBase)))
 		{
-			desc.Descriptor = DelegateFunction.FromType(type).Unmanaged;
+			desc.Descriptor = UDelegateFunction.FromType(type).Unmanaged;
 		}
 		
 		return false;
@@ -236,13 +236,13 @@ internal static class PropertyHelper
 		{ typeof(double), DOUBLE_TYPE_ID },
 		{ typeof(bool), BOOL_TYPE_ID },
 		
-		{ typeof(UnrealString), STRING_TYPE_ID },
-		{ typeof(UnrealUtf8String), UTF8_STRING_TYPE_ID },
-		{ typeof(UnrealAnsiString), ANSI_STRING_TYPE_ID },
-		{ typeof(UnrealName), NAME_TYPE_ID },
-		{ typeof(UnrealText), TEXT_TYPE_ID },
+		{ typeof(FString), STRING_TYPE_ID },
+		{ typeof(FUtf8String), UTF8_STRING_TYPE_ID },
+		{ typeof(FAnsiString), ANSI_STRING_TYPE_ID },
+		{ typeof(FName), NAME_TYPE_ID },
+		{ typeof(FText), TEXT_TYPE_ID },
 		
-		{ typeof(FieldPath), FIELD_PATH_TYPE_ID },
+		{ typeof(FFieldPath), FIELD_PATH_TYPE_ID },
 	};
 
 }

@@ -7,22 +7,22 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(25)]
 [ConjugateKey("Unreal.LazyObjectPtr")]
-public sealed class LazyObjectPtr<T> : LazyObjectPtrBase
-	, IConjugate<LazyObjectPtr<T>>
-	, ICloneable<LazyObjectPtr<T>>
-	, IEquatable<LazyObjectPtr<T>>
-	, IEqualityOperators<LazyObjectPtr<T>?, LazyObjectPtr<T>?, bool>
+public sealed class TLazyObjectPtr<T> : LazyObjectPtrBase
+	, IConjugate<TLazyObjectPtr<T>>
+	, ICloneable<TLazyObjectPtr<T>>
+	, IEquatable<TLazyObjectPtr<T>>
+	, IEqualityOperators<TLazyObjectPtr<T>?, TLazyObjectPtr<T>?, bool>
 	, IPersistentObjectWrapper<T>
-	where T : UnrealObject
+	where T : UObject
 {
 
-	public static LazyObjectPtr<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+	public static TLazyObjectPtr<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 	
-	public static LazyObjectPtr<T> From<TSource>(LazyObjectPtr<TSource> other) where TSource : T => new(other);
+	public static TLazyObjectPtr<T> From<TSource>(TLazyObjectPtr<TSource> other) where TSource : T => new(other);
 
-	public LazyObjectPtr() => BuildConjugate_Black(UnrealClass.FromType<T>().Unmanaged);
+	public TLazyObjectPtr() => BuildConjugate_Black(UClass.FromType<T>().Unmanaged);
 	
-	public LazyObjectPtr(T? target) : this()
+	public TLazyObjectPtr(T? target) : this()
 	{
 		if (target is null)
 		{
@@ -32,18 +32,18 @@ public sealed class LazyObjectPtr<T> : LazyObjectPtrBase
 		Target = target;
 	}
 	
-	public LazyObjectPtr<T> Clone() => new(this);
+	public TLazyObjectPtr<T> Clone() => new(this);
 	object ICloneable.Clone() => Clone();
 
-	public bool Equals(LazyObjectPtr<T>? other) => base.Equals(other);
+	public bool Equals(TLazyObjectPtr<T>? other) => base.Equals(other);
 	public override bool Equals(object? obj) => base.Equals(obj);
 	public override int32 GetHashCode() => base.GetHashCode();
 
-	public static implicit operator LazyObjectPtr<T>(T? target) => new(target);
-	public static bool operator ==(LazyObjectPtr<T>? left, LazyObjectPtr<T>? right) => Equals(left, right);
-	public static bool operator !=(LazyObjectPtr<T>? left, LazyObjectPtr<T>? right) => !Equals(left, right);
+	public static implicit operator TLazyObjectPtr<T>(T? target) => new(target);
+	public static bool operator ==(TLazyObjectPtr<T>? left, TLazyObjectPtr<T>? right) => Equals(left, right);
+	public static bool operator !=(TLazyObjectPtr<T>? left, TLazyObjectPtr<T>? right) => !Equals(left, right);
 	
-	public static IEqualityComparer<LazyObjectPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
+	public static IEqualityComparer<TLazyObjectPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
 
 	public new T? Target
 	{
@@ -77,9 +77,9 @@ public sealed class LazyObjectPtr<T> : LazyObjectPtrBase
 		}
 	}
 	
-	protected override UnrealObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
+	protected override UObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
 
-	protected override void InternalSetTarget(UnrealObject? target)
+	protected override void InternalSetTarget(UObject? target)
 	{
 		if (target is not null && target is not T)
 		{
@@ -89,14 +89,14 @@ public sealed class LazyObjectPtr<T> : LazyObjectPtrBase
 		Target = (T?)target;
 	}
 
-	private sealed class EqualityComparer : IEqualityComparer<LazyObjectPtr<T>>
+	private sealed class EqualityComparer : IEqualityComparer<TLazyObjectPtr<T>>
 	{
-		public bool Equals(LazyObjectPtr<T>? lhs, LazyObjectPtr<T>? rhs) => lhs == rhs;
-		public int32 GetHashCode(LazyObjectPtr<T> obj) => obj.GetHashCode();
+		public bool Equals(TLazyObjectPtr<T>? lhs, TLazyObjectPtr<T>? rhs) => lhs == rhs;
+		public int32 GetHashCode(TLazyObjectPtr<T> obj) => obj.GetHashCode();
 	}
 
-	private LazyObjectPtr(IntPtr unmanaged) : base(unmanaged){}
-	private LazyObjectPtr(LazyObjectPtrBase? other) : this() => InternalCopy(other);
+	private TLazyObjectPtr(IntPtr unmanaged) : base(unmanaged){}
+	private TLazyObjectPtr(LazyObjectPtrBase? other) : this() => InternalCopy(other);
 
 	private unsafe void InternalCopy(LazyObjectPtrBase? other)
 	{

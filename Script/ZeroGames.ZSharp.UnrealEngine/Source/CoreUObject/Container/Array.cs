@@ -9,13 +9,13 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(31)]
 [ConjugateKey("Unreal.Array")]
-public sealed class UnrealArray<T> : UnrealConjugateBase
-	, IConjugate<UnrealArray<T>>
+public sealed class TArray<T> : UnrealConjugateBase
+	, IConjugate<TArray<T>>
 	, IList
 	, IList<T>
 	, IReadOnlyList<T>
-	, ISliceable<UnrealArray<T>>
-	, ICloneable<UnrealArray<T>>
+	, ISliceable<TArray<T>>
+	, ICloneable<TArray<T>>
 {
 	
     public struct Enumerator : IEnumerator<T>
@@ -42,7 +42,7 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 	    }
 	    object? IEnumerator.Current => Current;
 
-	    internal Enumerator(UnrealArray<T> target)
+	    internal Enumerator(TArray<T> target)
 	    {
 		    _target = target;
 		    _snapshot = target.Count;
@@ -66,14 +66,14 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 		    }
 	    }
         
-	    private UnrealArray<T>? _target;
+	    private TArray<T>? _target;
 	    private readonly int32 _snapshot;
 	    private int32 _index = -1;
     }
 
-	public static UnrealArray<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+	public static TArray<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-	public UnrealArray()
+	public TArray()
 	{
 		if (!PropertyHelper.CanBeValue(typeof(T)))
 		{
@@ -83,7 +83,7 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 		InternalConstruct();
 	}
 
-	public UnrealArray(IEnumerable<T> source) : this() => AddRange(source);
+	public TArray(IEnumerable<T> source) : this() => AddRange(source);
 
 	public Enumerator GetEnumerator() => new(this);
 	IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
@@ -172,10 +172,10 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 	}
 	void ICollection.CopyTo(Array array, int32 index) => CopyTo((T[])array, index);
 
-	public UnrealArray<T> Clone() => new(this);
+	public TArray<T> Clone() => new(this);
 	object ICloneable.Clone() => Clone();
 	
-	public UnrealArray<T> Slice(int32 start, int32 length)
+	public TArray<T> Slice(int32 start, int32 length)
 	{
 		if (length < 0)
 		{
@@ -184,7 +184,7 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 		
 		GuardIndex(start);
 		GuardIndex(start + length - 1);
-		UnrealArray<T> result = new();
+		TArray<T> result = new();
 		for (int32 i = start; i < start + length; ++i)
 		{
 			result.Add(this[i]);
@@ -237,7 +237,7 @@ public sealed class UnrealArray<T> : UnrealConjugateBase
 		public PropertyDesc ElementProperty;
 	}
 
-	private UnrealArray(IntPtr unmanaged) : base(unmanaged){}
+	private TArray(IntPtr unmanaged) : base(unmanaged){}
 
 	private void GuardIndex(int32 index)
 	{

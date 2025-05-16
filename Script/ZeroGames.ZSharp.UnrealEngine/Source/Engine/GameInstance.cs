@@ -2,12 +2,12 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 
-public partial class GameInstance
+public partial class UGameInstance
 {
 	
-	public T? GetSubsystem<T>() where T : GameInstanceSubsystem, IStaticClass => SubsystemBlueprintLibrary.GetGameInstanceSubsystem(this, T.StaticClass) as T;
+	public T? GetSubsystem<T>() where T : UGameInstanceSubsystem, IStaticClass => USubsystemBlueprintLibrary.GetGameInstanceSubsystem(this, T.StaticClass) as T;
 	
-	public static GameInstance? PrimaryInstance
+	public static UGameInstance? PrimaryInstance
 	{
 		get
 		{
@@ -16,9 +16,9 @@ public partial class GameInstance
 		}
 	}
 
-	public static GameInstance PrimaryInstanceChecked => PrimaryInstance ?? throw new InvalidOperationException();
+	public static UGameInstance PrimaryInstanceChecked => PrimaryInstance ?? throw new InvalidOperationException();
 
-	private static unsafe GameInstance? InternalPrimaryInstance { get; } = GameInstance_Interop.GetPrimaryInstance().GetTarget<GameInstance>();
+	private static unsafe UGameInstance? InternalPrimaryInstance { get; } = GameInstance_Interop.GetPrimaryInstance().GetTarget<UGameInstance>();
 	
 }
 

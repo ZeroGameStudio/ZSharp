@@ -8,20 +8,20 @@ using System.Runtime.CompilerServices;
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
-[ConjugateRegistryId(12)]
-[ConjugateKey("Unreal.Utf8String")]
-public sealed class UnrealUtf8String : UnrealConjugateBase
-    , IConjugate<UnrealUtf8String>
-    , ICloneable<UnrealUtf8String>
-    , IEquatable<UnrealUtf8String>
+[ConjugateRegistryId(11)]
+[ConjugateKey("Unreal.String")]
+public sealed class FString : UnrealConjugateBase
+    , IConjugate<FString>
+    , ICloneable<FString>
+    , IEquatable<FString>
     , IEquatable<string>
     , IComparable
-    , IComparable<UnrealUtf8String>
+    , IComparable<FString>
     , IComparable<string>
-    , IComparisonOperators<UnrealUtf8String?, UnrealUtf8String?, bool>
-    , IComparisonOperators<UnrealUtf8String?, string?, bool>
+    , IComparisonOperators<FString?, FString?, bool>
+    , IComparisonOperators<FString?, string?, bool>
     , IEnumerable<char>
-    , ISpanParsable<UnrealUtf8String>
+    , ISpanParsable<FString>
     , IConvertible
     , IPinnable<char>
     , IUnrealString
@@ -52,7 +52,7 @@ public sealed class UnrealUtf8String : UnrealConjugateBase
         }
         object IEnumerator.Current => Current;
 
-        internal Enumerator(UnrealUtf8String target)
+        internal Enumerator(FString target)
         {
             _target = target;
             _snapshot = target.Data;
@@ -79,33 +79,33 @@ public sealed class UnrealUtf8String : UnrealConjugateBase
             return data;
         }
         
-        private UnrealUtf8String? _target;
+        private FString? _target;
         private readonly string _snapshot;
         private int32 _index = -1;
     }
     
-    public static UnrealUtf8String BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+    public static FString BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 
-    public static UnrealUtf8String Parse(string s, IFormatProvider? provider) => s;
+    public static FString Parse(string s, IFormatProvider? provider) => s;
 
-    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out UnrealUtf8String result)
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out FString result)
     {
         result = s;
         return s is not null;
     }
 
-    public static UnrealUtf8String Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s.ToString(), provider);
-    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out UnrealUtf8String result) => TryParse(s.ToString(), provider, out result);
+    public static FString Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s.ToString(), provider);
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out FString result) => TryParse(s.ToString(), provider, out result);
 
-    public UnrealUtf8String() => BuildConjugate_Black(IntPtr.Zero);
-    public UnrealUtf8String(string? content) : this() => Data = content;
-    public UnrealUtf8String(UnrealUtf8String? other) : this() => Data = other?.Data;
+    public FString() => BuildConjugate_Black(IntPtr.Zero);
+    public FString(string? content) : this() => Data = content;
+    public FString(FString? other) : this() => Data = other?.Data;
 
-    public UnrealUtf8String Clone() => new(Data);
+    public FString Clone() => new(Data);
     object ICloneable.Clone() => Clone();
 
     public bool Equals(string? other) => Data == other;
-    public bool Equals(UnrealUtf8String? other) => Equals(other?.Data);
+    public bool Equals(FString? other) => Equals(other?.Data);
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(this, obj))
@@ -113,7 +113,7 @@ public sealed class UnrealUtf8String : UnrealConjugateBase
             return true;
         }
 
-        if (obj is UnrealUtf8String other)
+        if (obj is FString other)
         {
             return Equals(other);
         }
@@ -128,7 +128,7 @@ public sealed class UnrealUtf8String : UnrealConjugateBase
 
     public override int32 GetHashCode() => Data.GetHashCode();
 
-    public int32 CompareTo(UnrealUtf8String? other) => InternalCompare(this, other);
+    public int32 CompareTo(FString? other) => InternalCompare(this, other);
     public int32 CompareTo(string? other) => InternalCompare(this, other);
     int32 IComparable.CompareTo(object? obj)
     {
@@ -137,7 +137,7 @@ public sealed class UnrealUtf8String : UnrealConjugateBase
             return 1;
         }
 
-        if (obj is UnrealUtf8String other)
+        if (obj is FString other)
         {
             return CompareTo(other);
         }
@@ -176,27 +176,27 @@ public sealed class UnrealUtf8String : UnrealConjugateBase
     public DateTime ToDateTime(IFormatProvider? provider = null) => ((IConvertible)Data).ToDateTime(provider);
     public object ToType(Type conversionType, IFormatProvider? provider = null) => ((IConvertible)Data).ToType(conversionType, provider);
 
-    public static bool operator ==(UnrealUtf8String? lhs, UnrealUtf8String? rhs) => Equals(lhs, rhs);
-    public static bool operator !=(UnrealUtf8String? lhs, UnrealUtf8String? rhs) => !Equals(lhs, rhs);
-    public static bool operator >(UnrealUtf8String? lhs, UnrealUtf8String? rhs) => InternalCompare(lhs, rhs) > 0;
-    public static bool operator >=(UnrealUtf8String? lhs, UnrealUtf8String? rhs) => InternalCompare(lhs, rhs) >= 0;
-    public static bool operator <(UnrealUtf8String? lhs, UnrealUtf8String? rhs) => InternalCompare(lhs, rhs) < 0;
-    public static bool operator <=(UnrealUtf8String? lhs, UnrealUtf8String? rhs) => InternalCompare(lhs, rhs) <= 0;
+    public static bool operator ==(FString? lhs, FString? rhs) => Equals(lhs, rhs);
+    public static bool operator !=(FString? lhs, FString? rhs) => !Equals(lhs, rhs);
+    public static bool operator >(FString? lhs, FString? rhs) => InternalCompare(lhs, rhs) > 0;
+    public static bool operator >=(FString? lhs, FString? rhs) => InternalCompare(lhs, rhs) >= 0;
+    public static bool operator <(FString? lhs, FString? rhs) => InternalCompare(lhs, rhs) < 0;
+    public static bool operator <=(FString? lhs, FString? rhs) => InternalCompare(lhs, rhs) <= 0;
 
-    public static bool operator ==(UnrealUtf8String? lhs, string? rhs) => Equals(lhs?.Data, rhs);
-    public static bool operator !=(UnrealUtf8String? lhs, string? rhs) => !Equals(lhs?.Data, rhs);
-    public static bool operator >(UnrealUtf8String? lhs, string? rhs) => InternalCompare(lhs, rhs) > 0;
-    public static bool operator >=(UnrealUtf8String? lhs, string? rhs) => InternalCompare(lhs, rhs) >= 0;
-    public static bool operator <(UnrealUtf8String? lhs, string? rhs) => InternalCompare(lhs, rhs) < 0;
-    public static bool operator <=(UnrealUtf8String? lhs, string? rhs) => InternalCompare(lhs, rhs) <= 0;
+    public static bool operator ==(FString? lhs, string? rhs) => Equals(lhs?.Data, rhs);
+    public static bool operator !=(FString? lhs, string? rhs) => !Equals(lhs?.Data, rhs);
+    public static bool operator >(FString? lhs, string? rhs) => InternalCompare(lhs, rhs) > 0;
+    public static bool operator >=(FString? lhs, string? rhs) => InternalCompare(lhs, rhs) >= 0;
+    public static bool operator <(FString? lhs, string? rhs) => InternalCompare(lhs, rhs) < 0;
+    public static bool operator <=(FString? lhs, string? rhs) => InternalCompare(lhs, rhs) <= 0;
 
-    public static implicit operator UnrealUtf8String(string? value) => new(value);
-    public static implicit operator UnrealUtf8String(ReadOnlySpan<char> value) => new(value.ToString());
-    public static implicit operator string(UnrealUtf8String? value) => value?.Data ?? string.Empty;
-    public static implicit operator ReadOnlySpan<char>(UnrealUtf8String? value) => value?.Data;
+    public static implicit operator FString(string? value) => new(value);
+    public static implicit operator FString(ReadOnlySpan<char> value) => new(value.ToString());
+    public static implicit operator string(FString? value) => value?.Data ?? string.Empty;
+    public static implicit operator ReadOnlySpan<char>(FString? value) => value?.Data;
     
-    public static IEqualityComparer<UnrealUtf8String> DefaultEqualityComparer { get; } = new EqualityComparer();
-    public static IComparer<UnrealUtf8String> DefaultRelationalComparer { get; } = new RelationalComparer();
+    public static IEqualityComparer<FString> DefaultEqualityComparer { get; } = new EqualityComparer();
+    public static IComparer<FString> DefaultRelationalComparer { get; } = new RelationalComparer();
     
     [AllowNull]
     public string Data
@@ -213,33 +213,28 @@ public sealed class UnrealUtf8String : UnrealConjugateBase
         }
     }
     
-    private sealed class EqualityComparer : IEqualityComparer<UnrealUtf8String>
+    private sealed class EqualityComparer : IEqualityComparer<FString>
     {
-        public bool Equals(UnrealUtf8String? lhs, UnrealUtf8String? rhs) => lhs == rhs;
-        public int32 GetHashCode(UnrealUtf8String obj) => obj.GetHashCode();
+        public bool Equals(FString? lhs, FString? rhs) => lhs == rhs;
+        public int32 GetHashCode(FString obj) => obj.GetHashCode();
     }
 
-    private sealed class RelationalComparer : IComparer<UnrealUtf8String>
+    private sealed class RelationalComparer : IComparer<FString>
     {
-        public int32 Compare(UnrealUtf8String? lhs, UnrealUtf8String? rhs) => InternalCompare(lhs, rhs);
+        public int32 Compare(FString? lhs, FString? rhs) => InternalCompare(lhs, rhs);
     }
     
     private static int32 InternalCompare(string? lhs, string? rhs) => string.Compare(lhs, rhs, StringComparison.Ordinal);
     
-    private UnrealUtf8String(IntPtr unmanaged) : base(unmanaged){}
+    private FString(IntPtr unmanaged) : base(unmanaged){}
 
-    private unsafe string InternalGetData()
-    {
-        using InteropString buffer = new();
-        UnrealUtf8String_Interop.GetData(ConjugateHandle.FromConjugate(this), buffer.Address);
-        return buffer;
-    }
+    private unsafe string InternalGetData() => new(UnrealString_Interop.GetData(ConjugateHandle.FromConjugate(this)));
     
     private unsafe void InternalSetData(string? value)
     {
         fixed (char* buffer = value)
         {
-            UnrealUtf8String_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);
+            UnrealString_Interop.SetData(ConjugateHandle.FromConjugate(this), buffer);
         }
     }
     

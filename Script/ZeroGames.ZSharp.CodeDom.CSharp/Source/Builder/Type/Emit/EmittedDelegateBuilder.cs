@@ -45,8 +45,8 @@ public class EmittedDelegateBuilder(string namespaceName, string typeName, strin
 		};
 		definition.AddMember(statefulSignature);
 
-		definition.AddMember(new Block($"public UnrealObject {BindMethodName}(Signature @delegate) => base.{BindMethodName}(@delegate);"));
-		definition.AddMember(new Block($"public UnrealObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state) => base.{BindMethodName}(@delegate, state);"));
+		definition.AddMember(new Block($"public UObject {BindMethodName}(Signature @delegate) => base.{BindMethodName}(@delegate);"));
+		definition.AddMember(new Block($"public UObject {BindMethodName}<TState>(Signature<TState> @delegate, TState state) => base.{BindMethodName}(@delegate, state);"));
 		
 		definition.AddMember(new MethodDefinition(EMemberVisibility.Public, ExecuteMethodName, ReturnType, Parameters) { Body = new StrangeZCallBodyBuilder($"base.{ExecuteMethodName}", ReturnType, false, Parameters).Build() });
 	}
@@ -65,7 +65,7 @@ public class EmittedDelegateBuilder(string namespaceName, string typeName, strin
 	protected override string RedConstructorVisibility => "private";
 
 	protected override string StaticFieldInterfaceName => "IStaticSignature";
-	protected override string StaticFieldTypeName => "DelegateFunction";
+	protected override string StaticFieldTypeName => "UDelegateFunction";
 	protected override string StaticFieldPropertyName => "StaticSignature";
 
 	private static string StaticGetUnrealFieldPath(string namespaceName, string typeName, string? outerClassName)

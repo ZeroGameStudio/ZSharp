@@ -2,17 +2,17 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public partial class Quat
+public partial class FQuat
 {
 	
-	public Vector RotateVector(Vector vector) => KismetMathLibrary.Quat_RotateVector(this, vector);
-	public Vector UnrotateVector(Vector vector) => KismetMathLibrary.Quat_UnrotateVector(this, vector);
+	public FVector RotateVector(FVector vector) => UKismetMathLibrary.Quat_RotateVector(this, vector);
+	public FVector UnrotateVector(FVector vector) => UKismetMathLibrary.Quat_UnrotateVector(this, vector);
 	
-	public static explicit operator Vector(Quat @this) => @this.Vector;
-	public static explicit operator Rotator(Quat @this) => @this.Rotator;
+	public static explicit operator FVector(FQuat @this) => @this.Vector;
+	public static explicit operator FRotator(FQuat @this) => @this.Rotator;
 
-	public Vector Vector => Rotator.Vector;
-	public Rotator Rotator => KismetMathLibrary.Quat_Rotator(this);
+	public FVector Vector => Rotator.Vector;
+	public FRotator Rotator => UKismetMathLibrary.Quat_Rotator(this);
 
 }
 

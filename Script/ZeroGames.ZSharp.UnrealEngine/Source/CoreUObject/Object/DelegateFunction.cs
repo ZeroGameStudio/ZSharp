@@ -4,10 +4,10 @@ using System.Reflection;
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public partial class DelegateFunction
+public partial class UDelegateFunction
 {
 	
-	public new static DelegateFunction FromType(Type type)
+	public new static UDelegateFunction FromType(Type type)
 	{
 		PropertyInfo? staticUnrealFieldProperty = null;
 		if (type.IsAssignableTo(typeof(IStaticSignature)))
@@ -20,9 +20,9 @@ public partial class DelegateFunction
 			throw new ArgumentOutOfRangeException($"Type {type.FullName} is not a valid unreal field.");
 		}
 		
-		return (DelegateFunction)staticUnrealFieldProperty.GetValue(null)!;
+		return (UDelegateFunction)staticUnrealFieldProperty.GetValue(null)!;
 	}
-	public new static DelegateFunction FromType<T>() => FromType(typeof(T));
+	public new static UDelegateFunction FromType<T>() => FromType(typeof(T));
 	
 }
 

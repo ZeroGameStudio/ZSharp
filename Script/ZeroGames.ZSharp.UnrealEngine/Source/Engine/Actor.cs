@@ -2,23 +2,23 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 
-public partial class Actor
+public partial class AActor
 {
 
-	public ActorComponent AddComponent(UnrealClass @class)
+	public UActorComponent AddComponent(UClass @class)
 	{
 		MasterAlcCache.GuardInvariant();
 		return InternalAddComponent(@class, false);
 	}
 
-	public T AddComponent<T>() where T : ActorComponent, IStaticClass
+	public T AddComponent<T>() where T : UActorComponent, IStaticClass
 		=> (T)AddComponent(T.StaticClass);
 
-	public ActorComponent AddComponent(UnrealClass @class, Action<ActorComponent> initialize)
+	public UActorComponent AddComponent(UClass @class, Action<UActorComponent> initialize)
 	{
 		MasterAlcCache.GuardInvariant();
 		
-		ActorComponent component = InternalAddComponent(@class, true);
+		UActorComponent component = InternalAddComponent(@class, true);
 
 		try
 		{
@@ -32,7 +32,7 @@ public partial class Actor
 		return component;
 	}
 
-	public T AddComponent<T>(Action<T> initialize) where T : ActorComponent, IStaticClass
+	public T AddComponent<T>(Action<T> initialize) where T : UActorComponent, IStaticClass
 	{
 		MasterAlcCache.GuardInvariant();
 		
@@ -50,11 +50,11 @@ public partial class Actor
 		return component;
 	}
 	
-	public ActorComponent AddComponent<TState>(UnrealClass @class, Action<ActorComponent, TState> initialize, TState state)
+	public UActorComponent AddComponent<TState>(UClass @class, Action<UActorComponent, TState> initialize, TState state)
 	{
 		MasterAlcCache.GuardInvariant();
 		
-		ActorComponent component = InternalAddComponent(@class, true);
+		UActorComponent component = InternalAddComponent(@class, true);
 
 		try
 		{
@@ -68,7 +68,7 @@ public partial class Actor
 		return component;
 	}
 	
-	public T AddComponent<T, TState>(Action<T, TState> initialize, TState state) where T : ActorComponent, IStaticClass
+	public T AddComponent<T, TState>(Action<T, TState> initialize, TState state) where T : UActorComponent, IStaticClass
 	{
 		MasterAlcCache.GuardInvariant();
 		
@@ -86,11 +86,11 @@ public partial class Actor
 		return component;
 	}
 	
-	public async ZeroTask<ActorComponent> AddComponentAsync(UnrealClass @class, Func<ActorComponent, Lifecycle, ZeroTask> initializeAsync)
+	public async ZeroTask<UActorComponent> AddComponentAsync(UClass @class, Func<UActorComponent, Lifecycle, ZeroTask> initializeAsync)
 	{
 		MasterAlcCache.GuardInvariant();
 		
-		ActorComponent component = InternalAddComponent(@class, true);
+		UActorComponent component = InternalAddComponent(@class, true);
 
 		try
 		{
@@ -107,7 +107,7 @@ public partial class Actor
 		return component;
 	}
 
-	public async ZeroTask<T> AddComponentAsync<T>(Func<T, Lifecycle, ZeroTask> initializeAsync) where T : ActorComponent, IStaticClass
+	public async ZeroTask<T> AddComponentAsync<T>(Func<T, Lifecycle, ZeroTask> initializeAsync) where T : UActorComponent, IStaticClass
 	{
 		MasterAlcCache.GuardInvariant();
 		
@@ -128,11 +128,11 @@ public partial class Actor
 		return component;
 	}
 	
-	public async ZeroTask<ActorComponent> AddComponentAsync<TState>(UnrealClass @class, Func<ActorComponent, TState, Lifecycle, ZeroTask> initializeAsync, TState state)
+	public async ZeroTask<UActorComponent> AddComponentAsync<TState>(UClass @class, Func<UActorComponent, TState, Lifecycle, ZeroTask> initializeAsync, TState state)
 	{
 		MasterAlcCache.GuardInvariant();
 		
-		ActorComponent component = InternalAddComponent(@class, true);
+		UActorComponent component = InternalAddComponent(@class, true);
 
 		try
 		{
@@ -149,7 +149,7 @@ public partial class Actor
 		return component;
 	}
 	
-	public async ZeroTask<T> AddComponentAsync<T, TState>(Func<T, TState, Lifecycle, ZeroTask> initializeAsync, TState state) where T : ActorComponent, IStaticClass
+	public async ZeroTask<T> AddComponentAsync<T, TState>(Func<T, TState, Lifecycle, ZeroTask> initializeAsync, TState state) where T : UActorComponent, IStaticClass
 	{
 		MasterAlcCache.GuardInvariant();
 		
@@ -170,17 +170,17 @@ public partial class Actor
 		return component;
 	}
 
-	public T GetOrAddComponent<T>() where T : ActorComponent
+	public T GetOrAddComponent<T>() where T : UActorComponent
 		=> GetComponent<T>() ?? AddComponent<T>();
 
-	public T? GetComponent<T>() where T : ActorComponent
+	public T? GetComponent<T>() where T : UActorComponent
 	{
-		return (T?)GetComponentByClass(new(UnrealClass.FromType<T>()));
+		return (T?)GetComponentByClass(new(UClass.FromType<T>()));
 	}
 
-	public T[] GetComponents<T>() where T : ActorComponent
+	public T[] GetComponents<T>() where T : UActorComponent
 	{
-		UnrealArray<ActorComponent?> comps = K2_GetComponentsByClass(new(UnrealClass.FromType<T>()));
+		TArray<UActorComponent?> comps = K2_GetComponentsByClass(new(UClass.FromType<T>()));
 		int32 count = comps.Count;
 		var res = new T[count];
 		for (int32 i = 0; i < count; ++i)
@@ -192,10 +192,10 @@ public partial class Actor
 		return res;
 	}
 
-	public void GetComponents<T>(ICollection<T> result) where T : ActorComponent
+	public void GetComponents<T>(ICollection<T> result) where T : UActorComponent
 	{
-		UnrealArray<ActorComponent?> comps = K2_GetComponentsByClass(new(UnrealClass.FromType<T>()));
-		foreach (ActorComponent? comp in comps)
+		TArray<UActorComponent?> comps = K2_GetComponentsByClass(new(UClass.FromType<T>()));
+		foreach (UActorComponent? comp in comps)
 		{
 			result.Add((T)comp!);
 		}
@@ -216,10 +216,10 @@ public partial class Actor
 	private unsafe void InternalFinishSpawning()
 		=> Actor_Interop.FinishSpawning(ConjugateHandle.FromConjugate(this));
 
-	private unsafe ActorComponent InternalAddComponent(UnrealClass @class, bool defer)
-		=> Actor_Interop.AddComponent(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(@class), Convert.ToByte(defer)).GetTargetChecked<ActorComponent>();
+	private unsafe UActorComponent InternalAddComponent(UClass @class, bool defer)
+		=> Actor_Interop.AddComponent(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(@class), Convert.ToByte(defer)).GetTargetChecked<UActorComponent>();
 	
-	private unsafe void InternalFinishAddComponent(ActorComponent component)
+	private unsafe void InternalFinishAddComponent(UActorComponent component)
 		=> Actor_Interop.FinishAddComponent(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(component));
 	
 	private unsafe ENetMode InternalGetNetMode()

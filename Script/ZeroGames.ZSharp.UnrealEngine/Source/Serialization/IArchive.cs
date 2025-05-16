@@ -41,35 +41,35 @@ public interface IArchive : IMarshalPointer
 	IArchive Serialize(bool value);
 	IArchive Serialize(out bool value);
 	
-	IArchive Serialize(UnrealString? value);
-	IArchive Serialize(out UnrealString value);
+	IArchive Serialize(FString? value);
+	IArchive Serialize(out FString value);
 	
-	IArchive Serialize(UnrealAnsiString? value);
-	IArchive Serialize(out UnrealAnsiString value);
+	IArchive Serialize(FAnsiString? value);
+	IArchive Serialize(out FAnsiString value);
 	
-	IArchive Serialize(UnrealUtf8String? value);
-	IArchive Serialize(out UnrealUtf8String value);
+	IArchive Serialize(FUtf8String? value);
+	IArchive Serialize(out FUtf8String value);
 	
-	IArchive Serialize(UnrealName? value);
-	IArchive Serialize(out UnrealName value);
+	IArchive Serialize(FName? value);
+	IArchive Serialize(out FName value);
 	
-	IArchive Serialize(UnrealText? value);
-	IArchive Serialize(out UnrealText value);
+	IArchive Serialize(FText? value);
+	IArchive Serialize(out FText value);
 	
 	IArchive Serialize(string? value);
 	IArchive Serialize(out string value);
 	
-	IArchive Serialize(UnrealObject? value);
-	IArchive Serialize(out UnrealObject? value);
+	IArchive Serialize(UObject? value);
+	IArchive Serialize(out UObject? value);
 	
 	IArchive Serialize(UnrealScriptStructBase? value);
 	IArchive Serialize(out UnrealScriptStructBase value);
 	
-	bool NetSerialize(UnrealScriptStructBase? value, PackageMap map, out bool success);
-	bool NetSerialize(out UnrealScriptStructBase value, PackageMap map, out bool success);
+	bool NetSerialize(UnrealScriptStructBase? value, UPackageMap map, out bool success);
+	bool NetSerialize(out UnrealScriptStructBase value, UPackageMap map, out bool success);
 	
-	IArchive Serialize(SoftObjectPath? value);
-	IArchive Serialize(out SoftObjectPath value);
+	IArchive Serialize(FSoftObjectPath? value);
+	IArchive Serialize(out FSoftObjectPath value);
 
 	IArchive Serialize(ReadOnlySpan<uint8> value);
 	IArchive Serialize(out uint8[] value);

@@ -8,23 +8,23 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(22)]
 [ConjugateKey("Unreal.SoftClassPtr")]
-public sealed class SoftClassPtr<T> : SoftClassPtrBase
-	, IConjugate<SoftClassPtr<T>>
-	, ICloneable<SoftClassPtr<T>>
-	, IEquatable<SoftClassPtr<T>>
-	, IEqualityOperators<SoftClassPtr<T>?, SoftClassPtr<T>?, bool>
-	, ISoftObjectWrapper<UnrealClass>
+public sealed class TSoftClassPtr<T> : SoftClassPtrBase
+	, IConjugate<TSoftClassPtr<T>>
+	, ICloneable<TSoftClassPtr<T>>
+	, IEquatable<TSoftClassPtr<T>>
+	, IEqualityOperators<TSoftClassPtr<T>?, TSoftClassPtr<T>?, bool>
+	, ISoftObjectWrapper<UClass>
 	, IUnrealClassPath
 	where T : class, IUnrealObject
 {
 
-	public static SoftClassPtr<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+	public static TSoftClassPtr<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 	
-	public static SoftClassPtr<T> From<TSource>(SoftClassPtr<TSource> other) where TSource : class, T => new(other);
+	public static TSoftClassPtr<T> From<TSource>(TSoftClassPtr<TSource> other) where TSource : class, T => new(other);
 
-	public SoftClassPtr() => BuildConjugate_Black(UnrealClass.FromType<T>().Unmanaged);
+	public TSoftClassPtr() => BuildConjugate_Black(UClass.FromType<T>().Unmanaged);
 	
-	public SoftClassPtr(UnrealClass? target) : this()
+	public TSoftClassPtr(UClass? target) : this()
 	{
 		if (target is null)
 		{
@@ -34,24 +34,24 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 		Target = target;
 	}
 	
-	public SoftClassPtr<T> Clone() => new(this);
+	public TSoftClassPtr<T> Clone() => new(this);
 	object ICloneable.Clone() => Clone();
 
-	public bool Equals(SoftClassPtr<T>? other) => base.Equals(other);
+	public bool Equals(TSoftClassPtr<T>? other) => base.Equals(other);
 	public override bool Equals(object? obj) => base.Equals(obj);
 	public override int32 GetHashCode() => base.GetHashCode();
 	
-	public bool TryLoad([NotNullWhen(true)] out UnrealClass? target)
+	public bool TryLoad([NotNullWhen(true)] out UClass? target)
 	{
 		MasterAlcCache.GuardInvariant();
 		return InternalTryLoad(out target);
 	}
 	
-	public static implicit operator SoftClassPtr<T>(UnrealClass? target) => new(target);
-	public static bool operator ==(SoftClassPtr<T>? left, SoftClassPtr<T>? right) => Equals(left, right);
-	public static bool operator !=(SoftClassPtr<T>? left, SoftClassPtr<T>? right) => !Equals(left, right);
+	public static implicit operator TSoftClassPtr<T>(UClass? target) => new(target);
+	public static bool operator ==(TSoftClassPtr<T>? left, TSoftClassPtr<T>? right) => Equals(left, right);
+	public static bool operator !=(TSoftClassPtr<T>? left, TSoftClassPtr<T>? right) => !Equals(left, right);
 	
-	public static IEqualityComparer<SoftClassPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
+	public static IEqualityComparer<TSoftClassPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
 
 	public string Path
 	{
@@ -62,7 +62,7 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 		}
 	}
 	
-	public new UnrealClass? Target
+	public new UClass? Target
 	{
 		get
 		{
@@ -76,7 +76,7 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 		}
 	}
 
-	public new UnrealClass? TargetEvenIfGarbage
+	public new UClass? TargetEvenIfGarbage
 	{
 		get
 		{
@@ -94,26 +94,26 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 		}
 	}
 
-	protected override UnrealObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
+	protected override UObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
 	
-	protected override void InternalSetTarget(UnrealObject? target)
+	protected override void InternalSetTarget(UObject? target)
 	{
-		if (target is not null && target is not UnrealClass)
+		if (target is not null && target is not UClass)
 		{
 			throw new ArgumentOutOfRangeException(nameof(target));
 		}
 
-		Target = (UnrealClass?)target;
+		Target = (UClass?)target;
 	}
 	
-	private sealed class EqualityComparer : IEqualityComparer<SoftClassPtr<T>>
+	private sealed class EqualityComparer : IEqualityComparer<TSoftClassPtr<T>>
 	{
-		public bool Equals(SoftClassPtr<T>? lhs, SoftClassPtr<T>? rhs) => lhs == rhs;
-		public int32 GetHashCode(SoftClassPtr<T> obj) => obj.GetHashCode();
+		public bool Equals(TSoftClassPtr<T>? lhs, TSoftClassPtr<T>? rhs) => lhs == rhs;
+		public int32 GetHashCode(TSoftClassPtr<T> obj) => obj.GetHashCode();
 	}
 
-	private SoftClassPtr(IntPtr unmanaged) : base(unmanaged){}
-	private SoftClassPtr(SoftClassPtrBase? other) : this() => InternalCopy(other);
+	private TSoftClassPtr(IntPtr unmanaged) : base(unmanaged){}
+	private TSoftClassPtr(SoftClassPtrBase? other) : this() => InternalCopy(other);
 
 	private unsafe void InternalCopy(SoftClassPtrBase? other)
 	{
@@ -127,10 +127,10 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 		}
 	}
 
-	private unsafe UnrealClass? InternalGet(bool evenIfGarbage)
-		=> SoftClassPtr_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<UnrealClass>();
+	private unsafe UClass? InternalGet(bool evenIfGarbage)
+		=> SoftClassPtr_Interop.Get(ConjugateHandle.FromConjugate(this), Convert.ToByte(evenIfGarbage)).GetTarget<UClass>();
 
-	private unsafe void InternalSet(UnrealClass? target)
+	private unsafe void InternalSet(UClass? target)
 	{
 		if (target is not null && !target.IsChildOf<T>())
 		{
@@ -143,9 +143,9 @@ public sealed class SoftClassPtr<T> : SoftClassPtrBase
 	private unsafe bool InternalIsPending()
 		=> SoftClassPtr_Interop.IsPending(ConjugateHandle.FromConjugate(this)) > 0;
 
-	private unsafe bool InternalTryLoad([NotNullWhen(true)] out UnrealClass? target)
+	private unsafe bool InternalTryLoad([NotNullWhen(true)] out UClass? target)
 	{
-		target = SoftClassPtr_Interop.Load(ConjugateHandle.FromConjugate(this)).GetTarget<UnrealClass>();
+		target = SoftClassPtr_Interop.Load(ConjugateHandle.FromConjugate(this)).GetTarget<UClass>();
 		return target is not null;
 	}
 	

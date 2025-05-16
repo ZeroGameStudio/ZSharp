@@ -8,23 +8,23 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 // IMPORTANT: Type name and namespace is used by magic, DO NOT change!
 [ConjugateRegistryId(23)]
 [ConjugateKey("Unreal.SoftObjectPtr")]
-public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
-	, IConjugate<SoftObjectPtr<T>>
-	, ICloneable<SoftObjectPtr<T>>
-	, IEquatable<SoftObjectPtr<T>>
-	, IEqualityOperators<SoftObjectPtr<T>?, SoftObjectPtr<T>?, bool>
+public sealed class TSoftObjectPtr<T> : SoftObjectPtrBase
+	, IConjugate<TSoftObjectPtr<T>>
+	, ICloneable<TSoftObjectPtr<T>>
+	, IEquatable<TSoftObjectPtr<T>>
+	, IEqualityOperators<TSoftObjectPtr<T>?, TSoftObjectPtr<T>?, bool>
 	, ISoftObjectWrapper<T>
 	, IUnrealObjectPath
-	where T : UnrealObject
+	where T : UObject
 {
 
-	public static SoftObjectPtr<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
+	public static TSoftObjectPtr<T> BuildConjugate(IntPtr unmanaged) => new(unmanaged);
 	
-	public static SoftObjectPtr<T> From<TSource>(SoftObjectPtr<TSource> other) where TSource : T => new(other);
+	public static TSoftObjectPtr<T> From<TSource>(TSoftObjectPtr<TSource> other) where TSource : T => new(other);
 
-	public SoftObjectPtr() => BuildConjugate_Black(UnrealClass.FromType<T>().Unmanaged);
+	public TSoftObjectPtr() => BuildConjugate_Black(UClass.FromType<T>().Unmanaged);
 	
-	public SoftObjectPtr(T? target) : this()
+	public TSoftObjectPtr(T? target) : this()
 	{
 		if (target is null)
 		{
@@ -34,10 +34,10 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 		Target = target;
 	}
 	
-	public SoftObjectPtr<T> Clone() => new(this);
+	public TSoftObjectPtr<T> Clone() => new(this);
 	object ICloneable.Clone() => Clone();
 
-	public bool Equals(SoftObjectPtr<T>? other) => base.Equals(other);
+	public bool Equals(TSoftObjectPtr<T>? other) => base.Equals(other);
 	public override bool Equals(object? obj) => base.Equals(obj);
 	public override int32 GetHashCode() => base.GetHashCode();
 
@@ -47,11 +47,11 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 		return InternalTryLoad(out target);
 	}
 	
-	public static implicit operator SoftObjectPtr<T>(T? target) => new(target);
-	public static bool operator ==(SoftObjectPtr<T>? left, SoftObjectPtr<T>? right) => Equals(left, right);
-	public static bool operator !=(SoftObjectPtr<T>? left, SoftObjectPtr<T>? right) => !Equals(left, right);
+	public static implicit operator TSoftObjectPtr<T>(T? target) => new(target);
+	public static bool operator ==(TSoftObjectPtr<T>? left, TSoftObjectPtr<T>? right) => Equals(left, right);
+	public static bool operator !=(TSoftObjectPtr<T>? left, TSoftObjectPtr<T>? right) => !Equals(left, right);
 	
-	public static IEqualityComparer<SoftObjectPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
+	public static IEqualityComparer<TSoftObjectPtr<T>> DefaultEqualityComparer { get; } = new EqualityComparer();
 
 	public string Path
 	{
@@ -94,9 +94,9 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 		}
 	}
 	
-	protected override UnrealObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
+	protected override UObject? InternalGetTarget(bool evenIfGarbage) => evenIfGarbage ? TargetEvenIfGarbage : Target;
 	
-	protected override void InternalSetTarget(UnrealObject? target)
+	protected override void InternalSetTarget(UObject? target)
 	{
 		if (target is not null && target is not T)
 		{
@@ -106,14 +106,14 @@ public sealed class SoftObjectPtr<T> : SoftObjectPtrBase
 		Target = (T?)target;
 	}
 	
-	private sealed class EqualityComparer : IEqualityComparer<SoftObjectPtr<T>>
+	private sealed class EqualityComparer : IEqualityComparer<TSoftObjectPtr<T>>
 	{
-		public bool Equals(SoftObjectPtr<T>? lhs, SoftObjectPtr<T>? rhs) => lhs == rhs;
-		public int32 GetHashCode(SoftObjectPtr<T> obj) => obj.GetHashCode();
+		public bool Equals(TSoftObjectPtr<T>? lhs, TSoftObjectPtr<T>? rhs) => lhs == rhs;
+		public int32 GetHashCode(TSoftObjectPtr<T> obj) => obj.GetHashCode();
 	}
 
-	private SoftObjectPtr(IntPtr unmanaged) : base(unmanaged){}
-	private SoftObjectPtr(SoftObjectPtrBase? other) : this() => InternalCopy(other);
+	private TSoftObjectPtr(IntPtr unmanaged) : base(unmanaged){}
+	private TSoftObjectPtr(SoftObjectPtrBase? other) : this() => InternalCopy(other);
 
 	private unsafe void InternalCopy(SoftObjectPtrBase? other)
 	{

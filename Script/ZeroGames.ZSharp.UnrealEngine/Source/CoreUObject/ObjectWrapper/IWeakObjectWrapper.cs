@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public interface IWeakObjectWrapper<T> : IUnrealObjectWrapper<T> where T : UnrealObject
+public interface IWeakObjectWrapper<T> : IUnrealObjectWrapper<T> where T : UObject
 {
 	bool IsStale { get; }
 	bool IsStaleExcludingGarbage { get; }

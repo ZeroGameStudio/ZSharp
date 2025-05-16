@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class EmittedDelegateBuilder(string namespaceName, string typeName, string? outerClassName, EDelegateKind kind) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, EmittedDelegateBuilder.StaticGetUnrealFieldPath(namespaceName, typeName, outerClassName))
+public class EmittedDelegateBuilder(string namespaceName, string typeName, string? outerClassName, EDelegateKind kind) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, StaticGetUnrealFieldPath(namespaceName, typeName, outerClassName))
 {
 	
 	public EDelegateKind Kind { get; } = kind;
@@ -29,7 +29,7 @@ public class EmittedDelegateBuilder(string namespaceName, string typeName, strin
 	{
 		base.BuildTypeDefinition(definition);
 		
-		AddAttributeAfter("ConjugateKey", $"\"{ConjugateKey}\"");
+		AddAttributeAfter("ConjugateKey", UNREAL_FIELD_PATH_CONST);
 		
 		definition.Modifiers |= EMemberModifiers.Sealed | EMemberModifiers.Partial;
 
@@ -71,13 +71,11 @@ public class EmittedDelegateBuilder(string namespaceName, string typeName, strin
 	private static string StaticGetUnrealFieldPath(string namespaceName, string typeName, string? outerClassName)
 	{
 		string typeSegment = outerClassName is null ? typeName : $"{outerClassName}:{typeName}";
-		return $"/Script/{namespaceName.Split('.').Last()}.{typeSegment}__DelegateSignature";
+		return $"/Script/{namespaceName.Split('.').Last()}.{typeSegment.Substring(1)}__DelegateSignature";
 	}
 	
 	private string BindMethodName => Kind == EDelegateKind.Unicast ? "Bind" : "Add";
 	private string ExecuteMethodName => Kind == EDelegateKind.Unicast ? "Execute" : "Broadcast";
-
-	private string ConjugateKey => StaticGetUnrealFieldPath(Namespace, TypeName, OuterClassName);
 
 }
 

@@ -2,12 +2,12 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class EmittedScriptStructBuilder(string namespaceName, string typeName, bool implicitBase) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName}")
+public class EmittedScriptStructBuilder(string namespaceName, string typeName, bool implicitBase) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName.Substring(1)}")
 {
 	
 	public EmittedPropertyDefinition AddProperty(EMemberVisibility visibility, TypeReference type, string name)
 	{
-		string zcallName = $"up://Script/{_namespaceName.Split('.').Last()}.{_typeName}:{name}";
+		string zcallName = $"up:/{UnrealFieldPath}:{name}";
 		PropertyDefinition property;
 		{
 			EMemberModifiers modifiers = EMemberModifiers.Partial;
@@ -48,7 +48,7 @@ public static bool operator !=({TypeName}? left, {TypeName}? right) => !Equals(l
 
 		definition.Modifiers |= EMemberModifiers.Unsafe;
 		
-		AddAttributeAfter("ConjugateKey", $"\"{_unrealFieldPath}\"");
+		AddAttributeAfter("ConjugateKey", UNREAL_FIELD_PATH_CONST);
 
 		foreach (var property in _properties)
 		{
@@ -85,7 +85,6 @@ public static bool operator !=({TypeName}? left, {TypeName}? right) => !Equals(l
 
 	private readonly string _namespaceName = namespaceName;
 	private readonly string _typeName = typeName;
-	private readonly string _unrealFieldPath = $"/Script/{namespaceName.Split('.').Last()}.{typeName}";
 	private readonly bool _implicitBase = implicitBase;
 
 }

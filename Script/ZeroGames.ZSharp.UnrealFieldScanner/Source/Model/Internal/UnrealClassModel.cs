@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferredTypeModel
 {
 
-	public UnrealClassModel(ModelRegistry registry, TypeDefinition typeDef) : base(typeDef.Name)
+	public UnrealClassModel(ModelRegistry registry, TypeDefinition typeDef) : base(typeDef.Name.Substring(1))
 	{
 		_registry = registry;
 		_typeDef = typeDef;

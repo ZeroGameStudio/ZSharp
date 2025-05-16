@@ -2,12 +2,12 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class EmittedClassBuilder(string namespaceName, string typeName, bool implicitBase, bool implicitRedConstructor) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName}")
+public class EmittedClassBuilder(string namespaceName, string typeName, bool implicitBase, bool implicitRedConstructor) : GeneratedCompositeTypeBuilderBase<ClassDefinition>(namespaceName, typeName, $"/Script/{namespaceName.Split('.').Last()}.{typeName.Substring(1)}")
 {
 	
 	public EmittedEventMethodDefinition AddEventMethod(EMemberVisibility visibility, string name, bool withImplementation, bool withValidation, bool isSealed, TypeReference? returnType, params ParameterDeclaration[]? parameters)
 	{
-		string zcallName = $"uf://Script/{_namespaceName.Split('.').Last()}.{_typeName}:{name}";
+		string zcallName = $"uf:/{UnrealFieldPath}:{name}";
 		MethodDefinition stub;
 		{
 			EMemberModifiers modifiers = EMemberModifiers.Partial;
@@ -51,7 +51,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 	
 	public EmittedPropertyDefinition AddProperty(EMemberVisibility visibility, TypeReference type, string name, string[]? fieldNotifies, bool needsMarkDirty)
 	{
-		string zcallName = $"up://Script/{_namespaceName.Split('.').Last()}.{_typeName}:{name}";
+		string zcallName = $"up:/{UnrealFieldPath}:{name}";
 		PropertyDefinition property;
 		{
 			EMemberModifiers modifiers = EMemberModifiers.Partial;
@@ -94,7 +94,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 
 		definition.Modifiers |= EMemberModifiers.Unsafe;
 		
-		AddAttributeAfter("ConjugateKey", $"\"{_unrealFieldPath}\"");
+		AddAttributeAfter("ConjugateKey", UNREAL_FIELD_PATH_CONST);
 
 		foreach (var method in _methods)
 		{
@@ -137,7 +137,6 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 
 	private readonly string _namespaceName = namespaceName;
 	private readonly string _typeName = typeName;
-	private readonly string _unrealFieldPath = $"/Script/{namespaceName.Split('.').Last()}.{typeName}";
 	private readonly bool _implicitBase = implicitBase;
 
 }

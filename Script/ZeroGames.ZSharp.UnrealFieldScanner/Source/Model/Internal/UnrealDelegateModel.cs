@@ -7,7 +7,7 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 internal class UnrealDelegateModel : UnrealStructModel, IUnrealDelegateModel, IDeferredTypeModel
 {
 
-	public UnrealDelegateModel(ModelRegistry registry, TypeDefinition typeDef, IUnrealClassModel? outer = null) : base(typeDef.Name, registry, typeDef)
+	public UnrealDelegateModel(ModelRegistry registry, TypeDefinition typeDef, IUnrealClassModel? outer = null) : base(typeDef.Name.Substring(1) + "__DelegateSignature", registry, typeDef)
 	{
 		AssemblyName = typeDef.Scope.GetAssemblyName();
 		FullName = typeDef.FullName;

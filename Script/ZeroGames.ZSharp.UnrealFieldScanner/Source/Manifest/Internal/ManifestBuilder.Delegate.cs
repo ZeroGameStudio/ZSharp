@@ -9,7 +9,7 @@ partial class ManifestBuilder
 	{
 		UnrealDelegateDefinition result = new()
 		{
-			Name = $"{delegateModel.Name}__DelegateSignature",
+			Name = delegateModel.Name,
 			DelegateType = delegateModel.BaseType!.Value.FullName switch
 			{
 				UNREAL_DELEGATE_BASE_TYPE_FULL_NAME => EDelegateType.Unicast,

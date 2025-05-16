@@ -12,7 +12,7 @@ namespace ZeroGames.ZSharp.Analyzer.CSharp;
 public class UEnumAnalyzer : DiagnosticAnalyzer
 {
     
-    public const string DIAGNOSTIC_ID = "ZS0002";
+    public const string DIAGNOSTIC_ID = "ZS0003";
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [ _rule ];
 

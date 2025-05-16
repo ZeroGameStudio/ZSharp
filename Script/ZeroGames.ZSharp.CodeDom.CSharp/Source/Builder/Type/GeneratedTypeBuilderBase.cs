@@ -87,7 +87,7 @@ public abstract class GeneratedTypeBuilderBase<TDefinition>(string namespaceName
 	
 	protected string Namespace { get; } = namespaceName;
 	protected string TypeName { get; } = typeName;
-	protected string? UnrealFieldPath => unrealFieldPath;
+	protected string? UnrealFieldPath { get; } = unrealFieldPath;
 	protected string UnrealFieldPathLiteralText => $"\"{UnrealFieldPath}\"";
 
 	protected virtual bool GenerateIntrinsicContent => true;

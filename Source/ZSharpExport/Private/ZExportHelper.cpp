@@ -540,30 +540,45 @@ ZSharp::FZExportedDefaultValue ZSharp::FZExportHelper::GetParameterDefaultValue(
 		const UScriptStruct* scriptStruct = structParameter->Struct;
 		if (scriptStruct == TBaseStructure<FVector>::Get())
 		{
-			FVector value;
-			parameter->ImportText_Direct(*defaultValueText, &value, nullptr, PPF_None);
+			// X,Y,Z
+			TArray<FString> xyz;
+			defaultValueText.ParseIntoArray(xyz, TEXT(","));
+			FVector value = FVector::ZeroVector;
+			if (xyz.Num() == 3)
+			{
+				value = FVector { FCString::Atod(GetData(xyz[0])), FCString::Atod(GetData(xyz[1])), FCString::Atod(GetData(xyz[2])) };
+			}
 			body = FString::Printf(TEXT("new() { X = %.6f, Y = %.6f, Z = %.6f }"), value.X, value.Y, value.Z);
 		}
 		else if (scriptStruct == TBaseStructure<FRotator>::Get())
 		{
-			FRotator value;
-			parameter->ImportText_Direct(*defaultValueText, &value, nullptr, PPF_None);
+			// Pitch,Yaw,Roll
+			TArray<FString> xyz;
+			defaultValueText.ParseIntoArray(xyz, TEXT(","));
+			FRotator value = FRotator::ZeroRotator;
+			if (xyz.Num() == 3)
+			{
+				value = FRotator { FCString::Atod(GetData(xyz[0])), FCString::Atod(GetData(xyz[1])), FCString::Atod(GetData(xyz[2])) };
+			}
 			body = FString::Printf(TEXT("new() { Pitch = %.6f, Yaw = %.6f, Roll = %.6f }"), value.Pitch, value.Yaw, value.Roll);
 		}
 		else if (scriptStruct == TBaseStructure<FVector2D>::Get())
 		{
+			// (X=.,Y=.)
 			FVector2D value;
 			parameter->ImportText_Direct(*defaultValueText, &value, nullptr, PPF_None);
 			body = FString::Printf(TEXT("new() { X = %.3f, Y = %.3f }"), value.X, value.Y);
 		}
 		else if (scriptStruct == TBaseStructure<FLinearColor>::Get())
 		{
+			// (R=.,G=.,B=.,A=.)
 			FLinearColor value;
 			parameter->ImportText_Direct(*defaultValueText, &value, nullptr, PPF_None);
 			body = FString::Printf(TEXT("new() { R = %.6ff, G = %.6ff, B = %.6ff, A = %.6ff }"), value.R, value.G, value.B, value.A);
 		}
 		else if (scriptStruct == TBaseStructure<FColor>::Get())
 		{
+			// (R=.,G=.,B=.,A=.)
 			FColor value;
 			parameter->ImportText_Direct(*defaultValueText, &value, nullptr, PPF_None);
 			body = FString::Printf(TEXT("new() { R = %d, G = %d, B = %d, A = %d }"), value.R, value.G, value.B, value.A);

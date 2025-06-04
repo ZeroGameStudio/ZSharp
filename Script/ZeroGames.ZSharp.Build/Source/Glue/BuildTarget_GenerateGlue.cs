@@ -101,7 +101,7 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		
 		if (exportedType is ExportedClass exportedClass)
 		{
-			new ClassWriter(_registry, exportedClass, moduleDir, exportedType.Name).Write();
+			new ClassWriter(_registry, exportedClass, moduleDir, exportedType.Name.Substring(1)).Write();
 		}
 		else if (exportedType is ExportedEnum exportedEnum)
 		{
@@ -109,7 +109,7 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		}
 		else if (exportedType is ExportedDelegate exportedDelegate)
 		{
-			new DelegateWriter(_registry, exportedDelegate, moduleDir, exportedType.Name).Write();
+			new DelegateWriter(_registry, exportedDelegate, moduleDir, exportedType.Name.Substring(1)).Write();
 		}
 	}
 

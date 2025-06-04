@@ -66,7 +66,7 @@ void ZSharp::FZUnmanagedHeapGCHelper::CollectFieldPathReference(FReferenceCollec
 	// Migrate from CollectFieldPathReference() in UObjectGlobals.cpp.
 	if (FUObjectItem* owner = FGCInternals::GetResolvedOwner(instance))
 	{
-		auto reference = static_cast<UObject*>(owner->Object);		
+		auto reference = static_cast<UObject*>(owner->GetObject());		
 		if (CollectHeapReference(collector, reference))
 		{
 			FGCInternals::ClearCachedField(instance);

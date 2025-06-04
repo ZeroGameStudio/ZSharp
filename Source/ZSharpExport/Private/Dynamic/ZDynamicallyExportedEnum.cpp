@@ -86,7 +86,7 @@ void ZSharp::FZDynamicallyExportedEnum::ForeachEnumValue(TFunctionRef<void(const
 
 		const FString scriptName = preferScriptName ? Enum->GetMetaData(TEXT("ScriptName"), i) : "";
 		FRegexMatcher matcher { GIdentifierRegex, scriptName };
-		if (!scriptName.IsEmpty() && ensureAlways(matcher.FindNext()))
+		if (!scriptName.IsEmpty() && matcher.FindNext())
 		{
 			name = scriptName;
 		}

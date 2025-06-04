@@ -14,15 +14,46 @@ namespace ZSharp::ZWorld_Interop_Private
 	{
 		FWorldDelegateListener()
 		{
-			if (!IZSharpRuntimeModule::Get().HasEngineAssembly())
+			FWorldDelegates::OnPostWorldInitialization.AddLambda([](UWorld* world, const UWorld::InitializationValues)
 			{
-				return;
-			}
+#if WITH_EDITOR
+				if (IZSharpRuntimeModule::Get().HasEngineAssembly())
+#endif
+				{
+					FZWorld_Interop::GNotifyWorldInitialized(world);
+				}
+			});
 			
-			FWorldDelegates::OnPostWorldInitialization.AddLambda([](UWorld* world, const UWorld::InitializationValues){ FZWorld_Interop::GNotifyWorldInitialized(world); });
-			FWorldDelegates::OnWorldBeginTearDown.AddLambda([](UWorld* world){ FZWorld_Interop::GNotifyWorldTearingDown(world); });
-			FCoreUObjectDelegates::PreLoadMap.AddLambda([](const FString& map){ FZWorld_Interop::GPreLoadMap(*map); });
-			FCoreUObjectDelegates::PostLoadMapWithWorld.AddLambda([](UWorld* world){ FZWorld_Interop::GPostLoadMap(world); });
+			FWorldDelegates::OnWorldBeginTearDown.AddLambda([](UWorld* world)
+			{
+#if WITH_EDITOR
+				if (IZSharpRuntimeModule::Get().HasEngineAssembly())
+#endif
+				{
+					FZWorld_Interop::GNotifyWorldTearingDown(world);
+				}
+			});
+			
+			FCoreUObjectDelegates::PreLoadMap.AddLambda([](const FString& map)
+			{
+#if WITH_EDITOR
+				if (IZSharpRuntimeModule::Get().HasEngineAssembly())
+#endif
+				{
+					FZWorld_Interop::GPreLoadMap(*map);
+				}
+
+			});
+			
+			FCoreUObjectDelegates::PostLoadMapWithWorld.AddLambda([](UWorld* world)
+			{
+#if WITH_EDITOR
+				if (IZSharpRuntimeModule::Get().HasEngineAssembly())
+#endif
+				{
+					FZWorld_Interop::GPostLoadMap(world);
+				}
+			});
 		}
 	} GWorldDelegateListener;
 }

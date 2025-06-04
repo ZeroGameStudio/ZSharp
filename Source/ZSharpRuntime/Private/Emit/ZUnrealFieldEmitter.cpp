@@ -226,15 +226,15 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 	static void AddMetadata(UField* field, const TMap<FName, FString>& metadata)
 	{
 #if WITH_METADATA
-		UMetaData* target = field->GetOutermost()->GetMetaData();
+		FMetaData& target = field->GetOutermost()->GetMetaData();
 		if (!metadata.IsEmpty())
 		{
 			for (const auto& pair : metadata)
 			{
-				target->SetValue(field, pair.Key, *pair.Value);
+				target.SetValue(field, pair.Key, *pair.Value);
 			}
 		}
-		target->SetValue(field, "ZSharpEmittedField", TEXT("true"));
+		target.SetValue(field, "ZSharpEmittedField", TEXT("true"));
 #endif
 	}
 
@@ -769,7 +769,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			function->SetSuperStruct(superFunction);
 
 #if WITH_METADATA
-			UMetaData::CopyMetadata(superFunction, function);
+			FMetaData::CopyMetadata(superFunction, function);
 			function->SetMetaData("BlueprintInternalUseOnly", TEXT("true"));
 #endif
 		}
@@ -1125,10 +1125,10 @@ void ZSharp::FZUnrealFieldEmitter::EmitEnum(UPackage* pak, FZEnumDefinition& def
 		const TMap<FName, FString>& metadata = enumFieldDef.MetadataMap;
 		if (!metadata.IsEmpty())
 		{
-			UMetaData* target = enm->GetOutermost()->GetMetaData();
+			FMetaData& target = enm->GetOutermost()->GetMetaData();
 			for (const auto& pair : metadata)
 			{
-				target->SetValue(enm, FName { FString::Printf(TEXT("%s.%s"), *enumFieldDef.Name.ToString(), *pair.Key.ToString()) }, *pair.Value);
+				target.SetValue(enm, FName { FString::Printf(TEXT("%s.%s"), *enumFieldDef.Name.ToString(), *pair.Key.ToString()) }, *pair.Value);
 			}
 		}
 	}

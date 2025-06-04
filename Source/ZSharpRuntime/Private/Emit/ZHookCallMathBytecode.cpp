@@ -21,7 +21,7 @@ static DEFINE_FUNCTION(execCallMathFunction)
 	checkSlow(Function->FunctionFlags & FUNC_Native);
 	// ProcessContext is the arbiter of net callspace, so we can't call net functions using this instruction:
 	checkSlow(!Function->HasAnyFunctionFlags(FUNC_NetFuncFlags|FUNC_BlueprintAuthorityOnly|FUNC_BlueprintCosmetic|FUNC_NetRequest|FUNC_NetResponse));
-	UObject* NewContext = Function->GetOuterUClassUnchecked()->ClassDefaultObject;
+	UObject* NewContext = Function->GetOuterUClassUnchecked()->GetDefaultObject(false);
 	checkSlow(NewContext);
 	{
 #if PER_FUNCTION_SCRIPT_STATS

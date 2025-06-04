@@ -74,8 +74,8 @@ namespace ZSharp::ZSharpScriptStruct_Private
 			}
 		}
 
-		virtual bool Serialize(FArchive& ar, void* data) override { checkNoEntry(); return false; }
-		virtual bool Serialize(FStructuredArchive::FSlot slot, void* data) override { checkNoEntry(); return false; }
+		virtual bool Serialize(FArchive& Ar, void* Data, UStruct* DefaultsStruct, const void* Defaults) override { checkNoEntry(); return false; }
+		virtual bool Serialize(FStructuredArchive::FSlot Slot, void* Data, UStruct* DefaultsStruct, const void* Defaults) override { checkNoEntry(); return false; }
 		virtual void PostSerialize(const FArchive& ar, void* data) override { checkNoEntry(); }
 
 		virtual bool NetSerialize(FArchive& ar, UPackageMap* map, bool& outSuccess, void* data) override
@@ -136,7 +136,7 @@ namespace ZSharp::ZSharpScriptStruct_Private
 		virtual bool CanEditChange(const FEditPropertyChain& propertyChain, const void* data) const override { checkNoEntry(); return false; }
 #endif
 
-		virtual EPropertyVisitorControlFlow Visit(FPropertyVisitorPath& path, const FPropertyVisitorData& data, const TFunctionRef<EPropertyVisitorControlFlow(const FPropertyVisitorPath&, const FPropertyVisitorData&)> func) const override { checkNoEntry(); return EPropertyVisitorControlFlow::StepOver; }
+		virtual EPropertyVisitorControlFlow Visit(FPropertyVisitorContext& context, const TFunctionRef<EPropertyVisitorControlFlow(const FPropertyVisitorContext&)> func) const override { checkNoEntry(); return EPropertyVisitorControlFlow::StepOver; }
 		virtual void* ResolveVisitedPathInfo(void* data, const FPropertyVisitorInfo& info) const override { checkNoEntry(); return nullptr; }
 
 	private:

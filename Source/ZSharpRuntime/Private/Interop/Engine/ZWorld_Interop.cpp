@@ -2,6 +2,7 @@
 
 #include "ZWorld_Interop.h"
 
+#include "ZSharpRuntimeModule.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
@@ -13,6 +14,11 @@ namespace ZSharp::ZWorld_Interop_Private
 	{
 		FWorldDelegateListener()
 		{
+			if (!IZSharpRuntimeModule::Get().HasEngineAssembly())
+			{
+				return;
+			}
+			
 			FWorldDelegates::OnPostWorldInitialization.AddLambda([](UWorld* world, const UWorld::InitializationValues){ FZWorld_Interop::GNotifyWorldInitialized(world); });
 			FWorldDelegates::OnWorldBeginTearDown.AddLambda([](UWorld* world){ FZWorld_Interop::GNotifyWorldTearingDown(world); });
 			FCoreUObjectDelegates::PreLoadMap.AddLambda([](const FString& map){ FZWorld_Interop::GPreLoadMap(*map); });

@@ -4,6 +4,7 @@
 
 class IZSharpRuntimeModule : public IModuleInterface
 {
+	
 public:
 	static FORCEINLINE IZSharpRuntimeModule& Get()
 	{
@@ -15,6 +16,10 @@ public:
 	{
 		return FModuleManager::Get().IsModuleLoaded("ZSharpRuntime");
 	}
+
+public:
+	virtual bool HasEngineAssembly() const = 0;
+	
 };
 
 

@@ -85,7 +85,7 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 #endif
 	}
 
-	static void LoadEngineAssembly(IZMasterAssemblyLoadContext* alc)
+	static bool LoadEngineAssembly(IZMasterAssemblyLoadContext* alc)
 	{
 		static FZUnmanagedFunction GUnmanagedFunctions[] =
         {
@@ -359,7 +359,7 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			void*** ManagedFunctions = GManagedFunctions;
 		} GArgs{};
 
-		alc->LoadAssembly(ZSHARP_ENGINE_ASSEMBLY_NAME, (void*)&GArgs);
+		return alc->LoadAssembly(ZSHARP_ENGINE_ASSEMBLY_NAME, (void*)&GArgs) == EZLoadAssemblyErrorCode::Succeed;
 	}
 
 	static FAutoConsoleCommand GCmdReloadMasterAlc
@@ -394,6 +394,8 @@ class FZSharpRuntimeModule : public IZSharpRuntimeModule
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 	// End IModuleInterface
+
+	virtual bool HasEngineAssembly() const override { return bHasEngineAssembly; }
 	
 	bool ParseStartupAssembly(const FString& startupAssembly, FString& outAssemblyName, TArray<FString>& outArgs);
 
@@ -406,6 +408,9 @@ class FZSharpRuntimeModule : public IZSharpRuntimeModule
 	void HandleBeginPIE(const bool simulating);
 	void HandleEndPIE(const bool simulating);
 #endif
+
+private:
+	bool bHasEngineAssembly = false;
 	
 };
 
@@ -671,7 +676,7 @@ void FZSharpRuntimeModule::HandlePreMasterAlcStartup(ZSharp::IZMasterAssemblyLoa
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UFunction{}, 1);
 	alc->RegisterZCallResolver(new ZSharp::FZCallResolver_UProperty{}, 2);
 
-	ZSharp::ZSharpRuntimeModule_Private::LoadEngineAssembly(alc);
+	bHasEngineAssembly = ZSharp::ZSharpRuntimeModule_Private::LoadEngineAssembly(alc);
 }
 
 void FZSharpRuntimeModule::HandleMasterAlcStartup(ZSharp::IZMasterAssemblyLoadContext* alc)

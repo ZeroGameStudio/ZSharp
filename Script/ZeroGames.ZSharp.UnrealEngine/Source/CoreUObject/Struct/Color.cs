@@ -5,7 +5,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public partial class FColor
 {
     
-    public FColor(uint8 r, uint8 g, uint8 b, uint8 a = 255)
+    public FColor(uint8 r, uint8 g, uint8 b, uint8 a = 255) : this()
     {
         R = r;
         G = g;

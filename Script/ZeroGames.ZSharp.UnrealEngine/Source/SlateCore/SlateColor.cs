@@ -5,20 +5,13 @@ namespace ZeroGames.ZSharp.UnrealEngine.SlateCore;
 public partial class FSlateColor
 {
 
-    public FSlateColor(float r, float g, float b, float a = 1)
+    public FSlateColor(float r, float g, float b, float a = 1) : this()
     {
         SpecifiedColor = new(r, g, b, a);
     }
 
-    public FSlateColor(FLinearColor color)
-    {
-        SpecifiedColor = color;
-    }
-
-    public FSlateColor(FColor color, bool srgb)
-    {
-        SpecifiedColor = new(color, srgb);
-    }
+    public FSlateColor(FLinearColor color) : this(color.R, color.G, color.B, color.A){}
+    public FSlateColor(FColor color, bool srgb) : this(new FLinearColor(color, srgb)){}
     
     public static FSlateColor White => new(1,1,1);
     public static FSlateColor Gray => new(0.5f,0.5f,0.5f);

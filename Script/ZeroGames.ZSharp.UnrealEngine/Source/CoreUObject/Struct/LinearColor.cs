@@ -5,7 +5,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 public partial class FLinearColor
 {
 
-    public FLinearColor(float r, float g, float b, float a = 1)
+    public FLinearColor(float r, float g, float b, float a = 1) : this()
     {
         R = r;
         G = g;
@@ -13,7 +13,7 @@ public partial class FLinearColor
         A = a;
     }
 
-    public FLinearColor(FColor color, bool srgb)
+    public FLinearColor(FColor color, bool srgb) : this()
     {
 	    if (srgb)
 	    {

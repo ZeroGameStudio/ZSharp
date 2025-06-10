@@ -162,7 +162,7 @@ public class UClassGenerator : ISourceGenerator
 		CSharpGenerator generator = new();
 		string content = generator.Generate(compilationUnit);
 		
-		context.AddSource($"{className}.g.cs", SourceText.From(content, Encoding.UTF8));
+		context.AddSource($"{className.Substring(1)}.g.cs", SourceText.From(content, Encoding.UTF8));
 	}
 
 }

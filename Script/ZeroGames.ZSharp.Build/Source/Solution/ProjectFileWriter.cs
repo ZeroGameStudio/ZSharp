@@ -19,7 +19,7 @@ public class ProjectFileWriter
 	{
 		XDocument doc = XmlHelper.MakeDocument();
 		XElement root = new("Project");
-		root.SetAttributeValue("Sdk", "ZeroGames.ZSharp.Sdk/1.0.0-beta.5");
+		root.SetAttributeValue("Sdk", "ZeroGames.ZSharp.Sdk/1.0.0-beta.6");
 		doc.Add(root);
 		
 		OverrideDotNetProperties(root);
@@ -30,6 +30,7 @@ public class ProjectFileWriter
 		AddImplicitUsings(root);
 		AddStaticUsings(root);
 		AddTypeAliases(root);
+		AddSources(root);
 		AddMiscs(root);
 
 		string path = _project.Path;
@@ -265,6 +266,26 @@ public class ProjectFileWriter
 			
 			itemGroupElement.Add(usingElement);
 		}
+		
+		root.Add(itemGroupElement);
+	}
+
+	private void AddSources(XElement root)
+	{
+		root.Add(new XComment("Add sources."));
+		
+		XElement itemGroupElement = new("ItemGroup");
+		
+		XElement sourceElement = new("Compile");
+		sourceElement.SetAttributeValue("Include", "$(ZSharpProjectSourceDir)/**/*.cs");
+
+		itemGroupElement.Add(sourceElement);
+		
+		XElement glueElement = new("Compile");
+		glueElement.SetAttributeValue("Include", "$(UnrealProjectDir)/Intermediate/ZSharp/Glue/$(ZSharpProjectName)/**/*.cs");
+		glueElement.SetAttributeValue("Condition", "Exists('$(UnrealProjectDir)/Intermediate/ZSharp/Glue/$(ZSharpProjectName)')");
+
+		itemGroupElement.Add(glueElement);
 		
 		root.Add(itemGroupElement);
 	}

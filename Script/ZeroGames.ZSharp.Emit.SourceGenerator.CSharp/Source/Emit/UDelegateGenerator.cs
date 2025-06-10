@@ -91,7 +91,7 @@ public class UDelegateGenerator : ISourceGenerator
 		string content = generator.Generate(compilationUnit);
 
 		string prefix = string.IsNullOrWhiteSpace(outerTypeName) ? string.Empty : $"{outerTypeName}.";
-		context.AddSource($"{prefix}{className}.g.cs", SourceText.From(content, Encoding.UTF8));
+		context.AddSource($"{prefix.Substring(1)}{className.Substring(1)}.g.cs", SourceText.From(content, Encoding.UTF8));
 	}
 
 }

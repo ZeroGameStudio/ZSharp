@@ -178,7 +178,23 @@ public class ClassWriter
 		foreach (var property in _exportedClass.Properties.OrderBy(prop => prop.IsPublic ? 1 : prop.IsProtected ? 2 : 3))
 		{
 			EMemberVisibility visibility = property.IsPublic ? EMemberVisibility.Public : property.IsProtected ? EMemberVisibility.Protected : EMemberVisibility.Private;
-			builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType, property.IsNullInNotNullOut), property.Name, property.ZCallName, property.Index, !property.IsWritable, abstraction && property.IsNullInNotNullOut);
+			if (property.IsForceCopy)
+			{
+				if (property.IsReadable)
+				{
+					builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType, property.IsNullInNotNullOut), property.Name + "_Copy", property.ZCallName, property.Index, true, false, false);
+				}
+
+				if (property.IsWritable)
+				{
+					builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType, property.IsNullInNotNullOut), property.Name, property.ZCallName, property.Index, false, true, property.IsNullInNotNullOut);
+				}
+			}
+			else
+			{
+				builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType, property.IsNullInNotNullOut), property.Name, property.ZCallName, property.Index, property.IsReadable, property.IsWritable, property.IsNullInNotNullOut);
+			}
+
 			if (!abstraction)
 			{
 				builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{property.ZCallName.Split(':').Last()}");

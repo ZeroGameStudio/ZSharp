@@ -14,6 +14,7 @@
 #include "ZSharpClass.inl"
 
 #include "ZSharpFunction.inl"
+#include "Reflection/ZReflectionHelper.h"
 
 namespace ZSharp::ZUnrealFieldEmitter_Private
 {
@@ -686,6 +687,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			FProperty* property = def.Property;
 			property->RepNotifyFunc = def.RepNotifyName;
 		}
+
+		check(FZReflectionHelper::CanPropertyBeReference(def.Property));
 	}
 
 #undef NEW_PROPERTY

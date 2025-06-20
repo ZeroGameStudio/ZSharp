@@ -245,4 +245,24 @@ void ZSharp::FZReflectionHelper::ChangeEnumValueType(const FEnumProperty* srcPro
 	}
 }
 
+bool ZSharp::FZReflectionHelper::CanPropertyBeReference(const FProperty* property)
+{
+	if (property->GetOffset_ForInternal() > 0)
+	{
+		return true;
+	}
+
+	if (!property->GetOwnerVariant().IsA<UScriptStruct>())
+	{
+		return true;
+	}
+	
+	if (property->IsA<FNumericProperty>() || property->IsA<FBoolProperty>() || property->IsA<FEnumProperty>() || property->IsA<FObjectProperty>())
+	{
+		return true;
+	}
+
+	return false;
+}
+
 

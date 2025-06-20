@@ -10,9 +10,7 @@ namespace ZSharp
 	{
 
 	public:
-		explicit FZStructPropertyVisitor(const FStructProperty* underlyingProperty)
-			: FZPropertyVisitorBase(underlyingProperty)
-			, UnderlyingStructProperty(underlyingProperty){}
+		explicit FZStructPropertyVisitor(const FStructProperty* underlyingProperty);
 
 	public:
 		virtual void GetValue(const void* src, FZCallBufferSlot& dest) const override;
@@ -21,6 +19,7 @@ namespace ZSharp
 
 	private:
 		const FStructProperty* UnderlyingStructProperty;
+		bool bForceGetValue; // Conjugate registry can't deal with the first struct member variable.
 		
 	};
 }

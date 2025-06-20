@@ -14,6 +14,7 @@ namespace ZSharp
 		Private = 1 << 2,
 		Readable = 1 << 3,
 		Writable = 1 << 4,
+		ForceCopy = 1 << 5,
 	};
 	ENUM_CLASS_FLAGS(EZExportedPropertyFlags)
 	

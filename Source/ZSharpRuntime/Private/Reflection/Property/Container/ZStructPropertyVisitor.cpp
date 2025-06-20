@@ -6,6 +6,14 @@
 #include "CLR/IZSharpClr.h"
 #include "ZCall/ZCallBuffer.h"
 #include "Conjugate/ZStrangeConjugateRegistries.h"
+#include "Reflection/ZReflectionHelper.h"
+
+ZSharp::FZStructPropertyVisitor::FZStructPropertyVisitor(const FStructProperty* underlyingProperty)
+	: FZPropertyVisitorBase(underlyingProperty)
+	, UnderlyingStructProperty(underlyingProperty)
+	, bForceGetValue(!FZReflectionHelper::CanPropertyBeReference(underlyingProperty))
+{
+}
 
 void ZSharp::FZStructPropertyVisitor::GetValue(const void* src, FZCallBufferSlot& dest) const
 {
@@ -24,6 +32,12 @@ void ZSharp::FZStructPropertyVisitor::GetValue(const void* src, FZCallBufferSlot
 
 void ZSharp::FZStructPropertyVisitor::GetRef(const void* src, FZCallBufferSlot& dest) const
 {
+	if (bForceGetValue)
+	{
+		GetValue(src, dest);
+		return;
+	}
+	
 	const UScriptStruct* scriptStruct = UnderlyingStructProperty->Struct;
 	dest.WriteConjugate(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(scriptStruct, src));
 }

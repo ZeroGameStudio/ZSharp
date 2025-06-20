@@ -3,6 +3,7 @@
 #include "ZDynamicallyExportedProperty.h"
 
 #include "ZExportHelper.h"
+#include "Reflection/ZReflectionHelper.h"
 
 ZSharp::FZDynamicallyExportedProperty* ZSharp::FZDynamicallyExportedProperty::Create(const FProperty* property, int32 index)
 {
@@ -90,6 +91,11 @@ ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(const FProp
 	if (!property->IsA<FDelegateProperty>() && !property->HasAnyPropertyFlags(CPF_BlueprintReadOnly))
 	{
 		Flags |= EZExportedPropertyFlags::Writable;
+	}
+
+	if (!FZReflectionHelper::CanPropertyBeReference(Property))
+	{
+		Flags |= EZExportedPropertyFlags::ForceCopy;
 	}
 }
 

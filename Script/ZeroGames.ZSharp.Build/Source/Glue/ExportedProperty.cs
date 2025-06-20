@@ -11,6 +11,7 @@ public enum EExportedPropertyFlags : uint64
 	Private = 1 << 2,
 	Readable = 1 << 3,
 	Writable = 1 << 4,
+	ForceCopy = 1 << 5,
 }
 
 public class ExportedProperty : ExportedVariable
@@ -24,6 +25,7 @@ public class ExportedProperty : ExportedVariable
 	public bool IsPrivate => Flags.HasFlag(EExportedPropertyFlags.Private);
 	public bool IsReadable => Flags.HasFlag(EExportedPropertyFlags.Readable);
 	public bool IsWritable => Flags.HasFlag(EExportedPropertyFlags.Writable);
+	public bool IsForceCopy => Flags.HasFlag(EExportedPropertyFlags.ForceCopy);
 }
 
 

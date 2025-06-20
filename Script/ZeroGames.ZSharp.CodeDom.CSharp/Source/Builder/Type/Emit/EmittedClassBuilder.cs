@@ -69,7 +69,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 				beforeSetterReturns.Add($"this.MarkPropertyDirty(nameof({name}));");
 			}
 			
-			property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, 0, type, false, false)
+			property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, 0, type, false, true, true)
 			{
 				BeforeSetterReturnBlock = string.Join(Environment.NewLine, beforeSetterReturns)
 			}.Build(false);

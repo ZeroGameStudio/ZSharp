@@ -11,7 +11,7 @@ public class EmittedScriptStructBuilder(string namespaceName, string typeName, b
 		PropertyDefinition property;
 		{
 			EMemberModifiers modifiers = EMemberModifiers.Partial;
-			property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, 0, type, false, false).Build(false);
+			property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, 0, type, false, true, true).Build(false);
 			_properties.Add(property);
 		}
 		

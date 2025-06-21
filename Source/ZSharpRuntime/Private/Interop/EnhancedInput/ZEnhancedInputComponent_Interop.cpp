@@ -10,16 +10,22 @@
 
 namespace ZSharp::ZEnhancedInputComponent_Interop_Private
 {
+	static const UDelegateFunction* GetSignature()
+	{
+		static const UDelegateFunction* GSignature = FindObjectChecked<UDelegateFunction>(nullptr, TEXT("/Script/EnhancedInput.EnhancedInputActionHandlerDynamicSignature__DelegateSignature"));
+    	
+    	return GSignature;
+	}
+
 	FZConjugateHandle BindAction(FZConjugateHandle self, FZConjugateHandle inputAction, int64 triggerEvent, FZGCHandle delegate, TOptional<FZGCHandle> state, TFunctionRef<void(UZManagedDelegateProxy_EnhancedInput&, uint32)> setupBinding)
 	{
-		static const UFunction* GSignature = FindObjectChecked<UFunction>(nullptr, TEXT("/Script/EnhancedInput.EnhancedInputActionHandlerDynamicSignature__DelegateSignature"));
-		
+
 		FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
 		auto pSelf = registry.ConjugateUnsafeChecked<UEnhancedInputComponent>(self);
 		auto pInputAction = registry.ConjugateUnsafeChecked<const UInputAction>(inputAction);
 		ETriggerEvent eTriggerEvent = static_cast<ETriggerEvent>(triggerEvent);
 	
-		auto proxy = UZManagedDelegateProxyImpl::Create<UZManagedDelegateProxy_EnhancedInput>(GSignature, delegate, state);
+		auto proxy = UZManagedDelegateProxyImpl::Create<UZManagedDelegateProxy_EnhancedInput>(GetSignature(), delegate, state);
 		setupBinding(*proxy, pSelf->BindAction(pInputAction, eTriggerEvent, proxy, UZManagedDelegateProxyImpl::StubFunctionName).GetHandle());
 	
 		return registry.Conjugate(proxy);
@@ -33,6 +39,21 @@ uint32 ZSharp::FZEnhancedInputComponent_Interop::BindUFunctionAction(FZConjugate
 	auto pInputAction = registry.ConjugateUnsafeChecked<const UInputAction>(inputAction);
 	ETriggerEvent eTriggerEvent = static_cast<ETriggerEvent>(triggerEvent);
 	auto pObj = registry.ConjugateUnsafeChecked<UObject>(obj);
+	if (!pObj)
+    {
+    	return 0;
+    }
+    
+    const UFunction* func = pObj->FindFunction(functionName);
+    if (!func)
+    {
+    	return 0;
+    }
+    
+    if (!ensureAlways(func->IsSignatureCompatibleWith(ZSharp::ZEnhancedInputComponent_Interop_Private::GetSignature())))
+    {
+    	return 0;
+    }
 
 	return pSelf->BindAction(pInputAction, eTriggerEvent, pObj, functionName).GetHandle();
 }

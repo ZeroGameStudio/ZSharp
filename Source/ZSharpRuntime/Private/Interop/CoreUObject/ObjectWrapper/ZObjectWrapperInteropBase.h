@@ -47,7 +47,7 @@ namespace ZSharp
 		{
 			const auto& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<TConjugateRegistry>();
             typename TConjugateRegistry::ConjugateWrapperType* sdself = registry.ConjugateUnsafe(self);
-			sdself->Set(CastChecked<typename TConjugateRegistry::ConjugateWrapperType::ObjectType>(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe(target)));
+			sdself->Set(Cast<typename TConjugateRegistry::ConjugateWrapperType::ObjectType>(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe(target)));
 		}
 		
 		static uint8 IsValid(FZConjugateHandle self, uint8 evenIfGarbage)

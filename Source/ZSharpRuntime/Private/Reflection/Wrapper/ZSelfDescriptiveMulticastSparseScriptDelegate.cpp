@@ -24,7 +24,7 @@ void ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::AddUFunction(UObjec
 		return;
 	}
 
-	if (!func->IsSignatureCompatibleWith(Descriptor))
+	if (!ensureAlways(func->IsSignatureCompatibleWith(Descriptor)))
 	{
 		return;
 	}

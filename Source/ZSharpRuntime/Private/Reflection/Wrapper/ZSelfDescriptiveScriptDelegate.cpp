@@ -24,7 +24,7 @@ void ZSharp::FZSelfDescriptiveScriptDelegate::BindUFunction(UObject* object, FNa
 		return;
 	}
 
-	if (!func->IsSignatureCompatibleWith(Descriptor))
+	if (!ensureAlways(func->IsSignatureCompatibleWith(Descriptor)))
 	{
 		return;
 	}

@@ -333,8 +333,10 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(GameplayTag, Request),
 
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, BindUFunctionAction),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, BindStatelessAction),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, BindStatefulAction),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, RemoveBindingByHandle),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, RemoveBinding),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(InputActionValue, Deconstruct),

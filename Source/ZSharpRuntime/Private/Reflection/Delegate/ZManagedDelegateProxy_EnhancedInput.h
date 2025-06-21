@@ -3,7 +3,6 @@
 #pragma once
 
 #include "ZManagedDelegateProxyImpl.h"
-#include "EnhancedInputComponent.h"
 #include "ZManagedDelegateProxy_EnhancedInput.generated.h"
 
 namespace ZSharp
@@ -17,9 +16,9 @@ class UZManagedDelegateProxy_EnhancedInput final : public UZManagedDelegateProxy
 	GENERATED_BODY()
 
 	friend struct ZSharp::FZEnhancedInputComponent_Interop;
-
+	
 private:
-	TUniquePtr<FEnhancedInputActionEventBinding> Binding;
+	uint32 Binding;
 	
 };
 

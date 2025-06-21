@@ -6,6 +6,7 @@
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "EnhancedInputComponent.h"
+#include "Reflection/ZReflectionHelper.h"
 #include "Reflection/Delegate/ZManagedDelegateProxy_EnhancedInput.h"
 
 namespace ZSharp::ZEnhancedInputComponent_Interop_Private
@@ -49,11 +50,13 @@ uint32 ZSharp::FZEnhancedInputComponent_Interop::BindUFunctionAction(FZConjugate
     {
     	return 0;
     }
-    
-    if (!ensureAlways(func->IsSignatureCompatibleWith(ZSharp::ZEnhancedInputComponent_Interop_Private::GetSignature())))
+
+#if DO_CHECK
+    if (!ensureAlways(FZReflectionHelper::IsFunctionBindableToDelegate(func, ZEnhancedInputComponent_Interop_Private::GetSignature())))
     {
     	return 0;
     }
+#endif
 
 	return pSelf->BindAction(pInputAction, eTriggerEvent, pObj, functionName).GetHandle();
 }

@@ -93,7 +93,7 @@ ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(const FProp
 		Flags |= EZExportedPropertyFlags::Writable;
 	}
 
-	if (!FZReflectionHelper::CanPropertyBeReference(Property))
+	if (FZReflectionHelper::IsPropertyForceCopy(Property))
 	{
 		Flags |= EZExportedPropertyFlags::ForceCopy;
 	}

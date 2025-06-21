@@ -11,7 +11,7 @@
 ZSharp::FZStructPropertyVisitor::FZStructPropertyVisitor(const FStructProperty* underlyingProperty)
 	: FZPropertyVisitorBase(underlyingProperty)
 	, UnderlyingStructProperty(underlyingProperty)
-	, bForceGetValue(!FZReflectionHelper::CanPropertyBeReference(underlyingProperty))
+	, bForceCopy(FZReflectionHelper::IsPropertyForceCopy(underlyingProperty))
 {
 }
 
@@ -32,7 +32,7 @@ void ZSharp::FZStructPropertyVisitor::GetValue(const void* src, FZCallBufferSlot
 
 void ZSharp::FZStructPropertyVisitor::GetRef(const void* src, FZCallBufferSlot& dest) const
 {
-	if (bForceGetValue)
+	if (bForceCopy)
 	{
 		GetValue(src, dest);
 		return;

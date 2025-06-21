@@ -2,6 +2,7 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveMulticastSparseScriptDelegate.h"
 
+#include "Reflection/ZReflectionHelper.h"
 #include "Reflection/Delegate/ZManagedDelegateProxyImpl.h"
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
 
@@ -24,10 +25,12 @@ void ZSharp::FZSelfDescriptiveMulticastSparseScriptDelegate::AddUFunction(UObjec
 		return;
 	}
 
-	if (!ensureAlways(func->IsSignatureCompatibleWith(Descriptor)))
+#if DO_CHECK
+	if (!ensureAlways(FZReflectionHelper::IsFunctionBindableToDelegate(func, Descriptor)))
 	{
 		return;
 	}
+#endif
 	
 	FScriptDelegate unicast;
 	unicast.BindUFunction(object, name);

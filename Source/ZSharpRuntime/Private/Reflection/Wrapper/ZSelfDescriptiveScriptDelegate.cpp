@@ -2,6 +2,7 @@
 
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptDelegate.h"
 
+#include "Reflection/ZReflectionHelper.h"
 #include "Reflection/Delegate/ZManagedDelegateProxyImpl.h"
 #include "Reflection/Function/ZFunctionVisitorRegistry.h"
 
@@ -24,10 +25,12 @@ void ZSharp::FZSelfDescriptiveScriptDelegate::BindUFunction(UObject* object, FNa
 		return;
 	}
 
-	if (!ensureAlways(func->IsSignatureCompatibleWith(Descriptor)))
+#if DO_CHECK
+	if (!ensureAlways(FZReflectionHelper::IsFunctionBindableToDelegate(func, Descriptor)))
 	{
 		return;
 	}
+#endif
 	
 	UnderlyingInstance->BindUFunction(object, name);
 }

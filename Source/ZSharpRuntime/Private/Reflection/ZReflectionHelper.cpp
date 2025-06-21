@@ -245,24 +245,76 @@ void ZSharp::FZReflectionHelper::ChangeEnumValueType(const FEnumProperty* srcPro
 	}
 }
 
-bool ZSharp::FZReflectionHelper::CanPropertyBeReference(const FProperty* property)
+bool ZSharp::FZReflectionHelper::IsFunctionBindableToDelegate(const UFunction* function, const UDelegateFunction* delegate)
+{
+	static uint64 GIgnoredFlags = UFunction::GetDefaultIgnoredSignatureCompatibilityFlags() | CPF_ParmFlags;
+	
+	if (!function || !delegate)
+	{
+		return false;
+	}
+	
+	if (function == delegate)
+	{
+		// Delegate signature is not an invocable function.
+		return false;
+	}
+
+	TFieldIterator<FProperty> itA(function);
+	TFieldIterator<FProperty> itB(delegate);
+
+	while (itA && (itA->PropertyFlags & CPF_Parm))
+	{
+		if (itB && (itB->PropertyFlags & CPF_Parm))
+		{
+			FProperty* propA = *itA;
+			FProperty* propB = *itB;
+
+			const uint64 PropertyMash = propA->PropertyFlags ^ propB->PropertyFlags;
+			if ((PropertyMash & ~GIgnoredFlags) != 0)
+			{
+				// Flags mismatch between an argument of A and B
+				return false;
+			}
+
+			// TODO: Allow covariance/contravariance
+			if (!FStructUtils::ArePropertiesTheSame(propA, propB, false))
+			{
+				// Type mismatch between an argument of A and B
+				return false;
+			}
+		}
+		else
+		{
+			// B ran out of arguments before A did
+			return false;
+		}
+		++itA;
+		++itB;
+	}
+
+	// They matched all the way thru A's properties, but it could still be a mismatch if B has remaining parameters
+	return !(itB && (itB->PropertyFlags & CPF_Parm));
+}
+
+bool ZSharp::FZReflectionHelper::IsPropertyForceCopy(const FProperty* property)
 {
 	if (property->GetOffset_ForInternal() > 0)
 	{
-		return true;
+		return false;
 	}
 
 	if (!property->GetOwnerVariant().IsA<UScriptStruct>())
 	{
-		return true;
+		return false;
 	}
 	
 	if (property->IsA<FNumericProperty>() || property->IsA<FBoolProperty>() || property->IsA<FEnumProperty>() || property->IsA<FObjectProperty>())
 	{
-		return true;
+		return false;
 	}
 
-	return false;
+	return true;
 }
 
 

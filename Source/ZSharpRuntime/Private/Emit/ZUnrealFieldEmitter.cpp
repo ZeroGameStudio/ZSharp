@@ -688,7 +688,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			property->RepNotifyFunc = def.RepNotifyName;
 		}
 
-		check(FZReflectionHelper::CanPropertyBeReference(def.Property));
+		check(!FZReflectionHelper::IsPropertyForceCopy(def.Property));
 	}
 
 #undef NEW_PROPERTY

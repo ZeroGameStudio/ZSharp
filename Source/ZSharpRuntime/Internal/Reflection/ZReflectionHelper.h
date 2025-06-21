@@ -12,7 +12,8 @@ namespace ZSharp
 		static FString GetFieldClassConjugateKey(const FFieldClass* cls);
 		static FZRuntimeTypeUri GetContainerElementRuntimeTypeUriFromProperty(const FProperty* elementProperty);
 		static void ChangeEnumValueType(const FEnumProperty* srcProperty, const void* src, const FEnumProperty* destProperty, void* dest);
-		static bool CanPropertyBeReference(const FProperty* property);
+		static bool IsFunctionBindableToDelegate(const UFunction* function, const UDelegateFunction* delegate);
+		static bool IsPropertyForceCopy(const FProperty* property);
 	};
 }
 

@@ -34,6 +34,7 @@ void ZSharp::FZOptionalPropertyVisitor::SetValue(void* dest, const FZCallBufferS
 	if (!sdo)
 	{
 		UnderlyingProperty->InitializeValue(dest);
+		return;
 	}
 
 	// @FIXME: Enum Decay

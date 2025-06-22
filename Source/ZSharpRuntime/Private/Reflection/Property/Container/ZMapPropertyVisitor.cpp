@@ -37,6 +37,7 @@ void ZSharp::FZMapPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot& 
 	if (!sdsm)
 	{
 		UnderlyingProperty->InitializeValue(dest);
+		return;
 	}
 
 	// @FIXME: Enum Decay

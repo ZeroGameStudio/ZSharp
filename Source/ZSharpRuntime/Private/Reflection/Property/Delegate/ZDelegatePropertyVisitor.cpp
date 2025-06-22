@@ -33,6 +33,7 @@ void ZSharp::FZDelegatePropertyVisitor::SetValue(void* dest, const FZCallBufferS
 	if (!sdsd)
 	{
 		UnderlyingProperty->InitializeValue(dest);
+		return;
 	}
 	
 	check(sdsd->GetDescriptor() == UnderlyingDelegateProperty->SignatureFunction);

@@ -43,6 +43,7 @@ void ZSharp::FZArrayPropertyVisitor::SetValue(void* dest, const FZCallBufferSlot
 	if (!sdsa)
 	{
 		UnderlyingProperty->InitializeValue(dest);
+		return;
 	}
 
 	auto srcEnumProperty = CastField<const FEnumProperty>(sdsa->GetDescriptor());

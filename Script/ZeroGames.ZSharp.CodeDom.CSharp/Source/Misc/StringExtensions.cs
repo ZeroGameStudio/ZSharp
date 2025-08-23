@@ -6,26 +6,27 @@ namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
 public static class StringExtensions
 {
-	
-	public static string Indent(this string @this, int32 count = 1, string indentUnit = "\t")
+	extension(string @this)
 	{
-		if (count <= 0)
+		public string Indent(int32 count = 1, string indentUnit = "\t")
 		{
-			return @this;
-		}
+			if (count <= 0)
+			{
+				return @this;
+			}
 		
-		StringBuilder unitSb = new();
-		for (int32 i = 0; i < count; ++i)
-		{
-			unitSb.Append(indentUnit);
+			StringBuilder unitSb = new();
+			for (int32 i = 0; i < count; ++i)
+			{
+				unitSb.Append(indentUnit);
+			}
+
+			string indent = unitSb.ToString();
+			string newlineindent = Environment.NewLine + indent;
+
+			return @this.Insert(0, indent).Replace(Environment.NewLine, newlineindent);
 		}
-
-		string indent = unitSb.ToString();
-		string newlineindent = Environment.NewLine + indent;
-
-		return @this.Insert(0, indent).Replace(Environment.NewLine, newlineindent);
 	}
-	
 }
 
 

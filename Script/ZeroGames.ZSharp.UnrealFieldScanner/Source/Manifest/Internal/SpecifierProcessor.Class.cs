@@ -20,7 +20,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealClassDefinition def, IUnrealClassModel model, WithinAttribute specifier)
 	{
-		def.WithinPath = ((ITypeModel)specifier.OuterType_SCANTIME).GetUnrealFieldPath();
+		def.WithinPath = ((ITypeModel)specifier.OuterType_SCANTIME).UnrealFieldPath;
 	}
 	
 	[SpecifierProcessor]
@@ -241,7 +241,7 @@ partial class SpecifierProcessor
 		def.DefaultSubobjectOverrides.Add(new()
 		{
 			Name = specifier.Subobject,
-			ClassPath = ((ITypeModel)specifier.Class_SCANTIME).GetUnrealFieldPath(),
+			ClassPath = ((ITypeModel)specifier.Class_SCANTIME).UnrealFieldPath,
 		});
 	}
 	

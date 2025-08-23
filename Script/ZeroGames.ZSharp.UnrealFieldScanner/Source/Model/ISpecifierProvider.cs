@@ -11,15 +11,15 @@ public interface ISpecifierProvider
 
 public static class SpecifierProviderExtensions
 {
-	
-	public static bool HasSpecifier(this ISpecifierProvider @this, Type attributeType) => @this.HasSpecifier(attributeType, false);
-	public static IUnrealReflectionSpecifier? GetSpecifier(this ISpecifierProvider @this, Type attributeType) => @this.GetSpecifier(attributeType, false);
-
-	public static bool HasSpecifier<T>(this ISpecifierProvider @this, bool exactType) where T : IUnrealReflectionSpecifier => @this.HasSpecifier(typeof(T), exactType);
-	public static T? GetSpecifier<T>(this ISpecifierProvider @this, bool exactType) where T : IUnrealReflectionSpecifier => (T?)@this.GetSpecifier(typeof(T), exactType);
-	public static bool HasSpecifier<T>(this ISpecifierProvider @this) where T : IUnrealReflectionSpecifier => @this.HasSpecifier(typeof(T), false);
-	public static T? GetSpecifier<T>(this ISpecifierProvider @this) where T : IUnrealReflectionSpecifier => (T?)@this.GetSpecifier(typeof(T), false);
-	
+	extension(ISpecifierProvider @this)
+	{
+		public bool HasSpecifier(Type attributeType) => @this.HasSpecifier(attributeType, false);
+		public IUnrealReflectionSpecifier? GetSpecifier(Type attributeType) => @this.GetSpecifier(attributeType, false);
+		public bool HasSpecifier<T>(bool exactType) where T : IUnrealReflectionSpecifier => @this.HasSpecifier(typeof(T), exactType);
+		public T? GetSpecifier<T>(bool exactType) where T : IUnrealReflectionSpecifier => (T?)@this.GetSpecifier(typeof(T), exactType);
+		public bool HasSpecifier<T>() where T : IUnrealReflectionSpecifier => @this.HasSpecifier(typeof(T), false);
+		public T? GetSpecifier<T>() where T : IUnrealReflectionSpecifier => (T?)@this.GetSpecifier(typeof(T), false);
+	}
 }
 
 

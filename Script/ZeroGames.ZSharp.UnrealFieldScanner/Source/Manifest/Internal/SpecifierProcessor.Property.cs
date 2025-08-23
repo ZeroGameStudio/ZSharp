@@ -273,7 +273,7 @@ partial class SpecifierProcessor
 		classDef.DefaultSubobjects.Add(new()
 		{
 			Name = specifier.Name ?? def.Name,
-			ClassPath = model.Type.GetUnrealFieldPath() ?? throw Thrower.NoEntry(),
+			ClassPath = model.Type.UnrealFieldPath ?? throw Thrower.NoEntry(),
 			PropertyName = def.Name,
 			IsOptional = optional,
 			IsRootComponent = model.HasSpecifier<RootComponentAttribute>(),

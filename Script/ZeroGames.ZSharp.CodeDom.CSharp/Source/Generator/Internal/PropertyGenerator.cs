@@ -16,8 +16,8 @@ internal class PropertyGenerator
 			sb.AppendLine(string.Join(Environment.NewLine, definition.Attributes.Select(_attributeListGenerator.Generate)));
 		}
 		
-		string visibility = definition.GetVisibilityText();
-		string modifiers = definition.GetModifiersText();
+		string visibility = definition.VisibilityText;
+		string modifiers = definition.ModifiersText;
 		string type = definition.Type.TypeName;
 		string name = definition.Name;
 		string[] decls = [ visibility, modifiers, type, name ];

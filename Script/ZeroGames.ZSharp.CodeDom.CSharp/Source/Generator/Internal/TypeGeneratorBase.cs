@@ -16,8 +16,8 @@ internal abstract class TypeGeneratorBase<TDefinition> where TDefinition : TypeD
 			sb.AppendLine(string.Join(Environment.NewLine, definition.Attributes.Select(_attributeListGenerator.Generate)));
 		}
 
-		string visibility = definition.GetVisibilityText();
-		string modifiers = definition.GetModifiersText();
+		string visibility = definition.VisibilityText;
+		string modifiers = definition.ModifiersText;
 		string kind = GetTypeKindText(definition);
 		string name = definition.Name;
 		string baseList = definition.BaseTypes.Count > 0 ? $": {string.Join(", ", definition.BaseTypes)}" : string.Empty;

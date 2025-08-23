@@ -6,14 +6,15 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
 internal static class CustomAttributeProviderExtensions
 {
-
-	public static bool HasCustomAttribute(this ICustomAttributeProvider provider, string attributeTypeFullName)
+	extension(ICustomAttributeProvider @this)
 	{
-		return provider.CustomAttributes.Any(attr => attr.AttributeType.FullName == attributeTypeFullName);
+		public bool HasCustomAttribute(string attributeTypeFullName)
+		{
+			return @this.CustomAttributes.Any(attr => attr.AttributeType.FullName == attributeTypeFullName);
+		}
+
+		public bool HasCustomAttribute<T>() where T : Attribute => @this.HasCustomAttribute(typeof(T).FullName!);
 	}
-
-	public static bool HasCustomAttribute<T>(this ICustomAttributeProvider provider) where T : Attribute => HasCustomAttribute(provider, typeof(T).FullName!);
-
 }
 
 

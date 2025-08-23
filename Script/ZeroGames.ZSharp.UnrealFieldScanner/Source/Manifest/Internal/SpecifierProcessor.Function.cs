@@ -62,7 +62,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, ServerAttribute specifier)
 	{
-		check(!model.HasReturnValue());
+		check(!model.HasReturnValue);
 		
 		def.ZCallName = $"{def.Name}_Implementation";
 		def.FunctionFlags |= EFunctionFlags.Event | EFunctionFlags.Net | EFunctionFlags.NetServer;
@@ -71,7 +71,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, ClientAttribute specifier)
 	{
-		check(!model.HasReturnValue());
+		check(!model.HasReturnValue);
 		
 		def.ZCallName = $"{def.Name}_Implementation";
 		def.FunctionFlags |= EFunctionFlags.Event | EFunctionFlags.Net | EFunctionFlags.NetClient;
@@ -80,7 +80,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, NetMulticastAttribute specifier)
 	{
-		check(!model.HasReturnValue());
+		check(!model.HasReturnValue);
 		
 		def.ZCallName = $"{def.Name}_Implementation";
 		def.FunctionFlags |= EFunctionFlags.Event | EFunctionFlags.Net | EFunctionFlags.NetMulticast;

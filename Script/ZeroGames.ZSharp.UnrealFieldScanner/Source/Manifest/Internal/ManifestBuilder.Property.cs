@@ -190,7 +190,7 @@ partial class ManifestBuilder
 		{
 			check(propertyTypeModel.GenericArguments?.Count == 1);
 
-			descriptorFieldPath = propertyTypeModel.GenericArguments[0].GetUnrealFieldPath();
+			descriptorFieldPath = propertyTypeModel.GenericArguments[0].UnrealFieldPath;
 			return result;
 		}
 
@@ -198,7 +198,7 @@ partial class ManifestBuilder
 		// and these types must have [UnrealFieldPath] specifier on them.
 		if (propertyTypeModel.GetSpecifier<UnrealFieldPathAttribute>() is { } unrealFieldPathSpecifier)
 		{
-			if (propertyTypeModel.IsEnum())
+			if (propertyTypeModel.IsEnum)
 			{
 				enumUnderlyingType = TypeUriToEnumUnderlyingType(propertyTypeModel.Type.EnumUnderlyingType);
 				result = EPropertyType.Enum;

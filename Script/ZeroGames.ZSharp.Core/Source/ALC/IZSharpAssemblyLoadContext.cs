@@ -13,15 +13,16 @@ public interface IZSharpAssemblyLoadContext
 
 public static class ZSharpAssemblyLoadContextExtensions
 {
-
-	public static void GuardUnloaded(this IZSharpAssemblyLoadContext @this)
+	extension(IZSharpAssemblyLoadContext @this)
 	{
-		if (@this.IsUnloaded)
+		public void GuardUnloaded()
 		{
-			throw new AlcUnloadedException();
+			if (@this.IsUnloaded)
+			{
+				throw new AlcUnloadedException();
+			}
 		}
 	}
-	
 }
 
 

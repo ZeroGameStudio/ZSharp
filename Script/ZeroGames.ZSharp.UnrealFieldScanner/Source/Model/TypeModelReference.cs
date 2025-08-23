@@ -19,7 +19,7 @@ public readonly struct TypeModelReference : ITypeModel
 		FullName = fullName;
 	}
 
-	internal TypeModelReference(ModelRegistry registry, TypeReference typeRef) : this(registry.GetOrAddTypeModel(typeRef.GetDecayedType()))
+	internal TypeModelReference(ModelRegistry registry, TypeReference typeRef) : this(registry.GetOrAddTypeModel(typeRef.DecayedType))
 	{
 		GenericArguments = ResolveGenericArguments(registry, typeRef);
 	}

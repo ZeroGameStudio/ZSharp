@@ -6,13 +6,14 @@ namespace ZeroGames.ZSharp.UnrealFieldScanner;
 
 internal static class MetadataScopeExtensions
 {
-
-	public static string GetAssemblyName(this IMetadataScope scope) => scope.MetadataScopeType switch
+	extension(IMetadataScope @this)
 	{
-		MetadataScopeType.AssemblyNameReference => scope.Name,
-		_ => scope.Name.Remove(scope.Name.Length - 4, 4)
-	};
-
+		public string GetAssemblyName() => @this.MetadataScopeType switch
+		{
+			MetadataScopeType.AssemblyNameReference => @this.Name,
+			_ => @this.Name.Remove(@this.Name.Length - 4, 4)
+		};
+	}
 }
 
 

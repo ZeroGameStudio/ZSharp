@@ -4,54 +4,58 @@ namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
 internal static class MemberDefinitionExtensions
 {
-	
-	public static string GetVisibilityText(this MemberDefinitionBase @this) => @this.Visibility switch
+	extension(MemberDefinitionBase @this)
 	{
-		EMemberVisibility.Default => string.Empty,
-		EMemberVisibility.Public => "public",
-		EMemberVisibility.Internal => "internal",
-		EMemberVisibility.Protected => "protected",
-		EMemberVisibility.Private => "private",
-		_ => throw new NotSupportedException()
-	};
+		public string VisibilityText => @this.Visibility switch
+		{
+			EMemberVisibility.Default => string.Empty,
+			EMemberVisibility.Public => "public",
+			EMemberVisibility.Internal => "internal",
+			EMemberVisibility.Protected => "protected",
+			EMemberVisibility.Private => "private",
+			_ => throw new NotSupportedException()
+		};
 
-	public static string GetModifiersText(this MemberDefinitionBase @this)
-	{
-		List<string> modifiers = new();
-		
-		if (@this.Modifiers.HasFlag(EMemberModifiers.Abstract))
+		public string ModifiersText
 		{
-			modifiers.Add("abstract");
-		}
+			get
+			{
+				List<string> modifiers = new();
 		
-		if (@this.Modifiers.HasFlag(EMemberModifiers.Virtual))
-		{
-			modifiers.Add("virtual");
-		}
+				if (@this.Modifiers.HasFlag(EMemberModifiers.Abstract))
+				{
+					modifiers.Add("abstract");
+				}
 		
-		if (@this.Modifiers.HasFlag(EMemberModifiers.Sealed))
-		{
-			modifiers.Add("sealed");
-		}
+				if (@this.Modifiers.HasFlag(EMemberModifiers.Virtual))
+				{
+					modifiers.Add("virtual");
+				}
 		
-		if (@this.Modifiers.HasFlag(EMemberModifiers.Static))
-		{
-			modifiers.Add("static");
-		}
+				if (@this.Modifiers.HasFlag(EMemberModifiers.Sealed))
+				{
+					modifiers.Add("sealed");
+				}
 		
-		if (@this.Modifiers.HasFlag(EMemberModifiers.Unsafe))
-		{
-			modifiers.Add("unsafe");
-		}
+				if (@this.Modifiers.HasFlag(EMemberModifiers.Static))
+				{
+					modifiers.Add("static");
+				}
 		
-		if (@this.Modifiers.HasFlag(EMemberModifiers.Partial))
-		{
-			modifiers.Add("partial");
-		}
+				if (@this.Modifiers.HasFlag(EMemberModifiers.Unsafe))
+				{
+					modifiers.Add("unsafe");
+				}
+		
+				if (@this.Modifiers.HasFlag(EMemberModifiers.Partial))
+				{
+					modifiers.Add("partial");
+				}
 
-		return string.Join(" ", modifiers);
+				return string.Join(" ", modifiers);
+			}
+		}
 	}
-	
 }
 
 

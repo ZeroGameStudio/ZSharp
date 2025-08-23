@@ -9,8 +9,11 @@ partial interface IZSharpReplicatedObject
 
 public static class ZSharpReplicatedObjectExtensions
 {
-	public static void MarkPropertyDirty(this IZSharpReplicatedObject @this, FName propertyName) => @this.MarkPropertyDirty(propertyName);
-	public static void MarkPropertyDirty(this IZSharpReplicatedObject @this, string propertyName) => @this.MarkPropertyDirty(new FName(propertyName));
+	extension(IZSharpReplicatedObject @this)
+	{
+		public void MarkPropertyDirty(FName propertyName) => @this.MarkPropertyDirty(propertyName);
+		public void MarkPropertyDirty(string propertyName) => @this.MarkPropertyDirty(new FName(propertyName));
+	}
 }
 
 

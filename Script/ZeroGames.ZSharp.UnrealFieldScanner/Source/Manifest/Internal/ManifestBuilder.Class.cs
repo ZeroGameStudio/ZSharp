@@ -10,7 +10,7 @@ partial class ManifestBuilder
 		UnrealClassDefinition result = new()
 		{
 			Name = classModel.Name,
-			SuperPath = classModel.BaseType?.GetUnrealFieldPath(),
+			SuperPath = classModel.BaseType?.UnrealFieldPath,
 			ClassFlags = classModel.IsInternal ? EClassFlags.MinimalAPI : EClassFlags.RequiredAPI,
 			HasUClassConstructor = classModel.HasUClassConstructor,
 		};

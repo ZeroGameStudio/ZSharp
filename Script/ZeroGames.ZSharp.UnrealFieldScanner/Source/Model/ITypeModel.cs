@@ -12,12 +12,12 @@ public interface ITypeModel : ITypeUri, ISpecifierProvider, IScanTimeType
 
 public static class TypeModelExtensions
 {
-
-	public static bool IsObjectRootType(this ITypeModel @this) => @this.FullName == typeof(object).FullName;
-	public static bool IsEnum(this ITypeModel @this) => @this.BaseType?.FullName == typeof(Enum).FullName;
-	
-	public static string? GetUnrealFieldPath(this ITypeModel @this) => @this.GetSpecifier<UnrealFieldPathAttribute>()?.Path;
-
+	extension(ITypeModel @this)
+	{
+		public bool IsObjectRootType => @this.FullName == typeof(object).FullName;
+		public bool IsEnum => @this.BaseType?.FullName == typeof(Enum).FullName;
+		public string? UnrealFieldPath => @this.GetSpecifier<UnrealFieldPathAttribute>()?.Path;
+	}
 }
 
 

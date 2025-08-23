@@ -31,8 +31,24 @@ public readonly struct DynamicZCallResult(ZCallBufferSlot[] slots)
 
 public static class DynamicZCall
 {
+	
+	extension(IConjugate @this)
+	{
+		public DynamicZCallResult ZCall(IMasterAssemblyLoadContext alc, ZCallHandle handle, params ReadOnlySpan<object?> parameters)
+			=> InternalZCall(@this, alc, handle, parameters);
+	
+		public DynamicZCallResult ZCall(IMasterAssemblyLoadContext alc, string name, out ZCallHandle outHandle, params ReadOnlySpan<object?> parameters)
+		{
+			outHandle = alc.GetZCallHandle(name);
+			return InternalZCall(@this, alc, outHandle, parameters);
+		}
 
-	public static DynamicZCallResult ZCall(IMasterAssemblyLoadContext alc, ZCallHandle handle, params ReadOnlySpan<object?> parameters) => InternalZCall(alc, handle, parameters);
+		public DynamicZCallResult ZCall(IMasterAssemblyLoadContext alc, string name, params ReadOnlySpan<object?> parameters)
+			=> @this.ZCall(alc, name, out _, parameters);
+	}
+
+	public static DynamicZCallResult ZCall(IMasterAssemblyLoadContext alc, ZCallHandle handle, params ReadOnlySpan<object?> parameters)
+		=> InternalZCall(alc, handle, parameters);
 	
 	public static DynamicZCallResult ZCall(IMasterAssemblyLoadContext alc, string name, out ZCallHandle outHandle, params ReadOnlySpan<object?> parameters)
 	{
@@ -40,17 +56,8 @@ public static class DynamicZCall
 		return InternalZCall(alc, outHandle, parameters);
 	}
 
-	public static DynamicZCallResult ZCall(IMasterAssemblyLoadContext alc, string name, params ReadOnlySpan<object?> parameters) => ZCall(alc, name, out _, parameters);
-	
-	public static DynamicZCallResult ZCall(this IConjugate @this, IMasterAssemblyLoadContext alc, ZCallHandle handle, params ReadOnlySpan<object?> parameters) => @this.InternalZCall(alc, handle, parameters);
-	
-	public static DynamicZCallResult ZCall(this IConjugate @this, IMasterAssemblyLoadContext alc, string name, out ZCallHandle outHandle, params ReadOnlySpan<object?> parameters)
-	{
-		outHandle = alc.GetZCallHandle(name);
-		return InternalZCall(@this, alc, outHandle, parameters);
-	}
-
-	public static DynamicZCallResult ZCall(this IConjugate @this, IMasterAssemblyLoadContext alc, string name, params ReadOnlySpan<object?> parameters) => @this.ZCall(alc, name, out _, parameters);
+	public static DynamicZCallResult ZCall(IMasterAssemblyLoadContext alc, string name, params ReadOnlySpan<object?> parameters)
+		=> ZCall(alc, name, out _, parameters);
 	
 	private static unsafe DynamicZCallResult InternalZCall(IMasterAssemblyLoadContext alc, ZCallHandle handle, params ReadOnlySpan<object?> parameters)
 	{
@@ -69,7 +76,7 @@ public static class DynamicZCall
 		return new(slots);
 	}
 	
-	private static unsafe DynamicZCallResult InternalZCall(this IConjugate @this, IMasterAssemblyLoadContext alc, ZCallHandle handle, params ReadOnlySpan<object?> parameters)
+	private static unsafe DynamicZCallResult InternalZCall(IConjugate @this, IMasterAssemblyLoadContext alc, ZCallHandle handle, params ReadOnlySpan<object?> parameters)
 	{
 		ZCallBufferSlot[] slots = new ZCallBufferSlot[parameters.Length + 1];
 		slots[0] = ZCallBufferSlot.FromConjugate(@this);

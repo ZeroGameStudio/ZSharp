@@ -4,14 +4,15 @@ namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
 public static class ParameterExtensions
 {
-
-	public static string GetKindText(this ParameterDeclaration @this) => @this.Kind switch
+	extension(ParameterDeclaration @this)
 	{
-		EParameterKind.Ref => "ref ",
-		EParameterKind.Out => "out ",
-		_ => string.Empty
-	};
-
+		public string KindText => @this.Kind switch
+		{
+			EParameterKind.Ref => "ref ",
+			EParameterKind.Out => "out ",
+			_ => string.Empty
+		};
+	}
 }
 
 

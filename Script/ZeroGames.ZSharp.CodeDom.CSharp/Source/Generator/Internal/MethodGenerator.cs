@@ -16,8 +16,8 @@ internal class MethodGenerator
 			sb.AppendLine(string.Join(Environment.NewLine, definition.Attributes.Select(_attributeListGenerator.Generate)));
 		}
 		
-		string visibility = definition.GetVisibilityText();
-		string modifiers = definition.GetModifiersText();
+		string visibility = definition.VisibilityText;
+		string modifiers = definition.ModifiersText;
 		string kind = definition.IsDelegate ? "delegate" : string.Empty;
 		string returnType = definition.Signature.ReturnType?.TypeName ?? "void";
 		string name = definition.Name;
@@ -51,7 +51,7 @@ internal class MethodGenerator
 		{
 			attributes += ' ';
 		}
-		return $"{attributes}{parameter.GetKindText()}{parameter.Type.TypeName} {parameter.Name}{defaultValue}";
+		return $"{attributes}{parameter.KindText}{parameter.Type.TypeName} {parameter.Name}{defaultValue}";
 	}
 
 	private readonly AttributeListGenerator _attributeListGenerator = new();

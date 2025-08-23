@@ -9,9 +9,11 @@ public interface IUnrealStructModel : IUnrealFieldModel
 
 public static class UnrealStructModelExtensions
 {
-	
-	public static bool HasReturnValue(this IUnrealStructModel @this) => @this.Properties.Any(p => p.Role == EPropertyRole.Return);
-
+	extension(IUnrealStructModel @this)
+	{
+		public bool HasReturnValue
+			=> @this.Properties.Any(p => p.Role == EPropertyRole.Return);
+	}
 }
 
 

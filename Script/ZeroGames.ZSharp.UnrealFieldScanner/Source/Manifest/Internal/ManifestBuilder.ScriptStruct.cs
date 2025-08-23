@@ -10,7 +10,7 @@ partial class ManifestBuilder
 		UnrealScriptStructDefinition result = new()
 		{
 			Name = scriptStructModel.Name,
-			SuperPath = scriptStructModel.BaseType?.GetUnrealFieldPath(),
+			SuperPath = scriptStructModel.BaseType?.UnrealFieldPath,
 			StructFlags = EStructFlags.NoFlags,
 			HasNetSerialize = scriptStructModel.HasNetSerialize,
 		};

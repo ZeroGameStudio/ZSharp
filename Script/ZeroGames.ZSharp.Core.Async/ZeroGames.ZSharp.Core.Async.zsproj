@@ -14,8 +14,8 @@
 	"ExternalReferences":
 	[
 		{
-			"Name": "ZeroGames.Pooling",
-			"Path": "$(ZSharpPluginDir)/Managed/ForwardShared/ZeroGames.Pooling.dll"
+			"Name": "ZeroGames.Extensions.Pooling",
+			"Path": "$(ZSharpPluginDir)/Managed/ForwardShared/ZeroGames.Extensions.Pooling.dll"
 		}
 	],
 	"PublicUsings":

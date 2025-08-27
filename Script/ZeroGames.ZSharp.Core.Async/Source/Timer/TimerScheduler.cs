@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 using System.Numerics;
-using ZeroGames.Pooling;
+using ZeroGames.Extensions.Pooling;
 
 namespace ZeroGames.ZSharp.Core.Async;
 

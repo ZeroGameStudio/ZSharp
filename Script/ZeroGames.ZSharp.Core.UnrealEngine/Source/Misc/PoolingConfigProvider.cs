@@ -1,6 +1,6 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using ZeroGames.Pooling;
+using ZeroGames.Extensions.Pooling;
 
 namespace ZeroGames.ZSharp.Core.UnrealEngine;
 

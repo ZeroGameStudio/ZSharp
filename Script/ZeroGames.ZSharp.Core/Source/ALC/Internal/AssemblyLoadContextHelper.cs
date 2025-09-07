@@ -10,7 +10,7 @@ namespace ZeroGames.ZSharp.Core;
 internal static class AssemblyLoadContextHelper
 {
 	
-	public static unsafe ELoadAssemblyErrorCode LoadAssembly(AssemblyLoadContext alc, IAssemblyResolver resolver, bool implicitly, string name, void* args, out Assembly? assembly)
+	public static unsafe ELoadAssemblyErrorCode LoadAssembly(AssemblyLoadContext alc, IAssemblyResolver resolver, bool implicitly, string name, void* args, out Assembly? assembly, Action<Assembly>? preInvokeDllMain = null)
     {
         assembly = alc.Assemblies.SingleOrDefault(asm => asm.GetName().Name == name);
         if (assembly is not null)
@@ -54,6 +54,7 @@ internal static class AssemblyLoadContextHelper
 
         try
         {
+            preInvokeDllMain?.Invoke(assembly);
             return TryInvokeDllMain(assembly, args);
         }
         catch (Exception ex)

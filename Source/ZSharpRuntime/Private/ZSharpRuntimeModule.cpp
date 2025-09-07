@@ -7,6 +7,7 @@
 #include "CLR/IZSharpClr.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "ALC/ZCommonMethodArgs.h"
+#include "ALC/ZRedFrameScope.h"
 #include "Emit/ZUnrealFieldScanner.h"
 #include "ZCall/ZCallResolver_Export.h"
 #include "ZCall/ZCallResolver_UFunction.h"
@@ -309,6 +310,7 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, IsBoundToObject),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, Contains),
 
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Engine, IsInitialized),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Engine, GetEngine),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(GameInstance, GetPrimaryInstance),
@@ -361,6 +363,7 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			void*** ManagedFunctions = GManagedFunctions;
 		} GArgs{};
 
+		// We know engine assembly doesn't use conjugate so there is no need to push red frame.
 		return alc->LoadAssembly(ZSHARP_ENGINE_ASSEMBLY_NAME, (void*)&GArgs) == EZLoadAssemblyErrorCode::Succeed;
 	}
 
@@ -700,6 +703,7 @@ void FZSharpRuntimeModule::HandleMasterAlcStartup(ZSharp::IZMasterAssemblyLoadCo
 			argv.Emplace(*arg);
 		}
 		ZSharp::FZCommonMethodArgs commonArgs = { argv.Num(), argv.GetData() };
+		ZSharp::FZRedFrameScope scope;
 		const ZSharp::EZLoadAssemblyErrorCode err = alc->LoadAssembly(assemblyName, &commonArgs);
 		if (err != ZSharp::EZLoadAssemblyErrorCode::Succeed)
 		{

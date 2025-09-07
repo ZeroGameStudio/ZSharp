@@ -8,6 +8,7 @@ namespace ZSharp
 {
 	struct FZEngine_Interop
 	{
+		static uint8 IsInitialized();
 		static FZConjugateHandle GetEngine();
 	};
 }

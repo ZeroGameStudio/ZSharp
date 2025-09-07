@@ -41,13 +41,7 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
     
     private unsafe ELoadAssemblyErrorCode InternalLoadAssembly(string name, void* args, out Assembly? assembly, bool implicitly)
     {
-        ELoadAssemblyErrorCode err = AssemblyLoadContextHelper.LoadAssembly(this, _resolver, implicitly, name, args, out assembly);
-        if (err == ELoadAssemblyErrorCode.Succeed)
-        {
-            HandleAssemblyLoaded(assembly!);
-        }
-        
-        return err;
+        return AssemblyLoadContextHelper.LoadAssembly(this, _resolver, implicitly, name, args, out assembly, HandleAssemblyLoaded);
     }
 
     private unsafe Assembly? HandleResolve(AssemblyLoadContext alc, AssemblyName name)

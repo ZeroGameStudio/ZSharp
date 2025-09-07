@@ -6,6 +6,7 @@ namespace ZeroGames.ZSharp.UnrealEngine;
 
 internal static unsafe class Engine_Interop
 {
+	public static delegate* unmanaged<uint8> IsInitialized;
 	public static delegate* unmanaged<ConjugateHandle> GetEngine;
 }
 

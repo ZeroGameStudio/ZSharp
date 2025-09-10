@@ -60,6 +60,15 @@ partial class SpecifierProcessor
 	}
 	
 	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, RemoteAttribute specifier)
+	{
+		check(!model.HasReturnValue);
+		
+		def.ZCallName = $"{def.Name}_Implementation";
+		def.FunctionFlags |= EFunctionFlags.Event | EFunctionFlags.Net;
+	}
+	
+	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, ServerAttribute specifier)
 	{
 		check(!model.HasReturnValue);

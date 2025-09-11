@@ -20,7 +20,7 @@ partial class SpecifierProcessor
 	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, BlueprintPureAttribute specifier)
 	{
-		def.FunctionFlags |= EFunctionFlags.BlueprintCallable | EFunctionFlags.BlueprintPure;
+		def.FunctionFlags |= EFunctionFlags.BlueprintCallable | EFunctionFlags.BlueprintPure | EFunctionFlags.Const; // .NET has no 'const' concept so add const flag by default.
 	}
 	
 	[SpecifierProcessor]

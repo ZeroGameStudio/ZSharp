@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Engine/DeveloperSettings.h"
+
 #include "ZSharpRuntimeSettings.generated.h"
 
 UENUM(meta = (ZSharpNoExport))
@@ -25,7 +26,7 @@ struct FZEmitVirtualModule
 	UPROPERTY(EditAnywhere)
 	EZEmitVirtualModuleLoadingPhase LoadingPhase = EZEmitVirtualModuleLoadingPhase::PostEngineInit;
 
-	UPROPERTY(EditAnywhere, meta = (EditCondition = "LoadingPhase > EZEmitVirtualModuleLoadingPhase::PostEngineInit", EditConditionHides))
+	UPROPERTY(EditAnywhere, meta = (EditCondition = "LoadingPhase == EZEmitVirtualModuleLoadingPhase::BeforeModule || LoadingPhase == EZEmitVirtualModuleLoadingPhase::AfterModule", EditConditionHides))
 	FString TargetModule;
 	
 };

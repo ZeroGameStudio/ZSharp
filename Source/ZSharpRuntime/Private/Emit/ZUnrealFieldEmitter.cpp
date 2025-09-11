@@ -1578,7 +1578,7 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefini
 		check(superCdo);
 		
 		const INotifyFieldValueChanged* superInterface = Cast<INotifyFieldValueChanged>(superCdo);
-		int32 currentFieldNotifyIndex;
+		int32 currentFieldNotifyIndex = 0;
 		if (superInterface)
 		{
 			superInterface->GetFieldNotificationDescriptor().ForEachField(superCls, [&currentFieldNotifyIndex](UE::FieldNotification::FFieldId)
@@ -1590,8 +1590,6 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefini
 		else
 		{
 			check(cls->ImplementsInterface(UNotifyFieldValueChanged::StaticClass()));
-			
-			currentFieldNotifyIndex = 0;
 		}
 
 		for (const auto& field : def.FieldNotifies)

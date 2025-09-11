@@ -130,9 +130,12 @@ public class UClassGenerator : ISourceGenerator
 				{
 					foreach (var relatedField in arg.Value.Values)
 					{
-						fieldNotifies.Add($"\"{relatedField.Value}\"");
+						fieldNotifies.Add($"nameof({relatedField.Value})");
 					}
 				}
+				
+				usings.Add("ZeroGames.ZSharp.UnrealEngine.ZSharpRuntime");
+				usings.Add("ZeroGames.ZSharp.UnrealEngine.FieldNotification");
 			}
 			
 			AttributeData? replicated = attributes.SingleOrDefault(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, replicatedSpecifierSymbol));

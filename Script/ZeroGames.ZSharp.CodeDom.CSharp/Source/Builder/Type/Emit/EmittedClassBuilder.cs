@@ -58,15 +58,19 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 			List<string> beforeSetterReturns = new();
 			if (fieldNotifies is not null)
 			{
+				// Ensure this is assignable to IZSharpFieldNotifyObject.
+				beforeSetterReturns.Add("IZSharpFieldNotifyObject asFieldNotify = this;");
 				foreach (var fieldNotify in fieldNotifies)
 				{
-					beforeSetterReturns.Add($"BroadcastFieldValueChanged({fieldNotify});");
+					beforeSetterReturns.Add($"asFieldNotify.BroadcastFieldValueChanged(new FFieldNotificationId {{ FieldName = {fieldNotify} }});");
 				}
 			}
 			
 			if (needsMarkDirty)
 			{
-				beforeSetterReturns.Add($"this.MarkPropertyDirty(nameof({name}));");
+				// Ensure this is assignable to IZSharpReplicatedObject.
+				beforeSetterReturns.Add("IZSharpReplicatedObject asReplicated = this;");
+				beforeSetterReturns.Add($"asReplicated.MarkPropertyDirty(nameof({name}));");
 			}
 			
 			property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, 0, type, false, true, true)

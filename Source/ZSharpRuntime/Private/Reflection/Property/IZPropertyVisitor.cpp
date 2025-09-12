@@ -153,6 +153,12 @@ void ZSharp::IZPropertyVisitor::GetValue_InContainer(const void* src, FZCallBuff
 
 void ZSharp::IZPropertyVisitor::GetRef_InContainer(const void* src, FZCallBufferSlot& dest, int32 index) const
 {
+	if (FZReflectionHelper::IsPropertyForceCopy(GetUnderlyingProperty()))
+	{
+		GetValue_InContainer(src, dest, index);
+		return;
+	}
+	
 	GetRef(ContainerPtrToValuePtr(src, index), dest);
 }
 
@@ -164,6 +170,12 @@ void ZSharp::IZPropertyVisitor::SetValue_InContainer(void* dest, const FZCallBuf
 void ZSharp::IZPropertyVisitor::GetPropertyValue_InContainer(const void* src, FZCallBufferSlot& dest, int32 index) const
 {
 	checkSlow(!GetUnderlyingProperty()->GetOwnerStruct()->IsA<UFunction>());
+
+	if (FZReflectionHelper::IsPropertyForceCopy(GetUnderlyingProperty()))
+	{
+		GetValue_InContainer(src, dest, index);
+		return;
+	}
 	
 	if (const FProperty* underlyingProperty = GetUnderlyingProperty(); underlyingProperty->HasGetter())
 	{

@@ -309,11 +309,25 @@ bool ZSharp::FZReflectionHelper::IsPropertyForceCopy(const FProperty* property)
 		return false;
 	}
 	
-	if (property->IsA<FNumericProperty>() || property->IsA<FBoolProperty>() || property->IsA<FEnumProperty>() || property->IsA<FObjectProperty>())
+	if (property->IsA<FNumericProperty>() || property->IsA<FBoolProperty>() || property->IsA<FEnumProperty>())
 	{
 		return false;
 	}
 
+	if (property->IsA<FObjectProperty>())
+	{
+		// Special case for TSubclassOf<>.
+		if (auto classProperty = CastField<const FClassProperty>(property))
+		{
+			if (classProperty->HasAllPropertyFlags(CPF_UObjectWrapper))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
 	return true;
 }
 

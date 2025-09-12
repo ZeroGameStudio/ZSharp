@@ -19,8 +19,7 @@ namespace ZSharp
 
 	private:
 		const FStructProperty* UnderlyingStructProperty;
-		bool bForceCopy; // Conjugate registry can't deal with the first struct member variable.
-		
+
 	};
 }
 

@@ -20,7 +20,7 @@ public static class UnrealObjectGlobals
 			throw new ArgumentOutOfRangeException(nameof(@class));
 		}
 		
-		return (T)NewObject(UClass.FromType<T>(), null, null);
+		return (T)NewObject(@class, null, null);
 	}
 
 	public static T NewObject<T>(UClass @class, UObject? outer) where T : UObject
@@ -30,7 +30,7 @@ public static class UnrealObjectGlobals
 			throw new ArgumentOutOfRangeException(nameof(@class));
 		}
 		
-		return (T)NewObject(UClass.FromType<T>(), outer, null);
+		return (T)NewObject(@class, outer, null);
 	}
 
 	public static T NewObject<T>(UClass @class, string? name) where T : UObject
@@ -40,7 +40,7 @@ public static class UnrealObjectGlobals
 			throw new ArgumentOutOfRangeException(nameof(@class));
 		}
 		
-		return (T)NewObject(UClass.FromType<T>(), null, name);
+		return (T)NewObject(@class, null, name);
 	}
 
 	public static T NewObject<T>(UClass @class, UObject? outer, string? name) where T : UObject
@@ -50,7 +50,7 @@ public static class UnrealObjectGlobals
 			throw new ArgumentOutOfRangeException(nameof(@class));
 		}
 		
-		return (T)NewObject(UClass.FromType<T>(), outer, name);
+		return (T)NewObject(@class, outer, name);
 	}
 	
 	public static T NewObject<T>() where T : UObject, IStaticClass

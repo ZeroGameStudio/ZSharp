@@ -12,10 +12,10 @@ namespace ZSharp
 		static EWorldType::Type GetWorldType(FZConjugateHandle self);
 		static ENetMode GetNetMode(FZConjugateHandle self);
 
-		inline static void(*GNotifyWorldInitialized)(UWorld*) = nullptr;
-		inline static void(*GNotifyWorldTearingDown)(UWorld*) = nullptr;
+		inline static void(*GNotifyWorldInitialized)(FZConjugateHandle) = nullptr;
+		inline static void(*GNotifyWorldTearingDown)(FZConjugateHandle) = nullptr;
 		inline static void(*GPreLoadMap)(const TCHAR*) = nullptr;
-		inline static void(*GPostLoadMap)(UWorld*) = nullptr;
+		inline static void(*GPostLoadMap)(FZConjugateHandle) = nullptr;
 	};
 }
 

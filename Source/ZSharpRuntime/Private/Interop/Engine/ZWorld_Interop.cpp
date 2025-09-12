@@ -4,6 +4,7 @@
 
 #include "ZSharpRuntimeModule.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
+#include "ALC/ZRedFrameScope.h"
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Conjugate/ZStrangeConjugateRegistries.h"
@@ -20,7 +21,8 @@ namespace ZSharp::ZWorld_Interop_Private
 				if (IZSharpRuntimeModule::Get().HasEngineAssembly())
 #endif
 				{
-					FZWorld_Interop::GNotifyWorldInitialized(world);
+					FZRedFrameScope scope;
+					FZWorld_Interop::GNotifyWorldInitialized(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(world));
 				}
 			});
 			
@@ -30,7 +32,8 @@ namespace ZSharp::ZWorld_Interop_Private
 				if (IZSharpRuntimeModule::Get().HasEngineAssembly())
 #endif
 				{
-					FZWorld_Interop::GNotifyWorldTearingDown(world);
+					FZRedFrameScope scope;
+					FZWorld_Interop::GNotifyWorldTearingDown(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(world));
 				}
 			});
 			
@@ -40,6 +43,7 @@ namespace ZSharp::ZWorld_Interop_Private
 				if (IZSharpRuntimeModule::Get().HasEngineAssembly())
 #endif
 				{
+					FZRedFrameScope scope;
 					FZWorld_Interop::GPreLoadMap(*map);
 				}
 
@@ -51,7 +55,8 @@ namespace ZSharp::ZWorld_Interop_Private
 				if (IZSharpRuntimeModule::Get().HasEngineAssembly())
 #endif
 				{
-					FZWorld_Interop::GPostLoadMap(world);
+					FZRedFrameScope scope;
+					FZWorld_Interop::GPostLoadMap(IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(world));
 				}
 			});
 		}

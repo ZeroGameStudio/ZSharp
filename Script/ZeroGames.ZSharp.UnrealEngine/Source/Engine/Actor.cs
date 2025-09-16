@@ -207,14 +207,14 @@ public partial class AActor
 		return InternalGetNetMode();
 	}
 
-	internal void FinishSpawning()
+	internal void FinishSpawning(FTransform? transform)
 	{
 		MasterAlcCache.GuardInvariant();
-		InternalFinishSpawning();
+		InternalFinishSpawning(transform);
 	}
 	
-	private unsafe void InternalFinishSpawning()
-		=> Actor_Interop.FinishSpawning(ConjugateHandle.FromConjugate(this));
+	private unsafe void InternalFinishSpawning(FTransform? transform)
+		=> Actor_Interop.FinishSpawning(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(transform));
 
 	private unsafe UActorComponent InternalAddComponent(UClass @class, bool defer)
 		=> Actor_Interop.AddComponent(ConjugateHandle.FromConjugate(this), ConjugateHandle.FromConjugate(@class), Convert.ToByte(defer)).GetTargetChecked<UActorComponent>();

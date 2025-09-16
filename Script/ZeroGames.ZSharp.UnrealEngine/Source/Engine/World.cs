@@ -112,7 +112,7 @@ public partial class UWorld
 			}
 			finally
 			{
-				actor.FinishSpawning();
+				actor.FinishSpawning(transform);
 			}
 			
 			return actor;
@@ -154,7 +154,7 @@ public partial class UWorld
 			}
 			finally
 			{
-				actor.FinishSpawning();
+				actor.FinishSpawning(transform);
 			}
 			
 			return actor;
@@ -188,7 +188,7 @@ public partial class UWorld
 			throw new ArgumentOutOfRangeException(nameof(@class));
 		}
 
-		return InternalSpawnActor(@class, transform, spawnParameters, false, true) is T actor ? InternalInitializeActorAsync(actor, initializeAsync) : ZeroTask.FromResult<T?>(null);
+		return InternalSpawnActor(@class, transform, spawnParameters, false, true) is T actor ? InternalInitializeActorAsync(actor, transform, initializeAsync) : ZeroTask.FromResult<T?>(null);
 	}
 	
 	public ZeroTask<AActor?> SpawnActorDeferredAsync(UClass @class, FTransform? transform, Func<AActor, Lifecycle, ZeroTask> initializeAsync, in ActorSpawnParameters spawnParameters = default)
@@ -212,7 +212,7 @@ public partial class UWorld
 			throw new ArgumentOutOfRangeException(nameof(@class));
 		}
 		
-		return InternalSpawnActor(@class, transform, spawnParameters, false, true) is T actor ? InternalInitializeActorAsync(actor, initializeAsync, state) : ZeroTask.FromResult<T?>(null);
+		return InternalSpawnActor(@class, transform, spawnParameters, false, true) is T actor ? InternalInitializeActorAsync(actor, transform, initializeAsync, state) : ZeroTask.FromResult<T?>(null);
 	}
 	
 	public ZeroTask<AActor?> SpawnActorDeferredAsync<TState>(UClass @class, FTransform? transform, Func<AActor, TState, Lifecycle, ZeroTask> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default)
@@ -276,7 +276,7 @@ public partial class UWorld
 		}
 	}
 
-	private async ZeroTask<T?> InternalInitializeActorAsync<T>(T actor, Func<T, Lifecycle, ZeroTask> initializeAsync) where T : AActor, IStaticClass
+	private async ZeroTask<T?> InternalInitializeActorAsync<T>(T actor, FTransform? transform, Func<T, Lifecycle, ZeroTask> initializeAsync) where T : AActor, IStaticClass
 	{
 		try
 		{
@@ -288,13 +288,13 @@ public partial class UWorld
 		}
 		finally
 		{
-			actor.FinishSpawning();
+			actor.FinishSpawning(transform);
 		}
 			
 		return actor;
 	}
 
-	private async ZeroTask<T?> InternalInitializeActorAsync<T, TState>(T actor, Func<T, TState, Lifecycle, ZeroTask> initializeAsync, TState state) where T : AActor, IStaticClass
+	private async ZeroTask<T?> InternalInitializeActorAsync<T, TState>(T actor, FTransform? transform, Func<T, TState, Lifecycle, ZeroTask> initializeAsync, TState state) where T : AActor, IStaticClass
 	{
 		try
 		{
@@ -306,7 +306,7 @@ public partial class UWorld
 		}
 		finally
 		{
-			actor.FinishSpawning();
+			actor.FinishSpawning(transform);
 		}
 			
 		return actor;

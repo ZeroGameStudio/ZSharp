@@ -5,6 +5,7 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
+#include "Conjugate/ZStrangeConjugateRegistries.h"
 
 namespace ZSharp::ZActor_Interop_Private
 {
@@ -29,10 +30,13 @@ namespace ZSharp::ZActor_Interop_Private
 	}
 }
 
-void ZSharp::FZActor_Interop::FinishSpawning(FZConjugateHandle self)
+void ZSharp::FZActor_Interop::FinishSpawning(FZConjugateHandle self, FZConjugateHandle transform)
 {
-	auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-	pSelf->FinishSpawning(FTransform::Identity, true);
+	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
+	auto pSelf = alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
+	FZSelfDescriptiveScriptStruct* sdTransform = alc->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().ConjugateUnsafe(transform);
+	const FTransform& spawnTransform = sdTransform && sdTransform->GetDescriptor() == TBaseStructure<FTransform>::Get() ? *sdTransform->GetTypedUnderlyingInstance<FTransform>() : FTransform::Identity;
+	pSelf->FinishSpawning(spawnTransform, true);
 }
 
 ZSharp::FZConjugateHandle ZSharp::FZActor_Interop::AddComponent(FZConjugateHandle self, FZConjugateHandle componentClass, uint8 defer)

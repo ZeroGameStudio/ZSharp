@@ -32,7 +32,8 @@ internal abstract class PooledZeroTaskBackendBase<TResult, TImpl> : ZeroTaskBack
 		ReturnToPool();
 	}
 
-	~PooledZeroTaskBackendBase() => ReturnToPool();
+	// Can't work with ALC reloading.
+	// ~PooledZeroTaskBackendBase() => ReturnToPool();
 
 	private void ReturnToPool() => _pool.Return((TImpl)this);
 	

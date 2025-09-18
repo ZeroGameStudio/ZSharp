@@ -26,6 +26,8 @@ partial struct ZeroTask
 		=> Delay(delayType, TimeSpan.FromSeconds(delaySeconds), lifecycle);
 	public static ZeroTask<float> Delay(float delaySeconds, Lifecycle lifecycle = default)
 		=> Delay(EZeroTaskDelayType.WorldPaused, delaySeconds, lifecycle);
+	public static ZeroTask<float> Delay(double delaySeconds, Lifecycle lifecycle = default)
+		=> Delay(EZeroTaskDelayType.WorldPaused, (float)delaySeconds, lifecycle);
 
 	public static ZeroTask<int32> DelayFrame(int32 delayFrames, Lifecycle lifecycle = default)
 	{

@@ -209,7 +209,7 @@ public sealed class TArray<T> : UnrealConjugateBase
 			InternalSet(index, value);
 		}
 	}
-	object? IList.this[int index]
+	object? IList.this[int32 index]
 	{
 		get => this[index];
 		set => this[index] = (T)value!;

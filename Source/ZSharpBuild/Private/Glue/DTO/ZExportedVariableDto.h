@@ -22,6 +22,9 @@ struct FZExportedVariableDto
 
 	UPROPERTY()
 	bool bNullInNotNullOut = false;
+
+	UPROPERTY()
+	bool bBlackConjugate = false;
 };
 
 

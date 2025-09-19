@@ -73,6 +73,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 			paramDto.Type = param.GetType();
 			paramDto.UnderlyingType = param.GetUnderlyingType();
 			paramDto.bNullInNotNullOut = param.IsNullInNotNullOut();
+			paramDto.bBlackConjugate = param.HasBlackConjugate();
 			paramDto.Flags = static_cast<__underlying_type(EZExportedParameterFlags)>(param.GetFlags());
 			paramDto.DefaultValue = param.GetDefaultValue();
 			methodDto.Parameters.Emplace(MoveTemp(paramDto));
@@ -88,6 +89,7 @@ void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
 		propertyDto.Type = property.GetType();
 		propertyDto.UnderlyingType = property.GetUnderlyingType();
 		propertyDto.bNullInNotNullOut = property.IsNullInNotNullOut();
+		propertyDto.bBlackConjugate = property.HasBlackConjugate();
 		propertyDto.Flags = static_cast<__underlying_type(EZExportedPropertyFlags)>(property.GetFlags());
 		classDto.Properties.Emplace(MoveTemp(propertyDto));
 	});
@@ -153,10 +155,11 @@ void ZSharp::FZGlueManifestWriter::WriteDelegate(const IZExportedDelegate& deleg
 		paramDto.Type = param.GetType();
 		paramDto.UnderlyingType = param.GetUnderlyingType();
 		paramDto.bNullInNotNullOut = param.IsNullInNotNullOut();
+		paramDto.bBlackConjugate = param.HasBlackConjugate();
 		paramDto.Flags = static_cast<__underlying_type(EZExportedParameterFlags)>(param.GetFlags());
 		delegateDto.Parameters.Emplace(MoveTemp(paramDto));
 	});
-			
+	
 	assemblyDto->Delegates.Emplace(MoveTemp(delegateDto));
 	
 	UE_LOG(LogTemp, Log, TEXT("Exported Delegate Name: [%s] Module: [%s]"),

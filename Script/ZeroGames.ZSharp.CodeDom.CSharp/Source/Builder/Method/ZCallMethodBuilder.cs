@@ -8,7 +8,7 @@ public class ZCallMethodBuilder(EMemberVisibility visibility, EMemberModifiers m
 	public MethodDefinition Build(bool abstraction) => new(Visibility, Name, ReturnType, Parameters?.ToArray())
 	{
 		Modifiers = Modifiers,
-		Body = abstraction ? null : new ZCallMethodBodyBuilder(ZCallName, ReturnType, NeedsUnsafeBlock, Parameters?.ToArray())
+		Body = abstraction ? null : new ZCallMethodBodyBuilder(ZCallName, ReturnType, false, NeedsUnsafeBlock, Parameters?.ToArray())
 		{
 			IsStatic = Modifiers.HasFlag(EMemberModifiers.Static),
 			IsVirtual = Modifiers.HasFlag(EMemberModifiers.Virtual),

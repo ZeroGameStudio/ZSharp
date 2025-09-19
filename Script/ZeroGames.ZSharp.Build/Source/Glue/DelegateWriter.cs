@@ -24,7 +24,7 @@ public class DelegateWriter
 			builder.AddUsingNamespace(ns);
 		}
 		
-		builder.ReturnType = _exportedDelegate.ReturnParameter?.Type.ToString() is {} returnTypeName ? new(returnTypeName, _exportedDelegate.ReturnParameter.UnderlyingType, _exportedDelegate.ReturnParameter.IsNullInNotNullOut) : null;
+		builder.ReturnType = _exportedDelegate.ReturnParameter?.Type.ToString() is {} returnTypeName ? new(returnTypeName, _exportedDelegate.ReturnParameter.UnderlyingType, _exportedDelegate.ReturnParameter.IsNullInNotNullOut, _exportedDelegate.ReturnParameter.HasBlackConjugate) : null;
 
 		List<ParameterDeclaration> parameters = new();
 		foreach (var parameter in _exportedDelegate.Parameters)
@@ -36,7 +36,7 @@ public class DelegateWriter
 			
 			EParameterKind kind = parameter.IsInOut ? EParameterKind.Ref : parameter.IsOut ? EParameterKind.Out : EParameterKind.In;
 			AttributeDeclaration[]? attributes = parameter is { IsNullInNotNullOut: true, IsInOut: true } ? [ new("NotNull") ] : null;
-			parameters.Add(new(kind, new(parameter.Type.ToString(), parameter.UnderlyingType, parameter.IsNullInNotNullOut), parameter.Name, attributes));
+			parameters.Add(new(kind, new(parameter.Type.ToString(), parameter.UnderlyingType, parameter.IsNullInNotNullOut, parameter.HasBlackConjugate), parameter.Name, attributes));
 		}
 		builder.Parameters = parameters.ToArray();
 

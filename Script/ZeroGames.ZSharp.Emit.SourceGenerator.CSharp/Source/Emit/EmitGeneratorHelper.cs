@@ -78,8 +78,12 @@ public static class EmitGeneratorHelper
 		Loot(type);
 	}
 
-	public static TypeReference GetTypeReference(ITypeSymbol type) => new(GetNormalizedTypeName(type), type.TypeKind == TypeKind.Enum ? "int64" : null);
-	
+	public static TypeReference GetTypeReference(ITypeSymbol type)
+		=> new(GetNormalizedTypeName(type), type.TypeKind == TypeKind.Enum ? "int64" : null, IsNullInNotNullOut(type), HasBlackConjugate(type));
+
+	private static bool IsNullInNotNullOut(ITypeSymbol type) => false; // TODO
+	private static bool HasBlackConjugate(ITypeSymbol type) => false;
+
 }
 
 

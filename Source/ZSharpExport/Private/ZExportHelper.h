@@ -21,6 +21,7 @@ namespace ZSharp
 		static FZFullyExportedTypeName GetFieldFullyExportedTypeName(FFieldVariant field);
 		static const UEnum* GetUEnumFromProperty(const FProperty* property);
 		static bool CanFPropertyBeNullInNotNullOut(const FProperty* property);
+		static bool DoesFPropertyHaveBlackConjugate(const FProperty* property);
 		static FZExportedDefaultValue GetParameterDefaultValue(const FProperty* parameter);
 
 		static bool IsNameDeprecated(const FString& name);

@@ -13,6 +13,7 @@ namespace ZSharp
 		virtual FZFullyExportedTypeName GetType() const = 0;
 		virtual FString GetUnderlyingType() const = 0;
 		virtual bool IsNullInNotNullOut() const = 0;
+		virtual bool HasBlackConjugate() const = 0;
 	};
 }
 

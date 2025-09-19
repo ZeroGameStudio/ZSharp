@@ -2,21 +2,21 @@
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class ZCallPropertyBuilder(EMemberVisibility visibility, EMemberModifiers modifiers, string name, string zcallName, int32 index, TypeReference type, bool needsUnsafeBlock, bool readable, bool writable)
+public class ZCallPropertyBuilder(EMemberVisibility visibility, EMemberModifiers modifiers, string name, string zcallName, int32 index, TypeReference type, bool needsUnsafeBlock, bool readable, bool writable, bool refGetter)
 {
 	
 	public PropertyDefinition Build(bool abstraction) => new(Visibility, Name, Type, IsReadable, IsWritable)
 	{
 		Modifiers = Modifiers,
-		Getter = !abstraction && IsReadable ? new ZCallMethodBodyBuilder(ZCallName, Type, NeedsUnsafeBlock,
-			new ParameterDeclaration(EParameterKind.In, new("bool", null), string.Empty),
-			new ParameterDeclaration(EParameterKind.In, new(nameof(int32), null), Index != 0 ? Index.ToString() : string.Empty))
+		Getter = !abstraction && IsReadable ? new ZCallMethodBodyBuilder(ZCallName, Type, IsRefGetter, NeedsUnsafeBlock,
+			new ParameterDeclaration(EParameterKind.In, new("bool", null, false, false), string.Empty),
+			new ParameterDeclaration(EParameterKind.In, new(nameof(int32), null, false, false), Index != 0 ? Index.ToString() : string.Empty))
 			{
 				BeforeReturnBlock = BeforeGetterReturnBlock,
 			}.Build() : null,
-		Setter = !abstraction && IsWritable ? new ZCallMethodBodyBuilder(ZCallName, null, NeedsUnsafeBlock,
-			new ParameterDeclaration(EParameterKind.In, new("bool", null), "true"),
-			new ParameterDeclaration(EParameterKind.In, new(nameof(int32), null), Index != 0 ? Index.ToString() : string.Empty),
+		Setter = !abstraction && IsWritable ? new ZCallMethodBodyBuilder(ZCallName, null, false, NeedsUnsafeBlock,
+			new ParameterDeclaration(EParameterKind.In, new("bool", null, false, false), "true"),
+			new ParameterDeclaration(EParameterKind.In, new(nameof(int32), null, false, false), Index != 0 ? Index.ToString() : string.Empty),
 			new ParameterDeclaration(EParameterKind.In, Type, "value"))
 			{
 				BeforeReturnBlock = BeforeSetterReturnBlock,
@@ -32,6 +32,7 @@ public class ZCallPropertyBuilder(EMemberVisibility visibility, EMemberModifiers
 	public bool NeedsUnsafeBlock { get; } = needsUnsafeBlock;
 	public bool IsReadable { get; } = readable;
 	public bool IsWritable { get; } = writable;
+	public bool IsRefGetter { get; } = refGetter;
 	
 	public Block BeforeGetterReturnBlock { get; set; } = new();
 	public Block BeforeSetterReturnBlock { get; set; } = new();

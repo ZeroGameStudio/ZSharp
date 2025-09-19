@@ -52,6 +52,11 @@ bool ZSharp::FZDynamicallyExportedParameter::IsNullInNotNullOut() const
 	return bNullInNotNullOut;
 }
 
+bool ZSharp::FZDynamicallyExportedParameter::HasBlackConjugate() const
+{
+	return FZExportHelper::DoesFPropertyHaveBlackConjugate(Property);
+}
+
 ZSharp::FZDynamicallyExportedParameter::FZDynamicallyExportedParameter(const FProperty* property)
 	: Property(property)
 	, bNullInNotNullOut(false)

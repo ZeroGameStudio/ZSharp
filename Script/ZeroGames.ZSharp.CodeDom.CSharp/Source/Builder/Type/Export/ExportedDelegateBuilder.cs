@@ -57,7 +57,7 @@ public class ExportedDelegateBuilder(string namespaceName, string typeName, stri
 		abstractionDefinition.AddMember(statelessSignature);
 
 		string stateParameterName = signatureParameters is not null && signatureParameters.Any(p => p.Name is "state") ? "userState" : "state";
-		ParameterDeclaration[] statefulSignatureParameters = [..signatureParameters ?? [], new(EParameterKind.In, new("TState", null), stateParameterName)];
+		ParameterDeclaration[] statefulSignatureParameters = [..signatureParameters ?? [], new(EParameterKind.In, new("TState", null, false, false), stateParameterName)];
 		
 		MethodDefinition statefulSignature = new(EMemberVisibility.Public, "Signature<in TState>", signatureReturnType, statefulSignatureParameters)
 		{

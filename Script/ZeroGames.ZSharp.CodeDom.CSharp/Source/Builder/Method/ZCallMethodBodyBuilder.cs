@@ -4,19 +4,17 @@ using System.Text;
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class ZCallMethodBodyBuilder(string name, TypeReference? returnType, bool needsUnsafeBlock, params ParameterDeclaration[]? parameters)
+public class ZCallMethodBodyBuilder(string name, TypeReference? returnType, bool refGetter, bool needsUnsafeBlock, params ParameterDeclaration[]? parameters)
 {
 
 	public MethodBody Build()
 	{
-		StringBuilder sb = new();
-		
 		string shortName = Name.Split(':').Last();
 		string implPostfix = IsVirtual ? "_Implementation" : string.Empty;
 		string handleFieldName = $"_zcallHandleFor{shortName}{implPostfix}";
 		int32 numSlots = (IsStatic ? 0 : 1) + (Parameters?.Count ?? 0) + (ReturnType is null ? 0 : 1);
 
-		string getHandle = 
+		Block getHandle =
 $@"Thrower.ThrowIfNotInGameThread();
 
 const string ZCALL_NAME = ""{Name}"";
@@ -24,8 +22,8 @@ IMasterAssemblyLoadContext __alc__ = MasterAlcCache.Instance;
 {handleFieldName} ??= __alc__.GetZCallHandle(ZCALL_NAME);
 ZCallHandle __handle__ = {handleFieldName}.Value;";
 
-		sb.Append(getHandle);
-
+		StringBuilder bodySb = new();
+		bodySb.Append(MakeOutBlackConjugates());
 		bool needsBuffer = numSlots > 0;
 		if (needsBuffer)
 		{
@@ -35,18 +33,15 @@ ZCallBufferSlot* __slots__ = stackalloc ZCallBufferSlot[NUM_SLOTS]
 {{
 {MakeSlots().Indent()}
 }};
-ZCallBuffer __buffer__ = new(__slots__, NUM_SLOTS);";
+ZCallBuffer __buffer__ = new(__slots__, NUM_SLOTS);
 
-			sb.AppendLine();
-			sb.AppendLine();
-			sb.Append(setupBuffer);
+";
+
+			bodySb.Append(setupBuffer);
 		}
 
-		sb.AppendLine();
-		sb.AppendLine();
-
 		string bufferParameter = needsBuffer ? "&__buffer__" : "null";
-		sb.Append(
+		bodySb.Append(
 $@"if (__alc__.ZCall(__handle__, {bufferParameter}) != EZCallErrorCode.Succeed)
 {{
 	throw new InvalidOperationException();
@@ -54,22 +49,23 @@ $@"if (__alc__.ZCall(__handle__, {bufferParameter}) != EZCallErrorCode.Succeed)
 
 		if (needsBuffer)
 		{
-			sb.Append(MakeCopyOutsAndReturn());
+			bodySb.Append(MakeCopyOutsAndReturn());
 		}
 
 		Block body = NeedsUnsafeBlock ?
 $@"unsafe
 {{
-{sb.ToString().Indent()}
-}}" : sb.ToString();
+{bodySb.ToString().Indent()}
+}}" : bodySb.ToString();
 
 		Block defaultValues = _defaultValueBuilder.Build();
-		
-		return new(defaultValues, body);
+
+		return new(getHandle, defaultValues, body);
 	}
 
 	public string Name { get; } = name;
 	public TypeReference? ReturnType { get; } = returnType;
+	public bool IsRefGetter { get; } = refGetter;
 	public bool NeedsUnsafeBlock { get; } = needsUnsafeBlock;
 	public IReadOnlyList<ParameterDeclaration>? Parameters { get; } = parameters;
 
@@ -77,6 +73,28 @@ $@"unsafe
 	public bool IsVirtual { get; set; }
 
 	public Block BeforeReturnBlock { get; set; } = new();
+
+	protected string MakeOutBlackConjugates()
+	{
+		string result = string.Empty;
+		foreach (var parameter in Parameters?.Where(p => p is { Kind: EParameterKind.Ref or EParameterKind.Out, Type.HasBlackConjugate: true }) ?? [])
+		{
+			string nullTest = parameter.Type.TypeName.EndsWith("?") ? "??" : string.Empty;
+			result += $"{parameter.Name} {nullTest}= new();{Environment.NewLine}";
+		}
+
+		if (UseExplicitReturn)
+		{
+			result += $"{ReturnType!.Value.TypeName.TrimEnd('?')} __return__ = new();{Environment.NewLine}";
+		}
+
+		if (result.Length > 0)
+		{
+			result += Environment.NewLine;
+		}
+
+		return result;
+	}
 
 	protected string MakeSlots()
 	{
@@ -91,14 +109,15 @@ $@"unsafe
 			foreach (var parameter in Parameters)
 			{
 				string cast = !string.IsNullOrWhiteSpace(parameter.Type.UnderlyingType) ? $"({parameter.Type.UnderlyingType})" : string.Empty;
-				string arg = parameter.Kind != EParameterKind.Out ? $"{cast}{parameter.Name}" : string.Empty;
+				string arg = parameter is { Type.HasBlackConjugate: true } or not { Kind: EParameterKind.Out } ? $"{cast}{parameter.Name}" : string.Empty;
 				slots.Add($"ZCallBufferSlot.From{GetSlotType(parameter.Type)}({arg}),");
 			}
 		}
 
 		if (ReturnType is not null)
 		{
-			slots.Add($"ZCallBufferSlot.From{GetSlotType(ReturnType.Value)}(),");
+			string arg = UseExplicitReturn ? "__return__" : string.Empty;
+			slots.Add($"ZCallBufferSlot.From{GetSlotType(ReturnType.Value)}({arg}),");
 		}
 
 		return string.Join(Environment.NewLine, slots);
@@ -107,26 +126,25 @@ $@"unsafe
 	protected string MakeCopyOutsAndReturn()
 	{
 		string result = string.Empty;
-		if (Parameters?.Any(p => p.Kind != EParameterKind.In) ?? false)
-		{
-			result += $"{Environment.NewLine}{Environment.NewLine}";
-		}
-		
 		List<string> copyOuts = new();
 		for (int32 i = 0; i < Parameters?.Count; ++i)
 		{
 			var parameter = Parameters[i];
-			if (parameter.Kind == EParameterKind.In)
+			int32 index = i + (IsStatic ? 0 : 1);
+			if (parameter is { Kind: EParameterKind.In } or { Type.HasBlackConjugate: true })
 			{
 				continue;
 			}
 
-			int32 index = i + (IsStatic ? 0 : 1);
 			copyOuts.Add($"{parameter.Name} = {MakeReturnValue(parameter.Type, index.ToString())};");
 		}
 		
 		result += string.Join(Environment.NewLine, copyOuts);
-		
+		if (result.Length > 0)
+		{
+			result = Environment.NewLine + Environment.NewLine + result;
+		}
+
 		if (BeforeReturnBlock.Content != string.Empty)
 		{
 			result += $"{Environment.NewLine}{Environment.NewLine}{BeforeReturnBlock}";
@@ -135,9 +153,16 @@ $@"unsafe
 		if (ReturnType is not null)
 		{
 			result += $"{Environment.NewLine}{Environment.NewLine}";
-			result += $"return {MakeReturnValue(ReturnType.Value, "NUM_SLOTS - 1")};";
+			if (UseExplicitReturn)
+			{
+				result += "return __return__;";
+			}
+			else
+			{
+				result += $"return {MakeReturnValue(ReturnType!.Value, "NUM_SLOTS - 1")};";
+			}
 		}
-		
+
 		return result;
 	}
 
@@ -167,6 +192,8 @@ $@"unsafe
 		nameof(Boolean) or "bool" => "Bool",
 		_ => "Conjugate",
 	};
+
+	private bool UseExplicitReturn => ReturnType?.HasBlackConjugate is true && !IsRefGetter;
 
 	private ParameterDefaultValueBodyBuilder _defaultValueBuilder = new(parameters);
 

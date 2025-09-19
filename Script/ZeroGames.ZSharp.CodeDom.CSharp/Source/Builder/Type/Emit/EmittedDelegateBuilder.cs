@@ -37,7 +37,7 @@ public class EmittedDelegateBuilder(string namespaceName, string typeName, strin
 		ParameterDeclaration[]? signatureParameters = Parameters?.Select(DelegateHelper.ToSignatureParameterDecl).ToArray();
 
 		string stateParameterName = signatureParameters is not null && signatureParameters.Any(p => p.Name is "state") ? "userState" : "state";
-		ParameterDeclaration[] statefulSignatureParameters = [..signatureParameters ?? [], new(EParameterKind.In, new("TState", null), stateParameterName)];
+		ParameterDeclaration[] statefulSignatureParameters = [..signatureParameters ?? [], new(EParameterKind.In, new("TState", null, false, false), stateParameterName)];
 		
 		MethodDefinition statefulSignature = new(EMemberVisibility.Public, "Signature<in TState>", signatureReturnType, statefulSignatureParameters)
 		{

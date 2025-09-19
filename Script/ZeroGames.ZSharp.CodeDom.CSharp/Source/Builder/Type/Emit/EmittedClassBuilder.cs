@@ -36,7 +36,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 		MethodDefinition? validation = null;
 		if (withValidation)
 		{
-			validation = new MethodDefinition(implVisibility, $"{name}_Validate", new("bool", null), parameters)
+			validation = new MethodDefinition(implVisibility, $"{name}_Validate", new("bool", null, false, false), parameters)
 			{
 				Modifiers = implModifiers,
 			};
@@ -44,7 +44,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 			_methods.Add(validation);
 		}
 
-		FieldDefinition zcallHandle = AddStaticField(new("ZCallHandle?", null), $"_zcallHandleFor{name}");
+		FieldDefinition zcallHandle = AddStaticField(new("ZCallHandle?", null, false, false), $"_zcallHandleFor{name}");
 
 		return new(stub, implementation, validation, zcallHandle);
 	}
@@ -73,14 +73,14 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 				beforeSetterReturns.Add($"asReplicated.MarkPropertyDirty(nameof({name}));");
 			}
 			
-			property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, 0, type, false, true, true)
+			property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, 0, type, false, true, true, true)
 			{
 				BeforeSetterReturnBlock = string.Join(Environment.NewLine, beforeSetterReturns)
 			}.Build(false);
 			_properties.Add(property);
 		}
 		
-		FieldDefinition zcallHandle = AddStaticField(new("ZCallHandle?", null), $"_zcallHandleFor{name}");
+		FieldDefinition zcallHandle = AddStaticField(new("ZCallHandle?", null, false, false), $"_zcallHandleFor{name}");
 
 		return new(property, zcallHandle);
 	}

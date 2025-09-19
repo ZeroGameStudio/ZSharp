@@ -17,6 +17,7 @@ namespace ZSharp
 		virtual FZFullyExportedTypeName GetType() const override;
 		virtual FString GetUnderlyingType() const override;
 		virtual bool IsNullInNotNullOut() const override;
+		virtual bool HasBlackConjugate() const override;
 		virtual EZExportedParameterFlags GetFlags() const override;
 		virtual FZExportedDefaultValue GetDefaultValue() const override;
 

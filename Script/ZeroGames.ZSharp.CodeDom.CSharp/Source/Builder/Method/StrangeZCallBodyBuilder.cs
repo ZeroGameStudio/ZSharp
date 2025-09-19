@@ -4,13 +4,13 @@ using System.Text;
 
 namespace ZeroGames.ZSharp.CodeDom.CSharp;
 
-public class StrangeZCallBodyBuilder(string zcallReplace, TypeReference? returnType, bool needsUnsafeBlock, params ParameterDeclaration[]? parameters) : ZCallMethodBodyBuilder(string.Empty, returnType, needsUnsafeBlock, parameters)
+public class StrangeZCallBodyBuilder(string zcallReplace, TypeReference? returnType, bool needsUnsafeBlock, params ParameterDeclaration[]? parameters) : ZCallMethodBodyBuilder(string.Empty, returnType, false, needsUnsafeBlock, parameters)
 {
 
 	public new MethodBody Build()
 	{
 		StringBuilder sb = new();
-		
+		sb.Append(MakeOutBlackConjugates());
 		int32 numSlots = (IsStatic ? 0 : 1) + (Parameters?.Count ?? 0) + (ReturnType is null ? 0 : 1);
 		bool needsBuffer = numSlots > 0;
 		if (needsBuffer)
@@ -23,13 +23,13 @@ ZCallBufferSlot* __slots__ = stackalloc ZCallBufferSlot[NUM_SLOTS]
 {{
 {MakeSlots().Indent()}
 }};
-ZCallBuffer __buffer__ = new(__slots__, NUM_SLOTS);";
+ZCallBuffer __buffer__ = new(__slots__, NUM_SLOTS);
+
+";
 
 			sb.Append(setupBuffer);
 		}
 
-		sb.AppendLine();
-		sb.AppendLine();
 		string bufferParameter = needsBuffer ? "&__buffer__" : "null";
 		sb.Append(
 $@"if ({ZCallReplace}({bufferParameter}) != EZCallErrorCode.Succeed)

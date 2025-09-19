@@ -433,10 +433,10 @@ bool ZSharp::FZExportHelper::CanFPropertyBeNullInNotNullOut(const FProperty* pro
 		return false;
 	}
 
-	// Subclassof is null-in-not-null-out.
+	// Special case for TSubclassOf<>.
 	if (auto classProperty = CastField<const FClassProperty>(property))
 	{
-		if (classProperty->MetaClass != UObject::StaticClass())
+		if (classProperty->HasAllPropertyFlags(CPF_UObjectWrapper) && !classProperty->HasAnyPropertyFlags(CPF_TObjectPtr))
 		{
 			return true;
 		}
@@ -449,6 +449,35 @@ bool ZSharp::FZExportHelper::CanFPropertyBeNullInNotNullOut(const FProperty* pro
 	}
 
 	// The rest are all null-in-not-null-out.
+	return true;
+}
+
+bool ZSharp::FZExportHelper::DoesFPropertyHaveBlackConjugate(const FProperty* property)
+{
+	// Black conjugate affects parameter copy out and return behavior in glue.
+
+	// Primitives and enums aren't conjugate.
+	if (property->IsA<FNumericProperty>() || property->IsA<FBoolProperty>() || property->IsA<FEnumProperty>())
+	{
+		return false;
+	}
+
+	// Special case for TSubclassOf<>.
+	if (auto classProperty = CastField<const FClassProperty>(property))
+	{
+		if (classProperty->HasAllPropertyFlags(CPF_UObjectWrapper) && !classProperty->HasAnyPropertyFlags(CPF_TObjectPtr))
+		{
+			return true;
+		}
+	}
+	
+	// Object is always red conjugate.
+	if (property->IsA<FObjectProperty>())
+	{
+		return false;
+	}
+
+	// The rest all have black conjugate.
 	return true;
 }
 

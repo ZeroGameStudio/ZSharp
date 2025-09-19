@@ -63,16 +63,16 @@ public class ExportedClassBuilder(bool isAbstraction, EExportedClassKind kind, s
 		return method;
 	}
 
-	public PropertyDefinition AddProperty(EMemberVisibility visibility, TypeReference type, string name, string zcallName, int32 index, bool readable, bool writable, bool allowNull)
+	public PropertyDefinition AddProperty(EMemberVisibility visibility, TypeReference type, string name, string zcallName, int32 index, bool readable, bool writable, bool allowNull, bool refGetter)
 	{
 		EMemberModifiers modifiers = EMemberModifiers.Partial;
 
 		if (allowNull && !readable && !type.TypeName.EndsWith("?"))
 		{
-			type = new(type.TypeName + "?", type.UnderlyingType, type.IsNullInNotNullOut);
+			type = new(type.TypeName + "?", type.UnderlyingType, type.IsNullInNotNullOut, type.HasBlackConjugate);
 		}
 
-		PropertyDefinition property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, index, type, false, readable, writable).Build(IsAbstraction);
+		PropertyDefinition property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, index, type, false, readable, writable, refGetter).Build(IsAbstraction);
 		if (allowNull && readable && IsAbstraction)
 		{
 			property.AddAttributeListAfter(new AttributeDeclaration("AllowNull"));

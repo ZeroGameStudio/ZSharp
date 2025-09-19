@@ -37,7 +37,7 @@ public static class DelegateHelper
 			}
 		}
 
-		TypeReference targetType = new(targetTypeName, sourceType.UnderlyingType, sourceType.IsNullInNotNullOut);
+		TypeReference targetType = new(targetTypeName, sourceType.UnderlyingType, sourceType.IsNullInNotNullOut, sourceType.HasBlackConjugate);
 		return new(kind, targetType, source.Name, source.DefaultValue, targetAttributes);
 	}
 	

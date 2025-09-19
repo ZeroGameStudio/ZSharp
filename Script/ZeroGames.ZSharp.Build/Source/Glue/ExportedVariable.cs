@@ -10,6 +10,7 @@ public class ExportedVariable
 	public required FullyExportedTypeName Type { get; set; }
 	public string? UnderlyingType { get; set; }
 	[JsonPropertyName("bNullInNotNullOut")] public required bool IsNullInNotNullOut { get; set; }
+	[JsonPropertyName("bBlackConjugate")] public required bool HasBlackConjugate { get; set;}
 }
 
 

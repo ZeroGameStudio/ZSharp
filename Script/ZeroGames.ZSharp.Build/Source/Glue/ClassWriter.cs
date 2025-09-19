@@ -83,7 +83,7 @@ public class ClassWriter
 			if (_exportedClass.IsImplementableInterface)
 			{
 				@static = true;
-				parameters.Add(new(EParameterKind.In, new("UObject", null), "@this"));
+				parameters.Add(new(EParameterKind.In, new("UObject", null, false, false), "@this"));
 			}
 
 			bool hasOutParameter = method.Parameters.Any(p => p is { IsReturn: false, IsOut: true });
@@ -116,10 +116,10 @@ public class ClassWriter
 				}
 				
 				AttributeDeclaration[]? attributes = abstraction && parameter is { IsNullInNotNullOut: true, IsInOut: true } ? [ new("NotNull") ] : null;
-				parameters.Add(new(kind, new(parameter.Type.ToString(), parameter.UnderlyingType, parameter.IsNullInNotNullOut), parameter.Name, defaultValue, attributes));
+				parameters.Add(new(kind, new(parameter.Type.ToString(), parameter.UnderlyingType, parameter.IsNullInNotNullOut, parameter.HasBlackConjugate), parameter.Name, defaultValue, attributes));
 			}
 
-			TypeReference? returnType = method.ReturnParameter?.Type.ToString() is {} returnTypeName ? new(returnTypeName, method.ReturnParameter.UnderlyingType) : null;
+			TypeReference? returnType = method.ReturnParameter?.Type.ToString() is {} returnTypeName ? new(returnTypeName, method.ReturnParameter.UnderlyingType, method.ReturnParameter.IsNullInNotNullOut, method.ReturnParameter.HasBlackConjugate) : null;
 			
 			if (!_exportedClass.IsInterface && method.IsInterfaceMethod)
 			{
@@ -133,7 +133,7 @@ public class ClassWriter
 			builder.AddMethod(visibility, false, @static, method.Name, method.ZCallName, returnType, parameters.ToArray());
 			if (!abstraction)
 			{
-				builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{method.ZCallName.Split(':').Last()}");
+				builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null, false, false), $"_zcallHandleFor{method.ZCallName.Split(':').Last()}");
 			}
 
 			if (method is { IsVirtual: true, IsInterfaceMethod: false } /* @TODO: Interface event implementation */)
@@ -157,7 +157,7 @@ public class ClassWriter
 					methodDefinition = builder.AddMethod(EMemberVisibility.Protected, true, false, implName, implZCallName, returnType, eventImplParameters);
 					if (!abstraction)
 					{
-						builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{method.ZCallName.Split(':').Last()}_Implementation");
+						builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null, false, false), $"_zcallHandleFor{method.ZCallName.Split(':').Last()}_Implementation");
 					}
 				}
 				else if (abstraction)
@@ -182,22 +182,22 @@ public class ClassWriter
 			{
 				if (property.IsReadable)
 				{
-					builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType, property.IsNullInNotNullOut), property.Name + "_Copy", property.ZCallName, property.Index, true, false, false);
+					builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType, property.IsNullInNotNullOut, property.HasBlackConjugate), property.Name + "_Copy", property.ZCallName, property.Index, true, false, false, false);
 				}
 
 				if (property.IsWritable)
 				{
-					builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType, property.IsNullInNotNullOut), property.Name, property.ZCallName, property.Index, false, true, property.IsNullInNotNullOut);
+					builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType, property.IsNullInNotNullOut, property.HasBlackConjugate), property.Name, property.ZCallName, property.Index, false, true, property.IsNullInNotNullOut, true);
 				}
 			}
 			else
 			{
-				builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType, property.IsNullInNotNullOut), property.Name, property.ZCallName, property.Index, property.IsReadable, property.IsWritable, property.IsNullInNotNullOut);
+				builder.AddProperty(visibility, new(property.Type.ToString(), property.UnderlyingType, property.IsNullInNotNullOut, property.HasBlackConjugate), property.Name, property.ZCallName, property.Index, property.IsReadable, property.IsWritable, property.IsNullInNotNullOut, true);
 			}
 
 			if (!abstraction)
 			{
-				builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null), $"_zcallHandleFor{property.ZCallName.Split(':').Last()}");
+				builder.AddStaticFieldIfNotExists(new("ZCallHandle?", null, false, false), $"_zcallHandleFor{property.ZCallName.Split(':').Last()}");
 			}
 		}
 		

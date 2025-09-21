@@ -9,8 +9,8 @@ public partial class FVector
 	public static FVector MakeBackward(double scalar = 1) => new(-scalar, 0, 0);
 	public static FVector MakeRight(double scalar = 1) => new(0, scalar, 0);
 	public static FVector MakeLeft(double scalar = 1) => new(0, -scalar, 0);
-	public static FVector MakeUp(double scalar = 1) => new(0, scalar, 0);
-	public static FVector MakeDown(double scalar = 1) => new(0, -scalar, 0);
+	public static FVector MakeUp(double scalar = 1) => new(0, 0, scalar);
+	public static FVector MakeDown(double scalar = 1) => new(0, 0, -scalar);
 
 	public static double Dot(FVector lhs, FVector rhs) => lhs | rhs;
 	public static FVector Cross(FVector lhs, FVector rhs) => lhs ^ rhs;

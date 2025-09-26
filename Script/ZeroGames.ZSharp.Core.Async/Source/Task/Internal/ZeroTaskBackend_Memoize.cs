@@ -1,19 +1,20 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using System.Runtime.ExceptionServices;
+
 namespace ZeroGames.ZSharp.Core.Async;
 
-internal class ZeroTaskBackend_Memoize<TResult> : ZeroTaskBackendBase<TResult>, IMoveNextSource
+internal class ZeroTaskBackend_Memoize<TResult> : IZeroTaskBackend<TResult>, IMoveNextSource
 {
 
 	public ZeroTaskBackend_Memoize(IZeroTaskBackend backend)
 	{
 		check(typeof(TResult) == typeof(AsyncVoid));
-		check(backend is IReusedZeroTaskBackend);
 
 		ZeroTaskToken token = backend.Token;
 		
 		_backend = backend;
-		_token = token;
+		Token = token;
 
 		if (backend.GetStatus(token) is EZeroTaskStatus.Pending)
 		{
@@ -23,7 +24,7 @@ internal class ZeroTaskBackend_Memoize<TResult> : ZeroTaskBackendBase<TResult>, 
 		{
 			try
 			{
-				_backend.GetResult(_token);
+				_backend.GetResult(Token);
 				SetResult(default!);
 			}
 			catch (Exception ex)
@@ -35,12 +36,10 @@ internal class ZeroTaskBackend_Memoize<TResult> : ZeroTaskBackendBase<TResult>, 
 
 	public ZeroTaskBackend_Memoize(IZeroTaskBackend<TResult> backend)
 	{
-		check(backend is IReusedZeroTaskBackend);
-		
 		ZeroTaskToken token = backend.Token;
 		
 		_backend = backend;
-		_token = token;
+		Token = token;
 		
 		if (backend.GetStatus(token) is EZeroTaskStatus.Pending)
 		{
@@ -50,7 +49,7 @@ internal class ZeroTaskBackend_Memoize<TResult> : ZeroTaskBackendBase<TResult>, 
 		{
 			try
 			{
-				SetResult(backend.GetResult(_token));
+				SetResult(backend.GetResult(Token));
 			}
 			catch (Exception ex)
 			{
@@ -59,19 +58,62 @@ internal class ZeroTaskBackend_Memoize<TResult> : ZeroTaskBackendBase<TResult>, 
 		}
 	}
 
+	public EZeroTaskStatus GetStatus(ZeroTaskToken token)
+	{
+		if (_backend is null)
+		{
+			if (_error is not null)
+			{
+				return _error.SourceException is OperationCanceledException ? EZeroTaskStatus.Canceled : EZeroTaskStatus.Faulted;
+			}
+			else
+			{
+				return EZeroTaskStatus.Succeeded;
+			}
+		}
+
+		return _backend.GetStatus(Token);
+	}
+
+	public TResult GetResult(ZeroTaskToken token)
+	{
+		if (_backend is not null)
+		{
+			throw new InvalidOperationException("ZeroTask only supports await.");
+		}
+		
+		_error?.Throw();
+		return _result;
+	}
+
+	void IZeroTaskBackend.GetResult(ZeroTaskToken token)
+		=> GetResult(token);
+
+	public void SetContinuation(Action continuation, ZeroTaskToken token)
+	{
+		check(_backend is not null);
+		_continuations.Add(new(continuation, null));
+	}
+
+	public void SetMoveNextSource(IMoveNextSource source, ZeroTaskToken token)
+	{
+		check(_backend is not null);
+		_continuations.Add(new(null, source));
+	}
+
 	void IMoveNextSource.MoveNext()
 	{
 		try
 		{
 			if (_backend is IZeroTaskBackend<TResult> typedBackend)
 			{
-				SetResult(typedBackend.GetResult(_token));
+				SetResult(typedBackend.GetResult(Token));
 			}
 			else
 			{
 				check(typeof(TResult) == typeof(AsyncVoid));
 					
-				_backend.GetResult(_token);
+				_backend!.GetResult(Token);
 				SetResult(default!);
 			}
 		}
@@ -80,10 +122,51 @@ internal class ZeroTaskBackend_Memoize<TResult> : ZeroTaskBackendBase<TResult>, 
 			SetException(ex);
 		}
 	}
+	
+	public ZeroTaskToken Token { get; }
+	
+	private readonly record struct ContinuationVariant(Action? Action, IMoveNextSource? Source);
 
-	private readonly IZeroTaskBackend _backend;
-	private readonly ZeroTaskToken _token;
+	private void SetResult(TResult result)
+	{
+		_result = result;
+		SignalCompletion();
+	}
 
+	private void SetException(Exception exception)
+	{
+		_error = ExceptionDispatchInfo.Capture(exception);
+		SignalCompletion();
+	}
+	
+	private void SignalCompletion()
+	{
+		_backend = null;
+
+		foreach (var continuation in _continuations)
+		{
+			try
+			{
+				if (continuation.Action is not null)
+				{
+					continuation.Action();
+				}
+				else
+				{
+					continuation.Source!.MoveNext();
+				}
+			}
+			catch (Exception ex)
+			{
+				UnobservedZeroTaskExceptionPublisher.Publish(ex);
+			}
+		}
+	}
+
+	private IZeroTaskBackend? _backend;
+	private TResult _result = default!;
+	private ExceptionDispatchInfo? _error;
+	private readonly List<ContinuationVariant> _continuations = [];
 }
 
 

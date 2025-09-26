@@ -19,7 +19,7 @@ ZSharp::FZConjugateRegistry_UObject::FZConjugateRegistry_UObject(IZMasterAssembl
 	: Alc(alc)
 {
 	RegisterController(new FZUObjectConjugateController_GC);
-	RegisterController(new FZUObjectConjugateController_Actor);
+	// RegisterController(new FZUObjectConjugateController_Actor);
 }
 
 UObject* ZSharp::FZConjugateRegistry_UObject::ConjugateUnsafe(FZConjugateHandle handle) const

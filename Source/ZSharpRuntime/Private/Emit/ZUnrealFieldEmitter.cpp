@@ -687,8 +687,6 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			FProperty* property = def.Property;
 			property->RepNotifyFunc = def.RepNotifyName;
 		}
-
-		check(!FZReflectionHelper::IsPropertyForceCopy(def.Property));
 	}
 
 #undef NEW_PROPERTY
@@ -1345,6 +1343,13 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 	// All referenced script structs should be initialized so struct properties can link properly.
 	scriptStruct->StaticLink(true);
 	ZUnrealFieldEmitter_Private::FixupAlignmentForStruct(scriptStruct); // Link() aligns the last property for script struct, but we don't want to depend on implementation.
+
+#if DO_CHECK
+	for (TFieldIterator<const FProperty> it(scriptStruct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+	{
+		check(it->GetOffset_ForInternal() > 0 || !FZReflectionHelper::IsPropertyForceCopy(*it));
+	}
+#endif
 	
 	// Compile Z# struct.
 	FZSharpScriptStruct* zsstruct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);

@@ -66,6 +66,7 @@ internal struct ZeroTaskBackendComp<TResult>
 	
 	public void SetMoveNextSource(IMoveNextSource source, ZeroTaskToken token)
 	{
+		check(!_completed);
 		ValidateToken(token);
 		ValidateContinuation();
 		_moveNextSource = source;
@@ -73,6 +74,7 @@ internal struct ZeroTaskBackendComp<TResult>
 
 	public void SetContinuation(Action continuation, ZeroTaskToken token)
 	{
+		check(!_completed);
 		ValidateToken(token);
 		ValidateContinuation();
 		_continuation = continuation;

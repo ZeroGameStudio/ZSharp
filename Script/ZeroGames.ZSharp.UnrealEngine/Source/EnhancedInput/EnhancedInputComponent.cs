@@ -56,7 +56,7 @@ public partial class UEnhancedInputComponent
 	public bool RemoveBinding(UObject? handle)
 	{
 		MasterAlcCache.GuardInvariant();
-		return handle?.IsValid is true && InternalRemoveBinding(handle);
+		return handle is { IsExpired: false } && InternalRemoveBinding(handle);
 	}
 
 	private unsafe uint32 InternalBindAction(UInputAction action, ETriggerEvent triggerEvent, UObject obj, string name)

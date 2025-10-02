@@ -98,7 +98,7 @@ public partial class AActor
 		}
 		finally
 		{
-			if (!IsExpired)
+			if (__IsValid)
 			{
 				InternalFinishAddComponent(component);
 			}
@@ -119,7 +119,7 @@ public partial class AActor
 		}
 		finally
 		{
-			if (!IsExpired)
+			if (__IsValid)
 			{
 				InternalFinishAddComponent(component);
 			}
@@ -140,7 +140,7 @@ public partial class AActor
 		}
 		finally
 		{
-			if (!IsExpired)
+			if (__IsValid)
 			{
 				InternalFinishAddComponent(component);
 			}
@@ -161,7 +161,7 @@ public partial class AActor
 		}
 		finally
 		{
-			if (!IsExpired)
+			if (__IsValid)
 			{
 				InternalFinishAddComponent(component);
 			}

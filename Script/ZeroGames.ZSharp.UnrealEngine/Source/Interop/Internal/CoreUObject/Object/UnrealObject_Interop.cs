@@ -15,6 +15,7 @@ internal static unsafe class UnrealObject_Interop
 	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, ConjugateHandle, uint8> Implements;
 	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, ConjugateHandle, uint8> IsIn;
 	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, char*, ConjugateHandle, uint8> Rename;
+	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, uint8> IsValid;
 }
 
 

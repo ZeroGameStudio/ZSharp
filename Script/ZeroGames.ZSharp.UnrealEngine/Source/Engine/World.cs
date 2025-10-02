@@ -288,7 +288,10 @@ public partial class UWorld
 		}
 		finally
 		{
-			actor.FinishSpawning(transform);
+			if (__IsValid)
+			{
+				actor.FinishSpawning(transform);
+			}
 		}
 			
 		return actor;
@@ -306,7 +309,10 @@ public partial class UWorld
 		}
 		finally
 		{
-			actor.FinishSpawning(transform);
+			if (__IsValid)
+			{
+				actor.FinishSpawning(transform);
+			}
 		}
 			
 		return actor;

@@ -69,4 +69,11 @@ uint8 ZSharp::FZUnrealObject_Interop::Rename(FZConjugateHandle self, const TCHAR
 	return pSelf->Rename(newName, pNewOuter);
 }
 
+uint8 ZSharp::FZUnrealObject_Interop::IsValid(FZConjugateHandle self)
+{
+	const FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+	auto pSelf = registry.ConjugateUnsafeChecked<UObject>(self);
+	return ::IsValid(pSelf);
+}
+
 

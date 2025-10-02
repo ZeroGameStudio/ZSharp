@@ -151,6 +151,7 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, IsA),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, IsIn),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, Rename),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealObject, IsValid),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealStruct, IsChildOf),
 

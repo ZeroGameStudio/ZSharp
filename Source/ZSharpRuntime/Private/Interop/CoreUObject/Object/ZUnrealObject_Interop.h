@@ -16,6 +16,7 @@ namespace ZSharp
 		static uint8 IsA(FZConjugateHandle self, FZConjugateHandle cls);
 		static uint8 IsIn(FZConjugateHandle self, FZConjugateHandle outer);
 		static uint8 Rename(FZConjugateHandle self, const TCHAR* newName, FZConjugateHandle newOuter);
+		static uint8 IsValid(FZConjugateHandle self);
 	};
 }
 

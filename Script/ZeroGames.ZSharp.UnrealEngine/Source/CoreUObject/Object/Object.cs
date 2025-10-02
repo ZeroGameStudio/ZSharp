@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public partial class UObject : IUnrealObject
+public partial class UObject : IUnrealObject, ILifecycleBackend
 {
 
     public UClass GetClass()
@@ -73,10 +73,24 @@ public partial class UObject : IUnrealObject
     public bool Rename(string newName) => Rename(newName, null);
     public bool Rename(UObject newOuter) => Rename(null, newOuter);
 
+    bool ILifecycleBackend.IsExpired(LifecycleToken token) => !__IsValid;
+
+    public bool __IsValid => InternalIsValid;
+    public Lifecycle Lifecycle => Lifecycle.FromBackend(this);
+    public Lifecycle LifecycleEvenIfGarbage => Lifecycle.FromBackend(_lifecycleBackendEvenIfGarbage ??= new LifecycleBackendEvenIfGarbage(this));
+    LifecycleToken ILifecycleBackend.Token { get; } = default(LifecycleToken).Next;
+
     // @TODO: Construct on async loading thread.
     // Only called on emitted class, just before C++ UObject::PostInitProperties().
     // [ZCall(Name = ".pip")]
     // protected virtual void PostInitProperties(){}
+
+    private class LifecycleBackendEvenIfGarbage(UObject target) : ILifecycleBackend
+    {
+        bool ILifecycleBackend.IsExpired(LifecycleToken token) => target.IsExpired;
+        Lifecycle ILifecycleSource.Lifecycle => Lifecycle.FromBackend(this);
+        LifecycleToken ILifecycleBackend.Token { get; } = default(LifecycleToken).Next;
+    }
 
     private unsafe UClass InternalGetClass()
         => UnrealObject_Interop.GetClass(ConjugateHandle.FromConjugate(this)).GetTargetChecked<UClass>();
@@ -114,6 +128,10 @@ public partial class UObject : IUnrealObject
             return UnrealObject_Interop.Rename(ConjugateHandle.FromConjugate(this), newNameBuffer, ConjugateHandle.FromConjugate(newOuter)) > 0;
         }
     }
+
+    private unsafe bool InternalIsValid => UnrealObject_Interop.IsValid(ConjugateHandle.FromConjugate(this)) > 0;
+
+    private LifecycleBackendEvenIfGarbage? _lifecycleBackendEvenIfGarbage;
 
 }
 

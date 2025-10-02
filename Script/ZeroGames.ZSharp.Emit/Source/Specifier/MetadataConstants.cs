@@ -28,6 +28,7 @@ public static class MetadataConstants
 	public const string BlueprintSpawnableComponent = nameof(BlueprintSpawnableComponent);
 	
 	// Function metadata names
+	public const string CppDefaultPrefix = "CPP_Default_";
 	public const string WorldContext = nameof(WorldContext);
 	public const string DefaultToSelf = nameof(DefaultToSelf);
 	

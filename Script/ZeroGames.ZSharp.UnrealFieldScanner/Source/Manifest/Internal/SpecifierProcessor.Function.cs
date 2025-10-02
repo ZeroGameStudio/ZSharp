@@ -134,6 +134,12 @@ partial class SpecifierProcessor
 	
 	// Parameter
 	[SpecifierProcessor]
+	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, DefaultParameterAttribute specifier)
+	{
+		def.AddMetadata(MetadataConstants.CppDefaultPrefix + specifier.Parameter, specifier.Default);
+	}
+	
+	[SpecifierProcessor]
 	private static void ProcessSpecifier(UnrealFunctionDefinition def, IUnrealFunctionModel model, WorldContextAttribute specifier)
 	{
 		def.AddMetadata(MetadataConstants.WorldContext, specifier.Name);

@@ -18,12 +18,4 @@ public interface IConjugate<out T> : IConjugate where T : class, IConjugate<T>
 	static abstract T BuildConjugate(IntPtr unmanaged);
 }
 
-public static class ConjugateExtensions
-{
-	extension(IConjugate @this)
-	{
-		public bool IsValid => !@this.IsExpired;
-	}
-}
-
 

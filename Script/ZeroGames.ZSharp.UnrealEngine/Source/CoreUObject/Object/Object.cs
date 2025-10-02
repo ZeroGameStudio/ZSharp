@@ -75,7 +75,7 @@ public partial class UObject : IUnrealObject, ILifecycleBackend
 
     bool ILifecycleBackend.IsExpired(LifecycleToken token) => !__IsValid;
 
-    public bool __IsValid => InternalIsValid;
+    public bool __IsValid => !IsExpired && InternalIsValid;
     public Lifecycle Lifecycle => Lifecycle.FromBackend(this);
     public Lifecycle LifecycleEvenIfGarbage => Lifecycle.FromBackend(_lifecycleBackendEvenIfGarbage ??= new LifecycleBackendEvenIfGarbage(this));
     LifecycleToken ILifecycleBackend.Token { get; } = default(LifecycleToken).Next;

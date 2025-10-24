@@ -1419,7 +1419,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 		}
 
 		// Distinct.
-		for (int32 i = 0; i < interfaceClasses.Num(); ++i)
+		for (int32 i = interfaceClasses.Num() - 1; i >= 0; --i)
 		{
 			const UClass* interfaceClass = interfaceClasses[i];
 
@@ -1434,7 +1434,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 			}
 
 			// We already implement child(ren) of this interface so already implement this interface.
-			if (interfaceClasses.ContainsByPredicate([interfaceClass](const UClass* i){ return i->IsChildOf(interfaceClass); }))
+			if (interfaceClasses.ContainsByPredicate([interfaceClass](const UClass* iface){ return iface != interfaceClass && iface->IsChildOf(interfaceClass); }))
 			{
 				alreadyImplemented = true;
 			}

@@ -215,7 +215,7 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 			try
 			{
 				TypeDefinition typeDef = _registry.ResolveTypeDefinition(typeRef);
-				CustomAttribute? unrealFieldPathAttribute = typeDef.CustomAttributes.FirstOrDefault(attr => attr.AttributeType.FullName == typeof(UnrealFieldPathAttribute).FullName);
+				CustomAttribute? unrealFieldPathAttribute = typeDef.CustomAttributes.SingleOrDefault(attr => attr.AttributeType.FullName == typeof(UnrealFieldPathAttribute).FullName);
 				unrealFieldPath = unrealFieldPathAttribute?.ConstructorArguments[0].Value.ToString();
 			}
 			// It must not be an unreal interface if fail to resolve.

@@ -29,7 +29,7 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 		}
 	}
 
-	public UnrealPropertyModel(ModelRegistry registry, ParameterDefinition parameterDef, IUnrealStructModel outer) : base(parameterDef.Name, registry, parameterDef)
+	public UnrealPropertyModel(ModelRegistry registry, ParameterDefinition parameterDef, IUnrealStructModel outer) : base(GetParameterName(parameterDef), registry, parameterDef)
 	{
 		TypeReference typeRef = parameterDef.ParameterType;
 		check(!typeRef.IsArray);
@@ -81,9 +81,23 @@ internal class UnrealPropertyModel : UnrealFieldModel, IUnrealPropertyModel
 	public IPropertyAccessorModel? Getter { get; }
 	public IPropertyAccessorModel? Setter { get; }
 
+	private static string GetParameterName(ParameterDefinition parameterDef)
+	{
+		string? name = null;
+		if (parameterDef.CustomAttributes.SingleOrDefault(attr => attr.AttributeType.FullName == typeof(UParamAttribute).FullName) is { } uparamSpecifier)
+		{
+			if (uparamSpecifier.Properties.SingleOrDefault(prop => prop.Name == nameof(UParamAttribute.Name)) is { } nameProperty)
+			{
+				name = nameProperty.Argument.Value?.ToString();
+			}
+		}
+
+		return !string.IsNullOrEmpty(name) ? name : parameterDef.Name;
+	}
+	
 	private bool IsAccessorPublic(IPropertyAccessorModel? accessor) => accessor is not null && accessor.Visibility == EMemberVisibility.Public;
 	private bool IsAccessorProtected(IPropertyAccessorModel? accessor) => accessor is not null && accessor.Visibility == EMemberVisibility.Protected;
-
+	
 	private const string RETURN_NAME = "ReturnValue";
 
 }

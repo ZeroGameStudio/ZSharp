@@ -11,6 +11,7 @@ partial class ManifestBuilder
 		{
 			Name = classModel.Name,
 			SuperPath = classModel.BaseType?.UnrealFieldPath,
+			ImplementedInterfacePaths = classModel.Interfaces.Where(i => i.UnrealFieldPath.Length > 0).Select(i => i.UnrealFieldPath).ToList(),
 			ClassFlags = classModel.IsInternal ? EClassFlags.MinimalAPI : EClassFlags.RequiredAPI,
 			HasUClassConstructor = classModel.HasUClassConstructor,
 		};

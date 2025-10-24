@@ -135,4 +135,12 @@ public partial class UObject : IUnrealObject, ILifecycleBackend
 
 }
 
+public static class UObjectExtensions
+{
+    extension<T>(T @this) where T : UObject
+    {
+        public T? SelfIfValid => @this is { __IsValid: true } ? @this : null;
+    }
+}
+
 

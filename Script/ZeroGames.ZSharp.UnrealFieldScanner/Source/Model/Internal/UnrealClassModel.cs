@@ -35,8 +35,7 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 		SpecifierResolver.Resolve(_registry, _typeDef, _specifiers);
 
 		_baseType = new(_registry, _typeDef.BaseType);
-		_interfaces = _typeDef.Interfaces.Select(i => new InterfaceTypeUri(i.InterfaceType.Scope.GetAssemblyName(), i.InterfaceType.FullName)).ToArray();
-
+		_interfaces = _typeDef.Interfaces.Select(i => InterfaceTypeRefToUri(i.InterfaceType)).ToArray();
 		IsBaseInitialized = true;
 	}
 
@@ -206,6 +205,27 @@ internal class UnrealClassModel : UnrealStructModel, IUnrealClassModel, IDeferre
 		}
 
 		return true;
+	}
+
+	private InterfaceTypeUri InterfaceTypeRefToUri(TypeReference typeRef)
+	{
+		string? unrealFieldPath = null;
+		if (!typeRef.IsGenericInstance)
+		{
+			try
+			{
+				TypeDefinition typeDef = _registry.ResolveTypeDefinition(typeRef);
+				CustomAttribute? unrealFieldPathAttribute = typeDef.CustomAttributes.FirstOrDefault(attr => attr.AttributeType.FullName == typeof(UnrealFieldPathAttribute).FullName);
+				unrealFieldPath = unrealFieldPathAttribute?.ConstructorArguments[0].Value.ToString();
+			}
+			// It must not be an unreal interface if fail to resolve.
+			catch (InvalidOperationException)
+			{
+				unrealFieldPath = null;
+			}
+		}
+
+		return new(typeRef.Scope.GetAssemblyName(), typeRef.FullName, unrealFieldPath);
 	}
 
 	private readonly ModelRegistry _registry;

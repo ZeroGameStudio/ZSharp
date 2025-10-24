@@ -1412,11 +1412,42 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 
 	if (!def.ImplementedInterfacePaths.IsEmpty())
 	{
-		cls->Interfaces.Reserve(def.ImplementedInterfacePaths.Num());
+		TArray<UClass*> interfaceClasses;
 		for (const auto& implementedInterfacePath : def.ImplementedInterfacePaths)
 		{
-			UClass* interfaceClass = FindObjectChecked<UClass>(nullptr, *implementedInterfacePath.ToString());
+			interfaceClasses.Add(FindObjectChecked<UClass>(nullptr, *implementedInterfacePath.ToString()));
+		}
+
+		// Distinct.
+		for (int32 i = 0; i < interfaceClasses.Num(); ++i)
+		{
+			const UClass* interfaceClass = interfaceClasses[i];
+
 			check(interfaceClass->HasAllClassFlags(CLASS_Interface));
+			
+			bool alreadyImplemented = false;
+
+			// Super class already implements this interface.
+			if (superClass->ImplementsInterface(interfaceClass))
+			{
+				alreadyImplemented = true;
+			}
+
+			// We already implement child(ren) of this interface so already implement this interface.
+			if (interfaceClasses.ContainsByPredicate([interfaceClass](const UClass* i){ return i->IsChildOf(interfaceClass); }))
+			{
+				alreadyImplemented = true;
+			}
+
+			if (alreadyImplemented)
+			{
+				interfaceClasses.RemoveAt(i);
+			}
+		}
+		
+		cls->Interfaces.Reserve(def.ImplementedInterfacePaths.Num());
+		for (auto interfaceClass : interfaceClasses)
+		{
 #if WITH_METADATA
 			check(!interfaceClass->HasMetaData("CannotImplementInterfaceInBlueprint"));
 #endif

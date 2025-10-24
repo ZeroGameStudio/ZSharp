@@ -14,6 +14,7 @@ public readonly struct ZeroTaskCompletionSource
 	public void SetResult() => _backend.SetResult(default, _token);
 	public void SetException(Exception exception) => _backend.SetException(exception, _token);
 
+	public bool IsValid => _backend is not null;
 	public ZeroTask Task => _backend.GetTask(_token);
 
 	private ZeroTaskCompletionSource(ZeroTaskBackend_CompletionSource<AsyncVoid> backend)
@@ -33,6 +34,7 @@ public readonly struct ZeroTaskCompletionSource<TResult>
 	public void SetResult(TResult result) => _backend.SetResult(result, _token);
 	public void SetException(Exception exception) => _backend.SetException(exception, _token);
 
+	public bool IsValid => _backend is not null;
 	public ZeroTask<TResult> Task => _backend.GetTask(_token);
 
 	internal ZeroTaskCompletionSource(ZeroTaskBackend_CompletionSource<TResult> backend)

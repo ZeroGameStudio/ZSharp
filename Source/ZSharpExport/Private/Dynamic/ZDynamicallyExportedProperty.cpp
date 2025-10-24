@@ -79,7 +79,7 @@ ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(const FProp
 		bNullInNotNullOut = true;
 	}
 	
-	if (property->HasAllPropertyFlags(CPF_NativeAccessSpecifierPublic) || property->GetBoolMetaData("AllowPrivateAccess"))
+	if (property->HasAnyPropertyFlags(CPF_NativeAccessSpecifierPublic | CPF_BlueprintVisible | CPF_BlueprintAssignable) || property->GetBoolMetaData("AllowPrivateAccess"))
 	{
 		Flags |= EZExportedPropertyFlags::Public;
 	}
@@ -87,7 +87,7 @@ ZSharp::FZDynamicallyExportedProperty::FZDynamicallyExportedProperty(const FProp
 	{
 		Flags |= EZExportedPropertyFlags::Protected;
 	}
-	else if (property->HasAllPropertyFlags(CPF_NativeAccessSpecifierPrivate))
+	else
 	{
 		Flags |= EZExportedPropertyFlags::Private;
 	}

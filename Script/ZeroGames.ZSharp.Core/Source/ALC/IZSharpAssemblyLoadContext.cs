@@ -9,6 +9,7 @@ public interface IZSharpAssemblyLoadContext
 	unsafe ELoadAssemblyErrorCode LoadAssembly(string name, void* args, out Assembly? assembly);
 	unsafe EInvokeMethodErrorCode InvokeMethod(string assemblyName, string typeName, string methodName, void* args);
 	bool IsUnloaded { get; }
+	event Action<Assembly> OnAssemblyLoaded;
 }
 
 public static class ZSharpAssemblyLoadContextExtensions

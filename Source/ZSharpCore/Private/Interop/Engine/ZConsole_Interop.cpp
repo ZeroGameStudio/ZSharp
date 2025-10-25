@@ -2,6 +2,8 @@
 
 #include "ZConsole_Interop.h"
 
+#include "ALC/ZRedFrameScope.h"
+
 namespace ZSharp::ZConsole_Interop_Private
 {
 	// Forward to a singleton to use RemoveAll().
@@ -100,6 +102,7 @@ uint8 ZSharp::FZConsole_Interop::TryRegisterCommand(const TCHAR* name, const TCH
 	FString nameString = name;
 	IConsoleCommand* command = IConsoleManager::Get().RegisterConsoleCommand(name, help, FConsoleCommandWithArgsDelegate::CreateLambda([nameString](const TArray<FString>& args)
 	{
+		FZRedFrameScope scope;
 		GHandleExecuteCommand(*nameString, &args);
 	}));
 

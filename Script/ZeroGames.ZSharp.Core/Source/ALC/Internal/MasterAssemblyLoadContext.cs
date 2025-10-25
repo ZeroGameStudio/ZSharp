@@ -212,8 +212,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     protected override void HandleAssemblyLoaded(Assembly assembly)
     {
-        base.HandleAssemblyLoaded(assembly);
-
         foreach (var type in assembly.GetTypes())
         {
             if (type is { IsClass: false, IsInterface: false })
@@ -230,6 +228,8 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
                 }
             }
         }
+        
+        base.HandleAssemblyLoaded(assembly);
     }
 
     protected override void HandleUnload()

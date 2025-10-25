@@ -23,7 +23,8 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
     }
     
     public bool IsUnloaded { get; private set; }
-    
+    public event Action<Assembly>? OnAssemblyLoaded;
+
     protected ZSharpAssemblyLoadContextBase(string name) : base(name, true)
     {
         _resolver = IAssemblyResolver.Create();
@@ -32,7 +33,10 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
         Unloading += _ => HandleUnload();
     }
 
-    protected virtual void HandleAssemblyLoaded(Assembly assembly){}
+    protected virtual void HandleAssemblyLoaded(Assembly assembly)
+    {
+        OnAssemblyLoaded?.Invoke(assembly);
+    }
 
     protected virtual void HandleUnload()
     {

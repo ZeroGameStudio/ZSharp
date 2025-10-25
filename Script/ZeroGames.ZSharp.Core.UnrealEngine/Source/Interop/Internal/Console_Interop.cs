@@ -12,15 +12,29 @@ internal static unsafe class Console_Interop
 	[UnmanagedCallersOnly]
 	public static void HandleExecuteCommand(char* nameBuffer, IntPtr argsAddr)
 	{
-		using InteropStringArray argsBuffer = new(argsAddr);
+		try
+		{
+			using InteropStringArray argsBuffer = new(argsAddr);
 		
-		ConsoleManager.HandleExecuteCommand(new(nameBuffer), argsBuffer.ToStringArray());
+			ConsoleManager.HandleExecuteCommand(new(nameBuffer), argsBuffer.ToStringArray());
+		}
+		catch (Exception ex)
+		{
+			UnhandledExceptionHelper.Guard(ex);
+		}
 	}
 
 	[UnmanagedCallersOnly]
 	public static void HandleVariableChanged(char* nameBuffer)
 	{
-		ConsoleManager.HandleVariableChanged(new(nameBuffer));
+		try
+		{
+			ConsoleManager.HandleVariableChanged(new(nameBuffer));
+		}
+		catch (Exception ex)
+		{
+			UnhandledExceptionHelper.Guard(ex);
+		}
 	}
 
 	public static delegate* unmanaged<char*, uint8> TryExecuteCommand;

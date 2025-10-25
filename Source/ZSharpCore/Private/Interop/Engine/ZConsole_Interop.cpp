@@ -30,6 +30,8 @@ namespace ZSharp::ZConsole_Interop_Private
 
 		void HandleVariableChanged(IConsoleVariable* cvar)
 		{
+			FZRedFrameScope scope;
+			
 			FString name = IConsoleManager::Get().FindConsoleObjectName(cvar);
 			FZConsole_Interop::GHandleVariableChanged(*name);
 		}

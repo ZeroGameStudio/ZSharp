@@ -115,10 +115,16 @@ public sealed class TArray<T> : UnrealConjugateBase
 	public void InsertRange(int32 index, IEnumerable<T> items)
 	{
 		MasterAlcCache.GuardInvariant();
-		GuardIndex(index);
+		
 		foreach (var item in items)
 		{
-			InternalInsert(index, item);
+			// index == Count is allowed for insert.
+			if (index < 0 || index > Count)
+			{
+				throw new IndexOutOfRangeException();
+			}
+			
+			InternalInsert(index++, item);
 		}
 	}
 	

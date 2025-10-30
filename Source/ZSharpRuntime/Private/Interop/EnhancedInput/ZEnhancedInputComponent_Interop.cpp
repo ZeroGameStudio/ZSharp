@@ -6,6 +6,7 @@
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "EnhancedInputComponent.h"
+#include "Interop/ZInteropExceptionHelper.h"
 #include "Reflection/ZReflectionHelper.h"
 #include "Reflection/Delegate/ZManagedDelegateProxy_EnhancedInput.h"
 
@@ -35,61 +36,81 @@ namespace ZSharp::ZEnhancedInputComponent_Interop_Private
 
 uint32 ZSharp::FZEnhancedInputComponent_Interop::BindUFunctionAction(FZConjugateHandle self, FZConjugateHandle inputAction, int64 triggerEvent, FZConjugateHandle obj, const TCHAR* functionName)
 {
-	FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-	auto pSelf = registry.ConjugateUnsafeChecked<UEnhancedInputComponent>(self);
-	auto pInputAction = registry.ConjugateUnsafeChecked<const UInputAction>(inputAction);
-	ETriggerEvent eTriggerEvent = static_cast<ETriggerEvent>(triggerEvent);
-	auto pObj = registry.ConjugateUnsafeChecked<UObject>(obj);
-	if (!pObj)
-    {
-    	return 0;
-    }
+	TRY
+	{
+		FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+		auto pSelf = registry.ConjugateUnsafeChecked<UEnhancedInputComponent>(self);
+		auto pInputAction = registry.ConjugateUnsafeChecked<const UInputAction>(inputAction);
+		ETriggerEvent eTriggerEvent = static_cast<ETriggerEvent>(triggerEvent);
+		auto pObj = registry.ConjugateUnsafeChecked<UObject>(obj);
+		if (!pObj)
+		{
+			return 0;
+		}
     
-    const UFunction* func = pObj->FindFunction(functionName);
-    if (!func)
-    {
-    	return 0;
-    }
+		const UFunction* func = pObj->FindFunction(functionName);
+		if (!func)
+		{
+			return 0;
+		}
 
 #if DO_CHECK
-    if (!ensureAlways(FZReflectionHelper::IsFunctionBindableToDelegate(func, ZEnhancedInputComponent_Interop_Private::GetSignature())))
-    {
-    	return 0;
-    }
+		if (!ensureAlways(FZReflectionHelper::IsFunctionBindableToDelegate(func, ZEnhancedInputComponent_Interop_Private::GetSignature())))
+		{
+			return 0;
+		}
 #endif
 
-	return pSelf->BindAction(pInputAction, eTriggerEvent, pObj, functionName).GetHandle();
+		return pSelf->BindAction(pInputAction, eTriggerEvent, pObj, functionName).GetHandle();
+	}
+	CATCHR(0)
 }
 
 ZSharp::FZConjugateHandle ZSharp::FZEnhancedInputComponent_Interop::BindStatelessAction(FZConjugateHandle self, FZConjugateHandle inputAction, int64 triggerEvent, FZGCHandle delegate)
 {
-	return ZEnhancedInputComponent_Interop_Private::BindAction(self, inputAction, triggerEvent, delegate, {}, [](UZManagedDelegateProxy_EnhancedInput& proxy, uint32 handle){ proxy.Binding = handle; });
+	TRY
+	{
+		return ZEnhancedInputComponent_Interop_Private::BindAction(self, inputAction, triggerEvent, delegate, {}, [](UZManagedDelegateProxy_EnhancedInput& proxy, uint32 handle){ proxy.Binding = handle; });
+	}
+	CATCHR({})
 }
 
 ZSharp::FZConjugateHandle ZSharp::FZEnhancedInputComponent_Interop::BindStatefulAction(FZConjugateHandle self, FZConjugateHandle inputAction, int64 triggerEvent, FZGCHandle delegate, FZGCHandle state)
 {
-	return ZEnhancedInputComponent_Interop_Private::BindAction(self, inputAction, triggerEvent, delegate, state, [](UZManagedDelegateProxy_EnhancedInput& proxy, uint32 handle){ proxy.Binding = handle; });
+	TRY
+	{
+		return ZEnhancedInputComponent_Interop_Private::BindAction(self, inputAction, triggerEvent, delegate, state, [](UZManagedDelegateProxy_EnhancedInput& proxy, uint32 handle){ proxy.Binding = handle; });
+	}
+	CATCHR({})
 }
 
 uint8 ZSharp::FZEnhancedInputComponent_Interop::RemoveBindingByHandle(FZConjugateHandle self, uint32 handle)
 {
-	FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-	auto pSelf = registry.ConjugateUnsafeChecked<UEnhancedInputComponent>(self);
+	TRY
+	{
+		FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+		auto pSelf = registry.ConjugateUnsafeChecked<UEnhancedInputComponent>(self);
 
-	return pSelf->RemoveBindingByHandle(handle);
+		return pSelf->RemoveBindingByHandle(handle);
+	}
+	CATCHR(false)
 }
 
 uint8 ZSharp::FZEnhancedInputComponent_Interop::RemoveBinding(FZConjugateHandle self, FZConjugateHandle handle)
 {
-	FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-	auto pSelf = registry.ConjugateUnsafeChecked<UEnhancedInputComponent>(self);
-	auto pHandle = registry.ConjugateUnsafe<const UZManagedDelegateProxy_EnhancedInput>(handle);
-	if (!ensure(pHandle))
+	TRY
 	{
-		return false;
-	}
+		FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+		auto pSelf = registry.ConjugateUnsafeChecked<UEnhancedInputComponent>(self);
+		auto pHandle = registry.ConjugateUnsafe<const UZManagedDelegateProxy_EnhancedInput>(handle);
+		if (!ensure(pHandle))
+		{
+			return false;
+		}
 
-	return pSelf->RemoveBindingByHandle(pHandle->Binding);
+		return pSelf->RemoveBindingByHandle(pHandle->Binding);
+	}
+	CATCHR(false)
 }
 
 

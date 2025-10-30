@@ -2,6 +2,7 @@
 
 #include "ZLog_Interop.h"
 
+#include "Interop/ZInteropExceptionHelper.h"
 #include "Misc/Log/ZLogCategoryRegistry.h"
 #include "Misc/Log/ZRegisterLogCategoryMacros.h"
 
@@ -14,43 +15,55 @@ ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScriptEngine)
 ZSHARP_REGISTER_LOG_CATEGORY(LogZSharpScript)
 ZSHARP_REGISTER_LOG_CATEGORY(LogTemp)
 
-void ZSharp::FZLog_Interop::Log(const TCHAR* category, ELogVerbosity::Type verbosity, const TCHAR* message)
+namespace ZSharp::ZLog_Interop_Private
 {
+	static void Log(const TCHAR* category, ELogVerbosity::Type verbosity, const TCHAR* message)
+	{
 #if !NO_LOGGING
-	static const FString GEmpty;
+		static const FString GEmpty;
 	
-	if (!message)
-	{
-		message = *GEmpty;
-	}
+		if (!message)
+		{
+			message = *GEmpty;
+		}
 	
-	auto name = FName { category };
-	FLogCategoryBase* pLogCategory = FZLogCategoryRegistry::Get().GetCategory(name);
-	if (!pLogCategory)
-	{
-		pLogCategory = &LogZSharpScript;
-	}
-	FLogCategoryBase& logCategory = *pLogCategory;
+		auto name = FName { category };
+		FLogCategoryBase* pLogCategory = FZLogCategoryRegistry::Get().GetCategory(name);
+		if (!pLogCategory)
+		{
+			pLogCategory = &LogZSharpScript;
+		}
+		FLogCategoryBase& logCategory = *pLogCategory;
 
-	switch (verbosity)
-	{
+		switch (verbosity)
+		{
 #define LOG_CASE(Verbosity) case ELogVerbosity::Verbosity: { UE_LOG_REF(logCategory, Verbosity, TEXT("%s"), message); break; }
 		
-		LOG_CASE(Fatal)
-		LOG_CASE(Error)
-		LOG_CASE(Warning)
-		LOG_CASE(Display)
-		LOG_CASE(Log)
-		LOG_CASE(Verbose)
-		LOG_CASE(VeryVerbose)
+			LOG_CASE(Fatal)
+			LOG_CASE(Error)
+			LOG_CASE(Warning)
+			LOG_CASE(Display)
+			LOG_CASE(Log)
+			LOG_CASE(Verbose)
+			LOG_CASE(VeryVerbose)
 		
-#undef LOG_CASE
-		default:
-			{
-				break;
-			}
-	}
+	#undef LOG_CASE
+			default:
+				{
+					break;
+				}
+		}
 #endif
+	}
+}
+
+void ZSharp::FZLog_Interop::Log(const TCHAR* category, ELogVerbosity::Type verbosity, const TCHAR* message)
+{
+	TRY
+	{
+		ZLog_Interop_Private::Log(category, verbosity, message);
+	}
+	CATCH{}
 }
 
 

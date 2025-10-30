@@ -2,52 +2,75 @@
 
 #include "ZMasterAssemblyLoadContext_Interop.h"
 
-#include "Interop/Misc/ZSehHelper.h"
 #include "ALC/ZMasterAssemblyLoadContext.h"
 #include "CLR/ZGenericClr.h"
+#include "Interop/ZInteropExceptionHelper.h"
+
+namespace ZSharp::ZMasterAssemblyLoadContext_Interop_Private
+{
+	static FZCallHandle GetZCallHandle_Black(const TCHAR* name)
+	{
+		auto alc = static_cast<FZMasterAssemblyLoadContext*>(FZGenericClr::Get().GetMasterAlc());
+		if (!alc)
+		{
+			return FZCallHandle{};
+		}
+
+		return alc->GetZCallHandle_Black({ name });
+	}
+}
 
 ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext_Interop::ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer)
 {
-	auto alc = static_cast<FZMasterAssemblyLoadContext*>(FZGenericClr::Get().GetMasterAlc());
-	if (!alc)
+	TRY
 	{
-		return EZCallErrorCode::AlcUnavailable;
-	}
+		auto alc = static_cast<FZMasterAssemblyLoadContext*>(FZGenericClr::Get().GetMasterAlc());
+		if (!alc)
+		{
+			return EZCallErrorCode::AlcUnavailable;
+		}
 
-	GUARDED_INVOKE(alc->ZCall_Black(handle, buffer), EZCallErrorCode::UnknownError);
+		return alc->ZCall_Black(handle, buffer);
+	}
+	CATCHR(EZCallErrorCode::UnknownError)
 }
 
 ZSharp::FZCallHandle ZSharp::FZMasterAssemblyLoadContext_Interop::GetZCallHandle_Black(const TCHAR* name)
 {
-	auto alc = static_cast<FZMasterAssemblyLoadContext*>(FZGenericClr::Get().GetMasterAlc());
-	if (!alc)
+	TRY
 	{
-		return FZCallHandle{};
+		return ZMasterAssemblyLoadContext_Interop_Private::GetZCallHandle_Black(name);
 	}
-
-	return alc->GetZCallHandle_Black({ name });
+	CATCHR({})
 }
 
 void* ZSharp::FZMasterAssemblyLoadContext_Interop::BuildConjugate_Black(uint16 registryId, void* userdata)
 {
-	auto alc = static_cast<FZMasterAssemblyLoadContext*>(FZGenericClr::Get().GetMasterAlc());
-	if (!alc)
+	TRY
 	{
-		return nullptr;
-	}
+		auto alc = static_cast<FZMasterAssemblyLoadContext*>(FZGenericClr::Get().GetMasterAlc());
+		if (!alc)
+		{
+			return nullptr;
+		}
 
-	return alc->BuildConjugate_Black(registryId, userdata);
+		return alc->BuildConjugate_Black(registryId, userdata);
+	}
+	CATCHR(nullptr)
 }
 
 void ZSharp::FZMasterAssemblyLoadContext_Interop::ReleaseConjugate_Black(uint16 registryId, void* unmanaged)
 {
-	auto alc = static_cast<FZMasterAssemblyLoadContext*>(FZGenericClr::Get().GetMasterAlc());
-	if (!alc)
-	{
-		return;
-	}
+	GUARD
+	(
+		auto alc = static_cast<FZMasterAssemblyLoadContext*>(FZGenericClr::Get().GetMasterAlc());
+		if (!alc)
+		{
+			return;
+		}
 
-	return alc->ReleaseConjugate_Black(registryId, unmanaged);
+		return alc->ReleaseConjugate_Black(registryId, unmanaged);
+	);
 }
 
 

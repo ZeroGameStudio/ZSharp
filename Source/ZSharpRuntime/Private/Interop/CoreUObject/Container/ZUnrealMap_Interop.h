@@ -22,7 +22,7 @@ namespace ZSharp
 		static uint8 Remove(FZConjugateHandle self, FZCallBufferSlot key);
 		static void Clear(FZConjugateHandle self);
 		static uint8 Contains(FZConjugateHandle self, FZCallBufferSlot key);
-		static bool Get(FZConjugateHandle self, FZCallBufferSlot key, FZCallBufferSlot& value);
+		static uint8 Get(FZConjugateHandle self, FZCallBufferSlot key, FZCallBufferSlot& value);
 		static void Set(FZConjugateHandle self, FZCallBufferSlot key, FZCallBufferSlot value);
 		static int32 Count(FZConjugateHandle self);
 

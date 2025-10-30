@@ -42,6 +42,11 @@ internal static class DllEntry
     [UnmanagedCallersOnly]
     private static unsafe void DllMain(Args* args)
     {
+        AppDomain.CurrentDomain.UnhandledException += (_, eventArgs) =>
+        {
+            CoreLog.Error($"FATAL!!!!!!! MANAGED EXCEPTION UNHANDLED!!!!!!!{Environment.NewLine}{eventArgs.ExceptionObject}");
+        };
+        
         for (int32 i = 0; i < args->UnmanagedFunctions.Count; ++i)
         {
             UnmanagedFunction* function = args->UnmanagedFunctions.Functions + i;

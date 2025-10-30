@@ -5,77 +5,108 @@
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZStrangeConjugateRegistries.h"
+#include "Interop/ZInteropExceptionHelper.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptSet.h"
 
 ZSharp::FZUnrealSet_Interop::FZIterator::FZIterator(const FScriptSetHelper& target)
 	: Target(target)
 {
-	Iterator = MakeUnique<FScriptSetHelper::FIterator>(Target);
+	GUARD(Iterator = MakeUnique<FScriptSetHelper::FIterator>(Target));
 }
 
 uint8 ZSharp::FZUnrealSet_Interop::Add(FZConjugateHandle self, FZCallBufferSlot item)
 {
-	FZSelfDescriptiveScriptSet* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(self);
-	return sdself->Add(item);
+	TRY
+	{
+		FZSelfDescriptiveScriptSet* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(self);
+		return sdself->Add(item);
+	}
+	CATCHR(false)
 }
 
 uint8 ZSharp::FZUnrealSet_Interop::Remove(FZConjugateHandle self, FZCallBufferSlot item)
 {
-	FZSelfDescriptiveScriptSet* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(self);
-	return sdself->Remove(item);
+	TRY
+	{
+		FZSelfDescriptiveScriptSet* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(self);
+		return sdself->Remove(item);
+	}
+	CATCHR(false)
 }
 
 void ZSharp::FZUnrealSet_Interop::Clear(FZConjugateHandle self)
 {
-	FZSelfDescriptiveScriptSet* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(self);
-	sdself->Clear();
+	GUARD
+	(
+		FZSelfDescriptiveScriptSet* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(self);
+		sdself->Clear();
+	);
 }
 
 uint8 ZSharp::FZUnrealSet_Interop::Contains(FZConjugateHandle self, FZCallBufferSlot item)
 {
-	FZSelfDescriptiveScriptSet* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(self);
-	return sdself->Contains(item);
+	TRY
+	{
+		FZSelfDescriptiveScriptSet* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(self);
+		return sdself->Contains(item);
+	}
+	CATCHR(false)
 }
 
 int32 ZSharp::FZUnrealSet_Interop::Count(FZConjugateHandle self)
 {
-	FZSelfDescriptiveScriptSet* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(self);
-	return sdself->Num();
+	TRY
+	{
+		FZSelfDescriptiveScriptSet* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(self);
+		return sdself->Num();
+	}
+	CATCHR(0)
 }
 
 ZSharp::FZUnrealSet_Interop::FZIterator* ZSharp::FZUnrealSet_Interop::CreateEnumerator(FZConjugateHandle target)
 {
-	FZSelfDescriptiveScriptSet* sdtarget = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(target);
-	if (!sdtarget->Num())
+	TRY
 	{
-		return nullptr;
-	}
+		FZSelfDescriptiveScriptSet* sdtarget = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(target);
+		if (!sdtarget->Num())
+		{
+			return nullptr;
+		}
 	
-	auto* it = new FZIterator { sdtarget->GetHelper() };
-	if (!it)
-	{
-		delete it;
-		it = nullptr;
-	}
+		auto* it = new FZIterator { sdtarget->GetHelper() };
+		if (!it)
+		{
+			delete it;
+			it = nullptr;
+		}
 
-	return it;
+		return it;
+	}
+	CATCHR(nullptr)
 }
 
 void ZSharp::FZUnrealSet_Interop::ReleaseEnumerator(FZIterator* self)
 {
-	delete self;
+	GUARD(delete self);
 }
 
 uint8 ZSharp::FZUnrealSet_Interop::EnumeratorMoveNext(FZIterator* self)
 {
-	++*self->Iterator;
-	return !!*self->Iterator;
+	TRY
+	{
+		++*self->Iterator;
+		return !!*self->Iterator;
+	}
+	CATCHR(false)
 }
 
 void ZSharp::FZUnrealSet_Interop::EnumeratorCurrent(FZIterator* self, FZConjugateHandle target, FZCallBufferSlot& item)
 {
-	FZSelfDescriptiveScriptSet* sdtarget = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(target);
-	sdtarget->Get(*self->Iterator, item);
+	GUARD
+	(
+		FZSelfDescriptiveScriptSet* sdtarget = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(target);
+		sdtarget->Get(*self->Iterator, item);
+	);
 }
 
 

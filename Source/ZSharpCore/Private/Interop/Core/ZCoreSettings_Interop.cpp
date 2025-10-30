@@ -2,6 +2,8 @@
 
 #include "ZCoreSettings_Interop.h"
 
+#include "Interop/ZInteropExceptionHelper.h"
+
 namespace ZSharp::ZCoreSettings_Interop_Private
 {
 	static TAutoConsoleVariable<bool> GCVarTreatManagedFatalAsError
@@ -21,12 +23,20 @@ namespace ZSharp::ZCoreSettings_Interop_Private
 
 uint8 ZSharp::FZCoreSettings_Interop::ShouldTreatManagedFatalAsError()
 {
-	return ZCoreSettings_Interop_Private::GCVarTreatManagedFatalAsError.GetValueOnGameThread();
+	TRY
+	{
+		return ZCoreSettings_Interop_Private::GCVarTreatManagedFatalAsError.GetValueOnGameThread();
+	}
+	CATCHR(false)
 }
 
 uint8 ZSharp::FZCoreSettings_Interop::ShouldSuppressAlcUnloadedException()
 {
-	return ZCoreSettings_Interop_Private::GCVarSuppressAlcUnloadedException.GetValueOnGameThread();
+	TRY
+	{
+		return ZCoreSettings_Interop_Private::GCVarSuppressAlcUnloadedException.GetValueOnGameThread();
+	}
+	CATCHR(false)
 }
 
 

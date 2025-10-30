@@ -3,6 +3,8 @@
 #include "ZSharpEditorModule.h"
 
 #include "IZBuildEngine.h"
+#include "ALC/IZMasterAssemblyLoadContext.h"
+#include "CLR/IZSharpClr.h"
 #include "Interfaces/IMainFrameModule.h"
 
 namespace ZSharp::ZSharpEditorModule_Private
@@ -37,13 +39,13 @@ namespace ZSharp::ZSharpEditorModule_Private
 			slowTask.MakeDialog();
 	
 			slowTask.EnterProgressFrame(25, LOCTEXT("GeneratingExampleContent", "Generating example content..."));
-			ZSharp::IZBuildEngine::Get().GenerateExampleContent();
+			IZBuildEngine::Get().GenerateExampleContent();
 
 			slowTask.EnterProgressFrame(25, LOCTEXT("GeneratingExampleContent", "Generating Visual Studio project files..."));
-			ZSharp::IZBuildEngine::Get().GenerateSolution({});
+			IZBuildEngine::Get().GenerateSolution({});
 
 			slowTask.EnterProgressFrame(50, LOCTEXT("GeneratingExampleContent", "Generating glue code..."));
-			ZSharp::IZBuildEngine::Get().GenerateGlue({});
+			IZBuildEngine::Get().GenerateGlue({});
 		}
 
 		static const FText GRestartTitle = LOCTEXT("RestartTitle", "Generate Finished");
@@ -84,6 +86,13 @@ void FZSharpEditorModule::ShutdownModule()
 
 void FZSharpEditorModule::HandleMainFrameCreationFinished(TSharedPtr<SWindow>, bool)
 {
+	if (ZSharp::IZMasterAssemblyLoadContext* alc = ZSharp::IZSharpClr::Get().GetMasterAlc())
+	{
+		alc->Unload();
+	}
+
+	ZSharp::IZSharpClr::Get().CreateMasterAlc();
+	
 	ExecuteOnGameThread(TEXT("Generate Z# Example Content"), []
 	{
 		if (IsEngineExitRequested())

@@ -6,6 +6,7 @@
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Conjugate/ZStrangeConjugateRegistries.h"
+#include "Interop/ZInteropExceptionHelper.h"
 
 namespace ZSharp::ZActor_Interop_Private
 {
@@ -32,43 +33,57 @@ namespace ZSharp::ZActor_Interop_Private
 
 void ZSharp::FZActor_Interop::FinishSpawning(FZConjugateHandle self, FZConjugateHandle transform)
 {
-	IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
-	auto pSelf = alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-	FZSelfDescriptiveScriptStruct* sdTransform = alc->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().ConjugateUnsafe(transform);
-	const FTransform& spawnTransform = sdTransform && sdTransform->GetDescriptor() == TBaseStructure<FTransform>::Get() ? *sdTransform->GetTypedUnderlyingInstance<FTransform>() : FTransform::Identity;
-	pSelf->FinishSpawning(spawnTransform, true);
+	GUARD
+	(
+		IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
+		auto pSelf = alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
+		FZSelfDescriptiveScriptStruct* sdTransform = alc->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().ConjugateUnsafe(transform);
+		const FTransform& spawnTransform = sdTransform && sdTransform->GetDescriptor() == TBaseStructure<FTransform>::Get() ? *sdTransform->GetTypedUnderlyingInstance<FTransform>() : FTransform::Identity;
+		pSelf->FinishSpawning(spawnTransform, true);
+	);
 }
 
 ZSharp::FZConjugateHandle ZSharp::FZActor_Interop::AddComponent(FZConjugateHandle self, FZConjugateHandle componentClass, uint8 defer)
 {
-	auto& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-	auto pSelf = registry.ConjugateUnsafe<AActor>(self);
-	auto pComponentClass = registry.ConjugateUnsafe<UClass>(componentClass);
-	
-	UActorComponent* component = NewObject<UActorComponent>(pSelf, pComponentClass);
-	ZActor_Interop_Private::AttachComponent(pSelf, component);
-
-	if (!defer)
+	TRY
 	{
-		ZActor_Interop_Private::FinishAddComponent(pSelf, component);
-	}
+		auto& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+		auto pSelf = registry.ConjugateUnsafe<AActor>(self);
+		auto pComponentClass = registry.ConjugateUnsafe<UClass>(componentClass);
 	
-	return registry.Conjugate(component);
+		UActorComponent* component = NewObject<UActorComponent>(pSelf, pComponentClass);
+		ZActor_Interop_Private::AttachComponent(pSelf, component);
+
+		if (!defer)
+		{
+			ZActor_Interop_Private::FinishAddComponent(pSelf, component);
+		}
+	
+		return registry.Conjugate(component);
+	}
+	CATCHR({})
 }
 
 void ZSharp::FZActor_Interop::FinishAddComponent(FZConjugateHandle self, FZConjugateHandle component)
 {
-	auto& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-	auto pSelf = registry.ConjugateUnsafe<AActor>(self);
-	auto pComponent = registry.ConjugateUnsafe<UActorComponent>(component);
-
-	ZActor_Interop_Private::FinishAddComponent(pSelf, pComponent);
+	GUARD
+	(
+		auto& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+		auto pSelf = registry.ConjugateUnsafe<AActor>(self);
+		auto pComponent = registry.ConjugateUnsafe<UActorComponent>(component);
+		
+		ZActor_Interop_Private::FinishAddComponent(pSelf, pComponent);
+	);
 }
 
 ENetMode ZSharp::FZActor_Interop::GetNetMode(FZConjugateHandle self)
 {
-	auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-	return pSelf->GetNetMode();
+	TRY
+	{
+		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
+		return pSelf->GetNetMode();
+	}
+	CATCHR(NM_Standalone)
 }
 
 

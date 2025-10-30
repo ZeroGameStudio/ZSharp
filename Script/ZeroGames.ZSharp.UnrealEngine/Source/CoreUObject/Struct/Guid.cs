@@ -6,6 +6,7 @@ namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 partial class FGuid
 {
+    
     public const int32 SIZEOF_GUID = 16;
     
     public static implicit operator FGuid(Guid value)

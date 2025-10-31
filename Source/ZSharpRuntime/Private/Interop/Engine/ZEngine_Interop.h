@@ -10,6 +10,8 @@ namespace ZSharp
 	{
 		static uint8 IsInitialized();
 		static FZConjugateHandle GetEngine();
+
+		inline static void(*GPostEngineInit)() = nullptr;
 	};
 }
 

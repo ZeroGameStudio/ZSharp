@@ -12,9 +12,9 @@
 
 namespace ZSharp::ZWorld_Interop_Private
 {
-	struct FWorldDelegateListener
+	struct FZWorldDelegateListener
 	{
-		FWorldDelegateListener()
+		FZWorldDelegateListener()
 		{
 			FWorldDelegates::OnPostWorldInitialization.AddLambda([](UWorld* world, const UWorld::InitializationValues)
 			{

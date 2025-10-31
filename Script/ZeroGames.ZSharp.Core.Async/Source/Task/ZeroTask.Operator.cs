@@ -30,7 +30,7 @@ partial struct ZeroTask
 		}
 	}
 
-	public ZeroTask Preserve()
+	public ZeroTask Memoize()
 		=> _backend is IReusedZeroTaskBackend ? new(new ZeroTaskBackend_Memoize<AsyncVoid>(_backend)) : this;
 
 	public async ZeroTask<bool> DontThrowOnExpired()
@@ -91,7 +91,7 @@ partial struct ZeroTask<TResult>
 	// We don't care about the result so forward to ZeroTask directly.
 	public void Forget(Action<Exception>? exceptionHandler = null) => ((ZeroTask)this).Forget(exceptionHandler);
 	
-	public ZeroTask<TResult> Preserve()
+	public ZeroTask<TResult> Memoize()
 		=> _backend is IReusedZeroTaskBackend ? new(new ZeroTaskBackend_Memoize<TResult>(_backend)) : this;
 	
 	public async ZeroTask<(TResult? Result, bool IsCanceled)> DontThrowOnExpired()

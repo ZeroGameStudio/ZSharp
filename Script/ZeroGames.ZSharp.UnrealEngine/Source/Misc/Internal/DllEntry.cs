@@ -46,6 +46,8 @@ internal static class DllEntry
         
         int32 offset = 0;
         // StreamableManager interop functions
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<void>)&Engine_Interop.PostEngineInit;
+        
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, IntPtr, int32, void>)&StreamableManager_Interop.Update;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, IntPtr, void>)&StreamableManager_Interop.SignalCompletion;
 

@@ -10,19 +10,55 @@ internal static unsafe class World_Interop
 {
 	[UnmanagedCallersOnly]
 	public static void NotifyWorldInitialized(ConjugateHandle world)
-		=> UWorld.InternalNotifyWorldInitialized(world);
-	
+	{
+		try
+		{
+			UWorld.InternalNotifyWorldInitialized(world);
+		}
+		catch (Exception ex)
+		{
+			UnhandledExceptionHelper.Guard(ex);
+		}
+	}
+
 	[UnmanagedCallersOnly]
 	public static void NotifyWorldTearingDown(ConjugateHandle world)
-		=> UWorld.InternalNotifyWorldTearingDown(world);
-	
+	{
+		try
+		{
+			UWorld.InternalNotifyWorldTearingDown(world);
+		}
+		catch (Exception ex)
+		{
+			UnhandledExceptionHelper.Guard(ex);
+		}
+	}
+
 	[UnmanagedCallersOnly]
 	public static void PreLoadMap(char* map)
-		=> UWorld.InternalPreLoadMap(new(map));
-	
+	{
+		try
+		{
+			UWorld.InternalPreLoadMap(new(map));
+		}
+		catch (Exception ex)
+		{
+			UnhandledExceptionHelper.Guard(ex);
+		}
+	}
+
 	[UnmanagedCallersOnly]
 	public static void PostLoadMap(ConjugateHandle world)
-		=> UWorld.InternalPostLoadMap(world);
+	{
+		try
+		{
+			UWorld.InternalPostLoadMap(world);
+		}
+		catch (Exception ex)
+		{
+			UnhandledExceptionHelper.Guard(ex);
+		}
+	}
 	
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle, ConjugateHandle, char*, ConjugateHandle, ConjugateHandle, ConjugateHandle, ConjugateHandle, ESpawnActorCollisionHandlingMethod, ESpawnActorScaleMethod, ESpawnActorNameMode, uint8, uint8, ConjugateHandle> SpawnActor;
 	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, EWorldType> GetWorldType;

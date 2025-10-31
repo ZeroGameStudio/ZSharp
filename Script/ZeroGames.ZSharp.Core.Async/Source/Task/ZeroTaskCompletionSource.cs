@@ -6,10 +6,13 @@ public readonly struct ZeroTaskCompletionSource
 {
 
 	public static ZeroTaskCompletionSource Create(Lifecycle lifecycle = default)
-		=> new(ZeroTaskBackend_CompletionSource<AsyncVoid>.GetFromPool(lifecycle));
+		=> new(lifecycle);
 	
 	public static ZeroTaskCompletionSource<TResult> Create<TResult>(Lifecycle lifecycle = default)
-		=> new(ZeroTaskBackend_CompletionSource<TResult>.GetFromPool(lifecycle));
+		=> new(lifecycle);
+
+	public ZeroTaskCompletionSource() : this(ZeroTaskBackend_CompletionSource<AsyncVoid>.GetFromPool(default)){}
+	public ZeroTaskCompletionSource(Lifecycle lifecycle) : this(ZeroTaskBackend_CompletionSource<AsyncVoid>.GetFromPool(lifecycle)){}
 	
 	public void SetResult() => _backend.SetResult(default, _token);
 	public void SetException(Exception exception) => _backend.SetException(exception, _token);
@@ -31,6 +34,9 @@ public readonly struct ZeroTaskCompletionSource
 public readonly struct ZeroTaskCompletionSource<TResult>
 {
 	
+	public ZeroTaskCompletionSource() : this(ZeroTaskBackend_CompletionSource<TResult>.GetFromPool(default)){}
+	public ZeroTaskCompletionSource(Lifecycle lifecycle) : this(ZeroTaskBackend_CompletionSource<TResult>.GetFromPool(lifecycle)){}
+
 	public void SetResult(TResult result) => _backend.SetResult(result, _token);
 	public void SetException(Exception exception) => _backend.SetException(exception, _token);
 

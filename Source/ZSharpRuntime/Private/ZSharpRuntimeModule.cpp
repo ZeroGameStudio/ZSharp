@@ -70,20 +70,23 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 
 	static void ReloadMasterAlc()
 	{
-#if ZSHARP_WITH_MASTER_ALC_RELOAD
-		const bool existing = UnloadMasterAlc();
-		CreateMasterAlc();
-		if (existing)
+		if (ZSHARP_WITH_MASTER_ALC_RELOAD && GIsEditor)
 		{
-			UE_LOG(LogZSharpRuntime, Log, TEXT("Master ALC reloaded."));
+			const bool existing = UnloadMasterAlc();
+			CreateMasterAlc();
+			if (existing)
+			{
+				UE_LOG(LogZSharpRuntime, Log, TEXT("Master ALC reloaded."));
+			}
+			else
+			{
+				UE_LOG(LogZSharpRuntime, Log, TEXT("Master ALC created."));
+			}
 		}
 		else
 		{
-			UE_LOG(LogZSharpRuntime, Log, TEXT("Master ALC created."));
+			UE_LOG(LogZSharpRuntime, Warning, TEXT("Reloading Master ALC is disabled in this environment."));
 		}
-#else
-		UE_LOG(LogZSharpRuntime, Warning, TEXT("Reloading Master ALC is disabled in this environment."));
-#endif
 	}
 
 	static bool LoadEngineAssembly(IZMasterAssemblyLoadContext* alc)
@@ -349,6 +352,8 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 
 		static void** GManagedFunctions[] =
 		{
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZEngine_Interop::GPostEngineInit),
+			
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZStreamableManager_Interop::GUpdate),
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZStreamableManager_Interop::GSignalCompletion),
 

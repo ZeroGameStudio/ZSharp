@@ -15,15 +15,12 @@ public struct AsyncZeroTaskMethodBuilder : IAsyncMethodBuilder<AsyncZeroTaskMeth
 
 	public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : INotifyCompletion where TStateMachine : IAsyncStateMachine
 	{
-		if (_backend is null)
+		bool assignTask = _backend is null;
+		AsyncZeroTaskMethodBuilderShared.AwaitOnCompleted(ref awaiter, ref stateMachine, ref _backend);
+		if (assignTask)
 		{
-			var backend = ZeroTaskBackend_AsyncStateMachine<AsyncVoid, TStateMachine>.GetFromPool();
-			backend.StateMachine = stateMachine;
-			_backend = backend;
-			Task = ZeroTask.FromBackend(backend);
+			Task = ZeroTask.FromBackend((ZeroTaskBackend_AsyncStateMachine<AsyncVoid, TStateMachine>)_backend!);
 		}
-		
-		AsyncZeroTaskMethodBuilderShared.AwaitOnCompleted(ref awaiter, _backend);
 	}
 
 	public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : ICriticalNotifyCompletion where TStateMachine : IAsyncStateMachine
@@ -70,15 +67,12 @@ public struct AsyncZeroTaskMethodBuilder<TResult> : IAsyncMethodBuilder<TResult,
 
 	public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : INotifyCompletion where TStateMachine : IAsyncStateMachine
 	{
-		if (_backend is null)
+		bool assignTask = _backend is null;
+		AsyncZeroTaskMethodBuilderShared.AwaitOnCompleted(ref awaiter, ref stateMachine, ref _backend);
+		if (assignTask)
 		{
-			var backend = ZeroTaskBackend_AsyncStateMachine<TResult, TStateMachine>.GetFromPool();
-			backend.StateMachine = stateMachine;
-			_backend = backend;
-			Task = ZeroTask.FromBackend(backend);
+			Task = ZeroTask.FromBackend((ZeroTaskBackend_AsyncStateMachine<TResult, TStateMachine>)_backend!);
 		}
-		
-		AsyncZeroTaskMethodBuilderShared.AwaitOnCompleted(ref awaiter, _backend);
 	}
 
 	public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : ICriticalNotifyCompletion where TStateMachine : IAsyncStateMachine
@@ -125,16 +119,7 @@ public struct AsyncZeroTaskVoidMethodBuilder : IAsyncMethodBuilder<AsyncZeroTask
 	public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine => stateMachine.MoveNext();
 
 	public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : INotifyCompletion where TStateMachine : IAsyncStateMachine
-	{
-		if (_backend is null)
-		{
-			var backend = ZeroTaskBackend_AsyncStateMachine<AsyncVoid, TStateMachine>.GetFromPool();
-			backend.StateMachine = stateMachine;
-			_backend = backend;
-		}
-		
-		AsyncZeroTaskMethodBuilderShared.AwaitOnCompleted(ref awaiter, _backend);
-	}
+		=> AsyncZeroTaskMethodBuilderShared.AwaitOnCompleted(ref awaiter, ref stateMachine, ref _backend);
 
 	public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : ICriticalNotifyCompletion where TStateMachine : IAsyncStateMachine
 		=> AwaitOnCompleted(ref awaiter, ref stateMachine);
@@ -168,9 +153,18 @@ public struct AsyncZeroTaskVoidMethodBuilder : IAsyncMethodBuilder<AsyncZeroTask
 internal static class AsyncZeroTaskMethodBuilderShared
 {
 	
-	public static void AwaitOnCompleted<TAwaiter, TResult>(ref TAwaiter awaiter, IAsyncStateMachineTask<TResult> backend) where TAwaiter : INotifyCompletion
+	public static void AwaitOnCompleted<TAwaiter, TStateMachine, TResult>(ref TAwaiter awaiter, ref TStateMachine stateMachine, ref IAsyncStateMachineTask<TResult>? backend)
+		where TAwaiter : INotifyCompletion
+		where TStateMachine : IAsyncStateMachine
 	{
 		Thrower.ThrowIfNotInGameThread();
+		
+		if (backend is null)
+		{
+			var typedBackend = ZeroTaskBackend_AsyncStateMachine<TResult, TStateMachine>.GetFromPool();
+			backend = typedBackend; // IMPORTANT: THIS MUST HAPPEN BEFORE ASSIGNING STATE MACHINE TO BACKEND BECAUSE THIS MODIFIES THE BUILDER!
+			typedBackend.StateMachine = stateMachine;
+		}
 		
 		// IZeroTaskAwaiter is internal and only implemented by struct ZeroTask.Awaiter.
 		// The null tests here ensure that the jit can optimize away the interface tests when TAwaiter is a ref type.

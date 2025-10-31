@@ -17,10 +17,11 @@ internal class ZeroTaskBackend_AsyncStateMachine<TResult, TStateMachine> : Poole
 	{
 		ensure(CanMoveNext);
 		
-		_stateMachine!.MoveNext(); // IMPORTANT: USE MUTABLE REF (FIELD) INSTEAD OF COPY (GETTER).
+		StateMachine!.MoveNext();
 	}
-	
-	public TStateMachine StateMachine { set => _stateMachine = value; }
+
+	// Use field to ensure mutable and avoid copy.
+	public TStateMachine? StateMachine;
 	
 	public Action MoveNextDelegate
 	{
@@ -43,8 +44,7 @@ internal class ZeroTaskBackend_AsyncStateMachine<TResult, TStateMachine> : Poole
 	}
 
 	private bool CanMoveNext => IsInGameThread || !AsyncSettings.ForceAsyncZeroTaskMethodContinueOnGameThread;
-
-	private TStateMachine? _stateMachine;
+	
 	private Action? _moveNextDelegate;
 
 }

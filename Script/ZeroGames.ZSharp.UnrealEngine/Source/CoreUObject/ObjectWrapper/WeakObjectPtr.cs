@@ -31,6 +31,8 @@ public sealed class TWeakObjectPtr<T> : WeakObjectPtrBase
 
 		Target = target;
 	}
+
+	public TStrongObjectPtr<T> Pin() => new(Target);
 	
 	public TWeakObjectPtr<T> Clone() => new(this);
 	object ICloneable.Clone() => Clone();

@@ -45,21 +45,28 @@ public partial class UEngine
 
 	internal static void InternalPostEngineInit()
 	{
-		_engineInitializedTcs.SetResult();
+		_engineInitializedTcs?.SetResult();
 		_postEngineInit?.Invoke();
 	}
 
 	static UEngine()
 	{
-		_engineInitializedTcs = ZeroTaskCompletionSource.Create();
-		WhenEngineInitialized = _engineInitializedTcs.Task.Memoize();
+		if (!IsInitialized)
+		{
+			_engineInitializedTcs = ZeroTaskCompletionSource.Create();
+			WhenEngineInitialized = _engineInitializedTcs.Value.Task.Memoize();
+		}
+		else
+		{
+			WhenEngineInitialized = ZeroTask.CompletedTask;
+		}
 	}
 
 	private static unsafe bool InternalIsInitialized => Engine_Interop.IsInitialized() > 0;
 	[field: AllowNull]
 	private static unsafe UEngine InternalInstance => field ??= Engine_Interop.GetEngine().GetTargetChecked<UEngine>(); // Lazy because static ctor can run before engine inits.
 
-	private static readonly ZeroTaskCompletionSource _engineInitializedTcs;
+	private static readonly ZeroTaskCompletionSource? _engineInitializedTcs;
 	private static Action? _postEngineInit;
 
 }

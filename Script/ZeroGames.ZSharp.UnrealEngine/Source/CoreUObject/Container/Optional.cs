@@ -58,6 +58,15 @@ public sealed class TOptional<T> : UnrealConjugateBase
 			return InternalIsSet;
 		}
 	}
+	
+	public T Value
+	{
+		get
+		{
+			MasterAlcCache.GuardInvariant();
+			return InternalIsSet && InternalTryGetValue(out var value) ? value : throw new InvalidOperationException();
+		}
+	}
 
 	[StructLayout(LayoutKind.Sequential)]
 	private struct Userdata

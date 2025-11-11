@@ -27,7 +27,7 @@ void ZSharp::FZUObjectConjugateController_GC::NotifyConjugateReleased(UObject* u
 	ConjugateMap.Remove(unmanaged);
 }
 
-void ZSharp::FZUObjectConjugateController_GC::SetLifecycleExpiredCallback(const TFunction<void(UObject*)>& callback)
+void ZSharp::FZUObjectConjugateController_GC::SetLifetimeExpiredCallback(const TFunction<void(UObject*)>& callback)
 {
 	OnExpired = callback;
 }

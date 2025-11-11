@@ -47,7 +47,7 @@ namespace ZSharp
 
 		/**
 		 * Builds a RED conjugate.
-		 * RED means: Unmanaged part creates first and managed part follows. Lifecycle is handled by unmanaged side.
+		 * RED means: Unmanaged part creates first and managed part follows. Lifetime is handled by unmanaged side.
 		 * IMPORTANT: This should only interact with conjugate registries so don't call unless you know what you are doing!
 		 * 
 		 * @param unmanaged Pointer to the unmanaged part (also known as conjugate handle).

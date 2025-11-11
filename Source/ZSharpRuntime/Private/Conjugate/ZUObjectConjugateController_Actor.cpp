@@ -51,7 +51,7 @@ void ZSharp::FZUObjectConjugateController_Actor::NotifyConjugateReleased(UObject
 	}
 }
 
-void ZSharp::FZUObjectConjugateController_Actor::SetLifecycleExpiredCallback(const TFunction<void(UObject*)>& callback)
+void ZSharp::FZUObjectConjugateController_Actor::SetLifetimeExpiredCallback(const TFunction<void(UObject*)>& callback)
 {
 	OnExpired = callback;
 }

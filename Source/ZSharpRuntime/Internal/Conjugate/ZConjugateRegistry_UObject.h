@@ -70,7 +70,7 @@ namespace ZSharp
 	private:
 		void ReleaseConjugate_Red(void* unmanaged);
 		void NotifyConjugated(UObject* unmanaged);
-		void NotifyLifecycleExpired(UObject* unmanaged);
+		void NotifyLifetimeExpired(UObject* unmanaged);
 
 	private:
 		FZRuntimeTypeHandle GetManagedType(const UObject* unmanaged) const;

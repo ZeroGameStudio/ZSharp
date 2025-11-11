@@ -19,7 +19,7 @@ namespace ZSharp
 		virtual bool CanBuildConjugate(UObject* unmanaged) const override;
 		virtual void NotifyConjugated(UObject* unmanaged) override;
 		virtual void NotifyConjugateReleased(UObject* unmanaged) override;
-		virtual void SetLifecycleExpiredCallback(const TFunction<void(UObject*)>& callback) override;
+		virtual void SetLifetimeExpiredCallback(const TFunction<void(UObject*)>& callback) override;
 
 	private:
 		void HandleReachabilityAnalysis();

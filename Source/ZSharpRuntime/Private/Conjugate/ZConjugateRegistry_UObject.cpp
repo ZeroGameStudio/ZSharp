@@ -82,7 +82,7 @@ void ZSharp::FZConjugateRegistry_UObject::RegisterController(IZUObjectConjugateC
 {
 	Controllers.Emplace(controller);
 
-	controller->SetLifecycleExpiredCallback([this](UObject* unmanaged){ NotifyLifecycleExpired(unmanaged); });
+	controller->SetLifetimeExpiredCallback([this](UObject* unmanaged){ NotifyLifetimeExpired(unmanaged); });
 	for (const auto& pair : ConjugateMap)
 	{
 		if (UObject* unmanaged = pair.Value.ResolveObjectPtrEvenIfGarbage())
@@ -162,7 +162,7 @@ void ZSharp::FZConjugateRegistry_UObject::NotifyConjugated(UObject* unmanaged)
 	}
 }
 
-void ZSharp::FZConjugateRegistry_UObject::NotifyLifecycleExpired(UObject* unmanaged)
+void ZSharp::FZConjugateRegistry_UObject::NotifyLifetimeExpired(UObject* unmanaged)
 {
 	ReleaseConjugate_Red(unmanaged);
 }

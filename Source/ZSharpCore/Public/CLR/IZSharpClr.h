@@ -21,7 +21,7 @@ namespace ZSharp
  	 * A .NET runtime will automatically set up based on which implementation you choose when this module is loaded.
  	 * Generally, it uses CoreCLR for desktop platforms, and Mono for other platforms.
  	 * For those platforms who prohibit JIT compilation, interpreter mode will be used.
- 	 * The lifecycle of the runtime accompanies the entire process, and there is one and only one CLR object per process.
+ 	 * The lifetime of the runtime accompanies the entire process, and there is one and only one CLR object per process.
  	 * The runtime internally maintains multiple System.Runtime.Loader.AssemblyLoadContext instances to achieve environment isolation.
  	 *
  	 * There are three types of ALC in Z# architecture:

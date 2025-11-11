@@ -7,6 +7,7 @@ namespace ZeroGames.ZSharp.Core.Async;
 public readonly partial struct Lifecycle
 {
 
+	public static implicit operator Lifecycle(CancellationTokenSource cts) => new(cts);
 	public static implicit operator Lifecycle(CancellationToken cancellationToken) => new(cancellationToken);
 
 	public Lifecycle ForceNonReactive() => new(this, true);
@@ -15,47 +16,51 @@ public readonly partial struct Lifecycle
 	{
 		Thrower.ThrowIfNotInGameThread();
 
+		// Never or Expired.
+		if (_backend is null)
+		{
+			reactiveLifecycle = _token.IsInlineExpired ? ReactiveLifecycle.Expired : ReactiveLifecycle.NeverExpired;
+			return true;
+		}
+		
+		// Backend is not reactive or force non-reactive.
 		if (_nonReactive)
 		{
 			reactiveLifecycle = default;
 			return false;
 		}
-
-		if (_backend is null)
+		
+		if (_backend is WeakReference wr)
 		{
-			reactiveLifecycle = new(_token.IsInlineExpired);
-			return true;
-		}
-
-		if (_backend is WeakReference)
-		{
-			reactiveLifecycle = default;
-			return false;
-		}
-
-		if (_token.IsValid)
-		{
-			if (_backend is IReactiveLifecycleBackend reactiveBackend)
+			// Backend is dead.
+			if (wr.Target is not { } target)
 			{
-				reactiveLifecycle = new(reactiveBackend);
+				reactiveLifecycle = ReactiveLifecycle.Expired;
 				return true;
 			}
-			else
+			
+			// If target is not reactive then _nonReactive should be true.
+			var backend = (IReactiveLifecycleBackend)target;
+			
+			// Backend is expired.
+			if (backend.IsExpired(_token))
 			{
-				reactiveLifecycle = default;
-				return false;
+				reactiveLifecycle = ReactiveLifecycle.Expired;
+				return true;
 			}
-		}
-		else if (_backend is CancellationTokenSource cts)
-		{
-			reactiveLifecycle = cts.Token;
+			
+			reactiveLifecycle = ReactiveLifecycle.FromBackend(backend);
 			return true;
 		}
-		else
+		
+		if (_backend is CancellationTokenSource cts)
 		{
-			reactiveLifecycle = (CancellationToken)_backend;
+			reactiveLifecycle = ReactiveLifecycle.FromCancellationTokenSource(cts);
 			return true;
 		}
+		
+		reactiveLifecycle = ReactiveLifecycle.FromCancellationToken((CancellationToken)_backend);
+		return true;
 	}
 
 	public bool IsExpired
@@ -71,34 +76,66 @@ public readonly partial struct Lifecycle
 
 			if (_backend is WeakReference wr)
 			{
-				return !wr.IsAlive;
-			}
+				if (wr.Target is not { } target)
+				{
+					return true;
+				}
 
-			if (_token.IsValid)
-			{
-				var backend = (ILifecycleBackend)_backend;
-				return _token != backend.Token || backend.IsExpired(_token);
+				if (target is not ILifecycleBackend backend)
+				{
+					return false;
+				}
+				
+				return backend.IsExpired(_token);
 			}
-			else if (_backend is CancellationTokenSource cts)
+			
+			if (_backend is CancellationTokenSource cts)
 			{
 				return cts.IsCancellationRequested;
 			}
-			else
-			{
-				return ((CancellationToken)_backend).IsCancellationRequested;
-			}
+
+			return ((CancellationToken)_backend).IsCancellationRequested;
 		}
 	}
 	
-	internal Lifecycle(in Lifecycle other, bool nonReactive)
+	private Lifecycle(bool inlineExpired)
+	{
+		if (inlineExpired)
+		{
+			_token = LifecycleToken.InlineExpired;
+		}
+	}
+	
+	private Lifecycle(Lifecycle other, bool nonReactive)
 	{
 		_backend = other._backend;
 		_token = other._token;
 		_nonReactive = nonReactive;
 	}
 
-	internal Lifecycle(object backend)
+	private Lifecycle(CancellationTokenSource cts)
 	{
+		if (cts.IsCancellationRequested)
+		{
+			_token = LifecycleToken.InlineExpired;
+		}
+		else
+		{
+			// Keep a strong reference to cts because dead doesn't imply canceled.
+			_backend = cts;
+		}
+	}
+
+	private Lifecycle(CancellationToken cancellationToken)
+	{
+		_backend = cancellationToken;
+	}
+
+	private Lifecycle(object backend)
+	{
+		ensure(backend is not ValueType);
+		ensure(backend is not CancellationTokenSource);
+		
 		if (backend is ILifecycleBackend iBackend)
 		{
 			if (iBackend.IsExpired(iBackend.Token))
@@ -107,48 +144,20 @@ public readonly partial struct Lifecycle
 			}
 			else
 			{
-				_backend = iBackend;
+				// Keep a weak reference to backend is enough because dead implies expired.
+				_backend = new WeakReference(iBackend);
 				_token = iBackend.Token;
+				_nonReactive = backend is not IReactiveLifecycleBackend;
 			}
 		}
-		else if (backend is CancellationToken cancellationToken)
-		{
-			if (cancellationToken.IsCancellationRequested)
-			{
-				_token = LifecycleToken.InlineExpired;
-			}
-			else if (cancellationToken.CanBeCanceled)
-			{
-				_backend = cancellationToken;
-			}
-		}
-		else if (backend is CancellationTokenSource cts)
-		{
-			if (cts.IsCancellationRequested)
-			{
-				_token = LifecycleToken.InlineExpired;
-			}
-			else
-			{
-				_backend = cts;
-			}
-		}
-		else if (backend is not ValueType)
+		else
 		{
 			_backend = new WeakReference(backend);
 			_nonReactive = true;
 		}
 	}
 
-	internal Lifecycle(bool inlineExpired)
-	{
-		if (inlineExpired)
-		{
-			_token = LifecycleToken.InlineExpired;
-		}
-	}
-
-	// ILifecycleBackend, CancellationToken, CancellationTokenSource or any other reference type.
+	// WeakReference, CancellationToken, CancellationTokenSource.
 	private readonly object? _backend;
 	private readonly LifecycleToken _token;
 	private readonly bool _nonReactive;

@@ -13,77 +13,78 @@ public readonly partial struct ReactiveLifecycle
 	{
 		Thrower.ThrowIfNotInGameThread();
 		
-		if (@this.IsExpired)
-		{
-			return Lifecycle.Expired;
-		}
-
 		if (@this._backend is null)
 		{
-			return Lifecycle.NeverExpired;
+			return @this._token.IsInlineExpired ? Lifecycle.Expired : Lifecycle.NeverExpired;
 		}
 
-		return new(@this._backend);
+		return Lifecycle.FromBackend(@this._backend);
 	}
 
-	public Lifecycle ForceNonReactive() => new(this, true);
+	public Lifecycle ForceNonReactive() => ((Lifecycle)this).ForceNonReactive();
 	
 	public LifecycleExpiredRegistration RegisterOnExpired(Action callback)
 	{
 		Thrower.ThrowIfNotInGameThread();
-
-		if (IsExpired)
-		{
-			callback();
-			return default;
-		}
-
+		
 		if (_backend is null)
 		{
+			if (_token.IsInlineExpired)
+			{
+				callback();
+			}
 			return default;
 		}
 
-		if (_backend is IReactiveLifecycleBackend backend)
+		if (_backend is WeakReference<IReactiveLifecycleBackend> wr)
 		{
+			if (!wr.TryGetTarget(out var backend))
+			{
+				callback();
+				return default;
+			}
+			
 			return backend.RegisterOnExpired(callback, _token);
 		}
-		else if (_backend is CancellationTokenSource cts)
+		
+		if (_backend is CancellationTokenSource cts)
 		{
 			return new(cts.Token.RegisterWithoutCaptureExecutionContext(callback));
 		}
-		else
-		{
-			return new(((CancellationToken)_backend).RegisterWithoutCaptureExecutionContext(callback));
-		}
+		
+		return new(((CancellationToken)_backend).RegisterWithoutCaptureExecutionContext(callback));
 	}
 	
 	public LifecycleExpiredRegistration RegisterOnExpired(Action<object?> callback, object? state)
 	{
 		Thrower.ThrowIfNotInGameThread();
 
-		if (IsExpired)
-		{
-			callback(state);
-			return default;
-		}
-		
 		if (_backend is null)
 		{
+			if (_token.IsInlineExpired)
+			{
+				callback(state);
+			}
 			return default;
 		}
 
-		if (_backend is IReactiveLifecycleBackend backend)
+		if (_backend is WeakReference<IReactiveLifecycleBackend> wr)
 		{
+			if (!wr.TryGetTarget(out var backend))
+			{
+				callback(state);
+				return default;
+			}
+			
 			return backend.RegisterOnExpired(callback, state, _token);
 		}
-		else if (_backend is CancellationTokenSource cts)
+		
+		if (_backend is CancellationTokenSource cts)
 		{
 			return new(cts.Token.RegisterWithoutCaptureExecutionContext(callback, state));
 		}
-		else
-		{
-			return new(((CancellationToken)_backend).RegisterWithoutCaptureExecutionContext(callback, state));
-		}
+		
+		return new(((CancellationToken)_backend).RegisterWithoutCaptureExecutionContext(callback, state));
 	}
 
 	public bool IsExpired
@@ -97,61 +98,63 @@ public readonly partial struct ReactiveLifecycle
 				return _token.IsInlineExpired;
 			}
 
-			if (_token.IsValid)
+			if (_backend is WeakReference<IReactiveLifecycleBackend> wr)
 			{
-				var backend = (ILifecycleBackend)_backend;
-				return _token != backend.Token || backend.IsExpired(_token);
+				if (!wr.TryGetTarget(out var backend))
+				{
+					return true;
+				}
+				
+				return backend.IsExpired(_token);
 			}
-			else if (_backend is CancellationTokenSource cts)
+			
+			if (_backend is CancellationTokenSource cts)
 			{
 				return cts.IsCancellationRequested;
 			}
-			else
-			{
-				return ((CancellationToken)_backend).IsCancellationRequested;
-			}
+
+			return ((CancellationToken)_backend).IsCancellationRequested;
 		}
 	}
 	
-	internal ReactiveLifecycle(object backend)
+	private ReactiveLifecycle(IReactiveLifecycleBackend backend)
 	{
-		if (backend is IReactiveLifecycleBackend reactiveBackend)
+		if (backend.IsExpired(backend.Token))
 		{
-			if (reactiveBackend.IsExpired(reactiveBackend.Token))
-			{
-				_token = LifecycleToken.InlineExpired;
-			}
-			else
-			{
-				_backend = reactiveBackend;
-				_token = reactiveBackend.Token;
-			}
+			_token = LifecycleToken.InlineExpired;
 		}
-		else if (backend is CancellationToken cancellationToken)
+		else
 		{
-			if (cancellationToken.IsCancellationRequested)
-			{
-				_token = LifecycleToken.InlineExpired;
-			}
-			else if (cancellationToken.CanBeCanceled)
-			{
-				_backend = cancellationToken;
-			}
-		}
-		else if (backend is CancellationTokenSource cts)
-		{
-			if (cts.IsCancellationRequested)
-			{
-				_token = LifecycleToken.InlineExpired;
-			}
-			else
-			{
-				_backend = cts;
-			}
+			_backend = new WeakReference<IReactiveLifecycleBackend>(backend);
+			_token = backend.Token;
 		}
 	}
 
-	internal ReactiveLifecycle(bool inlineExpired)
+	private ReactiveLifecycle(CancellationTokenSource cts)
+	{
+		if (cts.IsCancellationRequested)
+		{
+			_token = LifecycleToken.InlineExpired;
+		}
+		else
+		{
+			_backend = cts;
+		}
+	}
+
+	private ReactiveLifecycle(CancellationToken cancellationToken)
+	{
+		if (cancellationToken.IsCancellationRequested)
+		{
+			_token = LifecycleToken.InlineExpired;
+		}
+		else if (cancellationToken.CanBeCanceled)
+		{
+			_backend = cancellationToken;
+		}
+	}
+
+	private ReactiveLifecycle(bool inlineExpired)
 	{
 		if (inlineExpired)
 		{
@@ -159,7 +162,7 @@ public readonly partial struct ReactiveLifecycle
 		}
 	}
 
-	// IReactiveLifecycleBackend, CancellationToken or CancellationTokenSource
+	// WeakReference<IReactiveLifecycleBackend>, CancellationToken or CancellationTokenSource
 	private readonly object? _backend;
 	private readonly LifecycleToken _token;
 	

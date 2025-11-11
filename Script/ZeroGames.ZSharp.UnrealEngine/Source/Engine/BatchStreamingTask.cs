@@ -60,7 +60,7 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 	
 	public int32 TotalCount => _totalCount;
 
-	internal BatchStreamingTask(IntPtr unmanaged, int32 totalCount, Lifecycle lifecycle, IProgress<BatchStreamingProgress>? progress) : base(unmanaged, lifecycle)
+	internal BatchStreamingTask(IntPtr unmanaged, int32 totalCount, Lifetime lifetime, IProgress<BatchStreamingProgress>? progress) : base(unmanaged, lifetime)
 	{
 		_totalCount = totalCount;
 		_progress = progress;

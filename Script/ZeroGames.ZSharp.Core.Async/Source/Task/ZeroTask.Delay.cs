@@ -5,60 +5,60 @@ namespace ZeroGames.ZSharp.Core.Async;
 partial struct ZeroTask
 {
 	
-	public static ZeroTask<float> Delay(EZeroTaskDelayType delayType, TimeSpan delayTime, Lifecycle lifecycle = default)
+	public static ZeroTask<float> Delay(EZeroTaskDelayType delayType, TimeSpan delayTime, Lifetime lifetime = default)
 	{
 		Thrower.ThrowIfNotInGameThread();
 
-		if (lifecycle.IsExpired)
+		if (lifetime.IsExpired)
 		{
-			return FromExpired<float>(lifecycle);
+			return FromExpired<float>(lifetime);
 		}
 
-		var backend = ZeroTaskBackend_DelaySeconds.GetFromPool(delayType, (float)delayTime.TotalSeconds, lifecycle);
+		var backend = ZeroTaskBackend_DelaySeconds.GetFromPool(delayType, (float)delayTime.TotalSeconds, lifetime);
 		ZeroTask<float> task = FromBackend(backend);
 		backend.Run();
 		return task;
 	}
-	public static ZeroTask<float> Delay(TimeSpan delayTime, Lifecycle lifecycle = default)
-		=> Delay(EZeroTaskDelayType.WorldPaused, delayTime, lifecycle);
+	public static ZeroTask<float> Delay(TimeSpan delayTime, Lifetime lifetime = default)
+		=> Delay(EZeroTaskDelayType.WorldPaused, delayTime, lifetime);
 	
-	public static ZeroTask<float> Delay(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle = default)
-		=> Delay(delayType, TimeSpan.FromSeconds(delaySeconds), lifecycle);
-	public static ZeroTask<float> Delay(float delaySeconds, Lifecycle lifecycle = default)
-		=> Delay(EZeroTaskDelayType.WorldPaused, delaySeconds, lifecycle);
-	public static ZeroTask<float> Delay(double delaySeconds, Lifecycle lifecycle = default)
-		=> Delay(EZeroTaskDelayType.WorldPaused, (float)delaySeconds, lifecycle);
+	public static ZeroTask<float> Delay(EZeroTaskDelayType delayType, float delaySeconds, Lifetime lifetime = default)
+		=> Delay(delayType, TimeSpan.FromSeconds(delaySeconds), lifetime);
+	public static ZeroTask<float> Delay(float delaySeconds, Lifetime lifetime = default)
+		=> Delay(EZeroTaskDelayType.WorldPaused, delaySeconds, lifetime);
+	public static ZeroTask<float> Delay(double delaySeconds, Lifetime lifetime = default)
+		=> Delay(EZeroTaskDelayType.WorldPaused, (float)delaySeconds, lifetime);
 
-	public static ZeroTask<int32> DelayFrame(int32 delayFrames, Lifecycle lifecycle = default)
+	public static ZeroTask<int32> DelayFrame(int32 delayFrames, Lifetime lifetime = default)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		
-		if (lifecycle.IsExpired)
+		if (lifetime.IsExpired)
 		{
-			return FromExpired<int32>(lifecycle);
+			return FromExpired<int32>(lifetime);
 		}
 
-		var backend = ZeroTaskBackend_DelayFrames.GetFromPool(delayFrames, lifecycle);
+		var backend = ZeroTaskBackend_DelayFrames.GetFromPool(delayFrames, lifetime);
 		ZeroTask<int32> task = FromBackend(backend);
 		backend.Run();
 		return task;
 	}
 
-	public static ZeroTask<float> Yield(EEventLoopTickingGroup tickingGroup, Lifecycle lifecycle = default)
+	public static ZeroTask<float> Yield(EEventLoopTickingGroup tickingGroup, Lifetime lifetime = default)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		
-		if (lifecycle.IsExpired)
+		if (lifetime.IsExpired)
 		{
-			return FromExpired<float>(lifecycle);
+			return FromExpired<float>(lifetime);
 		}
 		
-		var backend = ZeroTaskBackend_Yield.GetFromPool(tickingGroup, lifecycle);
+		var backend = ZeroTaskBackend_Yield.GetFromPool(tickingGroup, lifetime);
 		ZeroTask<float> task = FromBackend(backend);
 		backend.Run();
 		return task;
 	}
-	public static ZeroTask<float> Yield(Lifecycle lifecycle = default) => Yield(EEventLoopTickingGroup.DuringWorldTimerTick, lifecycle);
+	public static ZeroTask<float> Yield(Lifetime lifetime = default) => Yield(EEventLoopTickingGroup.DuringWorldTimerTick, lifetime);
 
 }
 

@@ -41,7 +41,7 @@ public class StreamingTask<T> : StreamingTaskBase, IAwaitable<T?, StreamingTask<
 		}
 	}
 	
-	internal StreamingTask(IntPtr unmanaged, Lifecycle lifecycle) : base(unmanaged, lifecycle){}
+	internal StreamingTask(IntPtr unmanaged, Lifetime lifetime) : base(unmanaged, lifetime){}
 
 	internal static StreamingTask<T> EmptyTask { get; } = new(default(EEmptyConstructor));
 

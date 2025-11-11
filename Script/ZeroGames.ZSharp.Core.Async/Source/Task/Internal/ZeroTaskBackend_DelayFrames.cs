@@ -5,11 +5,11 @@ namespace ZeroGames.ZSharp.Core.Async;
 internal class ZeroTaskBackend_DelayFrames : PooledZeroTaskBackendBase<int32, ZeroTaskBackend_DelayFrames>
 {
 
-	public static ZeroTaskBackend_DelayFrames GetFromPool(int32 delayFrames, Lifecycle lifecycle)
+	public static ZeroTaskBackend_DelayFrames GetFromPool(int32 delayFrames, Lifetime lifetime)
 	{
 		var task = InternalGetFromPool();
 		task._delayFrames = delayFrames;
-		task.Lifecycle = lifecycle;
+		task.Lifetime = lifetime;
 
 		return task;
 	}
@@ -21,27 +21,27 @@ internal class ZeroTaskBackend_DelayFrames : PooledZeroTaskBackendBase<int32, Ze
 			var @this = (ZeroTaskBackend_DelayFrames)state!;
 			@this._expiredRegistration.Dispose();
 			@this.SetResult(deltaTime);
-		}, this, _delayFrames, false, false, Lifecycle, static (ex, state) =>
+		}, this, _delayFrames, false, false, Lifetime, static (ex, state) =>
 		{
 			var @this = (ZeroTaskBackend_DelayFrames)state!;
 			@this._expiredRegistration.Dispose();
 			@this.SetException(ex);
 		});
 		
-		// Timer doesn't care whether the Lifecycle is reactive or not so we do here.
-		if (Lifecycle.TryToReactive(out var reactiveLifecycle))
+		// Timer doesn't care whether the Lifetime is reactive or not so we do here.
+		if (Lifetime.TryToReactive(out var reactiveLifetime))
 		{
-			reactiveLifecycle.RegisterOnExpired(static state =>
+			reactiveLifetime.RegisterOnExpired(static state =>
 			{
 				var (@this, token) = ((ZeroTaskBackend_DelayFrames, ZeroTaskToken))state!;
 				if (@this.IsCompletedEvenIfRecycled(token))
 				{
 					// Although we dispose expired registration in the timer callback,
-					// This callback can even get invoked if lifecycle is backed by a CancellationToken owned by another thread.
+					// This callback can even get invoked if lifetime is backed by a CancellationToken owned by another thread.
 					return;
 				}
 				@this._timer.Dispose();
-				@this.SetException(new LifecycleExpiredException(@this.Lifecycle));
+				@this.SetException(new LifetimeExpiredException(@this.Lifetime));
 			}, (this, Token));
 		}
 	}
@@ -58,7 +58,7 @@ internal class ZeroTaskBackend_DelayFrames : PooledZeroTaskBackendBase<int32, Ze
 	private int32 _delayFrames;
 	
 	private Timer _timer;
-	private LifecycleExpiredRegistration _expiredRegistration;
+	private LifetimeExpiredRegistration _expiredRegistration;
 
 }
 

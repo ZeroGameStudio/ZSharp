@@ -15,7 +15,7 @@ internal class StreamableManager : IStreamableManager
 		throw new ArgumentOutOfRangeException(nameof(unmanaged));
 	}
 	
-	public StreamingTask<T> LoadAsync<T>(string path, Lifecycle lifecycle = default) where T : UObject
+	public StreamingTask<T> LoadAsync<T>(string path, Lifetime lifetime = default) where T : UObject
 	{
 		using InteropStringArray buffer = new();
 		buffer.Add(path);
@@ -25,12 +25,12 @@ internal class StreamableManager : IStreamableManager
 			return StreamingTask<T>.EmptyTask;
 		}
 		
-		StreamingTask<T> task = new(unmanagedTask, lifecycle);
+		StreamingTask<T> task = new(unmanagedTask, lifetime);
 		_taskMap[unmanagedTask] = task;
 		return task;
 	}
 
-	public BatchStreamingTask<T> LoadAsync<T>(IEnumerable<string> paths, Lifecycle lifecycle = default, IProgress<BatchStreamingProgress>? progress = null) where T : UObject
+	public BatchStreamingTask<T> LoadAsync<T>(IEnumerable<string> paths, Lifetime lifetime = default, IProgress<BatchStreamingProgress>? progress = null) where T : UObject
 	{
 		using InteropStringArray buffer = new(paths);
 		IntPtr unmanagedTask = RequestAsyncLoad(buffer.Address, progress is not null);
@@ -39,7 +39,7 @@ internal class StreamableManager : IStreamableManager
 			return BatchStreamingTask<T>.EmptyTask;
 		}
 		
-		BatchStreamingTask<T> task = new(unmanagedTask, buffer.Count, lifecycle, progress);
+		BatchStreamingTask<T> task = new(unmanagedTask, buffer.Count, lifetime, progress);
 		_taskMap[unmanagedTask] = task;
 		return task;
 	}

@@ -86,7 +86,7 @@ public partial class AActor
 		return component;
 	}
 	
-	public async ZeroTask<UActorComponent> AddComponentAsync(UClass @class, Func<UActorComponent, Lifecycle, ZeroTask> initializeAsync)
+	public async ZeroTask<UActorComponent> AddComponentAsync(UClass @class, Func<UActorComponent, Lifetime, ZeroTask> initializeAsync)
 	{
 		MasterAlcCache.GuardInvariant();
 		
@@ -94,7 +94,7 @@ public partial class AActor
 
 		try
 		{
-			await initializeAsync(component, Lifecycle);
+			await initializeAsync(component, Lifetime);
 		}
 		finally
 		{
@@ -107,7 +107,7 @@ public partial class AActor
 		return component;
 	}
 
-	public async ZeroTask<T> AddComponentAsync<T>(Func<T, Lifecycle, ZeroTask> initializeAsync) where T : UActorComponent, IStaticClass
+	public async ZeroTask<T> AddComponentAsync<T>(Func<T, Lifetime, ZeroTask> initializeAsync) where T : UActorComponent, IStaticClass
 	{
 		MasterAlcCache.GuardInvariant();
 		
@@ -115,7 +115,7 @@ public partial class AActor
 
 		try
 		{
-			await initializeAsync(component, Lifecycle);
+			await initializeAsync(component, Lifetime);
 		}
 		finally
 		{
@@ -128,7 +128,7 @@ public partial class AActor
 		return component;
 	}
 	
-	public async ZeroTask<UActorComponent> AddComponentAsync<TState>(UClass @class, Func<UActorComponent, TState, Lifecycle, ZeroTask> initializeAsync, TState state)
+	public async ZeroTask<UActorComponent> AddComponentAsync<TState>(UClass @class, Func<UActorComponent, TState, Lifetime, ZeroTask> initializeAsync, TState state)
 	{
 		MasterAlcCache.GuardInvariant();
 		
@@ -136,7 +136,7 @@ public partial class AActor
 
 		try
 		{
-			await initializeAsync(component, state, Lifecycle);
+			await initializeAsync(component, state, Lifetime);
 		}
 		finally
 		{
@@ -149,7 +149,7 @@ public partial class AActor
 		return component;
 	}
 	
-	public async ZeroTask<T> AddComponentAsync<T, TState>(Func<T, TState, Lifecycle, ZeroTask> initializeAsync, TState state) where T : UActorComponent, IStaticClass
+	public async ZeroTask<T> AddComponentAsync<T, TState>(Func<T, TState, Lifetime, ZeroTask> initializeAsync, TState state) where T : UActorComponent, IStaticClass
 	{
 		MasterAlcCache.GuardInvariant();
 		
@@ -157,7 +157,7 @@ public partial class AActor
 
 		try
 		{
-			await initializeAsync(component, state, Lifecycle);
+			await initializeAsync(component, state, Lifetime);
 		}
 		finally
 		{

@@ -18,7 +18,7 @@ internal abstract class PooledZeroTaskBackendBase<TResult, TImpl> : ZeroTaskBack
 		Deinitialize();
 		Comp.TryPublishUnobservedException();
 		Comp.Reset();
-		Lifecycle = default;
+		Lifetime = default;
 	}
 	
 	protected static TImpl InternalGetFromPool() => _pool.Get();

@@ -5,12 +5,12 @@ namespace ZeroGames.ZSharp.Core.Async;
 internal class ZeroTaskBackend_DelaySeconds : PooledZeroTaskBackendBase<float, ZeroTaskBackend_DelaySeconds>
 {
 
-	public static ZeroTaskBackend_DelaySeconds GetFromPool(EZeroTaskDelayType delayType, float delaySeconds, Lifecycle lifecycle)
+	public static ZeroTaskBackend_DelaySeconds GetFromPool(EZeroTaskDelayType delayType, float delaySeconds, Lifetime lifetime)
 	{
 		var task = InternalGetFromPool();
 		task._delayType = delayType;
 		task._delaySeconds = delaySeconds;
-		task.Lifecycle = lifecycle;
+		task.Lifetime = lifetime;
 
 		return task;
 	}
@@ -30,27 +30,27 @@ internal class ZeroTaskBackend_DelaySeconds : PooledZeroTaskBackendBase<float, Z
 			var @this = (ZeroTaskBackend_DelaySeconds)state!;
 			@this._expiredRegistration.Dispose();
 			@this.SetResult(deltaTime);
-		}, this, _delaySeconds, false, false, Lifecycle, static (ex, state) =>
+		}, this, _delaySeconds, false, false, Lifetime, static (ex, state) =>
 		{
 			var @this = (ZeroTaskBackend_DelaySeconds)state!;
 			@this._expiredRegistration.Dispose();
 			@this.SetException(ex);
 		});
 
-		// Timer doesn't care whether the Lifecycle is reactive or not so we do here.
-		if (Lifecycle.TryToReactive(out var reactiveLifecycle))
+		// Timer doesn't care whether the Lifetime is reactive or not so we do here.
+		if (Lifetime.TryToReactive(out var reactiveLifetime))
 		{
-			reactiveLifecycle.RegisterOnExpired(static state =>
+			reactiveLifetime.RegisterOnExpired(static state =>
 			{
 				var (@this, token) = ((ZeroTaskBackend_DelaySeconds, ZeroTaskToken))state!;
 				if (@this.IsCompletedEvenIfRecycled(token))
 				{
 					// Although we dispose expired registration in the timer callback,
-					// This callback can even get invoked if lifecycle is backed by a CancellationToken owned by another thread.
+					// This callback can even get invoked if lifetime is backed by a CancellationToken owned by another thread.
 					return;
 				}
 				@this._timer.Dispose();
-				@this.SetException(new LifecycleExpiredException(@this.Lifecycle));
+				@this.SetException(new LifetimeExpiredException(@this.Lifetime));
 			}, (this, Token));
 		}
 	}
@@ -69,7 +69,7 @@ internal class ZeroTaskBackend_DelaySeconds : PooledZeroTaskBackendBase<float, Z
 	private float _delaySeconds;
 	
 	private Timer _timer;
-	private LifecycleExpiredRegistration _expiredRegistration;
+	private LifetimeExpiredRegistration _expiredRegistration;
 
 }
 

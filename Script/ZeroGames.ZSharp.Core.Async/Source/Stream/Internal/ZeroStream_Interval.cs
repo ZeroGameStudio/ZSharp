@@ -5,17 +5,17 @@ namespace ZeroGames.ZSharp.Core.Async;
 internal sealed class ZeroStream_Interval : IZeroStream<float>
 {
 
-	public ZeroStream_Interval(EZeroTaskDelayType delayType, float intervalSeconds, Lifecycle lifecycle)
+	public ZeroStream_Interval(EZeroTaskDelayType delayType, float intervalSeconds, Lifetime lifetime)
 	{
 		_delayType = delayType;
 		_intervalSeconds = intervalSeconds;
-		_lifecycle = lifecycle;
+		_lifetime = lifetime;
 	}
 
 	public IZeroStreamEnumerator<float> GetAsyncEnumerator()
 	{
 		Thrower.ThrowIfNotInGameThread();
-		return new Enumerator(_delayType, _intervalSeconds, _lifecycle);
+		return new Enumerator(_delayType, _intervalSeconds, _lifetime);
 	}
 
 	private class Enumerator : IZeroStreamEnumerator<float>
@@ -33,7 +33,7 @@ internal sealed class ZeroStream_Interval : IZeroStream<float>
 				throw new InvalidOperationException();
 			}
 
-			_current = await ZeroTask.Delay(_delayType, _intervalSeconds, _lifecycle);
+			_current = await ZeroTask.Delay(_delayType, _intervalSeconds, _lifetime);
 			return true;
 		}
 
@@ -50,16 +50,16 @@ internal sealed class ZeroStream_Interval : IZeroStream<float>
 			}
 		}
 		
-		internal Enumerator(EZeroTaskDelayType delayType, float intervalSeconds, Lifecycle lifecycle)
+		internal Enumerator(EZeroTaskDelayType delayType, float intervalSeconds, Lifetime lifetime)
 		{
 			_delayType = delayType;
 			_intervalSeconds = intervalSeconds;
-			_lifecycle = lifecycle;
+			_lifetime = lifetime;
 		}
 
 		private readonly EZeroTaskDelayType _delayType;
 		private readonly float _intervalSeconds;
-		private readonly Lifecycle _lifecycle;
+		private readonly Lifetime _lifetime;
 
 		private float _current;
 		
@@ -68,7 +68,7 @@ internal sealed class ZeroStream_Interval : IZeroStream<float>
 	
 	private readonly EZeroTaskDelayType _delayType;
 	private readonly float _intervalSeconds;
-	private readonly Lifecycle _lifecycle;
+	private readonly Lifetime _lifetime;
 	
 }
 

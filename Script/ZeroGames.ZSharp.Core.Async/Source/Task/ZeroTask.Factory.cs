@@ -20,40 +20,40 @@ partial struct ZeroTask
 		return FromBackend(new ZeroTaskBackend_Exception<T>(exception));
 	}
 
-	public static ZeroTask FromExpired(Lifecycle lifecycle) => FromExpired<AsyncVoid>(lifecycle);
-	public static ZeroTask<T> FromExpired<T>(Lifecycle lifecycle)
+	public static ZeroTask FromExpired(Lifetime lifetime) => FromExpired<AsyncVoid>(lifetime);
+	public static ZeroTask<T> FromExpired<T>(Lifetime lifetime)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		
-		if (!lifecycle.IsExpired)
+		if (!lifetime.IsExpired)
 		{
-			throw new ArgumentOutOfRangeException(nameof(lifecycle));
+			throw new ArgumentOutOfRangeException(nameof(lifetime));
 		}
 		
-		return FromException<T>(new LifecycleExpiredException(lifecycle));
+		return FromException<T>(new LifetimeExpiredException(lifetime));
 	}
 	
-	public static ZeroTask FromBackend(IZeroTaskBackend backend, Lifecycle lifecycle = default)
+	public static ZeroTask FromBackend(IZeroTaskBackend backend, Lifetime lifetime = default)
 	{
 		Thrower.ThrowIfNotInGameThread();
 
 		return new(backend);
 	}
 
-	public static ZeroTask<T> FromBackend<T>(IZeroTaskBackend<T> backend, Lifecycle lifecycle = default)
+	public static ZeroTask<T> FromBackend<T>(IZeroTaskBackend<T> backend, Lifetime lifetime = default)
 	{
 		Thrower.ThrowIfNotInGameThread();
 
 		return new(backend);
 	}
 
-	public static ZeroTask FromCompletionSource(out ZeroTaskCompletionSource source, Lifecycle lifecycle = default)
+	public static ZeroTask FromCompletionSource(out ZeroTaskCompletionSource source, Lifetime lifetime = default)
 	{
 		source = ZeroTaskCompletionSource.Create();
 		return source.Task;
 	}
 
-	public static ZeroTask<T> FromCompletionSource<T>(out ZeroTaskCompletionSource<T> source, Lifecycle lifecycle = default)
+	public static ZeroTask<T> FromCompletionSource<T>(out ZeroTaskCompletionSource<T> source, Lifetime lifetime = default)
 	{
 		source = ZeroTaskCompletionSource.Create<T>();
 		return source.Task;

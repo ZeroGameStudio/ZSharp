@@ -36,13 +36,13 @@ internal abstract class ZeroTaskBackendBase<TResult> : IZeroTaskBackend<TResult>
 	protected void TrySetResult(TResult result) => _comp.TrySetResult(result);
 	protected void TrySetException(Exception exception) => _comp.TrySetException(exception);
 	
-	protected ref Lifecycle Lifecycle => ref _lifecycle;
+	protected ref Lifetime Lifetime => ref _lifetime;
 	protected ref ZeroTaskBackendComp<TResult> Comp => ref _comp;
 
 	~ZeroTaskBackendBase() => Comp.TryPublishUnobservedException();
 	
 	private ZeroTaskBackendComp<TResult> _comp;
-	private Lifecycle _lifecycle;
+	private Lifetime _lifetime;
 	
 }
 

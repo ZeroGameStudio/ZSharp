@@ -30,7 +30,7 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 
 	void IStreamingTask.Update(int32 loadedCount)
 	{
-		if (_lifecycle.IsExpired)
+		if (_lifetime.IsExpired)
 		{
 			return;
 		}
@@ -40,7 +40,7 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 	
 	void IStreamingTask.SignalCompletion()
 	{
-		if (_lifecycle.IsExpired)
+		if (_lifetime.IsExpired)
 		{
 			InternalCancel();
 			return;
@@ -92,10 +92,10 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 		}
 	}
 
-	internal StreamingTaskBase(IntPtr unmanaged, Lifecycle lifecycle)
+	internal StreamingTaskBase(IntPtr unmanaged, Lifetime lifetime)
 	{
 		Unmanaged = unmanaged;
-		_lifecycle = lifecycle;
+		_lifetime = lifetime;
 	}
 
 	private protected enum EEmptyConstructor;
@@ -158,7 +158,7 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 	{
 		ensure(_state != EState.Loaded);
 		_state = EState.Cancelled;
-		_expiredException = ExceptionDispatchInfo.Capture(new LifecycleExpiredException(_lifecycle));
+		_expiredException = ExceptionDispatchInfo.Capture(new LifetimeExpiredException(_lifetime));
 	}
 	
 	private unsafe void InternalDispose()
@@ -183,7 +183,7 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 		}
 	}
 	
-	private readonly Lifecycle _lifecycle;
+	private readonly Lifetime _lifetime;
 	private ExceptionDispatchInfo? _expiredException;
 
 	private EState _state;

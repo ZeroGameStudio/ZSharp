@@ -5,11 +5,11 @@ namespace ZeroGames.ZSharp.Core.Async;
 internal class ZeroTaskBackend_Yield : PooledZeroTaskBackendBase<float, ZeroTaskBackend_Yield>
 {
 	
-	public static ZeroTaskBackend_Yield GetFromPool(EEventLoopTickingGroup tickingGroup, Lifecycle lifecycle)
+	public static ZeroTaskBackend_Yield GetFromPool(EEventLoopTickingGroup tickingGroup, Lifetime lifetime)
 	{
 		var task = InternalGetFromPool();
 		task._tickingGroup = tickingGroup;
-		task.Lifecycle = lifecycle;
+		task.Lifetime = lifetime;
 
 		return task;
 	}
@@ -21,7 +21,7 @@ internal class ZeroTaskBackend_Yield : PooledZeroTaskBackendBase<float, ZeroTask
 			var @this = (ZeroTaskBackend_Yield)state!;
 			@this.SetResult(args.WorldDeltaSeconds);
 			@continue = false;
-		}, this, Lifecycle, (ex, state) =>
+		}, this, Lifetime, (ex, state) =>
 		{
 			var @this = (ZeroTaskBackend_Yield)state!;
 			@this.SetException(ex);

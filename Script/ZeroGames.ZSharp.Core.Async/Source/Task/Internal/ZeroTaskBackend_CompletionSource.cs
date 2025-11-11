@@ -5,17 +5,17 @@ namespace ZeroGames.ZSharp.Core.Async;
 internal class ZeroTaskBackend_CompletionSource<TResult> : PooledZeroTaskBackendBase<TResult, ZeroTaskBackend_CompletionSource<TResult>>
 {
 	
-	public static ZeroTaskBackend_CompletionSource<TResult> GetFromPool(Lifecycle lifecycle)
+	public static ZeroTaskBackend_CompletionSource<TResult> GetFromPool(Lifetime lifetime)
 	{
 		var task = InternalGetFromPool();
-		task.Lifecycle = lifecycle;
+		task.Lifetime = lifetime;
 
 		return task;
 	}
 	
 	public void SetResult(TResult result, ZeroTaskToken token)
 	{
-		// User may not know whether this is expired when using reactive lifecycle so we return silently.
+		// User may not know whether this is expired when using reactive lifetime so we return silently.
 		if (token != Token)
 		{
 			return;
@@ -28,9 +28,9 @@ internal class ZeroTaskBackend_CompletionSource<TResult> : PooledZeroTaskBackend
 
 		_completed = true;
 
-		if (Lifecycle.IsExpired)
+		if (Lifetime.IsExpired)
 		{
-			SetException(new LifecycleExpiredException(Lifecycle));
+			SetException(new LifetimeExpiredException(Lifetime));
 		}
 		else
 		{
@@ -40,7 +40,7 @@ internal class ZeroTaskBackend_CompletionSource<TResult> : PooledZeroTaskBackend
 
 	public void SetException(Exception exception, ZeroTaskToken token)
 	{
-		// User may not know whether this is expired when using reactive lifecycle so we return silently.
+		// User may not know whether this is expired when using reactive lifetime so we return silently.
 		if (token != Token)
 		{
 			return;
@@ -53,7 +53,7 @@ internal class ZeroTaskBackend_CompletionSource<TResult> : PooledZeroTaskBackend
 
 		_completed = true;
 
-		SetException(Lifecycle.IsExpired ? new LifecycleExpiredException(null, exception, Lifecycle) : exception);
+		SetException(Lifetime.IsExpired ? new LifetimeExpiredException(null, exception, Lifetime) : exception);
 	}
 
 	public ZeroTask<TResult> GetTask(ZeroTaskToken token)
@@ -66,13 +66,13 @@ internal class ZeroTaskBackend_CompletionSource<TResult> : PooledZeroTaskBackend
 	{
 		base.Initialize();
 		
-		if (Lifecycle.TryToReactive(out var reactiveLifecycle))
+		if (Lifetime.TryToReactive(out var reactiveLifetime))
 		{
-			reactiveLifecycle.RegisterOnExpired(static state =>
+			reactiveLifetime.RegisterOnExpired(static state =>
 			{
 				var (@this, token) = ((ZeroTaskBackend_CompletionSource<TResult>, ZeroTaskToken))state!;
 				@this._completed = true;
-				@this.SetException(new LifecycleExpiredException(@this.Lifecycle));
+				@this.SetException(new LifetimeExpiredException(@this.Lifetime));
 			}, (this, Token));
 		}
 	}

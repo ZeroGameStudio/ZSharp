@@ -4,26 +4,26 @@ using System.Threading;
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public readonly partial struct ReactiveLifecycle
+public readonly partial struct ReactiveLifetime
 {
 
-	public static implicit operator ReactiveLifecycle(CancellationToken cancellationToken) => new(cancellationToken);
+	public static implicit operator ReactiveLifetime(CancellationToken cancellationToken) => new(cancellationToken);
 
-	public static implicit operator Lifecycle(ReactiveLifecycle @this)
+	public static implicit operator Lifetime(ReactiveLifetime @this)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		
 		if (@this._backend is null)
 		{
-			return @this._token.IsInlineExpired ? Lifecycle.Expired : Lifecycle.NeverExpired;
+			return @this._token.IsInlineExpired ? Lifetime.Expired : Lifetime.NeverExpired;
 		}
 
-		return Lifecycle.FromBackend(@this._backend);
+		return Lifetime.FromBackend(@this._backend);
 	}
 
-	public Lifecycle ForceNonReactive() => ((Lifecycle)this).ForceNonReactive();
+	public Lifetime ForceNonReactive() => ((Lifetime)this).ForceNonReactive();
 	
-	public LifecycleExpiredRegistration RegisterOnExpired(Action callback)
+	public LifetimeExpiredRegistration RegisterOnExpired(Action callback)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		
@@ -36,7 +36,7 @@ public readonly partial struct ReactiveLifecycle
 			return default;
 		}
 
-		if (_backend is WeakReference<IReactiveLifecycleBackend> wr)
+		if (_backend is WeakReference<IReactiveLifetimeBackend> wr)
 		{
 			if (!wr.TryGetTarget(out var backend))
 			{
@@ -55,7 +55,7 @@ public readonly partial struct ReactiveLifecycle
 		return new(((CancellationToken)_backend).RegisterWithoutCaptureExecutionContext(callback));
 	}
 	
-	public LifecycleExpiredRegistration RegisterOnExpired(Action<object?> callback, object? state)
+	public LifetimeExpiredRegistration RegisterOnExpired(Action<object?> callback, object? state)
 	{
 		Thrower.ThrowIfNotInGameThread();
 
@@ -68,7 +68,7 @@ public readonly partial struct ReactiveLifecycle
 			return default;
 		}
 
-		if (_backend is WeakReference<IReactiveLifecycleBackend> wr)
+		if (_backend is WeakReference<IReactiveLifetimeBackend> wr)
 		{
 			if (!wr.TryGetTarget(out var backend))
 			{
@@ -98,7 +98,7 @@ public readonly partial struct ReactiveLifecycle
 				return _token.IsInlineExpired;
 			}
 
-			if (_backend is WeakReference<IReactiveLifecycleBackend> wr)
+			if (_backend is WeakReference<IReactiveLifetimeBackend> wr)
 			{
 				if (!wr.TryGetTarget(out var backend))
 				{
@@ -117,24 +117,24 @@ public readonly partial struct ReactiveLifecycle
 		}
 	}
 	
-	private ReactiveLifecycle(IReactiveLifecycleBackend backend)
+	private ReactiveLifetime(IReactiveLifetimeBackend backend)
 	{
 		if (backend.IsExpired(backend.Token))
 		{
-			_token = LifecycleToken.InlineExpired;
+			_token = LifetimeToken.InlineExpired;
 		}
 		else
 		{
-			_backend = new WeakReference<IReactiveLifecycleBackend>(backend);
+			_backend = new WeakReference<IReactiveLifetimeBackend>(backend);
 			_token = backend.Token;
 		}
 	}
 
-	private ReactiveLifecycle(CancellationTokenSource cts)
+	private ReactiveLifetime(CancellationTokenSource cts)
 	{
 		if (cts.IsCancellationRequested)
 		{
-			_token = LifecycleToken.InlineExpired;
+			_token = LifetimeToken.InlineExpired;
 		}
 		else
 		{
@@ -142,11 +142,11 @@ public readonly partial struct ReactiveLifecycle
 		}
 	}
 
-	private ReactiveLifecycle(CancellationToken cancellationToken)
+	private ReactiveLifetime(CancellationToken cancellationToken)
 	{
 		if (cancellationToken.IsCancellationRequested)
 		{
-			_token = LifecycleToken.InlineExpired;
+			_token = LifetimeToken.InlineExpired;
 		}
 		else if (cancellationToken.CanBeCanceled)
 		{
@@ -154,17 +154,17 @@ public readonly partial struct ReactiveLifecycle
 		}
 	}
 
-	private ReactiveLifecycle(bool inlineExpired)
+	private ReactiveLifetime(bool inlineExpired)
 	{
 		if (inlineExpired)
 		{
-			_token = LifecycleToken.InlineExpired;
+			_token = LifetimeToken.InlineExpired;
 		}
 	}
 
-	// WeakReference<IReactiveLifecycleBackend>, CancellationToken or CancellationTokenSource
+	// WeakReference<IReactiveLifetimeBackend>, CancellationToken or CancellationTokenSource
 	private readonly object? _backend;
-	private readonly LifecycleToken _token;
+	private readonly LifetimeToken _token;
 	
 }
 

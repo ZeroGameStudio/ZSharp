@@ -2,7 +2,7 @@
 
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
-public partial class UObject : IUnrealObject, ILifecycleBackend
+public partial class UObject : IUnrealObject, ILifetimeBackend
 {
 
     public UClass GetClass()
@@ -73,23 +73,23 @@ public partial class UObject : IUnrealObject, ILifecycleBackend
     public bool Rename(string newName) => Rename(newName, null);
     public bool Rename(UObject newOuter) => Rename(null, newOuter);
 
-    bool ILifecycleBackend.IsExpired(LifecycleToken token) => !__IsValid;
+    bool ILifetimeBackend.IsExpired(LifetimeToken token) => !__IsValid;
 
     public bool __IsValid => !IsExpired && InternalIsValid;
-    public Lifecycle Lifecycle => Lifecycle.FromBackend(this);
-    public Lifecycle LifecycleEvenIfGarbage => Lifecycle.FromBackend(_lifecycleBackendEvenIfGarbage ??= new LifecycleBackendEvenIfGarbage(this));
-    LifecycleToken ILifecycleBackend.Token { get; } = default(LifecycleToken).Next;
+    public Lifetime Lifetime => Lifetime.FromBackend(this);
+    public Lifetime LifetimeEvenIfGarbage => Lifetime.FromBackend(_lifetimeBackendEvenIfGarbage ??= new LifetimeBackendEvenIfGarbage(this));
+    LifetimeToken ILifetimeBackend.Token { get; } = default(LifetimeToken).Next;
 
     // @TODO: Construct on async loading thread.
     // Only called on emitted class, just before C++ UObject::PostInitProperties().
     // [ZCall(Name = ".pip")]
     // protected virtual void PostInitProperties(){}
 
-    private class LifecycleBackendEvenIfGarbage(UObject target) : ILifecycleBackend
+    private class LifetimeBackendEvenIfGarbage(UObject target) : ILifetimeBackend
     {
-        bool ILifecycleBackend.IsExpired(LifecycleToken token) => target.IsExpired;
-        Lifecycle ILifecycleSource.Lifecycle => Lifecycle.FromBackend(this);
-        LifecycleToken ILifecycleBackend.Token { get; } = default(LifecycleToken).Next;
+        bool ILifetimeBackend.IsExpired(LifetimeToken token) => target.IsExpired;
+        Lifetime ILifetimeSource.Lifetime => Lifetime.FromBackend(this);
+        LifetimeToken ILifetimeBackend.Token { get; } = default(LifetimeToken).Next;
     }
 
     private unsafe UClass InternalGetClass()
@@ -131,7 +131,7 @@ public partial class UObject : IUnrealObject, ILifecycleBackend
 
     private unsafe bool InternalIsValid => UnrealObject_Interop.IsValid(ConjugateHandle.FromConjugate(this)) > 0;
 
-    private LifecycleBackendEvenIfGarbage? _lifecycleBackendEvenIfGarbage;
+    private LifetimeBackendEvenIfGarbage? _lifetimeBackendEvenIfGarbage;
 
 }
 

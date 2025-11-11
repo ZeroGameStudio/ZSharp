@@ -5,14 +5,14 @@ namespace ZeroGames.ZSharp.Core.Async;
 public readonly struct ZeroTaskCompletionSource
 {
 
-	public static ZeroTaskCompletionSource Create(Lifecycle lifecycle = default)
-		=> new(lifecycle);
+	public static ZeroTaskCompletionSource Create(Lifetime lifetime = default)
+		=> new(lifetime);
 	
-	public static ZeroTaskCompletionSource<TResult> Create<TResult>(Lifecycle lifecycle = default)
-		=> new(lifecycle);
+	public static ZeroTaskCompletionSource<TResult> Create<TResult>(Lifetime lifetime = default)
+		=> new(lifetime);
 
 	public ZeroTaskCompletionSource() : this(ZeroTaskBackend_CompletionSource<AsyncVoid>.GetFromPool(default)){}
-	public ZeroTaskCompletionSource(Lifecycle lifecycle) : this(ZeroTaskBackend_CompletionSource<AsyncVoid>.GetFromPool(lifecycle)){}
+	public ZeroTaskCompletionSource(Lifetime lifetime) : this(ZeroTaskBackend_CompletionSource<AsyncVoid>.GetFromPool(lifetime)){}
 	
 	public void SetResult() => _backend.SetResult(default, _token);
 	public void SetException(Exception exception) => _backend.SetException(exception, _token);
@@ -35,7 +35,7 @@ public readonly struct ZeroTaskCompletionSource<TResult>
 {
 	
 	public ZeroTaskCompletionSource() : this(ZeroTaskBackend_CompletionSource<TResult>.GetFromPool(default)){}
-	public ZeroTaskCompletionSource(Lifecycle lifecycle) : this(ZeroTaskBackend_CompletionSource<TResult>.GetFromPool(lifecycle)){}
+	public ZeroTaskCompletionSource(Lifetime lifetime) : this(ZeroTaskBackend_CompletionSource<TResult>.GetFromPool(lifetime)){}
 
 	public void SetResult(TResult result) => _backend.SetResult(result, _token);
 	public void SetException(Exception exception) => _backend.SetException(exception, _token);

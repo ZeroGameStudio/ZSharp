@@ -5,16 +5,16 @@ namespace ZeroGames.ZSharp.Core.Async;
 internal sealed class ZeroStream_EveryTick : IZeroStream<float>
 {
 
-	public ZeroStream_EveryTick(EEventLoopTickingGroup tickingGroup, Lifecycle lifecycle)
+	public ZeroStream_EveryTick(EEventLoopTickingGroup tickingGroup, Lifetime lifetime)
 	{
 		_tickingGroup = tickingGroup;
-		_lifecycle = lifecycle;
+		_lifetime = lifetime;
 	}
 
 	public IZeroStreamEnumerator<float> GetAsyncEnumerator()
 	{
 		Thrower.ThrowIfNotInGameThread();
-		return new Enumerator(_tickingGroup, _lifecycle);
+		return new Enumerator(_tickingGroup, _lifetime);
 	}
 
 	private class Enumerator : IZeroStreamEnumerator<float>
@@ -32,7 +32,7 @@ internal sealed class ZeroStream_EveryTick : IZeroStream<float>
 				throw new InvalidOperationException();
 			}
 
-			_current = await ZeroTask.Yield(_tickingGroup, _lifecycle);
+			_current = await ZeroTask.Yield(_tickingGroup, _lifetime);
 			return true;
 		}
 
@@ -49,14 +49,14 @@ internal sealed class ZeroStream_EveryTick : IZeroStream<float>
 			}
 		}
 		
-		internal Enumerator(EEventLoopTickingGroup tickingGroup, Lifecycle lifecycle)
+		internal Enumerator(EEventLoopTickingGroup tickingGroup, Lifetime lifetime)
 		{
 			_tickingGroup = tickingGroup;
-			_lifecycle = lifecycle;
+			_lifetime = lifetime;
 		}
 
 		private readonly EEventLoopTickingGroup _tickingGroup;
-		private readonly Lifecycle _lifecycle;
+		private readonly Lifetime _lifetime;
 
 		private float _current;
 		
@@ -64,7 +64,7 @@ internal sealed class ZeroStream_EveryTick : IZeroStream<float>
 	}
 	
 	private readonly EEventLoopTickingGroup _tickingGroup;
-	private readonly Lifecycle _lifecycle;
+	private readonly Lifetime _lifetime;
 	
 }
 

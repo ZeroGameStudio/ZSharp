@@ -25,7 +25,7 @@ internal class ZeroTaskBackend_WhenAny<TResult> : ZeroTaskBackendBase<(int32 Win
 
 		if (count is 0)
 		{
-			SetException(new LifecycleExpiredException(Lifecycle.Expired));
+			SetException(new LifetimeExpiredException(Lifetime.Expired));
 		}
 	}
 

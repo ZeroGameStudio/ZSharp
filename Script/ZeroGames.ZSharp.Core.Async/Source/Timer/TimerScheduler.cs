@@ -23,7 +23,7 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		ErrorHandler = errorHandler ?? DefaultErrorHandler;
 	}
 	
-	public Timer Register(Action<T> callback, T rate, bool looped = false, bool fixedRate = true, Lifecycle lifecycle = default, Action<LifecycleExpiredException>? onExpired = null)
+	public Timer Register(Action<T> callback, T rate, bool looped = false, bool fixedRate = true, Lifetime lifetime = default, Action<LifetimeExpiredException>? onExpired = null)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		if (looped && rate < _minRate)
@@ -31,10 +31,10 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 			rate = _minRate;
 		}
 
-		return InternalRegister(callback, null, null, rate, looped, fixedRate, lifecycle, onExpired, null);
+		return InternalRegister(callback, null, null, rate, looped, fixedRate, lifetime, onExpired, null);
 	}
 
-	public Timer Register(Action<T, object?> callback, object? state, T rate, bool looped = false, bool fixedRate = true, Lifecycle lifecycle = default, Action<LifecycleExpiredException, object?>? onExpired = null)
+	public Timer Register(Action<T, object?> callback, object? state, T rate, bool looped = false, bool fixedRate = true, Lifetime lifetime = default, Action<LifetimeExpiredException, object?>? onExpired = null)
 	{
 		Thrower.ThrowIfNotInGameThread();
 		if (looped && rate < _minRate)
@@ -42,7 +42,7 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 			rate = _minRate;
 		}
 
-		return InternalRegister(null, callback, state, rate, looped, fixedRate, lifecycle, null, onExpired);
+		return InternalRegister(null, callback, state, rate, looped, fixedRate, lifetime, null, onExpired);
 	}
 
 	public void Unregister(Timer timer)
@@ -216,7 +216,7 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 			Rate = T.Zero;
 			IsLooped = false;
 			IsFixedRate = false;
-			Lifecycle = default;
+			Lifetime = default;
 			StatelessOnExpired = null;
 			StatefulOnExpired = null;
 			SuspendVersion = 0;
@@ -230,9 +230,9 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		public T Rate { get; set; }
 		public bool IsLooped { get; set; }
 		public bool IsFixedRate { get; set; }
-		public Lifecycle Lifecycle { get; set; }
-		public Action<LifecycleExpiredException>? StatelessOnExpired { get; set; }
-		public Action<LifecycleExpiredException, object?>? StatefulOnExpired { get; set; }
+		public Lifetime Lifetime { get; set; }
+		public Action<LifetimeExpiredException>? StatelessOnExpired { get; set; }
+		public Action<LifetimeExpiredException, object?>? StatefulOnExpired { get; set; }
 		public uint64 SuspendVersion { get; set; }
 		
 		public T TriggerTime => StartTime + Rate;
@@ -275,7 +275,7 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 
 	private static void DefaultErrorHandler(Exception exception) => UnhandledExceptionHelper.Guard(exception, "Unhandled Exception Detected in Timer Scheduler.");
 
-	private Timer InternalRegister(Action<T>? statelessCallback, Action<T, object?>? statefulCallback, object? state, T rate, bool looped, bool fixedRate, Lifecycle lifecycle, Action<LifecycleExpiredException>? statelessOnExpired, Action<LifecycleExpiredException, object?>? statefulOnExpired)
+	private Timer InternalRegister(Action<T>? statelessCallback, Action<T, object?>? statefulCallback, object? state, T rate, bool looped, bool fixedRate, Lifetime lifetime, Action<LifetimeExpiredException>? statelessOnExpired, Action<LifetimeExpiredException, object?>? statefulOnExpired)
 	{
 		Timer timer = new(this, ++_handle);
 		TimerData data = TimerData.GetFromPool();
@@ -286,7 +286,7 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 		data.Rate = rate;
 		data.IsLooped = looped;
 		data.IsFixedRate = fixedRate;
-		data.Lifecycle = lifecycle;
+		data.Lifetime = lifetime;
 		data.StatelessOnExpired = statelessOnExpired;
 		data.StatefulOnExpired = statefulOnExpired;
 		_registry[timer] = data;
@@ -350,7 +350,7 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 	{
 		try
 		{
-			if (!data.Lifecycle.IsExpired)
+			if (!data.Lifetime.IsExpired)
 			{
 				data.StatelessCallback?.Invoke(deltaTime);
 				data.StatefulCallback?.Invoke(deltaTime, data.State);
@@ -358,8 +358,8 @@ public sealed class TimerScheduler<T> : ITimerScheduler<T> where T : struct, INu
 			else
 			{
 				expired = true;
-				data.StatelessOnExpired?.Invoke(new(data.Lifecycle));
-				data.StatefulOnExpired?.Invoke(new(data.Lifecycle), data.State);
+				data.StatelessOnExpired?.Invoke(new(data.Lifetime));
+				data.StatefulOnExpired?.Invoke(new(data.Lifetime), data.State);
 			}
 		}
 		catch (Exception ex)

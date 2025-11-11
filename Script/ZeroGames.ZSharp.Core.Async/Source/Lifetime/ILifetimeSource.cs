@@ -2,9 +2,9 @@
 
 namespace ZeroGames.ZSharp.Core.Async;
 
-public interface ILifecycleSource
+public interface ILifetimeSource
 {
-	Lifecycle Lifecycle { get; }
+	Lifetime Lifetime { get; }
 }
 
 

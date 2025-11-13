@@ -111,7 +111,7 @@ namespace ZSharp::ZSharpClass_Private
 				}
 			}
 
-			ZSharpStruct_Private::SetupPropertyDefaults(zscls, obj);
+			ZSharpStruct_Private::SetupPropertyDefaultsExcludeSuper(zscls, obj);
 			if (zscls->bDefaultToReplicated)
 			{
 				static constexpr uint8 GMaxByteAsTrue = 0xFF;

@@ -32,8 +32,8 @@ public class Dotnet : ModuleRules
 		
 		// Z# configurations
 		const bool FORCE_USE_MONO = false;
-		const bool USE_MONO_FOR_EDITOR_BUILD = true;
-		const string DOTNET_VERSION = "9.0.0";
+		const bool USE_MONO_FOR_EDITOR_BUILD = false;
+		const string DOTNET_VERSION = "10.0.0";
 		
 		// Select runtime implementation.
 		string runtimeImpl = FORCE_USE_MONO || Target.bBuildEditor && USE_MONO_FOR_EDITOR_BUILD ? "mono" : platformName switch

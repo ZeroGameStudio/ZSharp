@@ -10,14 +10,33 @@
 #include "ZUnrealFieldDefinitions.h"
 #include "UObject/PropertyOptional.h"
 
-#include "ZSharpScriptStruct.inl"
 #include "ZSharpClass.inl"
 
 #include "ZSharpFunction.inl"
 #include "Reflection/ZReflectionHelper.h"
+#include "StructUtils/UserDefinedStruct.h"
 
 namespace ZSharp::ZUnrealFieldEmitter_Private
 {
+	
+#define ZSHARP_STEAL_MEMBER_VARIABLE(Type, MemberType, MemberName, Variable) \
+	static MemberType(Type::*Variable); \
+	template <decltype(Variable) MemberPtr> \
+	struct TMemberPtrInitializer_##Variable \
+	{ \
+		TMemberPtrInitializer_##Variable() \
+			{ \
+				Variable = MemberPtr; \
+			} \
+		static TMemberPtrInitializer_##Variable GInstance; \
+	}; \
+	template <decltype(Variable) MemberPtr> TMemberPtrInitializer_##Variable<MemberPtr> TMemberPtrInitializer_##Variable<MemberPtr>::GInstance; \
+	template struct TMemberPtrInitializer_##Variable<&Type::MemberName>;
+	
+	ZSHARP_STEAL_MEMBER_VARIABLE(UUserDefinedStruct, FUserStructOnScopeIgnoreDefaults, DefaultStructInstance, GUUserDefinedStructDefaultInstanceMemberPtr);
+	
+#undef ZSHARP_STEAL_MEMBER_VARIABLE
+	
 	static FString MakeNMZCallName(const UObject* outer, const FString& lastName)
 	{
 		if (lastName.IsEmpty())
@@ -1149,7 +1168,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitStructSkeleton(UPackage* pak, FZScriptStr
 
 	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
 	
-	FStaticConstructObjectParameters params { UScriptStruct::StaticClass() };
+	FStaticConstructObjectParameters params { UUserDefinedStruct::StaticClass() };
 	params.Outer = pak;
 	params.Name = *def.Name.ToString();
 	params.SetFlags = def.Flags | GCompiledInFlags;
@@ -1282,7 +1301,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 
 void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStructDefinition& def) const
 {
-	UScriptStruct* scriptStruct = def.ScriptStruct;
+	auto scriptStruct = CastChecked<UUserDefinedStruct>(def.ScriptStruct);
 
 	// We didn't use static constructor before so we need to manually set up super.
 	UScriptStruct* superScriptStruct = nullptr;
@@ -1290,6 +1309,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 	{
 		superScriptStruct = FindObjectChecked<UScriptStruct>(nullptr, *def.SuperPath.ToString());
 		check(superScriptStruct->IsNative());
+		check(!superScriptStruct->GetCppStructOps() || !superScriptStruct->PropertyLink); // Only support empty C++ base.
 		scriptStruct->SetSuperStruct(superScriptStruct);
 		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | superScriptStruct->StructFlags & STRUCT_Inherit);
 		check(!FZSharpFieldRegistry::Get().IsZSharpScriptStruct(superScriptStruct) || (scriptStruct->StructFlags & STRUCT_HasInstancedReference) == STRUCT_NoFlags); // If super is a Z# script struct then it should not have STRUCT_HasInstancedReference fixed up yet.
@@ -1330,30 +1350,28 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 	if (def.bHasNetSerialize)
 	{
 		// @TODO: Full traits support.
+		checkNoEntry();
 		UE_CLOG(superScriptStruct, LogZSharpEmit, Fatal, TEXT("Struct with NetSerialize can't have super struct yet!!!"));
 		zsstrct->bHasNetSerialize = true;
 		zsstrct->bHasIdentical = true; // @FIXME
 		zsstrct->NetSerializeZCallName = ZUnrealFieldEmitter_Private::MakeNMZCallName(scriptStruct, ".netserialize");
 	}
 	
-	auto ops = new ZSharpScriptStruct_Private::FZSharpStructOps { scriptStruct, zsstrct, scriptStruct->GetPropertiesSize(), scriptStruct->GetMinAlignment() };
-	scriptStruct->DeferCppStructOps(FTopLevelAssetPath { pak->GetFName(), scriptStruct->GetFName() }, ops);
-
 	// Compile script struct.
 	// All referenced script structs should be initialized so struct properties can link properly.
 	scriptStruct->StaticLink(true);
 	ZUnrealFieldEmitter_Private::FixupAlignmentForStruct(scriptStruct); // Link() aligns the last property for script struct, but we don't want to depend on implementation.
-
+	
+	FUserStructOnScopeIgnoreDefaults& defaultInstance = scriptStruct->*ZUnrealFieldEmitter_Private::GUUserDefinedStructDefaultInstanceMemberPtr;
+	defaultInstance.Recreate(scriptStruct);
+	ZSharpStruct_Private::SetupPropertyDefaults(zsstrct, defaultInstance.GetStructMemory());
+	
 #if DO_CHECK
 	for (TFieldIterator<const FProperty> it(scriptStruct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
 	{
 		check(it->GetOffset_ForInternal() > 0 || !FZReflectionHelper::IsPropertyForceCopy(*it));
 	}
 #endif
-	
-	// Compile Z# struct.
-	FZSharpScriptStruct* zsstruct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
-	zsstruct->CppStructOps = ops;
 }
 
 void ZSharp::FZUnrealFieldEmitter::FinishEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const

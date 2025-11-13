@@ -41,7 +41,7 @@ public class SolutionFolder
 				nodes.Add(cur.Name);
 			} while ((cur = cur?.Parent) is { Parent: not null });
 			nodes.Reverse();
-			return string.Join('/', nodes);
+			return '/' + string.Join('/', nodes) + '/';
 		}
 	}
 	

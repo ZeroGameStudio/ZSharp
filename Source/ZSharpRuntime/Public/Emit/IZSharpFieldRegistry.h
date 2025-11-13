@@ -18,6 +18,9 @@ namespace ZSharp
 			TArray<FProperty*> PropertyChain;
 			FString Buffer;
 		};
+		
+		virtual const UStruct* GetStruct() const = 0;
+		virtual ~FZSharpStruct(){}
 
 		TArray<FPropertyDefault> PropertyDefaults;
 	};
@@ -28,11 +31,9 @@ namespace ZSharp
 		friend class FZSharpFieldRegistry;
 		
 		const UScriptStruct* ScriptStruct = nullptr;
-
-		// The engine will destruct this. (@see: GetDeferredCppStructOps())
-		UScriptStruct::ICppStructOps* CppStructOps;
 		
 	public:
+		virtual const UStruct* GetStruct() const override { return ScriptStruct; }
 		FZCallHandle GetNetSerializeZCallHandle() const;
 
 	public:
@@ -86,6 +87,7 @@ namespace ZSharp
 		};
 
 	public:
+		virtual const UStruct* GetStruct() const override { return Class; }
 		FZCallHandle GetConstructorZCallHandle() const;
 		
 	public:

@@ -58,7 +58,7 @@ ZSharp::FZConjugateHandle ZSharp::FZUnrealObjectGlobals_Interop::FindObject(FZCo
 		FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
 		auto pCls = registry.ConjugateUnsafeChecked<UClass>(cls);
 		auto pOuter = registry.ConjugateUnsafe<UObject>(outer);
-		return registry.Conjugate(StaticFindObject(pCls, pOuter, name, !!exactClass));
+		return registry.Conjugate(StaticFindObject(pCls, pOuter, name, !!exactClass ? EFindObjectFlags::ExactClass : EFindObjectFlags::None));
 	}
 	CATCHR({})
 }

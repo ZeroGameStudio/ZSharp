@@ -3,7 +3,7 @@
 #pragma once
 
 #ifndef ZSHARP_DISABLE_INTEROP_GUARD
-#define ZSHARP_DISABLE_INTEROP_GUARD !ZSHARP_WITH_CORECLR
+#define ZSHARP_DISABLE_INTEROP_GUARD 1
 #endif
 
 #if PLATFORM_SEH_EXCEPTIONS_DISABLED || ZSHARP_DISABLE_INTEROP_GUARD
@@ -13,7 +13,7 @@
 #define GUARD(Code) Code;
 #else
 #include "HAL/ExceptionHandling.h"
-	
+
 namespace ZSharp::ZInteropExceptionHelper_Private
 {
 	inline int32 ReportCrash(Windows::LPEXCEPTION_POINTERS ExceptionInfo)

@@ -8,10 +8,10 @@ public class ProjectDto
 {
 	public string Folder { get; set; } = "Game";
 
-	public string TargetFramework { get; set; } = "net9.0";
+	public string TargetFramework { get; set; } = "net10.0";
 	[JsonConverter(typeof(JsonStringEnumConverter<EProjectOutputType>))] public EProjectOutputType OutputType { get; set; } = EProjectOutputType.Runtime;
 	[JsonConverter(typeof(JsonStringEnumConverter<EProjectLanguageType>))] public EProjectLanguageType Language { get; set; } = EProjectLanguageType.CSharp;
-	public string LanguageVersion { get; set; } = "preview";
+	public string LanguageVersion { get; set; } = "14";
 	public string RootNamespace { get; set; } = string.Empty;
 	public bool AllowUnsafeBlocks { get; set; } = true;
 	public List<string> WarningsAsErrors { get; set; } = [];

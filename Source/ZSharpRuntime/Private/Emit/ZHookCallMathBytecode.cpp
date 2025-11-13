@@ -48,7 +48,7 @@ static DEFINE_FUNCTION(execCallMathFunction)
 #define CONDITIONAL_DLLIMPORT DLLIMPORT
 #endif
 
-CONDITIONAL_DLLIMPORT extern FNativeFuncPtr GNatives[EX_Max];
+CONDITIONAL_DLLIMPORT extern TStaticArray<FNativeFuncPtr, EX_Max> GNatives;
 
 struct FZHookCallMathBytecode
 {

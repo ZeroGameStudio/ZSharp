@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using ZeroGames.ZSharp.UnrealEngine.FieldNotification;
+
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 public partial class UObject : IUnrealObject, ILifetimeBackend
@@ -139,6 +141,11 @@ public static class UObjectExtensions
 {
     extension<T>(T @this) where T : UObject
     {
+        public void BroadcastFieldValueChanged(FFieldNotificationId fieldId) => UFieldNotificationLibrary.BroadcastFieldValueChanged(@this, fieldId);
+        public void BroadcastFieldValueChanged(FName fieldName) => UFieldNotificationLibrary.BroadcastFieldValueChanged(@this, new FFieldNotificationId { FieldName = fieldName });
+        
+        public void MarkPropertyDirty(FName propertyName) => UNetPushModelHelpers.MarkPropertyDirty(@this, propertyName);
+        
         public T? SelfIfValid => @this is { __IsValid: true } ? @this : null;
     }
 }

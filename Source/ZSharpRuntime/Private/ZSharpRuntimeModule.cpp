@@ -31,7 +31,7 @@
 #include "Interop/CoreUObject/ObjectWrapper/ZWeakObjectPtr_Interop.h"
 #include "Interop/CoreUObject/ObjectWrapper/ZLazyObjectPtr_Interop.h"
 #include "Interop/CoreUObject/ObjectWrapper/ZScriptInterface_Interop.h"
-#include "Interop/CoreUObject/ZStrongObjectPtr_Interop.h"
+#include "Interop/CoreUObject/ObjectWrapper/ZStrongObjectPtr_Interop.h"
 #include "Interop/CoreUObject/Container/ZUnrealArray_Interop.h"
 #include "Interop/CoreUObject/Container/ZUnrealSet_Interop.h"
 #include "Interop/CoreUObject/Container/ZUnrealMap_Interop.h"
@@ -39,6 +39,7 @@
 #include "Interop/CoreUObject/Delegate/ZUnrealDelegate_Interop.h"
 #include "Interop/CoreUObject/Delegate/ZUnrealMulticastInlineDelegate_Interop.h"
 #include "Interop/CoreUObject/Delegate/ZUnrealMulticastSparseDelegate_Interop.h"
+#include "Interop/CoreUObject/ZUnrealFieldEmitter_Interop.h"
 #include "Interop/Engine/ZEngine_Interop.h"
 #include "Interop/Engine/ZGameInstance_Interop.h"
 #include "Interop/Engine/ZStreamableManager_Interop.h"
@@ -313,6 +314,10 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, IsBound),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, IsBoundToObject),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealMulticastSparseDelegate, Contains),
+			
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealFieldEmitter, InternalConstructScriptStructInstance),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealFieldEmitter, InternalDestructScriptStructInstance),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(UnrealFieldEmitter, InternalReloadStructOpsFakeVTable),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Engine, IsInitialized),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Engine, GetEngine),
@@ -413,8 +418,6 @@ class FZSharpRuntimeModule : public IZSharpRuntimeModule
 	void HandlePreMasterAlcStartup(ZSharp::IZMasterAssemblyLoadContext* alc);
 	void HandleMasterAlcStartup(ZSharp::IZMasterAssemblyLoadContext* alc);
 
-	void EarlyShutdown();
-
 #if WITH_EDITOR
 	void HandleBeginPIE(const bool simulating);
 	void HandleEndPIE(const bool simulating);
@@ -434,8 +437,6 @@ void FZSharpRuntimeModule::StartupModule()
 	ZSharp::IZSharpClr::Get().PreMasterAlcStartup().AddRaw(this, &ThisClass::HandlePreMasterAlcStartup);
 	ZSharp::IZSharpClr::Get().OnMasterAlcStartup().AddRaw(this, &ThisClass::HandleMasterAlcStartup);
 
-	FCoreDelegates::OnPreExit.AddRaw(this, &ThisClass::EarlyShutdown);
-	
 	ZSharp::FZUnrealFieldScanner::Get().Startup();
 
 	ZSharp::ZSharpRuntimeModule_Private::CreateMasterAlc();
@@ -448,12 +449,17 @@ void FZSharpRuntimeModule::StartupModule()
 
 void FZSharpRuntimeModule::ShutdownModule()
 {
+	ZSharp::ZSharpRuntimeModule_Private::UnloadMasterAlc();
+
+	ZSharp::FZUnrealFieldScanner::Get().Shutdown();
+	
+	ZSharp::IZSharpClr::Get().PreMasterAlcStartup().RemoveAll(this);
+	ZSharp::IZSharpClr::Get().OnMasterAlcStartup().RemoveAll(this);
+	
 #if WITH_EDITOR
 	FEditorDelegates::PreBeginPIE.RemoveAll(this);
 	FEditorDelegates::ShutdownPIE.RemoveAll(this);
 #endif
-
-	FCoreDelegates::OnPreExit.RemoveAll(this);
 }
 
 bool FZSharpRuntimeModule::ParseStartupAssembly(const FString& startupAssembly, FString& outAssemblyName, TArray<FString>& outArgs)
@@ -716,17 +722,6 @@ void FZSharpRuntimeModule::HandleMasterAlcStartup(ZSharp::IZMasterAssemblyLoadCo
 			UE_LOG(LogZSharpRuntime, Fatal, TEXT("Master ALC startup assembly [%s] load failed with error code [%d]"), *assemblyName, err);
 		}
 	}
-}
-
-void FZSharpRuntimeModule::EarlyShutdown()
-{
-	// Some conjugates rely on UObject system to destruct, so we must do this before UObject system shuts down.
-	ZSharp::ZSharpRuntimeModule_Private::UnloadMasterAlc();
-
-	ZSharp::FZUnrealFieldScanner::Get().Shutdown();
-	
-	ZSharp::IZSharpClr::Get().PreMasterAlcStartup().RemoveAll(this);
-	ZSharp::IZSharpClr::Get().OnMasterAlcStartup().RemoveAll(this);
 }
 
 #if WITH_EDITOR

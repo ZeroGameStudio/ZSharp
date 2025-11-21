@@ -130,6 +130,7 @@ namespace ZSharp::ZGenericClr_Private
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZDefaultAssemblyLoadContext_Interop::GLoadAssembly),
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZDefaultAssemblyLoadContext_Interop::GInvokeMethod),
 
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GPrepareUnloading),
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GUnload),
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GLoadAssembly),
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GInvokeMethod),

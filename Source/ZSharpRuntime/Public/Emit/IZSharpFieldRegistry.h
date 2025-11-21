@@ -4,6 +4,8 @@
 
 #include "ZCall/ZCallHandle.h"
 
+struct FZSharpStructOpsFakeVTable;
+
 namespace ZSharp
 {
 	struct ZSHARPRUNTIME_API FZSharpEnum
@@ -41,6 +43,8 @@ namespace ZSharp
 
 		bool bHasNetSerialize = false;
 		bool bHasIdentical = false;
+		
+		FZSharpStructOpsFakeVTable* FakeVTable;
 
 	private:
 		mutable FZCallHandle NetSerializeZCallHandle{};

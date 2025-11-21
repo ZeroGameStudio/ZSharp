@@ -46,6 +46,22 @@ public static bool operator ==({TypeName}? left, {TypeName}? right) => Equals(le
 public static bool operator !=({TypeName}? left, {TypeName}? right) => !Equals(left, right);";
 		definition.AddMember(new Block(systemInterfaceBlock));
 
+		string emitHelperBlock =
+$@"private static unsafe IntPtr __PRIVATE_ConstructThunkPtr => (IntPtr)(delegate* unmanaged<void*, void>)&__PRIVATE_ConstructThunk;
+[UnmanagedCallersOnly]
+private static unsafe void __PRIVATE_ConstructThunk(void* instance)
+{{
+    UnrealFieldEmitterHelper.InternalConstructScriptStructInstance(instance, StaticStruct);
+}}
+
+private static unsafe IntPtr __PRIVATE_DestructThunkPtr => (IntPtr)(delegate* unmanaged<void*, void>)&__PRIVATE_DestructThunk;
+[UnmanagedCallersOnly]
+private static unsafe void __PRIVATE_DestructThunk(void* instance)
+{{
+    UnrealFieldEmitterHelper.InternalDestructScriptStructInstance(instance, StaticStruct);
+}}";
+		definition.AddMember(new Block(emitHelperBlock));
+
 		definition.Modifiers |= EMemberModifiers.Unsafe;
 		
 		AddAttributeAfter("ConjugateKey", UNREAL_FIELD_PATH_CONST);

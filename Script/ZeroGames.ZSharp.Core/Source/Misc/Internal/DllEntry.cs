@@ -69,6 +69,7 @@ internal static class DllEntry
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, char*, char*, void*, EInvokeMethodErrorCode>)&DefaultAssemblyLoadContext_Interop.InvokeMethod;
 
         // MasterAssemblyLoadContext interop functions
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<int32>)&MasterAssemblyLoadContext_Interop.PrepareUnloading;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<int32>)&MasterAssemblyLoadContext_Interop.Unload;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, void*, ELoadAssemblyErrorCode>)&MasterAssemblyLoadContext_Interop.LoadAssembly;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, char*, char*, void*, EInvokeMethodErrorCode>)&MasterAssemblyLoadContext_Interop.InvokeMethod;

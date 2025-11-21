@@ -59,6 +59,13 @@ namespace ZSharp
 		TSet<FName> EmittedModules;
 		
 	};
+	
+	struct FZUnrealFieldEmitterHelper
+	{
+		static void ConstructScriptStructInstance(void* instance, const UScriptStruct* scriptStruct);
+		static void DestructScriptStructInstance(void* instance, const UScriptStruct* scriptStruct);
+		static void ReloadStructOpsFakeVTable(const TCHAR* scriptStructPath, void* constructThunk, void* destructThunk);
+	};
 }
 
 

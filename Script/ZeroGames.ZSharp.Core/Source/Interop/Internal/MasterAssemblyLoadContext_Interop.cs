@@ -8,6 +8,21 @@ namespace ZeroGames.ZSharp.Core;
 
 internal static unsafe class MasterAssemblyLoadContext_Interop
 {
+    
+    [UnmanagedCallersOnly]
+    public static int32 PrepareUnloading()
+    {
+        try
+        {
+            MasterAssemblyLoadContext.Instance!.PrepareUnloading();
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            UnhandledExceptionHelper.Guard(ex);
+            return -1;
+        }
+    }
 
     [UnmanagedCallersOnly]
     public static int32 Unload()

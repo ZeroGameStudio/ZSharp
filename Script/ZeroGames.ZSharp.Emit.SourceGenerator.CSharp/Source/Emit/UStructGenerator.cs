@@ -44,7 +44,7 @@ public class UStructGenerator : ISourceGenerator
 		string namespaceName = EmitGeneratorHelper.GetTypeNamespace(ustructSymbol);
 
 		EmittedScriptStructBuilder builder = new(namespaceName, className, implicitBase);
-		HashSet<string> usings = new();
+		HashSet<string> usings = ["System.Runtime.InteropServices"];
 
 		var properties = ustructSymbol.GetMembers()
 			.OfType<IPropertySymbol>()

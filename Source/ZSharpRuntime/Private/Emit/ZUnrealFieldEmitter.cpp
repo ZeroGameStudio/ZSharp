@@ -11,32 +11,13 @@
 #include "UObject/PropertyOptional.h"
 
 #include "ZSharpClass.inl"
+#include "ZSharpScriptStruct.inl"
 
 #include "ZSharpFunction.inl"
 #include "Reflection/ZReflectionHelper.h"
-#include "StructUtils/UserDefinedStruct.h"
 
 namespace ZSharp::ZUnrealFieldEmitter_Private
 {
-	
-#define ZSHARP_STEAL_MEMBER_VARIABLE(Type, MemberType, MemberName, Variable) \
-	static MemberType(Type::*Variable); \
-	template <decltype(Variable) MemberPtr> \
-	struct TMemberPtrInitializer_##Variable \
-	{ \
-		TMemberPtrInitializer_##Variable() \
-			{ \
-				Variable = MemberPtr; \
-			} \
-		static TMemberPtrInitializer_##Variable GInstance; \
-	}; \
-	template <decltype(Variable) MemberPtr> TMemberPtrInitializer_##Variable<MemberPtr> TMemberPtrInitializer_##Variable<MemberPtr>::GInstance; \
-	template struct TMemberPtrInitializer_##Variable<&Type::MemberName>;
-	
-	ZSHARP_STEAL_MEMBER_VARIABLE(UUserDefinedStruct, FUserStructOnScopeIgnoreDefaults, DefaultStructInstance, GUUserDefinedStructDefaultInstanceMemberPtr);
-	
-#undef ZSHARP_STEAL_MEMBER_VARIABLE
-	
 	static FString MakeNMZCallName(const UObject* outer, const FString& lastName)
 	{
 		if (lastName.IsEmpty())
@@ -865,6 +846,8 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			propertyDefault.Buffer = propertyDefaultDef.Buffer;
 		}
 	}
+	
+	static TMap<FString, TTuple<void*, void*>> GDeferredStructOpsThunks;
 }
 
 ZSharp::FZUnrealFieldEmitter& ZSharp::FZUnrealFieldEmitter::Get()
@@ -1168,7 +1151,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitStructSkeleton(UPackage* pak, FZScriptStr
 
 	ZUnrealFieldEmitter_Private::FatalIfObjectExists(pak, def.Name);
 	
-	FStaticConstructObjectParameters params { UUserDefinedStruct::StaticClass() };
+	FStaticConstructObjectParameters params { UScriptStruct::StaticClass() };
 	params.Outer = pak;
 	params.Name = *def.Name.ToString();
 	params.SetFlags = def.Flags | GCompiledInFlags;
@@ -1301,7 +1284,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitClassSkeleton(UPackage* pak, FZClassDefin
 
 void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStructDefinition& def) const
 {
-	auto scriptStruct = CastChecked<UUserDefinedStruct>(def.ScriptStruct);
+	auto scriptStruct = def.ScriptStruct;
 
 	// We didn't use static constructor before so we need to manually set up super.
 	UScriptStruct* superScriptStruct = nullptr;
@@ -1309,7 +1292,6 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 	{
 		superScriptStruct = FindObjectChecked<UScriptStruct>(nullptr, *def.SuperPath.ToString());
 		check(superScriptStruct->IsNative());
-		check(!superScriptStruct->GetCppStructOps() || !superScriptStruct->PropertyLink); // Only support empty C++ base.
 		scriptStruct->SetSuperStruct(superScriptStruct);
 		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | superScriptStruct->StructFlags & STRUCT_Inherit);
 		check(!FZSharpFieldRegistry::Get().IsZSharpScriptStruct(superScriptStruct) || (scriptStruct->StructFlags & STRUCT_HasInstancedReference) == STRUCT_NoFlags); // If super is a Z# script struct then it should not have STRUCT_HasInstancedReference fixed up yet.
@@ -1357,14 +1339,16 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 		zsstrct->NetSerializeZCallName = ZUnrealFieldEmitter_Private::MakeNMZCallName(scriptStruct, ".netserialize");
 	}
 	
+	// We don't manage lifetime of ops, DeferCppStructOps does.
+	TTuple<void*, void*> chunks;
+	verify(ZUnrealFieldEmitter_Private::GDeferredStructOpsThunks.RemoveAndCopyValue(scriptStruct->GetPathName(), chunks));
+	auto ops = new ZSharpScriptStruct_Private::FZSharpStructOps { scriptStruct->GetPropertiesSize(), scriptStruct->GetMinAlignment(), chunks.Get<0>(), chunks.Get<1>() };
+	scriptStruct->DeferCppStructOps(FTopLevelAssetPath { pak->GetFName(), scriptStruct->GetFName() }, ops);
+	
 	// Compile script struct.
 	// All referenced script structs should be initialized so struct properties can link properly.
 	scriptStruct->StaticLink(true);
 	ZUnrealFieldEmitter_Private::FixupAlignmentForStruct(scriptStruct); // Link() aligns the last property for script struct, but we don't want to depend on implementation.
-	
-	FUserStructOnScopeIgnoreDefaults& defaultInstance = scriptStruct->*ZUnrealFieldEmitter_Private::GUUserDefinedStructDefaultInstanceMemberPtr;
-	defaultInstance.Recreate(scriptStruct);
-	ZSharpStruct_Private::SetupPropertyDefaults(zsstrct, defaultInstance.GetStructMemory());
 	
 #if DO_CHECK
 	for (TFieldIterator<const FProperty> it(scriptStruct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
@@ -1372,6 +1356,10 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 		check(it->GetOffset_ForInternal() > 0 || !FZReflectionHelper::IsPropertyForceCopy(*it));
 	}
 #endif
+	
+	// Compile Z# struct.
+	FZSharpScriptStruct* zsstruct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
+	zsstruct->FakeVTable = (FZSharpStructOpsFakeVTable*)ops->FakeVPtr;
 }
 
 void ZSharp::FZUnrealFieldEmitter::FinishEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const
@@ -1661,6 +1649,66 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitClass_II(UPackage* pak, FZClassDefini
 	cls->SetUpRuntimeReplicationData();
 
 	UE_LOG(LogZSharpEmit, Log, TEXT("Successfully emit Z# class [%s]!"), *cls->GetPathName());
+}
+
+void ZSharp::FZUnrealFieldEmitterHelper::ConstructScriptStructInstance(void* instance, const UScriptStruct* scriptStruct)
+{
+	const FZSharpScriptStruct* zsstrct = FZSharpFieldRegistry::Get().GetScriptStruct(scriptStruct);
+	check(zsstrct);
+	
+	// We have to construct super manually because super may have user defined CppStructOps.
+	if (UStruct* super = scriptStruct->GetSuperStruct())
+	{
+		super->InitializeStruct(instance);
+	}
+			
+	for (TFieldIterator<FProperty> it(scriptStruct, EFieldIteratorFlags::ExcludeSuper); it; ++it)
+	{
+		check(it->ArrayDim == 1);
+		it->InitializeValue_InContainer(instance);
+	}
+
+	ZSharpStruct_Private::SetupPropertyDefaults(zsstrct, instance);
+}
+
+void ZSharp::FZUnrealFieldEmitterHelper::DestructScriptStructInstance(void* instance, const UScriptStruct* scriptStruct)
+{
+	UStruct* super = scriptStruct->GetSuperStruct();
+	for (FProperty* property = scriptStruct->DestructorLink; property; property = property->DestructorLinkNext)
+	{
+		// hit super.
+		if (super && property->IsInContainer(super->GetStructureSize()))
+		{
+			break;
+		}
+
+		check(property->ArrayDim == 1);
+		if (!property->HasAnyPropertyFlags(CPF_NoDestructor))
+		{
+			property->DestroyValue_InContainer(instance);
+		}
+	}
+
+	// We have to destruct super manually because super may have user defined CppStructOps.
+	if (super)
+	{
+		super->DestroyStruct(instance);
+	}
+}
+
+void ZSharp::FZUnrealFieldEmitterHelper::ReloadStructOpsFakeVTable(const TCHAR* scriptStructPath, void* constructThunk, void* destructThunk)
+{
+	const UScriptStruct* scriptStruct = FindObject<const UScriptStruct>(nullptr, scriptStructPath);
+	if (!scriptStruct)
+	{
+		ZUnrealFieldEmitter_Private::GDeferredStructOpsThunks.Emplace(FString { scriptStructPath }, TTuple<void*, void*> { constructThunk, destructThunk });
+		return;
+	}
+	
+	FZSharpScriptStruct* zsstrct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
+	check(zsstrct);
+	
+	zsstrct->FakeVTable->Set(constructThunk, destructThunk);
 }
 
 

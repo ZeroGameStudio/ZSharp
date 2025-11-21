@@ -41,8 +41,17 @@ void ZSharp::FZMasterAssemblyLoadContext::Unload()
 	}
 
 	UnloadingCallback();
+	
+	FZMasterAssemblyLoadContext_Interop::GPrepareUnloading();
 
+	// Reversely release conjugate registries (finally UObjects).
+	TArray<IZConjugateRegistry*> reversedRegistries;
 	for (const auto& registry : ConjugateRegistries)
+	{
+		reversedRegistries.Insert(registry.Get(), 0);
+	}
+	
+	for (const auto& registry : reversedRegistries)
 	{
 		registry->Release();
 	}

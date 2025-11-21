@@ -118,6 +118,40 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         }
     }
 
+    public void PrepareUnloading()
+    {
+        try
+        {
+            foreach (var rec in _unloadingCallbacks)
+            {
+                rec.Callback();
+            }
+        }
+        catch (Exception ex)
+        {
+            CoreLog.Warning($"Unhandled exception detected in MasterALC unloading callback.\n{ex}");
+        }
+
+        // Dispose all conjugates to ensure that there is no resource leak.
+        Dictionary<IntPtr, ConjugateRec> temp = _conjugateMap.ToDictionary();
+        foreach (var pair in temp)
+        {
+            if (!pair.Value.WeakRef.TryGetTarget(out var conjugate))
+            {
+                CoreLog.Error($"Conjugate {pair.Key} is expired!");
+                continue;
+            }
+            
+            // Black only, unmanaged side will handle red.
+            if (conjugate.IsBlack)
+            {
+                conjugate.Dispose();
+            }
+        }
+        
+        FlushPendingDisposedConjugates(this);
+    }
+
     public EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
     {
         GuardInvariant();
@@ -210,6 +244,26 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     
     public static MasterAssemblyLoadContext? Instance { get; private set; }
 
+    public uint64 Generation { get; }
+
+    protected override void HandleUnload()
+    {
+        try
+        {
+            if (Instance != this)
+            {
+                CoreLog.Error("Current Master ALC is not this instance!");
+                return;
+            }
+
+            Instance = null;
+        }
+        finally
+        {
+            base.HandleUnload();
+        }
+    }
+
     protected override void HandleAssemblyLoaded(Assembly assembly)
     {
         foreach (var type in assembly.GetTypes())
@@ -230,59 +284,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         }
         
         base.HandleAssemblyLoaded(assembly);
-    }
-
-    protected override void HandleUnload()
-    {
-        try
-        {
-            if (Instance != this)
-            {
-                CoreLog.Error("Current Master ALC is not this instance!");
-                return;
-            }
-
-            try
-            {
-                foreach (var rec in _unloadingCallbacks)
-                {
-                    rec.Callback();
-                }
-            }
-            catch (Exception ex)
-            {
-                CoreLog.Warning($"Unhandled exception detected in MasterALC unloading callback.\n{ex}");
-            }
-
-            // Dispose all conjugates to ensure that there is no resource leak.
-            Dictionary<IntPtr, ConjugateRec> temp = _conjugateMap.ToDictionary();
-            foreach (var pair in temp)
-            {
-                if (!pair.Value.WeakRef.TryGetTarget(out var conjugate))
-                {
-                    CoreLog.Error($"Conjugate {pair.Key} is expired!");
-                    continue;
-                }
-                
-                // All red conjugates should have been released at this point.
-                if (!conjugate.IsBlack)
-                {
-                    CoreLog.Error($"Conjugate {pair.Key} is not black!");
-                    continue;
-                }
-                
-                conjugate.Dispose();
-            }
-
-            // Manually flush pending disposed conjugates before mark IsUnloaded.
-            FlushPendingDisposedConjugates(this);
-
-            Instance = null;
-        }
-        finally
-        {
-            base.HandleUnload();
-        }
     }
     
     private readonly record struct ConjugateRec(uint16 RegistryId, WeakReference<IConjugate> WeakRef);
@@ -311,6 +312,9 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     private MasterAssemblyLoadContext() : base(INSTANCE_NAME)
     {
+        ++_generation;
+        Generation = _generation;
+        
         Instance = this;
 
         _conjugateKeyCache.TryAdd($"@{typeof(uint8).FullName}", typeof(uint8));
@@ -442,6 +446,8 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 1 << 16;
     private const string BUILD_CONJUGATE_METHOD_NAME = nameof(IConjugate<>.BuildConjugate);
+
+    private static uint64 _generation;
 
     private static readonly List<UnloadingRec> _unloadingCallbacks = new();
     private static uint64 _unloadingHandle;

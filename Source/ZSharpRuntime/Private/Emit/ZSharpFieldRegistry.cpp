@@ -2,6 +2,7 @@
 
 #include "ZSharpFieldRegistry.h"
 
+#include "ZSharpStructOps.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 
@@ -108,6 +109,7 @@ void ZSharp::FZSharpFieldRegistry::ClearAlcSensitiveStates()
 	for (const auto& pair : ScriptStructRegistry)
 	{
 		pair.Value->NetSerializeZCallHandle = {};
+		pair.Value->FakeVTable->Clear();
 	}
 	
 	for (const auto& pair : ClassRegistry)

@@ -206,6 +206,9 @@ namespace ZSharp
 				ReleaseConjugate_Red(conjugate);
 			}
 		}
+		
+		virtual uint16 GetRegistryId() const override { return RegistryId; }
+		virtual int32 GetNumConjugates() const override { return ConjugateMap.Num(); }
 
 	private:
 		void* BuildConjugate_Black(void* userdata)

@@ -12,6 +12,8 @@
 ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(TUniqueFunction<void()>&& unloadingCallback, TUniqueFunction<void()>&& unloadedCallback)
 	: UnloadingCallback(MoveTemp(unloadingCallback))
 	, UnloadedCallback(MoveTemp(unloadedCallback))
+	, bCoreUObjectShutdown(false)
+	, bUnloadingPrepared(false)
 	, bUnloaded(false)
 	, RedStackDepth(0)
 {
@@ -21,6 +23,8 @@ ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(TUniqueFunction
 	});
 	
 	GCDelegate = FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);
+	PreExitDelegate = FCoreDelegates::OnPreExit.AddRaw(this, &ThisClass::HandlePreExit);
+	
 }
 
 ZSharp::FZMasterAssemblyLoadContext::~FZMasterAssemblyLoadContext()
@@ -42,7 +46,7 @@ void ZSharp::FZMasterAssemblyLoadContext::Unload()
 
 	UnloadingCallback();
 	
-	FZMasterAssemblyLoadContext_Interop::GPrepareUnloading();
+	PrepareUnloading();
 
 	// Reversely release conjugate registries (finally UObjects).
 	TArray<IZConjugateRegistry*> reversedRegistries;
@@ -53,6 +57,23 @@ void ZSharp::FZMasterAssemblyLoadContext::Unload()
 	
 	for (const auto& registry : reversedRegistries)
 	{
+		if (bCoreUObjectShutdown)
+		{
+			/*
+			 * If CoreUObject module has shutdown, then all conjugates should have gone:
+			 * 1. All black conjugates have been released during PrepareUnloading().
+			 * 2. All UObjects have been purged during FCoreDelegate::OnExit so there are no UObject red conjugates.
+			 * 3. We are not in red stack so there are no other red conjugates.
+			 */
+			check(registry->GetNumConjugates() == 0);
+		}
+		else
+		{
+			// If CoreUObject module has not shutdown, then all conjugates should have gone except UObjects.
+			constexpr uint16 GUObjectConjugateRegistryId = 1;
+			check(registry->GetRegistryId() == GUObjectConjugateRegistryId || registry->GetNumConjugates() == 0);
+		}
+		
 		registry->Release();
 	}
 
@@ -253,9 +274,31 @@ ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHan
 #endif
 }
 
+void ZSharp::FZMasterAssemblyLoadContext::PrepareUnloading()
+{
+	if (bUnloadingPrepared)
+	{
+		return;
+	}
+	
+	bUnloadingPrepared = true;
+	
+	FZMasterAssemblyLoadContext_Interop::GPrepareUnloading();
+}
+
 void ZSharp::FZMasterAssemblyLoadContext::HandleGarbageCollectComplete()
 {
 	UE_CLOG(IsInRedStack(), LogZSharpCore, Fatal, TEXT("Collect Garbage inside of Red ZCall!!!"));
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::HandlePreExit()
+{
+	PrepareUnloading();
+}
+
+void ZSharp::FZMasterAssemblyLoadContext::HandleExit()
+{
+	bCoreUObjectShutdown = true;
 }
 
 

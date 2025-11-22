@@ -50,6 +50,9 @@ namespace ZSharp
 		 * Should pop the top frame of your inner storage and release any conjugates captured by this frame.
 		 */
 		virtual void PopRedFrame() = 0;
+		
+		virtual uint16 GetRegistryId() const = 0;
+		virtual int32 GetNumConjugates() const = 0;
 
 	public:
 		virtual ~IZConjugateRegistry(){}

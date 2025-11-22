@@ -120,6 +120,14 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public void PrepareUnloading()
     {
+        if (_unloadingPrepared)
+        {
+            CoreLog.Error("PrepareUnloading() called more than once!");
+            return;
+        }
+        
+        _unloadingPrepared = true;
+        
         try
         {
             foreach (var rec in _unloadingCallbacks)
@@ -187,6 +195,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     public IntPtr BuildConjugate_Red(IntPtr unmanaged, IntPtr typeHandle)
     {
         GuardInvariant();
+        GuardUnloadingPrepared();
         
         if (!_buildRedConjugateDelegateLookup.TryGetValue(typeHandle, out var buildConjugate))
         {
@@ -340,6 +349,15 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         this.GuardUnloaded();
     }
     
+    [Conditional("ASSERTION_CHECK_SLOW")]
+    private void GuardUnloadingPrepared()
+    {
+        if (_unloadingPrepared)
+        {
+            throw new InvalidOperationException("Master ALC is Unloading.");
+        }
+    }
+    
     private Type? GetTypeForCompositeKey(string key)
     {
         int32 quoteIndex = key.IndexOf('<');
@@ -398,6 +416,8 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     private IntPtr BuildConjugate_Black(IConjugate managed, IntPtr userdata)
     {
+        GuardUnloadingPrepared();
+        
         uint16 registryId = GetTypeConjugateRegistryId(managed.GetType());
         if (registryId == 0)
         {
@@ -460,6 +480,8 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private readonly Dictionary<Type, uint16> _conjugateRegistryIdLookup = new();
     private readonly Queue<IConjugate> _pendingDisposedConjugates = new();
     private readonly Lock _pendingDisposedConjugatesLock = new();
+    
+    private bool _unloadingPrepared;
 
     private readonly Dictionary<IntPtr, Func<IntPtr, IConjugate>> _buildRedConjugateDelegateLookup = [];
 

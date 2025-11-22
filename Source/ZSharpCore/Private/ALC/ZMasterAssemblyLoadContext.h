@@ -53,16 +53,22 @@ namespace ZSharp
 		
 		FZCallHandle GetZCallHandle_Red(const FString& name);
 		EZCallErrorCode ZCall_Red(FZCallHandle handle, FZCallBuffer* buffer);
+		
+		void PrepareUnloading();
 
 	private:
 		bool IsInRedStack() const { return !!RedStackDepth; }
 		
 	private:
 		void HandleGarbageCollectComplete();
+		void HandlePreExit();
+		void HandleExit();
 
 	private:
 		TUniqueFunction<void()> UnloadingCallback;
 		TUniqueFunction<void()> UnloadedCallback;
+		bool bCoreUObjectShutdown;
+		bool bUnloadingPrepared;
 		bool bUnloaded;
 
 		TMap<FZCallHandle, TUniquePtr<IZCallDispatcher>> ZCallMap;
@@ -74,6 +80,7 @@ namespace ZSharp
 		int32 RedStackDepth;
 
 		FDelegateHandle GCDelegate;
+		FDelegateHandle PreExitDelegate;
 		
 	};
 }

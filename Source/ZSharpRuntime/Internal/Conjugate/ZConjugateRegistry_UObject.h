@@ -66,6 +66,8 @@ namespace ZSharp
 		virtual void ReleaseConjugate(void* unmanaged) override;
 		virtual void PushRedFrame() override;
 		virtual void PopRedFrame() override;
+		virtual uint16 GetRegistryId() const override { return RegistryId; }
+		virtual int32 GetNumConjugates() const override { return ConjugateMap.Num(); }
 
 	private:
 		void ReleaseConjugate_Red(void* unmanaged);

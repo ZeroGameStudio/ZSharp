@@ -468,12 +468,15 @@ void ZSharp::FZGenericClr::Shutdown()
 	if (MasterAlc)
 	{
 		MasterAlc->Unload();
+		MasterAlc = nullptr;
 	}
 
 	for (const auto& Pair : SlimAlcMap)
 	{
 		Pair.Value->Unload();
 	}
+	
+	SlimAlcMap.Empty();
 
 	bInitialized = false;
 }

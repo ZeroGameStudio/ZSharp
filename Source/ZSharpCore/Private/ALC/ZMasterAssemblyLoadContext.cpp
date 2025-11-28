@@ -24,7 +24,6 @@ ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(TUniqueFunction
 	
 	GCDelegate = FCoreUObjectDelegates::GarbageCollectComplete.AddRaw(this, &ThisClass::HandleGarbageCollectComplete);
 	PreExitDelegate = FCoreDelegates::OnPreExit.AddRaw(this, &ThisClass::HandlePreExit);
-	
 }
 
 ZSharp::FZMasterAssemblyLoadContext::~FZMasterAssemblyLoadContext()
@@ -32,10 +31,12 @@ ZSharp::FZMasterAssemblyLoadContext::~FZMasterAssemblyLoadContext()
 	check(bUnloaded);
 	
 	FCoreUObjectDelegates::GarbageCollectComplete.Remove(GCDelegate);
+	FCoreDelegates::OnPreExit.Remove(PreExitDelegate);
 }
 
 void ZSharp::FZMasterAssemblyLoadContext::Unload()
 {
+	checkNoRecursion();
 	checkSlow(IsInGameThread());
 	check(!IsInRedStack());
 
@@ -276,6 +277,8 @@ ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Red(FZCallHan
 
 void ZSharp::FZMasterAssemblyLoadContext::PrepareUnloading()
 {
+	checkNoRecursion();
+	
 	if (bUnloadingPrepared)
 	{
 		return;

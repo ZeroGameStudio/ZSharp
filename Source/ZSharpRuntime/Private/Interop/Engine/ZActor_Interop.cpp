@@ -39,7 +39,7 @@ void ZSharp::FZActor_Interop::FinishSpawning(FZConjugateHandle self, FZConjugate
 		auto pSelf = alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
 		FZSelfDescriptiveScriptStruct* sdTransform = alc->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().ConjugateUnsafe(transform);
 		const FTransform& spawnTransform = sdTransform && sdTransform->GetDescriptor() == TBaseStructure<FTransform>::Get() ? *sdTransform->GetTypedUnderlyingInstance<FTransform>() : FTransform::Identity;
-		pSelf->FinishSpawning(spawnTransform, true);
+		pSelf->FinishSpawning(spawnTransform);
 	);
 }
 

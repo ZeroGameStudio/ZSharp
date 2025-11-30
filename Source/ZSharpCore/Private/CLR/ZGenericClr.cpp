@@ -26,6 +26,7 @@
 #include "Interop/Core/ZSlimAssemblyLoadContext_Interop.h"
 #include "Interop/Engine/ZBuild_Interop.h"
 #include "Interop/Engine/ZPath_Interop.h"
+#include "Interop/Engine/ZProfiling_Interop.h"
 #include "Interop/ZUnmanagedFunctionInteropHelper.h"
 
 #if ZSHARP_WITH_MONO
@@ -215,6 +216,9 @@ namespace ZSharp::ZGenericClr_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Console, TryUnregisterObject),
 			
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Build, WithEditor),
+			
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Profiling, BeginCpuProfilerEvent),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Profiling, EndCpuProfilerEvent),
 			
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Path, GetProjectDir),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Path, GetPluginDir),

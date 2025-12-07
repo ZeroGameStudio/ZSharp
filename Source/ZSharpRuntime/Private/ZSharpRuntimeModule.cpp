@@ -2,6 +2,8 @@
 
 #include "ZSharpRuntimeModule.h"
 
+#include "Interop/ZInteropAssertions.h"
+
 #include "ZSharpRuntimeLogChannels.h"
 #include "ZSharpRuntimeMacros.h"
 #include "CLR/IZSharpClr.h"
@@ -339,6 +341,26 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, AddComponent),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, FinishAddComponent),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, GetNetMode),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, GetActorTransform),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, GetActorLocation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, GetActorRotation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, GetActorScale),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, SetActorTransform),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, SetActorLocation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, SetActorRotation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, SetActorLocationAndRotation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, SetActorScale),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, SetActorRelativeTransform),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, SetActorRelativeLocation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, SetActorRelativeRotation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, SetActorRelativeScale),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, AddActorWorldTransform),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, AddActorWorldTransformKeepScale),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, AddActorWorldOffset),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, AddActorWorldRotation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, AddActorLocalTransform),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, AddActorLocalOffset),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, AddActorLocalRotation),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(ActorComponent, GetNetMode),
 

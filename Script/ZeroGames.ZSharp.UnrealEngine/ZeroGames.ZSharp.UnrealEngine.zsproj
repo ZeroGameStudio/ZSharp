@@ -12,6 +12,13 @@
 		"ZeroGames.ZSharp.Core.Async",
 		"ZeroGames.ZSharp.Emit",
 	],
+	"ExternalReferences":
+	[
+		{
+			"Name": "ZeroGames.Extensions.Math",
+			"Path": "$(ZSharpPluginDir)/Managed/ForwardShared/ZeroGames.Extensions.Math.dll"
+		}
+	],
 	"PublicUsings":
 	[
 		"ZeroGames.ZSharp.UnrealEngine",

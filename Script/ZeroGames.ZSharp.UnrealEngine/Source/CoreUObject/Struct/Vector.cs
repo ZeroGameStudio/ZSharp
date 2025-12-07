@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using ZeroGames.Extensions.Math;
+
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 public partial class FVector
@@ -28,6 +30,9 @@ public partial class FVector
 		Y = y;
 		Z = z;
 	}
+	
+	public static implicit operator FVector(Vector value) => new(value.X, value.Y, value.Z);
+	public static implicit operator Vector(FVector value) => new(value.X, value.Y, value.Z);
 	
 	public void Deconstruct(out double x, out double y, out double z)
 	{
@@ -99,9 +104,6 @@ public partial class FVector
 	public static double operator|(FVector lhs, FVector rhs) => lhs.Dot(rhs);
 	public static FVector operator^(FVector lhs, FVector rhs) => lhs.Cross(rhs);
 	
-	public static explicit operator FRotator(FVector @this) => @this.Rotator;
-	public static explicit operator FQuat(FVector @this) => @this.Quat;
-
 	public double this[int32 index]
 	{
 		get => index switch
@@ -183,7 +185,7 @@ public partial class FVector
 	public FQuat Quat => Rotator.Quat;
 
 	private const double TOLERANCE = 1e-4;
-	private const double NORMALIZED_TOLERANCE = 1e-2;
+	private const double NORMALIZED_TOLERANCE = 1e-8;
 	
 }
 

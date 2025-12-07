@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using ZeroGames.Extensions.Math;
+
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 public partial class FRotator
@@ -11,6 +13,9 @@ public partial class FRotator
 		Yaw = yaw;
 		Roll = roll;
 	}
+	
+	public static implicit operator FRotator(Rotator value) => new(value.Pitch, value.Yaw, value.Roll);
+	public static implicit operator Rotator(FRotator value) => new(value.Pitch, value.Yaw, value.Roll);
 	
 	public void Deconstruct(out double pitch, out double yaw, out double roll)
 	{
@@ -28,9 +33,6 @@ public partial class FRotator
 	public FVector RotateVector(FVector vector) => UKismetMathLibrary.Quat_RotateVector(Quat, vector);
 	public FVector UnrotateVector(FVector vector) => UKismetMathLibrary.Quat_UnrotateVector(Quat, vector);
 	
-	public static explicit operator FVector(FRotator @this) => @this.Vector;
-	public static explicit operator FQuat(FRotator @this) => @this.Quat;
-
 	public FVector Vector => UKismetMathLibrary.Conv_RotatorToVector(this);
 	public FQuat Quat => UKismetMathLibrary.Conv_RotatorToQuaternion(this);
 

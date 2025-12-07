@@ -14,7 +14,7 @@ namespace ZSharp
 	class FZGenericClr final : public IZSharpClr
 	{
 
-		using ThisClass = FZGenericClr;
+		using ThisClass = FZGenericClr; 
 
 	public:
 		static FZGenericClr& Get();

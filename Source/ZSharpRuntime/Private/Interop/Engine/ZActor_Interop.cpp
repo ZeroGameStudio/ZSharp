@@ -2,10 +2,7 @@
 
 #include "ZActor_Interop.h"
 
-#include "ALC/IZMasterAssemblyLoadContext.h"
-#include "CLR/IZSharpClr.h"
-#include "Conjugate/ZConjugateRegistry_UObject.h"
-#include "Conjugate/ZStrangeConjugateRegistries.h"
+#include "Conjugate/ZConjugateUnsafe.h"
 #include "Interop/ZInteropExceptionHelper.h"
 
 namespace ZSharp::ZActor_Interop_Private
@@ -35,10 +32,9 @@ void ZSharp::FZActor_Interop::FinishSpawning(FZConjugateHandle self, FZConjugate
 {
 	GUARD
 	(
-		IZMasterAssemblyLoadContext* alc = IZSharpClr::Get().GetMasterAlc();
-		auto pSelf = alc->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		FZSelfDescriptiveScriptStruct* sdTransform = alc->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().ConjugateUnsafe(transform);
-		const FTransform& spawnTransform = sdTransform && sdTransform->GetDescriptor() == TBaseStructure<FTransform>::Get() ? *sdTransform->GetTypedUnderlyingInstance<FTransform>() : FTransform::Identity;
+		auto pSelf = ConjugateUnsafe<AActor>(self);
+		auto pTransform = ConjugateUnsafe<FTransform>(transform);
+		const FTransform& spawnTransform = pTransform ? *pTransform : FTransform::Identity;
 		pSelf->FinishSpawning(spawnTransform);
 	);
 }
@@ -47,9 +43,12 @@ ZSharp::FZConjugateHandle ZSharp::FZActor_Interop::AddComponent(FZConjugateHandl
 {
 	TRY
 	{
-		auto& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-		auto pSelf = registry.ConjugateUnsafe<AActor>(self);
-		auto pComponentClass = registry.ConjugateUnsafe<UClass>(componentClass);
+		auto pSelf = ConjugateUnsafe<AActor>(self);
+		auto pComponentClass = ConjugateUnsafe<UClass>(componentClass);
+		if (!pComponentClass)
+		{
+			return {};
+		}
 	
 		UActorComponent* component = NewObject<UActorComponent>(pSelf, pComponentClass);
 		ZActor_Interop_Private::AttachComponent(pSelf, component);
@@ -59,7 +58,7 @@ ZSharp::FZConjugateHandle ZSharp::FZActor_Interop::AddComponent(FZConjugateHandl
 			ZActor_Interop_Private::FinishAddComponent(pSelf, component);
 		}
 	
-		return registry.Conjugate(component);
+		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(component);
 	}
 	CATCHR({})
 }
@@ -68,9 +67,12 @@ void ZSharp::FZActor_Interop::FinishAddComponent(FZConjugateHandle self, FZConju
 {
 	GUARD
 	(
-		auto& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-		auto pSelf = registry.ConjugateUnsafe<AActor>(self);
-		auto pComponent = registry.ConjugateUnsafe<UActorComponent>(component);
+		auto pSelf = ConjugateUnsafe<AActor>(self);
+		auto pComponent = ConjugateUnsafe<UActorComponent>(component);
+		if (!pComponent)
+		{
+			return;
+		}
 		
 		ZActor_Interop_Private::FinishAddComponent(pSelf, pComponent);
 	);
@@ -80,54 +82,36 @@ ENetMode ZSharp::FZActor_Interop::GetNetMode(FZConjugateHandle self)
 {
 	TRY
 	{
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->GetNetMode();
+		return ConjugateUnsafe<AActor>(self)->GetNetMode();
 	}
 	CATCHR(NM_Standalone)
 }
 
 void ZSharp::FZActor_Interop::GetActorTransform(FZConjugateHandle self, FTransform& transform)
 {
-	GUARD
-	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		transform = pSelf->GetActorTransform();
-	);
+	GUARD(transform = ConjugateUnsafe<AActor>(self)->GetActorTransform());
 }
 
 void ZSharp::FZActor_Interop::GetActorLocation(FZConjugateHandle self, FVector& location)
 {
-	GUARD
-	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		location = pSelf->GetActorLocation();
-	);
+	GUARD(location = ConjugateUnsafe<AActor>(self)->GetActorLocation());
 }
 
 void ZSharp::FZActor_Interop::GetActorRotation(FZConjugateHandle self, FRotator& rotation)
 {
-	GUARD
-	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		rotation = pSelf->GetActorRotation();
-	);
+	GUARD(rotation = ConjugateUnsafe<AActor>(self)->GetActorRotation());
 }
 
 void ZSharp::FZActor_Interop::GetActorScale(FZConjugateHandle self, FVector& scale)
 {
-	GUARD
-	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		scale = pSelf->GetActorScale();
-	);
+	GUARD(scale = ConjugateUnsafe<AActor>(self)->GetActorScale());
 }
 
 uint8 ZSharp::FZActor_Interop::SetActorTransform(FZConjugateHandle self, const FTransform& newTransform, uint8 sweep, ETeleportType teleport)
 {
 	TRY
 	{
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->SetActorTransform(newTransform, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->SetActorTransform(newTransform, !!sweep, nullptr, teleport);
 	}
 	CATCHR(false)
 }
@@ -136,8 +120,7 @@ uint8 ZSharp::FZActor_Interop::SetActorLocation(FZConjugateHandle self, const FV
 {
 	TRY
 	{
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->SetActorLocation(newLocation, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->SetActorLocation(newLocation, !!sweep, nullptr, teleport);
 	}
 	CATCHR(false)
 }
@@ -146,8 +129,7 @@ uint8 ZSharp::FZActor_Interop::SetActorRotation(FZConjugateHandle self, const FR
 {
 	TRY
 	{
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->SetActorRotation(newRotator, teleport);
+		return ConjugateUnsafe<AActor>(self)->SetActorRotation(newRotator, teleport);
 	}
 	CATCHR(false)
 }
@@ -156,8 +138,7 @@ uint8 ZSharp::FZActor_Interop::SetActorLocationAndRotation(FZConjugateHandle sel
 {
 	TRY
 	{
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->SetActorLocationAndRotation(newLocation, newRotator, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->SetActorLocationAndRotation(newLocation, newRotator, !!sweep, nullptr, teleport);
 	}
 	CATCHR(false)
 }
@@ -166,8 +147,7 @@ void ZSharp::FZActor_Interop::SetActorScale(FZConjugateHandle self, const FVecto
 {
 	GUARD
 	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->SetActorScale3D(newScale);
+		return ConjugateUnsafe<AActor>(self)->SetActorScale3D(newScale);
 	);
 }
 
@@ -175,8 +155,7 @@ void ZSharp::FZActor_Interop::SetActorRelativeTransform(FZConjugateHandle self, 
 {
 	TRY
 	{
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->SetActorRelativeTransform(newTransform, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->SetActorRelativeTransform(newTransform, !!sweep, nullptr, teleport);
 	}
 	CATCHR(false)
 }
@@ -185,8 +164,7 @@ void ZSharp::FZActor_Interop::SetActorRelativeLocation(FZConjugateHandle self, c
 {
 	GUARD
 	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->SetActorRelativeLocation(newLocation, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->SetActorRelativeLocation(newLocation, !!sweep, nullptr, teleport);
 	);
 }
 
@@ -194,8 +172,7 @@ void ZSharp::FZActor_Interop::SetActorRelativeRotation(FZConjugateHandle self, c
 {
 	GUARD
 	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->SetActorRelativeRotation(newRotator, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->SetActorRelativeRotation(newRotator, !!sweep, nullptr, teleport);
 	);
 }
 
@@ -203,8 +180,7 @@ void ZSharp::FZActor_Interop::SetActorRelativeScale(FZConjugateHandle self, cons
 {
 	GUARD
 	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->SetActorRelativeScale3D(newScale);
+		return ConjugateUnsafe<AActor>(self)->SetActorRelativeScale3D(newScale);
 	);
 }
 
@@ -212,8 +188,7 @@ void ZSharp::FZActor_Interop::AddActorWorldTransform(FZConjugateHandle self, con
 {
 	GUARD
 	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->AddActorWorldTransform(deltaTransform, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->AddActorWorldTransform(deltaTransform, !!sweep, nullptr, teleport);
 	);
 }
 
@@ -221,8 +196,7 @@ void ZSharp::FZActor_Interop::AddActorWorldTransformKeepScale(FZConjugateHandle 
 {
 	GUARD
 	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->AddActorWorldTransformKeepScale(deltaTransform, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->AddActorWorldTransformKeepScale(deltaTransform, !!sweep, nullptr, teleport);
 	);
 }
 
@@ -230,8 +204,7 @@ void ZSharp::FZActor_Interop::AddActorWorldOffset(FZConjugateHandle self, const 
 {
 	GUARD
 	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->AddActorWorldOffset(deltaLocation, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->AddActorWorldOffset(deltaLocation, !!sweep, nullptr, teleport);
 	);
 }
 
@@ -239,8 +212,7 @@ void ZSharp::FZActor_Interop::AddActorWorldRotation(FZConjugateHandle self, cons
 {
 	GUARD
 	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->AddActorWorldRotation(deltaRotator, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->AddActorWorldRotation(deltaRotator, !!sweep, nullptr, teleport);
 	);
 }
 
@@ -248,8 +220,7 @@ void ZSharp::FZActor_Interop::AddActorLocalTransform(FZConjugateHandle self, con
 {
 	GUARD
 	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->AddActorLocalTransform(deltaTransform, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->AddActorLocalTransform(deltaTransform, !!sweep, nullptr, teleport);
 	);
 }
 
@@ -257,8 +228,7 @@ void ZSharp::FZActor_Interop::AddActorLocalOffset(FZConjugateHandle self, const 
 {
 	GUARD
 	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->AddActorLocalOffset(deltaLocation, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->AddActorLocalOffset(deltaLocation, !!sweep, nullptr, teleport);
 	);
 }
 
@@ -266,8 +236,7 @@ void ZSharp::FZActor_Interop::AddActorLocalRotation(FZConjugateHandle self, cons
 {
 	GUARD
 	(
-		auto pSelf = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<AActor>(self);
-		return pSelf->AddActorLocalRotation(deltaRotator, !!sweep, nullptr, teleport);
+		return ConjugateUnsafe<AActor>(self)->AddActorLocalRotation(deltaRotator, !!sweep, nullptr, teleport);
 	);
 }
 

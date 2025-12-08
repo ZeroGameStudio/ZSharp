@@ -47,7 +47,6 @@ namespace ZSharp::ZWorld_Interop_Private
 					FZRedFrameScope scope;
 					FZWorld_Interop::GPreLoadMap(*map);
 				}
-
 			});
 			
 			FCoreUObjectDelegates::PostLoadMapWithWorld.AddLambda([](UWorld* world)

@@ -4,7 +4,7 @@
 
 namespace ZSharp
 {
-	// A type T where T::StaticClass() returns UClass* and T* is convertible to UObject* is regarded as a UScriptStruct.
+	// A type T where T::StaticClass() returns UClass* and T* is convertible to UObject* is regarded as a UClass.
 	template <typename, typename = void>
 	struct TZIsUClass
 	{

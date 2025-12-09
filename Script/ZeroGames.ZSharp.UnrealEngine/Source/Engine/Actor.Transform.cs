@@ -144,52 +144,52 @@ partial class AActor
 		=> Actor_Interop.GetActorScale(ConjugateHandle.FromConjugate(this), out scale);
 	
 	private unsafe bool InternalSetActorTransform(in Transform newTransform, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.SetActorTransform(ConjugateHandle.FromConjugate(this), in newTransform, Convert.ToByte(sweep), teleport) > 0;
+		=> Actor_Interop.SetActorTransform(ConjugateHandle.FromConjugate(this), in newTransform, Convert.ToByte(sweep), Convert.ToByte(teleport)) > 0;
 	
 	private unsafe bool InternalSetActorLocation(in Vector newLocation, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.SetActorLocation(ConjugateHandle.FromConjugate(this), newLocation, Convert.ToByte(sweep), teleport) > 0;
+		=> Actor_Interop.SetActorLocation(ConjugateHandle.FromConjugate(this), newLocation, Convert.ToByte(sweep), Convert.ToByte(teleport)) > 0;
 	
 	private unsafe bool InternalSetActorRotation(in Rotator newRotation, ETeleportType teleport)
-		=> Actor_Interop.SetActorRotation(ConjugateHandle.FromConjugate(this), in newRotation, teleport) > 0;
+		=> Actor_Interop.SetActorRotation(ConjugateHandle.FromConjugate(this), in newRotation, Convert.ToByte(teleport)) > 0;
 	
 	private unsafe bool InternalSetActorLocationAndRotation(in Vector newLocation, in Rotator newRotation, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.SetActorLocationAndRotation(ConjugateHandle.FromConjugate(this), newLocation, in newRotation, Convert.ToByte(sweep), teleport) > 0;
+		=> Actor_Interop.SetActorLocationAndRotation(ConjugateHandle.FromConjugate(this), newLocation, in newRotation, Convert.ToByte(sweep), Convert.ToByte(teleport)) > 0;
 	
 	private unsafe void InternalSetActorScale(in Vector newScale)
 		=> Actor_Interop.SetActorScale(ConjugateHandle.FromConjugate(this), in newScale);
 	
 	private unsafe void InternalSetActorRelativeTransform(in Transform newRelativeTransform, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.SetActorRelativeTransform(ConjugateHandle.FromConjugate(this), in newRelativeTransform, Convert.ToByte(sweep), teleport);
+		=> Actor_Interop.SetActorRelativeTransform(ConjugateHandle.FromConjugate(this), in newRelativeTransform, Convert.ToByte(sweep), Convert.ToByte(teleport));
 	
 	private unsafe void InternalSetActorRelativeLocation(in Vector newRelativeLocation, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.SetActorRelativeLocation(ConjugateHandle.FromConjugate(this), in newRelativeLocation, Convert.ToByte(sweep), teleport);
+		=> Actor_Interop.SetActorRelativeLocation(ConjugateHandle.FromConjugate(this), in newRelativeLocation, Convert.ToByte(sweep), Convert.ToByte(teleport));
 	
 	private unsafe void InternalSetActorRelativeRotation(in Rotator newRelativeRotation, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.SetActorRelativeRotation(ConjugateHandle.FromConjugate(this), in newRelativeRotation, Convert.ToByte(sweep), teleport);
+		=> Actor_Interop.SetActorRelativeRotation(ConjugateHandle.FromConjugate(this), in newRelativeRotation, Convert.ToByte(sweep), Convert.ToByte(teleport));
 	
 	private unsafe void InternalSetActorRelativeScale(in Vector newRelativeScale)
 		=> Actor_Interop.SetActorRelativeScale(ConjugateHandle.FromConjugate(this), in newRelativeScale);
 	
 	private unsafe void InternalAddActorWorldTransform(in Transform deltaTransform, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.AddActorWorldTransform(ConjugateHandle.FromConjugate(this), in deltaTransform, Convert.ToByte(sweep), teleport);
+		=> Actor_Interop.AddActorWorldTransform(ConjugateHandle.FromConjugate(this), in deltaTransform, Convert.ToByte(sweep), Convert.ToByte(teleport));
 	
 	private unsafe void InternalAddActorWorldTransformKeepScale(in Transform deltaTransform, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.AddActorWorldTransformKeepScale(ConjugateHandle.FromConjugate(this), in deltaTransform, Convert.ToByte(sweep), teleport);
+		=> Actor_Interop.AddActorWorldTransformKeepScale(ConjugateHandle.FromConjugate(this), in deltaTransform, Convert.ToByte(sweep), Convert.ToByte(teleport));
 	
 	private unsafe void InternalAddActorWorldOffset(in Vector deltaLocation, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.AddActorWorldOffset(ConjugateHandle.FromConjugate(this), in deltaLocation, Convert.ToByte(sweep), teleport);
+		=> Actor_Interop.AddActorWorldOffset(ConjugateHandle.FromConjugate(this), in deltaLocation, Convert.ToByte(sweep), Convert.ToByte(teleport));
 	
 	private unsafe void InternalAddActorWorldRotation(in Rotator deltaRotation, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.AddActorWorldRotation(ConjugateHandle.FromConjugate(this), in deltaRotation, Convert.ToByte(sweep), teleport);
+		=> Actor_Interop.AddActorWorldRotation(ConjugateHandle.FromConjugate(this), in deltaRotation, Convert.ToByte(sweep), Convert.ToByte(teleport));
 	
 	private unsafe void InternalAddActorLocalTransform(in Transform deltaTransform, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.AddActorLocalTransform(ConjugateHandle.FromConjugate(this), in deltaTransform, Convert.ToByte(sweep), teleport);
+		=> Actor_Interop.AddActorLocalTransform(ConjugateHandle.FromConjugate(this), in deltaTransform, Convert.ToByte(sweep), Convert.ToByte(teleport));
 	
 	private unsafe void InternalAddActorLocalOffset(in Vector deltaLocation, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.AddActorLocalOffset(ConjugateHandle.FromConjugate(this), in deltaLocation, Convert.ToByte(sweep), teleport);
+		=> Actor_Interop.AddActorLocalOffset(ConjugateHandle.FromConjugate(this), in deltaLocation, Convert.ToByte(sweep), Convert.ToByte(teleport));
 	
 	private unsafe void InternalAddActorLocalRotation(in Rotator deltaRotation, bool sweep, ETeleportType teleport)
-		=> Actor_Interop.AddActorLocalRotation(ConjugateHandle.FromConjugate(this), in deltaRotation, Convert.ToByte(sweep), teleport);
+		=> Actor_Interop.AddActorLocalRotation(ConjugateHandle.FromConjugate(this), in deltaRotation, Convert.ToByte(sweep), Convert.ToByte(teleport));
 
 }
 

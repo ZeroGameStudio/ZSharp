@@ -49,6 +49,7 @@
 #include "Interop/Engine/ZWorld_Interop.h"
 #include "Interop/Engine/ZActor_Interop.h"
 #include "Interop/Engine/ZActorComponent_Interop.h"
+#include "Interop/Engine/ZSceneComponent_Interop.h"
 #include "Interop/GameplayTags/ZGameplayTag_Interop.h"
 #include "Interop/EnhancedInput/ZEnhancedInputComponent_Interop.h"
 #include "Interop/EnhancedInput/ZInputActionValue_Interop.h"
@@ -363,6 +364,31 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(Actor, AddActorLocalRotation),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(ActorComponent, GetNetMode),
+			
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, GetComponentTransform),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, GetComponentLocation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, GetComponentRotation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, GetComponentScale),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, GetSocketTransform),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, GetSocketLocation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, GetSocketRotation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, GetSocketScale),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, SetWorldTransform),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, SetWorldLocation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, SetWorldRotation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, SetWorldLocationAndRotation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, SetWorldScale),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, SetRelativeTransform),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, SetRelativeLocation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, SetRelativeRotation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, SetRelativeScale),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, AddWorldTransform),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, AddWorldTransformKeepScale),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, AddWorldOffset),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, AddWorldRotation),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, AddLocalTransform),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, AddLocalOffset),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, AddLocalRotation),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(GameplayTag, Request),
 

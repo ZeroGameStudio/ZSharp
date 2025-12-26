@@ -85,7 +85,8 @@ void ZSharp::FZSceneComponent_Interop::SetWorldTransform(FZConjugateHandle self,
     GUARD
     (
         auto pSelf = ConjugateUnsafe<USceneComponent>(self);
-        pSelf->SetWorldTransform(newTransform, !!sweep, nullptr, teleport);
+        FTransform trans = newTransform;
+        pSelf->SetWorldTransform(trans, !!sweep, nullptr, teleport);
     );
 }
 
@@ -127,12 +128,12 @@ void ZSharp::FZSceneComponent_Interop::SetWorldScale(FZConjugateHandle self, con
 
 void ZSharp::FZSceneComponent_Interop::SetRelativeTransform(FZConjugateHandle self, const FTransform& newTransform, uint8 sweep, ETeleportType teleport)
 {
-    TRY
-    {
+    GUARD
+    (
         auto pSelf = ConjugateUnsafe<USceneComponent>(self);
-        pSelf->SetRelativeTransform(newTransform, !!sweep, nullptr, teleport);
-    }
-    CATCHR(false)
+        FTransform trans = newTransform;
+        pSelf->SetRelativeTransform(trans, !!sweep, nullptr, teleport);
+    );
 }
 
 void ZSharp::FZSceneComponent_Interop::SetRelativeLocation(FZConjugateHandle self, const FVector& newLocation, uint8 sweep, ETeleportType teleport)
@@ -167,7 +168,8 @@ void ZSharp::FZSceneComponent_Interop::AddWorldTransform(FZConjugateHandle self,
     GUARD
     (
         auto pSelf = ConjugateUnsafe<USceneComponent>(self);
-        pSelf->AddWorldTransform(deltaTransform, !!sweep, nullptr, teleport);
+        FTransform trans = deltaTransform;
+        pSelf->AddWorldTransform(trans, !!sweep, nullptr, teleport);
     );
 }
 
@@ -176,7 +178,8 @@ void ZSharp::FZSceneComponent_Interop::AddWorldTransformKeepScale(FZConjugateHan
     GUARD
     (
         auto pSelf = ConjugateUnsafe<USceneComponent>(self);
-        pSelf->AddWorldTransformKeepScale(deltaTransform, !!sweep, nullptr, teleport);
+        FTransform trans = deltaTransform;
+        pSelf->AddWorldTransformKeepScale(trans, !!sweep, nullptr, teleport);
     );
 }
 
@@ -203,7 +206,8 @@ void ZSharp::FZSceneComponent_Interop::AddLocalTransform(FZConjugateHandle self,
     GUARD
     (
         auto pSelf = ConjugateUnsafe<USceneComponent>(self);
-        pSelf->AddLocalTransform(deltaTransform, !!sweep, nullptr, teleport);
+        FTransform trans = deltaTransform;
+        pSelf->AddLocalTransform(trans, !!sweep, nullptr, teleport);
     );
 }
 

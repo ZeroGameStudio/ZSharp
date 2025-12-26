@@ -9,6 +9,15 @@
 #include "Interop/ZInteropExceptionHelper.h"
 #include "ZCall/ZCallBuffer.h"
 
+namespace ZSharp::ZUnrealDelegate_Interop_Private
+{
+	static void GetFunctionName(FZConjugateHandle self, FString& functionName)
+	{
+		FZSelfDescriptiveScriptDelegate* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Delegate>().ConjugateUnsafe(self);
+		functionName = sdself->GetFunctionName().ToString();
+	}
+}
+
 ZSharp::EZCallErrorCode ZSharp::FZUnrealDelegate_Interop::Execute(FZCallBuffer* buffer)
 {
 	TRY
@@ -90,11 +99,7 @@ ZSharp::FZConjugateHandle ZSharp::FZUnrealDelegate_Interop::GetObject(FZConjugat
 
 void ZSharp::FZUnrealDelegate_Interop::GetFunctionName(FZConjugateHandle self, FString& functionName)
 {
-	GUARD
-	(
-		FZSelfDescriptiveScriptDelegate* sdself = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Delegate>().ConjugateUnsafe(self);
-		functionName = sdself->GetFunctionName().ToString();
-	);
+	GUARD(ZUnrealDelegate_Interop_Private::GetFunctionName(self, functionName));
 }
 
 

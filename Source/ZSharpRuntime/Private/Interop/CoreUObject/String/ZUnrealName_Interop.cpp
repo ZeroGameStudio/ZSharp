@@ -7,14 +7,19 @@
 #include "Conjugate/ZRegularConjugateRegistries.h"
 #include "Interop/ZInteropExceptionHelper.h"
 
-void ZSharp::FZUnrealName_Interop::GetData(FZConjugateHandle self, FString& result)
+namespace ZSharp::ZUnrealName_Interop_Private
 {
-	GUARD
-	(
+	static void GetData(FZConjugateHandle self, FString& result)
+	{
 		const auto& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Name>();
 		const FName* nameseslf = registry.ConjugateUnsafe(self);
 		result = nameseslf->ToString();
-	);
+	}
+}
+
+void ZSharp::FZUnrealName_Interop::GetData(FZConjugateHandle self, FString& result)
+{
+	GUARD(ZUnrealName_Interop_Private::GetData(self, result));
 }
 
 void ZSharp::FZUnrealName_Interop::SetData(FZConjugateHandle self, const TCHAR* data)

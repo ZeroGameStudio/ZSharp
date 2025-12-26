@@ -17,12 +17,18 @@ ZSharp::FZConjugateHandle ZSharp::FZGameInstance_Interop::GetPrimaryInstance()
 		{
 			result = gameEngine->GameInstance;
 		}
+		
+#if WITH_EDITOR
+		
 		else if (auto editorEngine = Cast<const UEditorEngine>(GEngine))
 		{
 			const FWorldContext* primaryPIEWorld = editorEngine->GetWorldContextFromPIEInstance(0);
 			result = primaryPIEWorld ? primaryPIEWorld->OwningGameInstance : nullptr;
 		}
+		
+#endif
 
+		check(result);
 		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().Conjugate(result);
 	}
 	CATCHR({})

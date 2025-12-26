@@ -7,6 +7,23 @@
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Interop/ZInteropExceptionHelper.h"
 
+namespace ZSharp::ZUnrealObject_Interop_Private
+{
+	static void GetName(FZConjugateHandle self, FString& result)
+	{
+		const FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+		auto pSelf = registry.ConjugateUnsafeChecked<const UObject>(self);
+		result = pSelf->GetName();
+	}
+
+	static void GetPathName(FZConjugateHandle self, FString& result)
+	{
+		const FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+		auto pSelf = registry.ConjugateUnsafeChecked<const UObject>(self);
+		result = pSelf->GetPathName();
+	}
+}
+
 ZSharp::FZConjugateHandle ZSharp::FZUnrealObject_Interop::GetClass(FZConjugateHandle self)
 {
 	TRY
@@ -20,22 +37,12 @@ ZSharp::FZConjugateHandle ZSharp::FZUnrealObject_Interop::GetClass(FZConjugateHa
 
 void ZSharp::FZUnrealObject_Interop::GetName(FZConjugateHandle self, FString& result)
 {
-	GUARD
-	(
-		const FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-		auto pSelf = registry.ConjugateUnsafeChecked<const UObject>(self);
-		result = pSelf->GetName();
-	);
+	GUARD(ZUnrealObject_Interop_Private::GetName(self, result));
 }
 
 void ZSharp::FZUnrealObject_Interop::GetPathName(FZConjugateHandle self, FString& result)
 {
-	GUARD
-	(
-		const FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-		auto pSelf = registry.ConjugateUnsafeChecked<const UObject>(self);
-		result = pSelf->GetPathName();
-	);
+	GUARD(ZUnrealObject_Interop_Private::GetPathName(self, result));
 }
 
 ZSharp::FZConjugateHandle ZSharp::FZUnrealObject_Interop::GetOuter(FZConjugateHandle self)

@@ -7,11 +7,19 @@
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Interop/ZInteropExceptionHelper.h"
 
+namespace ZSharp::ZStrongObjectPtr_Interop_Private
+{
+	static FZStrongObjectPtr_Interop::FStrongObjectPtr* Alloc(FZConjugateHandle target)
+	{
+		return new FZStrongObjectPtr_Interop::FStrongObjectPtr { IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe(target) };
+	}
+}
+
 ZSharp::FZStrongObjectPtr_Interop::FStrongObjectPtr* ZSharp::FZStrongObjectPtr_Interop::Alloc(FZConjugateHandle target)
 {
 	TRY
 	{
-		return new FStrongObjectPtr { IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe(target) };
+		return ZStrongObjectPtr_Interop_Private::Alloc(target);
 	}
 	CATCHR(nullptr)
 }

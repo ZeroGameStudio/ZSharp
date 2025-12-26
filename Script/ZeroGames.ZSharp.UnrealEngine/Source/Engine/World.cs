@@ -1,5 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
+using ZeroGames.Extensions.Math;
+
 namespace ZeroGames.ZSharp.UnrealEngine.Engine;
 
 public enum ESpawnActorNameMode : uint8
@@ -34,7 +36,7 @@ public partial class UWorld
 
 	#region SpawnActor
 	
-	public T? SpawnActor<T>(UClass @class, FTransform? transform, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public T? SpawnActor<T>(UClass @class, in Transform transform, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 	{
 		if (!@class.IsChildOf<T>())
 		{
@@ -49,23 +51,23 @@ public partial class UWorld
 		return null;
 	}
 	
-	public AActor? SpawnActor(UClass @class, FTransform? transform, in ActorSpawnParameters spawnParameters = default)
+	public AActor? SpawnActor(UClass @class, in Transform transform, in ActorSpawnParameters spawnParameters = default)
 		=> SpawnActor<AActor>(@class, transform, spawnParameters);
 
-	public T? SpawnActor<T>(UClass @class, FVector? location, FRotator? rotation, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
-		=> SpawnActor<T>(@class, new() { Translation = location, Rotation = rotation?.Quat }, spawnParameters);
+	public T? SpawnActor<T>(UClass @class, in Vector location, in Rotator rotation, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+		=> SpawnActor<T>(@class, new() { Translation = location, Rotation = rotation.Quaternion }, spawnParameters);
 	
-	public T? SpawnActor<T>(FTransform? transform, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public T? SpawnActor<T>(in Transform transform, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 		=> SpawnActor<T>(T.StaticClass, transform, spawnParameters);
 	
-	public T? SpawnActor<T>(FVector? location, FRotator? rotation, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public T? SpawnActor<T>(in Vector location, in Rotator rotation, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 		=> SpawnActor<T>(T.StaticClass, location, rotation, spawnParameters);
 	
 	#endregion
 	
 	#region SpawnActorAbsolute
 	
-	public T? SpawnActorAbsolute<T>(UClass @class, FTransform? transform, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public T? SpawnActorAbsolute<T>(UClass @class, in Transform transform, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 	{
 		if (!@class.IsChildOf<T>())
 		{
@@ -75,23 +77,23 @@ public partial class UWorld
 		return (T?)SpawnActorAbsolute(@class, transform, spawnParameters);
 	}
 	
-	public AActor? SpawnActorAbsolute(UClass @class, FTransform? transform, in ActorSpawnParameters spawnParameters = default)
+	public AActor? SpawnActorAbsolute(UClass @class, in Transform transform, in ActorSpawnParameters spawnParameters = default)
 		=> SpawnActorAbsolute<AActor>(@class, transform, spawnParameters);
 
-	public T? SpawnActorAbsolute<T>(UClass @class, FVector? location, FRotator? rotation, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
-		=> SpawnActorAbsolute<T>(@class, new() { Translation = location, Rotation = rotation?.Quat }, spawnParameters);
+	public T? SpawnActorAbsolute<T>(UClass @class, in Vector location, in Rotator rotation, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+		=> SpawnActorAbsolute<T>(@class, new() { Translation = location, Rotation = rotation.Quaternion }, spawnParameters);
 
-	public T? SpawnActorAbsolute<T>(FTransform? transform, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public T? SpawnActorAbsolute<T>(in Transform transform, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 		=> SpawnActorAbsolute<T>(T.StaticClass, transform, spawnParameters);
 	
-	public T? SpawnActorAbsolute<T>(FVector? location, FRotator? rotation, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public T? SpawnActorAbsolute<T>(in Vector location, in Rotator rotation, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 		=> SpawnActorAbsolute<T>(T.StaticClass, location, rotation, spawnParameters);
 	
 	#endregion
 	
 	#region SpawnActorDeferred
 
-	public T? SpawnActorDeferred<T>(UClass @class, FTransform? transform, Func<T, FTransform?> initialize, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public T? SpawnActorDeferred<T>(UClass @class, in Transform transform, Func<T, Transform?> initialize, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 	{
 		MasterAlcCache.GuardInvariant();
 		
@@ -102,7 +104,7 @@ public partial class UWorld
 		
 		if (InternalSpawnActor(@class, transform, spawnParameters, false, true) is T actor)
 		{
-			FTransform? userTransform = null;
+			Transform? userTransform = null;
 			try
 			{
 				userTransform = initialize(actor);
@@ -122,19 +124,19 @@ public partial class UWorld
 		return null;
 	}
 
-	public AActor? SpawnActorDeferred(UClass @class, FTransform? transform, Func<AActor, FTransform?> initialize, in ActorSpawnParameters spawnParameters = default)
+	public AActor? SpawnActorDeferred(UClass @class, in Transform transform, Func<AActor, Transform?> initialize, in ActorSpawnParameters spawnParameters = default)
 		=> SpawnActorDeferred<AActor>(@class, transform, initialize, spawnParameters);
 
-	public T? SpawnActorDeferred<T>(UClass @class, FVector? location, FRotator? rotation, Func<T, FTransform?> initialize, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
-		=> SpawnActorDeferred<T>(@class, new() { Translation = location, Rotation = rotation?.Quat }, initialize, spawnParameters);
+	public T? SpawnActorDeferred<T>(UClass @class, in Vector location, in Rotator rotation, Func<T, Transform?> initialize, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+		=> SpawnActorDeferred<T>(@class, new() { Translation = location, Rotation = rotation.Quaternion }, initialize, spawnParameters);
 
-	public T? SpawnActorDeferred<T>(FTransform? transform, Func<T, FTransform?> initialize, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public T? SpawnActorDeferred<T>(in Transform transform, Func<T, Transform?> initialize, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 		=> SpawnActorDeferred<T>(T.StaticClass, transform, initialize, spawnParameters);
 	
-	public T? SpawnActorDeferred<T>(FVector? location, FRotator? rotation, Func<T, FTransform?> initialize, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public T? SpawnActorDeferred<T>(in Vector location, in Rotator rotation, Func<T, Transform?> initialize, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 		=> SpawnActorDeferred<T>(T.StaticClass, location, rotation, initialize, spawnParameters);
 	
-	public T? SpawnActorDeferred<T, TState>(UClass @class, FTransform? transform, Func<T, TState, FTransform?> initialize, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public T? SpawnActorDeferred<T, TState>(UClass @class, in Transform transform, Func<T, TState, Transform?> initialize, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 	{
 		MasterAlcCache.GuardInvariant();
 		
@@ -145,7 +147,7 @@ public partial class UWorld
 		
 		if (InternalSpawnActor(@class, transform, spawnParameters, false, true) is T actor)
 		{
-			FTransform? userTransform = null;
+			Transform? userTransform = null;
 			try
 			{
 				userTransform = initialize(actor, state);
@@ -165,23 +167,23 @@ public partial class UWorld
 		return null;
 	}
 	
-	public AActor? SpawnActorDeferred<TState>(UClass @class, FTransform? transform, Func<AActor, TState, FTransform?> initialize, TState state, in ActorSpawnParameters spawnParameters = default)
+	public AActor? SpawnActorDeferred<TState>(UClass @class, in Transform transform, Func<AActor, TState, Transform?> initialize, TState state, in ActorSpawnParameters spawnParameters = default)
 		=> SpawnActorDeferred<AActor, TState>(@class, transform, initialize, state, spawnParameters);
 
-	public T? SpawnActorDeferred<T, TState>(UClass @class, FVector? location, FRotator? rotation, Func<T, TState, FTransform?> initialize, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
-		=> SpawnActorDeferred<T, TState>(@class, new() { Translation = location, Rotation = rotation?.Quat }, initialize, state, spawnParameters);
+	public T? SpawnActorDeferred<T, TState>(UClass @class, in Vector location, in Rotator rotation, Func<T, TState, Transform?> initialize, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+		=> SpawnActorDeferred<T, TState>(@class, new() { Translation = location, Rotation = rotation.Quaternion }, initialize, state, spawnParameters);
 	
-	public T? SpawnActorDeferred<T, TState>(FTransform? transform, Func<T, TState, FTransform?> initialize, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public T? SpawnActorDeferred<T, TState>(in Transform transform, Func<T, TState, Transform?> initialize, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 		=> SpawnActorDeferred<T, TState>(T.StaticClass, transform, initialize, state, spawnParameters);
 	
-	public T? SpawnActorDeferred<T, TState>(FVector? location, FRotator? rotation, Func<T, TState, FTransform?> initialize, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public T? SpawnActorDeferred<T, TState>(in Vector location, in Rotator rotation, Func<T, TState, Transform?> initialize, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 		=> SpawnActorDeferred<T, TState>(T.StaticClass, location, rotation, initialize, state, spawnParameters);
 	
 	#endregion
 	
 	#region SpawnActorDeferredAsync
 
-	public ZeroTask<T?> SpawnActorDeferredAsync<T>(UClass @class, FTransform? transform, Func<T, Lifetime, ZeroTask<FTransform?>> initializeAsync, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public ZeroTask<T?> SpawnActorDeferredAsync<T>(UClass @class, in Transform transform, Func<T, Lifetime, ZeroTask<Transform?>> initializeAsync, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 	{
 		MasterAlcCache.GuardInvariant();
 		
@@ -193,19 +195,19 @@ public partial class UWorld
 		return InternalSpawnActor(@class, transform, spawnParameters, false, true) is T actor ? InternalInitializeActorAsync(actor, transform, initializeAsync) : ZeroTask.FromResult<T?>(null);
 	}
 	
-	public ZeroTask<AActor?> SpawnActorDeferredAsync(UClass @class, FTransform? transform, Func<AActor, Lifetime, ZeroTask<FTransform?>> initializeAsync, in ActorSpawnParameters spawnParameters = default)
+	public ZeroTask<AActor?> SpawnActorDeferredAsync(UClass @class, in Transform transform, Func<AActor, Lifetime, ZeroTask<Transform?>> initializeAsync, in ActorSpawnParameters spawnParameters = default)
 		=> SpawnActorDeferredAsync<AActor>(@class, transform, initializeAsync, spawnParameters);
 
-	public ZeroTask<T?> SpawnActorDeferredAsync<T>(UClass @class, FVector? location, FRotator? rotation, Func<T, Lifetime, ZeroTask<FTransform?>> initializeAsync, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
-		=> SpawnActorDeferredAsync<T>(@class, new() { Translation = location, Rotation = rotation?.Quat }, initializeAsync, spawnParameters);
+	public ZeroTask<T?> SpawnActorDeferredAsync<T>(UClass @class, in Vector location, in Rotator rotation, Func<T, Lifetime, ZeroTask<Transform?>> initializeAsync, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+		=> SpawnActorDeferredAsync<T>(@class, new() { Translation = location, Rotation = rotation.Quaternion }, initializeAsync, spawnParameters);
 
-	public ZeroTask<T?> SpawnActorDeferredAsync<T>(FTransform? transform, Func<T, Lifetime, ZeroTask<FTransform?>> initializeAsync, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public ZeroTask<T?> SpawnActorDeferredAsync<T>(in Transform transform, Func<T, Lifetime, ZeroTask<Transform?>> initializeAsync, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 		=> SpawnActorDeferredAsync<T>(T.StaticClass, transform, initializeAsync, spawnParameters);
 
-	public ZeroTask<T?> SpawnActorDeferredAsync<T>(FVector? location, FRotator? rotation, Func<T, Lifetime, ZeroTask<FTransform?>> initializeAsync, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
-		=> SpawnActorDeferredAsync<T>(T.StaticClass, new() { Translation = location, Rotation = rotation?.Quat }, initializeAsync, spawnParameters);
+	public ZeroTask<T?> SpawnActorDeferredAsync<T>(in Vector location, in Rotator rotation, Func<T, Lifetime, ZeroTask<Transform?>> initializeAsync, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+		=> SpawnActorDeferredAsync<T>(T.StaticClass, new() { Translation = location, Rotation = rotation.Quaternion }, initializeAsync, spawnParameters);
 
-	public ZeroTask<T?> SpawnActorDeferredAsync<T, TState>(UClass @class, FTransform? transform, Func<T, TState, Lifetime, ZeroTask<FTransform?>> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public ZeroTask<T?> SpawnActorDeferredAsync<T, TState>(UClass @class, in Transform transform, Func<T, TState, Lifetime, ZeroTask<Transform?>> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 	{
 		MasterAlcCache.GuardInvariant();
 		
@@ -217,17 +219,17 @@ public partial class UWorld
 		return InternalSpawnActor(@class, transform, spawnParameters, false, true) is T actor ? InternalInitializeActorAsync(actor, transform, initializeAsync, state) : ZeroTask.FromResult<T?>(null);
 	}
 	
-	public ZeroTask<AActor?> SpawnActorDeferredAsync<TState>(UClass @class, FTransform? transform, Func<AActor, TState, Lifetime, ZeroTask<FTransform?>> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default)
+	public ZeroTask<AActor?> SpawnActorDeferredAsync<TState>(UClass @class, in Transform transform, Func<AActor, TState, Lifetime, ZeroTask<Transform?>> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default)
 		=> SpawnActorDeferredAsync<AActor, TState>(@class, transform, initializeAsync, state, spawnParameters);
 
-	public ZeroTask<T?> SpawnActorDeferredAsync<T, TState>(UClass @class, FVector? location, FRotator? rotation, Func<T, TState, Lifetime, ZeroTask<FTransform?>> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
-		=> SpawnActorDeferredAsync<T, TState>(@class, new() { Translation = location, Rotation = rotation?.Quat }, initializeAsync, state, spawnParameters);
+	public ZeroTask<T?> SpawnActorDeferredAsync<T, TState>(UClass @class, in Vector location, in Rotator rotation, Func<T, TState, Lifetime, ZeroTask<Transform?>> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+		=> SpawnActorDeferredAsync<T, TState>(@class, new() { Translation = location, Rotation = rotation.Quaternion }, initializeAsync, state, spawnParameters);
 	
-	public ZeroTask<T?> SpawnActorDeferredAsync<T, TState>(FTransform? transform, Func<T, TState, Lifetime, ZeroTask<FTransform?>> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+	public ZeroTask<T?> SpawnActorDeferredAsync<T, TState>(in Transform transform, Func<T, TState, Lifetime, ZeroTask<Transform?>> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
 		=> SpawnActorDeferredAsync<T, TState>(T.StaticClass, transform, initializeAsync, state, spawnParameters);
 
-	public ZeroTask<T?> SpawnActorDeferredAsync<T, TState>(FVector? location, FRotator? rotation, Func<T, TState, Lifetime, ZeroTask<FTransform?>> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
-		=> SpawnActorDeferredAsync<T, TState>(T.StaticClass, new() { Translation = location, Rotation = rotation?.Quat }, initializeAsync, state, spawnParameters);
+	public ZeroTask<T?> SpawnActorDeferredAsync<T, TState>(in Vector location, in Rotator rotation, Func<T, TState, Lifetime, ZeroTask<Transform?>> initializeAsync, TState state, in ActorSpawnParameters spawnParameters = default) where T : AActor, IStaticClass
+		=> SpawnActorDeferredAsync<T, TState>(T.StaticClass, new() { Translation = location, Rotation = rotation.Quaternion }, initializeAsync, state, spawnParameters);
 
 	#endregion
 
@@ -255,15 +257,15 @@ public partial class UWorld
 	internal static void InternalPostLoadMap(ConjugateHandle world)
 		=> PostLoadMap?.Invoke(world.GetTargetChecked<UWorld>());
 
-	private unsafe AActor? InternalSpawnActor(UClass @class, FTransform? transform, in ActorSpawnParameters spawnParameters, bool absolute, bool deferred)
+	private unsafe AActor? InternalSpawnActor(UClass @class, in Transform transform, in ActorSpawnParameters spawnParameters, bool absolute, bool deferred)
 	{
 		fixed (char* nameBuffer = spawnParameters.Name)
 		{
 			return World_Interop.SpawnActor
 			(
-				ConjugateHandle.FromConjugate(this), 
+				ConjugateHandle.FromConjugate(this),
 				ConjugateHandle.FromConjugate(@class),
-				ConjugateHandle.FromConjugate(transform),
+				transform,
 				nameBuffer,
 				ConjugateHandle.FromConjugate(spawnParameters.Template),
 				ConjugateHandle.FromConjugate(spawnParameters.Owner),
@@ -278,9 +280,9 @@ public partial class UWorld
 		}
 	}
 
-	private async ZeroTask<T?> InternalInitializeActorAsync<T>(T actor, FTransform? transform, Func<T, Lifetime, ZeroTask<FTransform?>> initializeAsync) where T : AActor, IStaticClass
+	private async ZeroTask<T?> InternalInitializeActorAsync<T>(T actor, Transform transform, Func<T, Lifetime, ZeroTask<Transform?>> initializeAsync) where T : AActor, IStaticClass
 	{
-		FTransform? userTransform = null;
+		Transform? userTransform = null;
 		try
 		{
 			userTransform = await initializeAsync(actor, Lifetime);
@@ -300,9 +302,9 @@ public partial class UWorld
 		return actor;
 	}
 
-	private async ZeroTask<T?> InternalInitializeActorAsync<T, TState>(T actor, FTransform? transform, Func<T, TState, Lifetime, ZeroTask<FTransform?>> initializeAsync, TState state) where T : AActor, IStaticClass
+	private async ZeroTask<T?> InternalInitializeActorAsync<T, TState>(T actor, Transform transform, Func<T, TState, Lifetime, ZeroTask<Transform?>> initializeAsync, TState state) where T : AActor, IStaticClass
 	{
-		FTransform? userTransform = null;
+		Transform? userTransform = null;
 		try
 		{
 			userTransform = await initializeAsync(actor, state, Lifetime);

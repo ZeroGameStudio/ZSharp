@@ -7,9 +7,9 @@
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Interop/ZInteropExceptionHelper.h"
 
-ZSharp::FZConjugateHandle ZSharp::FZUnrealObjectGlobals_Interop::NewObject(FZConjugateHandle cls, FZConjugateHandle outer, const TCHAR* name)
+namespace ZSharp::ZUnrealObjectGlobals_Interop_Private
 {
-	TRY
+	static FZConjugateHandle NewObject(FZConjugateHandle cls, FZConjugateHandle outer, const TCHAR* name)
 	{
 		FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
 		auto pCls = registry.ConjugateUnsafeChecked<const UClass>(cls);
@@ -22,6 +22,14 @@ ZSharp::FZConjugateHandle ZSharp::FZUnrealObjectGlobals_Interop::NewObject(FZCon
 		params.Outer = pOuter;
 		params.Name = name;
 		return registry.Conjugate(StaticConstructObject_Internal(params));
+	}
+}
+
+ZSharp::FZConjugateHandle ZSharp::FZUnrealObjectGlobals_Interop::NewObject(FZConjugateHandle cls, FZConjugateHandle outer, const TCHAR* name)
+{
+	TRY
+	{
+		return ZUnrealObjectGlobals_Interop_Private::NewObject(cls, outer, name);
 	}
 	CATCHR({})
 }

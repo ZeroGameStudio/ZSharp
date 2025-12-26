@@ -19,19 +19,21 @@ namespace ZSharp::ZEnhancedInputComponent_Interop_Private
     	return GSignature;
 	}
 
-	FZConjugateHandle BindAction(FZConjugateHandle self, FZConjugateHandle inputAction, int64 triggerEvent, FZGCHandle delegate, TOptional<FZGCHandle> state, TFunctionRef<void(UZManagedDelegateProxy_EnhancedInput&, uint32)> setupBinding)
+	struct FZBinder
 	{
-
-		FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
-		auto pSelf = registry.ConjugateUnsafeChecked<UEnhancedInputComponent>(self);
-		auto pInputAction = registry.ConjugateUnsafeChecked<const UInputAction>(inputAction);
-		ETriggerEvent eTriggerEvent = static_cast<ETriggerEvent>(triggerEvent);
+		static FZConjugateHandle BindAction(FZConjugateHandle self, FZConjugateHandle inputAction, int64 triggerEvent, FZGCHandle delegate, TOptional<FZGCHandle> state)
+		{
+			FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+			auto pSelf = registry.ConjugateUnsafeChecked<UEnhancedInputComponent>(self);
+			auto pInputAction = registry.ConjugateUnsafeChecked<const UInputAction>(inputAction);
+			ETriggerEvent eTriggerEvent = static_cast<ETriggerEvent>(triggerEvent);
 	
-		auto proxy = UZManagedDelegateProxyImpl::Create<UZManagedDelegateProxy_EnhancedInput>(GetSignature(), delegate, state);
-		setupBinding(*proxy, pSelf->BindAction(pInputAction, eTriggerEvent, proxy, UZManagedDelegateProxyImpl::StubFunctionName).GetHandle());
+			auto proxy = UZManagedDelegateProxyImpl::Create<UZManagedDelegateProxy_EnhancedInput>(GetSignature(), delegate, state);
+			proxy->Binding = pSelf->BindAction(pInputAction, eTriggerEvent, proxy, UZManagedDelegateProxyImpl::StubFunctionName).GetHandle();
 	
-		return registry.Conjugate(proxy);
-	}
+			return registry.Conjugate(proxy);
+		}
+	};
 }
 
 uint32 ZSharp::FZEnhancedInputComponent_Interop::BindUFunctionAction(FZConjugateHandle self, FZConjugateHandle inputAction, int64 triggerEvent, FZConjugateHandle obj, const TCHAR* functionName)
@@ -70,7 +72,7 @@ ZSharp::FZConjugateHandle ZSharp::FZEnhancedInputComponent_Interop::BindStateles
 {
 	TRY
 	{
-		return ZEnhancedInputComponent_Interop_Private::BindAction(self, inputAction, triggerEvent, delegate, {}, [](UZManagedDelegateProxy_EnhancedInput& proxy, uint32 handle){ proxy.Binding = handle; });
+		return ZEnhancedInputComponent_Interop_Private::FZBinder::BindAction(self, inputAction, triggerEvent, delegate, {});
 	}
 	CATCHR({})
 }
@@ -79,7 +81,7 @@ ZSharp::FZConjugateHandle ZSharp::FZEnhancedInputComponent_Interop::BindStateful
 {
 	TRY
 	{
-		return ZEnhancedInputComponent_Interop_Private::BindAction(self, inputAction, triggerEvent, delegate, state, [](UZManagedDelegateProxy_EnhancedInput& proxy, uint32 handle){ proxy.Binding = handle; });
+		return ZEnhancedInputComponent_Interop_Private::FZBinder::BindAction(self, inputAction, triggerEvent, delegate, state);
 	}
 	CATCHR({})
 }

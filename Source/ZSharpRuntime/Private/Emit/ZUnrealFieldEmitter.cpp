@@ -1296,6 +1296,16 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | superScriptStruct->StructFlags & STRUCT_Inherit);
 		check(!FZSharpFieldRegistry::Get().IsZSharpScriptStruct(superScriptStruct) || (scriptStruct->StructFlags & STRUCT_HasInstancedReference) == STRUCT_NoFlags); // If super is a Z# script struct then it should not have STRUCT_HasInstancedReference fixed up yet.
 	}
+	else
+	{
+		// Migrate from UPropertyBag::GetOrCreateFromDescs().
+		// @hack:
+		// This method is called to prevent non-editor builds to not crash on IsChildOf().
+		// The issues is that the UScriptStruct(const FObjectInitializer& ObjectInitializer) ctor (which is macro/UHT generated)
+		// does not call ReinitializeBaseChainArray(), when the code is compiled with USTRUCT_ISCHILDOF_STRUCTARRAY.
+		// Calling SetSuperStruct() forces the ReinitializeBaseChainArray() to be called.
+		scriptStruct->SetSuperStruct(nullptr);
+	}
 
 	// There is no RegisterDependencies() call for script struct.
 
@@ -1516,6 +1526,8 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitStruct(UPackage* pak, FZScriptStructD
 
 	FZSharpScriptStruct* zsstrct = FZSharpFieldRegistry::Get().GetMutableScriptStruct(scriptStruct);
 	ZUnrealFieldEmitter_Private::ConstructPropertyDefaults(def, scriptStruct, zsstrct);
+	
+	NotifyRegistrationEvent(*scriptStruct->GetOutermost()->GetName(), *scriptStruct->GetName(), ENotifyRegistrationType::NRT_Struct, ENotifyRegistrationPhase::NRP_Finished, nullptr, false, scriptStruct);
 }
 
 void ZSharp::FZUnrealFieldEmitter::PostEmitDelegate(UPackage* pak, FZDelegateDefinition& def) const

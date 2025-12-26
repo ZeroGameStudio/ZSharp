@@ -8,6 +8,10 @@
 namespace ZSharp
 {
 	struct FZEnhancedInputComponent_Interop;
+	namespace ZEnhancedInputComponent_Interop_Private
+	{
+		struct FZBinder;
+	}
 }
 
 UCLASS(Transient, MinimalAPI, meta = (ZSharpNoExport))
@@ -16,6 +20,7 @@ class UZManagedDelegateProxy_EnhancedInput final : public UZManagedDelegateProxy
 	GENERATED_BODY()
 
 	friend struct ZSharp::FZEnhancedInputComponent_Interop;
+	friend struct ZSharp::ZEnhancedInputComponent_Interop_Private::FZBinder;
 	
 private:
 	uint32 Binding;

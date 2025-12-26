@@ -9,12 +9,13 @@
 
 const TCHAR* ZSharp::FZUnrealString_Interop::GetData(FZConjugateHandle self)
 {
-	GUARD
-	(
+	TRY
+	{
 		const auto& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>();
 		const FString* strself = registry.ConjugateUnsafe(self);
 		return **strself;
-	);
+	}
+	CATCHR(nullptr)
 }
 
 void ZSharp::FZUnrealString_Interop::SetData(FZConjugateHandle self, const TCHAR* data)

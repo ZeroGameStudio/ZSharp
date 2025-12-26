@@ -111,7 +111,8 @@ uint8 ZSharp::FZActor_Interop::SetActorTransform(FZConjugateHandle self, const F
 {
 	TRY
 	{
-		return ConjugateUnsafe<AActor>(self)->SetActorTransform(newTransform, !!sweep, nullptr, teleport);
+		FTransform trans = newTransform;
+		return ConjugateUnsafe<AActor>(self)->SetActorTransform(trans, !!sweep, nullptr, teleport);
 	}
 	CATCHR(false)
 }
@@ -153,11 +154,11 @@ void ZSharp::FZActor_Interop::SetActorScale(FZConjugateHandle self, const FVecto
 
 void ZSharp::FZActor_Interop::SetActorRelativeTransform(FZConjugateHandle self, const FTransform& newTransform, uint8 sweep, ETeleportType teleport)
 {
-	TRY
-	{
-		return ConjugateUnsafe<AActor>(self)->SetActorRelativeTransform(newTransform, !!sweep, nullptr, teleport);
-	}
-	CATCHR(false)
+	GUARD
+	(
+		FTransform trans = newTransform;
+		return ConjugateUnsafe<AActor>(self)->SetActorRelativeTransform(trans, !!sweep, nullptr, teleport)
+	);
 }
 
 void ZSharp::FZActor_Interop::SetActorRelativeLocation(FZConjugateHandle self, const FVector& newLocation, uint8 sweep, ETeleportType teleport)
@@ -188,7 +189,8 @@ void ZSharp::FZActor_Interop::AddActorWorldTransform(FZConjugateHandle self, con
 {
 	GUARD
 	(
-		return ConjugateUnsafe<AActor>(self)->AddActorWorldTransform(deltaTransform, !!sweep, nullptr, teleport);
+		FTransform trans = deltaTransform;
+		return ConjugateUnsafe<AActor>(self)->AddActorWorldTransform(trans, !!sweep, nullptr, teleport);
 	);
 }
 
@@ -196,7 +198,8 @@ void ZSharp::FZActor_Interop::AddActorWorldTransformKeepScale(FZConjugateHandle 
 {
 	GUARD
 	(
-		return ConjugateUnsafe<AActor>(self)->AddActorWorldTransformKeepScale(deltaTransform, !!sweep, nullptr, teleport);
+		FTransform trans = deltaTransform;
+		return ConjugateUnsafe<AActor>(self)->AddActorWorldTransformKeepScale(trans, !!sweep, nullptr, teleport);
 	);
 }
 
@@ -220,7 +223,8 @@ void ZSharp::FZActor_Interop::AddActorLocalTransform(FZConjugateHandle self, con
 {
 	GUARD
 	(
-		return ConjugateUnsafe<AActor>(self)->AddActorLocalTransform(deltaTransform, !!sweep, nullptr, teleport);
+		FTransform trans = deltaTransform;
+		return ConjugateUnsafe<AActor>(self)->AddActorLocalTransform(trans, !!sweep, nullptr, teleport);
 	);
 }
 

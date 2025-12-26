@@ -8,10 +8,31 @@
 #include "Interop/ZInteropExceptionHelper.h"
 #include "Reflection/Wrapper/ZSelfDescriptiveScriptSet.h"
 
+namespace ZSharp::ZUnrealSet_Interop_Private
+{
+	static FZUnrealSet_Interop::FZIterator* CreateEnumerator(FZConjugateHandle target)
+	{
+		FZSelfDescriptiveScriptSet* sdtarget = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(target);
+		if (!sdtarget->Num())
+		{
+			return nullptr;
+		}
+	
+		auto* it = new FZUnrealSet_Interop::FZIterator { sdtarget->GetHelper() };
+		if (!it)
+		{
+			delete it;
+			it = nullptr;
+		}
+
+		return it;
+	}
+}
+
 ZSharp::FZUnrealSet_Interop::FZIterator::FZIterator(const FScriptSetHelper& target)
 	: Target(target)
 {
-	GUARD(Iterator = MakeUnique<FScriptSetHelper::FIterator>(Target));
+	Iterator = MakeUnique<FScriptSetHelper::FIterator>(Target);
 }
 
 uint8 ZSharp::FZUnrealSet_Interop::Add(FZConjugateHandle self, FZCallBufferSlot item)
@@ -67,20 +88,7 @@ ZSharp::FZUnrealSet_Interop::FZIterator* ZSharp::FZUnrealSet_Interop::CreateEnum
 {
 	TRY
 	{
-		FZSelfDescriptiveScriptSet* sdtarget = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Set>().ConjugateUnsafe(target);
-		if (!sdtarget->Num())
-		{
-			return nullptr;
-		}
-	
-		auto* it = new FZIterator { sdtarget->GetHelper() };
-		if (!it)
-		{
-			delete it;
-			it = nullptr;
-		}
-
-		return it;
+		return ZUnrealSet_Interop_Private::CreateEnumerator(target);
 	}
 	CATCHR(nullptr)
 }

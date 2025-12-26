@@ -9,7 +9,6 @@ namespace ZSharp
 {
 	struct FZUnrealSet_Interop
 	{
-	private:
 		struct FZIterator
 		{
 			explicit FZIterator(const FScriptSetHelper& target);

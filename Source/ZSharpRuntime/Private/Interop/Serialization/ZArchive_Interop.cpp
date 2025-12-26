@@ -11,6 +11,86 @@
 #include "Interop/ZInteropExceptionHelper.h"
 #include "StructUtils/InstancedStruct.h"
 
+namespace ZSharp::ZArchive_Interop_Private
+{
+	static FZConjugateHandle LoadString(FArchive& ar)
+	{
+		auto value = new FString;
+		ar << *value;
+		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(value, true);
+	}
+	
+	static FZConjugateHandle LoadAnsiString(FArchive& ar)
+	{
+		auto value = new FAnsiString;
+		ar << *value;
+		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_AnsiString>().Conjugate(value, true);
+	}
+	
+	static FZConjugateHandle LoadUtf8String(FArchive& ar)
+	{
+		auto value = new FUtf8String;
+		ar << *value;
+		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Utf8String>().Conjugate(value, true);
+	}
+	
+	static FZConjugateHandle LoadName(FArchive& ar)
+	{
+		auto value = new FName;
+		ar << *value;
+		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Name>().Conjugate(value, true);
+	}
+	
+	static FZConjugateHandle LoadText(FArchive& ar)
+	{
+		auto value = new FText;
+		ar << *value;
+		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Text>().Conjugate(value, true);
+	}
+	
+	static void SaveScriptStruct(FArchive& ar, FZConjugateHandle value)
+	{
+		FZSelfDescriptiveScriptStruct* sdvalue = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().ConjugateUnsafe(value);
+		FInstancedStruct instancedStruct;
+		instancedStruct.InitializeAs(sdvalue->GetDescriptor(), static_cast<uint8*>(sdvalue->GetUnderlyingInstance()));
+		instancedStruct.Serialize(ar);
+	}
+	
+	static FZConjugateHandle LoadScriptStruct(FArchive& ar)
+	{
+		FInstancedStruct instancedStruct;
+		instancedStruct.Serialize(ar);
+		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(instancedStruct.GetScriptStruct(), [instancedStruct](FZSelfDescriptiveScriptStruct& sdss){ instancedStruct.GetScriptStruct()->CopyScriptStruct(sdss.GetUnderlyingInstance(), instancedStruct.GetMemory()); });
+	}
+	
+	static uint8 NetSaveScriptStruct(FArchive& ar, FZConjugateHandle value, FZConjugateHandle map, uint8& success)
+	{
+		FZSelfDescriptiveScriptStruct* sdvalue = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().ConjugateUnsafe(value);
+		FInstancedStruct instancedStruct;
+		instancedStruct.InitializeAs(sdvalue->GetDescriptor(), static_cast<uint8*>(sdvalue->GetUnderlyingInstance()));
+		bool suc;
+		bool res = instancedStruct.NetSerialize(ar, IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<UPackageMap>(map), suc);
+		success = suc;
+		return res;
+	}
+	
+	static uint8 NetLoadScriptStruct(FArchive& ar, FZConjugateHandle& value, FZConjugateHandle map, uint8& success)
+	{
+		FInstancedStruct instancedStruct;
+		bool suc;
+		bool res = instancedStruct.NetSerialize(ar, IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<UPackageMap>(map), suc);
+		value = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(instancedStruct.GetScriptStruct(), [instancedStruct](FZSelfDescriptiveScriptStruct& sdss){ instancedStruct.GetScriptStruct()->CopyScriptStruct(sdss.GetUnderlyingInstance(), instancedStruct.GetMemory()); });
+		return res;
+	}
+	
+	static FZConjugateHandle LoadSoftObjectPath(FArchive& ar)
+	{
+		FSoftObjectPath value;
+		ar << value;
+		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(TBaseStructure<FSoftObjectPath>::Get(), [value](FZSelfDescriptiveScriptStruct& sdss){ *sdss.GetTypedUnderlyingInstance<FSoftObjectPath>() = value; });
+	}
+}
+
 void ZSharp::FZArchive_Interop::SaveUInt8(FArchive& ar, uint8 value)
 {
 	GUARD(ar << value);
@@ -180,9 +260,7 @@ ZSharp::FZConjugateHandle ZSharp::FZArchive_Interop::LoadString(FArchive& ar)
 {
 	TRY
 	{
-		auto value = new FString;
-		ar << *value;
-		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_String>().Conjugate(value, true);
+		return ZArchive_Interop_Private::LoadString(ar);
 	}
 	CATCHR({})
 }
@@ -196,9 +274,7 @@ ZSharp::FZConjugateHandle ZSharp::FZArchive_Interop::LoadAnsiString(FArchive& ar
 {
 	TRY
 	{
-		auto value = new FAnsiString;
-		ar << *value;
-		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_AnsiString>().Conjugate(value, true);
+		return ZArchive_Interop_Private::LoadAnsiString(ar);
 	}
 	CATCHR({})
 }
@@ -212,9 +288,7 @@ ZSharp::FZConjugateHandle ZSharp::FZArchive_Interop::LoadUtf8String(FArchive& ar
 {
 	TRY
 	{
-		auto value = new FUtf8String;
-		ar << *value;
-		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Utf8String>().Conjugate(value, true);
+		return ZArchive_Interop_Private::LoadUtf8String(ar);
 	}
 	CATCHR({})
 }
@@ -228,9 +302,7 @@ ZSharp::FZConjugateHandle ZSharp::FZArchive_Interop::LoadName(FArchive& ar)
 {
 	TRY
 	{
-		auto value = new FName;
-		ar << *value;
-		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Name>().Conjugate(value, true);
+		return ZArchive_Interop_Private::LoadName(ar);
 	}
 	CATCHR({})
 }
@@ -244,9 +316,7 @@ ZSharp::FZConjugateHandle ZSharp::FZArchive_Interop::LoadText(FArchive& ar)
 {
 	TRY
 	{
-		auto value = new FText;
-		ar << *value;
-		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_Text>().Conjugate(value, true);
+		return ZArchive_Interop_Private::LoadText(ar);
 	}
 	CATCHR({})
 }
@@ -273,22 +343,14 @@ ZSharp::FZConjugateHandle ZSharp::FZArchive_Interop::LoadObject(FArchive& ar)
 
 void ZSharp::FZArchive_Interop::SaveScriptStruct(FArchive& ar, FZConjugateHandle value)
 {
-	GUARD
-	(
-		FZSelfDescriptiveScriptStruct* sdvalue = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().ConjugateUnsafe(value);
-		FInstancedStruct instancedStruct;
-		instancedStruct.InitializeAs(sdvalue->GetDescriptor(), static_cast<uint8*>(sdvalue->GetUnderlyingInstance()));
-		instancedStruct.Serialize(ar);
-	);
+	GUARD(ZArchive_Interop_Private::SaveScriptStruct(ar, value));
 }
 
 ZSharp::FZConjugateHandle ZSharp::FZArchive_Interop::LoadScriptStruct(FArchive& ar)
 {
 	TRY
 	{
-		FInstancedStruct instancedStruct;
-		instancedStruct.Serialize(ar);
-		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(instancedStruct.GetScriptStruct(), [instancedStruct](FZSelfDescriptiveScriptStruct& sdss){ instancedStruct.GetScriptStruct()->CopyScriptStruct(sdss.GetUnderlyingInstance(), instancedStruct.GetMemory()); });
+		return ZArchive_Interop_Private::LoadScriptStruct(ar);
 	}
 	CATCHR({})
 }
@@ -297,13 +359,7 @@ uint8 ZSharp::FZArchive_Interop::NetSaveScriptStruct(FArchive& ar, FZConjugateHa
 {
 	TRY
 	{
-		FZSelfDescriptiveScriptStruct* sdvalue = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().ConjugateUnsafe(value);
-		FInstancedStruct instancedStruct;
-		instancedStruct.InitializeAs(sdvalue->GetDescriptor(), static_cast<uint8*>(sdvalue->GetUnderlyingInstance()));
-		bool suc;
-		bool res = instancedStruct.NetSerialize(ar, IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<UPackageMap>(map), suc);
-		success = suc;
-		return res;
+		return ZArchive_Interop_Private::NetSaveScriptStruct(ar, value, map, success);
 	}
 	CATCHR(false)
 }
@@ -312,11 +368,7 @@ uint8 ZSharp::FZArchive_Interop::NetLoadScriptStruct(FArchive& ar, FZConjugateHa
 {
 	TRY
 	{
-		FInstancedStruct instancedStruct;
-		bool suc;
-		bool res = instancedStruct.NetSerialize(ar, IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>().ConjugateUnsafe<UPackageMap>(map), suc);
-		value = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(instancedStruct.GetScriptStruct(), [instancedStruct](FZSelfDescriptiveScriptStruct& sdss){ instancedStruct.GetScriptStruct()->CopyScriptStruct(sdss.GetUnderlyingInstance(), instancedStruct.GetMemory()); });
-		return res;
+		return ZArchive_Interop_Private::NetLoadScriptStruct(ar, value, map, success);
 	}
 	CATCHR(false)
 }
@@ -334,9 +386,7 @@ ZSharp::FZConjugateHandle ZSharp::FZArchive_Interop::LoadSoftObjectPath(FArchive
 {
 	TRY
 	{
-		FSoftObjectPath value;
-		ar << value;
-		return IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UScriptStruct>().Conjugate(TBaseStructure<FSoftObjectPath>::Get(), [value](FZSelfDescriptiveScriptStruct& sdss){ *sdss.GetTypedUnderlyingInstance<FSoftObjectPath>() = value; });
+		return ZArchive_Interop_Private::LoadSoftObjectPath(ar);
 	}
 	CATCHR({})
 }

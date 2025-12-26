@@ -9,7 +9,6 @@ namespace ZSharp
 {
 	struct FZUnrealMap_Interop
 	{
-	private:
 		struct FZIterator
 		{
 			explicit FZIterator(const FScriptMapHelper& target);

@@ -7,14 +7,9 @@
 #include "Engine/StreamableManager.h"
 #include "Interop/ZInteropExceptionHelper.h"
 
-FStreamableManager* ZSharp::FZStreamableManager_Interop::GetGlobalStreamableManager()
+namespace ZSharp::ZStreamingTask_Interop_Private
 {
-	return &UAssetManager::GetStreamableManager();
-}
-
-ZSharp::FZStreamingTask_Interop::FZStreamingTask* ZSharp::FZStreamableManager_Interop::RequestAsyncLoading(FStreamableManager* manager, TArray<FString>& paths, uint8 pushLoadedCount)
-{
-	TRY
+	static FZStreamingTask_Interop::FZStreamingTask* RequestAsyncLoading(FStreamableManager* manager, TArray<FString>& paths, uint8 pushLoadedCount)
 	{
 		auto task = new FZStreamingTask_Interop::FZStreamingTask;
 
@@ -24,9 +19,9 @@ ZSharp::FZStreamingTask_Interop::FZStreamingTask* ZSharp::FZStreamableManager_In
 			{
 				if (!!pushLoadedCount)
 				{
-					GUpdate(task->Handle->GetOwningManager(), task, FZStreamingTask_Interop::GetLoadedCount(task));
+					FZStreamableManager_Interop::GUpdate(task->Handle->GetOwningManager(), task, FZStreamingTask_Interop::GetLoadedCount(task));
 				}
-				GSignalCompletion(task->Handle->GetOwningManager(), task);
+				FZStreamableManager_Interop::GSignalCompletion(task->Handle->GetOwningManager(), task);
 			}
 		};
 	
@@ -48,7 +43,7 @@ ZSharp::FZStreamingTask_Interop::FZStreamingTask* ZSharp::FZStreamableManager_In
 				{
 					FZRedFrameScope scope;
 					{
-						GUpdate(handle->GetOwningManager(), task, FZStreamingTask_Interop::GetLoadedCount(task));
+						FZStreamableManager_Interop::GUpdate(handle->GetOwningManager(), task, FZStreamingTask_Interop::GetLoadedCount(task));
 					}
 				}));
 			}
@@ -57,6 +52,19 @@ ZSharp::FZStreamingTask_Interop::FZStreamingTask* ZSharp::FZStreamableManager_In
 		}
 
 		return task;
+	}
+}
+
+FStreamableManager* ZSharp::FZStreamableManager_Interop::GetGlobalStreamableManager()
+{
+	return &UAssetManager::GetStreamableManager();
+}
+
+ZSharp::FZStreamingTask_Interop::FZStreamingTask* ZSharp::FZStreamableManager_Interop::RequestAsyncLoading(FStreamableManager* manager, TArray<FString>& paths, uint8 pushLoadedCount)
+{
+	TRY
+	{
+		return ZStreamingTask_Interop_Private::RequestAsyncLoading(manager, paths, pushLoadedCount);
 	}
 	CATCHR(nullptr)
 }

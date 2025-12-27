@@ -725,7 +725,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 	{
 		// Migrate from UECodeGen_Private::ConstructUFunction().
 		constexpr EObjectFlags GCompiledInFlags = RF_Public | RF_Transient | RF_MarkAsNative;
-
+		
 		UFunction* function;
 		if (!def.bIsEventOverride)
 		{
@@ -738,13 +738,13 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			params.Outer = outer;
 			params.Name = *def.Name.ToString();
 			params.SetFlags = def.Flags | GCompiledInFlags;
-	
+			
 			function = static_cast<UFunction*>(StaticConstructObject_Internal(params));
-
+			
 			function->FunctionFlags |= def.FunctionFlags;
 			function->RPCId = def.RpcId;
 			function->RPCResponseId = def.RpcResponseId;
-
+			
 			EmitProperties(function, def.Properties);
 			AddMetadata(function, def.MetadataMap);
 		}
@@ -765,6 +765,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			params.bSkipPostLoad = true;
 
 			function = static_cast<UFunction*>(StaticDuplicateObjectEx(params));
+			function->ClearFlags(RF_NeedPostLoad | RF_NeedPostLoadSubobjects); // Clear async loading flags added during duplication.
 
 			function->FunctionFlags |= FUNC_Native;
 			function->SetSuperStruct(superFunction);
@@ -1535,6 +1536,8 @@ void ZSharp::FZUnrealFieldEmitter::PostEmitDelegate(UPackage* pak, FZDelegateDef
 	UDelegateFunction* delegate = def.Delegate;
 
 	ZUnrealFieldEmitter_Private::FixupFlagsForStruct(delegate);
+	
+	NotifyRegistrationEvent(*delegate->GetOutermost()->GetName(), *delegate->GetName(), ENotifyRegistrationType::NRT_NoExportObject, ENotifyRegistrationPhase::NRP_Finished, nullptr, false, delegate);
 }
 
 void ZSharp::FZUnrealFieldEmitter::PostEmitClass_I(UPackage* pak, FZClassDefinition& def) const

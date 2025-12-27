@@ -4,6 +4,7 @@
 
 #include "Conjugate/ZConjugateUnsafe.h"
 #include "Interop/ZInteropExceptionHelper.h"
+#include "Interop/ZInteropHelper.h"
 
 static_assert(std::is_same_v<std::underlying_type_t<ERelativeTransformSpace>, int32>);
 static_assert(std::is_same_v<std::underlying_type_t<ETeleportType>, uint8>);
@@ -13,7 +14,7 @@ void ZSharp::FZSceneComponent_Interop::GetComponentTransform(FZConjugateHandle s
     GUARD
     (
         auto pSelf = ConjugateUnsafe<USceneComponent>(self);
-        transform = pSelf->GetComponentTransform();
+        FZInteropHelper::CopyTransformUnaligned(pSelf->GetComponentTransform(), transform);
     );
 }
 
@@ -49,7 +50,7 @@ void ZSharp::FZSceneComponent_Interop::GetSocketTransform(FZConjugateHandle self
     GUARD
     (
         auto pSelf = ConjugateUnsafe<USceneComponent>(self);
-        transform = pSelf->GetSocketTransform(socketName, transformSpace);
+        FZInteropHelper::CopyTransformUnaligned(pSelf->GetSocketTransform(socketName, transformSpace), transform);
     );
 }
 
@@ -85,7 +86,8 @@ void ZSharp::FZSceneComponent_Interop::SetWorldTransform(FZConjugateHandle self,
     GUARD
     (
         auto pSelf = ConjugateUnsafe<USceneComponent>(self);
-        FTransform trans = newTransform;
+        FTransform trans;
+        FZInteropHelper::CopyTransformUnaligned(newTransform, trans);
         pSelf->SetWorldTransform(trans, !!sweep, nullptr, teleport);
     );
 }
@@ -131,7 +133,8 @@ void ZSharp::FZSceneComponent_Interop::SetRelativeTransform(FZConjugateHandle se
     GUARD
     (
         auto pSelf = ConjugateUnsafe<USceneComponent>(self);
-        FTransform trans = newTransform;
+        FTransform trans;
+        FZInteropHelper::CopyTransformUnaligned(newTransform, trans);
         pSelf->SetRelativeTransform(trans, !!sweep, nullptr, teleport);
     );
 }
@@ -168,7 +171,8 @@ void ZSharp::FZSceneComponent_Interop::AddWorldTransform(FZConjugateHandle self,
     GUARD
     (
         auto pSelf = ConjugateUnsafe<USceneComponent>(self);
-        FTransform trans = deltaTransform;
+        FTransform trans;
+        FZInteropHelper::CopyTransformUnaligned(deltaTransform, trans);
         pSelf->AddWorldTransform(trans, !!sweep, nullptr, teleport);
     );
 }
@@ -178,7 +182,8 @@ void ZSharp::FZSceneComponent_Interop::AddWorldTransformKeepScale(FZConjugateHan
     GUARD
     (
         auto pSelf = ConjugateUnsafe<USceneComponent>(self);
-        FTransform trans = deltaTransform;
+        FTransform trans;
+        FZInteropHelper::CopyTransformUnaligned(deltaTransform, trans);
         pSelf->AddWorldTransformKeepScale(trans, !!sweep, nullptr, teleport);
     );
 }
@@ -206,7 +211,8 @@ void ZSharp::FZSceneComponent_Interop::AddLocalTransform(FZConjugateHandle self,
     GUARD
     (
         auto pSelf = ConjugateUnsafe<USceneComponent>(self);
-        FTransform trans = deltaTransform;
+        FTransform trans;
+        FZInteropHelper::CopyTransformUnaligned(deltaTransform, trans);
         pSelf->AddLocalTransform(trans, !!sweep, nullptr, teleport);
     );
 }

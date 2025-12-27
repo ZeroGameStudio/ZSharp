@@ -10,7 +10,7 @@
 		"ZeroGames.ZSharp.Core",
 		"ZeroGames.ZSharp.Core.UnrealEngine",
 		"ZeroGames.ZSharp.Core.Async",
-		"ZeroGames.ZSharp.Emit",
+		"ZeroGames.ZSharp.Emit"
 	],
 	"ExternalReferences":
 	[

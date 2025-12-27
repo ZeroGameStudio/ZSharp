@@ -8,6 +8,7 @@
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Interop/ZInteropExceptionHelper.h"
+#include "Interop/ZInteropHelper.h"
 
 namespace ZSharp::ZWorld_Interop_Private
 {
@@ -81,7 +82,8 @@ namespace ZSharp::ZWorld_Interop_Private
 
 		UWorld* pSelf = registry.ConjugateUnsafe<UWorld>(self);
 		UClass* pCls = registry.ConjugateUnsafe<UClass>(cls);
-		FTransform spawnTransform = transform;
+		FTransform spawnTransform;
+		FZInteropHelper::CopyTransformUnaligned(transform, spawnTransform);
 		AActor* pTemplate = registry.ConjugateUnsafe<AActor>(actorTemplate);
 		AActor* pOwner = registry.ConjugateUnsafe<AActor>(owner);
 		APawn* pInstigator = registry.ConjugateUnsafe<APawn>(instigator);

@@ -4,6 +4,7 @@
 
 #include "Conjugate/ZConjugateUnsafe.h"
 #include "Interop/ZInteropExceptionHelper.h"
+#include "Interop/ZInteropHelper.h"
 
 namespace ZSharp::ZActor_Interop_Private
 {
@@ -28,13 +29,13 @@ namespace ZSharp::ZActor_Interop_Private
 	}
 }
 
-void ZSharp::FZActor_Interop::FinishSpawning(FZConjugateHandle self, FZConjugateHandle transform)
+void ZSharp::FZActor_Interop::FinishSpawning(FZConjugateHandle self, const FTransform& transform)
 {
 	GUARD
 	(
 		auto pSelf = ConjugateUnsafe<AActor>(self);
-		auto pTransform = ConjugateUnsafe<FTransform>(transform);
-		const FTransform& spawnTransform = pTransform ? *pTransform : FTransform::Identity;
+		FTransform spawnTransform;
+		FZInteropHelper::CopyTransformUnaligned(transform, spawnTransform);
 		pSelf->FinishSpawning(spawnTransform);
 	);
 }
@@ -89,7 +90,7 @@ ENetMode ZSharp::FZActor_Interop::GetNetMode(FZConjugateHandle self)
 
 void ZSharp::FZActor_Interop::GetActorTransform(FZConjugateHandle self, FTransform& transform)
 {
-	GUARD(transform = ConjugateUnsafe<AActor>(self)->GetActorTransform());
+	GUARD(FZInteropHelper::CopyTransformUnaligned(ConjugateUnsafe<AActor>(self)->GetActorTransform(), transform));
 }
 
 void ZSharp::FZActor_Interop::GetActorLocation(FZConjugateHandle self, FVector& location)
@@ -111,7 +112,8 @@ uint8 ZSharp::FZActor_Interop::SetActorTransform(FZConjugateHandle self, const F
 {
 	TRY
 	{
-		FTransform trans = newTransform;
+		FTransform trans;
+		FZInteropHelper::CopyTransformUnaligned(newTransform, trans);
 		return ConjugateUnsafe<AActor>(self)->SetActorTransform(trans, !!sweep, nullptr, teleport);
 	}
 	CATCHR(false)
@@ -156,7 +158,8 @@ void ZSharp::FZActor_Interop::SetActorRelativeTransform(FZConjugateHandle self, 
 {
 	GUARD
 	(
-		FTransform trans = newTransform;
+		FTransform trans;
+		FZInteropHelper::CopyTransformUnaligned(newTransform, trans);
 		return ConjugateUnsafe<AActor>(self)->SetActorRelativeTransform(trans, !!sweep, nullptr, teleport)
 	);
 }
@@ -189,7 +192,8 @@ void ZSharp::FZActor_Interop::AddActorWorldTransform(FZConjugateHandle self, con
 {
 	GUARD
 	(
-		FTransform trans = deltaTransform;
+		FTransform trans;
+		FZInteropHelper::CopyTransformUnaligned(deltaTransform, trans);
 		return ConjugateUnsafe<AActor>(self)->AddActorWorldTransform(trans, !!sweep, nullptr, teleport);
 	);
 }
@@ -198,7 +202,8 @@ void ZSharp::FZActor_Interop::AddActorWorldTransformKeepScale(FZConjugateHandle 
 {
 	GUARD
 	(
-		FTransform trans = deltaTransform;
+		FTransform trans;
+		FZInteropHelper::CopyTransformUnaligned(deltaTransform, trans);
 		return ConjugateUnsafe<AActor>(self)->AddActorWorldTransformKeepScale(trans, !!sweep, nullptr, teleport);
 	);
 }
@@ -223,7 +228,8 @@ void ZSharp::FZActor_Interop::AddActorLocalTransform(FZConjugateHandle self, con
 {
 	GUARD
 	(
-		FTransform trans = deltaTransform;
+		FTransform trans;
+		FZInteropHelper::CopyTransformUnaligned(deltaTransform, trans);
 		return ConjugateUnsafe<AActor>(self)->AddActorLocalTransform(trans, !!sweep, nullptr, teleport);
 	);
 }

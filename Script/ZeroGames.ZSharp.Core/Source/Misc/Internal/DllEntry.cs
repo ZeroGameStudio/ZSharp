@@ -84,7 +84,7 @@ internal static class DllEntry
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, void*, ELoadAssemblyErrorCode>)&SlimAssemblyLoadContext_Interop.LoadAssembly;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, char*, char*, char*, void*, EInvokeMethodErrorCode>)&SlimAssemblyLoadContext_Interop.InvokeMethod;
         
-        GameThreadScheduler.IsInGameThreadFuncPtr = (delegate* unmanaged<uint8>)args->UnmanagedProperties.IsInGameThreadFuncPtr;
+        GameThreadScheduler.IsInGameThreadFuncPtr = (delegate* unmanaged[SuppressGCTransition]<uint8>)args->UnmanagedProperties.IsInGameThreadFuncPtr;
 
         if (args->WaitForDebugger != 0)
         {

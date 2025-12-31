@@ -12,7 +12,7 @@ internal static class GameThreadScheduler
 
 	public static unsafe bool IsInGameThread => IsInGameThreadFuncPtr() > 0;
 	
-	public static unsafe delegate* unmanaged<uint8> IsInGameThreadFuncPtr;
+	public static unsafe delegate* unmanaged[SuppressGCTransition]<uint8> IsInGameThreadFuncPtr;
 
 	// IMPORTANT: Don't rename because ZeroGames.ZSharp.Core.Async inject this by name.
 	private static Action<SendOrPostCallback, object?> _post = null!;

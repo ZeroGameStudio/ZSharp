@@ -18,25 +18,25 @@ internal static unsafe class Actor_Interop
 	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, out Rotator, void> GetActorRotation;
 	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, out Vector, void> GetActorScale;
 	
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Transform, uint8, uint8, uint8> SetActorTransform;
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Vector, uint8, uint8, uint8> SetActorLocation;
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Rotator, uint8, uint8> SetActorRotation;
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Vector, in Rotator, uint8, uint8, uint8> SetActorLocationAndRotation;
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Vector, void> SetActorScale;
+	public static delegate* unmanaged<ConjugateHandle, in Transform, uint8, uint8, uint8> SetActorTransform;
+	public static delegate* unmanaged<ConjugateHandle, in Vector, uint8, uint8, uint8> SetActorLocation;
+	public static delegate* unmanaged<ConjugateHandle, in Rotator, uint8, uint8> SetActorRotation;
+	public static delegate* unmanaged<ConjugateHandle, in Vector, in Rotator, uint8, uint8, uint8> SetActorLocationAndRotation;
+	public static delegate* unmanaged<ConjugateHandle, in Vector, void> SetActorScale;
 	
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Transform, uint8, uint8, void> SetActorRelativeTransform;
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Vector, uint8, uint8, void> SetActorRelativeLocation;
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Rotator, uint8, uint8, void> SetActorRelativeRotation;
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Vector, void> SetActorRelativeScale;
+	public static delegate* unmanaged<ConjugateHandle, in Transform, uint8, uint8, void> SetActorRelativeTransform;
+	public static delegate* unmanaged<ConjugateHandle, in Vector, uint8, uint8, void> SetActorRelativeLocation;
+	public static delegate* unmanaged<ConjugateHandle, in Rotator, uint8, uint8, void> SetActorRelativeRotation;
+	public static delegate* unmanaged<ConjugateHandle, in Vector, void> SetActorRelativeScale;
 	
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Transform, uint8, uint8, void> AddActorWorldTransform;
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Transform, uint8, uint8, void> AddActorWorldTransformKeepScale;
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Vector, uint8, uint8, void> AddActorWorldOffset;
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Rotator, uint8, uint8, void> AddActorWorldRotation;
+	public static delegate* unmanaged<ConjugateHandle, in Transform, uint8, uint8, void> AddActorWorldTransform;
+	public static delegate* unmanaged<ConjugateHandle, in Transform, uint8, uint8, void> AddActorWorldTransformKeepScale;
+	public static delegate* unmanaged<ConjugateHandle, in Vector, uint8, uint8, void> AddActorWorldOffset;
+	public static delegate* unmanaged<ConjugateHandle, in Rotator, uint8, uint8, void> AddActorWorldRotation;
 	
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Transform, uint8, uint8, void> AddActorLocalTransform;
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Vector, uint8, uint8, void> AddActorLocalOffset;
-	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, in Rotator, uint8, uint8, void> AddActorLocalRotation;
+	public static delegate* unmanaged<ConjugateHandle, in Transform, uint8, uint8, void> AddActorLocalTransform;
+	public static delegate* unmanaged<ConjugateHandle, in Vector, uint8, uint8, void> AddActorLocalOffset;
+	public static delegate* unmanaged<ConjugateHandle, in Rotator, uint8, uint8, void> AddActorLocalRotation;
 }
 
 

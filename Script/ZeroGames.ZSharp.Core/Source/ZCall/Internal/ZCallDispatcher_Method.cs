@@ -53,13 +53,27 @@ internal sealed class ZCallDispatcher_Method(string name, MethodInfo method) : I
 				var parameter = parameterInfos[i];
 				if (parameter.ParameterType.IsByRef)
 				{
-					(*buffer)[Method.IsStatic ? i : i + 1].Object = parameters[i];
+					if (!parameter.ParameterType.IsEnum)
+					{
+						(*buffer)[Method.IsStatic ? i : i + 1].Object = parameters[i];
+					}
+					else
+					{
+						(*buffer)[Method.IsStatic ? i : i + 1].Int64 = (int64)Convert.ChangeType(parameters[i], typeof(int64))!;
+					}
 				}
 			}
 
 			if (Method.ReturnType != typeof(void))
 			{
-				(*buffer)[pos].Object = returnValue;
+				if (!Method.ReturnType.IsEnum)
+				{
+					(*buffer)[pos].Object = returnValue;
+				}
+				else
+				{
+					(*buffer)[pos].Int64 = (int64)Convert.ChangeType(returnValue, typeof(int64))!;
+				}
 			}
 
 			return EZCallErrorCode.Succeed;

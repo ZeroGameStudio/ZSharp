@@ -60,7 +60,7 @@ public class StreamingTask<T> : StreamingTaskBase, IAwaitable<T?, StreamingTask<
 			{
 				_cached = true;
 				ConjugateHandle handle = default;
-				assert(StreamingTask_Interop.GetResult(Unmanaged, &handle, 1) == 1);
+				ensureAlways(StreamingTask_Interop.GetResult(Unmanaged, &handle, 1) == 1);
 				_result = handle.GetTarget<T>();
 			}
 			

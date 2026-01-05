@@ -123,7 +123,7 @@ internal static class ConsoleManager
 		{
 			fixed (char* nameBuffer = name)
 			{
-				assert(Console_Interop.TryUnregisterOnChanged(nameBuffer) > 0);
+				ensureAlways(Console_Interop.TryUnregisterOnChanged(nameBuffer) > 0);
 			}
 			
 			_onChangedMap.Remove(name);

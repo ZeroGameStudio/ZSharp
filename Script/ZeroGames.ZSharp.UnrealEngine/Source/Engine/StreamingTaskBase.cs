@@ -46,7 +46,7 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 			return;
 		}
 
-		ensure(_state == EState.Loading);
+		assert(_state == EState.Loading);
 		_state = EState.Loaded;
 		
 		_continuation.MoveNextSource?.MoveNext();
@@ -156,14 +156,14 @@ public abstract class StreamingTaskBase : IDisposable, IStreamingTask
 
 	private void InternalCancel()
 	{
-		ensure(_state != EState.Loaded);
+		assert(_state != EState.Loaded);
 		_state = EState.Cancelled;
 		_expiredException = ExceptionDispatchInfo.Capture(new LifetimeExpiredException(_lifetime));
 	}
 	
 	private unsafe void InternalDispose()
 	{
-		ensure(_state != EState.Loading);
+		assert(_state != EState.Loading);
 		
 		if (Unmanaged == IntPtr.Zero)
 		{

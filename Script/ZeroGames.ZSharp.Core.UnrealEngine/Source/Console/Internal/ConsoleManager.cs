@@ -123,7 +123,7 @@ internal static class ConsoleManager
 		{
 			fixed (char* nameBuffer = name)
 			{
-				ensure(Console_Interop.TryUnregisterOnChanged(nameBuffer) > 0);
+				assert(Console_Interop.TryUnregisterOnChanged(nameBuffer) > 0);
 			}
 			
 			_onChangedMap.Remove(name);
@@ -230,7 +230,7 @@ internal static class ConsoleManager
 	public static void HandleVariableChanged(string name)
 	{
 		verify(_onChangedMap.TryGetValue(name, out var invocationList));
-		ensure(invocationList.Count > 0);
+		assert(invocationList.Count > 0);
 		foreach (var action in invocationList)
 		{
 			action(ConsoleVariable.FromName(name));

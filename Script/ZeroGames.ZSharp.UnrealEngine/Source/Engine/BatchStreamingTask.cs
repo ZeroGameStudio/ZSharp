@@ -109,7 +109,7 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 				{
 					ConjugateHandle* buffer = stackalloc ConjugateHandle[STACK_ALLOC_THRESHOLD];
 					int32 writeCount = StreamingTask_Interop.GetResult(Unmanaged, buffer, _totalCount);
-					ensure(writeCount == _totalCount);
+					assert(writeCount == _totalCount);
 					List<T> list = new(writeCount);
 					for (int32 i = 0; i < writeCount; ++i)
 					{
@@ -129,7 +129,7 @@ public class BatchStreamingTask<T> : StreamingTaskBase, IAwaitable<T[], BatchStr
 					{
 						writeCount = StreamingTask_Interop.GetResult(Unmanaged, fixedBuffer, _totalCount);
 					}
-					ensure(writeCount == _totalCount);
+					assert(writeCount == _totalCount);
 					List<T> list = new(writeCount);
 					for (int32 i = 0; i < writeCount; ++i)
 					{

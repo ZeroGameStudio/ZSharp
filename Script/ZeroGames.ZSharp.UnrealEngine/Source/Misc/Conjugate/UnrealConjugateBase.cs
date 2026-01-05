@@ -69,7 +69,7 @@ public abstract class UnrealConjugateBase : IConjugate
     
     void IConjugate.Release()
     {
-        ensure(IsRed);
+        assert(IsRed);
 
         MarkAsDead();
     }
@@ -106,7 +106,7 @@ public abstract class UnrealConjugateBase : IConjugate
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void MarkAsDead()
     {
-        ensure(!IsExpired);
+        assert(!IsExpired);
         
         ClearUnmanaged();
 

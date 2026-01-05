@@ -133,8 +133,8 @@ public readonly partial struct Lifetime
 
 	private Lifetime(object backend)
 	{
-		ensure(backend is not ValueType);
-		ensure(backend is not CancellationTokenSource);
+		assert(backend is not ValueType);
+		assert(backend is not CancellationTokenSource);
 		
 		if (backend is ILifetimeBackend iBackend)
 		{

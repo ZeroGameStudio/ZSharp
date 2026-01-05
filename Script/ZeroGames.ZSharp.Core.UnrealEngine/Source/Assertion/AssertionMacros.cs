@@ -9,6 +9,44 @@ namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
 public static class AssertionMacros
 {
+	
+	[Conditional("ASSERTION_CHECK")]
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static void assert
+	(
+		bool condition,
+		string? message = null,
+		[CallerArgumentExpression(nameof(condition))] string? expr = null,
+		[CallerFilePath] string? file = null,
+		[CallerLineNumber] int32 line = 0,
+		[CallerColumnNumber] int32 column = -1
+	)
+	{
+		if (!condition)
+		{
+			CallerInfoHelper.Inject(ref column);
+			AssertFail(message, expr, file, line, column);
+		}
+	}
+
+	[Conditional("ASSERTION_CHECK_SLOW")]
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static void assertSlow
+	(
+		bool condition,
+		string? message = null,
+		[CallerArgumentExpression(nameof(condition))] string? expr = null,
+		[CallerFilePath] string? file = null,
+		[CallerLineNumber] int32 line = 0,
+		[CallerColumnNumber] int32 column = -1
+	)
+	{
+		if (!condition)
+		{
+			CallerInfoHelper.Inject(ref column);
+			AssertFail(message, expr, file, line, column);
+		}
+	}
 
 	[Conditional("ASSERTION_CHECK")]
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -169,7 +207,7 @@ public static class AssertionMacros
 			CallerInfoHelper.Inject(ref context, ref column);
 			if (_ensureCache.Add(new(context, file ?? string.Empty, line, column)))
 			{
-				EnsureFail(message, expr, file, line, column);
+				AssertFail(message, expr, file, line, column);
 			}
 		}
 #endif
@@ -192,7 +230,7 @@ public static class AssertionMacros
 		if (!condition)
 		{
 			CallerInfoHelper.Inject(ref column);
-			EnsureFail(message, expr, file, line, column);
+			AssertFail(message, expr, file, line, column);
 		}
 #endif
 		
@@ -264,7 +302,7 @@ public static class AssertionMacros
 		throw new AssertionFailedException(finalMessage);
 	}
 
-	private static void EnsureFail(string? message, string? expr, string? file, int32 line, int32 column)
+	private static void AssertFail(string? message, string? expr, string? file, int32 line, int32 column)
 	{
 		try
 		{

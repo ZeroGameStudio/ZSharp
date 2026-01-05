@@ -15,7 +15,7 @@ internal class ZeroTaskBackend_AsyncStateMachine<TResult, TStateMachine> : Poole
 
 	public void MoveNext()
 	{
-		ensure(CanMoveNext);
+		assert(CanMoveNext);
 		
 		StateMachine!.MoveNext();
 	}

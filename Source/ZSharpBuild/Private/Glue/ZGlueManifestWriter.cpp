@@ -13,6 +13,7 @@
 #include "JsonObjectConverter.h"
 #include "ZSharpExportSettings.h"
 #include "DTO/ZExportedDelegateDto.h"
+#include "DTO/ZExportedMiscDto.h"
 
 void ZSharp::FZGlueManifestWriter::Write(const TArray<FString>& assemblies)
 {
@@ -33,6 +34,16 @@ void ZSharp::FZGlueManifestWriter::Write(const TArray<FString>& assemblies)
 
 		FFileHelper::SaveStringToFile(jsonStr, *FPaths::Combine(glueDir, pair.Key, "Manifest.json"));
 	}
+	
+	FZExportedMiscDto miscDto;
+	WriteMisc(miscDto);
+	FString miscJsonStr;
+	if (!FJsonObjectConverter::UStructToJsonObjectString<FZExportedMiscDto>(miscDto, miscJsonStr))
+	{
+		checkNoEntry();
+	}
+
+	FFileHelper::SaveStringToFile(miscJsonStr, *FPaths::Combine(glueDir, "__Misc", "Manifest.json"));
 }
 
 void ZSharp::FZGlueManifestWriter::WriteClass(const IZExportedClass& cls)
@@ -165,6 +176,16 @@ void ZSharp::FZGlueManifestWriter::WriteDelegate(const IZExportedDelegate& deleg
 	UE_LOG(LogTemp, Log, TEXT("Exported Delegate Name: [%s] Module: [%s]"),
 		*delegate.GetName(),
 		*delegate.GetModule());
+}
+
+void ZSharp::FZGlueManifestWriter::WriteMisc(FZExportedMiscDto& dto)
+{
+	TArray<TSharedPtr<FName>> collisionProfiles;
+	UCollisionProfile::GetProfileNames(collisionProfiles);
+	for (const auto& profile : collisionProfiles)
+	{
+		dto.CollisionProfiles.Emplace(profile->ToString());
+	}
 }
 
 TUniquePtr<FZExportedAssemblyDto>* ZSharp::FZGlueManifestWriter::GetAssemblyDto(const IZExportedType& type)

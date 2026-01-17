@@ -37,6 +37,7 @@ public class ZSharpBuild : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
+				"Engine",
 				
 				"Projects",
 				"Json",

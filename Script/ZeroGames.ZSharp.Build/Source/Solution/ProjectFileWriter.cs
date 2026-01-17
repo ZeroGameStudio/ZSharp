@@ -287,6 +287,16 @@ public class ProjectFileWriter
 
 		itemGroupElement.Add(glueElement);
 		
+		if (_project.IntrinsicType is EIntrinsicProjectType.Engine)
+		{
+			XElement miscElement = new("Compile");
+			miscElement.SetAttributeValue("Include", "$(UnrealProjectDir)/Intermediate/ZSharp/Glue/__Misc/**/*.cs");
+			
+			itemGroupElement.Add(miscElement);
+		}
+		
+
+		
 		root.Add(itemGroupElement);
 	}
 

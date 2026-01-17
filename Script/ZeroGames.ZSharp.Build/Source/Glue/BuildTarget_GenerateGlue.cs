@@ -13,6 +13,8 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		await SetupRegistry();
 		Parallel.ForEach(_registry.ExportedTypes, (type, _) => GenerateType(type));
 
+		GenerateMisc();
+
 		return "success";
 	}
 	
@@ -45,12 +47,20 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		
 		foreach (var dir in Directory.GetDirectories(_glueDir))
 		{
+			string dirName = new DirectoryInfo(dir).Name;
+			
+			// Skip preserved dirs.
+			if (dirName.StartsWith("__"))
+			{
+				continue;
+			}
+			
 			if (!File.Exists($"{dir}/Manifest.json"))
 			{
 				continue;
 			}
 			
-			if (!(_assemblies?.Contains(new DirectoryInfo(dir).Name) ?? true))
+			if (_assemblies?.Contains(dirName) is false)
 			{
 				continue;
 			}
@@ -111,6 +121,36 @@ public class BuildTarget_GenerateGlue : BuildTargetBase, IUnrealProjectDir
 		{
 			new DelegateWriter(_registry, exportedDelegate, moduleDir, exportedType.Name.Substring(1)).Write();
 		}
+	}
+	
+	private void GenerateMisc()
+	{
+		string miscDir = $"{_glueDir}/__Misc";
+		string manifestDir = $"{miscDir}/Manifest.json";
+		if (!File.Exists(manifestDir))
+		{
+			return;
+		}
+
+		string codeDir = $"{miscDir}/Glue";
+		if (Directory.Exists(codeDir))
+		{
+			Directory.Delete(codeDir, true);
+		}
+		
+		Directory.CreateDirectory(codeDir);
+
+		using FileStream fs = File.OpenRead(manifestDir);
+		JsonSerializerOptions options = new()
+		{
+			PropertyNameCaseInsensitive = true,
+		};
+		if (JsonSerializer.Deserialize<ExportedMisc>(fs, options) is not { } misc)
+		{
+			return;
+		}
+		
+		new MiscWriter(misc, codeDir).Write();
 	}
 
 	private void CreateModuleDirectory(string dir)

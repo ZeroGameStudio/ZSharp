@@ -4,6 +4,8 @@
 
 #include "DTO/ZExportedAssemblyDto.h"
 
+struct FZExportedMiscDto;
+
 namespace ZSharp
 {
 	class IZExportedType;
@@ -21,6 +23,7 @@ namespace ZSharp
 		void WriteClass(const IZExportedClass& cls);
 		void WriteEnum(const IZExportedEnum& enm);
 		void WriteDelegate(const IZExportedDelegate& delegate);
+		void WriteMisc(FZExportedMiscDto& dto);
 
 		TUniquePtr<FZExportedAssemblyDto>* GetAssemblyDto(const IZExportedType& type);
 

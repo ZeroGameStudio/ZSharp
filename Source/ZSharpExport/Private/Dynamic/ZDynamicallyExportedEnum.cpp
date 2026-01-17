@@ -6,6 +6,7 @@
 #include "ZSharpExportSettings.h"
 #include "ZExportHelper.h"
 #include "ZUEnumUnderlyingTypeLookup.h"
+#include "Trait/ZManagedTypeInfo.h"
 
 ZSharp::FZDynamicallyExportedEnum* ZSharp::FZDynamicallyExportedEnum::Create(const UEnum* uenum)
 {
@@ -101,8 +102,31 @@ void ZSharp::FZDynamicallyExportedEnum::ForeachEnumValue(TFunctionRef<void(const
 			continue;
 		}
 		
-		const FString value = FString::Printf(TEXT("%lld"), Enum->GetValueByIndex(i));
-		action(name, value);
+		static const TMap<FString, TTuple<int64, int64>> GUnderlyingType2ValueRange
+		{
+#define PAIR(Type) { #Type, { MIN_##Type, MAX_##Type } }
+			
+			PAIR(uint8),
+			PAIR(uint16),
+			PAIR(uint32),
+			PAIR(uint64),
+			PAIR(int8),
+			PAIR(int16),
+			PAIR(int32),
+			PAIR(int64),
+			
+#undef PAIR
+		};
+		
+		int64 value = Enum->GetValueByIndex(i);
+		const auto& range = GUnderlyingType2ValueRange[GetUnderlyingType()];
+		if (value < range.Get<0>() || value > range.Get<1>())
+		{
+			continue;
+		}
+		
+		const FString valueStr = FString::Printf(TEXT("%lld"), value);
+		action(name, valueStr);
 	}
 }
 

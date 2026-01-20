@@ -15,9 +15,44 @@
 
 #include "ZSharpFunction.inl"
 #include "Reflection/ZReflectionHelper.h"
+#include "UObject/CoreRedirects.h"
 
 namespace ZSharp::ZUnrealFieldEmitter_Private
 {
+	template <typename T, ECoreRedirectFlags R>
+	static T* FindObjectWithCoreRedirectChecked(UObject* outer, const FString& path)
+	{
+		auto obj = FindObject<T>(outer, *path);
+		if (!obj)
+		{
+			FCoreRedirectObjectName oldPath { path };
+			FCoreRedirectObjectName newPath = FCoreRedirects::GetRedirectedName(R, oldPath);
+			return FindObjectChecked<T>(outer, *newPath.ToString());
+		}
+		
+		return obj;
+	}
+	
+	static UClass* FindClassWithCoreRedirectChecked(UObject* outer, const FString& path)
+	{
+		return FindObjectWithCoreRedirectChecked<UClass, ECoreRedirectFlags::Type_Class>(outer, path);
+	}
+	
+	static UScriptStruct* FindScriptStructWithCoreRedirectChecked(UObject* outer, const FString& path)
+	{
+		return FindObjectWithCoreRedirectChecked<UScriptStruct, ECoreRedirectFlags::Type_Struct>(outer, path);
+	}
+	
+	static UEnum* FindEnumWithCoreRedirectChecked(UObject* outer, const FString& path)
+	{
+		return FindObjectWithCoreRedirectChecked<UEnum, ECoreRedirectFlags::Type_Enum>(outer, path);
+	}
+	
+	static UDelegateFunction* FindDelegateWithCoreRedirectChecked(UObject* outer, const FString& path)
+	{
+		return FindObjectWithCoreRedirectChecked<UDelegateFunction, ECoreRedirectFlags::Type_Function>(outer, path);
+	}
+	
 	static FString MakeNMZCallName(const UObject* outer, const FString& lastName)
 	{
 		if (lastName.IsEmpty())
@@ -345,7 +380,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				
 				NEW_PROPERTY(Enum);
 
-				property->SetEnum(FindObjectChecked<UEnum>(nullptr, *def.DescriptorFieldPath.ToString()));
+				property->SetEnum(FindEnumWithCoreRedirectChecked(nullptr, *def.DescriptorFieldPath.ToString()));
 
 				FProperty* underlyingProperty = nullptr;
 				switch (def.EnumUnderlyingType)
@@ -431,7 +466,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 		case EZPropertyType::Object:
 			{
 				FObjectProperty* objectProperty;
-				auto descriptor = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				auto descriptor = FindClassWithCoreRedirectChecked(nullptr, def.DescriptorFieldPath.ToString());
 				if (descriptor->IsChildOf<UClass>())
 				{
 					// Special case for TObjectPtr<UClass>.
@@ -464,7 +499,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
 				
 				property->PropertyClass = UClass::StaticClass();
-				property->MetaClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				property->MetaClass = FindClassWithCoreRedirectChecked(nullptr, def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
@@ -475,7 +510,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
 
 				property->PropertyClass = UClass::StaticClass();
-				property->MetaClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				property->MetaClass = FindClassWithCoreRedirectChecked(nullptr, def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
@@ -485,7 +520,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
 				
-				property->PropertyClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				property->PropertyClass = FindClassWithCoreRedirectChecked(nullptr, def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
@@ -496,7 +531,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
 				
-				property->PropertyClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				property->PropertyClass = FindClassWithCoreRedirectChecked(nullptr, def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
@@ -506,7 +541,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
 				
-				property->PropertyClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				property->PropertyClass = FindClassWithCoreRedirectChecked(nullptr, def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
@@ -516,7 +551,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 
 				property->PropertyFlags |= CPF_UObjectWrapper; // Migrate from UHT.
 				
-				property->InterfaceClass = FindObjectChecked<UClass>(nullptr, *def.DescriptorFieldPath.ToString());
+				property->InterfaceClass = FindClassWithCoreRedirectChecked(nullptr, def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
@@ -529,7 +564,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(Struct);
 
-				property->Struct = FindObjectChecked<UScriptStruct>(nullptr, *def.DescriptorFieldPath.ToString());
+				property->Struct = FindScriptStructWithCoreRedirectChecked(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
@@ -538,7 +573,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(Delegate);
 
-				property->SignatureFunction = FindObjectChecked<UDelegateFunction>(nullptr, *def.DescriptorFieldPath.ToString());
+				property->SignatureFunction = FindDelegateWithCoreRedirectChecked(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
@@ -546,7 +581,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 			{
 				NEW_PROPERTY(MulticastInlineDelegate);
 
-				property->SignatureFunction = FindObjectChecked<UDelegateFunction>(nullptr, *def.DescriptorFieldPath.ToString());
+				property->SignatureFunction = FindDelegateWithCoreRedirectChecked(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
@@ -556,7 +591,7 @@ namespace ZSharp::ZUnrealFieldEmitter_Private
 				
 				NEW_PROPERTY(MulticastSparseDelegate);
 
-				property->SignatureFunction = FindObjectChecked<USparseDelegateFunction>(nullptr, *def.DescriptorFieldPath.ToString());
+				property->SignatureFunction = FindDelegateWithCoreRedirectChecked(nullptr, *def.DescriptorFieldPath.ToString());
 				
 				break;
 			}
@@ -937,7 +972,7 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 
 			if (!scriptStructDef->SuperPath.IsNone())
 			{
-				if (auto superStruct = FindObjectChecked<const UScriptStruct>(nullptr, *scriptStructDef->SuperPath.ToString()); scriptStruct2def.Contains(superStruct))
+				if (auto superStruct = ZUnrealFieldEmitter_Private::FindScriptStructWithCoreRedirectChecked(nullptr, *scriptStructDef->SuperPath.ToString()); scriptStruct2def.Contains(superStruct))
 				{
 					dependencies.Emplace(superStruct);
 				}
@@ -945,7 +980,7 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 
 			auto addDependency = [&scriptStruct2def, &dependencies](FName dependencyFieldPath)
 			{
-				if (auto referencedStruct = FindObjectChecked<const UScriptStruct>(nullptr, *dependencyFieldPath.ToString()); scriptStruct2def.Contains(referencedStruct))
+				if (auto referencedStruct = ZUnrealFieldEmitter_Private::FindScriptStructWithCoreRedirectChecked(nullptr, *dependencyFieldPath.ToString()); scriptStruct2def.Contains(referencedStruct))
 				{
 					dependencies.Emplace(referencedStruct);
 				}
@@ -1033,14 +1068,19 @@ void ZSharp::FZUnrealFieldEmitter::InternalEmit(FZUnrealFieldManifest& manifest)
 			const FZClassDefinition* classDef = class2def.FindChecked(cls);
 			TArray<const UClass*, TInlineAllocator<2>> dependencies;
 			
-			if (auto superClass = FindObjectChecked<const UClass>(nullptr, *classDef->SuperPath.ToString()); class2def.Contains(superClass))
+			if (classDef->SuperPath.ToString().Contains("GameplayDebuggerDataProviderNativeBase"))
+			{
+				UE_DEBUG_BREAK();
+			}
+			
+			if (auto superClass = ZUnrealFieldEmitter_Private::FindClassWithCoreRedirectChecked(nullptr, classDef->SuperPath.ToString()); class2def.Contains(superClass))
 			{
 				dependencies.Emplace(superClass);
 			}
 			
 			if (!classDef->WithinPath.IsNone())
 			{
-				if (auto withinClass = FindObjectChecked<const UClass>(nullptr, *classDef->WithinPath.ToString()); class2def.Contains(withinClass))
+				if (auto withinClass = ZUnrealFieldEmitter_Private::FindClassWithCoreRedirectChecked(nullptr, classDef->WithinPath.ToString()); class2def.Contains(withinClass))
 				{
 					dependencies.Emplace(withinClass);
 				}
@@ -1176,7 +1216,7 @@ void ZSharp::FZUnrealFieldEmitter::EmitDelegateSkeleton(UPackage* pak, FZDelegat
 	UE_CLOG(def.DelegateType == EZDelegateType::Sparse, LogZSharpEmit, Fatal, TEXT("Sparse delegate is not support for emit yet!!! Delegate: [%s]"), *def.Name.ToString());
 
 	FStaticConstructObjectParameters params { def.DelegateType == EZDelegateType::Sparse ? USparseDelegateFunction::StaticClass() : UDelegateFunction::StaticClass() };
-	params.Outer = def.OuterClassName.IsNone() ? static_cast<UObject*>(pak) : static_cast<UObject*>(FindObjectChecked<UClass>(pak, *def.OuterClassName.ToString()));
+	params.Outer = def.OuterClassName.IsNone() ? static_cast<UObject*>(pak) : static_cast<UObject*>(ZUnrealFieldEmitter_Private::FindClassWithCoreRedirectChecked(pak, *def.OuterClassName.ToString()));
 	params.Name = *def.Name.ToString();
 	params.SetFlags = def.Flags | GCompiledInFlags;
 	
@@ -1291,7 +1331,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitStruct(UPackage* pak, FZScriptStruc
 	UScriptStruct* superScriptStruct = nullptr;
 	if (!def.SuperPath.IsNone())
 	{
-		superScriptStruct = FindObjectChecked<UScriptStruct>(nullptr, *def.SuperPath.ToString());
+		superScriptStruct = ZUnrealFieldEmitter_Private::FindScriptStructWithCoreRedirectChecked(nullptr, *def.SuperPath.ToString());
 		check(superScriptStruct->IsNative());
 		scriptStruct->SetSuperStruct(superScriptStruct);
 		scriptStruct->StructFlags = static_cast<EStructFlags>(scriptStruct->StructFlags | superScriptStruct->StructFlags & STRUCT_Inherit);
@@ -1394,13 +1434,13 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 	// Migrate from InitializePrivateStaticClass().
 	// UZSharpClass must have super class.
 	check(!def.SuperPath.IsNone());
-	auto superClass = FindObjectChecked<UClass>(nullptr, *def.SuperPath.ToString());
+	auto superClass = ZUnrealFieldEmitter_Private::FindClassWithCoreRedirectChecked(nullptr, def.SuperPath.ToString());
 	check(superClass->IsNative());
 	cls->SetSuperStruct(superClass);
 	cls->ClassFlags |= superClass->ClassFlags & CLASS_ScriptInherit;
 	// UClass::Bind() will propagate cast flags so we don't need to do it manually.
 
-	auto withinClass = !def.WithinPath.IsNone() ? FindObjectChecked<UClass>(nullptr, *def.WithinPath.ToString()) : superClass->ClassWithin.Get();
+	auto withinClass = !def.WithinPath.IsNone() ? ZUnrealFieldEmitter_Private::FindClassWithCoreRedirectChecked(nullptr, def.WithinPath.ToString()) : superClass->ClassWithin.Get();
 	check(withinClass->IsNative());
 	check(withinClass->IsChildOf(superClass->ClassWithin));
 	cls->ClassWithin = withinClass;
@@ -1432,7 +1472,7 @@ void ZSharp::FZUnrealFieldEmitter::FinishEmitClass(UPackage* pak, FZClassDefinit
 		TArray<UClass*> interfaceClasses;
 		for (const auto& implementedInterfacePath : def.ImplementedInterfacePaths)
 		{
-			interfaceClasses.Add(FindObjectChecked<UClass>(nullptr, *implementedInterfacePath.ToString()));
+			interfaceClasses.Add(ZUnrealFieldEmitter_Private::FindClassWithCoreRedirectChecked(nullptr, implementedInterfacePath.ToString()));
 		}
 
 		// Distinct.

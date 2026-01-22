@@ -8,7 +8,7 @@ namespace ZSharp
 {
 	struct FZActor_Interop
 	{
-		static void FinishSpawning(FZConjugateHandle self, const FTransform& transform);
+		static void FinishSpawning(FZConjugateHandle self, const FTransform& transform, uint8 requiresRootComponent);
 		static FZConjugateHandle AddComponent(FZConjugateHandle self, FZConjugateHandle componentClass, uint8 defer);
 		static void FinishAddComponent(FZConjugateHandle self, FZConjugateHandle component);
 		static ENetMode GetNetMode(FZConjugateHandle self);

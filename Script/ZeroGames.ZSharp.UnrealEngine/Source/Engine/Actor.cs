@@ -13,14 +13,14 @@ public partial class AActor
 		return InternalGetNetMode();
 	}
 	
-	internal void FinishSpawning(in Transform transform)
+	internal void FinishSpawning(in Transform transform, bool requiresRootComponent)
 	{
 		MasterAlcCache.GuardInvariant();
-		InternalFinishSpawning(transform);
+		InternalFinishSpawning(transform, requiresRootComponent);
 	}
 	
-	private unsafe void InternalFinishSpawning(in Transform transform)
-		=> Actor_Interop.FinishSpawning(ConjugateHandle.FromConjugate(this), transform);
+	private unsafe void InternalFinishSpawning(in Transform transform, bool requiresRootComponent)
+		=> Actor_Interop.FinishSpawning(ConjugateHandle.FromConjugate(this), transform, Convert.ToByte(requiresRootComponent));
 	
 	private unsafe ENetMode InternalGetNetMode()
 		=> Actor_Interop.GetNetMode(ConjugateHandle.FromConjugate(this));

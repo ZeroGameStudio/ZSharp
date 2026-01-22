@@ -22,6 +22,7 @@ public readonly struct ActorSpawnParameters
 	public ESpawnActorCollisionHandlingMethod? SpawnCollisionHandlingOverride { get; init; }
 	public ESpawnActorScaleMethod? TransformScaleMethod { get; init; }
 	public ESpawnActorNameMode? NameMode { get; init; }
+	public bool RequiresRootComponent { get; init; }
 }
 
 public partial class UWorld
@@ -115,7 +116,7 @@ public partial class UWorld
 			}
 			finally
 			{
-				actor.FinishSpawning(userTransform ?? transform);
+				actor.FinishSpawning(userTransform ?? transform, spawnParameters.RequiresRootComponent);
 			}
 			
 			return actor;
@@ -158,7 +159,7 @@ public partial class UWorld
 			}
 			finally
 			{
-				actor.FinishSpawning(userTransform ?? transform);
+				actor.FinishSpawning(userTransform ?? transform, spawnParameters.RequiresRootComponent);
 			}
 			
 			return actor;
@@ -295,7 +296,7 @@ public partial class UWorld
 		{
 			if (__IsValid)
 			{
-				actor.FinishSpawning(userTransform ?? transform);
+				actor.FinishSpawning(userTransform ?? transform, false /* FIXME */);
 			}
 		}
 			
@@ -317,10 +318,10 @@ public partial class UWorld
 		{
 			if (__IsValid)
 			{
-				actor.FinishSpawning(userTransform ?? transform);
+				actor.FinishSpawning(userTransform ?? transform, false /* FIXME */);
 			}
 		}
-			
+		
 		return actor;
 	}
 	

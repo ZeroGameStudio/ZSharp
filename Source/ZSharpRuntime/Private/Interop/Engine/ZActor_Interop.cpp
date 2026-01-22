@@ -29,13 +29,29 @@ namespace ZSharp::ZActor_Interop_Private
 	}
 }
 
-void ZSharp::FZActor_Interop::FinishSpawning(FZConjugateHandle self, const FTransform& transform)
+void ZSharp::FZActor_Interop::FinishSpawning(FZConjugateHandle self, const FTransform& transform, uint8 requiresRootComponent)
 {
 	GUARD
 	(
 		auto pSelf = ConjugateUnsafe<AActor>(self);
 		FTransform spawnTransform;
 		FZInteropHelper::CopyTransformUnaligned(transform, spawnTransform);
+		
+		if (requiresRootComponent &&
+			pSelf->GetClass()->IsNative() && // Blueprint class is guaranteed to have root component by SCS.
+			!pSelf->GetRootComponent())
+		{
+			USceneComponent* newRoot = NewObject<USceneComponent>(pSelf);
+			pSelf->SetRootComponent(newRoot);
+			// No need to register component, FinishSpawning() does.
+		}
+		
+		// This keeps behaviors same between DSO root component and root component created during spawning.
+		if (USceneComponent* root = pSelf->GetRootComponent())
+		{
+			root->SetWorldTransform(transform);
+		}
+		
 		pSelf->FinishSpawning(spawnTransform);
 	);
 }

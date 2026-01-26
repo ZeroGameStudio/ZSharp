@@ -14,7 +14,7 @@ public class NativeGameplayTag : IDisposable
 			throw new ArgumentOutOfRangeException(tagName);
 		}
 		
-		Name = tagName;
+		TagName = tagName;
 		Comment = comment;
 		PluginName = pluginName;
 		ModuleName = moduleName;
@@ -29,17 +29,21 @@ public class NativeGameplayTag : IDisposable
 				_unmanaged = GameplayTag_Interop.TryRegisterNativeTag(tagNameBuffer, commentBuffer, pluginNameBuffer, moduleNameBuffer);
 			}
 		}
+
+		Tag = GameplayTag.Request(TagName);
 		
 		MasterAlcCache.Instance.RegisterAutoDisposedResource(this);
 	}
 	
-	public NativeGameplayTag(string tagName, string comment) : this(tagName, comment, string.Empty, string.Empty){}
-	public NativeGameplayTag(string tagName) : this(tagName, string.Empty){}
-
+	public NativeGameplayTag(string tagName, string comment, string moduleName) : this(tagName, comment, string.Empty, moduleName){}
+	public NativeGameplayTag(string tagName, string moduleName) : this(tagName, string.Empty, string.Empty, moduleName){}
+	
 	~NativeGameplayTag()
 	{
 		InternalDispose();
 	}
+
+	public static implicit operator GameplayTag(NativeGameplayTag value) => value.Tag;
 	
 	public void Dispose()
 	{
@@ -64,14 +68,16 @@ public class NativeGameplayTag : IDisposable
 		}
 	}
 	
-	public string Name { get; }
+	public string TagName { get; }
 	public string Comment { get; }
 	public string PluginName { get; }
 	public string ModuleName { get; }
 
+	public GameplayTag Tag { get; }
+
 	private IntPtr _unmanaged;
 	private bool _disposed;
-	
+
 }
 
 #endif

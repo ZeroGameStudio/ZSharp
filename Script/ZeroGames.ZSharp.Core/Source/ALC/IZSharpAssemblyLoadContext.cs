@@ -8,6 +8,7 @@ public interface IZSharpAssemblyLoadContext
 {
 	unsafe ELoadAssemblyErrorCode LoadAssembly(string name, void* args, out Assembly? assembly);
 	unsafe EInvokeMethodErrorCode InvokeMethod(string assemblyName, string typeName, string methodName, void* args);
+	void RegisterAutoDisposedResource(IDisposable? resource);
 	bool IsUnloaded { get; }
 	event Action<Assembly> OnAssemblyLoaded;
 }

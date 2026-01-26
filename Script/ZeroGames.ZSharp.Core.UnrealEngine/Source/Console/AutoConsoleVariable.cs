@@ -1,6 +1,8 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.Loader;
 
 namespace ZeroGames.ZSharp.Core.UnrealEngine;
 
@@ -16,6 +18,11 @@ public abstract class AutoConsoleVariableBase : IDisposable
 		if (_registered)
 		{
 			ConsoleManager.TryRegisterOnChanged(name, onChanged);
+		}
+		
+		if (AssemblyLoadContext.GetLoadContext(Assembly.GetCallingAssembly()) is IZSharpAssemblyLoadContext zsalc)
+		{
+			zsalc.RegisterAutoDisposedResource(this);
 		}
 	}
 

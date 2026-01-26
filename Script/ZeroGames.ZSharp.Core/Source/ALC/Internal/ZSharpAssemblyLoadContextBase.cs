@@ -21,7 +21,22 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
         
         return AssemblyLoadContextHelper.InvokeMethod(this, assemblyName, typeName, methodName, args);
     }
-    
+
+    public void RegisterAutoDisposedResource(IDisposable? resource)
+    {
+        if (resource is null)
+        {
+            return;
+        }
+
+        if (IsUnloaded)
+        {
+            resource.Dispose();
+        }
+
+        _autoDisposedResources.Add(resource);
+    }
+
     public bool IsUnloaded { get; private set; }
     public event Action<Assembly>? OnAssemblyLoaded;
 
@@ -40,7 +55,23 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
 
     protected virtual void HandleUnload()
     {
+        const int32 MAX_DISPOSE_ITERATION = 255;
+        
+        int32 disposeIteration = 0;
+        while (_autoDisposedResources.Count > 0 && disposeIteration++ < MAX_DISPOSE_ITERATION)
+        {
+            var resources = _autoDisposedResources.ToArray();
+            _autoDisposedResources.Clear();
+            
+            foreach (var resource in resources)
+            {
+                resource.Dispose();
+            }
+        }
+        
         IsUnloaded = true;
+        
+        Thrower.FatalIf(_autoDisposedResources.Count > 0, "[Z# ALC] Possible infinite recursion detected while auto disposing resources!!!");
     }
     
     private unsafe ELoadAssemblyErrorCode InternalLoadAssembly(string name, void* args, out Assembly? assembly, bool implicitly)
@@ -55,6 +86,7 @@ internal abstract class ZSharpAssemblyLoadContextBase : AssemblyLoadContext, IZS
     }
 
     private readonly IAssemblyResolver _resolver;
+    private readonly HashSet<IDisposable> _autoDisposedResources = [];
 
 }
 

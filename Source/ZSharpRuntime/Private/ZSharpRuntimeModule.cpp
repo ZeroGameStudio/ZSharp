@@ -390,6 +390,8 @@ namespace ZSharp::ZSharpRuntimeModule_Private
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, AddLocalOffset),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(SceneComponent, AddLocalRotation),
 
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(GameplayTag, TryRegisterNativeTag),
+			ZSHARP_BUILD_UNMANAGED_FUNCTION(GameplayTag, TryUnregisterNativeTag),
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(GameplayTag, Request),
 
 			ZSHARP_BUILD_UNMANAGED_FUNCTION(EnhancedInputComponent, BindUFunctionAction),

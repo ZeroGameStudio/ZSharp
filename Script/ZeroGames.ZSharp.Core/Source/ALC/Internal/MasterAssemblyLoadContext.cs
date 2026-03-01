@@ -475,12 +475,14 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     {
         if (_pendingDisposedConjugates.Count > 0 && !_flushPendingDisposedConjugatesPosted)
         {
-            GameThreadScheduler.Post(static state => Unsafe.As<MasterAssemblyLoadContext>(state)!.FlushPendingDisposedConjugates(false), this);
+            const bool FULL_DISPOSE = false;
+            GameThreadScheduler.Post(static state
+                => Unsafe.As<MasterAssemblyLoadContext>(state)!.FlushPendingDisposedConjugates(FULL_DISPOSE), this);
             _flushPendingDisposedConjugatesPosted = true;
         }
     }
     
-    private void FlushPendingDisposedConjugates(bool forceFullDispose)
+    private void FlushPendingDisposedConjugates(bool fullDispose)
     {
         bool lockTaken = false;
         try
@@ -498,7 +500,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
                 return;
             }
 
-            if (!forceFullDispose)
+            if (!fullDispose)
             {
                 const double HARD_DISPOSE_FACTOR = 0.05;
                 const double TIME_BUDGET_MS = 1;

@@ -3,6 +3,8 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace ZeroGames.ZSharp.Core;
@@ -104,16 +106,19 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     {
         this.GuardUnloaded();
 
-        if (GameThreadScheduler.IsInGameThread)
+        bool lockTaken = false;
+        try
         {
-            conjugate.Dispose();
+            _pendingDisposedConjugatesLock.Enter(ref lockTaken);
+            
+            _pendingDisposedConjugates.Enqueue(conjugate);
+            ConditionallyPostFlushPendingDisposedConjugates();
         }
-        else
+        finally
         {
-            lock (_pendingDisposedConjugatesLock)
+            if (lockTaken)
             {
-                _pendingDisposedConjugates.Enqueue(conjugate);
-                GameThreadScheduler.Post(FlushPendingDisposedConjugates, this);
+                _pendingDisposedConjugatesLock.Exit();
             }
         }
     }
@@ -144,9 +149,10 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         Dictionary<IntPtr, ConjugateRec> temp = _conjugateMap.ToDictionary();
         foreach (var pair in temp)
         {
-            if (!pair.Value.WeakRef.TryGetTarget(out var conjugate))
+            // This happens when a black conjugate was pushed into pending disposed queue (resurrected) but the queue is not flushed yet.
+            // Just skip here because we are going to flush the queue the next step.
+            if (pair.Value.Handle.Target is not { } conjugate)
             {
-                CoreLog.Error($"Conjugate {pair.Key} is expired!");
                 continue;
             }
             
@@ -157,7 +163,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             }
         }
         
-        FlushPendingDisposedConjugates(this);
+        FlushPendingDisposedConjugates(true);
     }
 
     public EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
@@ -208,7 +214,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         }
         
         IConjugate conjugate = buildConjugate(unmanaged);
-        _conjugateMap[unmanaged] = new(0, new(conjugate, true));
+        _conjugateMap[unmanaged] = new(0, BuildConjugateHandle(conjugate));
         return unmanaged;
     }
 
@@ -222,7 +228,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             return;
         }
 
-        if (!rec.WeakRef.TryGetTarget(out var conjugate))
+        if (rec.Handle.Target is not { } conjugate)
         {
             CoreLog.Error($"Conjugate {unmanaged} is expired!");
             return;
@@ -240,7 +246,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             return null;
         }
 
-        if (!rec.WeakRef.TryGetTarget(out var conjugate))
+        if (rec.Handle.Target is not { } conjugate)
         {
             CoreLog.Error($"Conjugate {unmanaged} is expired!");
             return null;
@@ -305,29 +311,8 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         base.HandleAssemblyLoaded(assembly);
     }
     
-    private readonly record struct ConjugateRec(uint16 RegistryId, WeakReference<IConjugate> WeakRef);
+    private readonly record struct ConjugateRec(uint16 RegistryId, GCHandle<IConjugate?> Handle);
     private readonly record struct UnloadingRec(MasterAlcUnloadingRegistration Registration, Action Callback, int64 Priority);
-    
-    private static void FlushPendingDisposedConjugates(object? state)
-    {
-        MasterAssemblyLoadContext @this = (MasterAssemblyLoadContext)state!;
-        lock (@this._pendingDisposedConjugatesLock)
-        {
-            if (@this.IsUnloaded)
-            {
-                if (@this._pendingDisposedConjugates.Count != 0)
-                {
-                    CoreLog.Error("Master ALC is unloaded but conjugate map is not empty!");
-                }
-                return;
-            }
-
-            while (@this._pendingDisposedConjugates.TryDequeue(out var conjugate))
-            {
-                conjugate.Dispose();
-            }
-        }
-    }
 
     private MasterAssemblyLoadContext() : base(INSTANCE_NAME)
     {
@@ -424,6 +409,9 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         }
     }
 
+    private GCHandle<IConjugate?> BuildConjugateHandle(IConjugate managed)
+        => GCHandle<IConjugate?>.FromIntPtr(GCHandle.ToIntPtr(GCHandle.Alloc(managed, GCHandleType.Weak)));
+
     private IntPtr BuildConjugate_Black(IConjugate managed, IntPtr userdata)
     {
         GuardUnloadingPrepared();
@@ -443,7 +431,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             return IntPtr.Zero;
         }
         
-        _conjugateMap[unmanaged] = new(registryId, new(managed, true));
+        _conjugateMap[unmanaged] = new(registryId, BuildConjugateHandle(managed));
         
         #if STAT_BLACK_CONJUGATES
         
@@ -482,6 +470,71 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         return 0;
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ConditionallyPostFlushPendingDisposedConjugates()
+    {
+        if (_pendingDisposedConjugates.Count > 0 && !_flushPendingDisposedConjugatesPosted)
+        {
+            GameThreadScheduler.Post(static state => Unsafe.As<MasterAssemblyLoadContext>(state)!.FlushPendingDisposedConjugates(false), this);
+            _flushPendingDisposedConjugatesPosted = true;
+        }
+    }
+    
+    private void FlushPendingDisposedConjugates(bool forceFullDispose)
+    {
+        bool lockTaken = false;
+        try
+        {
+            _pendingDisposedConjugatesLock.Enter(ref lockTaken);
+
+            _flushPendingDisposedConjugatesPosted = false;
+            
+            if (IsUnloaded)
+            {
+                if (_pendingDisposedConjugates.Count is not 0)
+                {
+                    CoreLog.Error("Master ALC is unloaded but conjugate map is not empty!");
+                }
+                return;
+            }
+
+            if (!forceFullDispose)
+            {
+                const double HARD_DISPOSE_FACTOR = 0.05;
+                const double TIME_BUDGET_MS = 1;
+                
+                _flushPendingDisposedConjugatesStopwatch.Restart();
+                
+                int32 hardDisposeCount = (int32)(_pendingDisposedConjugates.Count * HARD_DISPOSE_FACTOR);
+                int32 disposedCount = 0;
+                while (_pendingDisposedConjugates.TryDequeue(out var conjugate))
+                {
+                    conjugate.Dispose();
+                    
+                    if (++disposedCount >= hardDisposeCount && _flushPendingDisposedConjugatesStopwatch.Elapsed.TotalMilliseconds > TIME_BUDGET_MS)
+                    {
+                        ConditionallyPostFlushPendingDisposedConjugates();
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                while (_pendingDisposedConjugates.TryDequeue(out var conjugate))
+                {
+                    conjugate.Dispose();
+                }
+            }
+        }
+        finally
+        {
+            if (lockTaken)
+            {
+                _pendingDisposedConjugatesLock.Exit();
+            }
+        }
+    }
+    
     private void StatBlackConjugate(Type type, string stackTrace)
     {
         string typeName = type.Name;
@@ -516,7 +569,9 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private readonly Dictionary<IntPtr, ConjugateRec> _conjugateMap = new(DEFAULT_CONJUGATE_MAP_CAPACITY);
     private readonly Dictionary<Type, uint16> _conjugateRegistryIdLookup = new();
     private readonly Queue<IConjugate> _pendingDisposedConjugates = new();
-    private readonly Lock _pendingDisposedConjugatesLock = new();
+    private SpinLock _pendingDisposedConjugatesLock;
+    private bool _flushPendingDisposedConjugatesPosted;
+    private readonly Stopwatch _flushPendingDisposedConjugatesStopwatch = new();
     
     private bool _unloadingPrepared;
 

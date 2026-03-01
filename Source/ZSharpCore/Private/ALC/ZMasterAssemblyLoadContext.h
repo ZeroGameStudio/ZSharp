@@ -46,6 +46,9 @@ namespace ZSharp
 		
 		FZCallHandle GetZCallHandle_Black(const FString& name);
 		EZCallErrorCode ZCall_Black(FZCallHandle handle, FZCallBuffer* buffer) const;
+		
+	public:
+		FString StatBlackConjugates(const FString& typeName) const;
 	
 	private:
 		void* BuildConjugate_Red(void* unmanaged, FZRuntimeTypeHandle type);

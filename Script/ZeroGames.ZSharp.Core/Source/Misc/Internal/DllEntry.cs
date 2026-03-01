@@ -1,6 +1,7 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
 using System.Diagnostics;
+using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -42,6 +43,8 @@ internal static class DllEntry
     [UnmanagedCallersOnly]
     private static unsafe void DllMain(Args* args)
     {
+        GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
+        
         AppDomain.CurrentDomain.UnhandledException += (_, eventArgs) =>
         {
             CoreLog.Error($"FATAL!!!!!!! MANAGED EXCEPTION UNHANDLED!!!!!!!{Environment.NewLine}{eventArgs.ExceptionObject}");
@@ -78,6 +81,7 @@ internal static class DllEntry
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, ZCallHandle>)&MasterAssemblyLoadContext_Interop.GetZCallHandle_Red;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, InteropRuntimeTypeHandle, IntPtr>)&MasterAssemblyLoadContext_Interop.BuildConjugate_Red;
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<IntPtr, void>)&MasterAssemblyLoadContext_Interop.ReleaseConjugate_Red;
+        *args->ManagedFunctions[offset++] = (delegate* unmanaged<char*, IntPtr, void>)&MasterAssemblyLoadContext_Interop.StatBlackConjugate;
 
         // SlimAssemblyLoadContext interop functions
         *args->ManagedFunctions[offset++] = (delegate* unmanaged<GCHandle, int32>)&SlimAssemblyLoadContext_Interop.Unload;

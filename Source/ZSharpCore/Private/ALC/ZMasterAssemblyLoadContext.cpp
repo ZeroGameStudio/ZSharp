@@ -4,10 +4,56 @@
 
 #include "ZSharpCoreLogChannels.h"
 #include "ALC/ZRuntimeTypeUri.h"
+#include "CLR/ZSharpClr.h"
 #include "Interop/Core/ZMasterAssemblyLoadContext_Interop.h"
 #include "Interop/ZInteropRuntimeTypeUri.h"
 #include "ZCall/IZCallDispatcher.h"
 #include "Conjugate/ZConjugateRegistryDeclarations.h"
+
+namespace ZSharp::ZMasterAssemblyLoadContext_Private
+{
+	static FAutoConsoleCommand GCmdStatBlackConjugates
+	{
+		TEXT("z#.statblackconjugates"),
+		TEXT("Dump black conjugate info."),
+		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& args)
+		{
+			if (args.IsEmpty())
+			{
+				return;
+			}
+			
+			const auto alc = static_cast<FZMasterAssemblyLoadContext*>(IZSharpClr::Get().GetMasterAlc());
+			if (!alc)
+			{
+				return;
+			}
+			
+			FString stat = alc->StatBlackConjugates(args[0]);
+			if (stat.IsEmpty())
+			{
+				return;
+			}
+			
+			UE_LOG(LogZSharpCore, Warning, TEXT("================================================= Begin Stat Black Conjugates ================================================="));
+			
+			TArray<FString> pairs;
+			stat.ParseIntoArray(pairs, TEXT("&&&&&&&"));
+			for (const auto& pair : pairs)
+			{
+				FString stackTrace;
+				FString count;
+				if (pair.Split("|||||||", &stackTrace, &count))
+				{
+					UE_LOG(LogZSharpCore, Warning, TEXT("%s: %s"), *stackTrace, *count);
+				}
+			}
+			
+			UE_LOG(LogZSharpCore, Warning, TEXT("=================================================  End Stat Black Conjugates  ================================================="));
+		}),
+		ECVF_Default
+	};
+}
 
 ZSharp::FZMasterAssemblyLoadContext::FZMasterAssemblyLoadContext(TUniqueFunction<void()>&& unloadingCallback, TUniqueFunction<void()>&& unloadedCallback)
 	: UnloadingCallback(MoveTemp(unloadingCallback))
@@ -242,6 +288,13 @@ ZSharp::EZCallErrorCode ZSharp::FZMasterAssemblyLoadContext::ZCall_Black(FZCallH
 	}
 
 	return (*pDispatcher)->Dispatch(buffer);
+}
+
+FString ZSharp::FZMasterAssemblyLoadContext::StatBlackConjugates(const FString& typeName) const
+{
+	FString result;
+	FZMasterAssemblyLoadContext_Interop::GStatBlackConjugate(*typeName, result);
+	return result;
 }
 
 void* ZSharp::FZMasterAssemblyLoadContext::BuildConjugate_Red(void* unmanaged, FZRuntimeTypeHandle type)

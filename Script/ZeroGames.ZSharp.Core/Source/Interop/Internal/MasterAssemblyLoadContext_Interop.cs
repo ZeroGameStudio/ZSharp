@@ -152,6 +152,21 @@ internal static unsafe class MasterAssemblyLoadContext_Interop
             UnhandledExceptionHelper.Guard(ex);
         }
     }
+
+    [UnmanagedCallersOnly]
+    public static void StatBlackConjugate(char* typeName, IntPtr buffer)
+    {
+        try
+        {
+            string stat = MasterAssemblyLoadContext.Instance!.StatBlackConjugates(new(typeName));
+            using InteropString result = new(buffer);
+            result.Data = stat;
+        }
+        catch (Exception ex)
+        {
+            UnhandledExceptionHelper.Guard(ex);
+        }
+    }
     
     public static delegate* unmanaged<ZCallHandle, ZCallBuffer*, EZCallErrorCode> ZCall_Black;
     public static delegate* unmanaged<char*, ZCallHandle> GetZCallHandle_Black;

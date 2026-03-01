@@ -140,6 +140,7 @@ namespace ZSharp::ZGenericClr_Private
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GGetZCallHandle_Red),
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GBuildConjugate_Red),
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GReleaseConjugate_Red),
+			ZSHARP_BUILD_MANAGED_FUNCTION(FZMasterAssemblyLoadContext_Interop::GStatBlackConjugate),
 
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZSlimAssemblyLoadContext_Interop::GUnload),
 			ZSHARP_BUILD_MANAGED_FUNCTION(FZSlimAssemblyLoadContext_Interop::GLoadAssembly),

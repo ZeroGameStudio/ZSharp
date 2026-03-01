@@ -27,7 +27,8 @@ namespace ZSharp
 		inline static EZCallErrorCode(*GZCall_Red)(FZCallHandle handle, FZCallBuffer* buffer, FString* fatalMessage);
 		inline static FZCallHandle(*GGetZCallHandle_Red)(const TCHAR*);
 		inline static void*(*GBuildConjugate_Red)(void* unmanaged, FZRuntimeTypeHandle type);
-		inline static void (*GReleaseConjugate_Red)(void* unmanaged);
+		inline static void(*GReleaseConjugate_Red)(void* unmanaged);
+		inline static void(*GStatBlackConjugate)(const TCHAR*, FString&);
 	};
 }
 

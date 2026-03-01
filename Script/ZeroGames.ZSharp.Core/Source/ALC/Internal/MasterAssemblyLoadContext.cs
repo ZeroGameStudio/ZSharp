@@ -249,6 +249,16 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         return conjugate;
     }
     
+    public string StatBlackConjugates(string typeName)
+    {
+        if (!_statBlackConjugates.TryGetValue(typeName, out var stat))
+        {
+            return string.Empty;
+        }
+        
+        return string.Join("&&&&&&&", stat.OrderByDescending(pair => pair.Value).Select(pair => $"{pair.Key}|||||||{pair.Value}"));
+    }
+    
     public const string INSTANCE_NAME = "Master";
     
     public static MasterAssemblyLoadContext? Instance { get; private set; }
@@ -417,22 +427,44 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private IntPtr BuildConjugate_Black(IConjugate managed, IntPtr userdata)
     {
         GuardUnloadingPrepared();
-        
-        uint16 registryId = GetTypeConjugateRegistryId(managed.GetType());
+
+        Type type = managed.GetType();
+        uint16 registryId = GetTypeConjugateRegistryId(type);
         if (registryId == 0)
         {
-            CoreLog.Error($"Type {managed.GetType().FullName} does not have a valid conjugate registry id.");
+            CoreLog.Error($"Type {type.FullName} does not have a valid conjugate registry id.");
             return default;
         }
 
         IntPtr unmanaged = MasterAssemblyLoadContext_Interop.BuildConjugate_Black(registryId, userdata);
         if (unmanaged == default)
         {
-            CoreLog.Error($"Failed to build conjugate for type {managed.GetType().FullName}");
+            CoreLog.Error($"Failed to build conjugate for type {type.FullName}");
             return default;
         }
         
         _conjugateMap[unmanaged] = new(registryId, new(managed, true));
+
+        const bool STAT = true;
+        if (STAT)
+        {
+            string typeName = type.Name;
+            if (!_statBlackConjugates.TryGetValue(typeName, out var stat))
+            {
+                stat = [];
+                _statBlackConjugates[typeName] = stat;
+            }
+
+            string stackTrace = new StackTrace().ToString();
+            if (stat.TryGetValue(stackTrace, out var count))
+            {
+                stat[stackTrace] = count + 1;
+            }
+            else
+            {
+                stat[stackTrace] = 1;
+            }
+        }
 
         return unmanaged;
     }
@@ -484,6 +516,8 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private bool _unloadingPrepared;
 
     private readonly Dictionary<IntPtr, Func<IntPtr, IConjugate>> _buildRedConjugateDelegateLookup = [];
+
+    private readonly Dictionary<string, Dictionary<string, uint64>> _statBlackConjugates = [];
 
 }
 

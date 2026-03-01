@@ -445,7 +445,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         
         _conjugateMap[unmanaged] = new(registryId, new(managed, true));
 
-        const bool STAT = true;
+        const bool STAT = false;
         if (STAT)
         {
             string typeName = type.Name;

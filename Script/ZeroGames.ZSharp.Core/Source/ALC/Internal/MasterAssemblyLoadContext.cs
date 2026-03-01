@@ -433,38 +433,24 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         if (registryId == 0)
         {
             CoreLog.Error($"Type {type.FullName} does not have a valid conjugate registry id.");
-            return default;
+            return IntPtr.Zero;
         }
 
         IntPtr unmanaged = MasterAssemblyLoadContext_Interop.BuildConjugate_Black(registryId, userdata);
-        if (unmanaged == default)
+        if (unmanaged == IntPtr.Zero)
         {
             CoreLog.Error($"Failed to build conjugate for type {type.FullName}");
-            return default;
+            return IntPtr.Zero;
         }
         
         _conjugateMap[unmanaged] = new(registryId, new(managed, true));
-
-        const bool STAT = false;
-        if (STAT)
-        {
-            string typeName = type.Name;
-            if (!_statBlackConjugates.TryGetValue(typeName, out var stat))
-            {
-                stat = [];
-                _statBlackConjugates[typeName] = stat;
-            }
-
-            string stackTrace = new StackTrace().ToString();
-            if (stat.TryGetValue(stackTrace, out var count))
-            {
-                stat[stackTrace] = count + 1;
-            }
-            else
-            {
-                stat[stackTrace] = 1;
-            }
-        }
+        
+        #if STAT_BLACK_CONJUGATES
+        
+        string stackTrace = new StackTrace().ToString();
+        StatBlackConjugate(type, stackTrace);
+        
+        #endif
 
         return unmanaged;
     }
@@ -494,6 +480,25 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         }
 
         return 0;
+    }
+    
+    private void StatBlackConjugate(Type type, string stackTrace)
+    {
+        string typeName = type.Name;
+        if (!_statBlackConjugates.TryGetValue(typeName, out var stat))
+        {
+            stat = [];
+            _statBlackConjugates[typeName] = stat;
+        }
+        
+        if (stat.TryGetValue(stackTrace, out var count))
+        {
+            stat[stackTrace] = count + 1;
+        }
+        else
+        {
+            stat[stackTrace] = 1;
+        }
     }
 
     private const int32 DEFAULT_CONJUGATE_MAP_CAPACITY = 1 << 16;

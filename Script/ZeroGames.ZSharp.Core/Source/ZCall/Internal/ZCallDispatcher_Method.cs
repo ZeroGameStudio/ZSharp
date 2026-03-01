@@ -32,7 +32,11 @@ internal sealed class ZCallDispatcher_Method(string name, MethodInfo method) : I
 				Type parameterType = parameterInfos[i].ParameterType;
 				if (parameterType.IsEnum)
 				{
-					parameters[i] = Convert.ChangeType((*buffer)[pos++].Object, parameterType.GetEnumUnderlyingType());
+					parameters[i] = Enum.ToObject(parameterType, (*buffer)[pos++].Int64);
+				}
+				else if (parameterType.IsByRef && parameterType.GetElementType() is { IsEnum: true } elementType)
+				{
+					parameters[i] = Enum.ToObject(elementType, (*buffer)[pos++].Int64);
 				}
 				else if (parameterType.IsAssignableTo(typeof(IMarshalPointer)))
 				{
@@ -53,13 +57,13 @@ internal sealed class ZCallDispatcher_Method(string name, MethodInfo method) : I
 				var parameter = parameterInfos[i];
 				if (parameter.ParameterType.IsByRef)
 				{
-					if (!parameter.ParameterType.IsEnum)
+					if (parameter.ParameterType.GetElementType() is { IsEnum: true })
 					{
-						(*buffer)[Method.IsStatic ? i : i + 1].Object = parameters[i];
+						(*buffer)[Method.IsStatic ? i : i + 1].Int64 = (int64)Convert.ChangeType(parameters[i], typeof(int64))!;
 					}
 					else
 					{
-						(*buffer)[Method.IsStatic ? i : i + 1].Int64 = (int64)Convert.ChangeType(parameters[i], typeof(int64))!;
+						(*buffer)[Method.IsStatic ? i : i + 1].Object = parameters[i];
 					}
 				}
 			}

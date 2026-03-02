@@ -75,6 +75,12 @@ public partial class UObject : IUnrealObject, ILifetimeBackend
     public bool Rename(string newName) => Rename(newName, null);
     public bool Rename(UObject newOuter) => Rename(null, newOuter);
 
+    public void MarkPropertyDirty(string propertyName)
+    {
+        MasterAlcCache.GuardInvariant();
+        InternalMarkPropertyDirty(propertyName);
+    }
+
     bool ILifetimeBackend.IsExpired(LifetimeToken token) => !__IsValid;
 
     public bool __IsValid => !IsExpired && InternalIsValid;
@@ -130,6 +136,14 @@ public partial class UObject : IUnrealObject, ILifetimeBackend
             return UnrealObject_Interop.Rename(ConjugateHandle.FromConjugate(this), newNameBuffer, ConjugateHandle.FromConjugate(newOuter)) > 0;
         }
     }
+    
+    private unsafe void InternalMarkPropertyDirty(string propertyName)
+    {
+        fixed (char* buffer = propertyName)
+        {
+            UnrealObject_Interop.MarkPropertyDirty(ConjugateHandle.FromConjugate(this), buffer);
+        }
+    }
 
     private unsafe bool InternalIsValid => UnrealObject_Interop.IsValid(ConjugateHandle.FromConjugate(this)) > 0;
 
@@ -143,8 +157,6 @@ public static class UObjectExtensions
     {
         public void BroadcastFieldValueChanged(FFieldNotificationId fieldId) => UFieldNotificationLibrary.BroadcastFieldValueChanged(@this, fieldId);
         public void BroadcastFieldValueChanged(FName fieldName) => UFieldNotificationLibrary.BroadcastFieldValueChanged(@this, new FFieldNotificationId { FieldName = fieldName });
-        
-        public void MarkPropertyDirty(FName propertyName) => UNetPushModelHelpers.MarkPropertyDirty(@this, propertyName);
         
         public T? SelfIfValid => @this is { __IsValid: true } ? @this : null;
     }

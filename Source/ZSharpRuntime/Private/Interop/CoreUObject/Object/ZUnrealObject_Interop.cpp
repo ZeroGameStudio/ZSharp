@@ -6,6 +6,7 @@
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
 #include "Interop/ZInteropExceptionHelper.h"
+#include "Net/NetPushModelHelpers.h"
 
 namespace ZSharp::ZUnrealObject_Interop_Private
 {
@@ -21,6 +22,13 @@ namespace ZSharp::ZUnrealObject_Interop_Private
 		const FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
 		auto pSelf = registry.ConjugateUnsafeChecked<const UObject>(self);
 		result = pSelf->GetPathName();
+	}
+	
+	static void MarkPropertyDirty(FZConjugateHandle self, const TCHAR* propertyName)
+	{
+		const FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+		auto pSelf = registry.ConjugateUnsafeChecked<UObject>(self);
+		UNetPushModelHelpers::MarkPropertyDirty(pSelf, propertyName);
 	}
 }
 
@@ -116,6 +124,11 @@ uint8 ZSharp::FZUnrealObject_Interop::IsValid(FZConjugateHandle self)
 		return ::IsValid(pSelf);
 	}
 	CATCHR(false)
+}
+
+void ZSharp::FZUnrealObject_Interop::MarkPropertyDirty(FZConjugateHandle self, const TCHAR* propertyName)
+{
+	GUARD(ZUnrealObject_Interop_Private::MarkPropertyDirty(self, propertyName));
 }
 
 

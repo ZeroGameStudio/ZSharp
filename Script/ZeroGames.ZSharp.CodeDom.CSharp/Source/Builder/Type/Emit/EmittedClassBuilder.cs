@@ -66,7 +66,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 			
 			if (needsMarkDirty)
 			{
-				beforeSetterReturns.Add($"this.MarkPropertyDirty(nameof({name}));");
+				beforeSetterReturns.Add($"MarkPropertyDirty(nameof({name}));");
 			}
 			
 			property = new ZCallPropertyBuilder(visibility, modifiers, name, zcallName, 0, type, false, true, true, true)

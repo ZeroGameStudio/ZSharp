@@ -12,6 +12,10 @@ internal static unsafe class Actor_Interop
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle, uint8, ConjugateHandle> AddComponent;
 	public static delegate* unmanaged<ConjugateHandle, ConjugateHandle, void> FinishAddComponent;
 	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, ENetMode> GetNetMode;
+	
+	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, uint8> IsActorInitialized;
+	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, uint8> IsActorBeginningPlay;
+	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, uint8> HasActorBegunPlay;
 
 	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, out Transform, void> GetActorTransform;
 	public static delegate* unmanaged[SuppressGCTransition]<ConjugateHandle, out Vector, void> GetActorLocation;

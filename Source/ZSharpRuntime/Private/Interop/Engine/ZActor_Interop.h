@@ -13,6 +13,10 @@ namespace ZSharp
 		static void FinishAddComponent(FZConjugateHandle self, FZConjugateHandle component);
 		static ENetMode GetNetMode(FZConjugateHandle self);
 		
+		static uint8 IsActorInitialized(FZConjugateHandle self);
+		static uint8 IsActorBeginningPlay(FZConjugateHandle self);
+		static uint8 HasActorBegunPlay(FZConjugateHandle self);
+		
 		static void GetActorTransform(FZConjugateHandle self, FTransform& transform);
 		static void GetActorLocation(FZConjugateHandle self, FVector& location);
 		static void GetActorRotation(FZConjugateHandle self, FRotator& rotation);

@@ -104,6 +104,33 @@ ENetMode ZSharp::FZActor_Interop::GetNetMode(FZConjugateHandle self)
 	CATCHR(NM_Standalone)
 }
 
+uint8 ZSharp::FZActor_Interop::IsActorInitialized(FZConjugateHandle self)
+{
+	TRY
+	{
+		return ConjugateUnsafe<AActor>(self)->IsActorInitialized();
+	}
+	CATCHR(false)
+}
+
+uint8 ZSharp::FZActor_Interop::IsActorBeginningPlay(FZConjugateHandle self)
+{
+	TRY
+	{
+		return ConjugateUnsafe<AActor>(self)->IsActorBeginningPlay();
+	}
+	CATCHR(false)
+}
+
+uint8 ZSharp::FZActor_Interop::HasActorBegunPlay(FZConjugateHandle self)
+{
+	TRY
+	{
+		return ConjugateUnsafe<AActor>(self)->HasActorBegunPlay();
+	}
+	CATCHR(false)
+}
+
 void ZSharp::FZActor_Interop::GetActorTransform(FZConjugateHandle self, FTransform& transform)
 {
 	GUARD(FZInteropHelper::CopyTransformUnaligned(ConjugateUnsafe<AActor>(self)->GetActorTransform(), transform));

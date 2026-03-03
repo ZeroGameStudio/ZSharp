@@ -528,7 +528,6 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             }
             else
             {
-                CoreLog.Error(_pendingReleasedBlackConjugates.Count);
                 while (_pendingReleasedBlackConjugates.TryDequeue(out var unmanaged))
                 {
                     ReleaseConjugate_Black(unmanaged);

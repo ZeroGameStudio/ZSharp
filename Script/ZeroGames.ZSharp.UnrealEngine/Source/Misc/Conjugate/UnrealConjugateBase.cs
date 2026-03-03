@@ -11,6 +11,11 @@ public abstract class UnrealConjugateBase : IConjugate
 
     public void Dispose()
     {
+        if (!IsBlack)
+        {
+            throw new InvalidOperationException("Dispose black conjugate.");
+        }
+        
         InternalDispose();
         SuppressFinalize();
     }
@@ -23,8 +28,6 @@ public abstract class UnrealConjugateBase : IConjugate
     public bool IsBlack { get; }
     public bool IsRed => !IsBlack;
     
-    protected virtual void HandleExpired(){}
-
     protected void BuildConjugate_Black(IntPtr userdata)
     {
         if (Unmanaged != IntPtr.Zero)
@@ -55,12 +58,11 @@ public abstract class UnrealConjugateBase : IConjugate
         IsBlack = true;
     }
 
-    private protected UnrealConjugateBase(IntPtr unmanaged, bool needsHandleExpired = false)
+    private protected UnrealConjugateBase(IntPtr unmanaged)
     {
         GCHandle = GCHandle.Alloc(this);
         Unmanaged = unmanaged;
         IsBlack = false;
-        _needsHandleExpired = needsHandleExpired;
         
         SuppressFinalize();
     }
@@ -76,17 +78,6 @@ public abstract class UnrealConjugateBase : IConjugate
 
     private void InternalDispose()
     {
-        if (!IsBlack)
-        {
-            throw new InvalidOperationException("Dispose black conjugate.");
-        }
-
-        if (!IsInGameThread)
-        {
-            MasterAlcCache.Instance.PushPendingDisposeConjugate(this);
-            return;
-        }
-        
         if (_disposed)
         {
             return;
@@ -109,11 +100,6 @@ public abstract class UnrealConjugateBase : IConjugate
         assert(!IsExpired);
         
         ClearUnmanaged();
-
-        if (_needsHandleExpired)
-        {
-            HandleExpired();
-        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -130,8 +116,7 @@ public abstract class UnrealConjugateBase : IConjugate
     }
     
     private const IntPtr DEAD_ADDR = 0xDEAD;
-
-    private readonly bool _needsHandleExpired;
+    
     private bool _disposed;
     
 }

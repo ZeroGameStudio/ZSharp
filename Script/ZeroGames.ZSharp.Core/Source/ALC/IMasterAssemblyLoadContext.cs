@@ -50,7 +50,6 @@ public unsafe interface IMasterAssemblyLoadContext : IZSharpAssemblyLoadContext
 	ZCallHandle GetZCallHandle(string name);
 	IntPtr BuildConjugate(IConjugate managed, IntPtr userdata);
 	void ReleaseConjugate(IConjugate conjugate);
-	void PushPendingDisposeConjugate(IConjugate conjugate);
 	
 	uint64 Generation { get; }
 }

@@ -42,7 +42,7 @@ public abstract class UnrealObjectBase : UnrealConjugateBase, IUnrealFieldPath
 
     public abstract string UnrealFieldPath { get; }
 
-    protected UnrealObjectBase(IntPtr unmanaged) : base(unmanaged, true){}
+    protected UnrealObjectBase(IntPtr unmanaged) : base(unmanaged){}
 
 }
 

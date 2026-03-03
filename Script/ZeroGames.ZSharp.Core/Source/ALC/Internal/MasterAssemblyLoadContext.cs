@@ -97,29 +97,16 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
 
     public void ReleaseConjugate(IConjugate conjugate)
     {
-        GuardInvariant();
-        
-        ReleaseConjugate_Black(conjugate.Unmanaged);
-    }
-    
-    public void PushPendingDisposeConjugate(IConjugate conjugate)
-    {
         this.GuardUnloaded();
 
-        bool lockTaken = false;
-        try
+        IntPtr unmanaged = conjugate.Unmanaged;
+        if (GameThreadScheduler.IsInGameThread)
         {
-            _pendingDisposedConjugatesLock.Enter(ref lockTaken);
-            
-            _pendingDisposedConjugates.Enqueue(conjugate);
-            ConditionallyPostFlushPendingDisposedConjugates();
+            ReleaseConjugate_Black(unmanaged);
         }
-        finally
+        else
         {
-            if (lockTaken)
-            {
-                _pendingDisposedConjugatesLock.Exit();
-            }
+            PushPendingReleasedBlackConjugate_FinalizerThread(unmanaged);
         }
     }
 
@@ -163,7 +150,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             }
         }
         
-        FlushPendingDisposedConjugates(true);
+        FlushPendingReleasedBlackConjugates(true);
     }
 
     public EZCallErrorCode ZCall_Red(ZCallHandle handle, ZCallBuffer* buffer)
@@ -451,6 +438,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
             return;
         }
 
+        rec.Handle.Dispose();
         MasterAssemblyLoadContext_Interop.ReleaseConjugate_Black(rec.RegistryId, unmanaged);
     }
 
@@ -470,30 +458,49 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         return 0;
     }
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void ConditionallyPostFlushPendingDisposedConjugates()
-    {
-        if (_pendingDisposedConjugates.Count > 0 && !_flushPendingDisposedConjugatesPosted)
-        {
-            const bool FULL_DISPOSE = false;
-            GameThreadScheduler.Post(static state
-                => Unsafe.As<MasterAssemblyLoadContext>(state)!.FlushPendingDisposedConjugates(FULL_DISPOSE), this);
-            _flushPendingDisposedConjugatesPosted = true;
-        }
-    }
-    
-    private void FlushPendingDisposedConjugates(bool fullDispose)
+    private void PushPendingReleasedBlackConjugate_FinalizerThread(IntPtr unmanaged)
     {
         bool lockTaken = false;
         try
         {
-            _pendingDisposedConjugatesLock.Enter(ref lockTaken);
+            _pendingReleasedBlackConjugatesLock.Enter(ref lockTaken);
+            
+            _pendingReleasedBlackConjugates.Enqueue(unmanaged);
+            ConditionallyPostFlushPendingReleasedBlackConjugates_AnyThread();
+        }
+        finally
+        {
+            if (lockTaken)
+            {
+                _pendingReleasedBlackConjugatesLock.Exit();
+            }
+        }
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ConditionallyPostFlushPendingReleasedBlackConjugates_AnyThread()
+    {
+        if (_pendingReleasedBlackConjugates.Count > 0 && !_flushPendingReleasedBlackConjugatesPosted)
+        {
+            const bool FULL_DISPOSE = false;
+            GameThreadScheduler.Post(static state
+                => Unsafe.As<MasterAssemblyLoadContext>(state)!.FlushPendingReleasedBlackConjugates(FULL_DISPOSE), this);
+            _flushPendingReleasedBlackConjugatesPosted = true;
+        }
+    }
+    
+    private void FlushPendingReleasedBlackConjugates(bool fullDispose)
+    {
+        bool lockTaken = false;
+        try
+        {
+            _pendingReleasedBlackConjugatesLock.Enter(ref lockTaken);
 
-            _flushPendingDisposedConjugatesPosted = false;
+            _flushPendingReleasedBlackConjugatesPosted = false;
             
             if (IsUnloaded)
             {
-                if (_pendingDisposedConjugates.Count is not 0)
+                if (_pendingReleasedBlackConjugates.Count is not 0)
                 {
                     CoreLog.Error("Master ALC is unloaded but conjugate map is not empty!");
                 }
@@ -505,26 +512,26 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
                 const double HARD_DISPOSE_FACTOR = 0.05;
                 const double TIME_BUDGET_MS = 1;
                 
-                _flushPendingDisposedConjugatesStopwatch.Restart();
+                _flushPendingReleasedBlackConjugatesStopwatch.Restart();
                 
-                int32 hardDisposeCount = (int32)(_pendingDisposedConjugates.Count * HARD_DISPOSE_FACTOR);
+                int32 hardDisposeCount = (int32)(_pendingReleasedBlackConjugates.Count * HARD_DISPOSE_FACTOR);
                 int32 disposedCount = 0;
-                while (_pendingDisposedConjugates.TryDequeue(out var conjugate))
+                while (_pendingReleasedBlackConjugates.TryDequeue(out var unmanaged))
                 {
-                    conjugate.Dispose();
-                    
-                    if (++disposedCount >= hardDisposeCount && _flushPendingDisposedConjugatesStopwatch.Elapsed.TotalMilliseconds > TIME_BUDGET_MS)
+                    ReleaseConjugate_Black(unmanaged);
+                    if (++disposedCount >= hardDisposeCount && _flushPendingReleasedBlackConjugatesStopwatch.Elapsed.TotalMilliseconds > TIME_BUDGET_MS)
                     {
-                        ConditionallyPostFlushPendingDisposedConjugates();
+                        ConditionallyPostFlushPendingReleasedBlackConjugates_AnyThread();
                         break;
                     }
                 }
             }
             else
             {
-                while (_pendingDisposedConjugates.TryDequeue(out var conjugate))
+                CoreLog.Error(_pendingReleasedBlackConjugates.Count);
+                while (_pendingReleasedBlackConjugates.TryDequeue(out var unmanaged))
                 {
-                    conjugate.Dispose();
+                    ReleaseConjugate_Black(unmanaged);
                 }
             }
         }
@@ -532,7 +539,7 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
         {
             if (lockTaken)
             {
-                _pendingDisposedConjugatesLock.Exit();
+                _pendingReleasedBlackConjugatesLock.Exit();
             }
         }
     }
@@ -570,10 +577,10 @@ internal sealed unsafe class MasterAssemblyLoadContext : ZSharpAssemblyLoadConte
     private readonly List<(IZCallResolver Resolver, int64 Priority)> _zcallResolverLink = new();
     private readonly Dictionary<IntPtr, ConjugateRec> _conjugateMap = new(DEFAULT_CONJUGATE_MAP_CAPACITY);
     private readonly Dictionary<Type, uint16> _conjugateRegistryIdLookup = new();
-    private readonly Queue<IConjugate> _pendingDisposedConjugates = new();
-    private SpinLock _pendingDisposedConjugatesLock;
-    private bool _flushPendingDisposedConjugatesPosted;
-    private readonly Stopwatch _flushPendingDisposedConjugatesStopwatch = new();
+    private readonly Queue<IntPtr> _pendingReleasedBlackConjugates = new();
+    private SpinLock _pendingReleasedBlackConjugatesLock;
+    private bool _flushPendingReleasedBlackConjugatesPosted;
+    private readonly Stopwatch _flushPendingReleasedBlackConjugatesStopwatch = new();
     
     private bool _unloadingPrepared;
 

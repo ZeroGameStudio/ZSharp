@@ -6,50 +6,56 @@ public struct AssetHandle(string? path)
 {
 	public AssetHandle(UObject? asset) : this(asset?.GetPathName()){}
 	
+	public string Path
+	{
+		get => field ?? string.Empty;
+	} = path;
+	
 	public UObject? Asset
 	{
 		get
 		{
-			if (string.IsNullOrEmpty(_path))
+			if (string.IsNullOrEmpty(Path))
 			{
 				return null;
 			}
 			
 			if (field is not { __IsValid: true })
 			{
-				field = LoadObject(UObject.StaticClass, null, _path);
+				field = LoadObject(UObject.StaticClass, null, Path);
 			}
 			
 			return field?.SelfIfValid;
 		}
 	}
-	
-	private readonly string? _path = path;
 }
 
 public struct AssetHandle<T>(string? path) where T : UObject
 {
 	public AssetHandle(T? asset) : this(asset?.GetPathName()){}
+
+	public string Path
+	{
+		get => field ?? string.Empty;
+	} = path;
 	
 	public T? Asset
 	{
 		get
 		{
-			if (string.IsNullOrEmpty(_path))
+			if (string.IsNullOrEmpty(Path))
 			{
 				return null;
 			}
 			
 			if (field is not { __IsValid: true })
 			{
-				field = LoadObject<T>(null, _path);
+				field = LoadObject<T>(null, Path);
 			}
 			
 			return field?.SelfIfValid;
 		}
 	}
-	
-	private readonly string? _path = path;
 }
 
 

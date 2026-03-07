@@ -33,6 +33,8 @@ public partial class FVector
 	
 	public static implicit operator FVector(Vector value) => new(value.X, value.Y, value.Z);
 	public static implicit operator Vector(FVector value) => new(value.X, value.Y, value.Z);
+	public static implicit operator FVector(FVector2D value) => new(value.X, value.Y, 0);
+	public static implicit operator FVector(Vector2 value) => new(value.X, value.Y, 0);
 	
 	public void Deconstruct(out double x, out double y, out double z)
 	{

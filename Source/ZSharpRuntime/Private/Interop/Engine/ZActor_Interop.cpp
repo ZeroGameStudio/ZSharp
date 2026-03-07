@@ -43,13 +43,8 @@ void ZSharp::FZActor_Interop::FinishSpawning(FZConjugateHandle self, const FTran
 		{
 			USceneComponent* newRoot = NewObject<USceneComponent>(pSelf);
 			pSelf->SetRootComponent(newRoot);
+			newRoot->SetWorldTransform(spawnTransform);
 			// No need to register component, FinishSpawning() does.
-		}
-		
-		// This keeps behaviors same between DSO root component and root component created during spawning.
-		if (USceneComponent* root = pSelf->GetRootComponent())
-		{
-			root->SetWorldTransform(transform);
 		}
 		
 		pSelf->FinishSpawning(spawnTransform);

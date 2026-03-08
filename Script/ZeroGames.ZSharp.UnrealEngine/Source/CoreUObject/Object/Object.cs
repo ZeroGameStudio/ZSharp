@@ -75,6 +75,12 @@ public partial class UObject : IUnrealObject, ILifetimeBackend
     public bool Rename(string newName) => Rename(newName, null);
     public bool Rename(UObject newOuter) => Rename(null, newOuter);
 
+    public void BroadcastFieldValueChanged(string fieldName)
+    {
+        MasterAlcCache.GuardInvariant();
+        InternalBroadcastFieldValueChanged(fieldName);
+    }
+    
     public void MarkPropertyDirty(string propertyName)
     {
         MasterAlcCache.GuardInvariant();
@@ -137,6 +143,14 @@ public partial class UObject : IUnrealObject, ILifetimeBackend
         }
     }
     
+    private unsafe void InternalBroadcastFieldValueChanged(string fieldName)
+    {
+        fixed (char* buffer = fieldName)
+        {
+            UnrealObject_Interop.BroadcastFieldValueChanged(ConjugateHandle.FromConjugate(this), buffer);
+        }
+    }
+    
     private unsafe void InternalMarkPropertyDirty(string propertyName)
     {
         fixed (char* buffer = propertyName)
@@ -155,9 +169,6 @@ public static class UObjectExtensions
 {
     extension<T>(T @this) where T : UObject
     {
-        public void BroadcastFieldValueChanged(FFieldNotificationId fieldId) => UFieldNotificationLibrary.BroadcastFieldValueChanged(@this, fieldId);
-        public void BroadcastFieldValueChanged(FName fieldName) => UFieldNotificationLibrary.BroadcastFieldValueChanged(@this, new FFieldNotificationId { FieldName = fieldName });
-        
         public T? SelfIfValid => @this is { __IsValid: true } ? @this : null;
     }
 }

@@ -2,6 +2,7 @@
 
 #include "ZUnrealObject_Interop.h"
 
+#include "INotifyFieldValueChanged.h"
 #include "ALC/IZMasterAssemblyLoadContext.h"
 #include "CLR/IZSharpClr.h"
 #include "Conjugate/ZConjugateRegistry_UObject.h"
@@ -22,6 +23,24 @@ namespace ZSharp::ZUnrealObject_Interop_Private
 		const FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
 		auto pSelf = registry.ConjugateUnsafeChecked<const UObject>(self);
 		result = pSelf->GetPathName();
+	}
+	
+	static void BroadcastFieldValueChanged(FZConjugateHandle self, const TCHAR* fieldName)
+	{
+		const FZConjugateRegistry_UObject& registry = IZSharpClr::Get().GetMasterAlc()->GetConjugateRegistry<FZConjugateRegistry_UObject>();
+		auto pSelf = registry.ConjugateUnsafeChecked<UObject>(self);
+		
+		// Migrate from UFieldNotificationLibrary because it has no exposed API.
+		FFieldNotificationId notificationId { fieldName };
+		TScriptInterface<INotifyFieldValueChanged> iSelf = pSelf;
+		if (iSelf.GetObject() != nullptr && iSelf.GetInterface() != nullptr && notificationId.IsValid())
+		{
+			const UE::FieldNotification::FFieldId fieldId = iSelf->GetFieldNotificationDescriptor().GetField(pSelf->GetClass(), notificationId.GetFieldName());
+			if (fieldId.IsValid())
+			{
+				iSelf->BroadcastFieldValueChanged(fieldId);
+			}
+		}
 	}
 	
 	static void MarkPropertyDirty(FZConjugateHandle self, const TCHAR* propertyName)
@@ -124,6 +143,11 @@ uint8 ZSharp::FZUnrealObject_Interop::IsValid(FZConjugateHandle self)
 		return ::IsValid(pSelf);
 	}
 	CATCHR(false)
+}
+
+void ZSharp::FZUnrealObject_Interop::BroadcastFieldValueChanged(FZConjugateHandle self, const TCHAR* fieldName)
+{
+	GUARD(ZUnrealObject_Interop_Private::BroadcastFieldValueChanged(self, fieldName));
 }
 
 void ZSharp::FZUnrealObject_Interop::MarkPropertyDirty(FZConjugateHandle self, const TCHAR* propertyName)

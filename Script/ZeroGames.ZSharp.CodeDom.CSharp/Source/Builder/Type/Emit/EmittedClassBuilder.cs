@@ -60,7 +60,7 @@ public class EmittedClassBuilder(string namespaceName, string typeName, bool imp
 			{
 				foreach (var fieldNotify in fieldNotifies)
 				{
-					beforeSetterReturns.Add($"this.BroadcastFieldValueChanged({fieldNotify});");
+					beforeSetterReturns.Add($"BroadcastFieldValueChanged({fieldNotify});");
 				}
 			}
 			

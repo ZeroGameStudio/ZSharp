@@ -5,6 +5,8 @@ namespace ZeroGames.ZSharp.Core.UnrealEngine;
 public static class CoreGlobals
 {
 
+	public const int32 INDEX_NONE = -1;
+
 	public static unsafe bool IsInGameThread => CoreGlobals_Interop.IsInGameThreadFuncPtr() > 0;
 
 	public static unsafe bool GIsServer => *CoreGlobals_Interop.GIsServerPtr > 0;

@@ -9,6 +9,10 @@
 	"ExternalReferences":
 	[
 		{
+    		"Name": "ZeroGames.Extensions",
+    		"Path": "$(ZSharpPluginDir)/Managed/ForwardShared/ZeroGames.Extensions.dll"
+    	},
+		{
 			"Name": "Mono.Cecil",
 			"Path": "$(ZSharpPluginDir)/Managed/ForwardShared/Mono.Cecil.dll"
 		}

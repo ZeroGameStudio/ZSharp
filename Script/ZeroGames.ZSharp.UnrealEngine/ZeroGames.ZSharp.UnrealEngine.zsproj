@@ -17,13 +17,21 @@
 		{
 			"Name": "ZeroGames.Extensions.Math",
 			"Path": "$(ZSharpPluginDir)/Managed/ForwardShared/ZeroGames.Extensions.Math.dll"
-		}
+		},
+		{
+        	"Name": "ZeroGames.Extensions.Async",
+        	"Path": "$(ZSharpPluginDir)/Managed/ForwardShared/ZeroGames.Extensions.Async.dll"
+        }
 	],
 	"PublicUsings":
 	[
 		"ZeroGames.ZSharp.UnrealEngine",
 		"ZeroGames.ZSharp.UnrealEngine.CoreUObject",
 		"ZeroGames.ZSharp.UnrealEngine.Engine"
+	],
+	"PrivateUsings":
+	[
+		"ZeroGames.Extensions.Async"
 	],
 	"PublicStaticUsings":
 	[

@@ -14,6 +14,10 @@
 	"ExternalReferences":
 	[
 		{
+    		"Name": "ZeroGames.Extensions.Async",
+    		"Path": "$(ZSharpPluginDir)/Managed/ForwardShared/ZeroGames.Extensions.Async.dll"
+    	},
+		{
 			"Name": "ZeroGames.Extensions.Pooling",
 			"Path": "$(ZSharpPluginDir)/Managed/ForwardShared/ZeroGames.Extensions.Pooling.dll"
 		}
@@ -21,6 +25,10 @@
 	"PublicUsings":
 	[
 		"ZeroGames.ZSharp.Core.Async"
+	],
+	"PrivateUsings":
+	[
+		"ZeroGames.Extensions.Async"
 	],
 	"PrivateStaticUsings":
 	[

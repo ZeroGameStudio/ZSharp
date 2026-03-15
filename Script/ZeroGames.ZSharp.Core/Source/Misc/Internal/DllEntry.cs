@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Threading;
+using ZeroGames.Extensions;
 
 namespace ZeroGames.ZSharp.Core;
 
@@ -48,6 +49,12 @@ internal static class DllEntry
         AppDomain.CurrentDomain.UnhandledException += (_, eventArgs) =>
         {
             CoreLog.Error($"FATAL!!!!!!! MANAGED EXCEPTION UNHANDLED!!!!!!!{Environment.NewLine}{eventArgs.ExceptionObject}");
+        };
+
+        ExceptionGuard.OnUnhandedException += ex =>
+        {
+            UnhandledExceptionHelper.Guard(ex);
+            return true;
         };
         
         for (int32 i = 0; i < args->UnmanagedFunctions.Count; ++i)

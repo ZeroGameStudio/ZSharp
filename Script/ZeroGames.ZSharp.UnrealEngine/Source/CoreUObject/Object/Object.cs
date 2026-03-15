@@ -1,7 +1,5 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using ZeroGames.ZSharp.UnrealEngine.FieldNotification;
-
 namespace ZeroGames.ZSharp.UnrealEngine.CoreUObject;
 
 public partial class UObject : IUnrealObject, ILifetimeBackend
